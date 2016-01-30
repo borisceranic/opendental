@@ -181,6 +181,21 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(MedLabFacAttach,MedLabFacAttach) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(MedLabFacAttach medLabFacAttach,MedLabFacAttach oldMedLabFacAttach) {
+			if(medLabFacAttach.MedLabNum != oldMedLabFacAttach.MedLabNum) {
+				return true;
+			}
+			if(medLabFacAttach.MedLabResultNum != oldMedLabFacAttach.MedLabResultNum) {
+				return true;
+			}
+			if(medLabFacAttach.MedLabFacilityNum != oldMedLabFacAttach.MedLabFacilityNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one MedLabFacAttach from the database.</summary>
 		public static void Delete(long medLabFacAttachNum){
 			string command="DELETE FROM medlabfacattach "

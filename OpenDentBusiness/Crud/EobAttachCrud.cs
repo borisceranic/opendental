@@ -205,6 +205,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EobAttach,EobAttach) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EobAttach eobAttach,EobAttach oldEobAttach) {
+			if(eobAttach.ClaimPaymentNum != oldEobAttach.ClaimPaymentNum) {
+				return true;
+			}
+			if(eobAttach.DateTCreated != oldEobAttach.DateTCreated) {
+				return true;
+			}
+			if(eobAttach.FileName != oldEobAttach.FileName) {
+				return true;
+			}
+			if(eobAttach.RawBase64 != oldEobAttach.RawBase64) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EobAttach from the database.</summary>
 		public static void Delete(long eobAttachNum){
 			string command="DELETE FROM eobattach "

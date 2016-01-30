@@ -823,6 +823,7 @@ using System.Drawing;"+rn);
 			#endregion Update
 			#region Update 2nd override
 			//Update, 2nd override-------------------------------------------------------------------------------
+			//NOTE: If any changes are made to Update 2nd override, they need to be reflected in UpdateComparison as well!!!
 			if(!isMobile) {
 				strb.Append(rn+rn+t2+"///<summary>Updates one "+typeClass.Name+" in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>");
 				strb.Append(rn+t2+"public static bool Update("+typeClass.Name+" "+obj+","+typeClass.Name+" "+oldObj+"){");
@@ -939,6 +940,103 @@ using System.Drawing;"+rn);
 				strb.Append(rn+t2+"}");
 			}
 			#endregion Update 2nd override
+			#region UpdateComparison
+			//UpdateComparison-------------------------------------------------------------------------------
+			if(!isMobile) {
+				strb.Append(rn+rn+t2+"///<summary>Returns true if Update("+typeClass.Name+","+typeClass.Name+") would make changes to the database."
+					+rn+t2+"///Does not make any changes to the database and can be called before remoting role is checked.</summary>");
+				strb.Append(rn+t2+"public static bool UpdateComparison("+typeClass.Name+" "+obj+","+typeClass.Name+" "+oldObj+") {");
+				for(int f = 0;f<fieldsExceptPri.Count;f++) {
+					//if(isMobile && fieldsExceptPri[f]==priKey1) {//2 already skipped
+					//	continue;
+					//}
+					specialType=CrudGenHelper.GetSpecialType(fieldsExceptPri[f]);
+					if(specialType==CrudSpecialColType.DateEntry) {
+						strb.Append(rn+t3+"//"+fieldsExceptPri[f].Name+" not allowed to change");
+						continue;
+					}
+					if(specialType==CrudSpecialColType.DateTEntry) {
+						strb.Append(rn+t3+"//"+fieldsExceptPri[f].Name+" not allowed to change");
+						continue;
+					}
+					if(specialType==CrudSpecialColType.TimeStamp) {
+						strb.Append(rn+t3+"//"+fieldsExceptPri[f].Name+" can only be set by MySQL");
+						continue;
+					}
+					if(specialType==CrudSpecialColType.ExcludeFromUpdate) {
+						strb.Append(rn+t3+"//"+fieldsExceptPri[f].Name+" excluded from update");
+						continue;
+					}
+					strb.Append(rn+t3+"if("+obj+"."+fieldsExceptPri[f].Name+" != "+oldObj+"."+fieldsExceptPri[f].Name+") {");
+					if(specialType==CrudSpecialColType.DateT) {
+						strb.Append(rn+t4+"return true");
+					}
+					else if(specialType==CrudSpecialColType.DateEntryEditable) {
+						strb.Append(rn+t4+"return true");
+					}
+					else if(specialType==CrudSpecialColType.DateTEntryEditable) {
+						strb.Append(rn+t4+"return true");
+					}
+					else if(specialType==CrudSpecialColType.EnumAsString) {
+						strb.Append(rn+t4+"return true");
+					}
+					else if(specialType==CrudSpecialColType.TimeSpanNeg) {
+						strb.Append(rn+t4+"return true");
+					}
+					else if(specialType==CrudSpecialColType.TextIsClob || specialType==CrudSpecialColType.TextIsClobNote) {
+						strb.Append(rn+t4+"return true");
+						//paramList is already set above
+					}
+					else if(fieldsExceptPri[f].FieldType.IsEnum) {
+						strb.Append(rn+t4+"return true");
+					}
+					else switch(fieldsExceptPri[f].FieldType.Name) {
+							default:
+								throw new ApplicationException("Type not yet supported: "+fieldsExceptPri[f].FieldType.Name);
+							case "Boolean":
+								strb.Append(rn+t4+"return true");
+								break;
+							case "Bitmap":
+								strb.Append(rn+t4+"return true");
+								break;
+							case "Byte":
+								strb.Append(rn+t4+"return true");
+								break;
+							case "Color":
+								strb.Append(rn+t4+"return true");
+								break;
+							case "DateTime"://This is only for date, not dateT.
+								strb.Append(rn+t4+"return true");
+								break;
+							case "Double":
+								strb.Append(rn+t4+"return true");
+								break;
+							case "Interval":
+								strb.Append(rn+t4+"return true");
+								break;
+							case "Int64":
+								strb.Append(rn+t4+"return true");
+								break;
+							case "Int32":
+								strb.Append(rn+t4+"return true");
+								break;
+							case "Single":
+								strb.Append(rn+t4+"return true");
+								break;
+							case "String":
+								strb.Append(rn+t4+"return true");
+								break;
+							case "TimeSpan":
+								strb.Append(rn+t4+"return true");
+								break;
+						}
+					strb.Append(";");
+					strb.Append(rn+t3+"}");
+				}
+				strb.Append(rn+t3+"return false;");
+				strb.Append(rn+t2+"}");
+			}
+			#endregion UpdateComparison
 			#region Delete
 			//Delete---------------------------------------------------------------------------------------------
 			if(CrudGenHelper.IsDeleteForbidden(typeClass)) {

@@ -226,6 +226,37 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(SecurityLog,SecurityLog) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(SecurityLog securityLog,SecurityLog oldSecurityLog) {
+			if(securityLog.PermType != oldSecurityLog.PermType) {
+				return true;
+			}
+			if(securityLog.UserNum != oldSecurityLog.UserNum) {
+				return true;
+			}
+			//LogDateTime not allowed to change
+			if(securityLog.LogText != oldSecurityLog.LogText) {
+				return true;
+			}
+			if(securityLog.PatNum != oldSecurityLog.PatNum) {
+				return true;
+			}
+			if(securityLog.CompName != oldSecurityLog.CompName) {
+				return true;
+			}
+			if(securityLog.FKey != oldSecurityLog.FKey) {
+				return true;
+			}
+			if(securityLog.LogSource != oldSecurityLog.LogSource) {
+				return true;
+			}
+			if(securityLog.DefNum != oldSecurityLog.DefNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one SecurityLog from the database.</summary>
 		public static void Delete(long securityLogNum){
 			string command="DELETE FROM securitylog "

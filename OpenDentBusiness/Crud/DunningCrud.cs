@@ -229,6 +229,33 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Dunning,Dunning) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Dunning dunning,Dunning oldDunning) {
+			if(dunning.DunMessage != oldDunning.DunMessage) {
+				return true;
+			}
+			if(dunning.BillingType != oldDunning.BillingType) {
+				return true;
+			}
+			if(dunning.AgeAccount != oldDunning.AgeAccount) {
+				return true;
+			}
+			if(dunning.InsIsPending != oldDunning.InsIsPending) {
+				return true;
+			}
+			if(dunning.MessageBold != oldDunning.MessageBold) {
+				return true;
+			}
+			if(dunning.EmailSubject != oldDunning.EmailSubject) {
+				return true;
+			}
+			if(dunning.EmailBody != oldDunning.EmailBody) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Dunning from the database.</summary>
 		public static void Delete(long dunningNum){
 			string command="DELETE FROM dunning "

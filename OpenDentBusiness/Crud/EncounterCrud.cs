@@ -205,6 +205,30 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Encounter,Encounter) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Encounter encounter,Encounter oldEncounter) {
+			if(encounter.PatNum != oldEncounter.PatNum) {
+				return true;
+			}
+			if(encounter.ProvNum != oldEncounter.ProvNum) {
+				return true;
+			}
+			if(encounter.CodeValue != oldEncounter.CodeValue) {
+				return true;
+			}
+			if(encounter.CodeSystem != oldEncounter.CodeSystem) {
+				return true;
+			}
+			if(encounter.Note != oldEncounter.Note) {
+				return true;
+			}
+			if(encounter.DateEncounter != oldEncounter.DateEncounter) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Encounter from the database.</summary>
 		public static void Delete(long encounterNum){
 			string command="DELETE FROM encounter "

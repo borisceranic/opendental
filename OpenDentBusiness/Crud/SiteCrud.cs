@@ -173,6 +173,18 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Site,Site) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Site site,Site oldSite) {
+			if(site.Description != oldSite.Description) {
+				return true;
+			}
+			if(site.Note != oldSite.Note) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Site from the database.</summary>
 		public static void Delete(long siteNum){
 			string command="DELETE FROM site "

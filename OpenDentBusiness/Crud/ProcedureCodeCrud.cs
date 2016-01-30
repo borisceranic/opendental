@@ -383,6 +383,95 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ProcedureCode,ProcedureCode) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ProcedureCode procedureCode,ProcedureCode oldProcedureCode) {
+			//ProcCode excluded from update
+			if(procedureCode.Descript != oldProcedureCode.Descript) {
+				return true;
+			}
+			if(procedureCode.AbbrDesc != oldProcedureCode.AbbrDesc) {
+				return true;
+			}
+			if(procedureCode.ProcTime != oldProcedureCode.ProcTime) {
+				return true;
+			}
+			if(procedureCode.ProcCat != oldProcedureCode.ProcCat) {
+				return true;
+			}
+			if(procedureCode.TreatArea != oldProcedureCode.TreatArea) {
+				return true;
+			}
+			if(procedureCode.NoBillIns != oldProcedureCode.NoBillIns) {
+				return true;
+			}
+			if(procedureCode.IsProsth != oldProcedureCode.IsProsth) {
+				return true;
+			}
+			if(procedureCode.DefaultNote != oldProcedureCode.DefaultNote) {
+				return true;
+			}
+			if(procedureCode.IsHygiene != oldProcedureCode.IsHygiene) {
+				return true;
+			}
+			if(procedureCode.GTypeNum != oldProcedureCode.GTypeNum) {
+				return true;
+			}
+			if(procedureCode.AlternateCode1 != oldProcedureCode.AlternateCode1) {
+				return true;
+			}
+			if(procedureCode.MedicalCode != oldProcedureCode.MedicalCode) {
+				return true;
+			}
+			if(procedureCode.IsTaxed != oldProcedureCode.IsTaxed) {
+				return true;
+			}
+			if(procedureCode.PaintType != oldProcedureCode.PaintType) {
+				return true;
+			}
+			if(procedureCode.GraphicColor != oldProcedureCode.GraphicColor) {
+				return true;
+			}
+			if(procedureCode.LaymanTerm != oldProcedureCode.LaymanTerm) {
+				return true;
+			}
+			if(procedureCode.IsCanadianLab != oldProcedureCode.IsCanadianLab) {
+				return true;
+			}
+			if(procedureCode.PreExisting != oldProcedureCode.PreExisting) {
+				return true;
+			}
+			if(procedureCode.BaseUnits != oldProcedureCode.BaseUnits) {
+				return true;
+			}
+			if(procedureCode.SubstitutionCode != oldProcedureCode.SubstitutionCode) {
+				return true;
+			}
+			if(procedureCode.SubstOnlyIf != oldProcedureCode.SubstOnlyIf) {
+				return true;
+			}
+			//DateTStamp can only be set by MySQL
+			if(procedureCode.IsMultiVisit != oldProcedureCode.IsMultiVisit) {
+				return true;
+			}
+			if(procedureCode.DrugNDC != oldProcedureCode.DrugNDC) {
+				return true;
+			}
+			if(procedureCode.RevenueCodeDefault != oldProcedureCode.RevenueCodeDefault) {
+				return true;
+			}
+			if(procedureCode.ProvNumDefault != oldProcedureCode.ProvNumDefault) {
+				return true;
+			}
+			if(procedureCode.CanadaTimeUnits != oldProcedureCode.CanadaTimeUnits) {
+				return true;
+			}
+			if(procedureCode.IsRadiology != oldProcedureCode.IsRadiology) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ProcedureCode from the database.</summary>
 		public static void Delete(long codeNum){
 			ClearFkey(codeNum);

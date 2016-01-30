@@ -282,6 +282,58 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(RxPat,RxPat) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(RxPat rxPat,RxPat oldRxPat) {
+			if(rxPat.PatNum != oldRxPat.PatNum) {
+				return true;
+			}
+			if(rxPat.RxDate != oldRxPat.RxDate) {
+				return true;
+			}
+			if(rxPat.Drug != oldRxPat.Drug) {
+				return true;
+			}
+			if(rxPat.Sig != oldRxPat.Sig) {
+				return true;
+			}
+			if(rxPat.Disp != oldRxPat.Disp) {
+				return true;
+			}
+			if(rxPat.Refills != oldRxPat.Refills) {
+				return true;
+			}
+			if(rxPat.ProvNum != oldRxPat.ProvNum) {
+				return true;
+			}
+			if(rxPat.Notes != oldRxPat.Notes) {
+				return true;
+			}
+			if(rxPat.PharmacyNum != oldRxPat.PharmacyNum) {
+				return true;
+			}
+			if(rxPat.IsControlled != oldRxPat.IsControlled) {
+				return true;
+			}
+			//DateTStamp can only be set by MySQL
+			if(rxPat.SendStatus != oldRxPat.SendStatus) {
+				return true;
+			}
+			if(rxPat.RxCui != oldRxPat.RxCui) {
+				return true;
+			}
+			if(rxPat.DosageCode != oldRxPat.DosageCode) {
+				return true;
+			}
+			if(rxPat.NewCropGuid != oldRxPat.NewCropGuid) {
+				return true;
+			}
+			if(rxPat.IsErxOld != oldRxPat.IsErxOld) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one RxPat from the database.</summary>
 		public static void Delete(long rxNum){
 			ClearFkey(rxNum);

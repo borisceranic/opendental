@@ -173,6 +173,18 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(AutoNote,AutoNote) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(AutoNote autoNote,AutoNote oldAutoNote) {
+			if(autoNote.AutoNoteName != oldAutoNote.AutoNoteName) {
+				return true;
+			}
+			if(autoNote.MainText != oldAutoNote.MainText) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one AutoNote from the database.</summary>
 		public static void Delete(long autoNoteNum){
 			string command="DELETE FROM autonote "

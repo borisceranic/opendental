@@ -213,6 +213,33 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Intervention,Intervention) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Intervention intervention,Intervention oldIntervention) {
+			if(intervention.PatNum != oldIntervention.PatNum) {
+				return true;
+			}
+			if(intervention.ProvNum != oldIntervention.ProvNum) {
+				return true;
+			}
+			if(intervention.CodeValue != oldIntervention.CodeValue) {
+				return true;
+			}
+			if(intervention.CodeSystem != oldIntervention.CodeSystem) {
+				return true;
+			}
+			if(intervention.Note != oldIntervention.Note) {
+				return true;
+			}
+			if(intervention.DateEntry != oldIntervention.DateEntry) {
+				return true;
+			}
+			if(intervention.CodeSet != oldIntervention.CodeSet) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Intervention from the database.</summary>
 		public static void Delete(long interventionNum){
 			string command="DELETE FROM intervention "

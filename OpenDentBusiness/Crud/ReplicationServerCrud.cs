@@ -213,6 +213,33 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ReplicationServer,ReplicationServer) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ReplicationServer replicationServer,ReplicationServer oldReplicationServer) {
+			if(replicationServer.Descript != oldReplicationServer.Descript) {
+				return true;
+			}
+			if(replicationServer.ServerId != oldReplicationServer.ServerId) {
+				return true;
+			}
+			if(replicationServer.RangeStart != oldReplicationServer.RangeStart) {
+				return true;
+			}
+			if(replicationServer.RangeEnd != oldReplicationServer.RangeEnd) {
+				return true;
+			}
+			if(replicationServer.AtoZpath != oldReplicationServer.AtoZpath) {
+				return true;
+			}
+			if(replicationServer.UpdateBlocked != oldReplicationServer.UpdateBlocked) {
+				return true;
+			}
+			if(replicationServer.SlaveMonitor != oldReplicationServer.SlaveMonitor) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ReplicationServer from the database.</summary>
 		public static void Delete(long replicationServerNum){
 			string command="DELETE FROM replicationserver "

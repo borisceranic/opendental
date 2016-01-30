@@ -173,6 +173,18 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Sop,Sop) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Sop sop,Sop oldSop) {
+			if(sop.SopCode != oldSop.SopCode) {
+				return true;
+			}
+			if(sop.Description != oldSop.Description) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Sop from the database.</summary>
 		public static void Delete(long sopNum){
 			string command="DELETE FROM sop "

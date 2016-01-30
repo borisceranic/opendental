@@ -213,6 +213,33 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Employer,Employer) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Employer employer,Employer oldEmployer) {
+			if(employer.EmpName != oldEmployer.EmpName) {
+				return true;
+			}
+			if(employer.Address != oldEmployer.Address) {
+				return true;
+			}
+			if(employer.Address2 != oldEmployer.Address2) {
+				return true;
+			}
+			if(employer.City != oldEmployer.City) {
+				return true;
+			}
+			if(employer.State != oldEmployer.State) {
+				return true;
+			}
+			if(employer.Zip != oldEmployer.Zip) {
+				return true;
+			}
+			if(employer.Phone != oldEmployer.Phone) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Employer from the database.</summary>
 		public static void Delete(long employerNum){
 			string command="DELETE FROM employer "

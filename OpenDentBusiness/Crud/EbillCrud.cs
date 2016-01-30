@@ -205,6 +205,30 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Ebill,Ebill) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Ebill ebill,Ebill oldEbill) {
+			if(ebill.ClinicNum != oldEbill.ClinicNum) {
+				return true;
+			}
+			if(ebill.ClientAcctNumber != oldEbill.ClientAcctNumber) {
+				return true;
+			}
+			if(ebill.ElectUserName != oldEbill.ElectUserName) {
+				return true;
+			}
+			if(ebill.ElectPassword != oldEbill.ElectPassword) {
+				return true;
+			}
+			if(ebill.PracticeAddress != oldEbill.PracticeAddress) {
+				return true;
+			}
+			if(ebill.RemitAddress != oldEbill.RemitAddress) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Ebill from the database.</summary>
 		public static void Delete(long ebillNum){
 			string command="DELETE FROM ebill "

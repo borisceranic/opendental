@@ -725,6 +725,201 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EhrLabResult,EhrLabResult) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EhrLabResult ehrLabResult,EhrLabResult oldEhrLabResult) {
+			if(ehrLabResult.EhrLabNum != oldEhrLabResult.EhrLabNum) {
+				return true;
+			}
+			if(ehrLabResult.SetIdOBX != oldEhrLabResult.SetIdOBX) {
+				return true;
+			}
+			if(ehrLabResult.ValueType != oldEhrLabResult.ValueType) {
+				return true;
+			}
+			if(ehrLabResult.ObservationIdentifierID != oldEhrLabResult.ObservationIdentifierID) {
+				return true;
+			}
+			if(ehrLabResult.ObservationIdentifierText != oldEhrLabResult.ObservationIdentifierText) {
+				return true;
+			}
+			if(ehrLabResult.ObservationIdentifierCodeSystemName != oldEhrLabResult.ObservationIdentifierCodeSystemName) {
+				return true;
+			}
+			if(ehrLabResult.ObservationIdentifierIDAlt != oldEhrLabResult.ObservationIdentifierIDAlt) {
+				return true;
+			}
+			if(ehrLabResult.ObservationIdentifierTextAlt != oldEhrLabResult.ObservationIdentifierTextAlt) {
+				return true;
+			}
+			if(ehrLabResult.ObservationIdentifierCodeSystemNameAlt != oldEhrLabResult.ObservationIdentifierCodeSystemNameAlt) {
+				return true;
+			}
+			if(ehrLabResult.ObservationIdentifierTextOriginal != oldEhrLabResult.ObservationIdentifierTextOriginal) {
+				return true;
+			}
+			if(ehrLabResult.ObservationIdentifierSub != oldEhrLabResult.ObservationIdentifierSub) {
+				return true;
+			}
+			if(ehrLabResult.ObservationValueCodedElementID != oldEhrLabResult.ObservationValueCodedElementID) {
+				return true;
+			}
+			if(ehrLabResult.ObservationValueCodedElementText != oldEhrLabResult.ObservationValueCodedElementText) {
+				return true;
+			}
+			if(ehrLabResult.ObservationValueCodedElementCodeSystemName != oldEhrLabResult.ObservationValueCodedElementCodeSystemName) {
+				return true;
+			}
+			if(ehrLabResult.ObservationValueCodedElementIDAlt != oldEhrLabResult.ObservationValueCodedElementIDAlt) {
+				return true;
+			}
+			if(ehrLabResult.ObservationValueCodedElementTextAlt != oldEhrLabResult.ObservationValueCodedElementTextAlt) {
+				return true;
+			}
+			if(ehrLabResult.ObservationValueCodedElementCodeSystemNameAlt != oldEhrLabResult.ObservationValueCodedElementCodeSystemNameAlt) {
+				return true;
+			}
+			if(ehrLabResult.ObservationValueCodedElementTextOriginal != oldEhrLabResult.ObservationValueCodedElementTextOriginal) {
+				return true;
+			}
+			if(ehrLabResult.ObservationValueDateTime != oldEhrLabResult.ObservationValueDateTime) {
+				return true;
+			}
+			if(ehrLabResult.ObservationValueTime != oldEhrLabResult.ObservationValueTime) {
+				return true;
+			}
+			if(ehrLabResult.ObservationValueComparator != oldEhrLabResult.ObservationValueComparator) {
+				return true;
+			}
+			if(ehrLabResult.ObservationValueNumber1 != oldEhrLabResult.ObservationValueNumber1) {
+				return true;
+			}
+			if(ehrLabResult.ObservationValueSeparatorOrSuffix != oldEhrLabResult.ObservationValueSeparatorOrSuffix) {
+				return true;
+			}
+			if(ehrLabResult.ObservationValueNumber2 != oldEhrLabResult.ObservationValueNumber2) {
+				return true;
+			}
+			if(ehrLabResult.ObservationValueNumeric != oldEhrLabResult.ObservationValueNumeric) {
+				return true;
+			}
+			if(ehrLabResult.ObservationValueText != oldEhrLabResult.ObservationValueText) {
+				return true;
+			}
+			if(ehrLabResult.UnitsID != oldEhrLabResult.UnitsID) {
+				return true;
+			}
+			if(ehrLabResult.UnitsText != oldEhrLabResult.UnitsText) {
+				return true;
+			}
+			if(ehrLabResult.UnitsCodeSystemName != oldEhrLabResult.UnitsCodeSystemName) {
+				return true;
+			}
+			if(ehrLabResult.UnitsIDAlt != oldEhrLabResult.UnitsIDAlt) {
+				return true;
+			}
+			if(ehrLabResult.UnitsTextAlt != oldEhrLabResult.UnitsTextAlt) {
+				return true;
+			}
+			if(ehrLabResult.UnitsCodeSystemNameAlt != oldEhrLabResult.UnitsCodeSystemNameAlt) {
+				return true;
+			}
+			if(ehrLabResult.UnitsTextOriginal != oldEhrLabResult.UnitsTextOriginal) {
+				return true;
+			}
+			if(ehrLabResult.referenceRange != oldEhrLabResult.referenceRange) {
+				return true;
+			}
+			if(ehrLabResult.AbnormalFlags != oldEhrLabResult.AbnormalFlags) {
+				return true;
+			}
+			if(ehrLabResult.ObservationResultStatus != oldEhrLabResult.ObservationResultStatus) {
+				return true;
+			}
+			if(ehrLabResult.ObservationDateTime != oldEhrLabResult.ObservationDateTime) {
+				return true;
+			}
+			if(ehrLabResult.AnalysisDateTime != oldEhrLabResult.AnalysisDateTime) {
+				return true;
+			}
+			if(ehrLabResult.PerformingOrganizationName != oldEhrLabResult.PerformingOrganizationName) {
+				return true;
+			}
+			if(ehrLabResult.PerformingOrganizationNameAssigningAuthorityNamespaceId != oldEhrLabResult.PerformingOrganizationNameAssigningAuthorityNamespaceId) {
+				return true;
+			}
+			if(ehrLabResult.PerformingOrganizationNameAssigningAuthorityUniversalId != oldEhrLabResult.PerformingOrganizationNameAssigningAuthorityUniversalId) {
+				return true;
+			}
+			if(ehrLabResult.PerformingOrganizationNameAssigningAuthorityUniversalIdType != oldEhrLabResult.PerformingOrganizationNameAssigningAuthorityUniversalIdType) {
+				return true;
+			}
+			if(ehrLabResult.PerformingOrganizationIdentifierTypeCode != oldEhrLabResult.PerformingOrganizationIdentifierTypeCode) {
+				return true;
+			}
+			if(ehrLabResult.PerformingOrganizationIdentifier != oldEhrLabResult.PerformingOrganizationIdentifier) {
+				return true;
+			}
+			if(ehrLabResult.PerformingOrganizationAddressStreet != oldEhrLabResult.PerformingOrganizationAddressStreet) {
+				return true;
+			}
+			if(ehrLabResult.PerformingOrganizationAddressOtherDesignation != oldEhrLabResult.PerformingOrganizationAddressOtherDesignation) {
+				return true;
+			}
+			if(ehrLabResult.PerformingOrganizationAddressCity != oldEhrLabResult.PerformingOrganizationAddressCity) {
+				return true;
+			}
+			if(ehrLabResult.PerformingOrganizationAddressStateOrProvince != oldEhrLabResult.PerformingOrganizationAddressStateOrProvince) {
+				return true;
+			}
+			if(ehrLabResult.PerformingOrganizationAddressZipOrPostalCode != oldEhrLabResult.PerformingOrganizationAddressZipOrPostalCode) {
+				return true;
+			}
+			if(ehrLabResult.PerformingOrganizationAddressCountryCode != oldEhrLabResult.PerformingOrganizationAddressCountryCode) {
+				return true;
+			}
+			if(ehrLabResult.PerformingOrganizationAddressAddressType != oldEhrLabResult.PerformingOrganizationAddressAddressType) {
+				return true;
+			}
+			if(ehrLabResult.PerformingOrganizationAddressCountyOrParishCode != oldEhrLabResult.PerformingOrganizationAddressCountyOrParishCode) {
+				return true;
+			}
+			if(ehrLabResult.MedicalDirectorID != oldEhrLabResult.MedicalDirectorID) {
+				return true;
+			}
+			if(ehrLabResult.MedicalDirectorLName != oldEhrLabResult.MedicalDirectorLName) {
+				return true;
+			}
+			if(ehrLabResult.MedicalDirectorFName != oldEhrLabResult.MedicalDirectorFName) {
+				return true;
+			}
+			if(ehrLabResult.MedicalDirectorMiddleNames != oldEhrLabResult.MedicalDirectorMiddleNames) {
+				return true;
+			}
+			if(ehrLabResult.MedicalDirectorSuffix != oldEhrLabResult.MedicalDirectorSuffix) {
+				return true;
+			}
+			if(ehrLabResult.MedicalDirectorPrefix != oldEhrLabResult.MedicalDirectorPrefix) {
+				return true;
+			}
+			if(ehrLabResult.MedicalDirectorAssigningAuthorityNamespaceID != oldEhrLabResult.MedicalDirectorAssigningAuthorityNamespaceID) {
+				return true;
+			}
+			if(ehrLabResult.MedicalDirectorAssigningAuthorityUniversalID != oldEhrLabResult.MedicalDirectorAssigningAuthorityUniversalID) {
+				return true;
+			}
+			if(ehrLabResult.MedicalDirectorAssigningAuthorityIDType != oldEhrLabResult.MedicalDirectorAssigningAuthorityIDType) {
+				return true;
+			}
+			if(ehrLabResult.MedicalDirectorNameTypeCode != oldEhrLabResult.MedicalDirectorNameTypeCode) {
+				return true;
+			}
+			if(ehrLabResult.MedicalDirectorIdentifierTypeCode != oldEhrLabResult.MedicalDirectorIdentifierTypeCode) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EhrLabResult from the database.</summary>
 		public static void Delete(long ehrLabResultNum){
 			string command="DELETE FROM ehrlabresult "

@@ -253,6 +253,48 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(RegistrationKey,RegistrationKey) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(RegistrationKey registrationKey,RegistrationKey oldRegistrationKey) {
+			if(registrationKey.PatNum != oldRegistrationKey.PatNum) {
+				return true;
+			}
+			if(registrationKey.RegKey != oldRegistrationKey.RegKey) {
+				return true;
+			}
+			if(registrationKey.Note != oldRegistrationKey.Note) {
+				return true;
+			}
+			if(registrationKey.DateStarted != oldRegistrationKey.DateStarted) {
+				return true;
+			}
+			if(registrationKey.DateDisabled != oldRegistrationKey.DateDisabled) {
+				return true;
+			}
+			if(registrationKey.DateEnded != oldRegistrationKey.DateEnded) {
+				return true;
+			}
+			if(registrationKey.IsForeign != oldRegistrationKey.IsForeign) {
+				return true;
+			}
+			if(registrationKey.UsesServerVersion != oldRegistrationKey.UsesServerVersion) {
+				return true;
+			}
+			if(registrationKey.IsFreeVersion != oldRegistrationKey.IsFreeVersion) {
+				return true;
+			}
+			if(registrationKey.IsOnlyForTesting != oldRegistrationKey.IsOnlyForTesting) {
+				return true;
+			}
+			if(registrationKey.VotesAllotted != oldRegistrationKey.VotesAllotted) {
+				return true;
+			}
+			if(registrationKey.IsResellerCustomer != oldRegistrationKey.IsResellerCustomer) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one RegistrationKey from the database.</summary>
 		public static void Delete(long registrationKeyNum){
 			string command="DELETE FROM registrationkey "

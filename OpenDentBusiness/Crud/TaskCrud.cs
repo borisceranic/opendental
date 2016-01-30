@@ -277,6 +277,51 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Task,Task) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Task task,Task oldTask) {
+			if(task.TaskListNum != oldTask.TaskListNum) {
+				return true;
+			}
+			if(task.DateTask != oldTask.DateTask) {
+				return true;
+			}
+			if(task.KeyNum != oldTask.KeyNum) {
+				return true;
+			}
+			if(task.Descript != oldTask.Descript) {
+				return true;
+			}
+			if(task.TaskStatus != oldTask.TaskStatus) {
+				return true;
+			}
+			if(task.IsRepeating != oldTask.IsRepeating) {
+				return true;
+			}
+			if(task.DateType != oldTask.DateType) {
+				return true;
+			}
+			if(task.FromNum != oldTask.FromNum) {
+				return true;
+			}
+			if(task.ObjectType != oldTask.ObjectType) {
+				return true;
+			}
+			if(task.DateTimeEntry != oldTask.DateTimeEntry) {
+				return true;
+			}
+			if(task.UserNum != oldTask.UserNum) {
+				return true;
+			}
+			if(task.DateTimeFinished != oldTask.DateTimeFinished) {
+				return true;
+			}
+			if(task.PriorityDefNum != oldTask.PriorityDefNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Task from the database.</summary>
 		public static void Delete(long taskNum){
 			ClearFkey(taskNum);

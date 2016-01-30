@@ -173,6 +173,18 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(PhoneNumber,PhoneNumber) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(PhoneNumber phoneNumber,PhoneNumber oldPhoneNumber) {
+			if(phoneNumber.PatNum != oldPhoneNumber.PatNum) {
+				return true;
+			}
+			if(phoneNumber.PhoneNumberVal != oldPhoneNumber.PhoneNumberVal) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one PhoneNumber from the database.</summary>
 		public static void Delete(long phoneNumberNum){
 			string command="DELETE FROM phonenumber "

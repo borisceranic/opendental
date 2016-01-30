@@ -277,6 +277,57 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EhrTrigger,EhrTrigger) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EhrTrigger ehrTrigger,EhrTrigger oldEhrTrigger) {
+			if(ehrTrigger.Description != oldEhrTrigger.Description) {
+				return true;
+			}
+			if(ehrTrigger.ProblemSnomedList != oldEhrTrigger.ProblemSnomedList) {
+				return true;
+			}
+			if(ehrTrigger.ProblemIcd9List != oldEhrTrigger.ProblemIcd9List) {
+				return true;
+			}
+			if(ehrTrigger.ProblemIcd10List != oldEhrTrigger.ProblemIcd10List) {
+				return true;
+			}
+			if(ehrTrigger.ProblemDefNumList != oldEhrTrigger.ProblemDefNumList) {
+				return true;
+			}
+			if(ehrTrigger.MedicationNumList != oldEhrTrigger.MedicationNumList) {
+				return true;
+			}
+			if(ehrTrigger.RxCuiList != oldEhrTrigger.RxCuiList) {
+				return true;
+			}
+			if(ehrTrigger.CvxList != oldEhrTrigger.CvxList) {
+				return true;
+			}
+			if(ehrTrigger.AllergyDefNumList != oldEhrTrigger.AllergyDefNumList) {
+				return true;
+			}
+			if(ehrTrigger.DemographicsList != oldEhrTrigger.DemographicsList) {
+				return true;
+			}
+			if(ehrTrigger.LabLoincList != oldEhrTrigger.LabLoincList) {
+				return true;
+			}
+			if(ehrTrigger.VitalLoincList != oldEhrTrigger.VitalLoincList) {
+				return true;
+			}
+			if(ehrTrigger.Instructions != oldEhrTrigger.Instructions) {
+				return true;
+			}
+			if(ehrTrigger.Bibliography != oldEhrTrigger.Bibliography) {
+				return true;
+			}
+			if(ehrTrigger.Cardinality != oldEhrTrigger.Cardinality) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EhrTrigger from the database.</summary>
 		public static void Delete(long ehrTriggerNum){
 			string command="DELETE FROM ehrtrigger "

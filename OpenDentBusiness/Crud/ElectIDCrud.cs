@@ -197,6 +197,27 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ElectID,ElectID) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ElectID electID,ElectID oldElectID) {
+			if(electID.PayorID != oldElectID.PayorID) {
+				return true;
+			}
+			if(electID.CarrierName != oldElectID.CarrierName) {
+				return true;
+			}
+			if(electID.IsMedicaid != oldElectID.IsMedicaid) {
+				return true;
+			}
+			if(electID.ProviderTypes != oldElectID.ProviderTypes) {
+				return true;
+			}
+			if(electID.Comments != oldElectID.Comments) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ElectID from the database.</summary>
 		public static void Delete(long electIDNum){
 			string command="DELETE FROM electid "

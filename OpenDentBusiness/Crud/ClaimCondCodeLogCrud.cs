@@ -253,6 +253,48 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ClaimCondCodeLog,ClaimCondCodeLog) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ClaimCondCodeLog claimCondCodeLog,ClaimCondCodeLog oldClaimCondCodeLog) {
+			if(claimCondCodeLog.ClaimNum != oldClaimCondCodeLog.ClaimNum) {
+				return true;
+			}
+			if(claimCondCodeLog.Code0 != oldClaimCondCodeLog.Code0) {
+				return true;
+			}
+			if(claimCondCodeLog.Code1 != oldClaimCondCodeLog.Code1) {
+				return true;
+			}
+			if(claimCondCodeLog.Code2 != oldClaimCondCodeLog.Code2) {
+				return true;
+			}
+			if(claimCondCodeLog.Code3 != oldClaimCondCodeLog.Code3) {
+				return true;
+			}
+			if(claimCondCodeLog.Code4 != oldClaimCondCodeLog.Code4) {
+				return true;
+			}
+			if(claimCondCodeLog.Code5 != oldClaimCondCodeLog.Code5) {
+				return true;
+			}
+			if(claimCondCodeLog.Code6 != oldClaimCondCodeLog.Code6) {
+				return true;
+			}
+			if(claimCondCodeLog.Code7 != oldClaimCondCodeLog.Code7) {
+				return true;
+			}
+			if(claimCondCodeLog.Code8 != oldClaimCondCodeLog.Code8) {
+				return true;
+			}
+			if(claimCondCodeLog.Code9 != oldClaimCondCodeLog.Code9) {
+				return true;
+			}
+			if(claimCondCodeLog.Code10 != oldClaimCondCodeLog.Code10) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ClaimCondCodeLog from the database.</summary>
 		public static void Delete(long claimCondCodeLogNum){
 			string command="DELETE FROM claimcondcodelog "

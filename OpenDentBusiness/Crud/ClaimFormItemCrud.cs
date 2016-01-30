@@ -221,6 +221,36 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ClaimFormItem,ClaimFormItem) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ClaimFormItem claimFormItem,ClaimFormItem oldClaimFormItem) {
+			if(claimFormItem.ClaimFormNum != oldClaimFormItem.ClaimFormNum) {
+				return true;
+			}
+			if(claimFormItem.ImageFileName != oldClaimFormItem.ImageFileName) {
+				return true;
+			}
+			if(claimFormItem.FieldName != oldClaimFormItem.FieldName) {
+				return true;
+			}
+			if(claimFormItem.FormatString != oldClaimFormItem.FormatString) {
+				return true;
+			}
+			if(claimFormItem.XPos != oldClaimFormItem.XPos) {
+				return true;
+			}
+			if(claimFormItem.YPos != oldClaimFormItem.YPos) {
+				return true;
+			}
+			if(claimFormItem.Width != oldClaimFormItem.Width) {
+				return true;
+			}
+			if(claimFormItem.Height != oldClaimFormItem.Height) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ClaimFormItem from the database.</summary>
 		public static void Delete(long claimFormItemNum){
 			string command="DELETE FROM claimformitem "

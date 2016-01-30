@@ -189,6 +189,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(MedLabSpecimen,MedLabSpecimen) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(MedLabSpecimen medLabSpecimen,MedLabSpecimen oldMedLabSpecimen) {
+			if(medLabSpecimen.MedLabNum != oldMedLabSpecimen.MedLabNum) {
+				return true;
+			}
+			if(medLabSpecimen.SpecimenID != oldMedLabSpecimen.SpecimenID) {
+				return true;
+			}
+			if(medLabSpecimen.SpecimenDescript != oldMedLabSpecimen.SpecimenDescript) {
+				return true;
+			}
+			if(medLabSpecimen.DateTimeCollected != oldMedLabSpecimen.DateTimeCollected) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one MedLabSpecimen from the database.</summary>
 		public static void Delete(long medLabSpecimenNum){
 			string command="DELETE FROM medlabspecimen "

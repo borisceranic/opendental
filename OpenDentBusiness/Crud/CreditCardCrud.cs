@@ -277,6 +277,57 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(CreditCard,CreditCard) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(CreditCard creditCard,CreditCard oldCreditCard) {
+			if(creditCard.PatNum != oldCreditCard.PatNum) {
+				return true;
+			}
+			if(creditCard.Address != oldCreditCard.Address) {
+				return true;
+			}
+			if(creditCard.Zip != oldCreditCard.Zip) {
+				return true;
+			}
+			if(creditCard.XChargeToken != oldCreditCard.XChargeToken) {
+				return true;
+			}
+			if(creditCard.CCNumberMasked != oldCreditCard.CCNumberMasked) {
+				return true;
+			}
+			if(creditCard.CCExpiration != oldCreditCard.CCExpiration) {
+				return true;
+			}
+			if(creditCard.ItemOrder != oldCreditCard.ItemOrder) {
+				return true;
+			}
+			if(creditCard.ChargeAmt != oldCreditCard.ChargeAmt) {
+				return true;
+			}
+			if(creditCard.DateStart != oldCreditCard.DateStart) {
+				return true;
+			}
+			if(creditCard.DateStop != oldCreditCard.DateStop) {
+				return true;
+			}
+			if(creditCard.Note != oldCreditCard.Note) {
+				return true;
+			}
+			if(creditCard.PayPlanNum != oldCreditCard.PayPlanNum) {
+				return true;
+			}
+			if(creditCard.PayConnectToken != oldCreditCard.PayConnectToken) {
+				return true;
+			}
+			if(creditCard.PayConnectTokenExp != oldCreditCard.PayConnectTokenExp) {
+				return true;
+			}
+			if(creditCard.Procedures != oldCreditCard.Procedures) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one CreditCard from the database.</summary>
 		public static void Delete(long creditCardNum){
 			string command="DELETE FROM creditcard "

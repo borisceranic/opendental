@@ -173,6 +173,18 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(TaskSubscription,TaskSubscription) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(TaskSubscription taskSubscription,TaskSubscription oldTaskSubscription) {
+			if(taskSubscription.UserNum != oldTaskSubscription.UserNum) {
+				return true;
+			}
+			if(taskSubscription.TaskListNum != oldTaskSubscription.TaskListNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one TaskSubscription from the database.</summary>
 		public static void Delete(long taskSubscriptionNum){
 			string command="DELETE FROM tasksubscription "

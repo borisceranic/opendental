@@ -173,6 +173,18 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ScreenGroup,ScreenGroup) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ScreenGroup screenGroup,ScreenGroup oldScreenGroup) {
+			if(screenGroup.Description != oldScreenGroup.Description) {
+				return true;
+			}
+			if(screenGroup.SGDate != oldScreenGroup.SGDate) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ScreenGroup from the database.</summary>
 		public static void Delete(long screenGroupNum){
 			string command="DELETE FROM screengroup "

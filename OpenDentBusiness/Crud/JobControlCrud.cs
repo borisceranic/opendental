@@ -59,35 +59,6 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of JobControl into a DataTable.</summary>
-		public static DataTable ListToTable(List<JobControl> listJobControls,string tableName="") {
-			if(string.IsNullOrEmpty(tableName)) {
-				tableName="JobControl";
-			}
-			DataTable table=new DataTable(tableName);
-			table.Columns.Add("JobControlNum");
-			table.Columns.Add("UserNum");
-			table.Columns.Add("JobControlType");
-			table.Columns.Add("ControlData");
-			table.Columns.Add("XPos");
-			table.Columns.Add("YPos");
-			table.Columns.Add("Width");
-			table.Columns.Add("Height");
-			foreach(JobControl jobControl in listJobControls) {
-				table.Rows.Add(new object[] {
-					POut.Long  (jobControl.JobControlNum),
-					POut.Long  (jobControl.UserNum),
-					POut.Int   ((int)jobControl.JobControlType),
-					POut.String(jobControl.ControlData),
-					POut.Int   (jobControl.XPos),
-					POut.Int   (jobControl.YPos),
-					POut.Int   (jobControl.Width),
-					POut.Int   (jobControl.Height),
-				});
-			}
-			return table;
-		}
-
 		///<summary>Inserts one JobControl into the database.  Returns the new priKey.</summary>
 		public static long Insert(JobControl jobControl){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
@@ -240,6 +211,33 @@ namespace OpenDentBusiness.Crud{
 				+" WHERE JobControlNum = "+POut.Long(jobControl.JobControlNum);
 			Db.NonQ(command);
 			return true;
+		}
+
+		///<summary>Returns true if Update(JobControl,JobControl) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(JobControl jobControl,JobControl oldJobControl) {
+			if(jobControl.UserNum != oldJobControl.UserNum) {
+				return true;
+			}
+			if(jobControl.JobControlType != oldJobControl.JobControlType) {
+				return true;
+			}
+			if(jobControl.ControlData != oldJobControl.ControlData) {
+				return true;
+			}
+			if(jobControl.XPos != oldJobControl.XPos) {
+				return true;
+			}
+			if(jobControl.YPos != oldJobControl.YPos) {
+				return true;
+			}
+			if(jobControl.Width != oldJobControl.Width) {
+				return true;
+			}
+			if(jobControl.Height != oldJobControl.Height) {
+				return true;
+			}
+			return false;
 		}
 
 		///<summary>Deletes one JobControl from the database.</summary>

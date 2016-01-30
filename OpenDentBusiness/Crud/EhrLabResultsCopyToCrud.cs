@@ -272,6 +272,48 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EhrLabResultsCopyTo,EhrLabResultsCopyTo) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EhrLabResultsCopyTo ehrLabResultsCopyTo,EhrLabResultsCopyTo oldEhrLabResultsCopyTo) {
+			if(ehrLabResultsCopyTo.EhrLabNum != oldEhrLabResultsCopyTo.EhrLabNum) {
+				return true;
+			}
+			if(ehrLabResultsCopyTo.CopyToID != oldEhrLabResultsCopyTo.CopyToID) {
+				return true;
+			}
+			if(ehrLabResultsCopyTo.CopyToLName != oldEhrLabResultsCopyTo.CopyToLName) {
+				return true;
+			}
+			if(ehrLabResultsCopyTo.CopyToFName != oldEhrLabResultsCopyTo.CopyToFName) {
+				return true;
+			}
+			if(ehrLabResultsCopyTo.CopyToMiddleNames != oldEhrLabResultsCopyTo.CopyToMiddleNames) {
+				return true;
+			}
+			if(ehrLabResultsCopyTo.CopyToSuffix != oldEhrLabResultsCopyTo.CopyToSuffix) {
+				return true;
+			}
+			if(ehrLabResultsCopyTo.CopyToPrefix != oldEhrLabResultsCopyTo.CopyToPrefix) {
+				return true;
+			}
+			if(ehrLabResultsCopyTo.CopyToAssigningAuthorityNamespaceID != oldEhrLabResultsCopyTo.CopyToAssigningAuthorityNamespaceID) {
+				return true;
+			}
+			if(ehrLabResultsCopyTo.CopyToAssigningAuthorityUniversalID != oldEhrLabResultsCopyTo.CopyToAssigningAuthorityUniversalID) {
+				return true;
+			}
+			if(ehrLabResultsCopyTo.CopyToAssigningAuthorityIDType != oldEhrLabResultsCopyTo.CopyToAssigningAuthorityIDType) {
+				return true;
+			}
+			if(ehrLabResultsCopyTo.CopyToNameTypeCode != oldEhrLabResultsCopyTo.CopyToNameTypeCode) {
+				return true;
+			}
+			if(ehrLabResultsCopyTo.CopyToIdentifierTypeCode != oldEhrLabResultsCopyTo.CopyToIdentifierTypeCode) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EhrLabResultsCopyTo from the database.</summary>
 		public static void Delete(long ehrLabResultsCopyToNum){
 			string command="DELETE FROM ehrlabresultscopyto "

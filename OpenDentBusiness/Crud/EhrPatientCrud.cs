@@ -189,6 +189,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EhrPatient,EhrPatient) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EhrPatient ehrPatient,EhrPatient oldEhrPatient) {
+			if(ehrPatient.MotherMaidenFname != oldEhrPatient.MotherMaidenFname) {
+				return true;
+			}
+			if(ehrPatient.MotherMaidenLname != oldEhrPatient.MotherMaidenLname) {
+				return true;
+			}
+			if(ehrPatient.VacShareOk != oldEhrPatient.VacShareOk) {
+				return true;
+			}
+			if(ehrPatient.MedicaidState != oldEhrPatient.MedicaidState) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EhrPatient from the database.</summary>
 		public static void Delete(long patNum){
 			string command="DELETE FROM ehrpatient "

@@ -181,6 +181,21 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EmailAttach,EmailAttach) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EmailAttach emailAttach,EmailAttach oldEmailAttach) {
+			if(emailAttach.EmailMessageNum != oldEmailAttach.EmailMessageNum) {
+				return true;
+			}
+			if(emailAttach.DisplayedFileName != oldEmailAttach.DisplayedFileName) {
+				return true;
+			}
+			if(emailAttach.ActualFileName != oldEmailAttach.ActualFileName) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EmailAttach from the database.</summary>
 		public static void Delete(long emailAttachNum){
 			string command="DELETE FROM emailattach "

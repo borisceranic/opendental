@@ -173,6 +173,18 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(TaskAncestor,TaskAncestor) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(TaskAncestor taskAncestor,TaskAncestor oldTaskAncestor) {
+			if(taskAncestor.TaskNum != oldTaskAncestor.TaskNum) {
+				return true;
+			}
+			if(taskAncestor.TaskListNum != oldTaskAncestor.TaskListNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one TaskAncestor from the database.</summary>
 		public static void Delete(long taskAncestorNum){
 			string command="DELETE FROM taskancestor "

@@ -197,6 +197,27 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Reconcile,Reconcile) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Reconcile reconcile,Reconcile oldReconcile) {
+			if(reconcile.AccountNum != oldReconcile.AccountNum) {
+				return true;
+			}
+			if(reconcile.StartingBal != oldReconcile.StartingBal) {
+				return true;
+			}
+			if(reconcile.EndingBal != oldReconcile.EndingBal) {
+				return true;
+			}
+			if(reconcile.DateReconcile != oldReconcile.DateReconcile) {
+				return true;
+			}
+			if(reconcile.IsLocked != oldReconcile.IsLocked) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Reconcile from the database.</summary>
 		public static void Delete(long reconcileNum){
 			string command="DELETE FROM reconcile "

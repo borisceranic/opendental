@@ -370,6 +370,91 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Appointment,Appointment) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Appointment appointment,Appointment oldAppointment) {
+			if(appointment.PatNum != oldAppointment.PatNum) {
+				return true;
+			}
+			if(appointment.AptStatus != oldAppointment.AptStatus) {
+				return true;
+			}
+			if(appointment.Pattern != oldAppointment.Pattern) {
+				return true;
+			}
+			if(appointment.Confirmed != oldAppointment.Confirmed) {
+				return true;
+			}
+			if(appointment.TimeLocked != oldAppointment.TimeLocked) {
+				return true;
+			}
+			if(appointment.Op != oldAppointment.Op) {
+				return true;
+			}
+			if(appointment.Note != oldAppointment.Note) {
+				return true;
+			}
+			if(appointment.ProvNum != oldAppointment.ProvNum) {
+				return true;
+			}
+			if(appointment.ProvHyg != oldAppointment.ProvHyg) {
+				return true;
+			}
+			if(appointment.AptDateTime != oldAppointment.AptDateTime) {
+				return true;
+			}
+			if(appointment.NextAptNum != oldAppointment.NextAptNum) {
+				return true;
+			}
+			if(appointment.UnschedStatus != oldAppointment.UnschedStatus) {
+				return true;
+			}
+			if(appointment.IsNewPatient != oldAppointment.IsNewPatient) {
+				return true;
+			}
+			if(appointment.ProcDescript != oldAppointment.ProcDescript) {
+				return true;
+			}
+			if(appointment.Assistant != oldAppointment.Assistant) {
+				return true;
+			}
+			if(appointment.ClinicNum != oldAppointment.ClinicNum) {
+				return true;
+			}
+			if(appointment.IsHygiene != oldAppointment.IsHygiene) {
+				return true;
+			}
+			//DateTStamp can only be set by MySQL
+			if(appointment.DateTimeArrived != oldAppointment.DateTimeArrived) {
+				return true;
+			}
+			if(appointment.DateTimeSeated != oldAppointment.DateTimeSeated) {
+				return true;
+			}
+			if(appointment.DateTimeDismissed != oldAppointment.DateTimeDismissed) {
+				return true;
+			}
+			if(appointment.InsPlan1 != oldAppointment.InsPlan1) {
+				return true;
+			}
+			if(appointment.InsPlan2 != oldAppointment.InsPlan2) {
+				return true;
+			}
+			if(appointment.DateTimeAskedToArrive != oldAppointment.DateTimeAskedToArrive) {
+				return true;
+			}
+			if(appointment.ProcsColored != oldAppointment.ProcsColored) {
+				return true;
+			}
+			if(appointment.ColorOverride != oldAppointment.ColorOverride) {
+				return true;
+			}
+			if(appointment.AppointmentTypeNum != oldAppointment.AppointmentTypeNum) {
+				return true;
+			}
+			return false;
+		}
+
 		//Delete not allowed for this table
 		//public static void Delete(long aptNum){
 		//

@@ -178,6 +178,19 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ICD9,ICD9) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ICD9 iCD9,ICD9 oldICD9) {
+			if(iCD9.ICD9Code != oldICD9.ICD9Code) {
+				return true;
+			}
+			if(iCD9.Description != oldICD9.Description) {
+				return true;
+			}
+			//DateTStamp can only be set by MySQL
+			return false;
+		}
+
 		///<summary>Deletes one ICD9 from the database.</summary>
 		public static void Delete(long iCD9Num){
 			string command="DELETE FROM icd9 "

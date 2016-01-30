@@ -181,6 +181,21 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EhrMeasure,EhrMeasure) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EhrMeasure ehrMeasure,EhrMeasure oldEhrMeasure) {
+			if(ehrMeasure.MeasureType != oldEhrMeasure.MeasureType) {
+				return true;
+			}
+			if(ehrMeasure.Numerator != oldEhrMeasure.Numerator) {
+				return true;
+			}
+			if(ehrMeasure.Denominator != oldEhrMeasure.Denominator) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EhrMeasure from the database.</summary>
 		public static void Delete(long ehrMeasureNum){
 			string command="DELETE FROM ehrmeasure "

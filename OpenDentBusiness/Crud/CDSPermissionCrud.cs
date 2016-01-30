@@ -245,6 +245,45 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(CDSPermission,CDSPermission) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(CDSPermission cDSPermission,CDSPermission oldCDSPermission) {
+			if(cDSPermission.UserNum != oldCDSPermission.UserNum) {
+				return true;
+			}
+			if(cDSPermission.SetupCDS != oldCDSPermission.SetupCDS) {
+				return true;
+			}
+			if(cDSPermission.ShowCDS != oldCDSPermission.ShowCDS) {
+				return true;
+			}
+			if(cDSPermission.ShowInfobutton != oldCDSPermission.ShowInfobutton) {
+				return true;
+			}
+			if(cDSPermission.EditBibliography != oldCDSPermission.EditBibliography) {
+				return true;
+			}
+			if(cDSPermission.ProblemCDS != oldCDSPermission.ProblemCDS) {
+				return true;
+			}
+			if(cDSPermission.MedicationCDS != oldCDSPermission.MedicationCDS) {
+				return true;
+			}
+			if(cDSPermission.AllergyCDS != oldCDSPermission.AllergyCDS) {
+				return true;
+			}
+			if(cDSPermission.DemographicCDS != oldCDSPermission.DemographicCDS) {
+				return true;
+			}
+			if(cDSPermission.LabTestCDS != oldCDSPermission.LabTestCDS) {
+				return true;
+			}
+			if(cDSPermission.VitalCDS != oldCDSPermission.VitalCDS) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one CDSPermission from the database.</summary>
 		public static void Delete(long cDSPermissionNum){
 			string command="DELETE FROM cdspermission "

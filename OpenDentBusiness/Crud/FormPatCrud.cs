@@ -173,6 +173,18 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(FormPat,FormPat) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(FormPat formPat,FormPat oldFormPat) {
+			if(formPat.PatNum != oldFormPat.PatNum) {
+				return true;
+			}
+			if(formPat.FormDateTime != oldFormPat.FormDateTime) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one FormPat from the database.</summary>
 		public static void Delete(long formPatNum){
 			string command="DELETE FROM formpat "

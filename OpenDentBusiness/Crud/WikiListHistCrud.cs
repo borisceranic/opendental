@@ -197,6 +197,27 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(WikiListHist,WikiListHist) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(WikiListHist wikiListHist,WikiListHist oldWikiListHist) {
+			if(wikiListHist.UserNum != oldWikiListHist.UserNum) {
+				return true;
+			}
+			if(wikiListHist.ListName != oldWikiListHist.ListName) {
+				return true;
+			}
+			if(wikiListHist.ListHeaders != oldWikiListHist.ListHeaders) {
+				return true;
+			}
+			if(wikiListHist.ListContent != oldWikiListHist.ListContent) {
+				return true;
+			}
+			if(wikiListHist.DateTimeSaved != oldWikiListHist.DateTimeSaved) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one WikiListHist from the database.</summary>
 		public static void Delete(long wikiListHistNum){
 			string command="DELETE FROM wikilisthist "

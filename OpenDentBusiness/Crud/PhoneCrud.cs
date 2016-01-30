@@ -294,6 +294,60 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Phone,Phone) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Phone phone,Phone oldPhone) {
+			if(phone.Extension != oldPhone.Extension) {
+				return true;
+			}
+			if(phone.EmployeeName != oldPhone.EmployeeName) {
+				return true;
+			}
+			if(phone.ClockStatus != oldPhone.ClockStatus) {
+				return true;
+			}
+			if(phone.Description != oldPhone.Description) {
+				return true;
+			}
+			if(phone.ColorBar != oldPhone.ColorBar) {
+				return true;
+			}
+			if(phone.ColorText != oldPhone.ColorText) {
+				return true;
+			}
+			if(phone.EmployeeNum != oldPhone.EmployeeNum) {
+				return true;
+			}
+			if(phone.CustomerNumber != oldPhone.CustomerNumber) {
+				return true;
+			}
+			if(phone.InOrOut != oldPhone.InOrOut) {
+				return true;
+			}
+			if(phone.PatNum != oldPhone.PatNum) {
+				return true;
+			}
+			if(phone.DateTimeStart != oldPhone.DateTimeStart) {
+				return true;
+			}
+			if(phone.WebCamImage != oldPhone.WebCamImage) {
+				return true;
+			}
+			if(phone.ScreenshotPath != oldPhone.ScreenshotPath) {
+				return true;
+			}
+			if(phone.ScreenshotImage != oldPhone.ScreenshotImage) {
+				return true;
+			}
+			if(phone.CustomerNumberRaw != oldPhone.CustomerNumberRaw) {
+				return true;
+			}
+			if(phone.LastCallTimeStart != oldPhone.LastCallTimeStart) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Phone from the database.</summary>
 		public static void Delete(long phoneNum){
 			string command="DELETE FROM phone "

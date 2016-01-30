@@ -229,6 +229,39 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Signalod,Signalod) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Signalod signalod,Signalod oldSignalod) {
+			if(signalod.FromUser != oldSignalod.FromUser) {
+				return true;
+			}
+			if(signalod.ITypes != oldSignalod.ITypes) {
+				return true;
+			}
+			if(signalod.DateViewing != oldSignalod.DateViewing) {
+				return true;
+			}
+			if(signalod.SigType != oldSignalod.SigType) {
+				return true;
+			}
+			if(signalod.SigText != oldSignalod.SigText) {
+				return true;
+			}
+			if(signalod.SigDateTime != oldSignalod.SigDateTime) {
+				return true;
+			}
+			if(signalod.ToUser != oldSignalod.ToUser) {
+				return true;
+			}
+			if(signalod.AckTime != oldSignalod.AckTime) {
+				return true;
+			}
+			if(signalod.TaskNum != oldSignalod.TaskNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Signalod from the database.</summary>
 		public static void Delete(long signalNum){
 			string command="DELETE FROM signalod "

@@ -245,6 +245,39 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(InsSub,InsSub) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(InsSub insSub,InsSub oldInsSub) {
+			if(insSub.PlanNum != oldInsSub.PlanNum) {
+				return true;
+			}
+			if(insSub.Subscriber != oldInsSub.Subscriber) {
+				return true;
+			}
+			if(insSub.DateEffective != oldInsSub.DateEffective) {
+				return true;
+			}
+			if(insSub.DateTerm != oldInsSub.DateTerm) {
+				return true;
+			}
+			if(insSub.ReleaseInfo != oldInsSub.ReleaseInfo) {
+				return true;
+			}
+			if(insSub.AssignBen != oldInsSub.AssignBen) {
+				return true;
+			}
+			if(insSub.SubscriberID != oldInsSub.SubscriberID) {
+				return true;
+			}
+			if(insSub.BenefitNotes != oldInsSub.BenefitNotes) {
+				return true;
+			}
+			if(insSub.SubscNote != oldInsSub.SubscNote) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one InsSub from the database.</summary>
 		public static void Delete(long insSubNum){
 			string command="DELETE FROM inssub "

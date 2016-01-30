@@ -189,6 +189,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(SupplyOrder,SupplyOrder) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(SupplyOrder supplyOrder,SupplyOrder oldSupplyOrder) {
+			if(supplyOrder.SupplierNum != oldSupplyOrder.SupplierNum) {
+				return true;
+			}
+			if(supplyOrder.DatePlaced != oldSupplyOrder.DatePlaced) {
+				return true;
+			}
+			if(supplyOrder.Note != oldSupplyOrder.Note) {
+				return true;
+			}
+			if(supplyOrder.AmountTotal != oldSupplyOrder.AmountTotal) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one SupplyOrder from the database.</summary>
 		public static void Delete(long supplyOrderNum){
 			string command="DELETE FROM supplyorder "

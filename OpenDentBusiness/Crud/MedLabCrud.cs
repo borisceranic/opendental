@@ -471,6 +471,111 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(MedLab,MedLab) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(MedLab medLab,MedLab oldMedLab) {
+			if(medLab.ProvNum != oldMedLab.ProvNum) {
+				return true;
+			}
+			if(medLab.SendingApp != oldMedLab.SendingApp) {
+				return true;
+			}
+			if(medLab.SendingFacility != oldMedLab.SendingFacility) {
+				return true;
+			}
+			if(medLab.PatNum != oldMedLab.PatNum) {
+				return true;
+			}
+			if(medLab.PatIDLab != oldMedLab.PatIDLab) {
+				return true;
+			}
+			if(medLab.PatIDAlt != oldMedLab.PatIDAlt) {
+				return true;
+			}
+			if(medLab.PatAge != oldMedLab.PatAge) {
+				return true;
+			}
+			if(medLab.PatAccountNum != oldMedLab.PatAccountNum) {
+				return true;
+			}
+			if(medLab.PatFasting != oldMedLab.PatFasting) {
+				return true;
+			}
+			if(medLab.SpecimenID != oldMedLab.SpecimenID) {
+				return true;
+			}
+			if(medLab.SpecimenIDFiller != oldMedLab.SpecimenIDFiller) {
+				return true;
+			}
+			if(medLab.ObsTestID != oldMedLab.ObsTestID) {
+				return true;
+			}
+			if(medLab.ObsTestDescript != oldMedLab.ObsTestDescript) {
+				return true;
+			}
+			if(medLab.ObsTestLoinc != oldMedLab.ObsTestLoinc) {
+				return true;
+			}
+			if(medLab.ObsTestLoincText != oldMedLab.ObsTestLoincText) {
+				return true;
+			}
+			if(medLab.DateTimeCollected != oldMedLab.DateTimeCollected) {
+				return true;
+			}
+			if(medLab.TotalVolume != oldMedLab.TotalVolume) {
+				return true;
+			}
+			if(medLab.ActionCode != oldMedLab.ActionCode) {
+				return true;
+			}
+			if(medLab.ClinicalInfo != oldMedLab.ClinicalInfo) {
+				return true;
+			}
+			if(medLab.DateTimeEntered != oldMedLab.DateTimeEntered) {
+				return true;
+			}
+			if(medLab.OrderingProvNPI != oldMedLab.OrderingProvNPI) {
+				return true;
+			}
+			if(medLab.OrderingProvLocalID != oldMedLab.OrderingProvLocalID) {
+				return true;
+			}
+			if(medLab.OrderingProvLName != oldMedLab.OrderingProvLName) {
+				return true;
+			}
+			if(medLab.OrderingProvFName != oldMedLab.OrderingProvFName) {
+				return true;
+			}
+			if(medLab.SpecimenIDAlt != oldMedLab.SpecimenIDAlt) {
+				return true;
+			}
+			if(medLab.DateTimeReported != oldMedLab.DateTimeReported) {
+				return true;
+			}
+			if(medLab.ResultStatus != oldMedLab.ResultStatus) {
+				return true;
+			}
+			if(medLab.ParentObsID != oldMedLab.ParentObsID) {
+				return true;
+			}
+			if(medLab.ParentObsTestID != oldMedLab.ParentObsTestID) {
+				return true;
+			}
+			if(medLab.NotePat != oldMedLab.NotePat) {
+				return true;
+			}
+			if(medLab.NoteLab != oldMedLab.NoteLab) {
+				return true;
+			}
+			if(medLab.FileName != oldMedLab.FileName) {
+				return true;
+			}
+			if(medLab.OriginalPIDSegment != oldMedLab.OriginalPIDSegment) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one MedLab from the database.</summary>
 		public static void Delete(long medLabNum){
 			string command="DELETE FROM medlab "

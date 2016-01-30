@@ -344,6 +344,60 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(MedLabResult,MedLabResult) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(MedLabResult medLabResult,MedLabResult oldMedLabResult) {
+			if(medLabResult.MedLabNum != oldMedLabResult.MedLabNum) {
+				return true;
+			}
+			if(medLabResult.ObsID != oldMedLabResult.ObsID) {
+				return true;
+			}
+			if(medLabResult.ObsText != oldMedLabResult.ObsText) {
+				return true;
+			}
+			if(medLabResult.ObsLoinc != oldMedLabResult.ObsLoinc) {
+				return true;
+			}
+			if(medLabResult.ObsLoincText != oldMedLabResult.ObsLoincText) {
+				return true;
+			}
+			if(medLabResult.ObsIDSub != oldMedLabResult.ObsIDSub) {
+				return true;
+			}
+			if(medLabResult.ObsValue != oldMedLabResult.ObsValue) {
+				return true;
+			}
+			if(medLabResult.ObsSubType != oldMedLabResult.ObsSubType) {
+				return true;
+			}
+			if(medLabResult.ObsUnits != oldMedLabResult.ObsUnits) {
+				return true;
+			}
+			if(medLabResult.ReferenceRange != oldMedLabResult.ReferenceRange) {
+				return true;
+			}
+			if(medLabResult.AbnormalFlag != oldMedLabResult.AbnormalFlag) {
+				return true;
+			}
+			if(medLabResult.ResultStatus != oldMedLabResult.ResultStatus) {
+				return true;
+			}
+			if(medLabResult.DateTimeObs != oldMedLabResult.DateTimeObs) {
+				return true;
+			}
+			if(medLabResult.FacilityID != oldMedLabResult.FacilityID) {
+				return true;
+			}
+			if(medLabResult.DocNum != oldMedLabResult.DocNum) {
+				return true;
+			}
+			if(medLabResult.Note != oldMedLabResult.Note) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one MedLabResult from the database.</summary>
 		public static void Delete(long medLabResultNum){
 			string command="DELETE FROM medlabresult "

@@ -165,6 +165,15 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ConnectionGroup,ConnectionGroup) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ConnectionGroup connectionGroup,ConnectionGroup oldConnectionGroup) {
+			if(connectionGroup.Description != oldConnectionGroup.Description) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ConnectionGroup from the database.</summary>
 		public static void Delete(long connectionGroupNum){
 			string command="DELETE FROM connectiongroup "

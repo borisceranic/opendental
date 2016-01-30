@@ -197,6 +197,21 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(UserQuery,UserQuery) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(UserQuery userQuery,UserQuery oldUserQuery) {
+			if(userQuery.Description != oldUserQuery.Description) {
+				return true;
+			}
+			if(userQuery.FileName != oldUserQuery.FileName) {
+				return true;
+			}
+			if(userQuery.QueryText != oldUserQuery.QueryText) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one UserQuery from the database.</summary>
 		public static void Delete(long queryNum){
 			string command="DELETE FROM userquery "

@@ -205,6 +205,30 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ProcButtonQuick,ProcButtonQuick) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ProcButtonQuick procButtonQuick,ProcButtonQuick oldProcButtonQuick) {
+			if(procButtonQuick.Description != oldProcButtonQuick.Description) {
+				return true;
+			}
+			if(procButtonQuick.CodeValue != oldProcButtonQuick.CodeValue) {
+				return true;
+			}
+			if(procButtonQuick.Surf != oldProcButtonQuick.Surf) {
+				return true;
+			}
+			if(procButtonQuick.YPos != oldProcButtonQuick.YPos) {
+				return true;
+			}
+			if(procButtonQuick.ItemOrder != oldProcButtonQuick.ItemOrder) {
+				return true;
+			}
+			if(procButtonQuick.IsLabel != oldProcButtonQuick.IsLabel) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ProcButtonQuick from the database.</summary>
 		public static void Delete(long procButtonQuickNum){
 			string command="DELETE FROM procbuttonquick "

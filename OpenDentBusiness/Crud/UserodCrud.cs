@@ -269,6 +269,54 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Userod,Userod) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Userod userod,Userod oldUserod) {
+			if(userod.UserName != oldUserod.UserName) {
+				return true;
+			}
+			if(userod.Password != oldUserod.Password) {
+				return true;
+			}
+			if(userod.UserGroupNum != oldUserod.UserGroupNum) {
+				return true;
+			}
+			if(userod.EmployeeNum != oldUserod.EmployeeNum) {
+				return true;
+			}
+			if(userod.ClinicNum != oldUserod.ClinicNum) {
+				return true;
+			}
+			if(userod.ProvNum != oldUserod.ProvNum) {
+				return true;
+			}
+			if(userod.IsHidden != oldUserod.IsHidden) {
+				return true;
+			}
+			if(userod.TaskListInBox != oldUserod.TaskListInBox) {
+				return true;
+			}
+			if(userod.AnesthProvType != oldUserod.AnesthProvType) {
+				return true;
+			}
+			if(userod.DefaultHidePopups != oldUserod.DefaultHidePopups) {
+				return true;
+			}
+			if(userod.PasswordIsStrong != oldUserod.PasswordIsStrong) {
+				return true;
+			}
+			if(userod.ClinicIsRestricted != oldUserod.ClinicIsRestricted) {
+				return true;
+			}
+			if(userod.InboxHidePopups != oldUserod.InboxHidePopups) {
+				return true;
+			}
+			if(userod.UserNumCEMT != oldUserod.UserNumCEMT) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Userod from the database.</summary>
 		public static void Delete(long userNum){
 			string command="DELETE FROM userod "

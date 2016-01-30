@@ -173,6 +173,18 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(AccountingAutoPay,AccountingAutoPay) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(AccountingAutoPay accountingAutoPay,AccountingAutoPay oldAccountingAutoPay) {
+			if(accountingAutoPay.PayType != oldAccountingAutoPay.PayType) {
+				return true;
+			}
+			if(accountingAutoPay.PickList != oldAccountingAutoPay.PickList) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one AccountingAutoPay from the database.</summary>
 		public static void Delete(long accountingAutoPayNum){
 			string command="DELETE FROM accountingautopay "

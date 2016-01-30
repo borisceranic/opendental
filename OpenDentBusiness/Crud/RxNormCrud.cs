@@ -181,6 +181,21 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(RxNorm,RxNorm) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(RxNorm rxNorm,RxNorm oldRxNorm) {
+			if(rxNorm.RxCui != oldRxNorm.RxCui) {
+				return true;
+			}
+			if(rxNorm.MmslCode != oldRxNorm.MmslCode) {
+				return true;
+			}
+			if(rxNorm.Description != oldRxNorm.Description) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one RxNorm from the database.</summary>
 		public static void Delete(long rxNormNum){
 			string command="DELETE FROM rxnorm "

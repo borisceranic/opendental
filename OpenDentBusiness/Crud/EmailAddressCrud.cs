@@ -221,6 +221,36 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EmailAddress,EmailAddress) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EmailAddress emailAddress,EmailAddress oldEmailAddress) {
+			if(emailAddress.SMTPserver != oldEmailAddress.SMTPserver) {
+				return true;
+			}
+			if(emailAddress.EmailUsername != oldEmailAddress.EmailUsername) {
+				return true;
+			}
+			if(emailAddress.EmailPassword != oldEmailAddress.EmailPassword) {
+				return true;
+			}
+			if(emailAddress.ServerPort != oldEmailAddress.ServerPort) {
+				return true;
+			}
+			if(emailAddress.UseSSL != oldEmailAddress.UseSSL) {
+				return true;
+			}
+			if(emailAddress.SenderAddress != oldEmailAddress.SenderAddress) {
+				return true;
+			}
+			if(emailAddress.Pop3ServerIncoming != oldEmailAddress.Pop3ServerIncoming) {
+				return true;
+			}
+			if(emailAddress.ServerPortIncoming != oldEmailAddress.ServerPortIncoming) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EmailAddress from the database.</summary>
 		public static void Delete(long emailAddressNum){
 			string command="DELETE FROM emailaddress "

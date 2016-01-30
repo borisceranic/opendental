@@ -173,6 +173,18 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(UserGroup,UserGroup) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(UserGroup userGroup,UserGroup oldUserGroup) {
+			if(userGroup.Description != oldUserGroup.Description) {
+				return true;
+			}
+			if(userGroup.UserGroupNumCEMT != oldUserGroup.UserGroupNumCEMT) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one UserGroup from the database.</summary>
 		public static void Delete(long userGroupNum){
 			string command="DELETE FROM usergroup "

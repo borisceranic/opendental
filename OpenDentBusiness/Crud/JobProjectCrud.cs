@@ -57,31 +57,6 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of JobProject into a DataTable.</summary>
-		public static DataTable ListToTable(List<JobProject> listJobProjects,string tableName="") {
-			if(string.IsNullOrEmpty(tableName)) {
-				tableName="JobProject";
-			}
-			DataTable table=new DataTable(tableName);
-			table.Columns.Add("JobProjectNum");
-			table.Columns.Add("RootProjectNum");
-			table.Columns.Add("ParentProjectNum");
-			table.Columns.Add("Title");
-			table.Columns.Add("Description");
-			table.Columns.Add("ProjectStatus");
-			foreach(JobProject jobProject in listJobProjects) {
-				table.Rows.Add(new object[] {
-					POut.Long  (jobProject.JobProjectNum),
-					POut.Long  (jobProject.RootProjectNum),
-					POut.Long  (jobProject.ParentProjectNum),
-					POut.String(jobProject.Title),
-					POut.String(jobProject.Description),
-					POut.Int   ((int)jobProject.ProjectStatus),
-				});
-			}
-			return table;
-		}
-
 		///<summary>Inserts one JobProject into the database.  Returns the new priKey.</summary>
 		public static long Insert(JobProject jobProject){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
@@ -220,6 +195,27 @@ namespace OpenDentBusiness.Crud{
 				+" WHERE JobProjectNum = "+POut.Long(jobProject.JobProjectNum);
 			Db.NonQ(command);
 			return true;
+		}
+
+		///<summary>Returns true if Update(JobProject,JobProject) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(JobProject jobProject,JobProject oldJobProject) {
+			if(jobProject.RootProjectNum != oldJobProject.RootProjectNum) {
+				return true;
+			}
+			if(jobProject.ParentProjectNum != oldJobProject.ParentProjectNum) {
+				return true;
+			}
+			if(jobProject.Title != oldJobProject.Title) {
+				return true;
+			}
+			if(jobProject.Description != oldJobProject.Description) {
+				return true;
+			}
+			if(jobProject.ProjectStatus != oldJobProject.ProjectStatus) {
+				return true;
+			}
+			return false;
 		}
 
 		///<summary>Deletes one JobProject from the database.</summary>

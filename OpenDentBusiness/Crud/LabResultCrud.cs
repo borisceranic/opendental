@@ -226,6 +226,37 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(LabResult,LabResult) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(LabResult labResult,LabResult oldLabResult) {
+			if(labResult.LabPanelNum != oldLabResult.LabPanelNum) {
+				return true;
+			}
+			if(labResult.DateTimeTest != oldLabResult.DateTimeTest) {
+				return true;
+			}
+			if(labResult.TestName != oldLabResult.TestName) {
+				return true;
+			}
+			//DateTStamp can only be set by MySQL
+			if(labResult.TestID != oldLabResult.TestID) {
+				return true;
+			}
+			if(labResult.ObsValue != oldLabResult.ObsValue) {
+				return true;
+			}
+			if(labResult.ObsUnits != oldLabResult.ObsUnits) {
+				return true;
+			}
+			if(labResult.ObsRange != oldLabResult.ObsRange) {
+				return true;
+			}
+			if(labResult.AbnormalFlag != oldLabResult.AbnormalFlag) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one LabResult from the database.</summary>
 		public static void Delete(long labResultNum){
 			string command="DELETE FROM labresult "

@@ -181,6 +181,21 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(DashboardAR,DashboardAR) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(DashboardAR dashboardAR,DashboardAR oldDashboardAR) {
+			if(dashboardAR.DateCalc != oldDashboardAR.DateCalc) {
+				return true;
+			}
+			if(dashboardAR.BalTotal != oldDashboardAR.BalTotal) {
+				return true;
+			}
+			if(dashboardAR.InsEst != oldDashboardAR.InsEst) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one DashboardAR from the database.</summary>
 		public static void Delete(long dashboardARNum){
 			string command="DELETE FROM dashboardar "

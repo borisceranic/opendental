@@ -229,6 +229,39 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(MedLabFacility,MedLabFacility) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(MedLabFacility medLabFacility,MedLabFacility oldMedLabFacility) {
+			if(medLabFacility.FacilityName != oldMedLabFacility.FacilityName) {
+				return true;
+			}
+			if(medLabFacility.Address != oldMedLabFacility.Address) {
+				return true;
+			}
+			if(medLabFacility.City != oldMedLabFacility.City) {
+				return true;
+			}
+			if(medLabFacility.State != oldMedLabFacility.State) {
+				return true;
+			}
+			if(medLabFacility.Zip != oldMedLabFacility.Zip) {
+				return true;
+			}
+			if(medLabFacility.Phone != oldMedLabFacility.Phone) {
+				return true;
+			}
+			if(medLabFacility.DirectorTitle != oldMedLabFacility.DirectorTitle) {
+				return true;
+			}
+			if(medLabFacility.DirectorLName != oldMedLabFacility.DirectorLName) {
+				return true;
+			}
+			if(medLabFacility.DirectorFName != oldMedLabFacility.DirectorFName) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one MedLabFacility from the database.</summary>
 		public static void Delete(long medLabFacilityNum){
 			string command="DELETE FROM medlabfacility "

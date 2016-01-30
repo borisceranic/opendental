@@ -198,6 +198,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(OIDExternal,OIDExternal) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(OIDExternal oIDExternal,OIDExternal oldOIDExternal) {
+			if(oIDExternal.IDType != oldOIDExternal.IDType) {
+				return true;
+			}
+			if(oIDExternal.IDInternal != oldOIDExternal.IDInternal) {
+				return true;
+			}
+			if(oIDExternal.IDExternal != oldOIDExternal.IDExternal) {
+				return true;
+			}
+			if(oIDExternal.rootExternal != oldOIDExternal.rootExternal) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one OIDExternal from the database.</summary>
 		public static void Delete(long oIDExternalNum){
 			string command="DELETE FROM oidexternal "

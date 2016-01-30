@@ -205,6 +205,30 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Def,Def) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Def def,Def oldDef) {
+			if(def.Category != oldDef.Category) {
+				return true;
+			}
+			if(def.ItemOrder != oldDef.ItemOrder) {
+				return true;
+			}
+			if(def.ItemName != oldDef.ItemName) {
+				return true;
+			}
+			if(def.ItemValue != oldDef.ItemValue) {
+				return true;
+			}
+			if(def.ItemColor != oldDef.ItemColor) {
+				return true;
+			}
+			if(def.IsHidden != oldDef.IsHidden) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Def from the database.</summary>
 		public static void Delete(long defNum){
 			string command="DELETE FROM definition "

@@ -229,6 +229,39 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ApptViewItem,ApptViewItem) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ApptViewItem apptViewItem,ApptViewItem oldApptViewItem) {
+			if(apptViewItem.ApptViewNum != oldApptViewItem.ApptViewNum) {
+				return true;
+			}
+			if(apptViewItem.OpNum != oldApptViewItem.OpNum) {
+				return true;
+			}
+			if(apptViewItem.ProvNum != oldApptViewItem.ProvNum) {
+				return true;
+			}
+			if(apptViewItem.ElementDesc != oldApptViewItem.ElementDesc) {
+				return true;
+			}
+			if(apptViewItem.ElementOrder != oldApptViewItem.ElementOrder) {
+				return true;
+			}
+			if(apptViewItem.ElementColor != oldApptViewItem.ElementColor) {
+				return true;
+			}
+			if(apptViewItem.ElementAlignment != oldApptViewItem.ElementAlignment) {
+				return true;
+			}
+			if(apptViewItem.ApptFieldDefNum != oldApptViewItem.ApptFieldDefNum) {
+				return true;
+			}
+			if(apptViewItem.PatFieldDefNum != oldApptViewItem.PatFieldDefNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ApptViewItem from the database.</summary>
 		public static void Delete(long apptViewItemNum){
 			string command="DELETE FROM apptviewitem "

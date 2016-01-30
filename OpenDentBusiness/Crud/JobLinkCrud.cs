@@ -55,27 +55,6 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of JobLink into a DataTable.</summary>
-		public static DataTable ListToTable(List<JobLink> listJobLinks,string tableName="") {
-			if(string.IsNullOrEmpty(tableName)) {
-				tableName="JobLink";
-			}
-			DataTable table=new DataTable(tableName);
-			table.Columns.Add("JobLinkNum");
-			table.Columns.Add("JobNum");
-			table.Columns.Add("FKey");
-			table.Columns.Add("LinkType");
-			foreach(JobLink jobLink in listJobLinks) {
-				table.Rows.Add(new object[] {
-					POut.Long  (jobLink.JobLinkNum),
-					POut.Long  (jobLink.JobNum),
-					POut.Long  (jobLink.FKey),
-					POut.Int   ((int)jobLink.LinkType),
-				});
-			}
-			return table;
-		}
-
 		///<summary>Inserts one JobLink into the database.  Returns the new priKey.</summary>
 		public static long Insert(JobLink jobLink){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
@@ -200,6 +179,21 @@ namespace OpenDentBusiness.Crud{
 				+" WHERE JobLinkNum = "+POut.Long(jobLink.JobLinkNum);
 			Db.NonQ(command);
 			return true;
+		}
+
+		///<summary>Returns true if Update(JobLink,JobLink) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(JobLink jobLink,JobLink oldJobLink) {
+			if(jobLink.JobNum != oldJobLink.JobNum) {
+				return true;
+			}
+			if(jobLink.FKey != oldJobLink.FKey) {
+				return true;
+			}
+			if(jobLink.LinkType != oldJobLink.LinkType) {
+				return true;
+			}
+			return false;
 		}
 
 		///<summary>Deletes one JobLink from the database.</summary>

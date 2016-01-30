@@ -306,6 +306,61 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(TaskHist,TaskHist) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(TaskHist taskHist,TaskHist oldTaskHist) {
+			if(taskHist.UserNumHist != oldTaskHist.UserNumHist) {
+				return true;
+			}
+			//DateTStamp not allowed to change
+			if(taskHist.IsNoteChange != oldTaskHist.IsNoteChange) {
+				return true;
+			}
+			if(taskHist.TaskNum != oldTaskHist.TaskNum) {
+				return true;
+			}
+			if(taskHist.TaskListNum != oldTaskHist.TaskListNum) {
+				return true;
+			}
+			if(taskHist.DateTask != oldTaskHist.DateTask) {
+				return true;
+			}
+			if(taskHist.KeyNum != oldTaskHist.KeyNum) {
+				return true;
+			}
+			if(taskHist.Descript != oldTaskHist.Descript) {
+				return true;
+			}
+			if(taskHist.TaskStatus != oldTaskHist.TaskStatus) {
+				return true;
+			}
+			if(taskHist.IsRepeating != oldTaskHist.IsRepeating) {
+				return true;
+			}
+			if(taskHist.DateType != oldTaskHist.DateType) {
+				return true;
+			}
+			if(taskHist.FromNum != oldTaskHist.FromNum) {
+				return true;
+			}
+			if(taskHist.ObjectType != oldTaskHist.ObjectType) {
+				return true;
+			}
+			if(taskHist.DateTimeEntry != oldTaskHist.DateTimeEntry) {
+				return true;
+			}
+			if(taskHist.UserNum != oldTaskHist.UserNum) {
+				return true;
+			}
+			if(taskHist.DateTimeFinished != oldTaskHist.DateTimeFinished) {
+				return true;
+			}
+			if(taskHist.PriorityDefNum != oldTaskHist.PriorityDefNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one TaskHist from the database.</summary>
 		public static void Delete(long taskHistNum){
 			string command="DELETE FROM taskhist "

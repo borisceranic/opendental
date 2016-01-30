@@ -56,29 +56,6 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of JobQuote into a DataTable.</summary>
-		public static DataTable ListToTable(List<JobQuote> listJobQuotes,string tableName="") {
-			if(string.IsNullOrEmpty(tableName)) {
-				tableName="JobQuote";
-			}
-			DataTable table=new DataTable(tableName);
-			table.Columns.Add("JobQuoteNum");
-			table.Columns.Add("JobNum");
-			table.Columns.Add("PatNum");
-			table.Columns.Add("Amount");
-			table.Columns.Add("Note");
-			foreach(JobQuote jobQuote in listJobQuotes) {
-				table.Rows.Add(new object[] {
-					POut.Long  (jobQuote.JobQuoteNum),
-					POut.Long  (jobQuote.JobNum),
-					POut.Long  (jobQuote.PatNum),
-					POut.String(jobQuote.Amount),
-					POut.String(jobQuote.Note),
-				});
-			}
-			return table;
-		}
-
 		///<summary>Inserts one JobQuote into the database.  Returns the new priKey.</summary>
 		public static long Insert(JobQuote jobQuote){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
@@ -226,6 +203,24 @@ namespace OpenDentBusiness.Crud{
 				+" WHERE JobQuoteNum = "+POut.Long(jobQuote.JobQuoteNum);
 			Db.NonQ(command,paramNote);
 			return true;
+		}
+
+		///<summary>Returns true if Update(JobQuote,JobQuote) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(JobQuote jobQuote,JobQuote oldJobQuote) {
+			if(jobQuote.JobNum != oldJobQuote.JobNum) {
+				return true;
+			}
+			if(jobQuote.PatNum != oldJobQuote.PatNum) {
+				return true;
+			}
+			if(jobQuote.Amount != oldJobQuote.Amount) {
+				return true;
+			}
+			if(jobQuote.Note != oldJobQuote.Note) {
+				return true;
+			}
+			return false;
 		}
 
 		///<summary>Deletes one JobQuote from the database.</summary>

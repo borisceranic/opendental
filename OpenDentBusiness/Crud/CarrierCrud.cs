@@ -277,6 +277,57 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Carrier,Carrier) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Carrier carrier,Carrier oldCarrier) {
+			if(carrier.CarrierName != oldCarrier.CarrierName) {
+				return true;
+			}
+			if(carrier.Address != oldCarrier.Address) {
+				return true;
+			}
+			if(carrier.Address2 != oldCarrier.Address2) {
+				return true;
+			}
+			if(carrier.City != oldCarrier.City) {
+				return true;
+			}
+			if(carrier.State != oldCarrier.State) {
+				return true;
+			}
+			if(carrier.Zip != oldCarrier.Zip) {
+				return true;
+			}
+			if(carrier.Phone != oldCarrier.Phone) {
+				return true;
+			}
+			if(carrier.ElectID != oldCarrier.ElectID) {
+				return true;
+			}
+			if(carrier.NoSendElect != oldCarrier.NoSendElect) {
+				return true;
+			}
+			if(carrier.IsCDA != oldCarrier.IsCDA) {
+				return true;
+			}
+			if(carrier.CDAnetVersion != oldCarrier.CDAnetVersion) {
+				return true;
+			}
+			if(carrier.CanadianNetworkNum != oldCarrier.CanadianNetworkNum) {
+				return true;
+			}
+			if(carrier.IsHidden != oldCarrier.IsHidden) {
+				return true;
+			}
+			if(carrier.CanadianEncryptionMethod != oldCarrier.CanadianEncryptionMethod) {
+				return true;
+			}
+			if(carrier.CanadianSupportedTypes != oldCarrier.CanadianSupportedTypes) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Carrier from the database.</summary>
 		public static void Delete(long carrierNum){
 			string command="DELETE FROM carrier "

@@ -181,6 +181,21 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(QuickPasteCat,QuickPasteCat) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(QuickPasteCat quickPasteCat,QuickPasteCat oldQuickPasteCat) {
+			if(quickPasteCat.Description != oldQuickPasteCat.Description) {
+				return true;
+			}
+			if(quickPasteCat.ItemOrder != oldQuickPasteCat.ItemOrder) {
+				return true;
+			}
+			if(quickPasteCat.DefaultForTypes != oldQuickPasteCat.DefaultForTypes) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one QuickPasteCat from the database.</summary>
 		public static void Delete(long quickPasteCatNum){
 			string command="DELETE FROM quickpastecat "

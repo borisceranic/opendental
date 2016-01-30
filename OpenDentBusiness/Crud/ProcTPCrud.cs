@@ -285,6 +285,60 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ProcTP,ProcTP) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ProcTP procTP,ProcTP oldProcTP) {
+			if(procTP.TreatPlanNum != oldProcTP.TreatPlanNum) {
+				return true;
+			}
+			if(procTP.PatNum != oldProcTP.PatNum) {
+				return true;
+			}
+			if(procTP.ProcNumOrig != oldProcTP.ProcNumOrig) {
+				return true;
+			}
+			if(procTP.ItemOrder != oldProcTP.ItemOrder) {
+				return true;
+			}
+			if(procTP.Priority != oldProcTP.Priority) {
+				return true;
+			}
+			if(procTP.ToothNumTP != oldProcTP.ToothNumTP) {
+				return true;
+			}
+			if(procTP.Surf != oldProcTP.Surf) {
+				return true;
+			}
+			if(procTP.ProcCode != oldProcTP.ProcCode) {
+				return true;
+			}
+			if(procTP.Descript != oldProcTP.Descript) {
+				return true;
+			}
+			if(procTP.FeeAmt != oldProcTP.FeeAmt) {
+				return true;
+			}
+			if(procTP.PriInsAmt != oldProcTP.PriInsAmt) {
+				return true;
+			}
+			if(procTP.SecInsAmt != oldProcTP.SecInsAmt) {
+				return true;
+			}
+			if(procTP.PatAmt != oldProcTP.PatAmt) {
+				return true;
+			}
+			if(procTP.Discount != oldProcTP.Discount) {
+				return true;
+			}
+			if(procTP.Prognosis != oldProcTP.Prognosis) {
+				return true;
+			}
+			if(procTP.Dx != oldProcTP.Dx) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ProcTP from the database.</summary>
 		public static void Delete(long procTPNum){
 			string command="DELETE FROM proctp "

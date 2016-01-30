@@ -173,6 +173,18 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(InsFilingCodeSubtype,InsFilingCodeSubtype) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(InsFilingCodeSubtype insFilingCodeSubtype,InsFilingCodeSubtype oldInsFilingCodeSubtype) {
+			if(insFilingCodeSubtype.InsFilingCodeNum != oldInsFilingCodeSubtype.InsFilingCodeNum) {
+				return true;
+			}
+			if(insFilingCodeSubtype.Descript != oldInsFilingCodeSubtype.Descript) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one InsFilingCodeSubtype from the database.</summary>
 		public static void Delete(long insFilingCodeSubtypeNum){
 			string command="DELETE FROM insfilingcodesubtype "

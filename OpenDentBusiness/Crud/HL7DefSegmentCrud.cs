@@ -230,6 +230,30 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(HL7DefSegment,HL7DefSegment) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(HL7DefSegment hL7DefSegment,HL7DefSegment oldHL7DefSegment) {
+			if(hL7DefSegment.HL7DefMessageNum != oldHL7DefSegment.HL7DefMessageNum) {
+				return true;
+			}
+			if(hL7DefSegment.ItemOrder != oldHL7DefSegment.ItemOrder) {
+				return true;
+			}
+			if(hL7DefSegment.CanRepeat != oldHL7DefSegment.CanRepeat) {
+				return true;
+			}
+			if(hL7DefSegment.IsOptional != oldHL7DefSegment.IsOptional) {
+				return true;
+			}
+			if(hL7DefSegment.SegmentName != oldHL7DefSegment.SegmentName) {
+				return true;
+			}
+			if(hL7DefSegment.Note != oldHL7DefSegment.Note) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one HL7DefSegment from the database.</summary>
 		public static void Delete(long hL7DefSegmentNum){
 			string command="DELETE FROM hl7defsegment "

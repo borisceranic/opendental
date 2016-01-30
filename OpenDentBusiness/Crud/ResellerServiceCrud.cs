@@ -181,6 +181,21 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ResellerService,ResellerService) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ResellerService resellerService,ResellerService oldResellerService) {
+			if(resellerService.ResellerNum != oldResellerService.ResellerNum) {
+				return true;
+			}
+			if(resellerService.CodeNum != oldResellerService.CodeNum) {
+				return true;
+			}
+			if(resellerService.Fee != oldResellerService.Fee) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ResellerService from the database.</summary>
 		public static void Delete(long resellerServiceNum){
 			string command="DELETE FROM resellerservice "

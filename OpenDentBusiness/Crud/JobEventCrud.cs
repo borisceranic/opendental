@@ -66,31 +66,6 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of JobEvent into a DataTable.</summary>
-		public static DataTable ListToTable(List<JobEvent> listJobEvents,string tableName="") {
-			if(string.IsNullOrEmpty(tableName)) {
-				tableName="JobEvent";
-			}
-			DataTable table=new DataTable(tableName);
-			table.Columns.Add("JobEventNum");
-			table.Columns.Add("JobNum");
-			table.Columns.Add("OwnerNum");
-			table.Columns.Add("DateTimeEntry");
-			table.Columns.Add("Description");
-			table.Columns.Add("JobStatus");
-			foreach(JobEvent jobEvent in listJobEvents) {
-				table.Rows.Add(new object[] {
-					POut.Long  (jobEvent.JobEventNum),
-					POut.Long  (jobEvent.JobNum),
-					POut.Long  (jobEvent.OwnerNum),
-					POut.DateT (jobEvent.DateTimeEntry),
-					POut.String(jobEvent.Description),
-					POut.Int   ((int)jobEvent.JobStatus),
-				});
-			}
-			return table;
-		}
-
 		///<summary>Inserts one JobEvent into the database.  Returns the new priKey.</summary>
 		public static long Insert(JobEvent jobEvent){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
@@ -242,6 +217,25 @@ namespace OpenDentBusiness.Crud{
 				+" WHERE JobEventNum = "+POut.Long(jobEvent.JobEventNum);
 			Db.NonQ(command,paramDescription);
 			return true;
+		}
+
+		///<summary>Returns true if Update(JobEvent,JobEvent) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(JobEvent jobEvent,JobEvent oldJobEvent) {
+			if(jobEvent.JobNum != oldJobEvent.JobNum) {
+				return true;
+			}
+			if(jobEvent.OwnerNum != oldJobEvent.OwnerNum) {
+				return true;
+			}
+			//DateTimeEntry not allowed to change
+			if(jobEvent.Description != oldJobEvent.Description) {
+				return true;
+			}
+			if(jobEvent.JobStatus != oldJobEvent.JobStatus) {
+				return true;
+			}
+			return false;
 		}
 
 		///<summary>Deletes one JobEvent from the database.</summary>

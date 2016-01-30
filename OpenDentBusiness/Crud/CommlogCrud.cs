@@ -274,6 +274,49 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Commlog,Commlog) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Commlog commlog,Commlog oldCommlog) {
+			if(commlog.PatNum != oldCommlog.PatNum) {
+				return true;
+			}
+			if(commlog.CommDateTime != oldCommlog.CommDateTime) {
+				return true;
+			}
+			if(commlog.CommType != oldCommlog.CommType) {
+				return true;
+			}
+			if(commlog.Note != oldCommlog.Note) {
+				return true;
+			}
+			if(commlog.Mode_ != oldCommlog.Mode_) {
+				return true;
+			}
+			if(commlog.SentOrReceived != oldCommlog.SentOrReceived) {
+				return true;
+			}
+			if(commlog.UserNum != oldCommlog.UserNum) {
+				return true;
+			}
+			if(commlog.Signature != oldCommlog.Signature) {
+				return true;
+			}
+			if(commlog.SigIsTopaz != oldCommlog.SigIsTopaz) {
+				return true;
+			}
+			//DateTStamp can only be set by MySQL
+			if(commlog.DateTimeEnd != oldCommlog.DateTimeEnd) {
+				return true;
+			}
+			if(commlog.CommSource != oldCommlog.CommSource) {
+				return true;
+			}
+			if(commlog.ProgramNum != oldCommlog.ProgramNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Commlog from the database.</summary>
 		public static void Delete(long commlogNum){
 			string command="DELETE FROM commlog "

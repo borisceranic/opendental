@@ -301,6 +301,66 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Vitalsign,Vitalsign) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Vitalsign vitalsign,Vitalsign oldVitalsign) {
+			if(vitalsign.PatNum != oldVitalsign.PatNum) {
+				return true;
+			}
+			if(vitalsign.Height != oldVitalsign.Height) {
+				return true;
+			}
+			if(vitalsign.Weight != oldVitalsign.Weight) {
+				return true;
+			}
+			if(vitalsign.BpSystolic != oldVitalsign.BpSystolic) {
+				return true;
+			}
+			if(vitalsign.BpDiastolic != oldVitalsign.BpDiastolic) {
+				return true;
+			}
+			if(vitalsign.DateTaken != oldVitalsign.DateTaken) {
+				return true;
+			}
+			if(vitalsign.HasFollowupPlan != oldVitalsign.HasFollowupPlan) {
+				return true;
+			}
+			if(vitalsign.IsIneligible != oldVitalsign.IsIneligible) {
+				return true;
+			}
+			if(vitalsign.Documentation != oldVitalsign.Documentation) {
+				return true;
+			}
+			if(vitalsign.ChildGotNutrition != oldVitalsign.ChildGotNutrition) {
+				return true;
+			}
+			if(vitalsign.ChildGotPhysCouns != oldVitalsign.ChildGotPhysCouns) {
+				return true;
+			}
+			if(vitalsign.WeightCode != oldVitalsign.WeightCode) {
+				return true;
+			}
+			if(vitalsign.HeightExamCode != oldVitalsign.HeightExamCode) {
+				return true;
+			}
+			if(vitalsign.WeightExamCode != oldVitalsign.WeightExamCode) {
+				return true;
+			}
+			if(vitalsign.BMIExamCode != oldVitalsign.BMIExamCode) {
+				return true;
+			}
+			if(vitalsign.EhrNotPerformedNum != oldVitalsign.EhrNotPerformedNum) {
+				return true;
+			}
+			if(vitalsign.PregDiseaseNum != oldVitalsign.PregDiseaseNum) {
+				return true;
+			}
+			if(vitalsign.BMIPercentile != oldVitalsign.BMIPercentile) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Vitalsign from the database.</summary>
 		public static void Delete(long vitalsignNum){
 			string command="DELETE FROM vitalsign "

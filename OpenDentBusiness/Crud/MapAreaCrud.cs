@@ -213,6 +213,33 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(MapArea,MapArea) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(MapArea mapArea,MapArea oldMapArea) {
+			if(mapArea.Extension != oldMapArea.Extension) {
+				return true;
+			}
+			if(mapArea.XPos != oldMapArea.XPos) {
+				return true;
+			}
+			if(mapArea.YPos != oldMapArea.YPos) {
+				return true;
+			}
+			if(mapArea.Width != oldMapArea.Width) {
+				return true;
+			}
+			if(mapArea.Height != oldMapArea.Height) {
+				return true;
+			}
+			if(mapArea.Description != oldMapArea.Description) {
+				return true;
+			}
+			if(mapArea.ItemType != oldMapArea.ItemType) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one MapArea from the database.</summary>
 		public static void Delete(long mapAreaNum){
 			string command="DELETE FROM maparea "

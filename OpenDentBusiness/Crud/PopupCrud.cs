@@ -218,6 +218,34 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Popup,Popup) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Popup popup,Popup oldPopup) {
+			if(popup.PatNum != oldPopup.PatNum) {
+				return true;
+			}
+			if(popup.Description != oldPopup.Description) {
+				return true;
+			}
+			if(popup.IsDisabled != oldPopup.IsDisabled) {
+				return true;
+			}
+			if(popup.PopupLevel != oldPopup.PopupLevel) {
+				return true;
+			}
+			if(popup.UserNum != oldPopup.UserNum) {
+				return true;
+			}
+			//DateTimeEntry not allowed to change
+			if(popup.IsArchived != oldPopup.IsArchived) {
+				return true;
+			}
+			if(popup.PopupNumArchive != oldPopup.PopupNumArchive) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Popup from the database.</summary>
 		public static void Delete(long popupNum){
 			string command="DELETE FROM popup "

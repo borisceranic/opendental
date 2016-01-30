@@ -221,6 +221,36 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EhrNotPerformed,EhrNotPerformed) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EhrNotPerformed ehrNotPerformed,EhrNotPerformed oldEhrNotPerformed) {
+			if(ehrNotPerformed.PatNum != oldEhrNotPerformed.PatNum) {
+				return true;
+			}
+			if(ehrNotPerformed.ProvNum != oldEhrNotPerformed.ProvNum) {
+				return true;
+			}
+			if(ehrNotPerformed.CodeValue != oldEhrNotPerformed.CodeValue) {
+				return true;
+			}
+			if(ehrNotPerformed.CodeSystem != oldEhrNotPerformed.CodeSystem) {
+				return true;
+			}
+			if(ehrNotPerformed.CodeValueReason != oldEhrNotPerformed.CodeValueReason) {
+				return true;
+			}
+			if(ehrNotPerformed.CodeSystemReason != oldEhrNotPerformed.CodeSystemReason) {
+				return true;
+			}
+			if(ehrNotPerformed.Note != oldEhrNotPerformed.Note) {
+				return true;
+			}
+			if(ehrNotPerformed.DateEntry != oldEhrNotPerformed.DateEntry) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EhrNotPerformed from the database.</summary>
 		public static void Delete(long ehrNotPerformedNum){
 			string command="DELETE FROM ehrnotperformed "

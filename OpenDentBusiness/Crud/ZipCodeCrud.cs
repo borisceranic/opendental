@@ -189,6 +189,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ZipCode,ZipCode) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ZipCode zipCode,ZipCode oldZipCode) {
+			if(zipCode.ZipCodeDigits != oldZipCode.ZipCodeDigits) {
+				return true;
+			}
+			if(zipCode.City != oldZipCode.City) {
+				return true;
+			}
+			if(zipCode.State != oldZipCode.State) {
+				return true;
+			}
+			if(zipCode.IsFrequent != oldZipCode.IsFrequent) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ZipCode from the database.</summary>
 		public static void Delete(long zipCodeNum){
 			string command="DELETE FROM zipcode "

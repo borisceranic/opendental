@@ -197,6 +197,27 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(CodeSystem,CodeSystem) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(CodeSystem codeSystem,CodeSystem oldCodeSystem) {
+			if(codeSystem.CodeSystemName != oldCodeSystem.CodeSystemName) {
+				return true;
+			}
+			if(codeSystem.VersionCur != oldCodeSystem.VersionCur) {
+				return true;
+			}
+			if(codeSystem.VersionAvail != oldCodeSystem.VersionAvail) {
+				return true;
+			}
+			if(codeSystem.HL7OID != oldCodeSystem.HL7OID) {
+				return true;
+			}
+			if(codeSystem.Note != oldCodeSystem.Note) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one CodeSystem from the database.</summary>
 		public static void Delete(long codeSystemNum){
 			string command="DELETE FROM codesystem "

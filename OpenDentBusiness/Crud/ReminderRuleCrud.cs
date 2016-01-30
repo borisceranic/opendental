@@ -189,6 +189,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ReminderRule,ReminderRule) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ReminderRule reminderRule,ReminderRule oldReminderRule) {
+			if(reminderRule.ReminderCriterion != oldReminderRule.ReminderCriterion) {
+				return true;
+			}
+			if(reminderRule.CriterionFK != oldReminderRule.CriterionFK) {
+				return true;
+			}
+			if(reminderRule.CriterionValue != oldReminderRule.CriterionValue) {
+				return true;
+			}
+			if(reminderRule.Message != oldReminderRule.Message) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ReminderRule from the database.</summary>
 		public static void Delete(long reminderRuleNum){
 			string command="DELETE FROM reminderrule "

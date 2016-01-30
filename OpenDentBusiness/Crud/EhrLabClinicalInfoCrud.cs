@@ -222,6 +222,36 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EhrLabClinicalInfo,EhrLabClinicalInfo) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EhrLabClinicalInfo ehrLabClinicalInfo,EhrLabClinicalInfo oldEhrLabClinicalInfo) {
+			if(ehrLabClinicalInfo.EhrLabNum != oldEhrLabClinicalInfo.EhrLabNum) {
+				return true;
+			}
+			if(ehrLabClinicalInfo.ClinicalInfoID != oldEhrLabClinicalInfo.ClinicalInfoID) {
+				return true;
+			}
+			if(ehrLabClinicalInfo.ClinicalInfoText != oldEhrLabClinicalInfo.ClinicalInfoText) {
+				return true;
+			}
+			if(ehrLabClinicalInfo.ClinicalInfoCodeSystemName != oldEhrLabClinicalInfo.ClinicalInfoCodeSystemName) {
+				return true;
+			}
+			if(ehrLabClinicalInfo.ClinicalInfoIDAlt != oldEhrLabClinicalInfo.ClinicalInfoIDAlt) {
+				return true;
+			}
+			if(ehrLabClinicalInfo.ClinicalInfoTextAlt != oldEhrLabClinicalInfo.ClinicalInfoTextAlt) {
+				return true;
+			}
+			if(ehrLabClinicalInfo.ClinicalInfoCodeSystemNameAlt != oldEhrLabClinicalInfo.ClinicalInfoCodeSystemNameAlt) {
+				return true;
+			}
+			if(ehrLabClinicalInfo.ClinicalInfoTextOriginal != oldEhrLabClinicalInfo.ClinicalInfoTextOriginal) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EhrLabClinicalInfo from the database.</summary>
 		public static void Delete(long ehrLabClinicalInfoNum){
 			string command="DELETE FROM ehrlabclinicalinfo "

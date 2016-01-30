@@ -373,6 +373,93 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Clinic,Clinic) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Clinic clinic,Clinic oldClinic) {
+			if(clinic.Description != oldClinic.Description) {
+				return true;
+			}
+			if(clinic.Address != oldClinic.Address) {
+				return true;
+			}
+			if(clinic.Address2 != oldClinic.Address2) {
+				return true;
+			}
+			if(clinic.City != oldClinic.City) {
+				return true;
+			}
+			if(clinic.State != oldClinic.State) {
+				return true;
+			}
+			if(clinic.Zip != oldClinic.Zip) {
+				return true;
+			}
+			if(clinic.BillingAddress != oldClinic.BillingAddress) {
+				return true;
+			}
+			if(clinic.BillingAddress2 != oldClinic.BillingAddress2) {
+				return true;
+			}
+			if(clinic.BillingCity != oldClinic.BillingCity) {
+				return true;
+			}
+			if(clinic.BillingState != oldClinic.BillingState) {
+				return true;
+			}
+			if(clinic.BillingZip != oldClinic.BillingZip) {
+				return true;
+			}
+			if(clinic.PayToAddress != oldClinic.PayToAddress) {
+				return true;
+			}
+			if(clinic.PayToAddress2 != oldClinic.PayToAddress2) {
+				return true;
+			}
+			if(clinic.PayToCity != oldClinic.PayToCity) {
+				return true;
+			}
+			if(clinic.PayToState != oldClinic.PayToState) {
+				return true;
+			}
+			if(clinic.PayToZip != oldClinic.PayToZip) {
+				return true;
+			}
+			if(clinic.Phone != oldClinic.Phone) {
+				return true;
+			}
+			if(clinic.BankNumber != oldClinic.BankNumber) {
+				return true;
+			}
+			if(clinic.DefaultPlaceService != oldClinic.DefaultPlaceService) {
+				return true;
+			}
+			if(clinic.InsBillingProv != oldClinic.InsBillingProv) {
+				return true;
+			}
+			if(clinic.Fax != oldClinic.Fax) {
+				return true;
+			}
+			if(clinic.EmailAddressNum != oldClinic.EmailAddressNum) {
+				return true;
+			}
+			if(clinic.DefaultProv != oldClinic.DefaultProv) {
+				return true;
+			}
+			if(clinic.SmsContractDate != oldClinic.SmsContractDate) {
+				return true;
+			}
+			if(clinic.SmsMonthlyLimit != oldClinic.SmsMonthlyLimit) {
+				return true;
+			}
+			if(clinic.IsMedicalOnly != oldClinic.IsMedicalOnly) {
+				return true;
+			}
+			if(clinic.UseBillAddrOnClaims != oldClinic.UseBillAddrOnClaims) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Clinic from the database.</summary>
 		public static void Delete(long clinicNum){
 			string command="DELETE FROM clinic "

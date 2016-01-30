@@ -181,6 +181,21 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(PatField,PatField) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(PatField patField,PatField oldPatField) {
+			if(patField.PatNum != oldPatField.PatNum) {
+				return true;
+			}
+			if(patField.FieldName != oldPatField.FieldName) {
+				return true;
+			}
+			if(patField.FieldValue != oldPatField.FieldValue) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one PatField from the database.</summary>
 		public static void Delete(long patFieldNum){
 			string command="DELETE FROM patfield "

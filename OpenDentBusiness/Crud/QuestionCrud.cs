@@ -197,6 +197,27 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Question,Question) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Question question,Question oldQuestion) {
+			if(question.PatNum != oldQuestion.PatNum) {
+				return true;
+			}
+			if(question.ItemOrder != oldQuestion.ItemOrder) {
+				return true;
+			}
+			if(question.Description != oldQuestion.Description) {
+				return true;
+			}
+			if(question.Answer != oldQuestion.Answer) {
+				return true;
+			}
+			if(question.FormPatNum != oldQuestion.FormPatNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Question from the database.</summary>
 		public static void Delete(long questionNum){
 			string command="DELETE FROM question "

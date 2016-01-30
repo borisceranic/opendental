@@ -173,6 +173,18 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(AutoCodeCond,AutoCodeCond) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(AutoCodeCond autoCodeCond,AutoCodeCond oldAutoCodeCond) {
+			if(autoCodeCond.AutoCodeItemNum != oldAutoCodeCond.AutoCodeItemNum) {
+				return true;
+			}
+			if(autoCodeCond.Cond != oldAutoCodeCond.Cond) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one AutoCodeCond from the database.</summary>
 		public static void Delete(long autoCodeCondNum){
 			string command="DELETE FROM autocodecond "

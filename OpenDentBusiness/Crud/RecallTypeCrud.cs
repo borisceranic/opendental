@@ -189,6 +189,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(RecallType,RecallType) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(RecallType recallType,RecallType oldRecallType) {
+			if(recallType.Description != oldRecallType.Description) {
+				return true;
+			}
+			if(recallType.DefaultInterval != oldRecallType.DefaultInterval) {
+				return true;
+			}
+			if(recallType.TimePattern != oldRecallType.TimePattern) {
+				return true;
+			}
+			if(recallType.Procedures != oldRecallType.Procedures) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one RecallType from the database.</summary>
 		public static void Delete(long recallTypeNum){
 			string command="DELETE FROM recalltype "

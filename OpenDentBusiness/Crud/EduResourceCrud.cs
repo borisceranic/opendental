@@ -205,6 +205,30 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EduResource,EduResource) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EduResource eduResource,EduResource oldEduResource) {
+			if(eduResource.DiseaseDefNum != oldEduResource.DiseaseDefNum) {
+				return true;
+			}
+			if(eduResource.MedicationNum != oldEduResource.MedicationNum) {
+				return true;
+			}
+			if(eduResource.LabResultID != oldEduResource.LabResultID) {
+				return true;
+			}
+			if(eduResource.LabResultName != oldEduResource.LabResultName) {
+				return true;
+			}
+			if(eduResource.LabResultCompare != oldEduResource.LabResultCompare) {
+				return true;
+			}
+			if(eduResource.ResourceUrl != oldEduResource.ResourceUrl) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EduResource from the database.</summary>
 		public static void Delete(long eduResourceNum){
 			string command="DELETE FROM eduresource "

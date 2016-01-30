@@ -189,6 +189,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Deposit,Deposit) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Deposit deposit,Deposit oldDeposit) {
+			if(deposit.DateDeposit != oldDeposit.DateDeposit) {
+				return true;
+			}
+			if(deposit.BankAccountInfo != oldDeposit.BankAccountInfo) {
+				return true;
+			}
+			if(deposit.Amount != oldDeposit.Amount) {
+				return true;
+			}
+			if(deposit.Memo != oldDeposit.Memo) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Deposit from the database.</summary>
 		public static void Delete(long depositNum){
 			string command="DELETE FROM deposit "

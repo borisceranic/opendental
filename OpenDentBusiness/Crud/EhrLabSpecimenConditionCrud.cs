@@ -222,6 +222,36 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EhrLabSpecimenCondition,EhrLabSpecimenCondition) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EhrLabSpecimenCondition ehrLabSpecimenCondition,EhrLabSpecimenCondition oldEhrLabSpecimenCondition) {
+			if(ehrLabSpecimenCondition.EhrLabSpecimenNum != oldEhrLabSpecimenCondition.EhrLabSpecimenNum) {
+				return true;
+			}
+			if(ehrLabSpecimenCondition.SpecimenConditionID != oldEhrLabSpecimenCondition.SpecimenConditionID) {
+				return true;
+			}
+			if(ehrLabSpecimenCondition.SpecimenConditionText != oldEhrLabSpecimenCondition.SpecimenConditionText) {
+				return true;
+			}
+			if(ehrLabSpecimenCondition.SpecimenConditionCodeSystemName != oldEhrLabSpecimenCondition.SpecimenConditionCodeSystemName) {
+				return true;
+			}
+			if(ehrLabSpecimenCondition.SpecimenConditionIDAlt != oldEhrLabSpecimenCondition.SpecimenConditionIDAlt) {
+				return true;
+			}
+			if(ehrLabSpecimenCondition.SpecimenConditionTextAlt != oldEhrLabSpecimenCondition.SpecimenConditionTextAlt) {
+				return true;
+			}
+			if(ehrLabSpecimenCondition.SpecimenConditionCodeSystemNameAlt != oldEhrLabSpecimenCondition.SpecimenConditionCodeSystemNameAlt) {
+				return true;
+			}
+			if(ehrLabSpecimenCondition.SpecimenConditionTextOriginal != oldEhrLabSpecimenCondition.SpecimenConditionTextOriginal) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EhrLabSpecimenCondition from the database.</summary>
 		public static void Delete(long ehrLabSpecimenConditionNum){
 			string command="DELETE FROM ehrlabspecimencondition "

@@ -189,6 +189,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(LetterMerge,LetterMerge) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(LetterMerge letterMerge,LetterMerge oldLetterMerge) {
+			if(letterMerge.Description != oldLetterMerge.Description) {
+				return true;
+			}
+			if(letterMerge.TemplateName != oldLetterMerge.TemplateName) {
+				return true;
+			}
+			if(letterMerge.DataFileName != oldLetterMerge.DataFileName) {
+				return true;
+			}
+			if(letterMerge.Category != oldLetterMerge.Category) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one LetterMerge from the database.</summary>
 		public static void Delete(long letterMergeNum){
 			string command="DELETE FROM lettermerge "

@@ -210,6 +210,31 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(DiseaseDef,DiseaseDef) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(DiseaseDef diseaseDef,DiseaseDef oldDiseaseDef) {
+			if(diseaseDef.DiseaseName != oldDiseaseDef.DiseaseName) {
+				return true;
+			}
+			if(diseaseDef.ItemOrder != oldDiseaseDef.ItemOrder) {
+				return true;
+			}
+			if(diseaseDef.IsHidden != oldDiseaseDef.IsHidden) {
+				return true;
+			}
+			//DateTStamp can only be set by MySQL
+			if(diseaseDef.ICD9Code != oldDiseaseDef.ICD9Code) {
+				return true;
+			}
+			if(diseaseDef.SnomedCode != oldDiseaseDef.SnomedCode) {
+				return true;
+			}
+			if(diseaseDef.Icd10Code != oldDiseaseDef.Icd10Code) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one DiseaseDef from the database.</summary>
 		public static void Delete(long diseaseDefNum){
 			string command="DELETE FROM diseasedef "

@@ -205,6 +205,30 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EvaluationCriterionDef,EvaluationCriterionDef) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EvaluationCriterionDef evaluationCriterionDef,EvaluationCriterionDef oldEvaluationCriterionDef) {
+			if(evaluationCriterionDef.EvaluationDefNum != oldEvaluationCriterionDef.EvaluationDefNum) {
+				return true;
+			}
+			if(evaluationCriterionDef.CriterionDescript != oldEvaluationCriterionDef.CriterionDescript) {
+				return true;
+			}
+			if(evaluationCriterionDef.IsCategoryName != oldEvaluationCriterionDef.IsCategoryName) {
+				return true;
+			}
+			if(evaluationCriterionDef.GradingScaleNum != oldEvaluationCriterionDef.GradingScaleNum) {
+				return true;
+			}
+			if(evaluationCriterionDef.ItemOrder != oldEvaluationCriterionDef.ItemOrder) {
+				return true;
+			}
+			if(evaluationCriterionDef.MaxPointsPoss != oldEvaluationCriterionDef.MaxPointsPoss) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EvaluationCriterionDef from the database.</summary>
 		public static void Delete(long evaluationCriterionDefNum){
 			string command="DELETE FROM evaluationcriteriondef "

@@ -197,6 +197,27 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(WikiPageHist,WikiPageHist) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(WikiPageHist wikiPageHist,WikiPageHist oldWikiPageHist) {
+			if(wikiPageHist.UserNum != oldWikiPageHist.UserNum) {
+				return true;
+			}
+			if(wikiPageHist.PageTitle != oldWikiPageHist.PageTitle) {
+				return true;
+			}
+			if(wikiPageHist.PageContent != oldWikiPageHist.PageContent) {
+				return true;
+			}
+			if(wikiPageHist.DateTimeSaved != oldWikiPageHist.DateTimeSaved) {
+				return true;
+			}
+			if(wikiPageHist.IsDeleted != oldWikiPageHist.IsDeleted) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one WikiPageHist from the database.</summary>
 		public static void Delete(long wikiPageNum){
 			string command="DELETE FROM wikipagehist "

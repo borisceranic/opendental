@@ -91,45 +91,6 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of Job into a DataTable.</summary>
-		public static DataTable ListToTable(List<Job> listJobs,string tableName="") {
-			if(string.IsNullOrEmpty(tableName)) {
-				tableName="Job";
-			}
-			DataTable table=new DataTable(tableName);
-			table.Columns.Add("JobNum");
-			table.Columns.Add("ExpertNum");
-			table.Columns.Add("OwnerNum");
-			table.Columns.Add("ParentNum");
-			table.Columns.Add("Priority");
-			table.Columns.Add("Category");
-			table.Columns.Add("JobVersion");
-			table.Columns.Add("HoursEstimate");
-			table.Columns.Add("HoursActual");
-			table.Columns.Add("DateTimeEntry");
-			table.Columns.Add("Description");
-			table.Columns.Add("Title");
-			table.Columns.Add("JobStatus");
-			foreach(Job job in listJobs) {
-				table.Rows.Add(new object[] {
-					POut.Long  (job.JobNum),
-					POut.Long  (job.ExpertNum),
-					POut.Long  (job.OwnerNum),
-					POut.Long  (job.ParentNum),
-					POut.Int   ((int)job.Priority),
-					POut.Int   ((int)job.Category),
-					POut.String(job.JobVersion),
-					POut.Int   (job.HoursEstimate),
-					POut.Int   (job.HoursActual),
-					POut.DateT (job.DateTimeEntry),
-					POut.String(job.Description),
-					POut.String(job.Title),
-					POut.Int   ((int)job.JobStatus),
-				});
-			}
-			return table;
-		}
-
 		///<summary>Inserts one Job into the database.  Returns the new priKey.</summary>
 		public static long Insert(Job job){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
@@ -330,6 +291,46 @@ namespace OpenDentBusiness.Crud{
 				+" WHERE JobNum = "+POut.Long(job.JobNum);
 			Db.NonQ(command,paramDescription);
 			return true;
+		}
+
+		///<summary>Returns true if Update(Job,Job) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Job job,Job oldJob) {
+			if(job.ExpertNum != oldJob.ExpertNum) {
+				return true;
+			}
+			if(job.OwnerNum != oldJob.OwnerNum) {
+				return true;
+			}
+			if(job.ParentNum != oldJob.ParentNum) {
+				return true;
+			}
+			if(job.Priority != oldJob.Priority) {
+				return true;
+			}
+			if(job.Category != oldJob.Category) {
+				return true;
+			}
+			if(job.JobVersion != oldJob.JobVersion) {
+				return true;
+			}
+			if(job.HoursEstimate != oldJob.HoursEstimate) {
+				return true;
+			}
+			if(job.HoursActual != oldJob.HoursActual) {
+				return true;
+			}
+			//DateTimeEntry not allowed to change
+			if(job.Description != oldJob.Description) {
+				return true;
+			}
+			if(job.Title != oldJob.Title) {
+				return true;
+			}
+			if(job.JobStatus != oldJob.JobStatus) {
+				return true;
+			}
+			return false;
 		}
 
 		///<summary>Deletes one Job from the database.</summary>

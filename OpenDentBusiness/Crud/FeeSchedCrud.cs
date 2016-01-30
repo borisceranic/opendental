@@ -197,6 +197,27 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(FeeSched,FeeSched) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(FeeSched feeSched,FeeSched oldFeeSched) {
+			if(feeSched.Description != oldFeeSched.Description) {
+				return true;
+			}
+			if(feeSched.FeeSchedType != oldFeeSched.FeeSchedType) {
+				return true;
+			}
+			if(feeSched.ItemOrder != oldFeeSched.ItemOrder) {
+				return true;
+			}
+			if(feeSched.IsHidden != oldFeeSched.IsHidden) {
+				return true;
+			}
+			if(feeSched.IsGlobal != oldFeeSched.IsGlobal) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one FeeSched from the database.</summary>
 		public static void Delete(long feeSchedNum){
 			string command="DELETE FROM feesched "

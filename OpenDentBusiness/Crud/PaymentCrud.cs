@@ -271,6 +271,47 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Payment,Payment) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Payment payment,Payment oldPayment) {
+			if(payment.PayType != oldPayment.PayType) {
+				return true;
+			}
+			if(payment.PayDate != oldPayment.PayDate) {
+				return true;
+			}
+			if(payment.PayAmt != oldPayment.PayAmt) {
+				return true;
+			}
+			if(payment.CheckNum != oldPayment.CheckNum) {
+				return true;
+			}
+			if(payment.BankBranch != oldPayment.BankBranch) {
+				return true;
+			}
+			if(payment.PayNote != oldPayment.PayNote) {
+				return true;
+			}
+			if(payment.IsSplit != oldPayment.IsSplit) {
+				return true;
+			}
+			if(payment.PatNum != oldPayment.PatNum) {
+				return true;
+			}
+			if(payment.ClinicNum != oldPayment.ClinicNum) {
+				return true;
+			}
+			//DateEntry not allowed to change
+			//DepositNum excluded from update
+			if(payment.Receipt != oldPayment.Receipt) {
+				return true;
+			}
+			if(payment.IsRecurringCC != oldPayment.IsRecurringCC) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Payment from the database.</summary>
 		public static void Delete(long payNum){
 			string command="DELETE FROM payment "

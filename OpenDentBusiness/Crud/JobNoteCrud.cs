@@ -56,29 +56,6 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of JobNote into a DataTable.</summary>
-		public static DataTable ListToTable(List<JobNote> listJobNotes,string tableName="") {
-			if(string.IsNullOrEmpty(tableName)) {
-				tableName="JobNote";
-			}
-			DataTable table=new DataTable(tableName);
-			table.Columns.Add("JobNoteNum");
-			table.Columns.Add("JobNum");
-			table.Columns.Add("UserNum");
-			table.Columns.Add("DateTimeNote");
-			table.Columns.Add("Note");
-			foreach(JobNote jobNote in listJobNotes) {
-				table.Rows.Add(new object[] {
-					POut.Long  (jobNote.JobNoteNum),
-					POut.Long  (jobNote.JobNum),
-					POut.Long  (jobNote.UserNum),
-					POut.DateT (jobNote.DateTimeNote),
-					POut.String(jobNote.Note),
-				});
-			}
-			return table;
-		}
-
 		///<summary>Inserts one JobNote into the database.  Returns the new priKey.</summary>
 		public static long Insert(JobNote jobNote){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
@@ -226,6 +203,24 @@ namespace OpenDentBusiness.Crud{
 				+" WHERE JobNoteNum = "+POut.Long(jobNote.JobNoteNum);
 			Db.NonQ(command,paramNote);
 			return true;
+		}
+
+		///<summary>Returns true if Update(JobNote,JobNote) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(JobNote jobNote,JobNote oldJobNote) {
+			if(jobNote.JobNum != oldJobNote.JobNum) {
+				return true;
+			}
+			if(jobNote.UserNum != oldJobNote.UserNum) {
+				return true;
+			}
+			if(jobNote.DateTimeNote != oldJobNote.DateTimeNote) {
+				return true;
+			}
+			if(jobNote.Note != oldJobNote.Note) {
+				return true;
+			}
+			return false;
 		}
 
 		///<summary>Deletes one JobNote from the database.</summary>

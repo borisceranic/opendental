@@ -245,6 +245,45 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ClaimPayment,ClaimPayment) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ClaimPayment claimPayment,ClaimPayment oldClaimPayment) {
+			if(claimPayment.CheckDate != oldClaimPayment.CheckDate) {
+				return true;
+			}
+			if(claimPayment.CheckAmt != oldClaimPayment.CheckAmt) {
+				return true;
+			}
+			if(claimPayment.CheckNum != oldClaimPayment.CheckNum) {
+				return true;
+			}
+			if(claimPayment.BankBranch != oldClaimPayment.BankBranch) {
+				return true;
+			}
+			if(claimPayment.Note != oldClaimPayment.Note) {
+				return true;
+			}
+			if(claimPayment.ClinicNum != oldClaimPayment.ClinicNum) {
+				return true;
+			}
+			if(claimPayment.DepositNum != oldClaimPayment.DepositNum) {
+				return true;
+			}
+			if(claimPayment.CarrierName != oldClaimPayment.CarrierName) {
+				return true;
+			}
+			if(claimPayment.DateIssued != oldClaimPayment.DateIssued) {
+				return true;
+			}
+			if(claimPayment.IsPartial != oldClaimPayment.IsPartial) {
+				return true;
+			}
+			if(claimPayment.PayType != oldClaimPayment.PayType) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ClaimPayment from the database.</summary>
 		public static void Delete(long claimPaymentNum){
 			string command="DELETE FROM claimpayment "

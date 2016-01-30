@@ -205,6 +205,30 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EhrQuarterlyKey,EhrQuarterlyKey) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EhrQuarterlyKey ehrQuarterlyKey,EhrQuarterlyKey oldEhrQuarterlyKey) {
+			if(ehrQuarterlyKey.YearValue != oldEhrQuarterlyKey.YearValue) {
+				return true;
+			}
+			if(ehrQuarterlyKey.QuarterValue != oldEhrQuarterlyKey.QuarterValue) {
+				return true;
+			}
+			if(ehrQuarterlyKey.PracticeName != oldEhrQuarterlyKey.PracticeName) {
+				return true;
+			}
+			if(ehrQuarterlyKey.KeyValue != oldEhrQuarterlyKey.KeyValue) {
+				return true;
+			}
+			if(ehrQuarterlyKey.PatNum != oldEhrQuarterlyKey.PatNum) {
+				return true;
+			}
+			if(ehrQuarterlyKey.Notes != oldEhrQuarterlyKey.Notes) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EhrQuarterlyKey from the database.</summary>
 		public static void Delete(long ehrQuarterlyKeyNum){
 			string command="DELETE FROM ehrquarterlykey "

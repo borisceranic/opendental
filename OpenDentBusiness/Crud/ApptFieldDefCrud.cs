@@ -181,6 +181,21 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ApptFieldDef,ApptFieldDef) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ApptFieldDef apptFieldDef,ApptFieldDef oldApptFieldDef) {
+			if(apptFieldDef.FieldName != oldApptFieldDef.FieldName) {
+				return true;
+			}
+			if(apptFieldDef.FieldType != oldApptFieldDef.FieldType) {
+				return true;
+			}
+			if(apptFieldDef.PickList != oldApptFieldDef.PickList) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ApptFieldDef from the database.</summary>
 		public static void Delete(long apptFieldDefNum){
 			string command="DELETE FROM apptfielddef "

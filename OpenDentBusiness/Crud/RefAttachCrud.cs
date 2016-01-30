@@ -245,6 +245,45 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(RefAttach,RefAttach) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(RefAttach refAttach,RefAttach oldRefAttach) {
+			if(refAttach.ReferralNum != oldRefAttach.ReferralNum) {
+				return true;
+			}
+			if(refAttach.PatNum != oldRefAttach.PatNum) {
+				return true;
+			}
+			if(refAttach.ItemOrder != oldRefAttach.ItemOrder) {
+				return true;
+			}
+			if(refAttach.RefDate != oldRefAttach.RefDate) {
+				return true;
+			}
+			if(refAttach.IsFrom != oldRefAttach.IsFrom) {
+				return true;
+			}
+			if(refAttach.RefToStatus != oldRefAttach.RefToStatus) {
+				return true;
+			}
+			if(refAttach.Note != oldRefAttach.Note) {
+				return true;
+			}
+			if(refAttach.IsTransitionOfCare != oldRefAttach.IsTransitionOfCare) {
+				return true;
+			}
+			if(refAttach.ProcNum != oldRefAttach.ProcNum) {
+				return true;
+			}
+			if(refAttach.DateProcComplete != oldRefAttach.DateProcComplete) {
+				return true;
+			}
+			if(refAttach.ProvNum != oldRefAttach.ProvNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one RefAttach from the database.</summary>
 		public static void Delete(long refAttachNum){
 			string command="DELETE FROM refattach "

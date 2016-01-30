@@ -365,6 +365,90 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ComputerPref,ComputerPref) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ComputerPref computerPref,ComputerPref oldComputerPref) {
+			if(computerPref.ComputerName != oldComputerPref.ComputerName) {
+				return true;
+			}
+			if(computerPref.GraphicsUseHardware != oldComputerPref.GraphicsUseHardware) {
+				return true;
+			}
+			if(computerPref.GraphicsSimple != oldComputerPref.GraphicsSimple) {
+				return true;
+			}
+			if(computerPref.SensorType != oldComputerPref.SensorType) {
+				return true;
+			}
+			if(computerPref.SensorBinned != oldComputerPref.SensorBinned) {
+				return true;
+			}
+			if(computerPref.SensorPort != oldComputerPref.SensorPort) {
+				return true;
+			}
+			if(computerPref.SensorExposure != oldComputerPref.SensorExposure) {
+				return true;
+			}
+			if(computerPref.GraphicsDoubleBuffering != oldComputerPref.GraphicsDoubleBuffering) {
+				return true;
+			}
+			if(computerPref.PreferredPixelFormatNum != oldComputerPref.PreferredPixelFormatNum) {
+				return true;
+			}
+			if(computerPref.AtoZpath != oldComputerPref.AtoZpath) {
+				return true;
+			}
+			if(computerPref.TaskKeepListHidden != oldComputerPref.TaskKeepListHidden) {
+				return true;
+			}
+			if(computerPref.TaskDock != oldComputerPref.TaskDock) {
+				return true;
+			}
+			if(computerPref.TaskX != oldComputerPref.TaskX) {
+				return true;
+			}
+			if(computerPref.TaskY != oldComputerPref.TaskY) {
+				return true;
+			}
+			if(computerPref.DirectXFormat != oldComputerPref.DirectXFormat) {
+				return true;
+			}
+			if(computerPref.ScanDocSelectSource != oldComputerPref.ScanDocSelectSource) {
+				return true;
+			}
+			if(computerPref.ScanDocShowOptions != oldComputerPref.ScanDocShowOptions) {
+				return true;
+			}
+			if(computerPref.ScanDocDuplex != oldComputerPref.ScanDocDuplex) {
+				return true;
+			}
+			if(computerPref.ScanDocGrayscale != oldComputerPref.ScanDocGrayscale) {
+				return true;
+			}
+			if(computerPref.ScanDocResolution != oldComputerPref.ScanDocResolution) {
+				return true;
+			}
+			if(computerPref.ScanDocQuality != oldComputerPref.ScanDocQuality) {
+				return true;
+			}
+			if(computerPref.ClinicNum != oldComputerPref.ClinicNum) {
+				return true;
+			}
+			if(computerPref.ApptViewNum != oldComputerPref.ApptViewNum) {
+				return true;
+			}
+			if(computerPref.RecentApptView != oldComputerPref.RecentApptView) {
+				return true;
+			}
+			if(computerPref.PatSelectSearchMode != oldComputerPref.PatSelectSearchMode) {
+				return true;
+			}
+			if(computerPref.NoShowLanguage != oldComputerPref.NoShowLanguage) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ComputerPref from the database.</summary>
 		public static void Delete(long computerPrefNum){
 			string command="DELETE FROM computerpref "

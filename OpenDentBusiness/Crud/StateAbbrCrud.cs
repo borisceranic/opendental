@@ -181,6 +181,21 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(StateAbbr,StateAbbr) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(StateAbbr stateAbbr,StateAbbr oldStateAbbr) {
+			if(stateAbbr.Description != oldStateAbbr.Description) {
+				return true;
+			}
+			if(stateAbbr.Abbr != oldStateAbbr.Abbr) {
+				return true;
+			}
+			if(stateAbbr.MedicaidIDLength != oldStateAbbr.MedicaidIDLength) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one StateAbbr from the database.</summary>
 		public static void Delete(long stateAbbrNum){
 			string command="DELETE FROM stateabbr "

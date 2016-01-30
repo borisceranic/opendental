@@ -237,6 +237,42 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(PerioMeasure,PerioMeasure) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(PerioMeasure perioMeasure,PerioMeasure oldPerioMeasure) {
+			if(perioMeasure.PerioExamNum != oldPerioMeasure.PerioExamNum) {
+				return true;
+			}
+			if(perioMeasure.SequenceType != oldPerioMeasure.SequenceType) {
+				return true;
+			}
+			if(perioMeasure.IntTooth != oldPerioMeasure.IntTooth) {
+				return true;
+			}
+			if(perioMeasure.ToothValue != oldPerioMeasure.ToothValue) {
+				return true;
+			}
+			if(perioMeasure.MBvalue != oldPerioMeasure.MBvalue) {
+				return true;
+			}
+			if(perioMeasure.Bvalue != oldPerioMeasure.Bvalue) {
+				return true;
+			}
+			if(perioMeasure.DBvalue != oldPerioMeasure.DBvalue) {
+				return true;
+			}
+			if(perioMeasure.MLvalue != oldPerioMeasure.MLvalue) {
+				return true;
+			}
+			if(perioMeasure.Lvalue != oldPerioMeasure.Lvalue) {
+				return true;
+			}
+			if(perioMeasure.DLvalue != oldPerioMeasure.DLvalue) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one PerioMeasure from the database.</summary>
 		public static void Delete(long perioMeasureNum){
 			string command="DELETE FROM periomeasure "

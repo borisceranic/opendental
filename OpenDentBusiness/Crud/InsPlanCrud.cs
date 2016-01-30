@@ -381,6 +381,96 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(InsPlan,InsPlan) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(InsPlan insPlan,InsPlan oldInsPlan) {
+			if(insPlan.GroupName != oldInsPlan.GroupName) {
+				return true;
+			}
+			if(insPlan.GroupNum != oldInsPlan.GroupNum) {
+				return true;
+			}
+			if(insPlan.PlanNote != oldInsPlan.PlanNote) {
+				return true;
+			}
+			if(insPlan.FeeSched != oldInsPlan.FeeSched) {
+				return true;
+			}
+			if(insPlan.PlanType != oldInsPlan.PlanType) {
+				return true;
+			}
+			if(insPlan.ClaimFormNum != oldInsPlan.ClaimFormNum) {
+				return true;
+			}
+			if(insPlan.UseAltCode != oldInsPlan.UseAltCode) {
+				return true;
+			}
+			if(insPlan.ClaimsUseUCR != oldInsPlan.ClaimsUseUCR) {
+				return true;
+			}
+			if(insPlan.CopayFeeSched != oldInsPlan.CopayFeeSched) {
+				return true;
+			}
+			if(insPlan.EmployerNum != oldInsPlan.EmployerNum) {
+				return true;
+			}
+			if(insPlan.CarrierNum != oldInsPlan.CarrierNum) {
+				return true;
+			}
+			if(insPlan.AllowedFeeSched != oldInsPlan.AllowedFeeSched) {
+				return true;
+			}
+			if(insPlan.TrojanID != oldInsPlan.TrojanID) {
+				return true;
+			}
+			if(insPlan.DivisionNo != oldInsPlan.DivisionNo) {
+				return true;
+			}
+			if(insPlan.IsMedical != oldInsPlan.IsMedical) {
+				return true;
+			}
+			if(insPlan.FilingCode != oldInsPlan.FilingCode) {
+				return true;
+			}
+			if(insPlan.DentaideCardSequence != oldInsPlan.DentaideCardSequence) {
+				return true;
+			}
+			if(insPlan.ShowBaseUnits != oldInsPlan.ShowBaseUnits) {
+				return true;
+			}
+			if(insPlan.CodeSubstNone != oldInsPlan.CodeSubstNone) {
+				return true;
+			}
+			if(insPlan.IsHidden != oldInsPlan.IsHidden) {
+				return true;
+			}
+			if(insPlan.MonthRenew != oldInsPlan.MonthRenew) {
+				return true;
+			}
+			if(insPlan.FilingCodeSubtype != oldInsPlan.FilingCodeSubtype) {
+				return true;
+			}
+			if(insPlan.CanadianPlanFlag != oldInsPlan.CanadianPlanFlag) {
+				return true;
+			}
+			if(insPlan.CanadianDiagnosticCode != oldInsPlan.CanadianDiagnosticCode) {
+				return true;
+			}
+			if(insPlan.CanadianInstitutionCode != oldInsPlan.CanadianInstitutionCode) {
+				return true;
+			}
+			if(insPlan.RxBIN != oldInsPlan.RxBIN) {
+				return true;
+			}
+			if(insPlan.CobRule != oldInsPlan.CobRule) {
+				return true;
+			}
+			if(insPlan.SopCode != oldInsPlan.SopCode) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one InsPlan from the database.</summary>
 		public static void Delete(long planNum){
 			ClearFkey(planNum);

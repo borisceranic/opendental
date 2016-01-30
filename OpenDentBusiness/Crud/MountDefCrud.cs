@@ -197,6 +197,27 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(MountDef,MountDef) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(MountDef mountDef,MountDef oldMountDef) {
+			if(mountDef.Description != oldMountDef.Description) {
+				return true;
+			}
+			if(mountDef.ItemOrder != oldMountDef.ItemOrder) {
+				return true;
+			}
+			if(mountDef.IsRadiograph != oldMountDef.IsRadiograph) {
+				return true;
+			}
+			if(mountDef.Width != oldMountDef.Width) {
+				return true;
+			}
+			if(mountDef.Height != oldMountDef.Height) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one MountDef from the database.</summary>
 		public static void Delete(long mountDefNum){
 			string command="DELETE FROM mountdef "

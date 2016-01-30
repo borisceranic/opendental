@@ -237,6 +237,42 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Operatory,Operatory) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Operatory operatory,Operatory oldOperatory) {
+			if(operatory.OpName != oldOperatory.OpName) {
+				return true;
+			}
+			if(operatory.Abbrev != oldOperatory.Abbrev) {
+				return true;
+			}
+			if(operatory.ItemOrder != oldOperatory.ItemOrder) {
+				return true;
+			}
+			if(operatory.IsHidden != oldOperatory.IsHidden) {
+				return true;
+			}
+			if(operatory.ProvDentist != oldOperatory.ProvDentist) {
+				return true;
+			}
+			if(operatory.ProvHygienist != oldOperatory.ProvHygienist) {
+				return true;
+			}
+			if(operatory.IsHygiene != oldOperatory.IsHygiene) {
+				return true;
+			}
+			if(operatory.ClinicNum != oldOperatory.ClinicNum) {
+				return true;
+			}
+			if(operatory.SetProspective != oldOperatory.SetProspective) {
+				return true;
+			}
+			if(operatory.IsWebSched != oldOperatory.IsWebSched) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Operatory from the database.</summary>
 		public static void Delete(long operatoryNum){
 			string command="DELETE FROM operatory "

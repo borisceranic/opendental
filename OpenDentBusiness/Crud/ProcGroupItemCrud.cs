@@ -173,6 +173,18 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ProcGroupItem,ProcGroupItem) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ProcGroupItem procGroupItem,ProcGroupItem oldProcGroupItem) {
+			if(procGroupItem.ProcNum != oldProcGroupItem.ProcNum) {
+				return true;
+			}
+			if(procGroupItem.GroupNum != oldProcGroupItem.GroupNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ProcGroupItem from the database.</summary>
 		public static void Delete(long procGroupItemNum){
 			string command="DELETE FROM procgroupitem "

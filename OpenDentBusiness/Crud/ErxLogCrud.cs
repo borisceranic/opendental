@@ -202,6 +202,22 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ErxLog,ErxLog) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ErxLog erxLog,ErxLog oldErxLog) {
+			if(erxLog.PatNum != oldErxLog.PatNum) {
+				return true;
+			}
+			if(erxLog.MsgText != oldErxLog.MsgText) {
+				return true;
+			}
+			//DateTStamp can only be set by MySQL
+			if(erxLog.ProvNum != oldErxLog.ProvNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ErxLog from the database.</summary>
 		public static void Delete(long erxLogNum){
 			string command="DELETE FROM erxlog "

@@ -63,25 +63,6 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of JobPermission into a DataTable.</summary>
-		public static DataTable ListToTable(List<JobPermission> listJobPermissions,string tableName="") {
-			if(string.IsNullOrEmpty(tableName)) {
-				tableName="JobPermission";
-			}
-			DataTable table=new DataTable(tableName);
-			table.Columns.Add("JobPermissionNum");
-			table.Columns.Add("UserNum");
-			table.Columns.Add("JobPermType");
-			foreach(JobPermission jobPermission in listJobPermissions) {
-				table.Rows.Add(new object[] {
-					POut.Long  (jobPermission.JobPermissionNum),
-					POut.Long  (jobPermission.UserNum),
-					POut.Int   ((int)jobPermission.JobPermType),
-				});
-			}
-			return table;
-		}
-
 		///<summary>Inserts one JobPermission into the database.  Returns the new priKey.</summary>
 		public static long Insert(JobPermission jobPermission){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
@@ -199,6 +180,18 @@ namespace OpenDentBusiness.Crud{
 				+" WHERE JobPermissionNum = "+POut.Long(jobPermission.JobPermissionNum);
 			Db.NonQ(command);
 			return true;
+		}
+
+		///<summary>Returns true if Update(JobPermission,JobPermission) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(JobPermission jobPermission,JobPermission oldJobPermission) {
+			if(jobPermission.UserNum != oldJobPermission.UserNum) {
+				return true;
+			}
+			if(jobPermission.JobPermType != oldJobPermission.JobPermType) {
+				return true;
+			}
+			return false;
 		}
 
 		///<summary>Deletes one JobPermission from the database.</summary>

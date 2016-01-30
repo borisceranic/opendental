@@ -301,6 +301,66 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Loinc,Loinc) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Loinc loinc,Loinc oldLoinc) {
+			if(loinc.LoincCode != oldLoinc.LoincCode) {
+				return true;
+			}
+			if(loinc.Component != oldLoinc.Component) {
+				return true;
+			}
+			if(loinc.PropertyObserved != oldLoinc.PropertyObserved) {
+				return true;
+			}
+			if(loinc.TimeAspct != oldLoinc.TimeAspct) {
+				return true;
+			}
+			if(loinc.SystemMeasured != oldLoinc.SystemMeasured) {
+				return true;
+			}
+			if(loinc.ScaleType != oldLoinc.ScaleType) {
+				return true;
+			}
+			if(loinc.MethodType != oldLoinc.MethodType) {
+				return true;
+			}
+			if(loinc.StatusOfCode != oldLoinc.StatusOfCode) {
+				return true;
+			}
+			if(loinc.NameShort != oldLoinc.NameShort) {
+				return true;
+			}
+			if(loinc.ClassType != oldLoinc.ClassType) {
+				return true;
+			}
+			if(loinc.UnitsRequired != oldLoinc.UnitsRequired) {
+				return true;
+			}
+			if(loinc.OrderObs != oldLoinc.OrderObs) {
+				return true;
+			}
+			if(loinc.HL7FieldSubfieldID != oldLoinc.HL7FieldSubfieldID) {
+				return true;
+			}
+			if(loinc.ExternalCopyrightNotice != oldLoinc.ExternalCopyrightNotice) {
+				return true;
+			}
+			if(loinc.NameLongCommon != oldLoinc.NameLongCommon) {
+				return true;
+			}
+			if(loinc.UnitsUCUM != oldLoinc.UnitsUCUM) {
+				return true;
+			}
+			if(loinc.RankCommonTests != oldLoinc.RankCommonTests) {
+				return true;
+			}
+			if(loinc.RankCommonOrders != oldLoinc.RankCommonOrders) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Loinc from the database.</summary>
 		public static void Delete(long loincNum){
 			string command="DELETE FROM loinc "

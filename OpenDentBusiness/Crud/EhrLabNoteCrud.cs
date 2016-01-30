@@ -198,6 +198,21 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EhrLabNote,EhrLabNote) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EhrLabNote ehrLabNote,EhrLabNote oldEhrLabNote) {
+			if(ehrLabNote.EhrLabNum != oldEhrLabNote.EhrLabNum) {
+				return true;
+			}
+			if(ehrLabNote.EhrLabResultNum != oldEhrLabNote.EhrLabResultNum) {
+				return true;
+			}
+			if(ehrLabNote.Comments != oldEhrLabNote.Comments) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EhrLabNote from the database.</summary>
 		public static void Delete(long ehrLabNoteNum){
 			string command="DELETE FROM ehrlabnote "

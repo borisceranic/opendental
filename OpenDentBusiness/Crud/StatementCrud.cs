@@ -314,6 +314,64 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Statement,Statement) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Statement statement,Statement oldStatement) {
+			if(statement.PatNum != oldStatement.PatNum) {
+				return true;
+			}
+			if(statement.DateSent != oldStatement.DateSent) {
+				return true;
+			}
+			if(statement.DateRangeFrom != oldStatement.DateRangeFrom) {
+				return true;
+			}
+			if(statement.DateRangeTo != oldStatement.DateRangeTo) {
+				return true;
+			}
+			if(statement.Note != oldStatement.Note) {
+				return true;
+			}
+			if(statement.NoteBold != oldStatement.NoteBold) {
+				return true;
+			}
+			if(statement.Mode_ != oldStatement.Mode_) {
+				return true;
+			}
+			if(statement.HidePayment != oldStatement.HidePayment) {
+				return true;
+			}
+			if(statement.SinglePatient != oldStatement.SinglePatient) {
+				return true;
+			}
+			if(statement.Intermingled != oldStatement.Intermingled) {
+				return true;
+			}
+			if(statement.IsSent != oldStatement.IsSent) {
+				return true;
+			}
+			if(statement.DocNum != oldStatement.DocNum) {
+				return true;
+			}
+			//DateTStamp can only be set by MySQL
+			if(statement.IsReceipt != oldStatement.IsReceipt) {
+				return true;
+			}
+			if(statement.IsInvoice != oldStatement.IsInvoice) {
+				return true;
+			}
+			if(statement.IsInvoiceCopy != oldStatement.IsInvoiceCopy) {
+				return true;
+			}
+			if(statement.EmailSubject != oldStatement.EmailSubject) {
+				return true;
+			}
+			if(statement.EmailBody != oldStatement.EmailBody) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Statement from the database.</summary>
 		public static void Delete(long statementNum){
 			string command="DELETE FROM statement "

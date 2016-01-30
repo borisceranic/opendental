@@ -205,6 +205,30 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EhrAptObs,EhrAptObs) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EhrAptObs ehrAptObs,EhrAptObs oldEhrAptObs) {
+			if(ehrAptObs.AptNum != oldEhrAptObs.AptNum) {
+				return true;
+			}
+			if(ehrAptObs.IdentifyingCode != oldEhrAptObs.IdentifyingCode) {
+				return true;
+			}
+			if(ehrAptObs.ValType != oldEhrAptObs.ValType) {
+				return true;
+			}
+			if(ehrAptObs.ValReported != oldEhrAptObs.ValReported) {
+				return true;
+			}
+			if(ehrAptObs.UcumCode != oldEhrAptObs.UcumCode) {
+				return true;
+			}
+			if(ehrAptObs.ValCodeSystem != oldEhrAptObs.ValCodeSystem) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EhrAptObs from the database.</summary>
 		public static void Delete(long ehrAptObsNum){
 			string command="DELETE FROM ehraptobs "

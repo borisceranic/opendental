@@ -333,6 +333,72 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(SheetFieldDef,SheetFieldDef) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(SheetFieldDef sheetFieldDef,SheetFieldDef oldSheetFieldDef) {
+			if(sheetFieldDef.SheetDefNum != oldSheetFieldDef.SheetDefNum) {
+				return true;
+			}
+			if(sheetFieldDef.FieldType != oldSheetFieldDef.FieldType) {
+				return true;
+			}
+			if(sheetFieldDef.FieldName != oldSheetFieldDef.FieldName) {
+				return true;
+			}
+			if(sheetFieldDef.FieldValue != oldSheetFieldDef.FieldValue) {
+				return true;
+			}
+			if(sheetFieldDef.FontSize != oldSheetFieldDef.FontSize) {
+				return true;
+			}
+			if(sheetFieldDef.FontName != oldSheetFieldDef.FontName) {
+				return true;
+			}
+			if(sheetFieldDef.FontIsBold != oldSheetFieldDef.FontIsBold) {
+				return true;
+			}
+			if(sheetFieldDef.XPos != oldSheetFieldDef.XPos) {
+				return true;
+			}
+			if(sheetFieldDef.YPos != oldSheetFieldDef.YPos) {
+				return true;
+			}
+			if(sheetFieldDef.Width != oldSheetFieldDef.Width) {
+				return true;
+			}
+			if(sheetFieldDef.Height != oldSheetFieldDef.Height) {
+				return true;
+			}
+			if(sheetFieldDef.GrowthBehavior != oldSheetFieldDef.GrowthBehavior) {
+				return true;
+			}
+			if(sheetFieldDef.RadioButtonValue != oldSheetFieldDef.RadioButtonValue) {
+				return true;
+			}
+			if(sheetFieldDef.RadioButtonGroup != oldSheetFieldDef.RadioButtonGroup) {
+				return true;
+			}
+			if(sheetFieldDef.IsRequired != oldSheetFieldDef.IsRequired) {
+				return true;
+			}
+			if(sheetFieldDef.TabOrder != oldSheetFieldDef.TabOrder) {
+				return true;
+			}
+			if(sheetFieldDef.ReportableName != oldSheetFieldDef.ReportableName) {
+				return true;
+			}
+			if(sheetFieldDef.TextAlign != oldSheetFieldDef.TextAlign) {
+				return true;
+			}
+			if(sheetFieldDef.IsPaymentOption != oldSheetFieldDef.IsPaymentOption) {
+				return true;
+			}
+			if(sheetFieldDef.ItemColor != oldSheetFieldDef.ItemColor) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one SheetFieldDef from the database.</summary>
 		public static void Delete(long sheetFieldDefNum){
 			string command="DELETE FROM sheetfielddef "

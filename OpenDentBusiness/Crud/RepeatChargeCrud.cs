@@ -229,6 +229,39 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(RepeatCharge,RepeatCharge) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(RepeatCharge repeatCharge,RepeatCharge oldRepeatCharge) {
+			if(repeatCharge.PatNum != oldRepeatCharge.PatNum) {
+				return true;
+			}
+			if(repeatCharge.ProcCode != oldRepeatCharge.ProcCode) {
+				return true;
+			}
+			if(repeatCharge.ChargeAmt != oldRepeatCharge.ChargeAmt) {
+				return true;
+			}
+			if(repeatCharge.DateStart != oldRepeatCharge.DateStart) {
+				return true;
+			}
+			if(repeatCharge.DateStop != oldRepeatCharge.DateStop) {
+				return true;
+			}
+			if(repeatCharge.Note != oldRepeatCharge.Note) {
+				return true;
+			}
+			if(repeatCharge.CopyNoteToProc != oldRepeatCharge.CopyNoteToProc) {
+				return true;
+			}
+			if(repeatCharge.CreatesClaim != oldRepeatCharge.CreatesClaim) {
+				return true;
+			}
+			if(repeatCharge.IsEnabled != oldRepeatCharge.IsEnabled) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one RepeatCharge from the database.</summary>
 		public static void Delete(long repeatChargeNum){
 			string command="DELETE FROM repeatcharge "

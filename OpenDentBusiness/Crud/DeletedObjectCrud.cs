@@ -178,6 +178,19 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(DeletedObject,DeletedObject) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(DeletedObject deletedObject,DeletedObject oldDeletedObject) {
+			if(deletedObject.ObjectNum != oldDeletedObject.ObjectNum) {
+				return true;
+			}
+			if(deletedObject.ObjectType != oldDeletedObject.ObjectType) {
+				return true;
+			}
+			//DateTStamp can only be set by MySQL
+			return false;
+		}
+
 		///<summary>Deletes one DeletedObject from the database.</summary>
 		public static void Delete(long deletedObjectNum){
 			string command="DELETE FROM deletedobject "

@@ -181,6 +181,21 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ClaimAttach,ClaimAttach) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ClaimAttach claimAttach,ClaimAttach oldClaimAttach) {
+			if(claimAttach.ClaimNum != oldClaimAttach.ClaimNum) {
+				return true;
+			}
+			if(claimAttach.DisplayedFileName != oldClaimAttach.DisplayedFileName) {
+				return true;
+			}
+			if(claimAttach.ActualFileName != oldClaimAttach.ActualFileName) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ClaimAttach from the database.</summary>
 		public static void Delete(long claimAttachNum){
 			string command="DELETE FROM claimattach "

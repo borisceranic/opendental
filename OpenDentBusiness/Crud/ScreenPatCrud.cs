@@ -189,6 +189,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ScreenPat,ScreenPat) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ScreenPat screenPat,ScreenPat oldScreenPat) {
+			if(screenPat.PatNum != oldScreenPat.PatNum) {
+				return true;
+			}
+			if(screenPat.ScreenGroupNum != oldScreenPat.ScreenGroupNum) {
+				return true;
+			}
+			if(screenPat.SheetNum != oldScreenPat.SheetNum) {
+				return true;
+			}
+			if(screenPat.PatScreenPerm != oldScreenPat.PatScreenPerm) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ScreenPat from the database.</summary>
 		public static void Delete(long screenPatNum){
 			string command="DELETE FROM screenpat "

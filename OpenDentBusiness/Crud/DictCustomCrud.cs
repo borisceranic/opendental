@@ -165,6 +165,15 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(DictCustom,DictCustom) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(DictCustom dictCustom,DictCustom oldDictCustom) {
+			if(dictCustom.WordText != oldDictCustom.WordText) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one DictCustom from the database.</summary>
 		public static void Delete(long dictCustomNum){
 			string command="DELETE FROM dictcustom "

@@ -197,6 +197,27 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(ProgramProperty,ProgramProperty) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(ProgramProperty programProperty,ProgramProperty oldProgramProperty) {
+			if(programProperty.ProgramNum != oldProgramProperty.ProgramNum) {
+				return true;
+			}
+			if(programProperty.PropertyDesc != oldProgramProperty.PropertyDesc) {
+				return true;
+			}
+			if(programProperty.PropertyValue != oldProgramProperty.PropertyValue) {
+				return true;
+			}
+			if(programProperty.ComputerName != oldProgramProperty.ComputerName) {
+				return true;
+			}
+			if(programProperty.ClinicNum != oldProgramProperty.ClinicNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one ProgramProperty from the database.</summary>
 		public static void Delete(long programPropertyNum){
 			string command="DELETE FROM programproperty "

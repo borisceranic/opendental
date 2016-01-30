@@ -205,6 +205,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EhrSummaryCcd,EhrSummaryCcd) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EhrSummaryCcd ehrSummaryCcd,EhrSummaryCcd oldEhrSummaryCcd) {
+			if(ehrSummaryCcd.PatNum != oldEhrSummaryCcd.PatNum) {
+				return true;
+			}
+			if(ehrSummaryCcd.DateSummary != oldEhrSummaryCcd.DateSummary) {
+				return true;
+			}
+			if(ehrSummaryCcd.ContentSummary != oldEhrSummaryCcd.ContentSummary) {
+				return true;
+			}
+			if(ehrSummaryCcd.EmailAttachNum != oldEhrSummaryCcd.EmailAttachNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EhrSummaryCcd from the database.</summary>
 		public static void Delete(long ehrSummaryCcdNum){
 			string command="DELETE FROM ehrsummaryccd "

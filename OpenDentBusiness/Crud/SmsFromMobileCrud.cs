@@ -285,6 +285,54 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(SmsFromMobile,SmsFromMobile) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(SmsFromMobile smsFromMobile,SmsFromMobile oldSmsFromMobile) {
+			if(smsFromMobile.PatNum != oldSmsFromMobile.PatNum) {
+				return true;
+			}
+			if(smsFromMobile.ClinicNum != oldSmsFromMobile.ClinicNum) {
+				return true;
+			}
+			if(smsFromMobile.CommlogNum != oldSmsFromMobile.CommlogNum) {
+				return true;
+			}
+			if(smsFromMobile.MsgText != oldSmsFromMobile.MsgText) {
+				return true;
+			}
+			if(smsFromMobile.DateTimeReceived != oldSmsFromMobile.DateTimeReceived) {
+				return true;
+			}
+			if(smsFromMobile.SmsPhoneNumber != oldSmsFromMobile.SmsPhoneNumber) {
+				return true;
+			}
+			if(smsFromMobile.MobilePhoneNumber != oldSmsFromMobile.MobilePhoneNumber) {
+				return true;
+			}
+			if(smsFromMobile.MsgPart != oldSmsFromMobile.MsgPart) {
+				return true;
+			}
+			if(smsFromMobile.MsgTotal != oldSmsFromMobile.MsgTotal) {
+				return true;
+			}
+			if(smsFromMobile.MsgRefID != oldSmsFromMobile.MsgRefID) {
+				return true;
+			}
+			if(smsFromMobile.SmsStatus != oldSmsFromMobile.SmsStatus) {
+				return true;
+			}
+			if(smsFromMobile.Flags != oldSmsFromMobile.Flags) {
+				return true;
+			}
+			if(smsFromMobile.IsHidden != oldSmsFromMobile.IsHidden) {
+				return true;
+			}
+			if(smsFromMobile.MatchCount != oldSmsFromMobile.MatchCount) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one SmsFromMobile from the database.</summary>
 		public static void Delete(long smsFromMobileNum){
 			string command="DELETE FROM smsfrommobile "

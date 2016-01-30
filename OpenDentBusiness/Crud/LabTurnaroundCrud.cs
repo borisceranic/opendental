@@ -189,6 +189,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(LabTurnaround,LabTurnaround) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(LabTurnaround labTurnaround,LabTurnaround oldLabTurnaround) {
+			if(labTurnaround.LaboratoryNum != oldLabTurnaround.LaboratoryNum) {
+				return true;
+			}
+			if(labTurnaround.Description != oldLabTurnaround.Description) {
+				return true;
+			}
+			if(labTurnaround.DaysPublished != oldLabTurnaround.DaysPublished) {
+				return true;
+			}
+			if(labTurnaround.DaysActual != oldLabTurnaround.DaysActual) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one LabTurnaround from the database.</summary>
 		public static void Delete(long labTurnaroundNum){
 			string command="DELETE FROM labturnaround "

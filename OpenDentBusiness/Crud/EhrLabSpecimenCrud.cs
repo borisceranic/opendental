@@ -246,6 +246,45 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EhrLabSpecimen,EhrLabSpecimen) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EhrLabSpecimen ehrLabSpecimen,EhrLabSpecimen oldEhrLabSpecimen) {
+			if(ehrLabSpecimen.EhrLabNum != oldEhrLabSpecimen.EhrLabNum) {
+				return true;
+			}
+			if(ehrLabSpecimen.SetIdSPM != oldEhrLabSpecimen.SetIdSPM) {
+				return true;
+			}
+			if(ehrLabSpecimen.SpecimenTypeID != oldEhrLabSpecimen.SpecimenTypeID) {
+				return true;
+			}
+			if(ehrLabSpecimen.SpecimenTypeText != oldEhrLabSpecimen.SpecimenTypeText) {
+				return true;
+			}
+			if(ehrLabSpecimen.SpecimenTypeCodeSystemName != oldEhrLabSpecimen.SpecimenTypeCodeSystemName) {
+				return true;
+			}
+			if(ehrLabSpecimen.SpecimenTypeIDAlt != oldEhrLabSpecimen.SpecimenTypeIDAlt) {
+				return true;
+			}
+			if(ehrLabSpecimen.SpecimenTypeTextAlt != oldEhrLabSpecimen.SpecimenTypeTextAlt) {
+				return true;
+			}
+			if(ehrLabSpecimen.SpecimenTypeCodeSystemNameAlt != oldEhrLabSpecimen.SpecimenTypeCodeSystemNameAlt) {
+				return true;
+			}
+			if(ehrLabSpecimen.SpecimenTypeTextOriginal != oldEhrLabSpecimen.SpecimenTypeTextOriginal) {
+				return true;
+			}
+			if(ehrLabSpecimen.CollectionDateTimeStart != oldEhrLabSpecimen.CollectionDateTimeStart) {
+				return true;
+			}
+			if(ehrLabSpecimen.CollectionDateTimeEnd != oldEhrLabSpecimen.CollectionDateTimeEnd) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EhrLabSpecimen from the database.</summary>
 		public static void Delete(long ehrLabSpecimenNum){
 			string command="DELETE FROM ehrlabspecimen "

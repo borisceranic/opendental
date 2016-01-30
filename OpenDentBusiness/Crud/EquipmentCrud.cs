@@ -285,6 +285,54 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Equipment,Equipment) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Equipment equipment,Equipment oldEquipment) {
+			if(equipment.Description != oldEquipment.Description) {
+				return true;
+			}
+			if(equipment.SerialNumber != oldEquipment.SerialNumber) {
+				return true;
+			}
+			if(equipment.ModelYear != oldEquipment.ModelYear) {
+				return true;
+			}
+			if(equipment.DatePurchased != oldEquipment.DatePurchased) {
+				return true;
+			}
+			if(equipment.DateSold != oldEquipment.DateSold) {
+				return true;
+			}
+			if(equipment.PurchaseCost != oldEquipment.PurchaseCost) {
+				return true;
+			}
+			if(equipment.MarketValue != oldEquipment.MarketValue) {
+				return true;
+			}
+			if(equipment.Location != oldEquipment.Location) {
+				return true;
+			}
+			if(equipment.DateEntry != oldEquipment.DateEntry) {
+				return true;
+			}
+			if(equipment.ProvNumCheckedOut != oldEquipment.ProvNumCheckedOut) {
+				return true;
+			}
+			if(equipment.DateCheckedOut != oldEquipment.DateCheckedOut) {
+				return true;
+			}
+			if(equipment.DateExpectedBack != oldEquipment.DateExpectedBack) {
+				return true;
+			}
+			if(equipment.DispenseNote != oldEquipment.DispenseNote) {
+				return true;
+			}
+			if(equipment.Status != oldEquipment.Status) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Equipment from the database.</summary>
 		public static void Delete(long equipmentNum){
 			string command="DELETE FROM equipment "

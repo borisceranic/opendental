@@ -98,8 +98,10 @@ namespace OpenDental{
 		private System.Windows.Forms.Button butColorProvider;
 		private System.Windows.Forms.Button butColorClinic;
 		private System.Windows.Forms.Button butColorDefault;
-		///<summary>Local copy of a dictionary of all fees, stored in memory for easy access and editing.  Synced on form close.</summary>
+		///<summary>Local copy of a dictionary of all fees, stored in memory for easy access and editing.  Synced on form closing.</summary>
 		Dictionary<long,Dictionary<long,List<Fee>>> _dictFeesByFeeSchedNumsAndCodeNums;
+		///<summary>Stale local copy of all fees, stored in memory for used with Sync on form closing.</summary>
+		List<Fee> _listFeesOld;
 
 		///<summary></summary>
 		public FormProcCodes() {
@@ -1023,6 +1025,7 @@ namespace OpenDental{
 			_arrayClinics=Clinics.GetList();
 			_listProviders=ProviderC.GetListShort();
 			_dictFeesByFeeSchedNumsAndCodeNums=Fees.GetDict();
+			_listFeesOld = Fees.GetFeesAllDeepCopy(_dictFeesByFeeSchedNumsAndCodeNums);//Get copy of all fees from _dictFeesByFeeSchedNumsAndCodeNums
 			_listProcCodes=ProcedureCodeC.GetListLong();
 			_colorProv=DefC.GetColor(DefCat.FeeColors,DefC.GetByExactName(DefCat.FeeColors,"Provider"));
 			_colorProvClinic=DefC.GetColor(DefCat.FeeColors,DefC.GetByExactName(DefCat.FeeColors,"Provider and Clinic"));
@@ -1385,8 +1388,8 @@ namespace OpenDental{
 				return;
 			}
 			//not on a fee: Edit code instead
-			List<Fee> listFees=Fees.GetFeesAll(_dictFeesByFeeSchedNumsAndCodeNums);
-			if(Fees.Sync(listFees)) {
+			List<Fee> listFees = Fees.GetFeesAllDeepCopy(_dictFeesByFeeSchedNumsAndCodeNums);
+			if(Fees.Sync(listFees,_listFeesOld)) {
 				DataValid.SetInvalid(InvalidType.Fees);//Let other users know the fees have changed.
 			}
 			changed=false;//We just updated the database and synced our cache, set changed to false.
@@ -1397,6 +1400,7 @@ namespace OpenDental{
 			//The user could have edited a fee within the Procedure Code Edit window or within one of it's children so we need to refresh our cache.
 			//Yes, it could have even changed if the user Canceled out of the Proc Code Edit window (e.g. use FormProcCodeEditMore.cs)
 			_dictFeesByFeeSchedNumsAndCodeNums=Fees.GetDict();
+			_listFeesOld = Fees.GetFeesAllDeepCopy(_dictFeesByFeeSchedNumsAndCodeNums);//Get copy of all fees from _dictFeesByFeeSchedNumsAndCodeNums
 			FillGrid();
 		}
 
@@ -1636,9 +1640,9 @@ namespace OpenDental{
 		}
 
 		private void butTools_Click(object sender,System.EventArgs e) {
-			List<Fee> listFees=Fees.GetFeesAll(_dictFeesByFeeSchedNumsAndCodeNums);
+			List<Fee> listFees=Fees.GetFeesAllShallow(_dictFeesByFeeSchedNumsAndCodeNums);
 			long schedNum=_listFeeScheds[comboFeeSched1.SelectedIndex].FeeSchedNum;
-			FormFeeSchedTools FormF=new FormFeeSchedTools(schedNum,_listFeeScheds,listFees,_listProviders,_arrayClinics);
+			FormFeeSchedTools FormF=new FormFeeSchedTools(schedNum,_listFeeScheds,listFees,_listFeesOld,_listProviders,_arrayClinics);
 			FormF.ShowDialog();
 			if(FormF.DialogResult==DialogResult.Cancel) {
 				return;
@@ -1646,6 +1650,7 @@ namespace OpenDental{
 			//Fees could have changed from within the FeeSchedTools window.  Refresh our local dictionary to match the cache.
 			changed=false;
 			_dictFeesByFeeSchedNumsAndCodeNums=Fees.GetDict();
+			_listFeesOld = Fees.GetFeesAllDeepCopy(_dictFeesByFeeSchedNumsAndCodeNums);//Get copy of all fees from _dictFeesByFeeSchedNumsAndCodeNums
 			if(Programs.IsEnabled(ProgramName.eClinicalWorks)) {
 				FillComboBoxes();//To show possible added fee schedule.
 			}
@@ -1905,8 +1910,8 @@ namespace OpenDental{
 
 		private void FormProcedures_Closing(object sender,System.ComponentModel.CancelEventArgs e) {
 			if(changed) {
-				List<Fee> listFees=Fees.GetFeesAll(_dictFeesByFeeSchedNumsAndCodeNums);
-				Fees.Sync(listFees);
+				List<Fee> listFees=Fees.GetFeesAllShallow(_dictFeesByFeeSchedNumsAndCodeNums);
+				Fees.Sync(listFees,_listFeesOld);
 				DataValid.SetInvalid(InvalidType.ProcCodes,InvalidType.Fees);
 			}
 		}

@@ -66,31 +66,6 @@ namespace OpenDentBusiness.Crud{
 			return retVal;
 		}
 
-		///<summary>Converts a list of JobReview into a DataTable.</summary>
-		public static DataTable ListToTable(List<JobReview> listJobReviews,string tableName="") {
-			if(string.IsNullOrEmpty(tableName)) {
-				tableName="JobReview";
-			}
-			DataTable table=new DataTable(tableName);
-			table.Columns.Add("JobReviewNum");
-			table.Columns.Add("JobNum");
-			table.Columns.Add("ReviewerNum");
-			table.Columns.Add("DateTStamp");
-			table.Columns.Add("Description");
-			table.Columns.Add("ReviewStatus");
-			foreach(JobReview jobReview in listJobReviews) {
-				table.Rows.Add(new object[] {
-					POut.Long  (jobReview.JobReviewNum),
-					POut.Long  (jobReview.JobNum),
-					POut.Long  (jobReview.ReviewerNum),
-					POut.DateT (jobReview.DateTStamp),
-					POut.String(jobReview.Description),
-					POut.Int   ((int)jobReview.ReviewStatus),
-				});
-			}
-			return table;
-		}
-
 		///<summary>Inserts one JobReview into the database.  Returns the new priKey.</summary>
 		public static long Insert(JobReview jobReview){
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
@@ -242,6 +217,25 @@ namespace OpenDentBusiness.Crud{
 				+" WHERE JobReviewNum = "+POut.Long(jobReview.JobReviewNum);
 			Db.NonQ(command,paramDescription);
 			return true;
+		}
+
+		///<summary>Returns true if Update(JobReview,JobReview) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(JobReview jobReview,JobReview oldJobReview) {
+			if(jobReview.JobNum != oldJobReview.JobNum) {
+				return true;
+			}
+			if(jobReview.ReviewerNum != oldJobReview.ReviewerNum) {
+				return true;
+			}
+			//DateTStamp can only be set by MySQL
+			if(jobReview.Description != oldJobReview.Description) {
+				return true;
+			}
+			if(jobReview.ReviewStatus != oldJobReview.ReviewStatus) {
+				return true;
+			}
+			return false;
 		}
 
 		///<summary>Deletes one JobReview from the database.</summary>

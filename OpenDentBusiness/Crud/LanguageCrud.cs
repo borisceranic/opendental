@@ -189,6 +189,24 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Language,Language) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Language language,Language oldLanguage) {
+			if(language.EnglishComments != oldLanguage.EnglishComments) {
+				return true;
+			}
+			if(language.ClassType != oldLanguage.ClassType) {
+				return true;
+			}
+			if(language.English != oldLanguage.English) {
+				return true;
+			}
+			if(language.IsObsolete != oldLanguage.IsObsolete) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Language from the database.</summary>
 		public static void Delete(long languageNum){
 			string command="DELETE FROM language "

@@ -186,6 +186,22 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Transaction,Transaction) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Transaction transaction,Transaction oldTransaction) {
+			//DateTimeEntry not allowed to change
+			if(transaction.UserNum != oldTransaction.UserNum) {
+				return true;
+			}
+			if(transaction.DepositNum != oldTransaction.DepositNum) {
+				return true;
+			}
+			if(transaction.PayNum != oldTransaction.PayNum) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one Transaction from the database.</summary>
 		public static void Delete(long transactionNum){
 			string command="DELETE FROM transaction "

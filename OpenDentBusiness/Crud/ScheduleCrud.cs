@@ -234,6 +234,40 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(Schedule,Schedule) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(Schedule schedule,Schedule oldSchedule) {
+			if(schedule.SchedDate != oldSchedule.SchedDate) {
+				return true;
+			}
+			if(schedule.StartTime != oldSchedule.StartTime) {
+				return true;
+			}
+			if(schedule.StopTime != oldSchedule.StopTime) {
+				return true;
+			}
+			if(schedule.SchedType != oldSchedule.SchedType) {
+				return true;
+			}
+			if(schedule.ProvNum != oldSchedule.ProvNum) {
+				return true;
+			}
+			if(schedule.BlockoutType != oldSchedule.BlockoutType) {
+				return true;
+			}
+			if(schedule.Note != oldSchedule.Note) {
+				return true;
+			}
+			if(schedule.Status != oldSchedule.Status) {
+				return true;
+			}
+			if(schedule.EmployeeNum != oldSchedule.EmployeeNum) {
+				return true;
+			}
+			//DateTStamp can only be set by MySQL
+			return false;
+		}
+
 		///<summary>Deletes one Schedule from the database.</summary>
 		public static void Delete(long scheduleNum){
 			string command="DELETE FROM schedule "

@@ -253,6 +253,42 @@ namespace OpenDentBusiness.Crud{
 			return true;
 		}
 
+		///<summary>Returns true if Update(EhrAmendment,EhrAmendment) would make changes to the database.
+		///Does not make any changes to the database and can be called before remoting role is checked.</summary>
+		public static bool UpdateComparison(EhrAmendment ehrAmendment,EhrAmendment oldEhrAmendment) {
+			if(ehrAmendment.PatNum != oldEhrAmendment.PatNum) {
+				return true;
+			}
+			if(ehrAmendment.IsAccepted != oldEhrAmendment.IsAccepted) {
+				return true;
+			}
+			if(ehrAmendment.Description != oldEhrAmendment.Description) {
+				return true;
+			}
+			if(ehrAmendment.Source != oldEhrAmendment.Source) {
+				return true;
+			}
+			if(ehrAmendment.SourceName != oldEhrAmendment.SourceName) {
+				return true;
+			}
+			if(ehrAmendment.FileName != oldEhrAmendment.FileName) {
+				return true;
+			}
+			if(ehrAmendment.RawBase64 != oldEhrAmendment.RawBase64) {
+				return true;
+			}
+			if(ehrAmendment.DateTRequest != oldEhrAmendment.DateTRequest) {
+				return true;
+			}
+			if(ehrAmendment.DateTAcceptDeny != oldEhrAmendment.DateTAcceptDeny) {
+				return true;
+			}
+			if(ehrAmendment.DateTAppend != oldEhrAmendment.DateTAppend) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>Deletes one EhrAmendment from the database.</summary>
 		public static void Delete(long ehrAmendmentNum){
 			string command="DELETE FROM ehramendment "
