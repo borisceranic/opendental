@@ -608,6 +608,47 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		///<summary>For appointments that have more than one AppointmentCreate audit entry, deletes all but the newest.</summary>
+		[DbmMethod]
+		public static string AuditTrailDeleteDuplicateApptCreate(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log = "";
+			command="SELECT securitylog.SecurityLogNum "
+				+"FROM securitylog "
+				+"INNER JOIN ("
+					+"SELECT PatNum,FKey,MAX(LogDateTime) LogDateTime "
+					+"FROM securitylog "
+					+"WHERE PermType="+POut.Int((int)Permissions.AppointmentCreate)+" "
+					+"AND FKey>0 "
+					+"GROUP BY PatNum,FKey "
+					+"HAVING COUNT(*)>1"
+				+") sl ON sl.PatNum=securitylog.PatNum "
+				+"AND sl.FKey=securitylog.FKey "
+				+"AND sl.LogDateTime!=securitylog.LogDateTime "
+				+"AND securitylog.PermType="+POut.Int((int)Permissions.AppointmentCreate)+" "
+				+"GROUP BY securitylog.PatNum,securitylog.FKey";
+			List<long> listDupApptCreates = Db.GetListLong(command);
+			if(isCheck) {
+				int numFound = listDupApptCreates.Count;
+				if(numFound>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Appointments found with duplicate Appt Create audit trail entries:")+" "+numFound+"\r\n";
+				}
+			}
+			else {
+				if(listDupApptCreates.Count>0) {
+					command="DELETE FROM securitylog WHERE SecurityLogNum IN("+string.Join(",",listDupApptCreates)+")";
+					long numberFixed = Db.NonQ(command);
+					if(numberFixed>0 || verbose) {
+						log+=Lans.g("FormDatabaseMaintenance","Audit trail entries deleted due to duplicate Appt Create entries:")+" "
+							+numberFixed.ToString()+"\r\n";
+					}
+				}
+			}
+			return log;
+		}
+
 		[DbmMethod]
 		public static string AutoCodeItemsWithNoAutoCode(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
