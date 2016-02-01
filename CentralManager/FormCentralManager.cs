@@ -219,9 +219,10 @@ namespace CentralManager {
 				MessageBox.Show("Either a database or a Middle Tier URI must be specified in the connection.");
 				return;
 			}
-			//od username and password always allowed
-			args+="UserName=\""+Security.CurUser.UserName+"\" ";
-			args+="OdPassword=\""+Security.PasswordTyped+"\" ";
+      if(checkAutoLog.Checked) {
+			  args+="UserName=\""+Security.CurUser.UserName+"\" ";
+			  args+="OdPassword=\""+Security.PasswordTyped+"\" ";
+      }
 			#if DEBUG
 				Process.Start("C:\\Development\\OPEN DENTAL SUBVERSION\\head\\OpenDental\\bin\\Debug\\OpenDental.exe",args);
 			#else
