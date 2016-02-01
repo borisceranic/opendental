@@ -281,11 +281,17 @@ namespace OpenDentBusiness {
 		X,
 		///<summary>Show in patient forms.</summary>
 		F,
+		 /// <summary>Show in patient portal.</summary>
+		L,
 		///<summary>Patient picture (only one)</summary>
 		P,
 		///<summary>Statements (only one)</summary>
 		S,
 		///<summary>Graphical tooth charts and perio charts (only one)</summary>
-		T
+		T,
+		/// <summary>Treatment plan (only one)</summary>
+		R,
+		/// <summary>Expanded by default.</summary>
+		E
 	}
 }

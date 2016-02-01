@@ -12738,6 +12738,20 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX userodpref_Fkey ON userodpref (Fkey)";
 					Db.NonQ(command);
 				}
+				//Update image categories to expand if original preference was set to expand.
+				//Except the Statement folder will remain collapsed per Nathan.
+				//Also update preference to new persistent option to encourage usage.
+				command="SELECT ValueString FROM preference WHERE PrefName='ImagesModuleTreeIsCollapsed'";
+				if(Db.GetScalar(command)=="0") {
+					//Check for ItemValue 'S' incase someone renames their Statements image folder.  Category 18 is ImageCats according to Def.cs.
+					command="UPDATE definition SET ItemValue=CONCAT(ItemValue,'E') WHERE Category=18 AND ItemValue NOT LIKE '%S%'";
+					Db.NonQ(command);
+					command="UPDATE preference SET ValueString=2 WHERE PrefName='ImagesModuleTreeIsCollapsed'";
+					Db.NonQ(command);
+				}
+				else {//ImagesModuleTreeIsCollapsed=1
+					//All folders are already flagged as collapsed by default.
+				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE dashboardlayout ADD DashboardGroupName varchar(255) NOT NULL";
 					Db.NonQ(command);

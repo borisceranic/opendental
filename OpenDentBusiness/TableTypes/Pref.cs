@@ -305,6 +305,10 @@ namespace OpenDentBusiness {
 		///<summary>procedurelog.DiagnosticCode will be set to this for new procedures and complete procedures if this field was blank when set complete.
 		///This can be an ICD-9 or an ICD-10.  In future versions, could be another an ICD-11, ICD-12, etc.</summary>
 		ICD9DefaultForNewProcs,
+		///<summary>3-state prefernce used in the image module, state definitions are:
+		///0 = Expand the document tree each time the Images module is visited.
+		///1 = Document tree collapses when patient changes.
+		///2 = Document tree folders persistent expand/collapse per user.</summary>
 		ImagesModuleTreeIsCollapsed,
 		ImageWindowingMax,
 		ImageWindowingMin,

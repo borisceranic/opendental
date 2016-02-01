@@ -7,6 +7,8 @@ using System.Text;
 namespace OpenDentBusiness{
 	///<summary></summary>
 	public class UserOdPrefs{
+
+		/*
 		//If this table type will exist as cached data, uncomment the CachePattern region below and edit.
 		#region CachePattern
 		//This region can be eliminated if this is not a table type with cached data.
@@ -47,14 +49,14 @@ namespace OpenDentBusiness{
 		#endregion
 
 		///<summary></summary>
-		public static List<UserOdPref> Refresh(long patNum){
+		public static List<UserOdPref> Refresh(long userNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<UserOdPref>>(MethodBase.GetCurrentMethod(),patNum);
+				return Meth.GetObject<List<UserOdPref>>(MethodBase.GetCurrentMethod(),userNum);
 			}
-			string command="SELECT * FROM userodpref WHERE PatNum = "+POut.Long(patNum);
+			string command="SELECT * FROM userodpref WHERE UserNum = "+POut.Long(userNum);
 			return Crud.UserOdPrefCrud.SelectMany(command);
 		}
-
+		
 		///<summary>Gets one UserOdPref from the db.</summary>
 		public static UserOdPref GetOne(long userOdPrefNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
@@ -62,6 +64,16 @@ namespace OpenDentBusiness{
 			}
 			return Crud.UserOdPrefCrud.SelectOne(userOdPrefNum);
 		}
+
+		///<summary></summary>
+		public static void Update(UserOdPref userOdPref){
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),userOdPref);
+				return;
+			}
+			Crud.UserOdPrefCrud.Update(userOdPref);
+		}
+		*/
 
 		///<summary></summary>
 		public static long Insert(UserOdPref userOdPref){
@@ -73,25 +85,6 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary></summary>
-		public static void Update(UserOdPref userOdPref){
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),userOdPref);
-				return;
-			}
-			Crud.UserOdPrefCrud.Update(userOdPref);
-		}
-
-		public static void Update(long fkey,UserOdFkeyType fkeyType,string valueString) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),fkey,fkeyType,valueString);
-				return;
-			}
-			string command="UPDATE userodpref SET ValueString='"+POut.String(valueString)+"' "+
-				"WHERE Fkey="+POut.Long(fkey)+" AND FkeyType="+POut.Int((int)fkeyType);
-			Db.NonQ(command);
-		}
-
-		///<summary></summary>
 		public static void Delete(long userOdPrefNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),userOdPrefNum);
@@ -100,5 +93,22 @@ namespace OpenDentBusiness{
 			Crud.UserOdPrefCrud.Delete(userOdPrefNum);
 		}
 
+		public static List<UserOdPref> GetByUserAndFkeyType(long userNum,UserOdFkeyType fkeyType) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<UserOdPref>>(MethodBase.GetCurrentMethod(),userNum,fkeyType);
+			}
+			string command="SELECT * FROM userodpref WHERE UserNum="+POut.Long(userNum)+" AND FkeyType="+POut.Int((int)fkeyType);
+			return Crud.UserOdPrefCrud.SelectMany(command);
+		}
+
+		public static void DeleteForFkey(long userNum,UserOdFkeyType fkeyType,long fkey) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),userNum,fkeyType,fkey);
+				return;
+			}
+			string command="DELETE FROM userodpref "
+				+"WHERE UserNum="+POut.Long(userNum)+" AND Fkey="+POut.Long(fkey)+" AND FkeyType="+POut.Int((int)fkeyType);
+			Db.NonQ(command);
+		}
 	}
 }

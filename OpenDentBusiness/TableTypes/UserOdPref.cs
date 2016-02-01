@@ -11,7 +11,7 @@ namespace OpenDentBusiness {
 		public long UserOdPrefNum;
 		///<summary>FK to userod.UserNum.</summary>
 		public long UserNum;
-		///<summary>FK to table associated with FkeyType.  Can be 0 if the user preference does not need a foreign key.</summary>
+		///<summary>Foreign key to a table associated with FkeyType.  Can be 0 if the user preference does not need a foreign key.</summary>
 		public long Fkey;
 		///<summary>Specifies which flag is overridden for the specified definition, since an individual definition can have multiple flags.</summary>
 		public UserOdFkeyType FkeyType;

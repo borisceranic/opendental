@@ -152,6 +152,10 @@ namespace OpenDental{
 		private int _selectedTab;
 		private CheckBox checkRecurChargPriProv;
 		private ODtextBox textTreatNote;
+		private RadioButton radioImagesModuleTreeIsExpanded;
+		private RadioButton radioImagesModuleTreeIsCollapsed;
+		private RadioButton radioImagesModuleTreeIsPersistentPerUser;
+		private GroupBox groupBox3;
 
 		///<summary>Default constructor.  Opens the form with the Appts tab selected.</summary>
 		public FormModuleSetup():this(0) {
@@ -256,6 +260,7 @@ namespace OpenDental{
 			this.label15 = new System.Windows.Forms.Label();
 			this.comboCobRule = new System.Windows.Forms.ComboBox();
 			this.tabAccount = new System.Windows.Forms.TabPage();
+			this.checkRecurChargPriProv = new System.Windows.Forms.CheckBox();
 			this.textInsWriteoffDescript = new System.Windows.Forms.TextBox();
 			this.label17 = new System.Windows.Forms.Label();
 			this.checkPromptAutoSplit = new System.Windows.Forms.CheckBox();
@@ -297,6 +302,10 @@ namespace OpenDental{
 			this.textProblemsIndicateNone = new System.Windows.Forms.TextBox();
 			this.label8 = new System.Windows.Forms.Label();
 			this.tabImages = new System.Windows.Forms.TabPage();
+			this.groupBox3 = new System.Windows.Forms.GroupBox();
+			this.radioImagesModuleTreeIsPersistentPerUser = new System.Windows.Forms.RadioButton();
+			this.radioImagesModuleTreeIsCollapsed = new System.Windows.Forms.RadioButton();
+			this.radioImagesModuleTreeIsExpanded = new System.Windows.Forms.RadioButton();
 			this.tabManage = new System.Windows.Forms.TabPage();
 			this.checkClaimsSendWindowValidateOnLoad = new System.Windows.Forms.CheckBox();
 			this.checkTimeCardADP = new System.Windows.Forms.CheckBox();
@@ -320,7 +329,6 @@ namespace OpenDental{
 			this.colorDialog = new System.Windows.Forms.ColorDialog();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.checkRecurChargPriProv = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -329,6 +337,7 @@ namespace OpenDental{
 			this.tabTreatPlan.SuspendLayout();
 			this.tabChart.SuspendLayout();
 			this.tabImages.SuspendLayout();
+			this.groupBox3.SuspendLayout();
 			this.tabManage.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
@@ -1172,6 +1181,17 @@ namespace OpenDental{
 			this.tabAccount.TabIndex = 2;
 			this.tabAccount.Text = "Account";
 			// 
+			// checkRecurChargPriProv
+			// 
+			this.checkRecurChargPriProv.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkRecurChargPriProv.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkRecurChargPriProv.Location = new System.Drawing.Point(44, 323);
+			this.checkRecurChargPriProv.Name = "checkRecurChargPriProv";
+			this.checkRecurChargPriProv.Size = new System.Drawing.Size(396, 17);
+			this.checkRecurChargPriProv.TabIndex = 209;
+			this.checkRecurChargPriProv.Text = "Recurring charges use primary provider";
+			this.checkRecurChargPriProv.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// textInsWriteoffDescript
 			// 
 			this.textInsWriteoffDescript.Location = new System.Drawing.Point(278, 302);
@@ -1648,12 +1668,57 @@ namespace OpenDental{
 			// tabImages
 			// 
 			this.tabImages.BackColor = System.Drawing.SystemColors.Window;
-			this.tabImages.Controls.Add(this.checkImagesModuleTreeIsCollapsed);
+			this.tabImages.Controls.Add(this.groupBox3);
 			this.tabImages.Location = new System.Drawing.Point(4, 22);
 			this.tabImages.Name = "tabImages";
 			this.tabImages.Size = new System.Drawing.Size(466, 479);
 			this.tabImages.TabIndex = 5;
 			this.tabImages.Text = "Images";
+			// 
+			// groupBox3
+			// 
+			this.groupBox3.Controls.Add(this.radioImagesModuleTreeIsPersistentPerUser);
+			this.groupBox3.Controls.Add(this.radioImagesModuleTreeIsCollapsed);
+			this.groupBox3.Controls.Add(this.radioImagesModuleTreeIsExpanded);
+			this.groupBox3.Location = new System.Drawing.Point(3, 6);
+			this.groupBox3.Name = "groupBox3";
+			this.groupBox3.Size = new System.Drawing.Size(460, 76);
+			this.groupBox3.TabIndex = 51;
+			this.groupBox3.TabStop = false;
+			this.groupBox3.Text = "Folder Expansion Preference";
+			// 
+			// radioImagesModuleTreeIsPersistentPerUser
+			// 
+			this.radioImagesModuleTreeIsPersistentPerUser.Location = new System.Drawing.Point(117, 51);
+			this.radioImagesModuleTreeIsPersistentPerUser.Name = "radioImagesModuleTreeIsPersistentPerUser";
+			this.radioImagesModuleTreeIsPersistentPerUser.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+			this.radioImagesModuleTreeIsPersistentPerUser.Size = new System.Drawing.Size(337, 17);
+			this.radioImagesModuleTreeIsPersistentPerUser.TabIndex = 54;
+			this.radioImagesModuleTreeIsPersistentPerUser.TabStop = true;
+			this.radioImagesModuleTreeIsPersistentPerUser.Text = "Document tree folders persistent expand/collapse per user";
+			this.radioImagesModuleTreeIsPersistentPerUser.UseVisualStyleBackColor = true;
+			// 
+			// radioImagesModuleTreeIsCollapsed
+			// 
+			this.radioImagesModuleTreeIsCollapsed.Location = new System.Drawing.Point(117, 34);
+			this.radioImagesModuleTreeIsCollapsed.Name = "radioImagesModuleTreeIsCollapsed";
+			this.radioImagesModuleTreeIsCollapsed.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+			this.radioImagesModuleTreeIsCollapsed.Size = new System.Drawing.Size(337, 17);
+			this.radioImagesModuleTreeIsCollapsed.TabIndex = 53;
+			this.radioImagesModuleTreeIsCollapsed.TabStop = true;
+			this.radioImagesModuleTreeIsCollapsed.Text = "Document tree collapses when patient changes";
+			this.radioImagesModuleTreeIsCollapsed.UseVisualStyleBackColor = true;
+			// 
+			// radioImagesModuleTreeIsExpanded
+			// 
+			this.radioImagesModuleTreeIsExpanded.Location = new System.Drawing.Point(72, 17);
+			this.radioImagesModuleTreeIsExpanded.Name = "radioImagesModuleTreeIsExpanded";
+			this.radioImagesModuleTreeIsExpanded.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+			this.radioImagesModuleTreeIsExpanded.Size = new System.Drawing.Size(382, 17);
+			this.radioImagesModuleTreeIsExpanded.TabIndex = 0;
+			this.radioImagesModuleTreeIsExpanded.TabStop = true;
+			this.radioImagesModuleTreeIsExpanded.Text = "Expand the document tree each time the Images module is visited";
+			this.radioImagesModuleTreeIsExpanded.UseVisualStyleBackColor = true;
 			// 
 			// tabManage
 			// 
@@ -1911,17 +1976,6 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// checkRecurChargPriProv
-			// 
-			this.checkRecurChargPriProv.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkRecurChargPriProv.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkRecurChargPriProv.Location = new System.Drawing.Point(44, 323);
-			this.checkRecurChargPriProv.Name = "checkRecurChargPriProv";
-			this.checkRecurChargPriProv.Size = new System.Drawing.Size(396, 17);
-			this.checkRecurChargPriProv.TabIndex = 209;
-			this.checkRecurChargPriProv.Text = "Recurring charges use primary provider";
-			this.checkRecurChargPriProv.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
 			// FormModuleSetup
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -1950,6 +2004,7 @@ namespace OpenDental{
 			this.tabChart.ResumeLayout(false);
 			this.tabChart.PerformLayout();
 			this.tabImages.ResumeLayout(false);
+			this.groupBox3.ResumeLayout(false);
 			this.tabManage.ResumeLayout(false);
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();
@@ -2161,7 +2216,17 @@ namespace OpenDental{
 			#endregion
 			#region Image Module
 			//Image module-----------------------------------------------------------------------
-			checkImagesModuleTreeIsCollapsed.Checked=PrefC.GetBool(PrefName.ImagesModuleTreeIsCollapsed);
+			switch(PrefC.GetInt(PrefName.ImagesModuleTreeIsCollapsed)) {
+				case 0:
+					radioImagesModuleTreeIsExpanded.Checked=true;
+					break;
+				case 1:
+					radioImagesModuleTreeIsCollapsed.Checked=true;
+					break;
+				case 2:
+					radioImagesModuleTreeIsPersistentPerUser.Checked=true;
+					break;
+			}
 			#endregion
 			#region Manage Module
 			//Manage module----------------------------------------------------------------------
@@ -2415,6 +2480,16 @@ namespace OpenDental{
 				MsgBox.Show(this,"Days until medication order stop date cannot be a negative number.");
 				return;
 			}
+			int imageModuleIsCollapsedVal=0;
+			if(radioImagesModuleTreeIsExpanded.Checked) {
+        imageModuleIsCollapsedVal=0;
+      }
+      else if(radioImagesModuleTreeIsCollapsed.Checked) {
+        imageModuleIsCollapsedVal=1;
+      }
+      else if(radioImagesModuleTreeIsPersistentPerUser.Checked) {
+        imageModuleIsCollapsedVal=2;
+      }
 			if(
 				#region Appointment Module
 				Prefs.UpdateBool(PrefName.AppointmentBubblesDisabled,checkAppointmentBubblesDisabled.Checked)
@@ -2500,7 +2575,7 @@ namespace OpenDental{
 				//| Prefs.UpdateBool(PrefName.ChartAddProcNoRefreshGrid,checkChartAddProcNoRefreshGrid.Checked)//Not implemented.  May revisit someday.
 				#endregion
 				#region Image Module
-				| Prefs.UpdateBool(PrefName.ImagesModuleTreeIsCollapsed,checkImagesModuleTreeIsCollapsed.Checked)
+				| Prefs.UpdateInt(PrefName.ImagesModuleTreeIsCollapsed,imageModuleIsCollapsedVal)
 				#endregion
 				#region Manage Module
 				| Prefs.UpdateBool(PrefName.RxSendNewToQueue,checkRxSendNewToQueue.Checked)

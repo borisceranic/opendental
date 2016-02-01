@@ -30,6 +30,7 @@ using Tao.OpenGl;
 using CodeBase;
 using xImageDeviceManager;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace OpenDental {
 
@@ -160,6 +161,12 @@ namespace OpenDental {
 		public event EventHandler CloseClick=null;
 		///<summary>Gets updated to PatCur.PatNum that the last security log was made with so that we don't make too many security logs for this patient.  When _patNumLast no longer matches PatCur.PatNum (e.g. switched to a different patient within a module), a security log will be entered.  Gets reset (cleared and the set back to PatCur.PatNum) any time a module button is clicked which will cause another security log to be entered.</summary>
 		private long _patNumLast;
+		///<summary>Keeps track of which image categories are currently expanded.</summary>
+		private List<UserOdPref> listUserOdPrefImageCats=null;
+		/// <summary>Tracks the last user to load ContrImages</summary>
+		private long UserNumPrev=-1;
+		///<summary>Used to flag when ImagesModuleTreeIsCollapsed=2 to disable some of the on expand and collapse logic.</summary>
+		private bool hasTreePrefsEnabled;
 		#endregion ManuallyCreatedVariables
 
 		///<summary></summary>
@@ -1246,13 +1253,16 @@ namespace OpenDental {
 					SelectTreeNode(node);
 				}
 			}
-			if(PrefC.GetBool(PrefName.ImagesModuleTreeIsCollapsed)) {
+			if(PrefC.GetInt(PrefName.ImagesModuleTreeIsCollapsed)==0) {//Expand the document tree each time the Images module is visited
+					treeDocuments.ExpandAll();//Invalidates tree too.
+			}
+			else if(PrefC.GetInt(PrefName.ImagesModuleTreeIsCollapsed)==1) {//Document tree collapses when patient changes
 				TreeNode selectedNode=treeDocuments.SelectedNode;//Save the selection so we can reselect after collapsing.
 				treeDocuments.CollapseAll();//Invalidates tree and clears selection too.
 				treeDocuments.SelectedNode=selectedNode;//This will expand any category/folder nodes necessary to show the selection.
 				if(PatNumPrev==PatCur.PatNum) {//Maintain previously expanded nodes when patient not changed.
 					for(int i=0;i<ExpandedCats.Count;i++) {
-						for(int j=0;j<treeDocuments.Nodes.Count;j++) {
+						for(int j=0;j<treeDocuments.Nodes.Count;j++) {//Enumerate the image categories.
 							if(ExpandedCats[i]==((ImageNodeId)treeDocuments.Nodes[j].Tag).PriKey) {
 								treeDocuments.Nodes[j].Expand();
 								break;
@@ -1265,8 +1275,58 @@ namespace OpenDental {
 				}
 				PatNumPrev=PatCur.PatNum;
 			}
-			else {
-				treeDocuments.ExpandAll();//Invalidates tree too.
+			else {//Document tree folders persistent expand/collapse per user
+				hasTreePrefsEnabled=true;//Initialize flag so that we don't run into duplication of the UserOdPref overrides rows.
+				if(UserNumPrev==Security.CurUser.UserNum) {//User has not changed.  Maintain expanded nodes.
+					TreeNode selectedNode=treeDocuments.SelectedNode;//Save the selection so we can reselect after collapsing.
+					treeDocuments.CollapseAll();//Invalidates tree and clears selection too.
+					treeDocuments.SelectedNode=selectedNode;//This will expand any category/folder nodes necessary to show the selection.
+					for(int i=0;i<ExpandedCats.Count;i++) {
+						for(int j=0;j<treeDocuments.Nodes.Count;j++) {//Enumerate the image categories.
+							ImageNodeId nodeIdCategory=(ImageNodeId)treeDocuments.Nodes[j].Tag;//Get current tree document node.
+							if(nodeIdCategory.PriKey==ExpandedCats[i]){
+								treeDocuments.Nodes[j].Expand();
+								break;
+							}
+						}
+					}
+				}
+				else {//User has changed.  Expand image categories based on user preference.
+					ExpandedCats.Clear();
+					listUserOdPrefImageCats=UserOdPrefs.GetByUserAndFkeyType(Security.CurUser.UserNum,UserOdFkeyType.Definition);//Update override list.
+					Def[] arrayImageCats=DefC.Short[(int)DefCat.ImageCats];//Get the image categories.
+					for(int i=0;i<arrayImageCats.Length;i++) {
+						Def curDef=arrayImageCats[i];
+						//Should only be one value with associated Fkey.
+						UserOdPref userOdPrefTemp=listUserOdPrefImageCats.Where(x => x.Fkey==curDef.DefNum).FirstOrDefault();
+						if(userOdPrefTemp!=null) {//User has a preference for this image category.
+							if(!userOdPrefTemp.ValueString.Contains("E")) {//The user's preference is to collapse this category.
+								continue;
+							}
+							for(int j=0;j<treeDocuments.Nodes.Count;j++) {//Enumerate the image categories.
+								ImageNodeId nodeIdCategory=(ImageNodeId)treeDocuments.Nodes[j].Tag;//Get current tree document node.
+								if(nodeIdCategory.PriKey==userOdPrefTemp.Fkey) {
+									treeDocuments.Nodes[j].Expand();//Expand folder.
+									break;
+								}
+							}
+						}
+						else {//User doesn't have a preference for this image category.
+							if(!curDef.ItemValue.Contains("E")) {//The default preference is to collapse this category.
+								continue;
+							}
+							for(int j=0;j<treeDocuments.Nodes.Count;j++) {//Enumerate the image categories.
+								ImageNodeId nodeIdCategory=(ImageNodeId)treeDocuments.Nodes[j].Tag;//Get current tree document node.
+								if(nodeIdCategory.PriKey==curDef.DefNum) {
+									treeDocuments.Nodes[j].Expand();
+									break;
+								}
+							}
+						}
+					}
+				}
+				UserNumPrev=Security.CurUser.UserNum;//Update the Previous user num.
+				hasTreePrefsEnabled=false;//Disable flag
 			}
 		}
 
@@ -2526,15 +2586,52 @@ namespace OpenDental {
 		}
 
 		private void TreeDocuments_AfterExpand(object sender,TreeViewEventArgs e) {
-			ExpandedCats.Add(((ImageNodeId)e.Node.Tag).PriKey);
+			ImageNodeId nodeCur=(ImageNodeId)e.Node.Tag;
+			ExpandedCats.Add(nodeCur.PriKey);
+			UpdateUserOdPrefForImageCat(nodeCur.PriKey,true);			
 		}
 
 		private void TreeDocuments_AfterCollapse(object sender,TreeViewEventArgs e) {
+			ImageNodeId nodeCur=(ImageNodeId)e.Node.Tag;
 			for(int i=0;i<ExpandedCats.Count;i++) {
-				if(ExpandedCats[i]==((ImageNodeId)e.Node.Tag).PriKey) {
+				if(ExpandedCats[i]==nodeCur.PriKey) {
 					ExpandedCats.RemoveAt(i);
-					return;
+					break;
 				}
+			}
+			UpdateUserOdPrefForImageCat(nodeCur.PriKey,false);
+		}
+
+		private void UpdateUserOdPrefForImageCat(long defNum,bool isExpand) {
+			if(PrefC.GetInt(PrefName.ImagesModuleTreeIsCollapsed)!=2) {//Document tree folders persistent expand/collapse per user.
+				return;
+			}
+			//Calls to Expand() and Collapse() in code cause the TreeDocuments_AfterExpand() and TreeDocuments_AfterCollapse() events to fire.
+			//This flag helps us ignore these two events when initializing the tree.
+			if(hasTreePrefsEnabled) {
+				return;
+			}
+			Def defImageCatCur=DefC.Short[(int)DefCat.ImageCats].Where(x => x.DefNum==defNum).FirstOrDefault();
+			if(defImageCatCur==null) {
+				return;//Should never happen, but if it does, there was something wrong with the treeDocument list, and thus nothing should be changed.
+			}
+			string defaultValue=defImageCatCur.ItemValue;//Stores the default ItemValue of the definition from the catList.
+			string curValue=defaultValue;//Stores the current edited ImageCats to compare to the default.
+			if(isExpand && !curValue.Contains("E")) {//Since we are expanding we would like to see if the expand flag is present.
+				curValue+="E";//If it is not, add expanded flag.
+			}
+			else if(!isExpand && curValue.Contains("E")) {//Since we are collapsing we want to see if the expand flag is present.
+				curValue=curValue.Replace("E","");//If it is, remove expanded flag.
+			}
+			//Always delete to remove previous value (prevents duplicates).
+			UserOdPrefs.DeleteForFkey(Security.CurUser.UserNum,UserOdFkeyType.Definition,defImageCatCur.DefNum);
+			if(defaultValue!=curValue) {//Insert an override in the UserOdPref table, only if the chosen value is different than the default.
+				UserOdPref userPrefCur=new UserOdPref();//Preference to be inserted to override.
+				userPrefCur.UserNum=Security.CurUser.UserNum;
+				userPrefCur.Fkey=defImageCatCur.DefNum;
+				userPrefCur.FkeyType=UserOdFkeyType.Definition;
+				userPrefCur.ValueString=curValue;
+				UserOdPrefs.Insert(userPrefCur);
 			}
 		}
 
