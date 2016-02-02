@@ -106,6 +106,9 @@ namespace OpenDental{
 
 		///<summary></summary>
 		protected override void OnKeyPress(KeyPressEventArgs e) {
+			if(this.ReadOnly) {
+				return;
+			}
 			base.OnKeyPress(e);
 			//if(CultureInfo.CurrentCulture.Name=="fr-CA" || CultureInfo.CurrentCulture.Name=="en-CA") {
 			//	return;//because they use - in their regular dates which interferes with this feature.
@@ -141,6 +144,9 @@ namespace OpenDental{
 
 		///<summary></summary>
 		protected override void OnKeyDown(KeyEventArgs e) {
+			if(this.ReadOnly) {
+				return;
+			}
 			base.OnKeyDown (e);
 			if(e.KeyCode!=Keys.Up && e.KeyCode!=Keys.Down){
 				//base.OnKeyDown (e);
