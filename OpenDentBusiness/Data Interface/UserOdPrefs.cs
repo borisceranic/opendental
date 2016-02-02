@@ -101,13 +101,17 @@ namespace OpenDentBusiness{
 			return Crud.UserOdPrefCrud.SelectMany(command);
 		}
 
+		///<summary>Deletes UserOdPref with provided parameters.  If "userNum" is 0 then will delete all UserOdPref's with corresponding fkeyType and fkey.</summary>
 		public static void DeleteForFkey(long userNum,UserOdFkeyType fkeyType,long fkey) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),userNum,fkeyType,fkey);
 				return;
 			}
 			string command="DELETE FROM userodpref "
-				+"WHERE UserNum="+POut.Long(userNum)+" AND Fkey="+POut.Long(fkey)+" AND FkeyType="+POut.Int((int)fkeyType);
+				+"WHERE Fkey="+POut.Long(fkey)+" AND FkeyType="+POut.Int((int)fkeyType);
+			if(userNum!=0) {
+				command+=" AND UserNum="+POut.Long(userNum);
+			}
 			Db.NonQ(command);
 		}
 	}
