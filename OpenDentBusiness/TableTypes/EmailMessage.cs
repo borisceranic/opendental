@@ -35,6 +35,7 @@ namespace OpenDentBusiness {
 		///This will bloat the database a little bit, but we need it for now to ensure our inbox is working in real world scenarios.
 		///We may remove later or move into a different table to increase the speed at which the inbox loads.
 		///Might be blank for a few emails downloaded immediately after the email inbox feature was created.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
 		public string RawEmailIn;
 		///<summary>Not a database column.</summary>
 		[CrudColumn(IsNotDbColumn=true)]
