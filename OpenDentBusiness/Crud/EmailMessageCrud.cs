@@ -154,7 +154,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.DateT (emailMessage.MsgDateTime)+","
 				+    POut.Int   ((int)emailMessage.SentOrReceived)+","
 				+"'"+POut.String(emailMessage.RecipientAddress)+"',"
-				+"'"+POut.String(emailMessage.RawEmailIn)+"',"
+				+    DbHelper.ParamChar+"paramRawEmailIn,"
 				+    POut.Long  (emailMessage.ProvNumWebMail)+","
 				+    POut.Long  (emailMessage.PatNumSubj)+","
 				+"'"+POut.String(emailMessage.CcAddress)+"',"
@@ -163,11 +163,15 @@ namespace OpenDentBusiness.Crud{
 				emailMessage.BodyText="";
 			}
 			OdSqlParameter paramBodyText=new OdSqlParameter("paramBodyText",OdDbType.Text,emailMessage.BodyText);
+			if(emailMessage.RawEmailIn==null) {
+				emailMessage.RawEmailIn="";
+			}
+			OdSqlParameter paramRawEmailIn=new OdSqlParameter("paramRawEmailIn",OdDbType.Text,emailMessage.RawEmailIn);
 			if(useExistingPK || PrefC.RandomKeys) {
-				Db.NonQ(command,paramBodyText);
+				Db.NonQ(command,paramBodyText,paramRawEmailIn);
 			}
 			else {
-				emailMessage.EmailMessageNum=Db.NonQ(command,true,paramBodyText);
+				emailMessage.EmailMessageNum=Db.NonQ(command,true,paramBodyText,paramRawEmailIn);
 			}
 			return emailMessage.EmailMessageNum;
 		}
@@ -208,7 +212,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.DateT (emailMessage.MsgDateTime)+","
 				+    POut.Int   ((int)emailMessage.SentOrReceived)+","
 				+"'"+POut.String(emailMessage.RecipientAddress)+"',"
-				+"'"+POut.String(emailMessage.RawEmailIn)+"',"
+				+    DbHelper.ParamChar+"paramRawEmailIn,"
 				+    POut.Long  (emailMessage.ProvNumWebMail)+","
 				+    POut.Long  (emailMessage.PatNumSubj)+","
 				+"'"+POut.String(emailMessage.CcAddress)+"',"
@@ -217,11 +221,15 @@ namespace OpenDentBusiness.Crud{
 				emailMessage.BodyText="";
 			}
 			OdSqlParameter paramBodyText=new OdSqlParameter("paramBodyText",OdDbType.Text,emailMessage.BodyText);
+			if(emailMessage.RawEmailIn==null) {
+				emailMessage.RawEmailIn="";
+			}
+			OdSqlParameter paramRawEmailIn=new OdSqlParameter("paramRawEmailIn",OdDbType.Text,emailMessage.RawEmailIn);
 			if(useExistingPK || isRandomKeys) {
-				Db.NonQ(command,paramBodyText);
+				Db.NonQ(command,paramBodyText,paramRawEmailIn);
 			}
 			else {
-				emailMessage.EmailMessageNum=Db.NonQ(command,true,paramBodyText);
+				emailMessage.EmailMessageNum=Db.NonQ(command,true,paramBodyText,paramRawEmailIn);
 			}
 			return emailMessage.EmailMessageNum;
 		}
@@ -237,7 +245,7 @@ namespace OpenDentBusiness.Crud{
 				+"MsgDateTime     =  "+POut.DateT (emailMessage.MsgDateTime)+", "
 				+"SentOrReceived  =  "+POut.Int   ((int)emailMessage.SentOrReceived)+", "
 				+"RecipientAddress= '"+POut.String(emailMessage.RecipientAddress)+"', "
-				+"RawEmailIn      = '"+POut.String(emailMessage.RawEmailIn)+"', "
+				+"RawEmailIn      =  "+DbHelper.ParamChar+"paramRawEmailIn, "
 				+"ProvNumWebMail  =  "+POut.Long  (emailMessage.ProvNumWebMail)+", "
 				+"PatNumSubj      =  "+POut.Long  (emailMessage.PatNumSubj)+", "
 				+"CcAddress       = '"+POut.String(emailMessage.CcAddress)+"', "
@@ -247,7 +255,11 @@ namespace OpenDentBusiness.Crud{
 				emailMessage.BodyText="";
 			}
 			OdSqlParameter paramBodyText=new OdSqlParameter("paramBodyText",OdDbType.Text,emailMessage.BodyText);
-			Db.NonQ(command,paramBodyText);
+			if(emailMessage.RawEmailIn==null) {
+				emailMessage.RawEmailIn="";
+			}
+			OdSqlParameter paramRawEmailIn=new OdSqlParameter("paramRawEmailIn",OdDbType.Text,emailMessage.RawEmailIn);
+			Db.NonQ(command,paramBodyText,paramRawEmailIn);
 		}
 
 		///<summary>Updates one EmailMessage in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
@@ -287,7 +299,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			if(emailMessage.RawEmailIn != oldEmailMessage.RawEmailIn) {
 				if(command!=""){ command+=",";}
-				command+="RawEmailIn = '"+POut.String(emailMessage.RawEmailIn)+"'";
+				command+="RawEmailIn = "+DbHelper.ParamChar+"paramRawEmailIn";
 			}
 			if(emailMessage.ProvNumWebMail != oldEmailMessage.ProvNumWebMail) {
 				if(command!=""){ command+=",";}
@@ -312,9 +324,13 @@ namespace OpenDentBusiness.Crud{
 				emailMessage.BodyText="";
 			}
 			OdSqlParameter paramBodyText=new OdSqlParameter("paramBodyText",OdDbType.Text,emailMessage.BodyText);
+			if(emailMessage.RawEmailIn==null) {
+				emailMessage.RawEmailIn="";
+			}
+			OdSqlParameter paramRawEmailIn=new OdSqlParameter("paramRawEmailIn",OdDbType.Text,emailMessage.RawEmailIn);
 			command="UPDATE emailmessage SET "+command
 				+" WHERE EmailMessageNum = "+POut.Long(emailMessage.EmailMessageNum);
-			Db.NonQ(command,paramBodyText);
+			Db.NonQ(command,paramBodyText,paramRawEmailIn);
 			return true;
 		}
 
