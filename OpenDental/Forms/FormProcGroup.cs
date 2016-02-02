@@ -1478,7 +1478,7 @@ namespace OpenDental{
 			if(DialogResult==DialogResult.OK) {
 				return;
 			}
-			if(GroupOld.Note.Trim()!=textNotes.Text.Trim()) {
+			if(GroupOld.Note.Replace("\r","").Trim()!=textNotes.Text.Replace("\r","").Trim()) {
 				if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"Note has been changed.  Unsaved changes will be lost.  Continue?")) {
 					e.Cancel=true;//Prevent the form from closing.
 					IsOpen=true;
