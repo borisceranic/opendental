@@ -611,8 +611,8 @@ namespace OpenDental {
 			}
 			TaskNoteList=TaskNotes.RefreshForTasks(taskNums);
 		}
-
-		private void tabContr_Click(object sender,System.EventArgs e) {
+		
+		private void tabContr_MouseDown(object sender,MouseEventArgs e) {
 			TreeHistory=new List<TaskList>();//clear the tree no matter which tab clicked.
 			FillTree();
 			FillGrid();
