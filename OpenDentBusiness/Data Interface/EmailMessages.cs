@@ -939,17 +939,18 @@ namespace OpenDentBusiness{
 		{
 			//No need to check RemotingRole; no call to db.
 			Health.Direct.Agent.IncomingMessage inMsg=null;
+			List<Health.Direct.Common.Mime.MimeEntity> listMimeLeafNodes=null;
 			try {
 				inMsg=RawEmailToIncomingMessage(strRawEmailIn,emailAddressInbox);
 				if(IsReceivedMessageEncrypted(inMsg)) {
 					inMsg=DecryptIncomingMessage(inMsg);
 				}
+				listMimeLeafNodes=GetMimeLeafNodes(inMsg.Message);
 			}
 			catch {
 				//Since we could not read the message, we cannot read the mime parts.  Therefore, none found.
-				return new List<List<Health.Direct.Common.Mime.MimeEntity>>(arrayMimeContentTypes.Length);
+				listMimeLeafNodes=new List<Health.Direct.Common.Mime.MimeEntity>();
 			}
-			List<Health.Direct.Common.Mime.MimeEntity> listMimeLeafNodes=GetMimeLeafNodes(inMsg.Message);
 			List<List<Health.Direct.Common.Mime.MimeEntity>> retVal=new List<List<Health.Direct.Common.Mime.MimeEntity>>();
 			for(int i=0;i<arrayMimeContentTypes.Length;i++) {
 				string mimeContentType=arrayMimeContentTypes[i];
@@ -1189,7 +1190,7 @@ namespace OpenDentBusiness{
 			}
 		}
 
-		///<summary>Sometimes an email From address will contain the person's name along with their email adress.  This function strips out the person's name if present.</summary>
+		///<summary>Sometimes an email From address will contain the person's name along with their email address.  This function strips out the person's name if present.</summary>
 		public static string GetAddressSimple(string emailAddress) {
 			if(emailAddress.Contains("<") && emailAddress.Contains(">")) {
 				int startIndex=emailAddress.IndexOf("<")+1;
