@@ -1197,6 +1197,11 @@ namespace OpenDental{
 				if(FormTME.SendText(patNum,wirelessPhone,message,txtMsgOk,clinicNum)) {
 					Appointments.SetConfirmed(PIn.Long(Table.Rows[gridMain.SelectedIndices[i]]["AptNum"].ToString()),PrefC.GetLong(PrefName.ConfirmStatusTextMessaged));
 				}
+				else {//There was an exception thrown in FormTME.SendText() meaning something went wrong.  Give the user an option to stop sending messages.
+					if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"There was an error sending, do you want to continue sending messages?")) {
+						break;
+					}
+				}
 			}
 			FillMain();
 			Cursor=Cursors.Default;
