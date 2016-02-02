@@ -380,6 +380,7 @@ namespace OpenDental {
 			if(PrefC.HasClinicsEnabled) {
 				if(checkClinAll.Checked) {
 					listClinicNums=_listClinics.Select(x => x.ClinicNum).Distinct().ToList();
+					listClinicNums.Add(0);
 				}
 				else {
 					for(int i=0;i<listClin.SelectedIndices.Count;i++) {
