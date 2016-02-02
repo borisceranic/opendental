@@ -154,6 +154,7 @@ namespace OpenDental{
 			this.textInstructions.MaxLength = 10000;
 			this.textInstructions.Multiline = true;
 			this.textInstructions.Name = "textInstructions";
+			this.textInstructions.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
 			this.textInstructions.Size = new System.Drawing.Size(400,127);
 			this.textInstructions.TabIndex = 1;
 			// 
