@@ -17,7 +17,8 @@ namespace OpenDentBusiness {
 				+"WHERE AptDateTime LIKE '"+POut.Date(date,false)+"%' "
 				+"AND aptstatus != '"+(int)ApptStatus.UnschedList+"' "
 				+"AND aptstatus != '"+(int)ApptStatus.Planned+"' "
-				+"AND ProvNum IN ("+String.Join(",",listProvNums)+") ";
+				+"AND (ProvNum IN ("+String.Join(",",listProvNums)+") "
+				+"OR ProvHyg IN ("+String.Join(",",listProvNums)+")) ";
 			if(listClinicNums.Count>0) {
 				command+="AND ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
 			}
