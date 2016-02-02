@@ -79,7 +79,7 @@ namespace OpenDental {
 			this.tabContr.SelectedIndex = 0;
 			this.tabContr.Size = new System.Drawing.Size(941, 23);
 			this.tabContr.TabIndex = 5;
-			this.tabContr.Click += new System.EventHandler(this.tabContr_Click);
+			this.tabContr.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tabContr_MouseDown);
 			// 
 			// tabUser
 			// 
