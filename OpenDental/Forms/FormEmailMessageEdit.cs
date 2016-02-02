@@ -35,6 +35,8 @@ namespace OpenDental{
 		private UI.Button butAddAutograph;
 		private Label label2;
 		private ListBox listAutographs;
+		private UI.Button butEditTemplate;
+		private UI.Button butEditAutograph;
 		private EmailPreviewControl emailPreview;
 
 		public EmailAddress EmailPreviewAddress {
@@ -76,11 +78,13 @@ namespace OpenDental{
 			this.labelTemplate = new System.Windows.Forms.Label();
 			this.listTemplates = new System.Windows.Forms.ListBox();
 			this.panelTemplates = new System.Windows.Forms.Panel();
+			this.butEditTemplate = new OpenDental.UI.Button();
 			this.butInsertTemplate = new OpenDental.UI.Button();
 			this.butDeleteTemplate = new OpenDental.UI.Button();
 			this.butAddTemplate = new OpenDental.UI.Button();
 			this.labelDecrypt = new System.Windows.Forms.Label();
 			this.panelAutographs = new System.Windows.Forms.Panel();
+			this.butEditAutograph = new OpenDental.UI.Button();
 			this.butInsertAutograph = new OpenDental.UI.Button();
 			this.butDeleteAutograph = new OpenDental.UI.Button();
 			this.butAddAutograph = new OpenDental.UI.Button();
@@ -121,6 +125,7 @@ namespace OpenDental{
 			// 
 			// panelTemplates
 			// 
+			this.panelTemplates.Controls.Add(this.butEditTemplate);
 			this.panelTemplates.Controls.Add(this.butInsertTemplate);
 			this.panelTemplates.Controls.Add(this.butDeleteTemplate);
 			this.panelTemplates.Controls.Add(this.butAddTemplate);
@@ -130,6 +135,22 @@ namespace OpenDental{
 			this.panelTemplates.Name = "panelTemplates";
 			this.panelTemplates.Size = new System.Drawing.Size(180, 268);
 			this.panelTemplates.TabIndex = 0;
+			// 
+			// butEditTemplate
+			// 
+			this.butEditTemplate.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butEditTemplate.Autosize = true;
+			this.butEditTemplate.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butEditTemplate.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butEditTemplate.CornerRadius = 4F;
+			this.butEditTemplate.Image = global::OpenDental.Properties.Resources.editPencil;
+			this.butEditTemplate.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butEditTemplate.Location = new System.Drawing.Point(102, 236);
+			this.butEditTemplate.Name = "butEditTemplate";
+			this.butEditTemplate.Size = new System.Drawing.Size(75, 26);
+			this.butEditTemplate.TabIndex = 19;
+			this.butEditTemplate.Text = "Edit";
+			this.butEditTemplate.Click += new System.EventHandler(this.butEditTemplate_Click);
 			// 
 			// butInsertTemplate
 			// 
@@ -194,6 +215,7 @@ namespace OpenDental{
 			// 
 			// panelAutographs
 			// 
+			this.panelAutographs.Controls.Add(this.butEditAutograph);
 			this.panelAutographs.Controls.Add(this.butInsertAutograph);
 			this.panelAutographs.Controls.Add(this.butDeleteAutograph);
 			this.panelAutographs.Controls.Add(this.butAddAutograph);
@@ -203,6 +225,22 @@ namespace OpenDental{
 			this.panelAutographs.Name = "panelAutographs";
 			this.panelAutographs.Size = new System.Drawing.Size(180, 268);
 			this.panelAutographs.TabIndex = 19;
+			// 
+			// butEditAutograph
+			// 
+			this.butEditAutograph.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butEditAutograph.Autosize = true;
+			this.butEditAutograph.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butEditAutograph.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butEditAutograph.CornerRadius = 4F;
+			this.butEditAutograph.Image = global::OpenDental.Properties.Resources.editPencil;
+			this.butEditAutograph.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butEditAutograph.Location = new System.Drawing.Point(101, 236);
+			this.butEditAutograph.Name = "butEditAutograph";
+			this.butEditAutograph.Size = new System.Drawing.Size(75, 26);
+			this.butEditAutograph.TabIndex = 20;
+			this.butEditAutograph.Text = "Edit";
+			this.butEditAutograph.Click += new System.EventHandler(this.butEditAutograph_Click);
 			// 
 			// butInsertAutograph
 			// 
@@ -603,6 +641,24 @@ namespace OpenDental{
 				arrayEmailTemplates[listTemplates.SelectedIndex].BodyText,listAttachments);
 		}
 
+		private void butEditTemplate_Click(object sender,EventArgs e) {
+			if(listTemplates.SelectedIndex==-1) {
+				return;
+			}
+			if(!Security.IsAuthorized(Permissions.Setup)) {
+				return;
+			}
+			FormEmailTemplateEdit FormE=new FormEmailTemplateEdit();
+			FormE.ETcur=EmailTemplates.List[listTemplates.SelectedIndex];
+			FormE.ShowDialog();
+			if(FormE.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			EmailTemplates.RefreshCache();
+			_hasTemplatesChanged=true;
+			FillTemplates();
+		}
+
 		///<summary>Hard coded template.</summary>
 		private void buttonFuchsMailDSF_Click(object sender,EventArgs e) {
 			emailPreview.ToAddress="skimom@springfielddental.net";
@@ -689,6 +745,15 @@ namespace OpenDental{
 			EmailAutographs.Delete(EmailAutographs.Listt[listAutographs.SelectedIndex].EmailAutographNum);
 			EmailAutographs.RefreshCache();
 			FillAutographs();
+		}
+
+		private void butEditAutograph_Click(object sender,EventArgs e) {
+			FormEmailAutographEdit FormEAE=new FormEmailAutographEdit(EmailAutographs.Listt[listAutographs.SelectedIndex]);
+			FormEAE.ShowDialog();
+			if(FormEAE.DialogResult==DialogResult.OK) {
+				EmailAutographs.RefreshCache();
+				FillAutographs();
+			}
 		}
 
 		#endregion
