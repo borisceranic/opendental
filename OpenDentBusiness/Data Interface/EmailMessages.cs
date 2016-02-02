@@ -917,17 +917,18 @@ namespace OpenDentBusiness{
 		{
 			//No need to check RemotingRole; no call to db.
 			Health.Direct.Agent.IncomingMessage inMsg=null;
+			List<Health.Direct.Common.Mime.MimeEntity> listMimeLeafNodes=null;
 			try {
 				inMsg=RawEmailToIncomingMessage(strRawEmailIn,emailAddressInbox);
 				if(IsReceivedMessageEncrypted(inMsg)) {
 					inMsg=DecryptIncomingMessage(inMsg);
 				}
+				listMimeLeafNodes=GetMimeLeafNodes(inMsg.Message);
 			}
 			catch {
 				//Since we could not read the message, we cannot read the mime parts.  Therefore, none found.
-				return new List<List<Health.Direct.Common.Mime.MimeEntity>>(arrayMimeContentTypes.Length);
+				listMimeLeafNodes=new List<Health.Direct.Common.Mime.MimeEntity>();
 			}
-			List<Health.Direct.Common.Mime.MimeEntity> listMimeLeafNodes=GetMimeLeafNodes(inMsg.Message);
 			List<List<Health.Direct.Common.Mime.MimeEntity>> retVal=new List<List<Health.Direct.Common.Mime.MimeEntity>>();
 			for(int i=0;i<arrayMimeContentTypes.Length;i++) {
 				string mimeContentType=arrayMimeContentTypes[i];
