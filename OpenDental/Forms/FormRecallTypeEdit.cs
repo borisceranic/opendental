@@ -790,6 +790,12 @@ namespace OpenDental{
 				MsgBox.Show(this,"Description cannot be blank.");
 				return;
 			}
+			for(int i=0;i<textPattern.Text.Length;i++) {
+				if(textPattern.Text[i]!='/' && textPattern.Text[i]!='X') {
+					MsgBox.Show(this,"Time Pattern may only contain '/' and 'X'.  Please fix to continue.");
+					return;
+				}
+			}
 			if(  textYears.errorProvider1.GetError(textYears)!=""
 				|| textMonths.errorProvider1.GetError(textMonths)!=""
 				|| textWeeks.errorProvider1.GetError(textWeeks)!=""
