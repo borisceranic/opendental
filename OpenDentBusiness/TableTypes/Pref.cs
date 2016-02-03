@@ -408,6 +408,8 @@ namespace OpenDentBusiness {
 		PatientSelectUsesSearchButton,
 		///<summary>Boolean. True by default.  If false, the Payment window follows old "Split to family" behavior.</summary>
 		PaymentsPromptForAutoSplit,
+		///<summary>Boolean. True by default.  If false, Payment clinic will be determined by FormOpenDental.</summary>
+		PaymentsUsePatientClinic,
 		PayPlansBillInAdvanceDays,
 		PerioColorCAL,
 		PerioColorFurcations,

@@ -155,6 +155,7 @@ namespace OpenDental{
 		private RadioButton radioImagesModuleTreeIsExpanded;
 		private RadioButton radioImagesModuleTreeIsCollapsed;
 		private RadioButton radioImagesModuleTreeIsPersistentPerUser;
+		private CheckBox checkPaymentsUsePatClin;
 		private GroupBox groupBox3;
 
 		///<summary>Default constructor.  Opens the form with the Appts tab selected.</summary>
@@ -329,6 +330,7 @@ namespace OpenDental{
 			this.colorDialog = new System.Windows.Forms.ColorDialog();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.checkPaymentsUsePatClin = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -1153,6 +1155,7 @@ namespace OpenDental{
 			// tabAccount
 			// 
 			this.tabAccount.BackColor = System.Drawing.SystemColors.Window;
+			this.tabAccount.Controls.Add(this.checkPaymentsUsePatClin);
 			this.tabAccount.Controls.Add(this.checkRecurChargPriProv);
 			this.tabAccount.Controls.Add(this.textInsWriteoffDescript);
 			this.tabAccount.Controls.Add(this.label17);
@@ -1185,7 +1188,7 @@ namespace OpenDental{
 			// 
 			this.checkRecurChargPriProv.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkRecurChargPriProv.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkRecurChargPriProv.Location = new System.Drawing.Point(44, 323);
+			this.checkRecurChargPriProv.Location = new System.Drawing.Point(44, 340);
 			this.checkRecurChargPriProv.Name = "checkRecurChargPriProv";
 			this.checkRecurChargPriProv.Size = new System.Drawing.Size(396, 17);
 			this.checkRecurChargPriProv.TabIndex = 209;
@@ -1194,7 +1197,7 @@ namespace OpenDental{
 			// 
 			// textInsWriteoffDescript
 			// 
-			this.textInsWriteoffDescript.Location = new System.Drawing.Point(278, 302);
+			this.textInsWriteoffDescript.Location = new System.Drawing.Point(278, 319);
 			this.textInsWriteoffDescript.Name = "textInsWriteoffDescript";
 			this.textInsWriteoffDescript.Size = new System.Drawing.Size(163, 20);
 			this.textInsWriteoffDescript.TabIndex = 207;
@@ -1202,7 +1205,7 @@ namespace OpenDental{
 			// label17
 			// 
 			this.label17.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label17.Location = new System.Drawing.Point(16, 304);
+			this.label17.Location = new System.Drawing.Point(16, 321);
 			this.label17.Name = "label17";
 			this.label17.Size = new System.Drawing.Size(261, 16);
 			this.label17.TabIndex = 208;
@@ -1976,6 +1979,17 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// checkPaymentsUsePatClin
+			// 
+			this.checkPaymentsUsePatClin.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkPaymentsUsePatClin.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkPaymentsUsePatClin.Location = new System.Drawing.Point(44, 298);
+			this.checkPaymentsUsePatClin.Name = "checkPaymentsUsePatClin";
+			this.checkPaymentsUsePatClin.Size = new System.Drawing.Size(396, 17);
+			this.checkPaymentsUsePatClin.TabIndex = 210;
+			this.checkPaymentsUsePatClin.Text = "Payments Use Patient Clinic";
+			this.checkPaymentsUsePatClin.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormModuleSetup
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -2159,6 +2173,7 @@ namespace OpenDental{
 			checkPromptAutoSplit.Checked=PrefC.GetBool(PrefName.PaymentsPromptForAutoSplit);
 			textInsWriteoffDescript.Text=PrefC.GetString(PrefName.InsWriteoffDescript);
 			checkRecurChargPriProv.Checked=PrefC.GetBool(PrefName.RecurringChargesUsePriProv);
+			checkPaymentsUsePatClin.Checked=PrefC.GetBool(PrefName.PaymentsUsePatientClinic);
 			#endregion
 			#region TP Module
 			//TP module-----------------------------------------------------------------------
@@ -2546,6 +2561,7 @@ namespace OpenDental{
 				| Prefs.UpdateBool(PrefName.PaymentsPromptForAutoSplit,checkPromptAutoSplit.Checked)
 				| Prefs.UpdateBool(PrefName.RecurringChargesUsePriProv,checkRecurChargPriProv.Checked)
 				| Prefs.UpdateString(PrefName.InsWriteoffDescript,textInsWriteoffDescript.Text)
+				| Prefs.UpdateBool(PrefName.PaymentsUsePatientClinic,checkPaymentsUsePatClin.Checked)
 				#endregion
 				#region TP Module
 				| Prefs.UpdateString(PrefName.TreatmentPlanNote,textTreatNote.Text)

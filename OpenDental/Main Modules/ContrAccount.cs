@@ -2948,7 +2948,12 @@ namespace OpenDental {
 			Payment PaymentCur=new Payment();
 			PaymentCur.PayDate=DateTimeOD.Today;
 			PaymentCur.PatNum=PatCur.PatNum;
-			PaymentCur.ClinicNum=PatCur.ClinicNum;
+			if(PrefC.GetBool(PrefName.PaymentsUsePatientClinic)) {
+				PaymentCur.ClinicNum=PatCur.ClinicNum;
+			}
+			else {
+				PaymentCur.ClinicNum=FormOpenDental.ClinicNum;
+			}
 			PaymentCur.DateEntry=DateTimeOD.Today;//So that it will show properly in the new window.
 			if(DefC.Short[(int)DefCat.PaymentTypes].Length>0){
 				PaymentCur.PayType=DefC.Short[(int)DefCat.PaymentTypes][0].DefNum;
