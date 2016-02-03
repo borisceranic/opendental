@@ -7785,6 +7785,10 @@
       <Project>{84688345-BB6A-4F2F-8672-A82B52FD433B}</Project>
       <Name>xODR</Name>
     </ProjectReference>
+    <ProjectReference Include="..\OpenDentalGraph\OpenDentalGraph.csproj">
+      <Project>{015e240b-23fb-4d91-b20c-ce221ddccb0f}</Project>
+      <Name>OpenDentalGraph</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OpenDentalWpf\OpenDentalWpf.csproj">
       <Project>{FA526250-6F77-4AD6-B496-E945F7472501}</Project>
       <Name>OpenDentalWpf</Name>

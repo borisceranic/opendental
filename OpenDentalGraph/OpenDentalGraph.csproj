@@ -1,0 +1,224 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{015E240B-23FB-4D91-B20C-CE221DDCCB0F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OpenDentalGraph</RootNamespace>
+    <AssemblyName>OpenDentalGraph</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>3</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>3</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\Required dlls\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Base\GraphIncome.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Base\GraphIncome.Designer.cs">
+      <DependentUpon>GraphIncome.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Base\GraphQuantityOverTime.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Base\GraphQuantityOverTime.Designer.cs">
+      <DependentUpon>GraphQuantityOverTime.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Base\Legend.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Base\Legend.designer.cs">
+      <DependentUpon>Legend.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Base\ODGraph.cs" />
+    <Compile Include="Base\ODGraphExtensions.cs" />
+    <Compile Include="Cache\DashboardCache.cs" />
+    <Compile Include="Cache\DashboardCacheAdjustment.cs" />
+    <Compile Include="Cache\DashboardCacheAR.cs" />
+    <Compile Include="Cache\DashboardCacheClaimPayment.cs" />
+    <Compile Include="Cache\DashboardCacheCompletedProc.cs" />
+    <Compile Include="Cache\DashboardCacheNewPatient.cs" />
+    <Compile Include="Cache\DashboardCachePaySplit.cs" />
+    <Compile Include="Cache\DashboardCacheProvider.cs" />
+    <Compile Include="Cache\DashboardCacheWriteoff.cs" />
+    <Compile Include="Concrete\GraphQuantityOverTimeFilter.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Concrete\GraphQuantityOverTimeFilter.Designer.cs">
+      <DependentUpon>GraphQuantityOverTimeFilter.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\DashboardCellCtrl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dashboard\DashboardCellCtrl.Designer.cs">
+      <DependentUpon>DashboardCellCtrl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\DashboardDockContainer.cs" />
+    <Compile Include="Dashboard\DashboardPanelCtrl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dashboard\DashboardPanelCtrl.Designer.cs">
+      <DependentUpon>DashboardPanelCtrl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\DashboardTabCtrl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dashboard\DashboardTabCtrl.Designer.cs">
+      <DependentUpon>DashboardTabCtrl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\FormDashboardEditCell.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dashboard\FormDashboardEditCell.Designer.cs">
+      <DependentUpon>FormDashboardEditCell.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\FormDashboardEditTab.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dashboard\FormDashboardEditTab.Designer.cs">
+      <DependentUpon>FormDashboardEditTab.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dashboard\FormDashboardNamePrompt.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dashboard\FormDashboardNamePrompt.Designer.cs">
+      <DependentUpon>FormDashboardNamePrompt.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Base\GraphIncome.resx">
+      <DependentUpon>GraphIncome.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Base\GraphQuantityOverTime.resx">
+      <DependentUpon>GraphQuantityOverTime.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Base\Legend.resx">
+      <DependentUpon>Legend.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Concrete\GraphQuantityOverTimeFilter.resx">
+      <DependentUpon>GraphQuantityOverTimeFilter.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dashboard\DashboardCellCtrl.resx">
+      <DependentUpon>DashboardCellCtrl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dashboard\DashboardPanelCtrl.resx">
+      <DependentUpon>DashboardPanelCtrl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dashboard\DashboardTabCtrl.resx">
+      <DependentUpon>DashboardTabCtrl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dashboard\FormDashboardEditCell.resx">
+      <DependentUpon>FormDashboardEditCell.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dashboard\FormDashboardEditTab.resx">
+      <DependentUpon>FormDashboardEditTab.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dashboard\FormDashboardNamePrompt.resx">
+      <DependentUpon>FormDashboardNamePrompt.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CodeBase\xCodeBase.csproj">
+      <Project>{18f7bc78-4b99-48d3-a1f1-0d13a63e3cf9}</Project>
+      <Name>xCodeBase</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OpenDentBusiness\OpenDentBusiness.csproj">
+      <Project>{3d0fc76e-803c-4de2-bdb1-47d63a4e2357}</Project>
+      <Name>OpenDentBusiness</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\addChart.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\addColumn.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\addRow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\deleteColumn.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\deleteRow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\deleteX18.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\drag.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\editPencil.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\loadingAnim.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\print.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\printpreview.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\printsetup.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\refresh.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -68,7 +68,7 @@ namespace OpenDental{
 		private System.Windows.Forms.Timer timerTimeIndic;
 		private System.Windows.Forms.MainMenu mainMenu;
 		private System.Windows.Forms.MenuItem menuItemSettings;
-		private System.Windows.Forms.MenuItem menuItemReports;
+		private System.Windows.Forms.MenuItem menuItemReportsHeader;
 		private System.Windows.Forms.MenuItem menuItemPrinter;
 		private System.Windows.Forms.MenuItem menuItemDataPath;
 		private System.Windows.Forms.MenuItem menuItemConfig;
@@ -370,6 +370,12 @@ namespace OpenDental{
 		private MenuItem menuItemPassword;
 		private MenuItem menuItemEmailSettings;
 		private FormSmsTextMessaging _formSmsTextMessaging;
+		private FormQuery _formUserQuery;
+		private OpenDentalGraph.FormDashboardEditTab _formDashboardEditTab;
+		private MenuItem menuItemReportsStandard;
+		private MenuItem menuItemReportsGraphic;
+		private MenuItem menuItemReportsUserQuery;
+
 		[Category("Data"),Description("Occurs when a user has taken action on an item needing action taken.")]
 		public event ActionNeededEventHandler ActionTaken=null;
 		private FormJobManager2 _formJobManager2; //singleton
@@ -591,7 +597,10 @@ namespace OpenDental{
 			this.menuItemSchools = new System.Windows.Forms.MenuItem();
 			this.menuItemStateAbbrs = new System.Windows.Forms.MenuItem();
 			this.menuItemZipCodes = new System.Windows.Forms.MenuItem();
-			this.menuItemReports = new System.Windows.Forms.MenuItem();
+			this.menuItemReportsHeader = new System.Windows.Forms.MenuItem();
+			this.menuItemReportsStandard = new System.Windows.Forms.MenuItem();
+			this.menuItemReportsGraphic = new System.Windows.Forms.MenuItem();
+			this.menuItemReportsUserQuery = new System.Windows.Forms.MenuItem();
 			this.menuItemCustomReports = new System.Windows.Forms.MenuItem();
 			this.menuItemTools = new System.Windows.Forms.MenuItem();
 			this.menuItemJobManager = new System.Windows.Forms.MenuItem();
@@ -693,7 +702,7 @@ namespace OpenDental{
             this.menuItemFile,
             this.menuItemSettings,
             this.menuItemLists,
-            this.menuItemReports,
+            this.menuItemReportsHeader,
             this.menuItemCustomReports,
             this.menuItemTools,
             this.menuClinics,
@@ -1427,12 +1436,33 @@ namespace OpenDental{
 			this.menuItemZipCodes.Text = "&Zip Codes";
 			this.menuItemZipCodes.Click += new System.EventHandler(this.menuItemZipCodes_Click);
 			// 
-			// menuItemReports
+			// menuItemReportsHeader
 			// 
-			this.menuItemReports.Index = 4;
-			this.menuItemReports.Shortcut = System.Windows.Forms.Shortcut.CtrlR;
-			this.menuItemReports.Text = "&Reports";
-			this.menuItemReports.Click += new System.EventHandler(this.menuItemReports_Click);
+			this.menuItemReportsHeader.Index = 4;
+			this.menuItemReportsHeader.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.menuItemReportsStandard,
+            this.menuItemReportsGraphic,
+            this.menuItemReportsUserQuery});
+			this.menuItemReportsHeader.Shortcut = System.Windows.Forms.Shortcut.CtrlR;
+			this.menuItemReportsHeader.Text = "&Reports";
+			// 
+			// menuItemReportsStandard
+			// 
+			this.menuItemReportsStandard.Index = 0;
+			this.menuItemReportsStandard.Text = "&Standard";
+			this.menuItemReportsStandard.Click += new System.EventHandler(this.menuItemReportsStandard_Click);
+			// 
+			// menuItemReportsGraphic
+			// 
+			this.menuItemReportsGraphic.Index = 1;
+			this.menuItemReportsGraphic.Text = "&Graphic";
+			this.menuItemReportsGraphic.Click += new System.EventHandler(this.menuItemReportsGraphic_Click);
+			// 
+			// menuItemReportsUserQuery
+			// 
+			this.menuItemReportsUserQuery.Index = 2;
+			this.menuItemReportsUserQuery.Text = "&User Query";
+			this.menuItemReportsUserQuery.Click += new System.EventHandler(this.menuItemReportsUserQuery_Click);
 			// 
 			// menuItemCustomReports
 			// 
@@ -6137,7 +6167,7 @@ namespace OpenDental{
 
 		#region Reports
 
-		private void menuItemReports_Click(object sender,EventArgs e) {
+		private void menuItemReportsStandard_Click(object sender,EventArgs e) {
 			if(!Security.IsAuthorized(Permissions.Reports)) {
 				return;
 			}
@@ -6152,6 +6182,37 @@ namespace OpenDental{
 				FormOI.Show();
 			}
 		}
+
+		private void menuItemReportsGraphic_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.ReportDashboard)) {
+				return;
+			}
+			if(_formDashboardEditTab!=null) {
+				_formDashboardEditTab.BringToFront();
+				return;
+			}
+			_formDashboardEditTab=new OpenDentalGraph.FormDashboardEditTab() { IsEditMode=false, };
+			_formDashboardEditTab.FormClosed+=new FormClosedEventHandler((object senderF,FormClosedEventArgs eF) => { _formDashboardEditTab=null; });
+			_formDashboardEditTab.Show();
+		}
+				
+		private void menuItemReportsUserQuery_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.UserQuery)) {
+				return;
+			}
+			if(DataConnection.DBtype==DatabaseType.Oracle) {
+				MsgBox.Show(this,"Not allowed while using Oracle.");
+				return;
+			}
+			SecurityLogs.MakeLogEntry(Permissions.UserQuery,0,"");
+			if(_formUserQuery!=null) {
+				_formUserQuery.BringToFront();
+				return;
+			}
+			_formUserQuery=new FormQuery(null);
+			_formUserQuery.FormClosed+=new FormClosedEventHandler((object senderF,FormClosedEventArgs eF) => { _formUserQuery=null; });
+			_formUserQuery.Show();
+		}		
 
 		#endregion
 

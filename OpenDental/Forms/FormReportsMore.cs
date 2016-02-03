@@ -37,7 +37,6 @@ namespace OpenDental {
 		private OpenDental.UI.ListBoxClickable listArizonaPrimaryCare;
 		private Label labelArizonaPrimaryCare;
 		private OpenDental.UI.ListBoxClickable listMonthly;
-		private UI.Button butGraphicReports;
 		private MenuStrip menuMain;
 		private UI.Button butUDS;
 		private UI.Button butPatList;
@@ -91,7 +90,6 @@ namespace OpenDental {
 			this.picturePodium = new OpenDental.UI.ODPictureBox();
 			this.butPatExport = new OpenDental.UI.Button();
 			this.butPatList = new OpenDental.UI.Button();
-			this.butGraphicReports = new OpenDental.UI.Button();
 			this.listArizonaPrimaryCare = new OpenDental.UI.ListBoxClickable();
 			this.butUDS = new OpenDental.UI.Button();
 			this.butLaserLabels = new OpenDental.UI.Button();
@@ -239,21 +237,6 @@ namespace OpenDental {
 			this.butPatList.TabIndex = 23;
 			this.butPatList.Text = "EHR Patient List";
 			this.butPatList.Click += new System.EventHandler(this.butPatList_Click);
-			// 
-			// butGraphicReports
-			// 
-			this.butGraphicReports.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butGraphicReports.Autosize = true;
-			this.butGraphicReports.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butGraphicReports.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butGraphicReports.CornerRadius = 4F;
-			this.butGraphicReports.Location = new System.Drawing.Point(538, 35);
-			this.butGraphicReports.Name = "butGraphicReports";
-			this.butGraphicReports.Size = new System.Drawing.Size(101, 24);
-			this.butGraphicReports.TabIndex = 21;
-			this.butGraphicReports.Text = "Graphic Reports";
-			this.butGraphicReports.UseVisualStyleBackColor = true;
-			this.butGraphicReports.Click += new System.EventHandler(this.butGraphicReports_Click);
 			// 
 			// listArizonaPrimaryCare
 			// 
@@ -431,7 +414,6 @@ namespace OpenDental {
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.butPatExport);
 			this.Controls.Add(this.butPatList);
-			this.Controls.Add(this.butGraphicReports);
 			this.Controls.Add(this.labelArizonaPrimaryCare);
 			this.Controls.Add(this.listArizonaPrimaryCare);
 			this.Controls.Add(this.butUDS);
@@ -904,16 +886,6 @@ namespace OpenDental {
 			//not visible
 			FormReportsUds FormRU=new FormReportsUds();
 			FormRU.ShowDialog();
-		}
-
-		private void butGraphicReports_Click(object sender,EventArgs e) {
-			if(!Security.IsAuthorized(Permissions.ReportDashboard)) {
-				return;
-			}
-			Cursor=Cursors.WaitCursor;
-			WinDashboard win=new WinDashboard();
-			win.Show();
-			Cursor=Cursors.Default;
 		}
 
 		private void setupToolStripMenuItem_Click(object sender,EventArgs e) {
