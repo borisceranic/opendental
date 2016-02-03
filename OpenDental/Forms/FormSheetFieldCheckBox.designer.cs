@@ -262,15 +262,17 @@ namespace OpenDental{
 			// 
 			// labelRequired
 			// 
+			this.labelRequired.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.labelRequired.Location = new System.Drawing.Point(465, 185);
 			this.labelRequired.Name = "labelRequired";
 			this.labelRequired.Size = new System.Drawing.Size(188, 40);
 			this.labelRequired.TabIndex = 116;
-			this.labelRequired.Text = "Radion buttons in a radio button group must all be marked required or all be mark" +
-    "ed not required.";
+			this.labelRequired.Text = "Radio buttons in a radio button group must all be marked required or all be marke" +
+    "d not required.";
 			// 
 			// textReportableName
 			// 
+			this.textReportableName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.textReportableName.Location = new System.Drawing.Point(456, 536);
 			this.textReportableName.Name = "textReportableName";
 			this.textReportableName.Size = new System.Drawing.Size(197, 20);
@@ -278,6 +280,7 @@ namespace OpenDental{
 			// 
 			// labelReportableName
 			// 
+			this.labelReportableName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.labelReportableName.Location = new System.Drawing.Point(315, 537);
 			this.labelReportableName.Name = "labelReportableName";
 			this.labelReportableName.Size = new System.Drawing.Size(141, 16);
@@ -287,6 +290,7 @@ namespace OpenDental{
 			// 
 			// labelMiscInstructions
 			// 
+			this.labelMiscInstructions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.labelMiscInstructions.Location = new System.Drawing.Point(370, 499);
 			this.labelMiscInstructions.Name = "labelMiscInstructions";
 			this.labelMiscInstructions.Size = new System.Drawing.Size(289, 32);
@@ -297,6 +301,7 @@ namespace OpenDental{
 			// 
 			// labelYesNo
 			// 
+			this.labelYesNo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.labelYesNo.Location = new System.Drawing.Point(462, 235);
 			this.labelYesNo.Name = "labelYesNo";
 			this.labelYesNo.Size = new System.Drawing.Size(197, 68);
@@ -435,6 +440,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.MinimumSize = new System.Drawing.Size(691, 667);
 			this.Name = "FormSheetFieldCheckBox";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit CheckBox";
