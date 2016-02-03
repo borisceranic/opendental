@@ -523,6 +523,34 @@ namespace UnitTests {
 			catch(Exception ex) {
 				textResults.Text+="52: Failed. "+ex.Message;
 			}
+			try {
+				Application.DoEvents();
+				textResults.Text+=AllTests.TestFiftyThree(specificTest);
+			}
+			catch(Exception ex) {
+				textResults.Text+="53: Failed. "+ex.Message;
+			}
+			try {
+				Application.DoEvents();
+				textResults.Text+=AllTests.TestFiftyFour(specificTest);
+			}
+			catch(Exception ex) {
+				textResults.Text+="54: Failed. "+ex.Message;
+			}
+			try {
+				Application.DoEvents();
+				textResults.Text+=AllTests.TestFiftyFive(specificTest);
+			}
+			catch(Exception ex) {
+				textResults.Text+="55: Failed. "+ex.Message;
+			}
+			try {
+				Application.DoEvents();
+				textResults.Text+=AllTests.TestFiftySix(specificTest);
+			}
+			catch(Exception ex) {
+				textResults.Text+="56: Failed. "+ex.Message;
+			}
 			textResults.Text+="Done";
 			Cursor=Cursors.Default;
 		}

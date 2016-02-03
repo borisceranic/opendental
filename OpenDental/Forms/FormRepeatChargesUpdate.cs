@@ -16,7 +16,9 @@ namespace OpenDental{
 		// ReSharper disable once InconsistentNaming
 		private UI.Button butOK;
 		// ReSharper disable once InconsistentNaming
-		private TextBox textBox1;
+		private TextBox textBox1;		
+		int _proceduresAddedCount=0;
+		int _claimsAddedCount=0;
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
@@ -124,6 +126,11 @@ namespace OpenDental{
 
 		private void FormRepeatChargesUpdate_Load(object sender, EventArgs e) {
 		
+		}
+
+		///<summary>Do not use this method in release code. This is only to be used for Unit Tests 53-56.</summary>
+		public void RunRepeatingChargesForUnitTests(DateTime dateRun) {
+			RunRepeatingCharges(dateRun);
 		}
 
 		private static Claim CreateClaim(string claimType,List<PatPlan> patPlanList,List<InsPlan> planList,List<ClaimProc> claimProcList,Procedure proc,List<InsSub> subList) {
@@ -295,15 +302,15 @@ namespace OpenDental{
 		}
 
 		///<summary>Returns 1 or 2 dates to be billed given the date range. Only filtering based on date range has been performed.</summary>
-		private static List<DateTime> GetBillingDatesHelper(DateTime dateStart, DateTime dateStop, int billingCycleDay=0) {
+		private static List<DateTime> GetBillingDatesHelper(DateTime dateStart, DateTime dateStop, DateTime dateRun, int billingCycleDay=0) {
 			List<DateTime> retVal=new List<DateTime>();
 			if(!PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
 				billingCycleDay=dateStart.Day;
 			}
 			//Add dates on the first of each of the last three months
-			retVal.Add(new DateTime(DateTime.Today.AddMonths(-0).Year,DateTime.Today.AddMonths(-0).Month,1));//current month -0
-			retVal.Add(new DateTime(DateTime.Today.AddMonths(-1).Year,DateTime.Today.AddMonths(-1).Month,1));//current month -1
-			retVal.Add(new DateTime(DateTime.Today.AddMonths(-2).Year,DateTime.Today.AddMonths(-2).Month,1));//current month -2
+			retVal.Add(new DateTime(dateRun.AddMonths(-0).Year,dateRun.AddMonths(-0).Month,1));//current month -0
+			retVal.Add(new DateTime(dateRun.AddMonths(-1).Year,dateRun.AddMonths(-1).Month,1));//current month -1
+			retVal.Add(new DateTime(dateRun.AddMonths(-2).Year,dateRun.AddMonths(-2).Month,1));//current month -2
 			//This loop fixes day of month, taking into account billing day past the end of the month.
 			for(int i=0;i<retVal.Count;i++) {
 				int billingDay=Math.Min(retVal[i].AddMonths(1).AddDays(-1).Day, billingCycleDay);
@@ -312,9 +319,9 @@ namespace OpenDental{
 			//Remove billing dates that are calulated before repeat charge started.
 			retVal.RemoveAll(x => x < dateStart);
 			//Remove billing dates older than one month and 20 days ago.
-			retVal.RemoveAll(x => x < DateTime.Today.AddMonths(-1).AddDays(-20));
+			retVal.RemoveAll(x => x < dateRun.AddMonths(-1).AddDays(-20));
 			//Remove any dates after today
-			retVal.RemoveAll(x => x > DateTime.Today);
+			retVal.RemoveAll(x => x > dateRun);
 			//Remove billing dates past the end of the dateStop
 			int monthAdd=0;
 			//To account for a partial month, add a charge after the repeat charge stop date in certain circumstances (for each of these scenarios, the 
@@ -373,9 +380,9 @@ namespace OpenDental{
 		}
 
 		///<summary>Should only be called if ODHQ.</summary>
-		private static List<Procedure> AddSmsRepeatingChargesHelper() {
-			DateTime dateStart=new DateTime(DateTime.Today.AddMonths(-1).AddDays(-20).Year,DateTime.Today.AddMonths(-1).AddDays(-20).Month,1);
-			DateTime dateStop=DateTime.Today.AddDays(1);
+		private static List<Procedure> AddSmsRepeatingChargesHelper(DateTime dateRun) {
+			DateTime dateStart=new DateTime(dateRun.AddMonths(-1).AddDays(-20).Year,dateRun.AddMonths(-1).AddDays(-20).Month,1);
+			DateTime dateStop=dateRun.AddDays(1);
 			List<SmsBilling> listSmsBilling=SmsBillings.GetByDateRange(dateStart,dateStop);
 			List<Patient> listPatients=Patients.GetMultPats(listSmsBilling.Select(x => x.CustPatNum).Distinct().ToList()).ToList(); //local cache
 			ProcedureCode procCodeAccess=ProcedureCodes.GetProcCode("038");
@@ -402,7 +409,7 @@ namespace OpenDental{
 					billingDate.Month,
 					Math.Min(pat.BillingCycleDay,DateTime.DaysInMonth(billingDate.Year,billingDate.Month)));
 				//example: dateUsage=08/01/2015, billing cycle date=8/14/2012, billing date should be 9/14/2015.
-				if(billingDate>DateTime.Today || billingDate<DateTime.Today.AddMonths(-1).AddDays(-20)){
+				if(billingDate>dateRun || billingDate<dateRun.AddMonths(-1).AddDays(-20)){
 					//One month and 20 day window. Bill regardless of presence of "038" repeat charge.
 					continue;
 				}
@@ -451,30 +458,29 @@ namespace OpenDental{
 			return retVal;
 		}
 
-		private void butOK_Click(object sender, EventArgs e) {
+		/// <summary>Runs repeating charges for the date passed in, usually today.</summary>
+		private void RunRepeatingCharges(DateTime dateRun) { 
 			List<RepeatCharge> listRepeatingCharges=RepeatCharges.Refresh(0).ToList();
-			int proceduresAddedCount=0;
-			int claimsAddedCount=0;
 			if(PrefC.IsODHQ) {
 				//If ODHQ, handle Integrated texting repeating charges differently.
 				listRepeatingCharges.RemoveAll(x => x.ProcCode=="038");
-				proceduresAddedCount+=AddSmsRepeatingChargesHelper().Count;
+				_proceduresAddedCount+=AddSmsRepeatingChargesHelper(dateRun).Count;
 			}
-			List<Procedure> listExistingProcs=Procedures.GetCompletedForDateRange(DateTime.Today.AddMonths(-2), DateTime.Today.AddDays(1),
+			List<Procedure> listExistingProcs=Procedures.GetCompletedForDateRange(dateRun.AddMonths(-2),dateRun.AddDays(1),
 				listRepeatingCharges.Select(x => x.ProcCode).Distinct().Select(x => ProcedureCodes.GetProcCode(x).CodeNum).ToList()
 				//,listRepeatingCharges.Select(possibleBillingDate=>possibleBillingDate.PatNum).ToList() //Passing in PatNums may make query less efficient
 				);
 			foreach(RepeatCharge repeatCharge in listRepeatingCharges){
-				if(!repeatCharge.IsEnabled || (repeatCharge.DateStop.Year > 1880 && repeatCharge.DateStop.AddMonths(3) < DateTime.Today)) {
+				if(!repeatCharge.IsEnabled || (repeatCharge.DateStop.Year > 1880 && repeatCharge.DateStop.AddMonths(3) < dateRun)) {
 					continue;//This repeating charge is too old to possibly create a new charge. Not precise but greatly reduces calls to DB.
 									 //We will filter by more stringently on the DateStop later on.
 				}
 				List<DateTime> listBillingDates;//This list will have 1 or 2 dates where a repeating charge might be added
 				if(PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
-					listBillingDates=GetBillingDatesHelper(repeatCharge.DateStart,repeatCharge.DateStop,Patients.GetPat(repeatCharge.PatNum).BillingCycleDay);
+					listBillingDates=GetBillingDatesHelper(repeatCharge.DateStart,repeatCharge.DateStop,dateRun,Patients.GetPat(repeatCharge.PatNum).BillingCycleDay);
 				}
 				else {
-					listBillingDates=GetBillingDatesHelper(repeatCharge.DateStart,repeatCharge.DateStop);
+					listBillingDates=GetBillingDatesHelper(repeatCharge.DateStart,repeatCharge.DateStop,dateRun);
 				}
 				long codeNum=ProcedureCodes.GetCodeNum(repeatCharge.ProcCode);
 				//Remove billing dates and procedures if there is a procedure for that patient with that code for the same amount in that month and year
@@ -508,13 +514,18 @@ namespace OpenDental{
 					if(repeatCharge.CreatesClaim && !ProcedureCodes.GetProcCode(repeatCharge.ProcCode).NoBillIns) {
 						listClaimsAdded=AddClaimsHelper(repeatCharge,procAdded);
 					}
-					proceduresAddedCount++;
-					claimsAddedCount+=listClaimsAdded.Count;
+					_proceduresAddedCount++;
+					_claimsAddedCount+=listClaimsAdded.Count;
 				}
-			}
-			MessageBox.Show(proceduresAddedCount+" "+Lan.g(this,"procedures added.")+"\r\n"+claimsAddedCount+" "+Lan.g(this,"claims added."));
-			DialogResult=DialogResult.OK;
+			}			
 		}
+
+		private void butOK_Click(object sender,EventArgs e) {
+			RunRepeatingCharges(DateTime.Today);
+			MessageBox.Show(_proceduresAddedCount+" "+Lan.g(this,"procedures added.")+"\r\n"+_claimsAddedCount+" "
+				+Lan.g(this,"claims added."));
+			DialogResult=DialogResult.OK;
+		}	
 
 		///<summary>Returns true if the existing procedure was for the possibleBillingDate.</summary>
 		private static bool IsRepeatDateHelper(RepeatCharge repeatCharge,DateTime possibleBillingDate,DateTime existingProcedureDate) {

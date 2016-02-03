@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 using OpenDentBusiness;
 using OpenDental;
 
@@ -2961,7 +2961,432 @@ namespace UnitTests {
 			if(listFailedTests.Count>0) {
 				throw new Exception("Signature tests "+String.Join(",",listFailedTests)+" failed.\r\n");
 			}
-			return "52: Passed.  SignatureBowWrapper signatures validated correctly.\r\n";
+			return "52: Passed.  SignatureBoxWrapper signatures validated correctly.\r\n";
 		}
+
+		///<summary>Tests that repeat charges are added correctly after the stop date.</summary>
+		public static string TestFiftyThree(int specificTest) {
+			if(specificTest!=0 && specificTest!=53) {
+				return "";
+			}
+			//Repeat charges should be added after the stop date if the duration of the repeating charge if the number of charges added to the account is 
+			//less than the number of months the repeat charge was active (a partial month is counted as a full month). 
+			string suffix ="53";
+			Patient pat=PatientT.CreatePatient(suffix);
+			Patient patOld=pat.Copy();
+			pat.BillingCycleDay=11;
+			Patients.Update(pat,patOld);
+			Prefs.UpdateBool(PrefName.BillingUseBillingCycleDay,true);
+			DataValid.SetInvalid(InvalidType.Prefs);
+			//delete all existing repeating charges
+			List<RepeatCharge> listRepeatingCharges=RepeatCharges.Refresh(0).ToList();
+			listRepeatingCharges.ForEach(x => RepeatCharges.Delete(x));
+			DateTime dateRun=new DateTime(2015,12,15);
+			//List of failed subtests within TestFiftyThree
+			List<int> listFailedTests=new List<int>();
+			//Subtest 1 =====================================================
+			//The start day is before the stop day which is before the billing day. Add a charge after the stop date.
+			RepeatCharge rc=new RepeatCharge();
+			rc.ChargeAmt=99;
+			rc.PatNum=pat.PatNum;
+			rc.ProcCode="D2750";//arbitrary code
+			rc.IsEnabled=true;
+			rc.DateStart=new DateTime(2015,11,8);
+			rc.DateStop=new DateTime(2015,12,9);
+			rc.RepeatChargeNum=RepeatCharges.Insert(rc);
+			FormRepeatChargesUpdate FormRCU=new FormRepeatChargesUpdate();
+			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
+			List<Procedure> procs=Procedures.Refresh(pat.PatNum);
+			if(procs.Count!=2 
+				|| procs.FindAll(x => x.ProcDate.ToShortDateString()=="11/11/2015").Count!=1
+				|| procs.FindAll(x => x.ProcDate.ToShortDateString()=="12/11/2015").Count!=1) 
+			{
+				listFailedTests.Add(1);
+			}
+			//Subtest 2 =====================================================
+			//The start day is after the billing day which is after the stop day. Add a charge after the stop date.
+			procs.ForEach(x => Procedures.Delete(x.ProcNum));
+			RepeatCharges.Delete(rc);
+			rc=new RepeatCharge();
+			rc.ChargeAmt=99;
+			rc.PatNum=pat.PatNum;
+			rc.ProcCode="D2750";
+			rc.IsEnabled=true;
+			rc.DateStart=new DateTime(2015,10,25);
+			rc.DateStop=new DateTime(2015,12,1);
+			rc.RepeatChargeNum=RepeatCharges.Insert(rc);
+			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
+			procs=Procedures.Refresh(pat.PatNum);
+			if(procs.Count!=2 
+				|| procs.FindAll(x => x.ProcDate.ToShortDateString()=="11/11/2015").Count!=1
+				|| procs.FindAll(x => x.ProcDate.ToShortDateString()=="12/11/2015").Count!=1) 
+			{
+				listFailedTests.Add(2);
+			}
+			//Subtest 3 =====================================================
+			//The start day is the same as the stop day but before the billing day. Add a charge after the stop date.
+			procs.ForEach(x => Procedures.Delete(x.ProcNum));
+			RepeatCharges.Delete(rc);
+			rc=new RepeatCharge();
+			rc.ChargeAmt=99;
+			rc.PatNum=pat.PatNum;
+			rc.ProcCode="D2750";
+			rc.IsEnabled=true;
+			rc.DateStart=new DateTime(2015,11,10);
+			rc.DateStop=new DateTime(2015,12,10);
+			RepeatCharges.Insert(rc);
+			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
+			procs=Procedures.Refresh(pat.PatNum);
+			if(procs.Count!=2 
+				|| procs.FindAll(x => x.ProcDate.ToShortDateString()=="11/11/2015").Count!=1
+				|| procs.FindAll(x => x.ProcDate.ToShortDateString()=="12/11/2015").Count!=1) 
+			{
+				listFailedTests.Add(3);
+			}
+			//Subtest 4 =====================================================
+			//The start day is the same as the stop day and the billing day. Don't add a charge after the stop date.
+			procs.ForEach(x => Procedures.Delete(x.ProcNum));
+			RepeatCharges.Delete(rc);
+			rc=new RepeatCharge();
+			rc.ChargeAmt=99;
+			rc.PatNum=pat.PatNum;
+			rc.ProcCode="D2750";
+			rc.IsEnabled=true;
+			rc.DateStart=new DateTime(2015,10,11);
+			rc.DateStop=new DateTime(2015,11,11);
+			rc.RepeatChargeNum=RepeatCharges.Insert(rc);
+			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
+			procs=Procedures.Refresh(pat.PatNum);
+			if(procs.Count!=1 || procs.FindAll(x => x.ProcDate.ToString("d")=="11/11/2015").Count!=1) {
+				listFailedTests.Add(4);
+			}
+			//Subtest 5 =====================================================
+			//The start day is after the stop day which is after the billing day. Don't add a charge after the stop date.
+			procs.ForEach(x => Procedures.Delete(x.ProcNum));
+			RepeatCharges.Delete(rc);
+			rc=new RepeatCharge();
+			rc.ChargeAmt=99;
+			rc.PatNum=pat.PatNum;
+			rc.ProcCode="D2750";
+			rc.IsEnabled=true;
+			rc.DateStart=new DateTime(2015,10,15);
+			rc.DateStop=new DateTime(2015,11,13);
+			rc.RepeatChargeNum=RepeatCharges.Insert(rc);
+			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
+			procs=Procedures.Refresh(pat.PatNum);
+			if(procs.Count!=1 || procs.FindAll(x => x.ProcDate.ToString("d")=="11/11/2015").Count!=1) {
+				listFailedTests.Add(5);
+			}
+			//Subtest 6 =====================================================
+			//The start day is before billing day which is before the stop day. Don't add a charge after the stop date.
+			procs.ForEach(x => Procedures.Delete(x.ProcNum));
+			RepeatCharges.Delete(rc);
+			rc=new RepeatCharge();
+			rc.ChargeAmt=99;
+			rc.PatNum=pat.PatNum;
+			rc.ProcCode="D2750";
+			rc.IsEnabled=true;
+			rc.DateStart=new DateTime(2015,11,05);
+			rc.DateStop=new DateTime(2015,11,20);
+			rc.RepeatChargeNum=RepeatCharges.Insert(rc);
+			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
+			procs=Procedures.Refresh(pat.PatNum);
+			if(procs.Count!=1 || procs.FindAll(x => x.ProcDate.ToString("d")=="11/11/2015").Count!=1) {
+				listFailedTests.Add(6);
+			}
+			procs.ForEach(x => Procedures.Delete(x.ProcNum));
+			if(listFailedTests.Count>0) { 
+				throw new Exception("Repeat charges adding a charge after the stop date: "+string.Join(" ,",listFailedTests.Select(x => "Subtest "+x))
+					+" failed.\r\n");
+			}
+			return "53: Passed.  Repeat charges add correctly after the stop date.\r\n";
+		}
+
+		///<summary>Tests that deleting a charge does not cause the wrong charges to be added back.</summary>
+		public static string TestFiftyFour(int specificTest) {
+			if(specificTest!=0 && specificTest!=54) {
+				return "";
+			}
+			//When there are multiple repeat charges on one account and the repeat charge tool is run, and then a procedure from the account is deleted, 
+			//and then the repeat charges tool is run again, the same number of procedures that were deleted should be added.
+			string suffix ="54";
+			Patient pat=PatientT.CreatePatient(suffix);
+			Patient patOld=pat.Copy();
+			pat.BillingCycleDay=11;
+			Patients.Update(pat,patOld);
+			Prefs.UpdateBool(PrefName.BillingUseBillingCycleDay,true);
+			DataValid.SetInvalid(InvalidType.Prefs);
+			List<RepeatCharge> listRepeatingCharges=RepeatCharges.Refresh(0).ToList();
+			listRepeatingCharges.ForEach(x => RepeatCharges.Delete(x));
+			DateTime dateRun=new DateTime(2015,12,15);
+			List<int> listFailedTests=new List<int>();
+			RepeatCharge rc=new RepeatCharge();
+			rc.ChargeAmt=99;
+			rc.PatNum=pat.PatNum;
+			rc.ProcCode="D2750";
+			rc.IsEnabled=true;
+			rc.DateStart=new DateTime(2015,11,1);
+			rc.Note="Charge #1";
+			rc.CopyNoteToProc=true;
+			rc.RepeatChargeNum=RepeatCharges.Insert(rc);
+			rc=new RepeatCharge();
+			rc.ChargeAmt=99;
+			rc.PatNum=pat.PatNum;
+			rc.ProcCode="D2750";
+			rc.IsEnabled=true;
+			rc.DateStart=new DateTime(2015,11,1);
+			rc.Note="Charge #2";
+			rc.CopyNoteToProc=true;
+			rc.RepeatChargeNum=RepeatCharges.Insert(rc);
+			rc=new RepeatCharge();
+			rc.ChargeAmt=99;
+			rc.PatNum=pat.PatNum;
+			rc.ProcCode="D2750";
+			rc.IsEnabled=true;
+			rc.DateStart=new DateTime(2015,11,1);
+			rc.Note="Charge #3";
+			rc.CopyNoteToProc=true;
+			rc.RepeatChargeNum=RepeatCharges.Insert(rc);
+			//Subtest 1 ===============================================================
+			//There are three procedures with the same amount, proc code, and start date. Run the repeat charge tool. Delete all procedures from 
+			//November. Run the repeat charge tool again. Make sure that the correct repeat charges were added back.
+			FormRepeatChargesUpdate FormRCU =new FormRepeatChargesUpdate();
+			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
+			List<Procedure> procs=Procedures.Refresh(pat.PatNum);
+			//Delete all procedures from November
+			procs.FindAll(x => x.ProcDate.Month==11)
+				.ForEach(x => Procedures.Delete(x.ProcNum));
+			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
+			//Make sure that the correct number of procedures were added using the correct repeating charges
+			if(procs.Count!=6
+				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #1").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #2").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #3").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #1").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #2").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #3").Count!=1) 
+			{
+				listFailedTests.Add(1);
+			}
+			//Subtest 2 ===============================================================
+			//Run the repeat charge tool. Delete all procedures from December. Run the repeat charge tool again. Make sure that the correct
+			//repeat charges were added back.
+			procs.ForEach(x => Procedures.Delete(x.ProcNum));
+			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
+			procs=Procedures.Refresh(pat.PatNum);
+			//Delete all procedures from December
+			procs.FindAll(x => x.ProcDate.Month==12)
+				.ForEach(x => Procedures.Delete(x.ProcNum));
+			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
+			//Make sure that the correct number of procedures were added using the correct repeating charges
+			if(procs.Count!=6
+				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #1").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #2").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #3").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #1").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #2").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #3").Count!=1) 
+			{
+				listFailedTests.Add(2);
+			}
+			//Subtest 3 ===============================================================
+			//Run the repeat charge tool. Delete one procedure from December. Run the repeat charge tool again. Make sure that the correct
+			//repeat charges were added back.
+			procs.ForEach(x => Procedures.Delete(x.ProcNum));
+			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
+			procs=Procedures.Refresh(pat.PatNum);
+			//Delete one procedure from December
+			procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #1")
+				.ForEach(x => Procedures.Delete(x.ProcNum));
+			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
+			//Make sure that the correct number of procedures were added using the correct repeating charges
+			if(procs.Count!=6
+				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #1").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #2").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #3").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #1").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #2").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #3").Count!=1) 
+			{
+				listFailedTests.Add(3);
+			}
+			//Subtest 4 ===============================================================
+			//Run the repeat charge tool. Delete one procedure from November. Run the repeat charge tool again. Make sure that the correct
+			//repeat charges were added back.
+			procs.ForEach(x => Procedures.Delete(x.ProcNum));
+			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
+			procs=Procedures.Refresh(pat.PatNum);
+			//Delete one procedure from November
+			procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #1")
+				.ForEach(x => Procedures.Delete(x.ProcNum));
+			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
+			//Make sure that the correct number of procedures were added using the correct repeating charges
+			if(procs.Count!=6
+				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #1").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #2").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #3").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #1").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #2").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #3").Count!=1) 
+			{
+				listFailedTests.Add(4);
+			}
+			if(listFailedTests.Count>0) { 
+				throw new Exception("Deleting charges and running repeating charge tool again: "
+					+string.Join(" ,",listFailedTests.Select(x=>"Subtest "+x))+" failed.\r\n");
+			}
+			return "54: Passed.  Deleting charges and running repeating charge tool again adds the correct charges.\r\n";
+		}
+
+		///<summary>Tests that changing the amount or start date on a repeat charge does not cause an additional one to be added.</summary>
+		public static string TestFiftyFive(int specificTest) {
+			if(specificTest!=0 && specificTest!=55) {
+				return "";
+			}
+			//Changing the amount or start date on a repeat charge should not cause the repeat charge to be added again.
+			string suffix ="55";
+			Patient pat=PatientT.CreatePatient(suffix);
+			Patient patOld=pat.Copy();
+			pat.BillingCycleDay=11;
+			Patients.Update(pat,patOld);
+			Prefs.UpdateBool(PrefName.BillingUseBillingCycleDay,true);
+			DataValid.SetInvalid(InvalidType.Prefs);
+			List<RepeatCharge> listRepeatingCharges=RepeatCharges.Refresh(0).ToList();
+			listRepeatingCharges.ForEach(x => RepeatCharges.Delete(x));
+			DateTime dateRun=new DateTime(2015,12,15);
+			List<int> listFailedTests=new List<int>();
+			//Subtest 1 ===============================================================
+			//Run the repeat charge tool. Change the charge amount on the repeat charge. Run the repeat charge tool again. Make sure that no  
+			//extra procedures are added.
+			RepeatCharge rc =new RepeatCharge();
+			rc.ChargeAmt=99;
+			rc.PatNum=pat.PatNum;
+			rc.ProcCode="D2750";
+			rc.IsEnabled=true;
+			rc.DateStart=new DateTime(2015,11,1);
+			rc.RepeatChargeNum=RepeatCharges.Insert(rc);
+			FormRepeatChargesUpdate FormRCU=new FormRepeatChargesUpdate();
+			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
+			rc.ChargeAmt=80;
+			RepeatCharges.Update(rc);
+			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
+			List<Procedure> procs=Procedures.Refresh(pat.PatNum);
+			if(procs.Count!=2 
+				|| procs.FindAll(x => x.ProcDate.ToShortDateString()=="11/11/2015" && x.ProcFee==99).Count!=1
+				|| procs.FindAll(x => x.ProcDate.ToShortDateString()=="12/11/2015" && x.ProcFee==99).Count!=1) 
+			{
+				listFailedTests.Add(1);
+			}
+			//Subtest 2 ===============================================================
+			//Run the repeat charge tool. Change the start date on the repeat charge. Run the repeat charge tool again. Make sure that no  
+			//extra procedures are added.
+			procs.ForEach(x => Procedures.Delete(x.ProcNum));
+			RepeatCharges.Delete(rc);
+			rc=new RepeatCharge();
+			rc.ChargeAmt=99;
+			rc.PatNum=pat.PatNum;
+			rc.ProcCode="D2750";
+			rc.IsEnabled=true;
+			rc.DateStart=new DateTime(2015,11,1);
+			rc.RepeatChargeNum=RepeatCharges.Insert(rc);
+			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
+			rc.DateStart=new DateTime(2015,11,2);
+			RepeatCharges.Update(rc);
+			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
+			procs=Procedures.Refresh(pat.PatNum);
+			if(procs.Count!=2 
+				|| procs.FindAll(x => x.ProcDate.ToShortDateString()=="11/11/2015" && x.ProcFee==99).Count!=1
+				|| procs.FindAll(x => x.ProcDate.ToShortDateString()=="12/11/2015" && x.ProcFee==99).Count!=1) 
+			{
+				listFailedTests.Add(2);
+			}
+			procs.ForEach(x => Procedures.Delete(x.ProcNum));
+			RepeatCharges.Delete(rc);
+			if(listFailedTests.Count>0) { 
+				throw new Exception("Changing the amount or start date adds the wrong repeat charge: "
+					+string.Join(" ,",listFailedTests.Select(x => "Subtest "+x))+" failed.\r\n");
+			}
+			return "55: Passed.  Repeat charges add correctly after changing the amount or start date.\r\n";
+		}
+
+		///<summary>Tests that repeat charges are not posted before the start date.</summary>
+		public static string TestFiftySix(int specificTest) {
+			if(specificTest!=0 && specificTest!=56) {
+				return "";
+			}
+			//Repeat charges should not be posted before the start date.
+			string suffix="56";
+			Patient pat=PatientT.CreatePatient(suffix);
+			Patient patOld=pat.Copy();
+			pat.BillingCycleDay=15;
+			Patients.Update(pat,patOld);
+			Prefs.UpdateBool(PrefName.BillingUseBillingCycleDay,true);
+			DataValid.SetInvalid(InvalidType.Prefs);
+			List<RepeatCharge> listRepeatingCharges=RepeatCharges.Refresh(0).ToList();
+			listRepeatingCharges.ForEach(x => RepeatCharges.Delete(x));
+			DateTime dateRun=new DateTime(2015,12,15);
+			List<int> listFailedTests=new List<int>();
+			//Subtest 1 ===============================================================
+			//The date start is the same as the date ran and the same as the billing day. Add a procedure that day.
+			RepeatCharge rc =new RepeatCharge();
+			rc.ChargeAmt=99;
+			rc.PatNum=pat.PatNum;
+			rc.ProcCode="D2750";
+			rc.IsEnabled=true;
+			rc.DateStart=new DateTime(2015,12,15);
+			rc.RepeatChargeNum=RepeatCharges.Insert(rc);
+			FormRepeatChargesUpdate FormRCU=new FormRepeatChargesUpdate();
+			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
+			List<Procedure> procs=Procedures.Refresh(pat.PatNum);
+			if(procs.Count!=1	|| procs.FindAll(x => x.ProcDate.ToShortDateString()=="12/15/2015" && x.ProcFee==99).Count!=1) {
+				listFailedTests.Add(1);
+			}
+			//Subtest 2 ===============================================================
+			//The start date is the same as the date ran but the billing day is three days earlier. Don't add a procedure that day.
+			procs.ForEach(x => Procedures.Delete(x.ProcNum));
+			RepeatCharges.Delete(rc);
+			patOld=pat.Copy();
+			pat.BillingCycleDay=12;
+			Patients.Update(pat,patOld);
+			rc=new RepeatCharge();
+			rc.ChargeAmt=99;
+			rc.PatNum=pat.PatNum;
+			rc.ProcCode="D2750";
+			rc.IsEnabled=true;
+			rc.DateStart=new DateTime(2015,12,15);
+			rc.RepeatChargeNum=RepeatCharges.Insert(rc);
+			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
+			procs=Procedures.Refresh(pat.PatNum);
+			if(procs.Count!=0) {
+				listFailedTests.Add(2);
+			}
+			//Subtest 3 ===============================================================
+			//The start date is the same as the billing day but is three days after the date ran. Don't add a procedure that day.
+			procs.ForEach(x => Procedures.Delete(x.ProcNum));
+			RepeatCharges.Delete(rc);
+			patOld=pat.Copy();
+			pat.BillingCycleDay=15;
+			Patients.Update(pat,patOld);
+			rc=new RepeatCharge();
+			rc.ChargeAmt=99;
+			rc.PatNum=pat.PatNum;
+			rc.ProcCode="D2750";
+			rc.IsEnabled=true;
+			rc.DateStart=new DateTime(2015,12,18);
+			rc.RepeatChargeNum=RepeatCharges.Insert(rc);
+			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
+			procs=Procedures.Refresh(pat.PatNum);
+			if(procs.Count!=0) {
+				listFailedTests.Add(3);
+			}
+			if(listFailedTests.Count>0) { 
+				throw new Exception("Repeat charges posting before the start date: "+string.Join(" ,",listFailedTests.Select(x => "Subtest "+x))
+					+" failed.\r\n");
+			}
+			return "56: Passed.  Repeat charges not posting before the start date.\r\n";
+		}
+
+
+
 	}
 }
