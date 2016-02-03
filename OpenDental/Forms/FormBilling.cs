@@ -763,7 +763,7 @@ namespace OpenDental{
 			FormStatementOptions FormSO=new FormStatementOptions();
 			List<long> listStatementNums=new List<long>();
 			foreach(int index in gridBill.SelectedIndices) {
-				listStatementNums.Add(PIn.Long(table.Rows[gridBill.SelectedIndices[index]]["StatementNum"].ToString()));
+				listStatementNums.Add(PIn.Long(table.Rows[index]["StatementNum"].ToString()));
 			}
 			FormSO.StmtList=Statements.GetStatements(listStatementNums);
 			FormSO.ShowDialog();
