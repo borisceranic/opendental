@@ -266,8 +266,8 @@ namespace OpenDental{
 			this.labelRequired.Name = "labelRequired";
 			this.labelRequired.Size = new System.Drawing.Size(188, 40);
 			this.labelRequired.TabIndex = 116;
-			this.labelRequired.Text = "Radion buttons in a radio button group must all be marked required or all be mark" +
-    "ed not required.";
+			this.labelRequired.Text = "Radio buttons in a radio button group must all be marked required or all be marke" +
+    "d not required.";
 			// 
 			// textReportableName
 			// 
