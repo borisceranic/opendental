@@ -1167,6 +1167,7 @@ namespace OpenDental{
 			List<RefAttach> RefAttachList=RefAttaches.Refresh(PatCur.PatNum);
 			List<Sheet> sheetList=Sheets.GetForPatient(PatCur.PatNum);
 			RepeatCharge[] repeatChargeList=RepeatCharges.Refresh(PatCur.PatNum);
+			List<CreditCard> listCreditCards=CreditCards.Refresh(PatCur.PatNum);
 			bool hasProcs=procList.Count>0;
 			bool hasAppt=apptList.Count>0;
 			bool hasClaims=claimList.Count>0;
@@ -1186,39 +1187,55 @@ namespace OpenDental{
 			bool hasRef=RefAttachList.Count>0;
 			bool hasSheets=sheetList.Count>0;
 			bool hasRepeat=repeatChargeList.Length>0;
+			bool hasCC=listCreditCards.Count>0;
 			if(hasProcs || hasAppt || hasClaims || hasAdj || hasPay || hasClaimProcs || hasComm || hasPayPlans
-				|| hasInsPlans || hasRef || hasMeds || isSuperFamilyHead || hasSheets || hasRepeat)
-			{
-				string message=Lan.g(this,
-					"You cannot delete this patient without first deleting the following data:")+"\r";
-				if(hasProcs)
+				|| hasInsPlans || hasRef || hasMeds || isSuperFamilyHead || hasSheets || hasRepeat || hasCC) {
+				string message=Lan.g(this,"You cannot delete this patient without first deleting the following data:")+"\r";
+				if(hasProcs) {
 					message+=Lan.g(this,"Procedures")+"\r";
-				if(hasAppt)
+				}
+				if(hasAppt) {
 					message+=Lan.g(this,"Appointments")+"\r";
-				if(hasClaims)
+				}
+				if(hasClaims) {
 					message+=Lan.g(this,"Claims")+"\r";
-				if(hasAdj)
+				}
+				if(hasAdj) {
 					message+=Lan.g(this,"Adjustments")+"\r";
-				if(hasPay)
+				}
+				if(hasPay) {
 					message+=Lan.g(this,"Payments")+"\r";
-				if(hasClaimProcs)
+				}
+				if(hasClaimProcs) {
 					message+=Lan.g(this,"Procedures attached to claims")+"\r";
-				if(hasComm)
+				}
+				if(hasComm) {
 					message+=Lan.g(this,"Commlog entries")+"\r";
-				if(hasPayPlans)
+				}
+				if(hasPayPlans) {
 					message+=Lan.g(this,"Payment plans")+"\r";
-				if(hasInsPlans)
+				}
+				if(hasInsPlans) {
 					message+=Lan.g(this,"Insurance plans")+"\r";
-				if(hasRef)
+				}
+				if(hasRef) {
 					message+=Lan.g(this,"References")+"\r";
-				if(hasMeds)
+				}
+				if(hasMeds) {
 					message+=Lan.g(this,"Medications")+"\r";
-				if(isSuperFamilyHead)
+				}
+				if(isSuperFamilyHead) {
 					message+=Lan.g(this,"Attached Super Family")+"\r";
-				if(hasSheets)
+				}
+				if(hasSheets) {
 					message+=Lan.g(this,"Sheets")+"\r";
-				if(hasRepeat)
+				}
+				if(hasRepeat) {
 					message+=Lan.g(this,"Repeating Charges")+"\r";
+				}
+				if(hasCC) {
+					message+=Lan.g(this,"Credit Cards")+"\r";
+				}
 				MessageBox.Show(message);
 				return;
 			}
