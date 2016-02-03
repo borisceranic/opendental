@@ -744,6 +744,23 @@ namespace OpenDental{
 			FillScreenPats();
 		}
 
+		private void ViewScreenForPat(OpenDentBusiness.Screen screenCur) {
+			FormScreenEdit FormSE=new FormScreenEdit();
+			FormSE.ScreenGroupCur=_screenGroup;
+			FormSE.IsNew=false;
+			FormSE.ScreenCur=screenCur;
+			ScreenPat screenPat=_listScreenPats.FirstOrDefault(x => x.ScreenPatNum==screenCur.ScreenPatNum);
+			FormSE.ScreenPatCur=screenPat;//Null represents anonymous.
+			FormSE.ShowDialog();
+		}
+
+		private void ViewScreenForPatWithSheets(OpenDentBusiness.Screen screenCur) {
+			MsgBox.Show(this,"Viewing screens taken via sheets is not currently supported.");
+			//TODO: Using the SheetNum from the screen get all corresponding data for the sheet from the db.
+			//TODO: Display the sheet fill edit window.
+			//TODO: Consider importing certain data from the sheet?  We do not want to re-process the entire sheet as it will duplicate procedures.
+		}
+
 		private void gridScreenPats_MouseClick(object sender,MouseEventArgs e) {
 			if(e.Button!=MouseButtons.Right) {
 				return;
@@ -812,13 +829,12 @@ namespace OpenDental{
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			FormScreenEdit FormSE=new FormScreenEdit();
-			FormSE.ScreenGroupCur=_screenGroup;
-			FormSE.IsNew=false;
-			FormSE.ScreenCur=_listScreens[e.Row];
-			ScreenPat screenPat=_listScreenPats.FirstOrDefault(x => x.ScreenPatNum==_listScreens[e.Row].ScreenPatNum);
-			FormSE.ScreenPatCur=screenPat;//Null represents anonymous.
-			FormSE.ShowDialog();
+			if(PrefC.GetBool(PrefName.ScreeningsUseSheets)) {
+				ViewScreenForPatWithSheets(_listScreens[e.Row]);
+			}
+			else {
+				ViewScreenForPat(_listScreens[e.Row]);
+			}
 			FillGrid();
 			FillScreenPats();
 		}
