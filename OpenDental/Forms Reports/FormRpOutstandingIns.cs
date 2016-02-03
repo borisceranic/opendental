@@ -7,6 +7,7 @@ using System.Drawing.Printing;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using System.Linq;
 using OpenDentBusiness;
 using System.Collections;
 using OpenDental.UI;
@@ -41,6 +42,8 @@ namespace OpenDental {
 		private Label labelClinic;
 		private decimal total;
 		private CheckBox checkIgnoreCustom;
+		private ComboBox comboLastClaimTrack;
+		private Label label3;
 		private List<Clinic> _listClinics;
 
 		public FormRpOutstandingIns() {
@@ -68,6 +71,8 @@ namespace OpenDental {
 			this.comboBoxMultiClinics = new OpenDental.UI.ComboBoxMulti();
 			this.labelClinic = new System.Windows.Forms.Label();
 			this.checkIgnoreCustom = new System.Windows.Forms.CheckBox();
+			this.comboLastClaimTrack = new System.Windows.Forms.ComboBox();
+			this.label3 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// checkPreauth
@@ -76,7 +81,7 @@ namespace OpenDental {
 			this.checkPreauth.Checked = true;
 			this.checkPreauth.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkPreauth.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkPreauth.Location = new System.Drawing.Point(313, 9);
+			this.checkPreauth.Location = new System.Drawing.Point(281, 9);
 			this.checkPreauth.Name = "checkPreauth";
 			this.checkPreauth.Size = new System.Drawing.Size(149, 18);
 			this.checkPreauth.TabIndex = 51;
@@ -86,7 +91,7 @@ namespace OpenDental {
 			// 
 			// labelProv
 			// 
-			this.labelProv.Location = new System.Drawing.Point(482, 8);
+			this.labelProv.Location = new System.Drawing.Point(431, 8);
 			this.labelProv.Name = "labelProv";
 			this.labelProv.Size = new System.Drawing.Size(87, 16);
 			this.labelProv.TabIndex = 48;
@@ -123,7 +128,7 @@ namespace OpenDental {
 			// label2
 			// 
 			this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.label2.Location = new System.Drawing.Point(600, 480);
+			this.label2.Location = new System.Drawing.Point(730, 480);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(69, 18);
 			this.label2.TabIndex = 46;
@@ -133,7 +138,7 @@ namespace OpenDental {
 			// textBox1
 			// 
 			this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.textBox1.Location = new System.Drawing.Point(675, 479);
+			this.textBox1.Location = new System.Drawing.Point(805, 479);
 			this.textBox1.Name = "textBox1";
 			this.textBox1.Size = new System.Drawing.Size(61, 20);
 			this.textBox1.TabIndex = 56;
@@ -146,7 +151,7 @@ namespace OpenDental {
 			this.butRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butRefresh.CornerRadius = 4F;
-			this.butRefresh.Location = new System.Drawing.Point(750, 5);
+			this.butRefresh.Location = new System.Drawing.Point(880, 5);
 			this.butRefresh.Name = "butRefresh";
 			this.butRefresh.Size = new System.Drawing.Size(82, 24);
 			this.butRefresh.TabIndex = 58;
@@ -175,7 +180,7 @@ namespace OpenDental {
 			this.comboBoxMultiProv.BackColor = System.Drawing.SystemColors.Window;
 			this.comboBoxMultiProv.DroppedDown = false;
 			this.comboBoxMultiProv.Items = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiProv.Items")));
-			this.comboBoxMultiProv.Location = new System.Drawing.Point(570, 7);
+			this.comboBoxMultiProv.Location = new System.Drawing.Point(519, 7);
 			this.comboBoxMultiProv.Name = "comboBoxMultiProv";
 			this.comboBoxMultiProv.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiProv.SelectedIndices")));
 			this.comboBoxMultiProv.Size = new System.Drawing.Size(160, 21);
@@ -229,7 +234,7 @@ namespace OpenDental {
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(750, 476);
+			this.butCancel.Location = new System.Drawing.Point(880, 476);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 45;
@@ -247,7 +252,7 @@ namespace OpenDental {
 			this.gridMain.Location = new System.Drawing.Point(12, 56);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(820, 406);
+			this.gridMain.Size = new System.Drawing.Size(950, 406);
 			this.gridMain.TabIndex = 1;
 			this.gridMain.Title = null;
 			this.gridMain.TranslationName = null;
@@ -259,7 +264,7 @@ namespace OpenDental {
 			this.comboBoxMultiClinics.BackColor = System.Drawing.SystemColors.Window;
 			this.comboBoxMultiClinics.DroppedDown = false;
 			this.comboBoxMultiClinics.Items = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiClinics.Items")));
-			this.comboBoxMultiClinics.Location = new System.Drawing.Point(570, 29);
+			this.comboBoxMultiClinics.Location = new System.Drawing.Point(519, 29);
 			this.comboBoxMultiClinics.Name = "comboBoxMultiClinics";
 			this.comboBoxMultiClinics.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiClinics.SelectedIndices")));
 			this.comboBoxMultiClinics.Size = new System.Drawing.Size(160, 21);
@@ -268,7 +273,7 @@ namespace OpenDental {
 			// 
 			// labelClinic
 			// 
-			this.labelClinic.Location = new System.Drawing.Point(482, 31);
+			this.labelClinic.Location = new System.Drawing.Point(431, 31);
 			this.labelClinic.Name = "labelClinic";
 			this.labelClinic.Size = new System.Drawing.Size(87, 16);
 			this.labelClinic.TabIndex = 60;
@@ -280,7 +285,7 @@ namespace OpenDental {
 			// 
 			this.checkIgnoreCustom.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkIgnoreCustom.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkIgnoreCustom.Location = new System.Drawing.Point(313, 29);
+			this.checkIgnoreCustom.Location = new System.Drawing.Point(281, 29);
 			this.checkIgnoreCustom.Name = "checkIgnoreCustom";
 			this.checkIgnoreCustom.Size = new System.Drawing.Size(149, 18);
 			this.checkIgnoreCustom.TabIndex = 61;
@@ -288,9 +293,28 @@ namespace OpenDental {
 			this.checkIgnoreCustom.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkIgnoreCustom.CheckedChanged += new System.EventHandler(this.checkIgnoreCustom_CheckedChanged);
 			// 
+			// comboLastClaimTrack
+			// 
+			this.comboLastClaimTrack.FormattingEnabled = true;
+			this.comboLastClaimTrack.Location = new System.Drawing.Point(688, 28);
+			this.comboLastClaimTrack.Name = "comboLastClaimTrack";
+			this.comboLastClaimTrack.Size = new System.Drawing.Size(178, 21);
+			this.comboLastClaimTrack.TabIndex = 62;
+			// 
+			// label3
+			// 
+			this.label3.Location = new System.Drawing.Point(685, 9);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(181, 16);
+			this.label3.TabIndex = 63;
+			this.label3.Text = "Last Claim Custom Tracking Status";
+			this.label3.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
 			// FormRpOutstandingIns
 			// 
-			this.ClientSize = new System.Drawing.Size(844, 512);
+			this.ClientSize = new System.Drawing.Size(974, 512);
+			this.Controls.Add(this.label3);
+			this.Controls.Add(this.comboLastClaimTrack);
 			this.Controls.Add(this.checkIgnoreCustom);
 			this.Controls.Add(this.labelClinic);
 			this.Controls.Add(this.comboBoxMultiClinics);
@@ -326,6 +350,7 @@ namespace OpenDental {
 				labelClinic.Visible=true;
 				FillClinics();
 			}
+			FillCustomTrack();
 			FillGrid();
 		}
 
@@ -356,6 +381,15 @@ namespace OpenDental {
 					comboBoxMultiClinics.SetSelected(curIndex,true);
 				}
 			}
+		}
+
+		private void FillCustomTrack() {
+			comboLastClaimTrack.Items.Add("All");
+			Def[] arrayDefs=DefC.GetList(DefCat.ClaimCustomTracking);
+			foreach(Def definition in arrayDefs) {
+				comboLastClaimTrack.Items.Add(definition.ItemName);
+			}
+			comboLastClaimTrack.SelectedIndex=0;
 		}
 
 		private void FillGrid() {
@@ -422,9 +456,13 @@ namespace OpenDental {
 				col=new ODGridColumn(Lan.g(this,"Clinic"),100);
 				gridMain.Columns.Add(col);
 			}
-			col=new ODGridColumn(Lan.g(this,"Date of Service"),93);
+			col=new ODGridColumn(Lan.g(this,"Date of Serv"),70);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Date Sent"),70);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn(Lan.g(this,"Track Status"),90);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn(Lan.g(this,"Date Status"),70);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Amount"),85,HorizontalAlignment.Right);
 			gridMain.Columns.Add(col);
@@ -436,6 +474,10 @@ namespace OpenDental {
 				DateTime dateLastLog=PIn.Date(Table.Rows[i]["DateLog"].ToString());
 				int daysSuppressed=PIn.Int(Table.Rows[i]["DaysSuppressed"].ToString());
 				if(!checkIgnoreCustom.Checked && dateLastLog.AddDays(daysSuppressed)>DateTime.Today) {
+					continue;
+				}
+				long customTrackDefNum=PIn.Long(Table.Rows[i]["DefNum"].ToString());
+				if(comboLastClaimTrack.SelectedIndex!=0 && customTrackDefNum!=DefC.GetList(DefCat.ClaimCustomTracking)[comboLastClaimTrack.SelectedIndex-1].DefNum) {
 					continue;
 				}
 				row=new ODGridRow();
@@ -490,6 +532,19 @@ namespace OpenDental {
 					row.Cells.Add(dateService.ToShortDateString());
 				}
 				row.Cells.Add(PIn.Date(Table.Rows[i]["DateSent"].ToString()).ToShortDateString());
+				if(customTrackDefNum==0) {
+					row.Cells.Add("-");
+				}
+				else {
+					row.Cells.Add(DefC.GetList(DefCat.ClaimCustomTracking).First(x => x.DefNum==customTrackDefNum).ItemName);
+				}
+				DateTime dateLog=PIn.Date(Table.Rows[i]["DateLog"].ToString());
+				if(dateLog.Year<1880) {
+					row.Cells.Add("-");
+				}
+				else { 
+					row.Cells.Add(dateLog.ToShortDateString());
+				}
 				row.Cells.Add(PIn.Double(Table.Rows[i]["ClaimFee"].ToString()).ToString("c"));
 				gridMain.Rows.Add(row);
 				total+=PIn.Decimal(Table.Rows[i]["ClaimFee"].ToString());

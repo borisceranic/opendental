@@ -16,7 +16,8 @@ namespace OpenDentBusiness {
 			string command;
 			command = "SELECT carrier.CarrierName,carrier.Phone,claim.ClaimType,patient.FName,patient.LName,patient.MiddleI,patient.PatNum,"
 				+"claim.DateService,claim.DateSent,claim.ClaimFee,claim.ClaimNum,claim.ClinicNum,"
-				+"definition.ItemValue DaysSuppressed,"+DbHelper.DtimeToDate("securitylog.LogDateTime")+" DateLog "
+				+"definition.ItemValue DaysSuppressed,"+DbHelper.DtimeToDate("securitylog.LogDateTime")+" DateLog,"
+				+"definition.DefNum DefNum "
 				+"FROM carrier "
 				+"INNER JOIN insplan ON insplan.CarrierNum=carrier.CarrierNum "
 				+"INNER JOIN claim ON claim.PlanNum=insplan.PlanNum "
