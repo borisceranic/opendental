@@ -134,6 +134,7 @@ namespace OpenDentBusiness{
 		public static void Sync(List<EmailAttach> emailAttachNew,List<EmailAttach> emailAttachOld) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),emailAttachNew,emailAttachOld);
+				return;
 			}
 			Crud.EmailAttachCrud.Sync(emailAttachNew,emailAttachOld);
 		}
