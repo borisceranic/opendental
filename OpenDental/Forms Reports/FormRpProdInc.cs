@@ -425,6 +425,7 @@ namespace OpenDental{
       this.checkClinicInfo.Size = new System.Drawing.Size(169, 16);
       this.checkClinicInfo.TabIndex = 51;
       this.checkClinicInfo.Text = "Show Clinic Info";
+      this.checkClinicInfo.CheckedChanged += new System.EventHandler(this.checkClinicInfo_CheckedChanged);
       // 
       // FormRpProdInc
       // 
