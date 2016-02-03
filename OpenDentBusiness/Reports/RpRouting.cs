@@ -10,7 +10,7 @@ namespace OpenDentBusiness {
 		///<summary>Gets a list of aptNums for one day in the schedule for a given set of providers and clinics.</summary>
 		public static List<long> GetRouting(DateTime date,List<long> listProvNums,List<long> listClinicNums) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<long>>(MethodBase.GetCurrentMethod(),date,listProvNums);
+				return Meth.GetObject<List<long>>(MethodBase.GetCurrentMethod(),date,listProvNums,listClinicNums);
 			}
 			string command=
 				"SELECT AptNum FROM appointment "
