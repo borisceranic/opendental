@@ -513,7 +513,10 @@ namespace OpenDentBusiness {
 		///<summary>The PK of the replication server that is flagged as the "report server".  If using replication, "create table" or "drop table" commands can only be executed within the user query window when connected to this server.</summary>
 		ReplicationUserQueryServer,
 		ReportFolderName,
-		ReportPandIhasClinicBreakdown,
+    ///<summary>Boolean, on by default.</summary>
+    ReportPandIhasClinicBreakdown,
+    ///<summary>Boolean, off by default.</summary>
+		ReportPandIhasClinicInfo,
 		ReportPandIschedProdSubtractsWO,
 		ReportsPPOwriteoffDefaultToProcDate,
 		ReportsShowPatNum,

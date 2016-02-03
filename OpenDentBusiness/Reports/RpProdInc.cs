@@ -15,11 +15,14 @@ namespace OpenDentBusiness {
 
 		#region Daily and Provider P&I Reports
 		///<summary>If not using clinics then supply an empty list of clinicNums.  Also used for the CEMT Provider P and I report.</summary>
-		public static DataSet GetDailyData(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics,bool hasBreakdown) {
+		public static DataSet GetDailyData(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics,bool hasBreakdown,bool hasClinicInfo) {
 			//No need to check RemotingRole; no call to db.
 			if(listClinics.Count>0) {
 				_hasClinics=true;
 			}
+      if(!hasClinicInfo) {
+        _hasClinics=false;
+      }
 			DataSet dataSet=GetDailyProdIncDataSet(dateFrom,dateTo,listProvs,listClinics,writeOffPay,hasAllProvs,hasAllClinics);
 			DataTable tableProduction=dataSet.Tables["tableProduction"];
 			DataTable tableAdj=dataSet.Tables["tableAdj"];
