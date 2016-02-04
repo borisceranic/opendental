@@ -445,6 +445,26 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please enter an amount.");
 				return;
 			}
+			double amt=PIn.Double(textAmount.Text);
+			if(!ClaimPaymentCur.CheckAmt.IsEqual(amt)) {//The user changed the insurance payment amount for the check.
+				List<ClaimPaySplit> listClaimPaySplit=Claims.GetAttachedToPayment(ClaimPaymentCur.ClaimPaymentNum);
+				double insPayTotal=0;
+				for(int i=0; i<listClaimPaySplit.Count; i++) {
+					insPayTotal+=listClaimPaySplit[i].InsPayAmt;
+				}
+				if(!insPayTotal.IsEqual(amt)) {
+					if(MsgBox.Show(this,true,"Amount entered does not match Total Payments attached.\r\n"
+						+"If you choose to continue, this insurance payment will be flagged as a partial payment, which will affect reports.\r\n"
+						+"Click OK to continue, or click Cancel to edit Amount."))
+					{
+						ClaimPaymentCur.IsPartial=true;
+					}
+					else {
+						//FormClaimPayBatch will set IsPartial back to false.
+						return;
+					}
+				}
+			}
 			if(IsNew){
 				//prevents backdating of initial check
 				if(!Security.IsAuthorized(Permissions.InsPayCreate,PIn.Date(textDate.Text))){
