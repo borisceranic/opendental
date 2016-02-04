@@ -791,7 +791,7 @@ namespace CentralManager {
 			unassigned.ClinicNum=0;
 			unassigned.Description="Unassigned";//Same issue here as above.
 			listClinics.Add(unassigned);
-			dataSetProdData=RpProdInc.GetDailyData(_dateFrom,_dateTo,listProvs,listClinics,radioWriteoffPay.Checked,true,true,false);
+			dataSetProdData=RpProdInc.GetDailyData(_dateFrom,_dateTo,listProvs,listClinics,radioWriteoffPay.Checked,true,true,false,true);
 			odThread.Tag=new object[] { dataSetProdData,conn };
 		}
 
