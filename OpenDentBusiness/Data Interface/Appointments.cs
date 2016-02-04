@@ -328,7 +328,11 @@ namespace OpenDentBusiness{
 				List<Provider> listProvs=ProviderC.GetListShort();
 				appt.ProvNum=listProvs[0].ProvNum;
 			}
-			ApptComms.InsertForAppt(appt);
+			double dayInterval=PrefC.GetDouble(PrefName.ApptReminderDayInterval);
+			double hourInterval=PrefC.GetDouble(PrefName.ApptReminderHourInterval);
+			DateTime automationBeginPref=PrefC.GetDateT(PrefName.AutomaticCommunicationTimeStart);
+			DateTime automationEndPref=PrefC.GetDateT(PrefName.AutomaticCommunicationTimeEnd);
+			ApptComms.InsertForAppt(appt,dayInterval,hourInterval,automationBeginPref,automationEndPref);
 			return Crud.AppointmentCrud.Insert(appt,useExistingPK);
 		}
 
