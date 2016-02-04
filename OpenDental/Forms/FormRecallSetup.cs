@@ -67,7 +67,7 @@ namespace OpenDental{
 		private Label label11;
 		private ValidDouble textHoursPrior;
 		private ValidDouble textDaysPrior;
-		private bool changed;
+		private bool _changed;
 		private RichTextBox textDayMsg;
 		private RichTextBox textHourMsg;
 		private TabPage tabAutomationSettings;
@@ -106,6 +106,8 @@ namespace OpenDental{
 		private string[] _arrayPriorities;
 		private double _daysPrior;
 		private double _hoursPrior;
+		private TimeSpan _automationStart;
+		private TimeSpan _automationEnd;
 
 		///<summary></summary>
 		public FormRecallSetup(){
@@ -1610,7 +1612,7 @@ namespace OpenDental{
 			Prefs.UpdateString(prefName,FormR.MessageVal);
 			//Prefs.RefreshCache();//above line handles it.
 			FillGrid();
-			changed=true;
+			_changed=true;
 		}
 
 		#endregion
@@ -1950,7 +1952,9 @@ namespace OpenDental{
 		#region Automation Settings
 		private void FillAutomationTab() {
 			dateRunStart.Text=PrefC.GetDateT(PrefName.AutomaticCommunicationTimeStart).ToShortTimeString();
+			_automationStart=dateRunStart.Value.TimeOfDay;
 			dateRunEnd.Text=PrefC.GetDateT(PrefName.AutomaticCommunicationTimeEnd).ToShortTimeString();
+			_automationEnd=dateRunEnd.Value.TimeOfDay;
 			switch(PrefC.GetInt(PrefName.WebSchedAutomaticSendSetting)) {
 				case (int)WebSchedAutomaticSend.DoNotSend:
 					radioDoNotSend.Checked=true;
@@ -2077,8 +2081,28 @@ namespace OpenDental{
 			else{
 				Prefs.UpdateBool(PrefName.RecallUseEmailIfHasEmailAddress,false);
 			}
+			if(radioDoNotSend.Checked) {
+				Prefs.UpdateInt(PrefName.WebSchedAutomaticSendSetting,(int)WebSchedAutomaticSend.DoNotSend);
+			}
+			else if(radioSendToEmail.Checked) {
+				Prefs.UpdateInt(PrefName.WebSchedAutomaticSendSetting,(int)WebSchedAutomaticSend.SendToEmail);
+			}
+			else if(radioSendToEmailNoPreferred.Checked) {
+				Prefs.UpdateInt(PrefName.WebSchedAutomaticSendSetting,(int)WebSchedAutomaticSend.SendToEmailNoPreferred);
+			}
+			else {
+				Prefs.UpdateInt(PrefName.WebSchedAutomaticSendSetting,(int)WebSchedAutomaticSend.SendToEmailOnlyPreferred);
+			}
+			Prefs.UpdateDateT(PrefName.AutomaticCommunicationTimeStart,dateRunStart.Value);
+			Prefs.UpdateDateT(PrefName.AutomaticCommunicationTimeEnd,dateRunEnd.Value);
+			//ApptComm preference updates MUST be after the AutomationStart and AutomationEnd updates.  Creating ApptComms depends on those values.
 			Prefs.UpdateBool(PrefName.ApptReminderSendAll,checkSendAll.Checked);
-			if(_daysPrior!=PIn.Double(textDaysPrior.Text) || _hoursPrior!=PIn.Double(textHoursPrior.Text)) {
+			if(_daysPrior!=PIn.Double(textDaysPrior.Text) 
+				|| _hoursPrior!=PIn.Double(textHoursPrior.Text) 
+				//If they changed either of the automation start/end values and the automation start/end isn't disabled, re-do reminders.
+				|| _automationStart!=dateRunStart.Value.TimeOfDay 
+				|| _automationEnd!=dateRunEnd.Value.TimeOfDay) 
+			{
 				Prefs.UpdateDouble(PrefName.ApptReminderDayInterval,PIn.Double(textDaysPrior.Text));
 				Prefs.UpdateDouble(PrefName.ApptReminderHourInterval,PIn.Double(textHoursPrior.Text));
 				//Update ApptComms with new reminder entries.
@@ -2094,21 +2118,7 @@ namespace OpenDental{
 				sendOrder+=((int)gridPriorities.Rows[i].Tag).ToString();
 			}
 			Prefs.UpdateString(PrefName.ApptReminderSendOrder,sendOrder);
-			if(radioDoNotSend.Checked) {
-				Prefs.UpdateInt(PrefName.WebSchedAutomaticSendSetting,(int)WebSchedAutomaticSend.DoNotSend);
-			}
-			else if(radioSendToEmail.Checked) {
-				Prefs.UpdateInt(PrefName.WebSchedAutomaticSendSetting,(int)WebSchedAutomaticSend.SendToEmail);
-			}
-			else if(radioSendToEmailNoPreferred.Checked) {
-				Prefs.UpdateInt(PrefName.WebSchedAutomaticSendSetting,(int)WebSchedAutomaticSend.SendToEmailNoPreferred);
-			}
-			else {
-				Prefs.UpdateInt(PrefName.WebSchedAutomaticSendSetting,(int)WebSchedAutomaticSend.SendToEmailOnlyPreferred);
-			}
-			Prefs.UpdateDateT(PrefName.AutomaticCommunicationTimeStart,dateRunStart.Value);
-			Prefs.UpdateDateT(PrefName.AutomaticCommunicationTimeEnd,dateRunEnd.Value);
-			changed=true;
+			_changed=true;
 			DialogResult=DialogResult.OK;
 		}
 
@@ -2117,7 +2127,7 @@ namespace OpenDental{
 		}
 
 		private void FormRecallSetup_FormClosing(object sender,FormClosingEventArgs e) {
-			if(changed) {
+			if(_changed) {
 				DataValid.SetInvalid(InvalidType.Prefs);
 			}
 		}

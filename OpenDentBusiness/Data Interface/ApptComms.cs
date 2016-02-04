@@ -34,6 +34,15 @@ namespace OpenDentBusiness{
 			return Crud.ApptCommCrud.SelectMany(command);
 		}
 
+		///<summary>Retrieves all ApptComm entries that are scheduled to be sent between the specified times and the present.</summary>
+		public static List<ApptComm> GetToSend(DateTime dateTimeStart,DateTime dateTimeEnd) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<ApptComm>>(MethodBase.GetCurrentMethod(),dateTimeStart,dateTimeEnd);
+			}
+			string command="SELECT * FROM apptcomm WHERE DateTimeSend BETWEEN "+POut.DateT(dateTimeStart)+" AND "+POut.DateT(dateTimeEnd)+")";
+			return Crud.ApptCommCrud.SelectMany(command);
+		}
+
 		///<summary></summary>
 		public static long Insert(ApptComm apptComm){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
@@ -63,28 +72,48 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Creates two ApptComm items, one to send using dayInterval, and one to send using hourInterval.</summary>
-		public static void InsertForAppt(Appointment appt) {
+		public static void InsertForAppt(Appointment appt,double dayInterval,double hourInterval,DateTime automationBeginPref,DateTime automationEndPref) {
 			if(appt.AptStatus!=ApptStatus.Scheduled && appt.AptStatus!=ApptStatus.ASAP) {
 				return;//Do nothing unless it's scheduled or ASAP.
 			}
 			ApptComm apptComm;
-			double dayInterval=PrefC.GetDouble(PrefName.ApptReminderDayInterval);
 			DateTime daySend=appt.AptDateTime.Subtract(TimeSpan.FromDays(dayInterval));
 			//This prevents a UE while pre-inserting new appointments and prevents adding reminder if the interval can't be reached.
 			if(dayInterval > 0 && appt.AptNum!=0 && daySend > DateTime.Now) {
 				apptComm=new ApptComm();
 				apptComm.ApptNum=appt.AptNum;
 				apptComm.ApptCommType=IntervalType.Daily;
-				apptComm.DateTimeSend=daySend;//Setting the ApptComm reminder to be sent dayInterval days before the appt.
+				DateTime automationBegin=new DateTime(daySend.Year,daySend.Month,daySend.Day
+					,automationBeginPref.Hour,automationBeginPref.Minute,automationBeginPref.Second);
+				if(daySend.TimeOfDay<automationBegin.TimeOfDay && automationBeginPref.TimeOfDay!=automationEndPref.TimeOfDay) {
+					//The reminder is scheduled to be sent prior to automation beginning.  Let's schedule it to send the night before.
+					DateTime automationEnd=new DateTime(daySend.Year,daySend.Month,daySend.Day
+						,automationEndPref.Hour,automationEndPref.Minute,automationEndPref.Second);//Make sure to use the reminder's day/month/year, then subtract one day.
+					DateTime dateSend=automationEnd.Subtract(TimeSpan.FromDays(1)).Subtract(TimeSpan.FromMinutes(30));//Schedule it for 30 minutes prior to automation end to make sure it attempts sending.
+					apptComm.DateTimeSend=dateSend;
+				}
+				else { 
+					apptComm.DateTimeSend=daySend;//Setting the ApptComm reminder to be sent dayInterval days before the appt.
+				}
 				ApptComms.Insert(apptComm);
 			}
-			double hourInterval=PrefC.GetDouble(PrefName.ApptReminderHourInterval);
 			DateTime hourSend=appt.AptDateTime.Subtract(TimeSpan.FromHours(hourInterval));
 			if(hourInterval > 0 && appt.AptNum!=0 && hourSend > DateTime.Now) {//This prevents a UE while pre-inserting new appointments.
 				apptComm=new ApptComm();
 				apptComm.ApptNum=appt.AptNum;
 				apptComm.ApptCommType=IntervalType.Hourly;
-				apptComm.DateTimeSend=hourSend;//Setting the ApptComm reminder to be sent hourInterval hours before the appt.
+				DateTime automationBegin=new DateTime(hourSend.Year,hourSend.Month,hourSend.Day
+					,automationBeginPref.Hour,automationBeginPref.Minute,automationBeginPref.Second);
+				if(hourSend.TimeOfDay<automationBegin.TimeOfDay && automationBeginPref.TimeOfDay!=automationEndPref.TimeOfDay) {
+					//The reminder is supposed to be sent prior to automation beginning.  Let's schedule it to send the night before.
+					DateTime automationEnd=new DateTime(hourSend.Year,hourSend.Month,hourSend.Day
+						,automationEndPref.Hour,automationEndPref.Minute,automationEndPref.Second);//Make sure to use the reminder's day/month/year, then subtract one day.
+					DateTime sendDate=automationEnd.Subtract(TimeSpan.FromDays(1)).Subtract(TimeSpan.FromMinutes(30));//Schedule it for 30 minutes prior to automation end to make sure it attempts sending.
+					apptComm.DateTimeSend=sendDate;
+				}
+				else { 
+					apptComm.DateTimeSend=hourSend;//Setting the ApptComm reminder to be sent HourInterval hours before the appt.
+				}
 				ApptComms.Insert(apptComm);
 			}
 		}
@@ -92,10 +121,21 @@ namespace OpenDentBusiness{
 		///<summary>Inserts appointment reminders for all future appointments.  
 		///Used when automated appt reminder settings are changed so we can make sure all future appointments have appropriate reminders.</summary>
 		public static void InsertForFutureAppts() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod());
+				return;
+			}
+			//Doing the remotingrole check here to save a lot of traffic over the wire in the Delete and Insert statements below.
+			//DO NOT USE METHODS THAT USE THE CACHE AFTER THIS POINT
 			List<Appointment> listFutureAppts=Appointments.GetFutureSchedApts();
+			double dayInterval=PrefC.GetDouble(PrefName.ApptReminderDayInterval);
+			double hourInterval=PrefC.GetDouble(PrefName.ApptReminderHourInterval);
+			DateTime automationBeginPref=PrefC.GetDateT(PrefName.AutomaticCommunicationTimeStart);
+			DateTime automationEndPref=PrefC.GetDateT(PrefName.AutomaticCommunicationTimeEnd);
 			foreach(Appointment appt in listFutureAppts) {
 				DeleteForAppt(appt.AptNum);
-				InsertForAppt(appt);
+				//Get the DateTime automation end
+				InsertForAppt(appt,dayInterval,hourInterval,automationBeginPref,automationEndPref);
 			}
 		}
 
@@ -103,15 +143,39 @@ namespace OpenDentBusiness{
 		public static void UpdateForAppt(Appointment appt) {
 			DeleteForAppt(appt.AptNum);
 			if(appt.AptDateTime > DateTime.Now) {//Prevents UE's when updating pre-inserted appointments with no scheduled time as well as appointments updated that were in the past.
-				InsertForAppt(appt);
+				double dayInterval=PrefC.GetDouble(PrefName.ApptReminderDayInterval);
+				double hourInterval=PrefC.GetDouble(PrefName.ApptReminderHourInterval);
+				DateTime automationBeginPref=PrefC.GetDateT(PrefName.AutomaticCommunicationTimeStart);
+				DateTime automationEndPref=PrefC.GetDateT(PrefName.AutomaticCommunicationTimeEnd);
+				InsertForAppt(appt,dayInterval,hourInterval,automationBeginPref,automationEndPref);
 			}
 		}
 
 		///<summary>Send Appointment reminders for all ApptComm items.</summary>
 		public static string SendReminders() {
-			List<ApptComm> listApptComms=GetAll();
 			string errorText="";
-			foreach(ApptComm apptComm in listApptComms) {//Foreach loops are faster than For loops.
+			DateTime automationStart=PrefC.GetDateT(PrefName.AutomaticCommunicationTimeStart);
+			DateTime automationEnd=PrefC.GetDateT(PrefName.AutomaticCommunicationTimeEnd);
+			if(automationStart.TimeOfDay!=automationEnd.TimeOfDay && (DateTime.Now.TimeOfDay<automationStart.TimeOfDay || DateTime.Now.TimeOfDay>automationEnd.TimeOfDay)) {
+				//Not currently within send window and automation start/end is enabled.
+				return "";
+			}
+			DateTime dateTimeAutomationStart=new DateTime();
+			DateTime dateTimeAutomationEnd=new DateTime();
+			if(automationStart.TimeOfDay!=automationEnd.TimeOfDay) {
+				//Get all entries for today, from automation start to automation end.
+				dateTimeAutomationStart=new DateTime(DateTime.Now.Year,DateTime.Now.Month,DateTime.Now.Day
+					,automationStart.Hour,automationStart.Minute,automationStart.Second);
+				dateTimeAutomationEnd=new DateTime(DateTime.Now.Year,DateTime.Now.Month,DateTime.Now.Day
+					,automationEnd.Hour,automationEnd.Minute,automationEnd.Second);
+			}
+			else {
+				//Get all entries for today, from midnight to midnight.
+				dateTimeAutomationStart=new DateTime(DateTime.Now.Year,DateTime.Now.Month,DateTime.Now.Day,0,0,0);
+				dateTimeAutomationEnd=dateTimeAutomationStart.AddDays(1);
+			}
+			List<ApptComm> listApptComms=GetToSend(dateTimeAutomationStart,dateTimeAutomationEnd);
+			foreach(ApptComm apptComm in listApptComms) {//Foreach loops are faster than For loops.  All reminders in the list are for appointments that haven't come yet.
 				if(apptComm.ApptCommType==IntervalType.Daily && (apptComm.DateTimeSend-DateTime.Now).TotalDays > 0) {//Send if Now is <= 0 days prior to the send day.
 					continue;//It's not currently enough days prior to the appointment to send a reminder.
 				}
@@ -120,11 +184,10 @@ namespace OpenDentBusiness{
 				}
 				//Check for entries that should have already been sent.  Our send interval is set at 10 minutes, so 30 minutes leeway was deemed enough to 
 				//catch edge cases (2 attempted sends on average).  If the DateTime the apptComm was supposed to be sent is older than 30 minutes ago, just delete it.
-				if(apptComm.DateTimeSend < (DateTime.Now-new TimeSpan(0,30,0))) {
+				if(apptComm.DateTimeSend < (DateTime.Now-new TimeSpan(0,30,0))) {//Only entries that were skipped due to the listener being down should be deleted here.
 					Delete(apptComm.ApptCommNum);
 					continue;
 				}
-				//It's within the correct day interval or within the correct hour interval, time to send a reminder.
 				bool sendAll=PrefC.GetBool(PrefName.ApptReminderSendAll);
 				string[] arraySendPriorities=PrefC.GetString(PrefName.ApptReminderSendOrder).Split(',');
 				Appointment appt=Appointments.GetOneApt(apptComm.ApptNum);
@@ -139,7 +202,8 @@ namespace OpenDentBusiness{
 						comm.Mode_=CommItemMode.Email;
 						comm.CommDateTime=DateTime.Now;
 						comm.CommSource=CommItemSource.ApptReminder;
-						comm.Note=Lans.g("ApptComms","Appointment reminder emailed for appointment on"+" "+appt.AptDateTime.ToShortDateString()+" at "+appt.AptDateTime.ToShortTimeString());
+						comm.Note=Lans.g("ApptComms","Appointment reminder emailed for appointment on")+" "+appt.AptDateTime.ToShortDateString()+" "
+							+Lans.g("ApptComms","at")+" "+appt.AptDateTime.ToShortTimeString();
 						comm.PatNum=pat.PatNum;
 						comm.SentOrReceived=CommSentOrReceived.Sent;
 						comm.UserNum=0;
@@ -153,7 +217,8 @@ namespace OpenDentBusiness{
 						comm.Mode_=CommItemMode.Text;
 						comm.CommDateTime=DateTime.Now;
 						comm.CommSource=CommItemSource.ApptReminder;
-						comm.Note=Lans.g("ApptComms","Appointment reminder texted for appointment on"+" "+appt.AptDateTime.ToShortDateString()+" at "+appt.AptDateTime.ToShortTimeString());
+						comm.Note=Lans.g("ApptComms","Appointment reminder texted for appointment on")+" "+appt.AptDateTime.ToShortDateString()+" "
+							+Lans.g("ApptComms","at")+" "+appt.AptDateTime.ToShortTimeString();
 						comm.PatNum=pat.PatNum;
 						comm.SentOrReceived=CommSentOrReceived.Sent;
 						comm.UserNum=0;
@@ -196,7 +261,7 @@ namespace OpenDentBusiness{
 							Delete(apptComm.ApptCommNum);
 							comm.CommDateTime=DateTime.Now;
 							comm.CommSource=CommItemSource.ApptReminder;
-							comm.Note=Lans.g("ApptComms","Appointment reminder sent for appointment on"+appt.AptDateTime.ToShortDateString()+" at "+appt.AptDateTime.ToShortTimeString());
+							comm.Note=Lans.g("ApptComms","Appointment reminder sent for appointment on")+appt.AptDateTime.ToShortDateString()+" "+Lans.g("ApptComms","at")+" "+appt.AptDateTime.ToShortTimeString();
 							comm.PatNum=pat.PatNum;
 							comm.SentOrReceived=CommSentOrReceived.Sent;
 							comm.UserNum=0;
