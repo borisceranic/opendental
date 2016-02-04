@@ -117,6 +117,10 @@ namespace OpenDental {
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {
+			Close();
+		}
+
+		private void FormApptTypes_FormClosing(object sender,FormClosingEventArgs e) {
 			if(_isChanged) {
 				for(int i=0;i<_listApptTypes.Count;i++) {
 					_listApptTypes[i].ItemOrder=i;
