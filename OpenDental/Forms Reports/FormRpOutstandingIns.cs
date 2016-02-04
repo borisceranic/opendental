@@ -546,6 +546,10 @@ namespace OpenDental {
 					row.Cells.Add(dateLog.ToShortDateString());
 				}
 				row.Cells.Add(PIn.Double(Table.Rows[i]["ClaimFee"].ToString()).ToString("c"));
+				row.Tag=new OutstandingInsClaim {
+					ClaimNum=PIn.Long(Table.Rows[i]["ClaimNum"].ToString()),
+					PatNum=PIn.Long(Table.Rows[i]["PatNum"].ToString())
+				};
 				gridMain.Rows.Add(row);
 				total+=PIn.Decimal(Table.Rows[i]["ClaimFee"].ToString());
 			}
@@ -594,11 +598,11 @@ namespace OpenDental {
 		}
 
 		private void gridMain_CellClick(object sender,ODGridClickEventArgs e) {
-			GotoModule.GotoAccount(PIn.Long(Table.Rows[e.Row]["PatNum"].ToString()));
+			GotoModule.GotoAccount(((OutstandingInsClaim)gridMain.Rows[e.Row].Tag).PatNum);
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			Claim claim=Claims.GetClaim(PIn.Long(Table.Rows[e.Row]["ClaimNum"].ToString()));
+			Claim claim=Claims.GetClaim(((OutstandingInsClaim)gridMain.Rows[e.Row].Tag).ClaimNum);
 			Patient pat=Patients.GetPat(claim.PatNum);
 			Family fam=Patients.GetFamily(pat.PatNum);
 			FormClaimEdit FormCE=new FormClaimEdit(claim,pat,fam);
@@ -812,6 +816,13 @@ namespace OpenDental {
 				return;
 			}
 			MessageBox.Show(Lan.g(this,"File created successfully"));
+		}
+
+
+		///<summary>Only used in this form to keep track of both the ClaimNum and PatNum within the grid.</summary>
+		private class OutstandingInsClaim {
+			public long ClaimNum;
+			public long PatNum;
 		}
 	}
 }
