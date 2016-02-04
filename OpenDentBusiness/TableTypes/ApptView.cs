@@ -42,6 +42,17 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Used only for serialization purposes</summary>
+		[XmlElement("ApptTimeScrollStart",typeof(long))]
+		public long ApptTimeScrollStartXml {
+			get {
+				return ApptTimeScrollStart.Ticks;
+			}
+			set {
+				ApptTimeScrollStart=TimeSpan.FromTicks(value);
+			}
+		}
+
+		///<summary>Used only for serialization purposes</summary>
 		[XmlElement("OnlySchedBeforeTime",typeof(long))]
 		public long OnlySchedBeforeTimeXml {
 			get {
