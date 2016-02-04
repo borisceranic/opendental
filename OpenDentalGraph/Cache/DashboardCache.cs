@@ -8,7 +8,10 @@ using CodeBase;
 namespace OpenDentalGraph.Cache {
 	public class DashboardCache {
 		private static Random _rand=new Random();
-		
+		///<summary>Register for this event once per app instance IF and only IF you want to provide a different db context for your cache threads.
+		///This will typically be unnecessary if the app itself already has a db context. This will typically only be used by BroadcastMonitor.</summary>
+		public static EventHandler OnSetDb;
+
 		#region Private Caches
 		private static DashboardCacheNewPatient _patients=new DashboardCacheNewPatient();
 		private static DashboardCacheCompletedProc _completedProcs=new DashboardCacheCompletedProc();
@@ -51,7 +54,7 @@ namespace OpenDentalGraph.Cache {
 		///If waitToReturn==false then runs async and returns immediately. Optionally wait for the method to return or run async.
 		///onExit event will be fired after async version has completed. Will not fire when sync version is run as this is a blocking call so when it returns it is done.
 		///If invalidateFirst==true then cache will be invalidated and forcefully refreshed. Use this sparingly.</summary>
-		public static void RefreshIfInvalid(List<DashboardLayout> layouts,bool waitToReturn,bool invalidateFirst,EventHandler onExit=null) {
+		public static void RefreshLayoutsIfInvalid(List<DashboardLayout> layouts,bool waitToReturn,bool invalidateFirst,EventHandler onExit=null) {
 			List<DashboardCellType> cellTypes=Enum.GetValues(typeof(DashboardCellType)).Cast<DashboardCellType>().ToList();
 			foreach(DashboardCellType cellType in cellTypes) {
 				List<DashboardFilter> filters=layouts
@@ -62,11 +65,12 @@ namespace OpenDentalGraph.Cache {
 				if(filters.Count<=0) {
 					continue;
 				}
-				RefreshIfInvalid(
+				RefreshCellTypeIfInvalid(
 					cellType,
 					new DashboardFilter() { DateFrom=filters.Min(x => x.DateFrom),DateTo=filters.Max(x => x.DateTo),UseDateFilter=filters.All(x => x.UseDateFilter) },
 					waitToReturn,
-					invalidateFirst);
+					invalidateFirst,
+					onExit);
 			}
 		}
 
@@ -74,7 +78,7 @@ namespace OpenDentalGraph.Cache {
 		///If waitToReturn==false then runs async and returns immediately. Optionally wait for the method to return or run async.
 		///onExit event will be fired after async version has completed. Will not fire when sync version is run as this is a blocking call so when it returns it is done.
 		///If invalidateFirst==true then cache will be invalidated and forcefully refreshed. Use this sparingly.</summary>
-		public static void RefreshIfInvalid(DashboardCellType cellType,DashboardFilter filter,bool waitToReturn,bool invalidateFirst,EventHandler onExit=null) {
+		public static void RefreshCellTypeIfInvalid(DashboardCellType cellType,DashboardFilter filter,bool waitToReturn,bool invalidateFirst,EventHandler onExit=null) {
 			//Create a random group name so we can arbitrarily group and wait on the threads we are about to start.
 			string groupName=cellType.ToString()+_rand.Next();
 			//Always fill provider cache.
@@ -106,10 +110,13 @@ namespace OpenDentalGraph.Cache {
 				ODThread.AddGroupNameExitHandler(groupName,onExit);
 			}
 		}
-		
+
 		///<summary>Start a thread dedicated to filling the given cache.</summary>
 		private static void FillCacheThreaded<T>(DashboardCacheBase<T> cache,DashboardFilter filter,string groupName,bool invalidateFirst) {
 			ODThread thread=new ODThread(new ODThread.WorkerDelegate((ODThread th) => {
+				if(OnSetDb!=null) {
+					OnSetDb(cache,new EventArgs());
+				}
 				cache.Run(filter,invalidateFirst);
 			}));
 			thread.GroupName=groupName;

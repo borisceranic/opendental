@@ -141,7 +141,7 @@ namespace OpenDentalGraph {
 
 		protected override void OnInit(bool forceCachRefresh) {
 			//This is occurring in a thread so it is ok to wait for Refresh to return. The UI is already loading and available on the main thread.
-			DashboardCache.RefreshIfInvalid(CellType,Graph.Filter,true,forceCachRefresh);			
+			DashboardCache.RefreshCellTypeIfInvalid(CellType,Graph.Filter,true,forceCachRefresh,null);
 		}
 		#endregion
 				
@@ -245,7 +245,7 @@ namespace OpenDentalGraph {
 					Graph.IsLoading=true;
 					//Spawn the cache thread(s) but don't block. 
 					//Register for OnThreadExitLocal will invoke back to this thread when all the threads have exited and refill the form.
-					DashboardCache.RefreshIfInvalid(CellType,new DashboardFilter() { UseDateFilter=false },false,false,OnThreadExitLocal);
+					DashboardCache.RefreshCellTypeIfInvalid(CellType,new DashboardFilter() { UseDateFilter=false },false,false,OnThreadExitLocal);
 					//Allow filtering in edit mode.
 					this.ShowFilters=true;
 					//Save a copy of the current settings in case user clicks cancel.

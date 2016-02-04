@@ -12,6 +12,7 @@ namespace OpenDentalGraph {
 		#region Private Data
 		private Random _rand=new Random();
 		private string _dashboardGroupName="Default";
+		private EventHandler _onSetDb=null;
 		#endregion
 
 		#region Properties
@@ -36,8 +37,12 @@ namespace OpenDentalGraph {
 		#endregion
 
 		#region Ctor/Init
-		public FormDashboardEditTab() {			
+		///<summary></summary>
+		/// <param name="onSetDb">Pass in a callback IF and only IF you want to provide a different db context for DashboardLayouts s-class.
+		/// This is only used in BroadcastMonitor as the db context is typically already set in OD proper.</param>
+		public FormDashboardEditTab(EventHandler onSetDb=null) {			
 			InitializeComponent();
+			_onSetDb=onSetDb;
 			//Text is loaded here because loading it from the designer forces the designer to use a resource.resx file. This is slow for some reason but loading it here is quick.
 			labelHelp.Text=@"Drag a graph type to a cell on the graphic reports editor.
 
@@ -61,6 +66,9 @@ Double-click tab header to rename tab.";
 		}
 
 		private void RefreshData(bool invalidateFirst) {
+			if(_onSetDb!=null) {
+				_onSetDb(this,new EventArgs());
+			}
 			dashboardTabControl.SetDashboardLayout(DashboardLayouts.GetDashboardLayout(DashboardGroupName),invalidateFirst);
 		}
 
