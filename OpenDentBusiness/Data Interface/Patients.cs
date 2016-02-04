@@ -367,10 +367,19 @@ namespace OpenDentBusiness{
 			else if(patNumStr.Length>0){
 				command+="AND FALSE ";//impossible to match a patNumStr that did not parse into a long.
 			}
+			//Replaces spaces and punctation with wildcards because users should be able to type the following example and match certain addresses:
+			//Search term: "4145 S Court St" should match "4145 S. Court St." in the database.
+			string strAddress=Regex.Replace(POut.String(address),@"[°\-.,:;_""'/\\)(#\s&]","%");
 			if(DataConnection.DBtype==DatabaseType.MySql) {
-				command+=
-					(address.Length>0?"AND patient.Address LIKE '%"+POut.String(address)+"%' ":"")//LIKE is case insensitive in mysql.
-					+(city.Length>0?"AND patient.City LIKE '"+POut.String(city)+"%' ":"")//LIKE is case insensitive in mysql.
+				if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {
+					//Search both Address and Address2 for HQ
+					command+=(strAddress.Length>0 ? "AND (patient.Address LIKE '%"+strAddress
+						+"%' OR patient.Address2 LIKE '%"+strAddress+"%') " : "");//LIKE is case insensitive in mysql.
+				}
+				else {
+					command+=(strAddress.Length>0 ? "AND patient.Address LIKE '%"+strAddress+"%' " : "");//LIKE is case insensitive in mysql
+				}
+				command+=(city.Length>0?"AND patient.City LIKE '"+POut.String(city)+"%' " : "")//LIKE is case insensitive in mysql.
 					+(state.Length>0?"AND patient.State LIKE '"+POut.String(state)+"%' ":"")//LIKE is case insensitive in mysql.
 					+(ssn.Length>0?"AND patient.SSN LIKE '"+POut.String(ssn)+"%' ":"")//LIKE is case insensitive in mysql.
 					//+(patNumStr.Length>0?"AND patient.PatNum LIKE '"+POut.String(patNumStr)+"%' ":"")//LIKE is case insensitive in mysql.
@@ -380,8 +389,7 @@ namespace OpenDentBusiness{
 					+(regKey.Length>0?"AND registrationkey.RegKey LIKE '%"+POut.String(regKey)+"%' ":"");//LIKE is case insensitive in mysql.
 			}
 			else {//oracle
-				command+=
-					(address.Length>0?"AND LOWER(patient.Address) LIKE '%"+POut.String(address).ToLower()+"%' ":"")//case matters in a like statement in oracle.
+				command+=(address.Length>0 ? "AND LOWER(patient.Address) LIKE '%"+strAddress.ToLower()+"%' " : "")//case matters in a like statement in oracle.
 					+(city.Length>0?"AND LOWER(patient.City) LIKE '"+POut.String(city).ToLower()+"%' ":"")//case matters in a like statement in oracle.
 					+(state.Length>0?"AND LOWER(patient.State) LIKE '"+POut.String(state).ToLower()+"%' ":"")//case matters in a like statement in oracle.
 					+(ssn.Length>0?"AND LOWER(patient.SSN) LIKE '"+POut.String(ssn).ToLower()+"%' ":"")//In case an office uses this field for something else.
@@ -390,7 +398,6 @@ namespace OpenDentBusiness{
 					+(email.Length>0?"AND LOWER(patient.Email) LIKE '%"+POut.String(email).ToLower()+"%' ":"")//case matters in a like statement in oracle.
 					+(country.Length>0?"AND LOWER(patient.Country) LIKE '%"+POut.String(country).ToLower()+"%' ":"")//case matters in a like statement in oracle.
 					+(regKey.Length>0?"AND LOWER(registrationkey.RegKey) LIKE '%"+POut.String(regKey).ToLower()+"%' ":"");//case matters in a like statement in oracle.
-
 			}
 			if(birthdate.Year>1880 && birthdate.Year<2100){
 				command+="AND patient.Birthdate ="+POut.Date(birthdate)+" ";
