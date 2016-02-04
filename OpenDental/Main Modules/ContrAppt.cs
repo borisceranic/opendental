@@ -2787,9 +2787,9 @@ namespace OpenDental {
 				aptCur.TimeLocked=PrefC.GetBool(PrefName.AppointmentTimeIsLocked);
 				try {
 					Appointments.Insert(aptCur);//now, aptnum is different.
-					for(int i=0;i<pinBoard.SelectedAppt.TableApptFields.Rows.Count;i++) {//Duplicate the appointment fields.
-						//in SendToPinboard, TableApptFields is refreshed for just the one planned appt instead of all appts for day.
-						ApptField apptField=new ApptField();
+					for(int i = 0;i<pinBoard.SelectedAppt.TableApptFields.Rows.Count;i++) {//Duplicate the appointment fields.
+																																								 //in SendToPinboard, TableApptFields is refreshed for just the one planned appt instead of all appts for day.
+						ApptField apptField = new ApptField();
 						apptField.AptNum=aptCur.AptNum;
 						apptField.FieldName=PIn.String(pinBoard.SelectedAppt.TableApptFields.Rows[i]["FieldName"].ToString());
 						apptField.FieldValue=PIn.String(pinBoard.SelectedAppt.TableApptFields.Rows[i]["FieldValue"].ToString());
@@ -2807,9 +2807,6 @@ namespace OpenDental {
 					MessageBox.Show(ex.Message);
 					return;
 				}
-				SecurityLogs.MakeLogEntry(Permissions.AppointmentCreate,aptCur.PatNum,
-					aptCur.AptDateTime.ToString()+", "+aptCur.ProcDescript,
-					aptCur.AptNum);
 				//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
 				if(HL7Defs.IsExistingHL7Enabled()) {
 					//S12 - New Appt Booking event
@@ -2854,6 +2851,11 @@ namespace OpenDental {
 						boolAptMoved=false;
 						return;
 					}
+				}
+				else {
+					SecurityLogs.MakeLogEntry(Permissions.AppointmentCreate,aptCur.PatNum,
+						aptCur.AptDateTime.ToString()+", "+aptCur.ProcDescript,
+						aptCur.AptNum);
 				}
 				if(lab!=null) {
 					LabCases.AttachToAppt(lab.LabCaseNum,aptCur.AptNum);
