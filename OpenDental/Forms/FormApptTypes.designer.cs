@@ -124,6 +124,7 @@ namespace OpenDental{
 			this.Name = "FormApptTypes";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Setup Appointment Types";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormApptTypes_FormClosing);
 			this.Load += new System.EventHandler(this.FormApptTypes_Load);
 			this.ResumeLayout(false);
 
