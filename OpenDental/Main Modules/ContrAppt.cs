@@ -2736,9 +2736,6 @@ namespace OpenDental {
 					MessageBox.Show(ex.Message);
 					return;
 				}
-				SecurityLogs.MakeLogEntry(Permissions.AppointmentCreate,aptCur.PatNum,
-					aptCur.AptDateTime.ToString()+", "+aptCur.ProcDescript,
-					aptCur.AptNum);
 				//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
 				if(HL7Defs.IsExistingHL7Enabled()) {
 					//S12 - New Appt Booking event
@@ -2783,6 +2780,11 @@ namespace OpenDental {
 						boolAptMoved=false;
 						return;
 					}
+				}
+				else {
+					SecurityLogs.MakeLogEntry(Permissions.AppointmentCreate,aptCur.PatNum,
+						aptCur.AptDateTime.ToString()+", "+aptCur.ProcDescript,
+						aptCur.AptNum);
 				}
 				if(lab!=null) {
 					LabCases.AttachToAppt(lab.LabCaseNum,aptCur.AptNum);
