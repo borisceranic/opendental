@@ -96,11 +96,29 @@
     <Compile Include="Cache\DashboardCachePaySplit.cs" />
     <Compile Include="Cache\DashboardCacheProvider.cs" />
     <Compile Include="Cache\DashboardCacheWriteoff.cs" />
+    <Compile Include="Base\BaseGraphOptionsCtrl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Base\BaseGraphOptionsCtrl.Designer.cs">
+      <DependentUpon>BaseGraphOptionsCtrl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Concrete\GraphQuantityOverTimeFilter.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Concrete\GraphQuantityOverTimeFilter.Designer.cs">
       <DependentUpon>GraphQuantityOverTimeFilter.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Concrete\IncomeGraphOptionsCtrl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Concrete\IncomeGraphOptionsCtrl.Designer.cs">
+      <DependentUpon>IncomeGraphOptionsCtrl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Concrete\ProductionGraphOptionsCtrl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Concrete\ProductionGraphOptionsCtrl.Designer.cs">
+      <DependentUpon>ProductionGraphOptionsCtrl.cs</DependentUpon>
     </Compile>
     <Compile Include="Dashboard\DashboardCellCtrl.cs">
       <SubType>UserControl</SubType>
@@ -158,6 +176,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Concrete\GraphQuantityOverTimeFilter.resx">
       <DependentUpon>GraphQuantityOverTimeFilter.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Concrete\IncomeGraphOptionsCtrl.resx">
+      <DependentUpon>IncomeGraphOptionsCtrl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Concrete\ProductionGraphOptionsCtrl.resx">
+      <DependentUpon>ProductionGraphOptionsCtrl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dashboard\DashboardCellCtrl.resx">
       <DependentUpon>DashboardCellCtrl.cs</DependentUpon>

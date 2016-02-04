@@ -12,16 +12,9 @@ using System.Drawing;
 namespace OpenDentalGraph {
 	public partial class GraphQuantityOverTimeFilter:GraphQuantityOverTimeFilterT {
 		#region Private Data
-		//public enum ShowDataType { production, income, ar, newPatients };
-		private DashboardCellType _dispalyDataType=DashboardCellType.NotDefined;
-		//private DashboardCacheNewPatient _cacheNewPatients=new DashboardCacheNewPatient();
-		//private DashboardCacheCompletedProc _cacheCompletedProcs=new DashboardCacheCompletedProc();
-		//private DashboardCacheWriteoff _cacheWriteoffs=new DashboardCacheWriteoff();
-		//private DashboardCacheAdjustment _cacheAdjustments=new DashboardCacheAdjustment();
-		//private DashboardCachePaySplit _cachePaySplits=new DashboardCachePaySplit();
-		//private DashboardCacheClaimPayment _cacheClaimPayments=new DashboardCacheClaimPayment();
-		//private DashboardCacheAR _cacheAR=new DashboardCacheAR();
-		//private DashboardCacheProvider _cacheProvider=new DashboardCacheProvider();
+		private DashboardCellType _cellType=DashboardCellType.NotDefined;
+		private IncomeGraphOptionsCtrl _incomeOptionsCtrl=new IncomeGraphOptionsCtrl();
+		private ProductionGraphOptionsCtrl _productionOptionsCtrl=new ProductionGraphOptionsCtrl();
 		#endregion
 
 		#region Properties
@@ -55,19 +48,20 @@ namespace OpenDentalGraph {
 						break;
 					case DashboardCellType.AccountsReceivableGraph:
 					case DashboardCellType.NewPatientsGraph:
+					default:
 						break;					
 				}
 			}
 		}
 		[Category("Graph")]
 		public DashboardCellType CellType {
-			get { return _dispalyDataType; }
+			get { return _cellType; }
 			set {
-				_dispalyDataType=value;
+				_cellType=value;
+				Control filterCtrl=null;
 				switch(CellType) {
 					case DashboardCellType.ProductionGraph:
-						splitContainerProductionIncome.Panel1Collapsed=false;
-						splitContainerProductionIncome.Panel2Collapsed=true;
+						filterCtrl=_productionOptionsCtrl;
 						Graph.GraphTitle="Production";
 						Graph.MoneyItemDescription="Production $";
 						Graph.CountItemDescription="Count Procedures";
@@ -78,8 +72,7 @@ namespace OpenDentalGraph {
 						Graph.QuickRangePref=QuickRange.last12Months;
 						break;
 					case DashboardCellType.IncomeGraph:
-						splitContainerProductionIncome.Panel1Collapsed=true;
-						splitContainerProductionIncome.Panel2Collapsed=false;
+						filterCtrl=_incomeOptionsCtrl;
 						Graph.GraphTitle="Income";
 						Graph.MoneyItemDescription="Income $";
 						Graph.CountItemDescription="Count Payments";
@@ -90,7 +83,6 @@ namespace OpenDentalGraph {
 						Graph.QuickRangePref=QuickRange.last12Months;
 						break;
 					case DashboardCellType.AccountsReceivableGraph:
-						splitContainer.Panel1Collapsed=true;
 						Graph.GraphTitle="Accounts Receivable";
 						Graph.MoneyItemDescription="Receivable $";
 						Graph.CountItemDescription="Not Used";
@@ -101,7 +93,6 @@ namespace OpenDentalGraph {
 						Graph.QuickRangePref=QuickRange.last12Months;
 						break;
 					case DashboardCellType.NewPatientsGraph:
-						splitContainer.Panel1Collapsed=true;
 						Graph.GraphTitle="New Patients";
 						Graph.MoneyItemDescription="Not Used";
 						Graph.CountItemDescription="Count Patients";
@@ -113,7 +104,16 @@ namespace OpenDentalGraph {
 						Graph.QtyType=QuantityType.count;
 						break;
 					default:
-						throw new Exception("Unsupported DisplayDataType: "+CellType.ToString());
+						throw new Exception("Unsupported CellType: "+CellType.ToString());
+				}
+				splitContainer.Panel1.Controls.Clear();
+				if(filterCtrl==null) {
+					splitContainer.Panel1Collapsed=true;
+				}
+				else {
+					splitContainer.Panel1Collapsed=false;
+					filterCtrl.Dock=DockStyle.Fill;
+					splitContainer.Panel1.Controls.Add(filterCtrl);
 				}
 			}
 		}
@@ -131,6 +131,8 @@ namespace OpenDentalGraph {
 			ShowFilters=false;
 			Graph.LegendDock=LegendDockType.None;
 			SetFilterAndGraphSettings(jsonSettings);
+			_incomeOptionsCtrl.InputsChanged+=OnFormInputsChanged;
+			_productionOptionsCtrl.InputsChanged+=OnFormInputsChanged;
 		}
 		#endregion
 
@@ -159,12 +161,12 @@ namespace OpenDentalGraph {
 			List<GraphQuantityOverTime.GraphPointBase> rawData=new List<GraphQuantityOverTime.GraphPointBase>();
 			switch(CellType) {
 				case DashboardCellType.ProductionGraph: {
-						if(checkIncludeAdjustments.Checked) {
+						if(_productionOptionsCtrl.IncludeAdjustments) {
 							rawData.AddRange(DashboardCache.Adjustments.Cache.FindAll(x => x.DateStamp.Year>1880)
 								.Select(x => new GraphQuantityOverTime.GraphPointBase(x) { SeriesName=DashboardCache.Provider.GetProvName(x.ProvNum) })
 								.ToList());
 						}
-						if(checkIncludeCompletedProcs.Checked||checkIncludeWriteoffs.Checked) {
+						if(_productionOptionsCtrl.IncludeCompletedProcs||_productionOptionsCtrl.IncludeWriteoffs) {
 							rawData.AddRange(DashboardCache.CompletedProcs.Cache
 								.Select(x => GetProcDataPoint(x))
 								.ToList());
@@ -172,12 +174,12 @@ namespace OpenDentalGraph {
 					}
 					break;
 				case DashboardCellType.IncomeGraph: {
-						if(checkIncludePaySplits.Checked) {
+						if(_incomeOptionsCtrl.IncludePaySplits) {
 							rawData.AddRange(DashboardCache.PaySplits.Cache.FindAll(x => x.DateStamp.Year>1880)
-								.Select(x => new GraphQuantityOverTime.GraphPointBase(x){ SeriesName=DashboardCache.Provider.GetProvName(x.ProvNum) })
+								.Select(x => new GraphQuantityOverTime.GraphPointBase(x) { SeriesName=DashboardCache.Provider.GetProvName(x.ProvNum) })
 								.ToList());
 						}
-						if(checkIncludeInsuranceClaimPayments.Checked) {
+						if(_incomeOptionsCtrl.IncludeInsuranceClaimPayments) {
 							rawData.AddRange(DashboardCache.ClaimPayments.Cache
 								.Select(x => new GraphQuantityOverTime.GraphPointBase(x) { SeriesName=DashboardCache.Provider.GetProvName(x.ProvNum) })
 								.ToList());
@@ -195,7 +197,7 @@ namespace OpenDentalGraph {
 					}
 					break;
 				default:
-					throw new Exception("Unsupported DisplayDataType: "+CellType.ToString());
+					throw new Exception("Unsupported CellType: "+CellType.ToString());
 			}
 			CommitData(rawData);
 		}
@@ -216,10 +218,10 @@ namespace OpenDentalGraph {
 
 		private GraphQuantityOverTime.GraphPointBase GetProcDataPoint(CompletedProc x) {
 			double finalValue=0;
-			if(checkIncludeCompletedProcs.Checked) {
+			if(_productionOptionsCtrl.IncludeCompletedProcs) {
 				finalValue+=x.Val;
 			}
-			if(checkIncludeWriteoffs.Checked) {
+			if(_productionOptionsCtrl.IncludeWriteoffs) {
 				Writeoff writeoff=DashboardCache.Writeoffs.Cache.FirstOrDefault(y => y.ProvNum==x.ProvNum && y.DateStamp==x.DateStamp);
 				if(writeoff!=null) {
 					finalValue-=writeoff.Val;
@@ -276,7 +278,7 @@ namespace OpenDentalGraph {
 			return CellType;
 		}
 		
-		public class ProductionGraphSettings:ODGraphSettingsAbs {
+		public class GraphQuantityOverTimeFilterSettings:ODGraphSettingsAbs {
 			public bool IncludeCompleteProcs { get; set; }
 			public bool IncludeAdjustements { get; set; }
 			public bool IncludeWriteoffs { get; set; }
@@ -286,14 +288,26 @@ namespace OpenDentalGraph {
 		#endregion
 
 		#region IODHasGraphSettings Implementation
-		public override ProductionGraphSettings GetGraphSettings() {
-			return new ProductionGraphSettings() {
-				IncludeAdjustements=checkIncludeAdjustments.Checked,
-				IncludeCompleteProcs=checkIncludeCompletedProcs.Checked,
-				IncludeWriteoffs=checkIncludeWriteoffs.Checked,
-				IncludePaySplits=checkIncludePaySplits.Checked,
-				IncludeInsuranceClaims=checkIncludeInsuranceClaimPayments.Checked,
-			};
+		public override GraphQuantityOverTimeFilterSettings GetGraphSettings() {
+			switch(CellType) {
+				case DashboardCellType.ProductionGraph:
+					return new GraphQuantityOverTimeFilterSettings() {
+						IncludeAdjustements=_productionOptionsCtrl.IncludeAdjustments,
+						IncludeCompleteProcs=_productionOptionsCtrl.IncludeCompletedProcs,
+						IncludeWriteoffs=_productionOptionsCtrl.IncludeWriteoffs,
+					};
+				case DashboardCellType.IncomeGraph:
+					return new GraphQuantityOverTimeFilterSettings() {
+						IncludePaySplits=_incomeOptionsCtrl.IncludePaySplits,
+						IncludeInsuranceClaims=_incomeOptionsCtrl.IncludeInsuranceClaimPayments,
+					};
+				case DashboardCellType.AccountsReceivableGraph:
+				case DashboardCellType.NewPatientsGraph:
+					//No custom filtering so do nothing.
+					return new GraphQuantityOverTimeFilterSettings();
+				default:
+					throw new Exception("Unsupported CellType: "+CellType.ToString());
+			}			
 		}
 				
 		public override void DeserializeFromJson(string json) {
@@ -301,12 +315,24 @@ namespace OpenDentalGraph {
 				if(string.IsNullOrEmpty(json)) {
 					return;
 				}
-				ProductionGraphSettings settings=ODGraphSettingsAbs.Deserialize<ProductionGraphSettings>(json);
-				this.checkIncludeAdjustments.Checked=settings.IncludeAdjustements;
-				this.checkIncludeCompletedProcs.Checked=settings.IncludeCompleteProcs;
-				this.checkIncludeWriteoffs.Checked=settings.IncludeWriteoffs;
-				this.checkIncludePaySplits.Checked=settings.IncludePaySplits;
-				this.checkIncludeInsuranceClaimPayments.Checked=settings.IncludeInsuranceClaims;				
+				GraphQuantityOverTimeFilterSettings settings=ODGraphSettingsAbs.Deserialize<GraphQuantityOverTimeFilterSettings>(json);
+				switch(CellType) {
+					case DashboardCellType.ProductionGraph:
+						_productionOptionsCtrl.IncludeAdjustments=settings.IncludeAdjustements;
+						_productionOptionsCtrl.IncludeCompletedProcs=settings.IncludeCompleteProcs;
+						_productionOptionsCtrl.IncludeWriteoffs=settings.IncludeWriteoffs;
+						break;
+					case DashboardCellType.IncomeGraph:
+						_incomeOptionsCtrl.IncludePaySplits=settings.IncludePaySplits;
+						_incomeOptionsCtrl.IncludeInsuranceClaimPayments=settings.IncludeInsuranceClaims;
+						break;
+					case DashboardCellType.AccountsReceivableGraph:
+					case DashboardCellType.NewPatientsGraph:
+						//No custom filtering so do nothing.
+						return;
+					default:
+						throw new Exception("Unsupported CellType: "+CellType.ToString());
+				}				
 			}
 			catch(Exception e) {
 #if DEBUG
@@ -320,10 +346,10 @@ namespace OpenDentalGraph {
 	///<summary>Intermediate concreate to allow final concrete to play nicely with designer.</summary>
 	public class GraphQuantityOverTimeFilterT:ODGraphFilterAbs<
 		GraphQuantityOverTime.GraphPointBase,
-		GraphQuantityOverTimeFilter.ProductionGraphSettings,
+		GraphQuantityOverTimeFilter.GraphQuantityOverTimeFilterSettings,
 		GraphQuantityOverTime.QuantityOverTimeGraphSettings> {
 
-		public override GraphQuantityOverTimeFilter.ProductionGraphSettings GetGraphSettings() {
+		public override GraphQuantityOverTimeFilter.GraphQuantityOverTimeFilterSettings GetGraphSettings() {
 			throw new NotImplementedException();
 		}
 		

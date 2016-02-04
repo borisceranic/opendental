@@ -16,12 +16,14 @@ namespace OpenDentalGraph {
 				_isEditMode=value;
 				TabPage tabPage; DashboardPanelCtrl dashboardPanel;
 				if(IsEditMode) { //Insert 'add' tab if it's not already there.
+					tabControl.ImageList=tabImageList;
 					if(tabControl.TabCount==0 || GetDashboardPanel(tabControl.TabCount-1,out tabPage,out dashboardPanel)) {
 						//Last page is a DashboardPanelCtrl so the 'add' tab is not already there, insert it at the end.
 						tabControl.TabPages.Add(new TabPage() { ImageIndex=0,BackColor=SystemColors.Control,Text="Add Tab",});						
 					}					
 				}
 				else { //Remove 'add' tab if it's not already there.
+					tabControl.ImageList=null;
 					if(tabControl.TabCount>0 && !GetDashboardPanel(tabControl.TabCount-1,out tabPage,out dashboardPanel)) {
 						//Last page exists and it is not a DashboardPanelCtrl it is the 'add' tab. Remove it.
 						tabControl.TabPages.RemoveAt(tabControl.TabCount-1);
