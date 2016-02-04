@@ -130,11 +130,15 @@ namespace OpenDentBusiness{
 			return Crud.EmailAttachCrud.SelectMany(command);
 		}
 
-		///<summary>Syncs a given list of EmailAttaches to a list of old EmailAttaches.</summary>
-		public static void Sync(List<EmailAttach> emailAttachNew,List<EmailAttach> emailAttachOld) {
+		///<summary>Syncs a given list of EmailAttaches to a list of old EmailAttaches.
+		///If emailAttachOld is not provided, it will use the emailMessageNum passed in to get the "old" attachments from the database.</summary>
+		public static void Sync(long emailMessageNum,List<EmailAttach> emailAttachNew,List<EmailAttach> emailAttachOld=null) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),emailAttachNew,emailAttachOld);
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),emailMessageNum,emailAttachNew,emailAttachOld);
 				return;
+			}
+			if(emailAttachOld==null) {
+				emailAttachOld=GetForEmail(emailMessageNum);//Get attachments from the database.
 			}
 			Crud.EmailAttachCrud.Sync(emailAttachNew,emailAttachOld);
 		}

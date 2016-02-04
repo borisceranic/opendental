@@ -96,20 +96,14 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Patient Portal will call this version. It allows attachments to be left in-tact. The Patient Portal will pass in an object with an empty attachment list, but that does not mean that the attachments should be deleted.</summary>
-		public static void Update(EmailMessage message,bool updateAttachments){
+		public static void Update(EmailMessage message,bool updateAttachments) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),message,updateAttachments);
 				return;
 			}
 			Crud.EmailMessageCrud.Update(message);
 			if(updateAttachments) {
-				//now, delete all attachments and recreate.
-				string command="DELETE FROM emailattach WHERE EmailMessageNum="+POut.Long(message.EmailMessageNum);
-				Db.NonQ(command);
-				for(int i=0;i<message.Attachments.Count;i++) {
-					message.Attachments[i].EmailMessageNum=message.EmailMessageNum;
-					EmailAttaches.Insert(message.Attachments[i]);
-				}
+				EmailAttaches.Sync(message.EmailMessageNum,message.Attachments);
 			}
 		}
 
@@ -368,7 +362,7 @@ namespace OpenDentBusiness{
 		///Throws exceptions.</summary>
 		public static void SendOldestUnsentAck(EmailAddress emailAddressFrom) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod());
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),emailAddressFrom);
 				return;
 			}
 			string command;
@@ -826,8 +820,11 @@ namespace OpenDentBusiness{
 		///The emailMessageNum will be used to set EmailMessage.EmailMessageNum.  If emailMessageNum is 0, then the EmailMessage will be inserted into the db, otherwise the EmailMessage will be updated in the db.
 		///If the raw message is encrypted, then will attempt to decrypt.  If decryption fails, then the EmailMessage SentOrReceived will be ReceivedEncrypted and the EmailMessage body will be set to the entire contents of the raw email.
 		///If decryption succeeds, then EmailMessage SentOrReceived will be set to ReceivedDirect, the EmailMessage body will contain the decrypted body text, and a Direct Ack "processed" message will be sent back to the sender using the email settings from emailAddressReceiver.
-		///Set isAck to true if decrypting a direct message, false otherwise.</summary>
-		public static EmailMessage ProcessRawEmailMessageIn(string strRawEmail,long emailMessageNum,EmailAddress emailAddressReceiver,bool isAck) {
+		///Set isAck to true if decrypting a direct message, false otherwise.
+		///Setting sentOrReceivedUnencrypted only works for unencrypted emails.  Currently used by DBM so that it doesn't force the status to received.</summary>
+		public static EmailMessage ProcessRawEmailMessageIn(string strRawEmail,long emailMessageNum,EmailAddress emailAddressReceiver,bool isAck
+			,EmailSentOrReceived sentOrReceivedUnencrypted=EmailSentOrReceived.Received) 
+		{
 			//No need to check RemotingRole; no call to db.
 			Health.Direct.Agent.IncomingMessage inMsg=RawEmailToIncomingMessage(strRawEmail,emailAddressReceiver);
 			bool isEncrypted=IsReceivedMessageEncrypted(inMsg);
@@ -873,10 +870,39 @@ namespace OpenDentBusiness{
 				}
 			}
 			else {//Unencrypted
-				emailMessage=ConvertMessageToEmailMessage(inMsg.Message,true,false);
+				//First check to see if attachments have already been digested for this email.
+				List<EmailAttach> listEmailAttaches=EmailAttaches.GetForEmail(emailMessageNum);
+				bool parseAttachments=true;//Always parse attachments from the strRawEmail unless we've already parsed them before.
+				if(listEmailAttaches.Count > 0) {
+					//Attachments have already been parsed so do not waste time re-parsing.
+					//Re-parsing attachments would be very bad because there is a good chance that strRawEmail has cleared out the body portion of attachments.
+					//The actual attachments will be affected (erased) if these attachments are re-parsed due to the body portions being blank.
+					parseAttachments=false;
+				}
+				emailMessage=ConvertMessageToEmailMessage(inMsg.Message,parseAttachments,false);
 				emailMessage.RawEmailIn=strRawEmail;
+				//Set the Attachments on emailMessage if the attachments weren't parsed from strRawEmail.
+				if(!parseAttachments) {
+					//Calling EmailMessages.Update() will delete all email attachments and sync them with the current list of attachments even if no changes.
+					//Therefore, we need to make sure to have the Attachments variable set to the "old" (current really) list of attachments.
+					emailMessage.Attachments=listEmailAttaches;
+				}
+				//Only try and trim the fat from the RawEmailIn column if attachments are present.
+				if(emailMessage.Attachments.Count > 0) {
+					//At this point we know that the attachments have been successfully extracted from the raw message (now or some time in the past).
+					//Try to remove the attachment text from the raw email as to save space in the database.
+					try {
+						emailMessage.RawEmailIn=DissolveAttachmentsFromIncomingMessage(inMsg);
+					}
+					catch {
+						//Something went wrong so keep the "bloat" in the database because it is the safest option.
+					}
+				}
+				else {//No attachments present.
+					//No need to try and annul attachment body text from strRawEmail because it doesn't have any attachments.
+				}
 				emailMessage.EmailMessageNum=emailMessageNum;
-				emailMessage.SentOrReceived=EmailSentOrReceived.Received;
+				emailMessage.SentOrReceived=sentOrReceivedUnencrypted;
 				emailMessage.RecipientAddress=emailAddressReceiver.EmailUsername.Trim();
 			}
 			EhrSummaryCcd ehrSummaryCcd=null;
@@ -919,7 +945,7 @@ namespace OpenDentBusiness{
 				EmailMessages.Insert(emailMessage);//Also inserts all of the attachments in emailMessage.Attachments after setting each attachment EmailMessageNum properly.
 			}
 			else {
-				EmailMessages.Update(emailMessage);//Also deletes all previous attachments, then recreates all of the attachments in emailMessage.Attachments after setting each attachment EmailMessageNum properly.
+				EmailMessages.Update(emailMessage);
 			}
 			if(ehrSummaryCcd!=null) {
 				ehrSummaryCcd.EmailAttachNum=emailMessage.Attachments[(int)ehrSummaryCcd.EmailAttachNum].EmailAttachNum;
@@ -1060,6 +1086,26 @@ namespace OpenDentBusiness{
 			Health.Direct.Common.Certificates.SystemX509Store.OpenAnchorEdit().Dispose();//Create the NHINDAnchor certificate store if it does not already exist on the local machine.
 			Health.Direct.Common.Certificates.SystemX509Store.OpenExternalEdit().Dispose();//Create the NHINDExternal certificate store if it does not already exist on the local machine.
 			Health.Direct.Common.Certificates.SystemX509Store.OpenPrivateEdit().Dispose();//Create the NHINDPrivate certificate store if it does not already exist on the local machine.
+		}
+
+		///<summary>Annuls the attachment text in the body section of all attachment mime parts (the Base64 content).
+		///Returns the entire incoming message as raw text which is meant to be stored in the RawEmailIn column as to save space in the database.
+		///Throws exceptions.</summary>
+		private static string DissolveAttachmentsFromIncomingMessage(Health.Direct.Agent.IncomingMessage incomingMessage) {
+			//No need to check RemotingRole; no call to db.
+			Health.Direct.Common.Mime.MimeEntityCollection mimeCol=new Health.Direct.Common.Mime.MimeEntityCollection(incomingMessage.Message.ContentType);
+			//GetParts() throws an exception if not multi-part, but that is OK, because attachments cannot exist in the message unless it is multi-part.
+			foreach(Health.Direct.Common.Mime.MimeEntity mimeEntity in incomingMessage.Message.GetParts()) {
+				if(mimeEntity.ContentDisposition!=null && mimeEntity.ContentDisposition.ToLower().Contains("attachment")) {//An email attachment.
+					//Clear out the body or content of the attachment as to reduce the amount of space we take up in the database.
+					//This is safe to do at this point because we have already extracted the attachments and they are stored in the AtoZ folder or db already.
+					//Since the Text of the body for the mimeEntity is protected, we need to replace the current mime body with a new mime body.
+					mimeEntity.Body=new Health.Direct.Common.Mime.Body("");
+				}
+				mimeCol.Entities.Add(mimeEntity);
+			}
+			incomingMessage.Message.UpdateBody(mimeCol);//Update the body of the message with the manipulated mime entity collection.
+			return incomingMessage.SerializeMessage();//Returns the entire email in its raw form.
 		}
 
 		///<summary>Throws exceptions if there are permission issues.  Creates the 3 necessary certificate stores if they do not already exist.</summary>

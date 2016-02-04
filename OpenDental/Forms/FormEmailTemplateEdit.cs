@@ -457,7 +457,8 @@ namespace OpenDental{
 			foreach(EmailAttach attachment in _listEmailAttachDisplayed) {
 				attachment.EmailTemplateNum=ETcur.EmailTemplateNum;
 			}
-			EmailAttaches.Sync(_listEmailAttachDisplayed,_listEmailAttachOld);
+			//Sync the email attachments and pass in an emailMessageNum of 0 because we will be providing _listEmailAttachOld.
+			EmailAttaches.Sync(0,_listEmailAttachDisplayed,_listEmailAttachOld);
 			DialogResult=DialogResult.OK;
 		}
 

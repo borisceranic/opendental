@@ -829,7 +829,6 @@ namespace OpenDental{
 		}
 
 		private void butRefresh_Click(object sender,EventArgs e) {
-			List<EmailAttach> listEmailAttachOld=_emailMessage.Attachments;
 			Cursor=Cursors.WaitCursor;
 			EmailAddress emailAddress=emailPreview.EmailAddressPreview;
 			try {
@@ -843,16 +842,6 @@ namespace OpenDental{
 				return;
 			}
 			Cursor=Cursors.Default;
-			string attachPath=EmailAttaches.GetAttachPath();
-			for(int i=0;i<listEmailAttachOld.Count;i++) {//For each old attachment, attempt to delete.  The new attachments were created with different names in ProcessRawEmailMessage().
-				string filePath=ODFileUtils.CombinePaths(attachPath,listEmailAttachOld[i].ActualFileName);
-				try {
-					File.Delete(filePath);//Deleting old file. If it fails there was no file, or permission problems.
-				}
-				catch {
-					//The file will take a little bit of extra hard drive space, but the file is not referened and cannot hurt anything.
-				}
-			}
 		}
 
 		private void butDirectMessage_Click(object sender,EventArgs e) {
