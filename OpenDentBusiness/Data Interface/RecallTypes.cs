@@ -262,7 +262,7 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod());
 				return;
 			}
-			string command="DELETE FROM recalltype";
+			string command="DELETE FROM recalltype WHERE RecallTypeNum >= 1 AND RecallTypeNum <= 6";//Don't delete manually added recall types
 			Db.NonQ(command);
 			command="INSERT INTO recalltype (RecallTypeNum,Description,DefaultInterval,TimePattern,Procedures) VALUES (1,'Prophy',393217,'/XXXX/','D0120,D1110')";
 			Db.NonQ(command);
@@ -276,7 +276,7 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 			command="INSERT INTO recalltype (RecallTypeNum,Description,DefaultInterval,Procedures) VALUES (6,'FMX',83886080,'D0210')";
 			Db.NonQ(command);
-			command="DELETE FROM recalltrigger";
+			command="DELETE FROM recalltrigger";//OK to delete triggers for manually added recalls, because deleting the triggers disables the recall type.
 			Db.NonQ(command);
 			//command="INSERT INTO recalltrigger (RecallTriggerNum,RecallTypeNum,CodeNum) VALUES (1,1,"+ProcedureCodes.GetCodeNum("D0415")+")";//collection of microorg for culture
 			//Db.NonQ(command);
@@ -307,6 +307,21 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 			command="UPDATE preference SET ValueString='1,2,3' WHERE PrefName='RecallTypesShowingInList'";
 			Db.NonQ(command);
+			//Delete recalls for manually added recall types.  This is the same strategy we use in FormRecallTypeEdit
+			//Types 1 through 6 were reinserted above, and thus the foreign keys will still be correct.
+			command="DELETE FROM recall WHERE RecallTypeNum < 1 OR RecallTypeNum > 6";
+			Db.NonQ(command);
+		}
+
+		///<summary>Returns true if any recall types that are not the default types are in use in patient recalls.</summary>
+		public static bool IsUsingManuallyAddedTypes() {
+			string command="SELECT COUNT(*) "
+				+"FROM recall "
+				+"WHERE RecallTypeNum < 1 OR RecallTypeNum > 6";//1 through 6 are the default recall types
+			if(Db.GetCount(command)=="0") {
+				return false;
+			}
+			return true;
 		}
 
 
