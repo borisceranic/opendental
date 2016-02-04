@@ -4808,6 +4808,46 @@ namespace OpenDentBusiness {
 		}
 
 		[DbmMethod]
+		public static string RecallsWithInvalidRecallType(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			command=@"SELECT recall.RecallTypeNum 
+				FROM recall 
+				LEFT JOIN recalltype ON recalltype.RecallTypeNum=recall.RecallTypeNum 
+				WHERE recalltype.RecallTypeNum IS NULL";
+			List<long> listRecallTypeNums=Db.GetListLong(command);
+			if(isCheck) {
+				int numFound=listRecallTypeNums.Count;
+				if(numFound>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Recalls found with invalid recall types:")+" "+numFound+"\r\n";
+				}
+			}
+			else {
+				//Inserting temporary recall types so that the recalls are no longer orphaned
+				long numberFixed=listRecallTypeNums.Count;
+				listRecallTypeNums=listRecallTypeNums.Distinct().ToList();
+				for(int i=0;i<listRecallTypeNums.Count;i++) {
+					command="INSERT INTO recalltype (RecallTypeNum,Description,DefaultInterval,TimePattern,Procedures) VALUES ("
+						+POut.Long(listRecallTypeNums[i])+",'Temporary Recall "+POut.Int(i+1)+"',0,'','')";
+					Db.NonQ(command);
+				}
+				long numberFixedTypes=listRecallTypeNums.Count;
+				if(numberFixedTypes > 0) {
+					Signalods.SetInvalid(InvalidType.RecallTypes);
+				}
+				if(numberFixed > 0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Recalls fixed with invalid recall types:")+" "+numberFixed+". "
+						+Lans.g("FormDatabaseMaintenance","Temporary recall types added:")+" "+numberFixedTypes+". "
+						+Lans.g("FormDatabaseMaintenance","Go to Setup | Appointments | Recall Types "
+							+"to either rename them or remove all recalls from these recall types.")+"\r\n";
+				}
+			}
+			return log;
+		}
+
+		[DbmMethod]
 		public static string RefAttachDeleteWithInvalidReferral(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);

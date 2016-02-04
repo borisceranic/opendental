@@ -364,7 +364,9 @@ namespace OpenDental{
 			}
 			#endregion
 			#region Recall Types
-			if(checkRecallTypes.Checked) {
+			if(checkRecallTypes.Checked && RecallTypes.IsUsingManuallyAddedTypes()
+				&& MsgBox.Show(this,MsgBoxButtons.OKCancel,"This will delete all patient recalls for recall types which were manually added.  Continue?")) 
+			{
 				RecallTypes.SetToDefault();
 				DataValid.SetInvalid(InvalidType.RecallTypes,InvalidType.Prefs);
 			}
