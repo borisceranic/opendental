@@ -126,7 +126,7 @@ namespace OpenDentalGraph {
 				}
 			}			
 			//This will start cache threads.
-			Cache.DashboardCache.RefreshIfInvalid(layouts,false,invalidateFirst);
+			Cache.DashboardCache.RefreshLayoutsIfInvalid(layouts,false,invalidateFirst);
 			this.SuspendLayout();	
 			layouts.OrderBy(x => x.DashboardTabOrder).ToList().ForEach(x => {
 				DashboardPanelCtrl dashboardPanel=new DashboardPanelCtrl(x);
