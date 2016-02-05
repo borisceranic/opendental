@@ -1506,6 +1506,8 @@ namespace OpenDentBusiness{
 			return SendWebSchedNotifications(recallNums,PrefC.GetBool(PrefName.RecallGroupByFamily),RecallListSort.Alphabetical);
 		}
 
+		///<summary>Makes several web service calls to WebServiceCustomersUpdates in order to get Web Sched URLs.
+		///Returns an error string to display to the user if anything went wrong otherwise returns empty string if all notifications sent.</summary>
 		public static string SendWebSchedNotifications(List<long> recallNums,bool isGroupFamily,RecallListSort sortBy,EmailAddress emailAddressOverride=null) {
 			//No need to check RemotingRole; no call to db.
 			string response="";
