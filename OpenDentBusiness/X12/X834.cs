@@ -1192,9 +1192,8 @@ namespace OpenDentBusiness {
 
 		public Hx834Ins(Hx834_Member member,Hx834_HealthCoverage healthCoverage) {
 			Member=member;
-			ProcessMember();
 			HealthCoverage=healthCoverage;
-			ProcessHealthCoverage();
+			ProcessMember();
 		}
 
 		public string GetPatMaintTypeDescript() {
@@ -1255,7 +1254,7 @@ namespace OpenDentBusiness {
 			ProcessSubscriberIdentifier(Member.SubscriberIdentifier);//Loop 2000 REF 0F
 			ProcessMemberPolicyNumber(Member.MemberPolicyNumber);//Loop 2000 REF 1L
 			//Loop 2000 REF - Member Supplemental Identifier.  Nowhere to store this information.  Perhaps this is a way to receive PatNum?
-			//Loop 2000 DTP - Member Level Dates.  Nowhere to store this information.
+			ProcessMemberLevelDates(Member.ListMemberLevelDates);//Loop 2000 DTP.
 			ProcessMemberName(Member.MemberName);//Loop 2100A NM1
 			ProcessMemberCommunicationsNumbers(Member.MemberCommunicationsNumbers);//Loop 2100A PER
 			ProcessMemberResidenceStreetAddress(Member.MemberResidenceStreetAddress);//Loop 2100A N3
@@ -1277,6 +1276,9 @@ namespace OpenDentBusiness {
 			//Loop 2100G - Responsible Person.  TODO: Create a new patient for this person in family if not present.  Use Pat.ResponsParty to link FK.
 			//Loop 2100H - Drop Off Location.  Address where patient would like shipments sent.  Nowhere to store this information.
 			//Loop 2200 - Disability Information.  Nowhere to store this information.
+			ProcessHealthCoverage();
+			//Loop 2000 LS - Useless.
+			ProcessMemberReportingCategories(Member.ListMemberReportingCategories);//Loop 2700
 		}
 
 		private void ProcessMemberLevelDetail(X12_INS mld) {
@@ -1426,7 +1428,7 @@ namespace OpenDentBusiness {
 			//REF04: Not used
 		}
 
-		private void ProcessMemberPolicyNumber(X12_REF mpn) {
+		private void ProcessMemberPolicyNumber(X12_REF mpn)  {
 			if(mpn==null) {
 				return;
 			}
@@ -1435,6 +1437,72 @@ namespace OpenDentBusiness {
 			Ins.GroupNum=mpn.ReferenceId;
 			//REF03: Not used
 			//REF04: Not used
+		}
+
+		private void ProcessMemberLevelDates(List <X12_DTP> listDates) {
+			for(int i=0;i<listDates.Count;i++) {
+				X12_DTP dtp=listDates[i];
+				if(dtp.DateTimeQualifier=="050") {//Recieved
+					//Used to identify the date an enrollment application is recieved.
+				}
+				else if(dtp.DateTimeQualifier=="286") {//Retirement
+				}
+				else if(dtp.DateTimeQualifier=="296") {//Initial Disability Period Return To Work
+				}
+				else if(dtp.DateTimeQualifier=="297") {//Initial Disability Period Last Day Worked
+				}
+				else if(dtp.DateTimeQualifier=="300") {//Enrollment Signature Date
+				}
+				else if(dtp.DateTimeQualifier=="301") {//Consolidated Omnibus Budget Reconciliation Act (COBRA) Qualifying Event
+				}
+				else if(dtp.DateTimeQualifier=="303") {//Maintenance Effective
+					//This code is used to send the effective date of a change to an existing member's information, excluding changed made in loop 2300.
+				}
+				else if(dtp.DateTimeQualifier=="336") {//Employment Begin
+				}
+				else if(dtp.DateTimeQualifier=="337") {//Employment End
+				}
+				else if(dtp.DateTimeQualifier=="338") {//Medicare Begin
+				}
+				else if(dtp.DateTimeQualifier=="339") {//Medicare End
+				}
+				else if(dtp.DateTimeQualifier=="340") {//Consolidated Omnibus Budget Reconciliation Act (COBRA) Begin
+				}
+				else if(dtp.DateTimeQualifier=="341") {//Consolidated Omnibus Budget Reconciliation Act (COBRA) End
+				}
+				else if(dtp.DateTimeQualifier=="350") {//Education Begin
+					//This is the start date for the student at the current educational institution.
+				}
+				else if(dtp.DateTimeQualifier=="351") {//Education End
+					//This is the expected graduation date the student at the current educational institution.
+				}
+				else if(dtp.DateTimeQualifier=="356") {//Eligibility Begin
+					//The date when a member could elect to enroll or begin benefits in any health care plan through the employer.
+					//This is not the actual begin date of coverage, which is conveyed in the DTP segment at position 2700.
+					//The effective date is communicated in the DTP of loop 2300.
+				}
+				else if(dtp.DateTimeQualifier=="357") {//Eligibility End
+					//The eligibility end date represents the last date of coverage for which claims will be paid for the individual being terminated.
+					//For example, if a date of 02/28/2001 is passed then claims for this individual will be paid through 11:59 p.m. on 02/28/2001.
+					//The termination date is communicated in the DTP of loop 2300.
+				}
+				else if(dtp.DateTimeQualifier=="383") {//Adjusted Hire
+				}
+				else if(dtp.DateTimeQualifier=="385") {//Credited Service Begin
+					//The start date from which an employee's length of service, as defined in the plan document, will be calculated.
+				}
+				else if(dtp.DateTimeQualifier=="386") {//Credited Service End
+					//The end date to be used in the calculation of an employee's length of service, as defined in the plan document.
+				}
+				else if(dtp.DateTimeQualifier=="393") {//Plan Participation Suspension
+				}
+				else if(dtp.DateTimeQualifier=="394") {//Rehire
+				}
+				else if(dtp.DateTimeQualifier=="473") {//Medicaid Begin
+				}
+				else if(dtp.DateTimeQualifier=="474") {//Medicaid End
+				}
+			}
 		}
 
 		private void ProcessMemberName(X12_NM1 mn) {
@@ -1631,6 +1699,7 @@ namespace OpenDentBusiness {
 			//DMG11: Nowhere to put this information.
 		}
 
+		///<summary>Partially implemented.  This data is ignored.  D3 does not seem to need this information, based on the example data provided.</summary>
 		private void ProcessMemberPolicyAmounts(List <X12_AMT> listAmts) {
 			ListBenefits.Clear();
 			for(int i=0;i<listAmts.Count;i++) {
@@ -1715,6 +1784,7 @@ namespace OpenDentBusiness {
 			}
 		}
 
+		///<summary>Partially implemented.  This data is ignored.  D3 does not seem to need this information, based on the example data provided.</summary>
 		private void ProcessMemberSchools(List <Hx834_School> listSchools) {
 			//We only have a spot to store the school name.  Nowhere to store the school contact information.
 			if(listSchools.Count > 0) {
@@ -1727,9 +1797,14 @@ namespace OpenDentBusiness {
 			if(HealthCoverage==null) {
 				return;
 			}
-			ProcessHD();
-			//TODO: Continue from Loop 2300 DTP.
-
+			ProcessHD();//Loop 2300 HD
+			ProcessHealthCoverageDates(HealthCoverage.ListHealthCoverageDates);//Loop 2300 DTP
+			ProcessHealthCoveragePolicies(HealthCoverage.ListHealthCoveragePolicies);//Loop 2300 AMT
+			ProcessHealthCoveragePolicyNumbers(HealthCoverage.ListHealthCoveragePolicyNumbers);//Loop 2300 REF
+			ProcessPriorCoverageMonths(HealthCoverage.PriorCoverageMonths);//Loop 2300 REF
+			ProcessIdentificationCards(HealthCoverage.ListIdentificationCards);//Loop 2300 IDC
+			ProcessProviderInformation(HealthCoverage.ListProviderInformation);//Loop 2310
+			ProcessCoordinationOfBenefits(HealthCoverage.ListCoordinationOfBeneifts);//Loop 2320
 		}
 
 		private void ProcessHD() {
@@ -1741,6 +1816,113 @@ namespace OpenDentBusiness {
 			//HD06 through HD08: Not used
 			//HD09: Late Enrollment Indicator.  Nowhere to store this information and it is useless anyway.
 			//HD10 through HD11: Not used
+		}
+
+		private void ProcessHealthCoverageDates(List <X12_DTP> listDates) {
+			for(int i=0;i<listDates.Count;i++) {
+				X12_DTP dtp=listDates[i];
+				if(dtp.DateTimeQualifier=="300") {//Enrollment Signature Date
+				}
+				else if(dtp.DateTimeQualifier=="303") {//Maintenance Effective
+					//This is the effective date of a change where a member's coverage is not being added or removed.
+				}
+				else if(dtp.DateTimeQualifier=="343") {//Premium Paid to Date End
+				}
+				else if(dtp.DateTimeQualifier=="348") {//Benefit Begin
+					//This is the effective date of coverage.  This code must always be sent when adding or reinstating coverage.
+					Sub.DateEffective=X12Parse.ToDate(dtp.DateTimePeriod);
+				}
+				else if(dtp.DateTimeQualifier=="349") {//Benefit End
+					//The termination date represents the last date of coverage in which claims will be paid for the individual being terminated.
+					//For example, if a date of 02/28/2001 is passed then claims for this individual will be paid through 11:50 p.m. on 02/28/2001.
+					Sub.DateTerm=X12Parse.ToDate(dtp.DateTimePeriod);
+				}
+				else if(dtp.DateTimeQualifier=="543") {//Last Premium Paid Date
+				}
+				else if(dtp.DateTimeQualifier=="695") {//Pervious Period
+					//This value is only to be used when reporting Previous Coverage Months.
+				}
+			}
+		}
+
+		///<summary>Not implemented.  D3 does not seem to need this information, based on the example data provided.</summary>
+		private void ProcessHealthCoveragePolicies(List <X12_AMT> listPolicies) {
+			for(int i=0;i<listPolicies.Count;i++) {
+			}
+		}
+
+		private void ProcessHealthCoveragePolicyNumbers(List <X12_REF> listPolicyNumbers) {
+			for(int i=0;i<listPolicyNumbers.Count;i++) {
+				X12_REF policyNum=listPolicyNumbers[i];
+				if(policyNum.ReferenceIdQualifier=="17") {//Client Reporting Category
+					//This seems to be the only code D3 cares about.  Not sure how to import this information yet, or if it is even useful.
+				}
+				else if(policyNum.ReferenceIdQualifier=="1L") {//Group or Policy Number
+					//Required when a group number that applies to this individual's participation in the coverage passed in this HD loop
+					//is required by the terms of the contract between the sponsor (sender) and payer (receiver);
+					//if not required may be sent at the sender's discretion.
+				}
+				else if(policyNum.ReferenceIdQualifier=="9V") {//Payment Category
+				}
+				else if(policyNum.ReferenceIdQualifier=="CE") {//Class of Contract Code
+				}
+				else if(policyNum.ReferenceIdQualifier=="E8") {//Service Contract (Coverage) Number
+				}
+				else if(policyNum.ReferenceIdQualifier=="M7") {//Medical Assistance Cateogory
+				}
+				else if(policyNum.ReferenceIdQualifier=="PID") {//Program Identification Number
+				}
+				else if(policyNum.ReferenceIdQualifier=="RB") {//Rate code number
+				}
+				else if(policyNum.ReferenceIdQualifier=="X9") {//Internal Control Number
+				}
+				else if(policyNum.ReferenceIdQualifier=="XM") {//Issuer Number
+				}
+				else if(policyNum.ReferenceIdQualifier=="XX1") {//Special Program Code
+				}
+				else if(policyNum.ReferenceIdQualifier=="XX2") {//Service Area Code
+				}
+				else if(policyNum.ReferenceIdQualifier=="ZX") {//Country Code
+				}
+				else if(policyNum.ReferenceIdQualifier=="ZZ") {//Mutually Defined
+					//Use this code for the Payment Plan Type Code (Annual or Quarterly) until a standard code is assigned.
+				}
+			}
+		}
+
+		///<summary>Not implemented.  D3 does not seem to need this information, based on the example data provided.</summary>
+		private void ProcessPriorCoverageMonths(X12_REF pcm) {
+			if(pcm==null) {
+				return;
+			}
+		}
+
+		///<summary>Not implemented.  D3 does not seem to need this information, based on the example data provided.</summary>
+		private void ProcessIdentificationCards(List <X12_IDC> listIdCards) {
+			for(int i=0;i<listIdCards.Count;i++) {
+			}
+		}
+
+		///<summary>Loop 2310</summary>
+		private void ProcessProviderInformation(List <Hx834_Provider> listProvs) {
+			for(int i=0;i<listProvs.Count;i++) {
+				Hx834_Provider prov=listProvs[i];
+				//This information is useless, because the customer will already have provider information in their system.  Do not import.
+			}
+		}
+
+		///<summary>Loop 2320</summary>
+		private void ProcessCoordinationOfBenefits(List <Hx834_Cob> listCobs) {
+			for(int i=0;i<listCobs.Count;i++) {
+				//Nowhere to store this information.  Is this information available in other Health Coverage segments for the current member?
+			}
+		}
+
+		///<summary>Loop 2700</summary>
+		private void ProcessMemberReportingCategories(List <Hx834_MemberReportingCategory> listReportCats) {
+			for(int i=0;i<listReportCats.Count;i++) {
+				//We may be able to use some of this information.  Not sure if this information is useful or where to store it.
+			}
 		}
 
 	}

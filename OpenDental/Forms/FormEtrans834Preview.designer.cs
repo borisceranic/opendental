@@ -71,6 +71,7 @@ namespace OpenDental{
 			this.gridInsPlans.Location = new System.Drawing.Point(12, 12);
 			this.gridInsPlans.Name = "gridInsPlans";
 			this.gridInsPlans.ScrollValue = 0;
+			this.gridInsPlans.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
 			this.gridInsPlans.Size = new System.Drawing.Size(950, 642);
 			this.gridInsPlans.TabIndex = 4;
 			this.gridInsPlans.Title = "Ins Plans";

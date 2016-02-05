@@ -27,10 +27,20 @@ namespace OpenDental {
 			gridInsPlans.BeginUpdate();
 			if(gridInsPlans.Columns.Count==0) {	
 				gridInsPlans.Columns.Clear();
-				gridInsPlans.Columns.Add(new UI.ODGridColumn("Patient",200));
-				gridInsPlans.Columns.Add(new UI.ODGridColumn("PatMaintType",100));
-				gridInsPlans.Columns.Add(new UI.ODGridColumn("CoverageMaintType",100));
-				sortedByColumnIdx=0;//Sort by Patient Name by default.
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("LName",150,HorizontalAlignment.Left));
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("FName",100,HorizontalAlignment.Left));
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("Middle",50,HorizontalAlignment.Left));
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("Birthdate",80,HorizontalAlignment.Center));
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("SSN",80,HorizontalAlignment.Center));
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("Pat Maint",80,HorizontalAlignment.Center));
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("Cov Maint",80,HorizontalAlignment.Center));
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("Date Begin",84,HorizontalAlignment.Center));
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("Date Term",84,HorizontalAlignment.Center));
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("Relation",80,HorizontalAlignment.Left));
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("SubscriberID",100,HorizontalAlignment.Left));
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("GroupNum",100,HorizontalAlignment.Left));
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("",1));//Spacer
+				sortedByColumnIdx=0;//Sort by Patient Last Name by default.
 				isSortAscending=true;//Start with A and progress to Z.
 			}
 			gridInsPlans.Rows.Clear();
@@ -44,9 +54,19 @@ namespace OpenDental {
 						row=new UI.ODGridRow();
 						row.Tag=eIns;
 						gridInsPlans.Rows.Add(row);
-						row.Cells.Add(eIns.Pat.GetNameLF());
+						row.Cells.Add(eIns.Pat.LName);
+						row.Cells.Add(eIns.Pat.FName);
+						row.Cells.Add(eIns.Pat.MiddleI);
+						row.Cells.Add(eIns.Pat.Birthdate.ToShortDateString());
+						row.Cells.Add(eIns.Pat.SSN);
 						row.Cells.Add(eIns.GetPatMaintTypeDescript());
 						row.Cells.Add("");
+						row.Cells.Add(eIns.Sub.DateEffective.ToShortDateString());
+						row.Cells.Add(eIns.Sub.DateTerm.ToShortDateString());
+						row.Cells.Add(eIns.Plan.Relationship.ToString());
+						row.Cells.Add(eIns.Sub.SubscriberID);
+						row.Cells.Add(eIns.Ins.GroupNum);
+						row.Cells.Add("");//Spacer
 					}
 					else {
 						for(int k=0;k<member.ListHealthCoverage.Count;k++) {
@@ -55,9 +75,19 @@ namespace OpenDental {
 							row=new UI.ODGridRow();
 							row.Tag=eIns;
 							gridInsPlans.Rows.Add(row);
-							row.Cells.Add(eIns.Pat.GetNameLF());
+							row.Cells.Add(eIns.Pat.LName);
+							row.Cells.Add(eIns.Pat.FName);
+							row.Cells.Add(eIns.Pat.MiddleI);
+							row.Cells.Add(eIns.Pat.Birthdate.ToShortDateString());
+							row.Cells.Add(eIns.Pat.SSN);
 							row.Cells.Add(eIns.GetPatMaintTypeDescript());
 							row.Cells.Add(eIns.GetCoverageMaintTypeDescript());
+							row.Cells.Add(eIns.Sub.DateEffective.ToShortDateString());
+							row.Cells.Add(eIns.Sub.DateTerm.ToShortDateString());
+							row.Cells.Add(eIns.Plan.Relationship.ToString());
+							row.Cells.Add(eIns.Sub.SubscriberID);
+							row.Cells.Add(eIns.Ins.GroupNum);
+							row.Cells.Add("");//Spacer
 						}
 					}
 				}
