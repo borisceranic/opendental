@@ -1179,9 +1179,12 @@ namespace OpenDental{
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
 				recallNums.Add(PIn.Long(table.Rows[gridMain.SelectedIndices[i]]["RecallNum"].ToString()));
 			}
-			Recalls.SendWebSchedNotifications(recallNums,checkGroupFamilies.Checked,(RecallListSort)comboSort.SelectedIndex);
-			FillMain(null);
+			string resultWebSched=Recalls.SendWebSchedNotifications(recallNums,checkGroupFamilies.Checked,(RecallListSort)comboSort.SelectedIndex);
 			Cursor=Cursors.Default;
+			if(!string.IsNullOrEmpty(resultWebSched)) {
+				MessageBox.Show(this,resultWebSched);//Show the error (already translated) to the user and then refresh the grid in case any were successful.
+			}
+			FillMain(null);
 		}
 
 		private void checkGroupFamilies_Click(object sender,EventArgs e) {
