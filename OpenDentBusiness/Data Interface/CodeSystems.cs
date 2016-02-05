@@ -19,14 +19,12 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<CodeSystem>>(MethodBase.GetCurrentMethod(),IsMemberNation);
 			}
-			//string command="SELECT * FROM codesystem WHERE CodeSystemName!='AdministrativeSex' AND CodeSystemName!='CDT'";
 #if DEBUG
 			string command="SELECT * FROM codesystem";// WHERE CodeSystemName IN ('ICD9CM','RXNORM','SNOMEDCT','CPT')";
 #else
-			//string command="SELECT * FROM codesystem WHERE CodeSystemName IN ('ICD9CM','ICD10','RXNORM','CPT','CVX','UCUM'"+(IsMemberNation?",'SNOMEDCT'":"")+")";
-			string command="SELECT * FROM codesystem WHERE CodeSystemName NOT IN ('AdministrativeSex','CDT'"+(!IsMemberNation?",'SNOMEDCT'":"")+")";
-			if(!PrefC.GetBool(PrefName.ShowFeatureEhr)) {//When EHR is disabled, only show code systems which are not EHR specific.
-				command+=" AND CodeSystemName IN ('CPT','ICD10CM','ICD9CM','RXNORM')";
+			string command="SELECT * FROM codesystem WHERE CodeSystemName NOT IN ('AdministrativeSex','CDT')";
+			if(!PrefC.GetBool(PrefName.ShowFeatureEhr)) {//When EHR is disabled, only show code systems which are not EHR specific. 
+				command+=" AND CodeSystemName IN ('CPT','ICD10CM','ICD9CM','RXNORM','SNOMEDCT')";//Snomed used for drug/problem interactions
 			}
 #endif
 			return Crud.CodeSystemCrud.SelectMany(command);
