@@ -39,6 +39,8 @@ namespace OpenDental {
 				gridInsPlans.Columns.Add(new UI.ODGridColumn("Relation",80,HorizontalAlignment.Left));
 				gridInsPlans.Columns.Add(new UI.ODGridColumn("SubscriberID",100,HorizontalAlignment.Left));
 				gridInsPlans.Columns.Add(new UI.ODGridColumn("GroupNum",100,HorizontalAlignment.Left));
+				//TODO: Contact information?
+				//TODO: Carrier information.
 				gridInsPlans.Columns.Add(new UI.ODGridColumn("",1));//Spacer
 				sortedByColumnIdx=0;//Sort by Patient Last Name by default.
 				isSortAscending=true;//Start with A and progress to Z.
