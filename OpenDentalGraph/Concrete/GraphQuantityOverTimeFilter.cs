@@ -15,6 +15,7 @@ namespace OpenDentalGraph {
 		private DashboardCellType _cellType=DashboardCellType.NotDefined;
 		private IncomeGraphOptionsCtrl _incomeOptionsCtrl=new IncomeGraphOptionsCtrl();
 		private ProductionGraphOptionsCtrl _productionOptionsCtrl=new ProductionGraphOptionsCtrl();
+		private BrokenApptGraphOptionsCtrl _brokenApptsCtrl=new BrokenApptGraphOptionsCtrl();
 		#endregion
 
 		#region Properties
@@ -24,6 +25,7 @@ namespace OpenDentalGraph {
 					case DashboardCellType.ProductionGraph:
 					case DashboardCellType.IncomeGraph:
 					case DashboardCellType.NewPatientsGraph:
+					case DashboardCellType.BrokenApptGraph:
 						return true;
 					case DashboardCellType.AccountsReceivableGraph:
 					default:
@@ -44,6 +46,7 @@ namespace OpenDentalGraph {
 				switch(CellType) {
 					case DashboardCellType.ProductionGraph:
 					case DashboardCellType.IncomeGraph:
+					case DashboardCellType.BrokenApptGraph:
 						splitContainer.Panel1Collapsed=!Graph.ShowFilters;
 						break;
 					case DashboardCellType.AccountsReceivableGraph:
@@ -58,7 +61,7 @@ namespace OpenDentalGraph {
 			get { return _cellType; }
 			set {
 				_cellType=value;
-				Control filterCtrl=null;
+				BaseGraphOptionsCtrl filterCtrl=null;
 				switch(CellType) {
 					case DashboardCellType.ProductionGraph:
 						filterCtrl=_productionOptionsCtrl;
@@ -81,6 +84,18 @@ namespace OpenDentalGraph {
 						Graph.BreakdownPref=BreakdownType.none;
 						Graph.LegendDock=LegendDockType.None;
 						Graph.QuickRangePref=QuickRange.last12Months;
+						break;
+					case DashboardCellType.BrokenApptGraph:
+						filterCtrl=_brokenApptsCtrl;
+						Graph.GraphTitle="Broken Appointments";
+						Graph.MoneyItemDescription="Not Used";
+						Graph.CountItemDescription="Count Appointments";
+						Graph.GroupByType=System.Windows.Forms.DataVisualization.Charting.IntervalType.Months;
+						Graph.SeriesType=System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+						Graph.BreakdownPref=BreakdownType.none;
+						Graph.LegendDock=LegendDockType.None;
+						Graph.QuickRangePref=QuickRange.last12Months;
+						Graph.QtyType=QuantityType.count;						
 						break;
 					case DashboardCellType.AccountsReceivableGraph:
 						Graph.GraphTitle="Accounts Receivable";
@@ -112,6 +127,7 @@ namespace OpenDentalGraph {
 				}
 				else {
 					splitContainer.Panel1Collapsed=false;
+					splitContainer.SplitterDistance=filterCtrl.GetPanelHeight();
 					filterCtrl.Dock=DockStyle.Fill;
 					splitContainer.Panel1.Controls.Add(filterCtrl);
 				}
@@ -133,6 +149,7 @@ namespace OpenDentalGraph {
 			SetFilterAndGraphSettings(jsonSettings);
 			_incomeOptionsCtrl.InputsChanged+=OnFormInputsChanged;
 			_productionOptionsCtrl.InputsChanged+=OnFormInputsChanged;
+			_brokenApptsCtrl.InputsChanged+=OnFormInputsChanged;
 		}
 		#endregion
 
@@ -159,12 +176,11 @@ namespace OpenDentalGraph {
 				return;
 			}
 			List<GraphQuantityOverTime.GraphPointBase> rawData=new List<GraphQuantityOverTime.GraphPointBase>();
+			//Fill the dataset that we will send to the graph. The dataset will be filled according to user preferences.
 			switch(CellType) {
 				case DashboardCellType.ProductionGraph: {
 						if(_productionOptionsCtrl.IncludeAdjustments) {
-							rawData.AddRange(DashboardCache.Adjustments.Cache.FindAll(x => x.DateStamp.Year>1880)
-								.Select(x => new GraphQuantityOverTime.GraphPointBase(x) { SeriesName=DashboardCache.Provider.GetProvName(x.ProvNum) })
-								.ToList());
+							rawData.AddRange(DashboardCache.Adjustments.Cache);
 						}
 						if(_productionOptionsCtrl.IncludeCompletedProcs||_productionOptionsCtrl.IncludeWriteoffs) {
 							rawData.AddRange(DashboardCache.CompletedProcs.Cache
@@ -175,25 +191,39 @@ namespace OpenDentalGraph {
 					break;
 				case DashboardCellType.IncomeGraph: {
 						if(_incomeOptionsCtrl.IncludePaySplits) {
-							rawData.AddRange(DashboardCache.PaySplits.Cache.FindAll(x => x.DateStamp.Year>1880)
-								.Select(x => new GraphQuantityOverTime.GraphPointBase(x) { SeriesName=DashboardCache.Provider.GetProvName(x.ProvNum) })
-								.ToList());
+							rawData.AddRange(DashboardCache.PaySplits.Cache);
 						}
 						if(_incomeOptionsCtrl.IncludeInsuranceClaimPayments) {
-							rawData.AddRange(DashboardCache.ClaimPayments.Cache
-								.Select(x => new GraphQuantityOverTime.GraphPointBase(x) { SeriesName=DashboardCache.Provider.GetProvName(x.ProvNum) })
-								.ToList());
+							rawData.AddRange(DashboardCache.ClaimPayments.Cache);
 						}
 					}
 					break;
 				case DashboardCellType.AccountsReceivableGraph: {
-						rawData.AddRange(DashboardCache.AR.Cache.FindAll(x => x.DateCalc.Year>1880)
-							.Select(x => GetARDataPoint(x))
+						rawData.AddRange(DashboardCache.AR.Cache
+							.Select(x => new GraphQuantityOverTime.GraphPointBase() {
+								Val=x.BalTotal,
+								SeriesName="All",
+								DateStamp=x.DateCalc,
+							})
 							.ToList());
 					}
 					break;
 				case DashboardCellType.NewPatientsGraph: {
-						rawData.AddRange(DashboardCache.Patients.Cache.FindAll(x => x.DateStamp.Year>1880));
+						rawData.AddRange(DashboardCache.Patients.Cache);
+					}
+					break;
+				case DashboardCellType.BrokenApptGraph: {
+						switch(_brokenApptsCtrl.CurGrouping) {
+							case BrokenApptGraphOptionsCtrl.Grouping.proc:
+								Graph.UseBuiltInColors=false;
+								break;
+							case BrokenApptGraphOptionsCtrl.Grouping.adjustment:
+							case BrokenApptGraphOptionsCtrl.Grouping.apptStatus:
+							default:
+								Graph.UseBuiltInColors=true;
+								break;
+						}
+						rawData.AddRange(DashboardCache.BrokenAppts.Cache.Select(x => GetBrokenApptDataPoint(x)));
 					}
 					break;
 				default:
@@ -203,25 +233,47 @@ namespace OpenDentalGraph {
 		}
 
 		private Color graph_OnGetGetColor(string seriesName) {
-			return DashboardCache.Provider.GetProvColor(seriesName);
+			switch(CellType) {
+				case DashboardCellType.BrokenApptGraph:
+				case DashboardCellType.NewPatientsGraph:
+				case DashboardCellType.AccountsReceivableGraph:
+				case DashboardCellType.IncomeGraph:
+				case DashboardCellType.ProductionGraph:
+				case DashboardCellType.NotDefined:
+				default:
+					return DashboardCache.Providers.GetProvColor(seriesName);
+			}
+			
 		}
 		#endregion
 
 		#region GraphDataPoint Conversions
-		private GraphQuantityOverTime.GraphPointBase GetARDataPoint(DashboardAR x) {
-			return new GraphQuantityOverTime.GraphPointBase() {
-				Val=x.BalTotal,
-				SeriesName="All",
-				DateStamp=x.DateCalc,
-			};
+		private GraphQuantityOverTime.GraphPointBase GetBrokenApptDataPoint(BrokenAppt x) {
+			switch(_brokenApptsCtrl.CurGrouping) {
+				case BrokenApptGraphOptionsCtrl.Grouping.proc:
+					return new GraphQuantityOverTime.GraphPointBase() {
+						DateStamp=x.DateStamp,
+						SeriesName=DashboardCache.Providers.GetProvName(x.ProvNum),
+						Val=x.Val
+					};
+				case BrokenApptGraphOptionsCtrl.Grouping.adjustment:
+				case BrokenApptGraphOptionsCtrl.Grouping.apptStatus:
+				default:
+					return new GraphQuantityOverTime.GraphPointBase() {
+						DateStamp=x.DateStamp,
+						SeriesName=DashboardCache.Clinics.GetClinicName(x.ClinicNum),
+						Val=x.Val
+					};
+			}
 		}
 
 		private GraphQuantityOverTime.GraphPointBase GetProcDataPoint(CompletedProc x) {
 			double finalValue=0;
+			//Val will be the sum of the completed proc and the writeoff, depending on user preference.
 			if(_productionOptionsCtrl.IncludeCompletedProcs) {
 				finalValue+=x.Val;
 			}
-			if(_productionOptionsCtrl.IncludeWriteoffs) {
+			if(_productionOptionsCtrl.IncludeWriteoffs) { //Writeoffs are always attached to completed procs so if we don't have a completed proc, we won't have a writeoff.
 				Writeoff writeoff=DashboardCache.Writeoffs.Cache.FirstOrDefault(y => y.ProvNum==x.ProvNum && y.DateStamp==x.DateStamp);
 				if(writeoff!=null) {
 					finalValue-=writeoff.Val;
@@ -229,7 +281,7 @@ namespace OpenDentalGraph {
 			}
 			return new GraphQuantityOverTime.GraphPointBase() {
 				Val=finalValue,
-				SeriesName=DashboardCache.Provider.GetProvName(x.ProvNum),
+				SeriesName=x.SeriesName,
 				DateStamp=x.DateStamp,
 			};
 		}
@@ -277,14 +329,15 @@ namespace OpenDentalGraph {
 		public override DashboardCellType GetCellType() {
 			return CellType;
 		}
-		
+
 		public class GraphQuantityOverTimeFilterSettings:ODGraphSettingsAbs {
 			public bool IncludeCompleteProcs { get; set; }
 			public bool IncludeAdjustements { get; set; }
 			public bool IncludeWriteoffs { get; set; }
 			public bool IncludePaySplits { get; set; }
 			public bool IncludeInsuranceClaims { get; set; }
-		}		
+			public BrokenApptGraphOptionsCtrl.Grouping CurGrouping { get;set;}
+		}
 		#endregion
 
 		#region IODHasGraphSettings Implementation
@@ -301,13 +354,17 @@ namespace OpenDentalGraph {
 						IncludePaySplits=_incomeOptionsCtrl.IncludePaySplits,
 						IncludeInsuranceClaims=_incomeOptionsCtrl.IncludeInsuranceClaimPayments,
 					};
+				case DashboardCellType.BrokenApptGraph:
+					return new GraphQuantityOverTimeFilterSettings() {
+						CurGrouping=_brokenApptsCtrl.CurGrouping,
+					};
 				case DashboardCellType.AccountsReceivableGraph:
 				case DashboardCellType.NewPatientsGraph:
 					//No custom filtering so do nothing.
 					return new GraphQuantityOverTimeFilterSettings();
 				default:
 					throw new Exception("Unsupported CellType: "+CellType.ToString());
-			}			
+			}
 		}
 				
 		public override void DeserializeFromJson(string json) {
@@ -325,6 +382,9 @@ namespace OpenDentalGraph {
 					case DashboardCellType.IncomeGraph:
 						_incomeOptionsCtrl.IncludePaySplits=settings.IncludePaySplits;
 						_incomeOptionsCtrl.IncludeInsuranceClaimPayments=settings.IncludeInsuranceClaims;
+						break;
+					case DashboardCellType.BrokenApptGraph:
+						_brokenApptsCtrl.CurGrouping=settings.CurGrouping;
 						break;
 					case DashboardCellType.AccountsReceivableGraph:
 					case DashboardCellType.NewPatientsGraph:

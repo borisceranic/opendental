@@ -20,7 +20,9 @@ namespace OpenDentalGraph.Cache {
 		private static DashboardCachePaySplit _paySplits=new DashboardCachePaySplit();
 		private static DashboardCacheClaimPayment _claimPayments=new DashboardCacheClaimPayment();
 		private static DashboardCacheAR _aR=new DashboardCacheAR();
-		private static DashboardCacheProvider _provider=new DashboardCacheProvider();
+		private static DashboardCacheProvider _providers=new DashboardCacheProvider();
+		private static DashboardCacheBrokenAppt _brokenAppts=new DashboardCacheBrokenAppt();
+		private static DashboardCacheClinic _clinics=new DashboardCacheClinic();
 		#endregion
 
 		#region Public Caches
@@ -45,8 +47,14 @@ namespace OpenDentalGraph.Cache {
 		public static DashboardCacheAR AR {
 			get { return _aR; }
 		}
-		public static DashboardCacheProvider Provider {
-			get { return _provider; }
+		public static DashboardCacheProvider Providers {
+			get { return _providers; }
+		}
+		public static DashboardCacheBrokenAppt BrokenAppts {
+			get { return _brokenAppts; }
+		}
+		public static DashboardCacheClinic Clinics {
+			get { return _clinics; }
 		}
 		#endregion
 
@@ -81,8 +89,11 @@ namespace OpenDentalGraph.Cache {
 		public static void RefreshCellTypeIfInvalid(DashboardCellType cellType,DashboardFilter filter,bool waitToReturn,bool invalidateFirst,EventHandler onExit=null) {
 			//Create a random group name so we can arbitrarily group and wait on the threads we are about to start.
 			string groupName=cellType.ToString()+_rand.Next();
-			//Always fill provider cache.
-			FillCacheThreaded(Provider,new DashboardFilter() { UseDateFilter=false },groupName,invalidateFirst);
+			//Always fill certain caches first. These will not be threaded as they need to be available to the threads which will run below.
+			//It doesn't hurt to block momentarily here as the queries will run very quickly.
+			Providers.Run(new DashboardFilter() { UseDateFilter=false },invalidateFirst);
+			Clinics.Run(new DashboardFilter() { UseDateFilter=false },invalidateFirst);
+			//Start certain cache threads depending on which cellType we are interested in. Each cache will have it's own thread.
 			switch(cellType) {
 				case DashboardCellType.ProductionGraph:
 					FillCacheThreaded(CompletedProcs,filter,groupName,invalidateFirst);
@@ -98,6 +109,9 @@ namespace OpenDentalGraph.Cache {
 					break;
 				case DashboardCellType.NewPatientsGraph:
 					FillCacheThreaded(Patients,filter,groupName,invalidateFirst);
+					break;
+				case DashboardCellType.BrokenApptGraph:
+					FillCacheThreaded(BrokenAppts,filter,groupName,invalidateFirst);
 					break;
 				case DashboardCellType.NotDefined:
 				default:

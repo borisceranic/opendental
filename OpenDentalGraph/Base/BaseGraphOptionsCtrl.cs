@@ -19,5 +19,9 @@ namespace OpenDentalGraph {
 				InputsChanged(this,new EventArgs());
 			}
 		}
+
+		public virtual int GetPanelHeight() {
+			return 37;
+		}
 	}
 }

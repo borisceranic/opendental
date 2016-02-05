@@ -17,10 +17,13 @@ namespace OpenDentalGraph.Cache {
 		}
 
 		protected override ClaimPayment GetInstanceFromDataRow(DataRow x) {
+			long provNum=x.Field<long>("ProvNum");
+			string provName=DashboardCache.Providers.GetProvName(provNum);
 			return new ClaimPayment() {
-				ProvNum=x.Field<long>("ProvNum"),
+				ProvNum=provNum,
 				DateStamp=x.Field<DateTime>("DateCP"),
 				Val=x.Field<double>("GrossIncome"),
+				SeriesName=provName,
 			};
 		}
 	}

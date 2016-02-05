@@ -39,5 +39,6 @@ namespace OpenDentBusiness {
 		IncomeGraph,
 		AccountsReceivableGraph,
 		NewPatientsGraph,
+		BrokenApptGraph,
 	}
 }

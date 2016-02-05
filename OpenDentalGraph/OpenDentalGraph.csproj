@@ -87,6 +87,7 @@
     </Compile>
     <Compile Include="Base\ODGraph.cs" />
     <Compile Include="Base\ODGraphExtensions.cs" />
+    <Compile Include="Cache\DashboardCacheBrokenAppt.cs" />
     <Compile Include="Cache\DashboardCache.cs" />
     <Compile Include="Cache\DashboardCacheAdjustment.cs" />
     <Compile Include="Cache\DashboardCacheAR.cs" />
@@ -94,6 +95,7 @@
     <Compile Include="Cache\DashboardCacheCompletedProc.cs" />
     <Compile Include="Cache\DashboardCacheNewPatient.cs" />
     <Compile Include="Cache\DashboardCachePaySplit.cs" />
+    <Compile Include="Cache\DashboardCacheClinic.cs" />
     <Compile Include="Cache\DashboardCacheProvider.cs" />
     <Compile Include="Cache\DashboardCacheWriteoff.cs" />
     <Compile Include="Base\BaseGraphOptionsCtrl.cs">
@@ -101,6 +103,12 @@
     </Compile>
     <Compile Include="Base\BaseGraphOptionsCtrl.Designer.cs">
       <DependentUpon>BaseGraphOptionsCtrl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Concrete\BrokenApptGraphOptionsCtrl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Concrete\BrokenApptGraphOptionsCtrl.Designer.cs">
+      <DependentUpon>BrokenApptGraphOptionsCtrl.cs</DependentUpon>
     </Compile>
     <Compile Include="Concrete\GraphQuantityOverTimeFilter.cs">
       <SubType>UserControl</SubType>
@@ -173,6 +181,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Base\Legend.resx">
       <DependentUpon>Legend.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Concrete\BrokenApptGraphOptionsCtrl.resx">
+      <DependentUpon>BrokenApptGraphOptionsCtrl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Concrete\GraphQuantityOverTimeFilter.resx">
       <DependentUpon>GraphQuantityOverTimeFilter.cs</DependentUpon>

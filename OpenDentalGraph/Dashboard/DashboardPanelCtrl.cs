@@ -180,6 +180,7 @@ namespace OpenDentalGraph {
 								case DashboardCellType.IncomeGraph:
 								case DashboardCellType.AccountsReceivableGraph:
 								case DashboardCellType.NewPatientsGraph:
+								case DashboardCellType.BrokenApptGraph:
 									cellHolder=new GraphQuantityOverTimeFilter(cell.CellType,cell.CellSettings).CreateDashboardDockContainer(cell);									
 									break;
 								default:

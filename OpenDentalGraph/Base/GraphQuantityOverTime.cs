@@ -50,9 +50,14 @@ namespace OpenDentalGraph {
 		private double _yAxisMinVal=double.NaN;
 		private bool _isLayoutPending=false;
 		private string _legendTitle="";
+		private bool _useBuiltInColors=false;
 		#endregion
 
 		#region Helper Classes
+		public class GraphDataPointClinic:GraphDataPointProv {
+			public long ClinicNum;
+		}
+
 		public class GraphDataPointProv:GraphPointBase {
 			public long ProvNum;
 		}
@@ -260,6 +265,17 @@ namespace OpenDentalGraph {
 			}
 		}
 
+		[Description("If true then built-in color palette will be used. If false then value returned by OnGetGetColor will be used for each series.")]
+		[Category("Graph")]
+		public bool UseBuiltInColors {
+			get {
+				return _useBuiltInColors;
+			}
+			set {
+				_useBuiltInColors=value;
+			}
+		}
+
 		[Description("Total absolute value duration between DateFrom and DateTo.")]
 		[Category("Graph")]
 		public TimeSpan DateRange {
@@ -420,7 +436,7 @@ namespace OpenDentalGraph {
 			series.Tag=tag;
 			series.ChartArea=_chartAreaDefault.Name;
 			series.ChartType=SeriesType;
-			if(OnGetGetColor!=null) {
+			if(!UseBuiltInColors && OnGetGetColor!=null) {
 				series.Color=OnGetGetColor(name);
 			}
 			//series.Legend="Default";			
@@ -830,7 +846,7 @@ namespace OpenDentalGraph {
 				BreakdownVal=this.BreakdownVal,
 				DateFrom=this.DateFrom,
 				DateTo=this.DateTo,
-				Title=this.GraphTitle
+				Title=this.GraphTitle,
 			};
 		}
 
@@ -866,7 +882,6 @@ namespace OpenDentalGraph {
 			public LegendDockType LegendDock { get; set; }
 			public BreakdownType BreakdownPref { get; set; }
 			public int BreakdownVal { get; set; }
-			
 		}
 		#endregion
 	}

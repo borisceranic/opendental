@@ -18,10 +18,13 @@ namespace OpenDentalGraph.Cache {
 		}
 
 		protected override CompletedProc GetInstanceFromDataRow(DataRow x) {
+			long provNum=x.Field<long>("ProvNum");
+			string seriesName=DashboardCache.Providers.GetProvName(provNum);
 			return new CompletedProc() {
-				ProvNum=x.Field<long>("ProvNum"),
+				ProvNum=provNum,
 				DateStamp=x.Field<DateTime>("ProcDate"),
 				Val=x.Field<double>("GrossProd"),
+				SeriesName=seriesName,
 			};
 		}
 	}
