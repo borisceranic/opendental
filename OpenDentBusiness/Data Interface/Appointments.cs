@@ -2078,18 +2078,18 @@ namespace OpenDentBusiness{
 			Dictionary<DateTime,List<ApptSearchProviderSchedule>> dictProviderSchedulesByDate=new Dictionary<DateTime,List<ApptSearchProviderSchedule>>();
 			List<ApptSearchProviderSchedule> listProviderSchedules=new List<ApptSearchProviderSchedule>();
 			if(dateScheduleStart.Date>=dateScheduleStop.Date) {
-				listProviderSchedules=GetApptSearchProviderScheduleForProvidersAndDate(listProvNums,dateScheduleStart,listSchedules,listAppointments);
+				listProviderSchedules=GetApptSearchProviderScheduleForProvidersAndDate(listProvNums,dateScheduleStart.Date,listSchedules,listAppointments);
 				dictProviderSchedulesByDate.Add(dateScheduleStart.Date,listProviderSchedules);
 				return dictProviderSchedulesByDate;
 			}
 			//Loop through all the days between the start and stop date and return the ApptSearchProviderSchedule's for all days.
-			for(int i=0;i<(dateScheduleStop-dateScheduleStart).Days;i++) {
-				listProviderSchedules=GetApptSearchProviderScheduleForProvidersAndDate(listProvNums,dateScheduleStart.AddDays(i),listSchedules,listAppointments);
-				if(dictProviderSchedulesByDate.ContainsKey(dateScheduleStart.AddDays(i))) {//Just in case.
-					dictProviderSchedulesByDate[dateScheduleStart.AddDays(i)]=listProviderSchedules;
+			for(int i=0;i<(dateScheduleStop.Date-dateScheduleStart.Date).Days;i++) {
+				listProviderSchedules=GetApptSearchProviderScheduleForProvidersAndDate(listProvNums,dateScheduleStart.Date.AddDays(i),listSchedules,listAppointments);
+				if(dictProviderSchedulesByDate.ContainsKey(dateScheduleStart.Date.AddDays(i))) {//Just in case.
+					dictProviderSchedulesByDate[dateScheduleStart.Date.AddDays(i)]=listProviderSchedules;
 				}
 				else {
-					dictProviderSchedulesByDate.Add(dateScheduleStart.AddDays(i),listProviderSchedules);
+					dictProviderSchedulesByDate.Add(dateScheduleStart.Date.AddDays(i),listProviderSchedules);
 				}
 			}
 			return dictProviderSchedulesByDate;
