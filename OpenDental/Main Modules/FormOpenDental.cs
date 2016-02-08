@@ -3111,14 +3111,9 @@ namespace OpenDental{
 				ToolBarMain.Buttons["Popups"].Enabled=false;
 			}
 			else {
-				if(!Programs.UsingEcwTightMode()) {
+				if(!Programs.UsingEcwTightMode()) {//eCW tight only gets Patient Select and Popups toolbar buttons
 					ToolBarMain.Buttons["Commlog"].Enabled=true;
-					if(pat.Email!="") {
-						ToolBarMain.Buttons["Email"].Enabled=true;
-					}
-					else {
-						ToolBarMain.Buttons["Email"].Enabled=false;
-					}
+					ToolBarMain.Buttons["Email"].Enabled=true;
 					if(Programs.IsEnabled(ProgramName.CallFire) || SmsPhones.IsIntegratedTextingEnabled()) {
 						ToolBarMain.Buttons["Text"].Enabled=true;
 					}
