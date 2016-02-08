@@ -227,6 +227,9 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Task>>(MethodBase.GetCurrentMethod(),listTaskNums);
 			}
+			if(listTaskNums==null || listTaskNums.Count==0) {
+				return new List<Task>();
+			}
 			string command="SELECT * FROM task WHERE TaskNum IN("+String.Join(",",listTaskNums)+") ORDER BY DateTimeEntry";
 			return Crud.TaskCrud.SelectMany(command);
 		}

@@ -4348,7 +4348,7 @@ namespace OpenDental{
 			}
 			ODThread killThread = new ODThread((o) => {
 				Thread.Sleep(15000);//15 seconds
-				Invoke(new ProcessKillCommandDelegate(ProcessKillCommand));
+				Invoke((Action)ProcessKillCommand);
 			});
 			killThread.Start();
 			string msg = "";
@@ -6187,7 +6187,7 @@ namespace OpenDental{
 				_formDashboardEditTab.BringToFront();
 				return;
 			}
-			_formDashboardEditTab=new OpenDentalGraph.FormDashboardEditTab() { IsEditMode=false, };
+			_formDashboardEditTab=new OpenDentalGraph.FormDashboardEditTab() { IsEditMode=false,};
 			_formDashboardEditTab.FormClosed+=new FormClosedEventHandler((object senderF,FormClosedEventArgs eF) => { _formDashboardEditTab=null; });
 			_formDashboardEditTab.Show();
 		}

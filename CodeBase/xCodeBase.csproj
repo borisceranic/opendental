@@ -127,7 +127,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Utilities\MathExtension.cs" />
+    <Compile Include="Utilities\ODPrimitiveExtentions.cs" />
     <Compile Include="Utilities\MiscUtils.cs" />
     <Compile Include="Utilities\ODEnvironment.cs" />
     <Compile Include="Utilities\ODEvent.cs" />

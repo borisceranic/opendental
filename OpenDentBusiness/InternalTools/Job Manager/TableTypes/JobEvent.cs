@@ -18,18 +18,20 @@ namespace OpenDentBusiness {
 		public long JobEventNum;
 		///<summary>FK to job.JobNum.  Links this event to the source job.</summary>
 		public long JobNum;
-		///<summary>FK to userod.UserNum.  The owner of the job at the time the entry was made.  
-		///Stored for viewing changes made to a job.</summary>
-		public long OwnerNum;
+		///<summary>FK to userod.UserNum. The usernum of the person that created the event.</summary>
+		public long UserNumEvent;
 		///<summary>Date/Time the event was created.</summary>
-		[CrudColumn(SpecialType=CrudSpecialColType.DateTEntry)]
+		[CrudColumn(SpecialType = CrudSpecialColType.DateTEntry)]
 		public DateTime DateTimeEntry;
-		///<summary>Copy of the job description at the time of the event creation.</summary>
-		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
-		public string Description;
 		///<summary>The status of the referenced job at the time the entry was made.</summary>
-		[CrudColumn(SpecialType=CrudSpecialColType.EnumAsString)]
-		public JobStat JobStatus;
+		[CrudColumn(SpecialType = CrudSpecialColType.EnumAsString)]
+		public JobPhase JobStatus;
+		///<summary>Human readable description of what was changed.</summary>
+		[CrudColumn(SpecialType = CrudSpecialColType.TextIsClob)]
+		public string Description;
+		///<summary>Copy of the job description at the time of the event creation. If it was changed.</summary>
+		[CrudColumn(SpecialType = CrudSpecialColType.TextIsClob)]
+		public string MainRTF; //From Description
 
 		///<summary></summary>
 		public JobEvent Copy() {

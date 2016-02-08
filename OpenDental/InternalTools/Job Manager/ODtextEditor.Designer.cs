@@ -46,12 +46,15 @@
 			this.panel4 = new System.Windows.Forms.Panel();
 			this.panel5 = new System.Windows.Forms.Panel();
 			this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-			this.textDescription = new OpenDental.ODtextBox();
+			this.textDescription = new System.Windows.Forms.RichTextBox();
+			this.panel2 = new System.Windows.Forms.Panel();
+			this.butSpellCheck = new System.Windows.Forms.Button();
 			this.panel1.SuspendLayout();
 			this.panel3.SuspendLayout();
 			this.panel4.SuspendLayout();
 			this.panel5.SuspendLayout();
 			this.flowLayoutPanel1.SuspendLayout();
+			this.panel2.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// comboFontSize
@@ -337,6 +340,7 @@
 			this.flowLayoutPanel1.Controls.Add(this.panel5);
 			this.flowLayoutPanel1.Controls.Add(this.panel3);
 			this.flowLayoutPanel1.Controls.Add(this.panel1);
+			this.flowLayoutPanel1.Controls.Add(this.panel2);
 			this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Top;
 			this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 0);
 			this.flowLayoutPanel1.Name = "flowLayoutPanel1";
@@ -352,13 +356,33 @@
 			this.textDescription.HideSelection = false;
 			this.textDescription.Location = new System.Drawing.Point(0, 27);
 			this.textDescription.Name = "textDescription";
-			this.textDescription.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
-			this.textDescription.RichEdit4IsEnabled = true;
 			this.textDescription.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textDescription.Size = new System.Drawing.Size(855, 496);
 			this.textDescription.TabIndex = 169;
 			this.textDescription.Text = "";
 			this.textDescription.TextChanged += new System.EventHandler(this.textDescription_TextChanged);
+			// 
+			// panel2
+			// 
+			this.panel2.AutoSize = true;
+			this.panel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.panel2.Controls.Add(this.butSpellCheck);
+			this.panel2.Location = new System.Drawing.Point(537, 0);
+			this.panel2.Margin = new System.Windows.Forms.Padding(0);
+			this.panel2.Name = "panel2";
+			this.panel2.Size = new System.Drawing.Size(77, 27);
+			this.panel2.TabIndex = 194;
+			// 
+			// butSpellCheck
+			// 
+			this.butSpellCheck.AutoSize = true;
+			this.butSpellCheck.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+			this.butSpellCheck.Location = new System.Drawing.Point(0, 0);
+			this.butSpellCheck.Name = "butSpellCheck";
+			this.butSpellCheck.Size = new System.Drawing.Size(74, 24);
+			this.butSpellCheck.TabIndex = 170;
+			this.butSpellCheck.Text = "Spell Check";
+			this.butSpellCheck.Click += new System.EventHandler(this.butSpellCheck_Click);
 			// 
 			// OdtextEditor
 			// 
@@ -375,6 +399,8 @@
 			this.panel5.ResumeLayout(false);
 			this.flowLayoutPanel1.ResumeLayout(false);
 			this.flowLayoutPanel1.PerformLayout();
+			this.panel2.ResumeLayout(false);
+			this.panel2.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -396,7 +422,7 @@
 		private System.Windows.Forms.Button butPaste;
 		private System.Windows.Forms.Button butBold;
 		private System.Windows.Forms.Button butUndo;
-		private ODtextBox textDescription;
+		private System.Windows.Forms.RichTextBox textDescription;//ODtextBox textDescription;
 		private System.Windows.Forms.Button butCopy;
 		private System.Windows.Forms.Button butCut;
 		private System.Windows.Forms.ColorDialog colorDialog1;
@@ -406,5 +432,7 @@
 		private System.Windows.Forms.Panel panel4;
 		private System.Windows.Forms.Panel panel5;
 		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
+		private System.Windows.Forms.Panel panel2;
+		private System.Windows.Forms.Button butSpellCheck;
 	}
 }

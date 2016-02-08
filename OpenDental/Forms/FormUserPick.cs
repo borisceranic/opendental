@@ -6,15 +6,20 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Linq;
 
 namespace OpenDental {
 	public partial class FormUserPick:Form {
-		public List<Userod> ListUser;
+		///<summary>The filtered list of Users to pick from.</summary>
+		public List<Userod> ListUserodsFiltered;
+		public List<Userod> ListUserodsShowing;
 		///<summary>If this form closes with OK, then this value will be filled.</summary>
 		public long SelectedUserNum;
-		public bool IsSelectionmode;
 		///<summary>If provided, this usernum will be preselected if it is also in the list of available usernums.</summary>
 		public long SuggestedUserNum=0;
+		public bool IsSelectionmode;
+		public bool IsShowAllAllowed;
+		public bool IsPickNoneAllowed;
 
 		public FormUserPick() {
 			InitializeComponent();
@@ -22,26 +27,33 @@ namespace OpenDental {
 		}
 
 		private void FormUserPick_Load(object sender,EventArgs e) {
-			if(ListUser==null) {
-				ListUser=UserodC.GetListShort();
+			if(IsShowAllAllowed && ListUserodsFiltered!=null && ListUserodsFiltered.Count>0) {
+				butShow.Visible=true;
 			}
-			for(int i=0;i<ListUser.Count;i++) {
-				listUser.Items.Add(ListUser[i]);
-				if(ListUser[i].UserNum==SuggestedUserNum) {
-					listUser.SelectedIndex=i;
-				}
+			if(IsPickNoneAllowed) {
+				butNone.Visible=true;
 			}
+			FillList(ListUserodsFiltered);
+		}
+
+		private void FillList(List<Userod> listUserods) {
+			if(listUserods==null) {
+				listUserods=UserodC.GetListShort();
+			}
+			ListUserodsShowing=listUserods.Select(x => x.Copy()).ToList();
+			listUserods.ForEach(x => listUser.Items.Add(x));
+			listUser.SelectedIndex=listUserods.FindIndex(x => x.UserNum==SuggestedUserNum);
 		}
 
 		private void listUser_DoubleClick(object sender,EventArgs e) {
 			if(listUser.SelectedIndex==-1) {
 				return;
 			}
-			if(!Security.IsAuthorized(Permissions.TaskEdit,true) && Userods.GetInbox(ListUser[listUser.SelectedIndex].UserNum)!=0 && !IsSelectionmode) {
+			if(!Security.IsAuthorized(Permissions.TaskEdit,true) && Userods.GetInbox(ListUserodsShowing[listUser.SelectedIndex].UserNum)!=0 && !IsSelectionmode) {
 				MsgBox.Show(this,"Please select a user that does not have an inbox.");
 				return;
 			}
-			SelectedUserNum=ListUser[listUser.SelectedIndex].UserNum;
+			SelectedUserNum=ListUserodsShowing[listUser.SelectedIndex].UserNum;
 			DialogResult=DialogResult.OK;
 		}
 
@@ -50,11 +62,16 @@ namespace OpenDental {
 				MsgBox.Show(this,"Please pick a user first.");
 				return;
 			}
-			if(!Security.IsAuthorized(Permissions.TaskEdit,true) && Userods.GetInbox(ListUser[listUser.SelectedIndex].UserNum)!=0 && !IsSelectionmode) {
+			if(!IsSelectionmode && !Security.IsAuthorized(Permissions.TaskEdit,true) && Userods.GetInbox(ListUserodsShowing[listUser.SelectedIndex].UserNum)!=0) {
 				MsgBox.Show(this,"Please select a user that does not have an inbox.");
 				return;
 			}
-			SelectedUserNum=ListUser[listUser.SelectedIndex].UserNum;
+			SelectedUserNum=ListUserodsShowing[listUser.SelectedIndex].UserNum;
+			DialogResult=DialogResult.OK;
+		}
+
+		private void butNone_Click(object sender,EventArgs e) {
+			SelectedUserNum=0;
 			DialogResult=DialogResult.OK;
 		}
 
@@ -62,8 +79,16 @@ namespace OpenDental {
 			DialogResult=DialogResult.Cancel;
 		}
 
-		
-
-		
+		private void butShow_Click(object sender,EventArgs e) {
+			SelectedUserNum=0;
+			if(Text=="Show All") {
+				Text="Show Filtered";
+				FillList(null);
+			}
+			else {
+				Text="Show All";
+				FillList(ListUserodsFiltered);
+			}
+		}
 	}
 }

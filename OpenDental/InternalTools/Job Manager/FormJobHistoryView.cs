@@ -22,8 +22,8 @@ namespace OpenDental {
 		private void FormJobHistoryView_Load(object sender,EventArgs e) {
 			textDateEntry.Text=_jobEvent.DateTimeEntry.ToShortDateString()+" "+_jobEvent.DateTimeEntry.ToShortTimeString();
 			textJobNum.Text=_jobEvent.JobNum.ToString();
-			textOwner.Text=Userods.GetName(_jobEvent.OwnerNum);
-			textStatus.Text=Enum.GetName(typeof(JobStat),(int)_jobEvent.JobStatus);
+			textOwner.Text=Userods.GetName(_jobEvent.UserNumEvent);
+			textStatus.Text=Enum.GetName(typeof(JobPhase),(int)_jobEvent.JobStatus);
 			try {
 				textDescription.Rtf=_jobEvent.Description;
 			}

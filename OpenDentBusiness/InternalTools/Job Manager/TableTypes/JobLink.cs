@@ -32,13 +32,9 @@ namespace OpenDentBusiness {
 		Request,
 		///<summary>2 -</summary>
 		Bug,
-		/////<summary>3 - deprecated</summary>//JobNum FKey added to JobReview table
-		Review,
-		///<summary>4 -</summary>
+		///<summary>3 -</summary>
 		QueryRequest,
-		/////<summary>5 - deprecated</summary>//JobNum FKey added to JobReview table
-		Quote,
-		///<summary>6 -</summary>
+		///<summary>4 -</summary>
 		Watcher
 	}
 

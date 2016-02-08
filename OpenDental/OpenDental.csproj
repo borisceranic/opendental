@@ -424,6 +424,12 @@
     <Compile Include="Forms\FormEtrans834Import.designer.cs">
       <DependentUpon>FormEtrans834Import.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormSpellChecker.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormSpellChecker.designer.cs">
+      <DependentUpon>FormSpellChecker.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\BasicTemplate.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -564,9 +570,6 @@
     </Compile>
     <Compile Include="InternalTools\Job Manager\FormJobHistoryView.designer.cs">
       <DependentUpon>FormJobHistoryView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="InternalTools\Job Manager\FormJobProjectEdit.cs">
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\FormProcBroken.cs">
       <SubType>Form</SubType>
@@ -3629,32 +3632,17 @@
     <Compile Include="InternalTools\Job Manager\FormJobQuoteEdit.designer.cs">
       <DependentUpon>FormJobQuoteEdit.cs</DependentUpon>
     </Compile>
-    <Compile Include="InternalTools\Job Manager\FormJobHistory.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="InternalTools\Job Manager\FormJobHistory.designer.cs">
-      <DependentUpon>FormJobHistory.cs</DependentUpon>
-    </Compile>
     <Compile Include="InternalTools\Job Manager\FormJobLinks.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="InternalTools\Job Manager\FormJobLinks.designer.cs">
       <DependentUpon>FormJobLinks.cs</DependentUpon>
     </Compile>
-    <Compile Include="InternalTools\Job Manager\FormJobManager.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="InternalTools\Job Manager\FormJobManager.Designer.cs">
-      <DependentUpon>FormJobManager.cs</DependentUpon>
-    </Compile>
     <Compile Include="InternalTools\Job Manager\FormJobNoteEdit.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="InternalTools\Job Manager\FormJobNoteEdit.designer.cs">
       <DependentUpon>FormJobNoteEdit.cs</DependentUpon>
-    </Compile>
-    <Compile Include="InternalTools\Job Manager\FormJobPicker.cs">
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="InternalTools\Job Manager\FormJobPermissions.cs">
       <SubType>Form</SubType>
@@ -3669,62 +3657,17 @@
     <Compile Include="InternalTools\Job Manager\UserControlJobEdit.Designer.cs">
       <DependentUpon>UserControlJobEdit.cs</DependentUpon>
     </Compile>
-    <Compile Include="InternalTools\Job Manager\UserControlManage.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="InternalTools\Job Manager\UserControlManage.Designer.cs">
-      <DependentUpon>UserControlManage.cs</DependentUpon>
-    </Compile>
-    <Compile Include="InternalTools\Job Manager\FormJobProjectSelect.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="InternalTools\Job Manager\FormJobReviewEdit.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="InternalTools\Job Manager\FormJobReviewEdit.designer.cs">
       <DependentUpon>FormJobReviewEdit.cs</DependentUpon>
     </Compile>
-    <Compile Include="InternalTools\Job Manager\FormJobReviews.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="InternalTools\Job Manager\FormJobReviews.designer.cs">
-      <DependentUpon>FormJobReviews.cs</DependentUpon>
-    </Compile>
-    <Compile Include="InternalTools\Job Manager\UserControlReviews.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="InternalTools\Job Manager\UserControlReviews.Designer.cs">
-      <DependentUpon>UserControlReviews.cs</DependentUpon>
-    </Compile>
-    <Compile Include="InternalTools\Job Manager\FormJobEdit.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="InternalTools\Job Manager\FormJobEdit.designer.cs">
-      <DependentUpon>FormJobEdit.cs</DependentUpon>
-    </Compile>
     <Compile Include="InternalTools\Job Manager\FormJobContainer.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="InternalTools\Job Manager\FormJobContainer.Designer.cs">
       <DependentUpon>FormJobContainer.cs</DependentUpon>
-    </Compile>
-    <Compile Include="InternalTools\Job Manager\JobContainerControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="InternalTools\Job Manager\JobContainerControl.Designer.cs">
-      <DependentUpon>JobContainerControl.cs</DependentUpon>
-    </Compile>
-    <Compile Include="InternalTools\Job Manager\UserControlJobs.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="InternalTools\Job Manager\UserControlJobs.Designer.cs">
-      <DependentUpon>UserControlJobs.cs</DependentUpon>
-    </Compile>
-    <Compile Include="InternalTools\Job Manager\UserControlProjects.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="InternalTools\Job Manager\UserControlProjects.designer.cs">
-      <DependentUpon>UserControlProjects.cs</DependentUpon>
     </Compile>
     <Compile Include="InternalTools\Phones\EscalationViewControl.cs">
       <SubType>UserControl</SubType>
@@ -4049,6 +3992,9 @@
     <EmbeddedResource Include="Forms\FormEtrans834Import.resx">
       <DependentUpon>FormEtrans834Import.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormSpellChecker.resx">
+      <DependentUpon>FormSpellChecker.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\BasicTemplate.resx">
       <DependentUpon>BasicTemplate.cs</DependentUpon>
     </EmbeddedResource>
@@ -4123,9 +4069,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="InternalTools\Job Manager\FormJobHistoryView.resx">
       <DependentUpon>FormJobHistoryView.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="InternalTools\Job Manager\FormJobProjectEdit.resx">
-      <DependentUpon>FormJobProjectEdit.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormProcBroken.resx">
       <DependentUpon>FormProcBroken.cs</DependentUpon>
@@ -6242,22 +6185,11 @@
     <EmbeddedResource Include="InternalTools\Job Manager\FormJobQuoteEdit.resx">
       <DependentUpon>FormJobQuoteEdit.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="InternalTools\Job Manager\FormJobHistory.resx">
-      <DependentUpon>FormJobHistory.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="InternalTools\Job Manager\FormJobLinks.resx">
       <DependentUpon>FormJobLinks.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="InternalTools\Job Manager\FormJobManager.resx">
-      <DependentUpon>FormJobManager.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="InternalTools\Job Manager\FormJobNoteEdit.resx">
       <DependentUpon>FormJobNoteEdit.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="InternalTools\Job Manager\FormJobPicker.resx">
-      <DependentUpon>FormJobPicker.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="InternalTools\Job Manager\FormJobPermissions.resx">
       <DependentUpon>FormJobPermissions.cs</DependentUpon>
@@ -6265,35 +6197,11 @@
     <EmbeddedResource Include="InternalTools\Job Manager\UserControlJobEdit.resx">
       <DependentUpon>UserControlJobEdit.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="InternalTools\Job Manager\UserControlManage.resx">
-      <DependentUpon>UserControlManage.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="InternalTools\Job Manager\FormJobProjectSelect.resx">
-      <DependentUpon>FormJobProjectSelect.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="InternalTools\Job Manager\FormJobReviewEdit.resx">
       <DependentUpon>FormJobReviewEdit.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="InternalTools\Job Manager\FormJobReviews.resx">
-      <DependentUpon>FormJobReviews.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="InternalTools\Job Manager\UserControlReviews.resx">
-      <DependentUpon>UserControlReviews.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="InternalTools\Job Manager\FormJobEdit.resx">
-      <DependentUpon>FormJobEdit.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="InternalTools\Job Manager\FormJobContainer.resx">
       <DependentUpon>FormJobContainer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="InternalTools\Job Manager\JobContainerControl.resx">
-      <DependentUpon>JobContainerControl.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="InternalTools\Job Manager\UserControlJobs.resx">
-      <DependentUpon>UserControlJobs.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="InternalTools\Job Manager\UserControlProjects.resx">
-      <DependentUpon>UserControlProjects.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="InternalTools\Phones\EscalationViewControl.resx">
       <DependentUpon>EscalationViewControl.cs</DependentUpon>

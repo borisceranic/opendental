@@ -48,19 +48,20 @@ namespace OpenDentBusiness.Crud{
 				jobEvent=new JobEvent();
 				jobEvent.JobEventNum  = PIn.Long  (row["JobEventNum"].ToString());
 				jobEvent.JobNum       = PIn.Long  (row["JobNum"].ToString());
-				jobEvent.OwnerNum     = PIn.Long  (row["OwnerNum"].ToString());
+				jobEvent.UserNumEvent = PIn.Long  (row["UserNumEvent"].ToString());
 				jobEvent.DateTimeEntry= PIn.DateT (row["DateTimeEntry"].ToString());
-				jobEvent.Description  = PIn.String(row["Description"].ToString());
 				string jobStatus=row["JobStatus"].ToString();
 				if(jobStatus==""){
-					jobEvent.JobStatus  =(JobStat)0;
+					jobEvent.JobStatus  =(JobPhase)0;
 				}
 				else try{
-					jobEvent.JobStatus  =(JobStat)Enum.Parse(typeof(JobStat),jobStatus);
+					jobEvent.JobStatus  =(JobPhase)Enum.Parse(typeof(JobPhase),jobStatus);
 				}
 				catch{
-					jobEvent.JobStatus  =(JobStat)0;
+					jobEvent.JobStatus  =(JobPhase)0;
 				}
+				jobEvent.Description  = PIn.String(row["Description"].ToString());
+				jobEvent.MainRTF      = PIn.String(row["MainRTF"].ToString());
 				retVal.Add(jobEvent);
 			}
 			return retVal;
@@ -74,18 +75,20 @@ namespace OpenDentBusiness.Crud{
 			DataTable table=new DataTable(tableName);
 			table.Columns.Add("JobEventNum");
 			table.Columns.Add("JobNum");
-			table.Columns.Add("OwnerNum");
+			table.Columns.Add("UserNumEvent");
 			table.Columns.Add("DateTimeEntry");
-			table.Columns.Add("Description");
 			table.Columns.Add("JobStatus");
+			table.Columns.Add("Description");
+			table.Columns.Add("MainRTF");
 			foreach(JobEvent jobEvent in listJobEvents) {
 				table.Rows.Add(new object[] {
 					POut.Long  (jobEvent.JobEventNum),
 					POut.Long  (jobEvent.JobNum),
-					POut.Long  (jobEvent.OwnerNum),
+					POut.Long  (jobEvent.UserNumEvent),
 					POut.DateT (jobEvent.DateTimeEntry),
-					POut.String(jobEvent.Description),
 					POut.Int   ((int)jobEvent.JobStatus),
+					POut.String(jobEvent.Description),
+					POut.String(jobEvent.MainRTF),
 				});
 			}
 			return table;
@@ -126,25 +129,30 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="JobEventNum,";
 			}
-			command+="JobNum,OwnerNum,DateTimeEntry,Description,JobStatus) VALUES(";
+			command+="JobNum,UserNumEvent,DateTimeEntry,JobStatus,Description,MainRTF) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(jobEvent.JobEventNum)+",";
 			}
 			command+=
 				     POut.Long  (jobEvent.JobNum)+","
-				+    POut.Long  (jobEvent.OwnerNum)+","
+				+    POut.Long  (jobEvent.UserNumEvent)+","
 				+    DbHelper.Now()+","
+				+"'"+POut.String(jobEvent.JobStatus.ToString())+"',"
 				+    DbHelper.ParamChar+"paramDescription,"
-				+"'"+POut.String(jobEvent.JobStatus.ToString())+"')";
+				+    DbHelper.ParamChar+"paramMainRTF)";
 			if(jobEvent.Description==null) {
 				jobEvent.Description="";
 			}
 			OdSqlParameter paramDescription=new OdSqlParameter("paramDescription",OdDbType.Text,jobEvent.Description);
+			if(jobEvent.MainRTF==null) {
+				jobEvent.MainRTF="";
+			}
+			OdSqlParameter paramMainRTF=new OdSqlParameter("paramMainRTF",OdDbType.Text,jobEvent.MainRTF);
 			if(useExistingPK || PrefC.RandomKeys) {
-				Db.NonQ(command,paramDescription);
+				Db.NonQ(command,paramDescription,paramMainRTF);
 			}
 			else {
-				jobEvent.JobEventNum=Db.NonQ(command,true,paramDescription);
+				jobEvent.JobEventNum=Db.NonQ(command,true,paramDescription,paramMainRTF);
 			}
 			return jobEvent.JobEventNum;
 		}
@@ -172,25 +180,30 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="JobEventNum,";
 			}
-			command+="JobNum,OwnerNum,DateTimeEntry,Description,JobStatus) VALUES(";
+			command+="JobNum,UserNumEvent,DateTimeEntry,JobStatus,Description,MainRTF) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(jobEvent.JobEventNum)+",";
 			}
 			command+=
 				     POut.Long  (jobEvent.JobNum)+","
-				+    POut.Long  (jobEvent.OwnerNum)+","
+				+    POut.Long  (jobEvent.UserNumEvent)+","
 				+    DbHelper.Now()+","
+				+"'"+POut.String(jobEvent.JobStatus.ToString())+"',"
 				+    DbHelper.ParamChar+"paramDescription,"
-				+"'"+POut.String(jobEvent.JobStatus.ToString())+"')";
+				+    DbHelper.ParamChar+"paramMainRTF)";
 			if(jobEvent.Description==null) {
 				jobEvent.Description="";
 			}
 			OdSqlParameter paramDescription=new OdSqlParameter("paramDescription",OdDbType.Text,jobEvent.Description);
+			if(jobEvent.MainRTF==null) {
+				jobEvent.MainRTF="";
+			}
+			OdSqlParameter paramMainRTF=new OdSqlParameter("paramMainRTF",OdDbType.Text,jobEvent.MainRTF);
 			if(useExistingPK || isRandomKeys) {
-				Db.NonQ(command,paramDescription);
+				Db.NonQ(command,paramDescription,paramMainRTF);
 			}
 			else {
-				jobEvent.JobEventNum=Db.NonQ(command,true,paramDescription);
+				jobEvent.JobEventNum=Db.NonQ(command,true,paramDescription,paramMainRTF);
 			}
 			return jobEvent.JobEventNum;
 		}
@@ -199,16 +212,21 @@ namespace OpenDentBusiness.Crud{
 		public static void Update(JobEvent jobEvent){
 			string command="UPDATE jobevent SET "
 				+"JobNum       =  "+POut.Long  (jobEvent.JobNum)+", "
-				+"OwnerNum     =  "+POut.Long  (jobEvent.OwnerNum)+", "
+				+"UserNumEvent =  "+POut.Long  (jobEvent.UserNumEvent)+", "
 				//DateTimeEntry not allowed to change
+				+"JobStatus    = '"+POut.String(jobEvent.JobStatus.ToString())+"', "
 				+"Description  =  "+DbHelper.ParamChar+"paramDescription, "
-				+"JobStatus    = '"+POut.String(jobEvent.JobStatus.ToString())+"' "
+				+"MainRTF      =  "+DbHelper.ParamChar+"paramMainRTF "
 				+"WHERE JobEventNum = "+POut.Long(jobEvent.JobEventNum);
 			if(jobEvent.Description==null) {
 				jobEvent.Description="";
 			}
 			OdSqlParameter paramDescription=new OdSqlParameter("paramDescription",OdDbType.Text,jobEvent.Description);
-			Db.NonQ(command,paramDescription);
+			if(jobEvent.MainRTF==null) {
+				jobEvent.MainRTF="";
+			}
+			OdSqlParameter paramMainRTF=new OdSqlParameter("paramMainRTF",OdDbType.Text,jobEvent.MainRTF);
+			Db.NonQ(command,paramDescription,paramMainRTF);
 		}
 
 		///<summary>Updates one JobEvent in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
@@ -218,18 +236,22 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="JobNum = "+POut.Long(jobEvent.JobNum)+"";
 			}
-			if(jobEvent.OwnerNum != oldJobEvent.OwnerNum) {
+			if(jobEvent.UserNumEvent != oldJobEvent.UserNumEvent) {
 				if(command!=""){ command+=",";}
-				command+="OwnerNum = "+POut.Long(jobEvent.OwnerNum)+"";
+				command+="UserNumEvent = "+POut.Long(jobEvent.UserNumEvent)+"";
 			}
 			//DateTimeEntry not allowed to change
+			if(jobEvent.JobStatus != oldJobEvent.JobStatus) {
+				if(command!=""){ command+=",";}
+				command+="JobStatus = '"+POut.String(jobEvent.JobStatus.ToString())+"'";
+			}
 			if(jobEvent.Description != oldJobEvent.Description) {
 				if(command!=""){ command+=",";}
 				command+="Description = "+DbHelper.ParamChar+"paramDescription";
 			}
-			if(jobEvent.JobStatus != oldJobEvent.JobStatus) {
+			if(jobEvent.MainRTF != oldJobEvent.MainRTF) {
 				if(command!=""){ command+=",";}
-				command+="JobStatus = '"+POut.String(jobEvent.JobStatus.ToString())+"'";
+				command+="MainRTF = "+DbHelper.ParamChar+"paramMainRTF";
 			}
 			if(command==""){
 				return false;
@@ -238,9 +260,13 @@ namespace OpenDentBusiness.Crud{
 				jobEvent.Description="";
 			}
 			OdSqlParameter paramDescription=new OdSqlParameter("paramDescription",OdDbType.Text,jobEvent.Description);
+			if(jobEvent.MainRTF==null) {
+				jobEvent.MainRTF="";
+			}
+			OdSqlParameter paramMainRTF=new OdSqlParameter("paramMainRTF",OdDbType.Text,jobEvent.MainRTF);
 			command="UPDATE jobevent SET "+command
 				+" WHERE JobEventNum = "+POut.Long(jobEvent.JobEventNum);
-			Db.NonQ(command,paramDescription);
+			Db.NonQ(command,paramDescription,paramMainRTF);
 			return true;
 		}
 
@@ -250,14 +276,17 @@ namespace OpenDentBusiness.Crud{
 			if(jobEvent.JobNum != oldJobEvent.JobNum) {
 				return true;
 			}
-			if(jobEvent.OwnerNum != oldJobEvent.OwnerNum) {
+			if(jobEvent.UserNumEvent != oldJobEvent.UserNumEvent) {
 				return true;
 			}
 			//DateTimeEntry not allowed to change
+			if(jobEvent.JobStatus != oldJobEvent.JobStatus) {
+				return true;
+			}
 			if(jobEvent.Description != oldJobEvent.Description) {
 				return true;
 			}
-			if(jobEvent.JobStatus != oldJobEvent.JobStatus) {
+			if(jobEvent.MainRTF != oldJobEvent.MainRTF) {
 				return true;
 			}
 			return false;

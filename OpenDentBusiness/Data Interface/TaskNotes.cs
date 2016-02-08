@@ -16,6 +16,18 @@ namespace OpenDentBusiness{
 			return Crud.TaskNoteCrud.SelectMany(command);
 		}
 
+		///<summary>A list of notes for many tasks.</summary>
+		public static List<TaskNote> GetForTasks(List<long> taskNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<TaskNote>>(MethodBase.GetCurrentMethod(),taskNums);
+			}
+			if(taskNums==null || taskNums.Count==0) {
+				return new List<TaskNote>();
+			}
+			string command = "SELECT * FROM tasknote WHERE TaskNum IN ("+string.Join(",",taskNums)+")";
+			return Crud.TaskNoteCrud.SelectMany(command);
+		}
+		
 		///<summary>A list of notes for multiple tasks, ordered by date time.</summary>
 		public static List<TaskNote> RefreshForTasks(List<long> taskNums) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

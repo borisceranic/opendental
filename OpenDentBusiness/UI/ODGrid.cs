@@ -10,6 +10,7 @@ using System.Globalization;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using PdfSharp.Drawing;
+using System.Linq;
 
 namespace OpenDental.UI {
 	///<summary></summary>
@@ -195,6 +196,22 @@ namespace OpenDental.UI {
 			LayoutScrollBars();
 			Invalidate();
 		}
+
+		public void AddRow(params string[] cells) {
+			ODGridRow row = new ODGridRow();
+			foreach(string cell in cells) {
+				row.Cells.Add(cell);
+			}
+			Rows.Add(row);
+		}
+
+		//public void AddRow(params ODGridCell[] cells) {
+		//	ODGridRow row = new ODGridRow();
+		//	foreach(ODGridCell cell in cells) {
+		//		row.Cells.Add(cell);
+		//	}
+		//	Rows.Add(row);
+		//}
 
 		#region Properties
 		public float CellFontSize {
@@ -422,6 +439,17 @@ namespace OpenDental.UI {
 			}
 			set {
 				selectedRowColor=value;
+			}
+		}
+
+		///<summary>The background color that is used for selected rows.</summary>
+		[Browsable(false)]
+		public Color HeaderColor {
+			get {
+				if(_useBlueTheme) {
+					return Color.FromArgb(223,234,245);//208,225,242);//166,185,204);
+				}
+				return Color.FromArgb(210,210,210);
 			}
 		}
 
@@ -907,6 +935,43 @@ namespace OpenDental.UI {
 					-vScroll.Value+1+titleHeight+headerHeight+RowLocs[rowI]+1,
 					GridW,//this is a really simple width value that always works well
 					RowHeights[rowI]+NoteHeights[rowI]-1);
+			}
+			//Color Individual Cells.
+			for(int i=0;i<rows[rowI].Cells.Count;i++) {
+				if(i>Columns.Count) {
+					break;
+				}
+				ODGridCell cell = rows[rowI].Cells[i];
+				if(cell.CellColor==default(Color)) {//same as Color.Empty
+					continue;
+				}
+				List<ODGridColumn> listColumns=Columns.Cast<ODGridColumn>().ToList();
+				//ACCOUNT FOR ROW BACK GROUND COLORS. Cell color= Avg(CellColor+BackGColor)
+				Color ColorCell;
+				if(selectedIndices.Contains(rowI)) {
+					ColorCell = Color.FromArgb(
+						(selectedRowColor.R+cell.CellColor.R)/2,
+						(selectedRowColor.G+cell.CellColor.G)/2,
+						(selectedRowColor.B+cell.CellColor.B)/2);
+				}
+				//colored row background
+				else if(rows[rowI].ColorBackG!=Color.White) {
+					ColorCell = Color.FromArgb(
+						(rows[rowI].ColorBackG.R+cell.CellColor.R)/2,
+						(rows[rowI].ColorBackG.G+cell.CellColor.G)/2,
+						(rows[rowI].ColorBackG.B+cell.CellColor.B)/2);
+				}
+				//normal row color
+				else {//need to draw over the gray background
+					ColorCell = cell.CellColor;
+				}
+				using(SolidBrush backBrush = new SolidBrush(ColorCell)) {
+					g.FillRectangle(backBrush,
+						listColumns.Take(i).Sum(x =>x.ColWidth)+1,
+						-vScroll.Value+1+titleHeight+headerHeight+RowLocs[rowI]+1,
+						listColumns[i].ColWidth,//this is a really simple width value that always works well
+						RowHeights[rowI]+NoteHeights[rowI]-1);
+				}
 			}
 			if(selectionMode==GridSelectionMode.OneCell && selectedCell.X!=-1 && selectedCell.Y!=-1
 			&& selectedCell.Y==rowI) {

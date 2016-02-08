@@ -25,7 +25,6 @@ namespace OpenDental{
 		private void InitializeComponent() {
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormJobReviewEdit));
 			this.label1 = new System.Windows.Forms.Label();
-			this.textReviewer = new System.Windows.Forms.TextBox();
 			this.label5 = new System.Windows.Forms.Label();
 			this.label9 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
@@ -35,6 +34,7 @@ namespace OpenDental{
 			this.butDelete = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.comboReviewer = new System.Windows.Forms.ComboBox();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -45,16 +45,6 @@ namespace OpenDental{
 			this.label1.TabIndex = 0;
 			this.label1.Text = "Reviewer";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// textReviewer
-			// 
-			this.textReviewer.Location = new System.Drawing.Point(141, 38);
-			this.textReviewer.MaxLength = 100;
-			this.textReviewer.Name = "textReviewer";
-			this.textReviewer.ReadOnly = true;
-			this.textReviewer.Size = new System.Drawing.Size(183, 20);
-			this.textReviewer.TabIndex = 0;
-			this.textReviewer.TabStop = false;
 			// 
 			// label5
 			// 
@@ -97,7 +87,7 @@ namespace OpenDental{
 			// 
 			this.comboStatus.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboStatus.FormattingEnabled = true;
-			this.comboStatus.Location = new System.Drawing.Point(141, 60);
+			this.comboStatus.Location = new System.Drawing.Point(141, 61);
 			this.comboStatus.Name = "comboStatus";
 			this.comboStatus.Size = new System.Drawing.Size(183, 21);
 			this.comboStatus.TabIndex = 4;
@@ -108,6 +98,7 @@ namespace OpenDental{
 			this.textDescription.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.textDescription.BackColor = System.Drawing.SystemColors.Window;
 			this.textDescription.DetectUrls = false;
 			this.textDescription.Location = new System.Drawing.Point(12, 125);
 			this.textDescription.Name = "textDescription";
@@ -164,10 +155,20 @@ namespace OpenDental{
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
+			// comboReviewer
+			// 
+			this.comboReviewer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboReviewer.FormattingEnabled = true;
+			this.comboReviewer.Location = new System.Drawing.Point(141, 38);
+			this.comboReviewer.Name = "comboReviewer";
+			this.comboReviewer.Size = new System.Drawing.Size(183, 21);
+			this.comboReviewer.TabIndex = 18;
+			// 
 			// FormJobReviewEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(413, 396);
+			this.Controls.Add(this.comboReviewer);
 			this.Controls.Add(this.textDescription);
 			this.Controls.Add(this.butDelete);
 			this.Controls.Add(this.comboStatus);
@@ -176,7 +177,6 @@ namespace OpenDental{
 			this.Controls.Add(this.label9);
 			this.Controls.Add(this.label5);
 			this.Controls.Add(this.label1);
-			this.Controls.Add(this.textReviewer);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -194,7 +194,6 @@ namespace OpenDental{
 		private OpenDental.UI.Button butOK;
 		private OpenDental.UI.Button butCancel;
 		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.TextBox textReviewer;
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.Label label9;
 		private System.Windows.Forms.Label label10;
@@ -202,5 +201,6 @@ namespace OpenDental{
 		private System.Windows.Forms.ComboBox comboStatus;
 		private UI.Button butDelete;
 		private ODtextBox textDescription;
+		private System.Windows.Forms.ComboBox comboReviewer;
 	}
 }

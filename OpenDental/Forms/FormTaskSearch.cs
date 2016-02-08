@@ -159,7 +159,7 @@ namespace OpenDental {
 
 		private void butUserPicker_Click(object sender,EventArgs e) {
 			FormUserPick FormUP=new FormUserPick();
-			FormUP.ListUser=UserodC.GetListt();
+			FormUP.ListUserodsFiltered=UserodC.GetListt();
 			if(FormUP.ShowDialog()==DialogResult.OK) {
 				comboUsers.SelectedIndex=_listUsers.FindIndex(x => x.UserNum==FormUP.SelectedUserNum)+1;
 			}

@@ -19,10 +19,10 @@ namespace OpenDental {
 		}
 
 		private void FormJobNew_Load(object sender,EventArgs e) {
-			controlJobEdit.IsNew=true;
 			if(JobCur==null) {
 				JobCur=new Job();
 			}
+			JobCur.IsNew=true;
 			Text="New Job"+(JobCur.Title.Length>0?" - "+JobCur.Title:"");
 			controlJobEdit.LoadJob(JobCur);
 		}
@@ -40,12 +40,23 @@ namespace OpenDental {
 			if(!controlJobEdit.IsChanged) {
 				return;
 			}
-			if(!MsgBox.Show(this,true,"Discard unsaved changes?")) {
-				e.Cancel=true;
-				DialogResult=DialogResult.None;
-				return;
+			if(controlJobEdit.IsChanged) {
+				switch(MessageBox.Show("Save changes to current job?","",MessageBoxButtons.YesNoCancel)) {
+					case DialogResult.OK:
+					case DialogResult.Yes:
+						controlJobEdit.ForceSave();
+						DialogResult=DialogResult.OK;
+						break;
+					case DialogResult.No:
+						DialogResult=DialogResult.Cancel;
+						break;
+					case DialogResult.Cancel:
+						//do not load or navigate to new job.
+						//no dialog result
+						e.Cancel=true;
+						return;
+				}
 			}
-			DialogResult=DialogResult.Cancel;//discard unsaved changes.
 		}
 
 	}

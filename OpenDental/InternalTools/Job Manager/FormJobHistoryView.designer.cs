@@ -85,7 +85,7 @@ namespace OpenDental{
 			this.label11.Name = "label11";
 			this.label11.Size = new System.Drawing.Size(83, 20);
 			this.label11.TabIndex = 22;
-			this.label11.Text = "Owner";
+			this.label11.Text = "User";
 			this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textOwner

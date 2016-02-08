@@ -63,14 +63,11 @@ namespace OpenDental {
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {
-			if(_jobQuote.IsNew) {
-				DialogResult=DialogResult.Cancel;
+			if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"Delete the current job quote?")) {
 				return;
 			}
-			if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Delete the current job quote, delete will not be permanent until changes are saved?")) {
-				_jobQuote=null;
-				DialogResult=DialogResult.OK;
-			}
+			_jobQuote=null;
+			DialogResult=DialogResult.OK;
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {

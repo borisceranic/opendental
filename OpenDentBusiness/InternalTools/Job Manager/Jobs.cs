@@ -9,32 +9,22 @@ namespace OpenDentBusiness {
 	///<summary></summary>
 	public class Jobs {
 
-		///<summary></summary>
-		public static List<Job> GetForExpert(long userNum) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<Job>>(MethodBase.GetCurrentMethod(),userNum);
-			}
-			string command="SELECT * FROM job WHERE Expert = "+POut.Long(userNum);
-			return Crud.JobCrud.SelectMany(command);
-		}
-
-		public static List<Job> GetForProject(long projectNum,bool showFinished) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<Job>>(MethodBase.GetCurrentMethod(),projectNum,showFinished);
-			}
-			string command="SELECT * FROM job WHERE ProjectNum = "+POut.Long(projectNum);
-			if(!showFinished) {
-				command+=" AND Status != " + (int)JobStat.Complete;
-			}
-			return Crud.JobCrud.SelectMany(command);
-		}
-
 		///<summary>Gets one Job from the db.</summary>
 		public static Job GetOne(long jobNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<Job>(MethodBase.GetCurrentMethod(),jobNum);
 			}
 			return Crud.JobCrud.SelectOne(jobNum);
+		}
+
+		///<summary>Gets one Job from the db. Fills all respective object lists from the DB too.</summary>
+		public static Job GetOneFilled(long jobNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<Job>(MethodBase.GetCurrentMethod(),jobNum);
+			}
+			Job job=Crud.JobCrud.SelectOne(jobNum);
+			FillInMemoryLists(new List<Job>() { job });
+			return job;
 		}
 
 		///<summary></summary>
@@ -71,117 +61,6 @@ namespace OpenDentBusiness {
 			JobEvents.DeleteForJob(jobNum);
 			JobNotes.DeleteForJob(jobNum);
 			Crud.JobCrud.Delete(jobNum); //Finally, delete the job itself.
-		}
-
-		///<summary>Returns a list for use in UserControlJobs, filtered by the passed in params. 
-		///String params can be "", JobNum can be 0, and other long params can be -1 if you do not want to filter by those params.</summary>
-		public static List<Job> GetJobList(long jobNum,string expert,string owner,string version,
-			string project,string title,long status,long priority,long category,bool showHidden) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<Job>>(MethodBase.GetCurrentMethod(),jobNum,expert,owner,version,project,title,status,priority,category,showHidden);
-			}
-			string command="SELECT job.*"
-					+"FROM job "
-					+"LEFT JOIN userod owner ON owner.UserNum = job.Owner "
-					+"LEFT JOIN userod expert ON expert.UserNum = job.Expert "
-					+"WHERE TRUE ";
-			if(expert!="") {
-				command+=" AND expert.UserName LIKE '%"+expert+"%'";
-			}
-			if(owner!="") {
-				command+=" AND owner.UserName LIKE '%"+owner+"%'";
-			}
-			if(version!="") {
-				command+=" AND JobVersion LIKE '%"+version+"%'";
-			}
-			if(title!="") {
-				command+=" AND Title LIKE '%"+title+"%'";
-			}
-			if(jobNum!=0) {
-				command+=" AND JobNum="+jobNum;
-			}
-			if(status>-1) {
-				command+= " AND Status="+status;
-			}
-			if(priority>-1) {
-				command+=" AND Priority="+priority;
-			}
-			if(category>-1) {
-				command+=" AND Category="+category;
-			}
-			if(!showHidden) {
-				command+=" AND Status NOT IN ("+(int)JobStat.Deleted+","+(int)JobStat.Complete+","+(int)JobStat.Rescinded+")";
-			}
-			return Crud.JobCrud.SelectMany(command);
-		}
-
-		///<summary>Sets a job's status and creates a JobEvent.  Does not set a new owner of the job.</summary>
-		public static void SetStatus(Job job,JobStat jobStatus,long jobOwnerNum) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),job,jobStatus);
-			}
-			if(job.IsNew || job.OwnerNum!=jobOwnerNum || job.JobStatus!=jobStatus) {
-				JobEvent jobEventCur=new JobEvent();
-				jobEventCur.Description=job.Description;
-				jobEventCur.JobNum=job.JobNum;
-				jobEventCur.JobStatus=job.JobStatus;
-				jobEventCur.OwnerNum=job.OwnerNum;
-				JobEvents.Insert(jobEventCur);
-			}
-			job.JobStatus=jobStatus;
-			job.OwnerNum=jobOwnerNum;
-			Jobs.Update(job);
-		}
-
-		///<summary>Returns a data table for the Job Manager control.  This data table will be optionally grouped by the booleans passed in and
-		///will be filtered to include entries based on the lists passed in.</summary>
-		public static DataTable GetForJobManager(List<string> listExpertNums,List<string> listOwnerNums,List<string> listJobStatuses) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),listExpertNums,listOwnerNums,listJobStatuses);
-			}
-			string command="SELECT * FROM job ";
-			List<string> listWhereClauses=new List<string>();
-			if(listExpertNums.Count>0) {//There are specific experts
-				listWhereClauses.Add("Expert IN("+String.Join(",",listExpertNums)+")");
-			}
-			if(listOwnerNums.Count>0) {//There are specific owners
-				listWhereClauses.Add("Owner IN("+String.Join(",",listOwnerNums)+")");
-			}
-			if(listJobStatuses.Count>0) {//There are specific statuses
-				listWhereClauses.Add("Status IN("+String.Join(",",listJobStatuses)+")");
-			}
-			if(listWhereClauses.Count>0) {
-				command+="WHERE "+string.Join(" AND ",listWhereClauses);
-			}
-			return Db.GetTable(command);
-		}
-
-		public static DataTable GetSummaryForOwner(long ownerNum) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),ownerNum);
-			}
-			string command="SELECT SUM(HoursEstimate) AS 'numEstHours', COUNT(DISTINCT JobNum) AS 'numJobs' FROM job "
-				+"WHERE Owner="+POut.Long(ownerNum)+" AND Status IN("
-				+POut.Long((int)JobStat.Assigned)
-				+","+POut.Long((int)JobStat.CurrentlyWorkingOn)
-				+","+POut.Long((int)JobStat.ReadyForReview)
-				+","+POut.Long((int)JobStat.ReadyToAssign)
-				+","+POut.Long((int)JobStat.OnHoldExpert)+")";
-			return Db.GetTable(command);
-		}
-
-		public static DataTable GetSummaryForExpert(long expertNum) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),expertNum);
-			}
-			string command="SELECT SUM(HoursEstimate) AS 'numEstHours', COUNT(DISTINCT JobNum) AS 'numJobs' FROM job "
-				+"WHERE Expert="+POut.Long(expertNum)+" AND Status IN("
-				+POut.Long((int)JobStat.Assigned)
-				+","+POut.Long((int)JobStat.CurrentlyWorkingOn)
-				+","+POut.Long((int)JobStat.ReadyForReview)
-				+","+POut.Long((int)JobStat.ReadyToAssign)
-				+","+POut.Long((int)JobStat.OnHoldExpert)+")";
-			return Db.GetTable(command);
 		}
 
 		public static List<Job> GetAll() {
@@ -242,13 +121,25 @@ namespace OpenDentBusiness {
 
 		///<summary>Must be called after job is filled using Jobs.FillInMemoryLists(). Returns list of user nums associated with this job.
 		/// Currently that is Expert, Owner, and Watchers.</summary>
-		public static List<long> GetUserNums(Job job) {
-			List<long> retVal=new List<long> {
-				job.ExpertNum,
-				job.OwnerNum
+		public static List<long> GetUserNums(Job job,bool HasApprover=false) {
+			List<long> retVal = new List<long> {
+				job.UserNumConcept,
+				job.UserNumExpert,
+				job.UserNumEngineer,
+				job.UserNumDocumenter,
+				job.UserNumCustContact,
+				job.UserNumCheckout,
+				job.UserNumInfo
 			};
-			job.ListJobLinks.FindAll(x=>x.LinkType==JobLinkType.Watcher).ForEach(x=>retVal.Add(x.FKey));
-			job.ListJobReviews.ForEach(x=>retVal.Add(x.ReviewerNum));
+			if(HasApprover) {
+				retVal.AddRange(new[]{
+					job.UserNumApproverConcept,
+					job.UserNumApproverJob,
+					job.UserNumApproverChange,
+				});
+			}
+			job.ListJobLinks.FindAll(x => x.LinkType==JobLinkType.Watcher).ForEach(x => retVal.Add(x.FKey));
+			job.ListJobReviews.ForEach(x => retVal.Add(x.ReviewerNum));
 			return retVal;
 		}
 
@@ -268,3 +159,89 @@ namespace OpenDentBusiness {
 		}
 	}
 }
+
+/*Convert script to convert the customer DB 
+#15.4... ot 16.1
+ALTER TABLE job ADD UserNumConcept BIGINT NOT NULL;
+ALTER TABLE job ADD UserNumExpert BIGINT NOT NULL;
+ALTER TABLE job ADD UserNumEngineer BIGINT NOT NULL;
+ALTER TABLE job ADD UserNumApproverConcept BIGINT NOT NULL;
+ALTER TABLE job ADD UserNumApproverJob BIGINT NOT NULL;
+ALTER TABLE job ADD UserNumApproverChange BIGINT NOT NULL;
+ALTER TABLE job ADD UserNumDocumenter BIGINT NOT NULL;
+ALTER TABLE job ADD UserNumCustContact BIGINT NOT NULL;
+ALTER TABLE job ADD UserNumCheckout BIGINT NOT NULL;
+ALTER TABLE job ADD UserNumInfo BIGINT NOT NULL;
+ALTER TABLE job ADD DateTimeCustContact DATETIME NOT NULL DEFAULT '0001-01-01';
+
+ALTER TABLE job ADD Documentation TEXT NOT NULL;
+# ALTER TABLE job DROP COLUMN Documentaion;
+
+ALTER TABLE job ADD IsApprovalNeeded TINYINT NOT NULL;
+ALTER TABLE job ADD AckDateTime DATETIME NOT NULL DEFAULT '0001-01-01';
+
+
+UPDATE job SET IsApprovalNeeded = 1 WHERE jobstatus IN('NeedsConceptApproval','NeedsJobApproval');
+
+UPDATE job SET UserNumExpert = ExpertNum;
+UPDATE job SET jobstatus = 'Concept', UserNumConcept = OwnerNum WHERE jobstatus = 'Concept';
+UPDATE job SET jobstatus = 'Concept'                                WHERE jobstatus = 'NeedsConceptApproval';
+
+UPDATE job SET jobstatus = 'Definiton', UserNumApproverConcept = 9 WHERE jobstatus = 'ConceptApproved';
+UPDATE job SET jobstatus = 'Definiton', UserNumApproverConcept = 9 WHERE jobstatus = 'CurrentlyWriting';
+UPDATE job SET jobstatus = 'Definiton', UserNumApproverConcept = 9 WHERE jobstatus = 'NeedsJobApproval';
+UPDATE job SET jobstatus = 'Definiton', UserNumApproverConcept = 9 WHERE jobstatus = 'NeedsJobClarification';
+
+UPDATE job SET jobstatus = 'Development', UserNumApproverConcept = 9, UserNumApproverJob = 9, UserNumEngineer = OwnerNum WHERE jobstatus = 'JobApproved';
+UPDATE job SET jobstatus = 'Development', UserNumApproverConcept = 9, UserNumApproverJob = 9, UserNumEngineer = OwnerNum WHERE jobstatus = 'Assigned';
+UPDATE job SET jobstatus = 'Development', UserNumApproverConcept = 9, UserNumApproverJob = 9, UserNumEngineer = OwnerNum WHERE jobstatus = 'CurrentlyWorkingOn';
+UPDATE job SET jobstatus = 'Development', UserNumApproverConcept = 9, UserNumApproverJob = 9, UserNumEngineer = OwnerNum WHERE jobstatus = 'ReadyForReview';
+UPDATE job SET jobstatus = 'Development', UserNumApproverConcept = 9, UserNumApproverJob = 9, UserNumEngineer = OwnerNum WHERE jobstatus = 'ReadyToAssign';
+UPDATE job SET jobstatus = 'Development', UserNumApproverConcept = 9, UserNumApproverJob = 9, UserNumEngineer = OwnerNum, Priority = 'OnHold' WHERE jobstatus = 'OnHoldExpert';
+UPDATE job SET jobstatus = 'Development', UserNumApproverConcept = 9, UserNumApproverJob = 9, UserNumEngineer = OwnerNum, Priority = 'OnHold' WHERE jobstatus = 'OnHoldEngineer';
+
+UPDATE job SET jobstatus = 'Documentation', UserNumDocumenter = OwnerNum WHERE jobstatus = 'ReadyToBeDocumented';
+UPDATE job SET jobstatus = 'Documentation', UserNumInfo = OwnerNum WHERE jobstatus = 'NeedsDocumentationClarification';
+
+UPDATE job SET jobstatus = 'Complete'      WHERE jobstatus = 'Complete';
+UPDATE job SET jobstatus = 'Complete'      WHERE jobstatus = 'NotifyCustomer';
+
+UPDATE job SET jobstatus = 'Cancelled'     WHERE jobstatus = 'Rescinded';
+UPDATE job SET jobstatus = 'Cancelled'     WHERE jobstatus = 'Deleted';
+
+ALTER TABLE job CHANGE JobStatus PhaseCur varchar(255) NOT NULL;
+
+
+ALTER TABLE job DROP COLUMN expertNum;
+ALTER TABLE job DROP COLUMN ownerNum;
+
+ALTER TABLE jobevent CHANGE OwnerNum UserNumEvent BIGINT NOT NULL;
+ALTER TABLE jobevent ADD COLUMN MainRTF TEXT NOT NULL;
+
+DELETE FROM joblink WHERE linktype IN(5,3); -- already converted to FKeys on Quote and Review tables.
+UPDATE joblink SET LinkType = LinkType-1 WHERE LinkType>5; -- Deleted link type Quote = 5
+UPDATE joblink SET LinkType = LinkType-1 WHERE LinkType>3; -- Deleted link type Review = 3
+
+DROP TABLE IF EXISTS jobnotifycust;
+CREATE TABLE jobnotifycust(
+		JobNotifyCustNum BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+		JobNum BIGINT NOT NULL,
+		PatNum BIGINT NOT NULL,
+		UserNumNotifier BIGINT NOT NULL,
+		Description VARCHAR(255) NOT NULL,
+		SecDateTEntry     DATETIME NOT NULL DEFAULT '0001-01-01',
+		DateTimeContacted DATETIME NOT NULL DEFAULT '0001-01-01'
+	) DEFAULT CHARSET = utf8;
+
+
+
+
+
+
+# TODO drop extra columns.
+# SELECT * FROM job;
+
+
+
+
+*/

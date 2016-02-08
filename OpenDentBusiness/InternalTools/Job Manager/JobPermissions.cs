@@ -69,13 +69,19 @@ namespace OpenDentBusiness{
 		//	return IsAuthorized(jobRole,false);
 		//}
 
-		///<summary>Checks to see if current user is authorized.  It also checks any date restrictions.  If not authorized, it gives a Message box saying so and returns false.</summary>
-		public static bool IsAuthorized(JobPerm jobPerm,bool suppressMessage=false) {
+		///<summary>Checks to see if user is authorized, if no user provided checks currently logged in user.  If not authorized and not suppressed, it gives a Message box saying so and returns false.</summary>
+		public static bool IsAuthorized(JobPerm jobPerm,bool suppressMessage=false,long userNum=-1) {
 			//No need to check RemotingRole; no call to db.
 			if(Security.CurUser==null) {
 				return false;
 			}
-			if(GetList().Any(x => x.UserNum==Security.CurUser.UserNum && x.JobPermType==jobPerm)) {
+			if(userNum==-1) {//no user passed in
+				userNum=Security.CurUser.UserNum;
+			}
+			if(userNum==0) {//"Unassigned" user passed in.
+				return true;
+			}
+			if(GetList().Any(x => x.UserNum==userNum && x.JobPermType==jobPerm)) {
 				return true;
 			}
 			if(!suppressMessage) {

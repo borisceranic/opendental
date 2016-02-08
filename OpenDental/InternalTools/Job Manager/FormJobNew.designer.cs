@@ -30,9 +30,10 @@ namespace OpenDental{
 			// controlJobEdit
 			// 
 			this.controlJobEdit.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.controlJobEdit.IsOverride = false;
 			this.controlJobEdit.Location = new System.Drawing.Point(0, 0);
 			this.controlJobEdit.Name = "controlJobEdit";
-			this.controlJobEdit.Size = new System.Drawing.Size(1046, 671);
+			this.controlJobEdit.Size = new System.Drawing.Size(1164, 713);
 			this.controlJobEdit.TabIndex = 0;
 			this.controlJobEdit.SaveClick += new System.EventHandler(this.userControlJobEdit1_SaveClick);
 			this.controlJobEdit.TitleChanged += new OpenDental.InternalTools.Job_Manager.UserControlJobEdit.UpdateTitleEvent(this.controlJobEdit_TitleChanged);
@@ -40,7 +41,7 @@ namespace OpenDental{
 			// FormJobNew
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(1046, 671);
+			this.ClientSize = new System.Drawing.Size(1164, 713);
 			this.Controls.Add(this.controlJobEdit);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormJobNew";

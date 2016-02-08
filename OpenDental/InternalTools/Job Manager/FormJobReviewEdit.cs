@@ -10,12 +10,11 @@ using OpenDentBusiness;
 namespace OpenDental {
 	public partial class FormJobReviewEdit:Form {
 		private JobReview _jobReviewCur;
-		private bool _isReadOnly;
+		private List<Userod> _listReviewers;
 
 		///<summary>Used for existing Reviews. Pass in the jobNum and the jobReviewNum.</summary>
-		public FormJobReviewEdit(JobReview jobReview,bool isReadOnly) {
+		public FormJobReviewEdit(JobReview jobReview) {
 			_jobReviewCur=jobReview.Copy();
-			_isReadOnly=isReadOnly;
 			InitializeComponent();
 			Lan.F(this);
 		}
@@ -28,13 +27,23 @@ namespace OpenDental {
 		}
 
 		private void FormJobReviewEdit_Load(object sender,EventArgs e) {
+			_listReviewers=Userods.GetUsersByJobRole(JobPerm.Writeup,false);
+			_listReviewers.ForEach(x => comboReviewer.Items.Add(x.UserName));
+			comboReviewer.SelectedIndex=_listReviewers.FindIndex(x => x.UserNum==_jobReviewCur.ReviewerNum);
 			Enum.GetNames(typeof(JobReviewStatus)).ToList().ForEach(x=>comboStatus.Items.Add(x));
 			comboStatus.SelectedIndex=(int)_jobReviewCur.ReviewStatus;
-			textReviewer.Text=Userods.GetName(_jobReviewCur.ReviewerNum);
-			if(_isReadOnly) {
-				textDescription.ReadOnly=true;
-				comboStatus.Enabled=false;
-				butDelete.Enabled=false;
+			//Disable all controls
+			comboReviewer.Enabled=false;
+			textDescription.ReadOnly=true;
+			comboStatus.Enabled=false;
+			butDelete.Enabled=false;
+			if(_jobReviewCur.ReviewerNum==0 && JobPermissions.IsAuthorized(JobPerm.Writeup,true)) {//allow any expert to change the expert if there is no expert.
+				comboReviewer.Enabled=true;
+			}
+			if(_jobReviewCur.ReviewerNum==Security.CurUser.UserNum || (_jobReviewCur.ReviewerNum==0 && JobPermissions.IsAuthorized(JobPerm.Writeup,true))) { //allow current expert to edit things.
+				textDescription.ReadOnly=false;
+				comboStatus.Enabled=true;
+				butDelete.Enabled=true;
 			}
 			if(new[]{JobReviewStatus.Done, JobReviewStatus.NeedsAdditionalWork}.Contains(_jobReviewCur.ReviewStatus)){
 				butDelete.Enabled=false;
@@ -50,13 +59,16 @@ namespace OpenDental {
 				DialogResult=DialogResult.Cancel;
 				return;
 			}
-			if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Delete the current job review, delete will not be permanent until changes are saved?")) {
+			if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Delete the current job review?")) {
 				_jobReviewCur=null;
 				DialogResult=DialogResult.OK;
 			}
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
+			if(comboReviewer.SelectedIndex>-1) {
+				_jobReviewCur.ReviewerNum=_listReviewers[comboReviewer.SelectedIndex].UserNum;
+			}
 			_jobReviewCur.ReviewStatus=(JobReviewStatus)comboStatus.SelectedIndex;
 			_jobReviewCur.Description=textDescription.Text;
 			if(_jobReviewCur.IsNew) {
