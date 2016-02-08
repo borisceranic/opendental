@@ -300,9 +300,16 @@ namespace OpenDentBusiness {
 			return Encoding.UTF8.GetString(memoryStreamInBytes,0,memoryStreamInBytes.Length);
 		}
 
-		/// <summary>Cleans supplied string to conform to XML standards.</summary>
+		///<summary>Cleans supplied string to conform to XML standards.  Certain special characters are problematic for NewCrop even when converted
+		///to valid XML.  For example, an input of "This & That" can be converted to a valid XML string of "This &amp; That", however NewCrop has an 
+		///aplhanumeric constraint on many fields in the XML.  The string "This &amp; That" violates the aplhanumeric contraint due to the ';'</summary>
 		public static string Tidy(string input,int length) {
-			string result=SecurityElement.Escape(input);//SecurityElement.Escape escapes characters into valid XML components
+			//https://msdn.microsoft.com/en-us/library/system.security.securityelement.escape(v=vs.110).aspx
+			string result=input.Replace("<","");//Remove '<' characters, since they would violate alphanumeric constraints, even if converted to valid XML as "&lt;".
+			result=result.Replace(">","");//Remove '>' characters, since they would violate alphanumeric constraints, even if converted to valid XML as "&gt;".
+			result=result.Replace("\"","");//Remove '"' characters, since they would violate alphanumeric constraints, even if converted to valid XML as "&quot;".
+			result=result.Replace("'","");//Remove '\'' characters, since they would violate alphanumeric constraints, even if converted to valid XML as "&apos;".
+			result=result.Replace("&","and");//Replace '&' characters, since they would violate alphanumeric constraints, even if converted to valid XML as "&amp;".
 			if(result.Length>length) {
 				result=result.Substring(0,length);
 			}
