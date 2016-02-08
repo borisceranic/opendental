@@ -3069,8 +3069,10 @@ namespace OpenDentBusiness
 					if(proc.ProvOrderOverride!=0) {
 						provOrderProc=listProvs[Providers.GetIndexLong(proc.ProvOrderOverride,listProvs)];
 					}
-					//Do not validate ordering provider override name or NPI if already validated elsewhere.
-					if(provOrderProc.ProvNum!=proc.ProvNum && provOrderProc.ProvNum!=claim.ProvTreat && provOrderProc.ProvNum!=claim.ProvBill) {
+					//Do not validate ordering provider override name or NPI if will not go out on eclaim or if already validated elsewhere.
+					if(!provOrderProc.IsNotPerson && provOrderProc.ProvNum!=proc.ProvNum && 
+						provOrderProc.ProvNum!=claim.ProvTreat && provOrderProc.ProvNum!=claim.ProvBill)
+					{
 						if(provOrderProc.LName=="") {
 							Comma(strb);
 							strb.Append("Ordering prov "+provOrderProc.Abbr+" LName for proc "+procCode.ProcCode);
