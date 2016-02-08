@@ -124,6 +124,9 @@ namespace OpenDental {
 		///Replaces: [FName], [LName], [LNameLetter], [NameF], [NameFL], [PatNum], 
 		///[ChartNumber], [HmPhone], [WkPhone], [WirelessPhone], [ReferredFromProvNameFL], etc.</summary>
 		public static string ReplacePatient(string message,Patient pat) {
+			if(pat==null) {
+				return message;
+			}
 			string retVal=message;
 			retVal=retVal.Replace("[FName]",pat.FName);
 			retVal=retVal.Replace("[LName]",pat.LName);

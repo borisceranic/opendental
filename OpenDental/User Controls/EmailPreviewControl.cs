@@ -37,6 +37,23 @@ namespace OpenDental {
 		public string BccAddress { get { return textBccAddress.Text; } set { textBccAddress.Text=value; } }
 		public bool IsSigned { get { return (_isSigningEnabled && _certSig!=null); } }
 		public bool HasAttachments { get { return _emailMessage.Attachments.Count>0; } }
+		
+		public long PatNum {
+			get { 
+				if(_patCur!=null) {
+					return _patCur.PatNum;
+				} 
+				return 0;
+			}
+		}
+		public long ClinicNum {
+			get { 
+				if(_patCur!=null) {
+					return _patCur.ClinicNum;
+				} 
+				return 0;
+			}
+		}
 
 		public X509Certificate2 Signature {
 			get {
@@ -53,7 +70,7 @@ namespace OpenDental {
 				return EmailAddresses.GetByClinic(0);//gets the practice default address
 			} 
 			if(comboEmailFrom.SelectedIndex==0) { //clinic/practice default
-				return EmailAddresses.GetByClinic(_patCur.ClinicNum);
+				return EmailAddresses.GetByClinic(ClinicNum);
 			}
 			else { //me or static email address
 				return _listEmailAddresses[comboEmailFrom.SelectedIndex-1];//-1 to account for predefined "Clinic/Practice" and items in combobox
@@ -152,7 +169,7 @@ namespace OpenDental {
 			_listEmailAddresses.RemoveAll(x => x.EmailAddressNum==PrefC.GetLong(PrefName.EmailNotifyAddressNum));
 			comboEmailFrom.Items.Add(Lan.g(this,"Practice/Clinic"));//default
 			comboEmailFrom.SelectedIndex=0;
-			textFromAddress.Text=EmailAddresses.GetByClinic(_patCur.ClinicNum).EmailUsername;
+			textFromAddress.Text=EmailAddresses.GetByClinic(ClinicNum).EmailUsername;
 			//Add all email addresses which are not associated to a user, a clinic, or either of the default email addresses.
 			for(int i=0;i<_listEmailAddresses.Count;i++) {
 				comboEmailFrom.Items.Add(_listEmailAddresses[i].EmailUsername);
@@ -169,7 +186,7 @@ namespace OpenDental {
 
 		private void comboEmailFrom_SelectionChangeCommitted(object sender,EventArgs e) {
 			if(comboEmailFrom.SelectedIndex==0) { //clinic/practice default
-				textFromAddress.Text=EmailAddresses.GetByClinic(_patCur.ClinicNum).EmailUsername;
+				textFromAddress.Text=EmailAddresses.GetByClinic(ClinicNum).EmailUsername;
 			}
 			else { //me or static email address
 				textFromAddress.Text=_listEmailAddresses[comboEmailFrom.SelectedIndex-1].EmailUsername;//-1 to account for predefined "Clinic/Practice" item in combobox
@@ -311,7 +328,7 @@ namespace OpenDental {
 		private void butAttach_Click(object sender,EventArgs e) {
 			OpenFileDialog dlg=new OpenFileDialog();
 			dlg.Multiselect=true;
-			if(_patCur.ImageFolder!="") {
+			if(_patCur!=null && _patCur.ImageFolder!="") {
 				if(PrefC.AtoZfolderUsed) {
 					dlg.InitialDirectory=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),
 						_patCur.ImageFolder.Substring(0,1).ToUpper(),
@@ -395,12 +412,12 @@ namespace OpenDental {
 		#region Body
 
 		public void LoadTemplate(string subject,string bodyText,List<EmailAttach> attachments) {
-			List<Appointment> listApts=Appointments.GetFutureSchedApts(_patCur.PatNum);
+			List<Appointment> listApts=Appointments.GetFutureSchedApts(PatNum);
 			Appointment aptNext=null;
 			if(listApts.Count > 0){
 				aptNext=listApts[0]; //next sched appt. If none, null.
 			}
-			Clinic clinic=Clinics.GetClinic(_patCur.ClinicNum);
+			Clinic clinic=Clinics.GetClinic(ClinicNum);
 			Subject=subject;
 			//patient information
 			Subject=FormMessageReplacements.ReplacePatient(Subject,_patCur);

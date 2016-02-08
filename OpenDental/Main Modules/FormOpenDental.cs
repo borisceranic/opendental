@@ -3257,6 +3257,7 @@ namespace OpenDental{
 			}
 			if(CurPatNum==0) {//Only on startup, I think.
 				if(!Programs.UsingEcwTightMode()) {//eCW tight only gets Patient Select and Popups toolbar buttons
+					//We need a drafts folder the user can view saved emails in before we allow the user to save email without a patient selected.
 					ToolBarMain.Buttons["Email"].Enabled=false;
 					ToolBarMain.Buttons["WebMail"].Enabled=false;
 					ToolBarMain.Buttons["Commlog"].Enabled=false;
@@ -3268,14 +3269,9 @@ namespace OpenDental{
 				ToolBarMain.Buttons["Popups"].Enabled=false;
 			}
 			else {
-				if(!Programs.UsingEcwTightMode()) {
+				if(!Programs.UsingEcwTightMode()) {//eCW tight only gets Patient Select and Popups toolbar buttons
 					ToolBarMain.Buttons["Commlog"].Enabled=true;
-					if(pat.Email!="") {
-						ToolBarMain.Buttons["Email"].Enabled=true;
-					}
-					else {
-						ToolBarMain.Buttons["Email"].Enabled=false;
-					}
+					ToolBarMain.Buttons["Email"].Enabled=true;
 					if(Programs.IsEnabled(ProgramName.CallFire) || SmsPhones.IsIntegratedTextingEnabled()) {
 						ToolBarMain.Buttons["Text"].Enabled=true;
 					}
