@@ -805,7 +805,7 @@ namespace OpenDental {
 				return;
 			}
 			DatabaseMaintenance.FixSpecialCharacters();
-			MsgBox.Show(this,"Special Characters have been removed from Appointment Notes, Appointment Procedure Descriptions, Patient Address Notes, and Patient Family Financial Urgent Notes.  Invalid null characters have been removed from Adjustment Notes, Payment Notes, and Definition Names.");
+			MsgBox.Show(this,"Done.");
 			_isCacheInvalid=true;//Definitions are cached and could have been changed from above DBM.
 		}
 
