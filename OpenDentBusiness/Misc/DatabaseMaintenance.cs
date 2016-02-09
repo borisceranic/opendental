@@ -13,6 +13,27 @@ namespace OpenDentBusiness {
 		private static DataTable table;
 		private static string command;
 		private static bool success=false;
+		///<summary>List of tables and columns to remove null characters from.
+		///Loop through this list two items at a time because it is designed to have a table first whis is then followed by a relative column.</summary>
+		private static List<string> _listTableAndColumns=new List<string>() {
+				//Table					//Column
+				"adjustment",   "AdjNote",
+				"appointment",  "Note",
+				"commlog",      "Note",
+				"definition",   "ItemName",
+				"diseasedef",   "DiseaseName",
+				"patient",      "Address",
+				"patient",      "Address2",
+				"patient",      "AddrNote",
+				"patient",      "MedUrgNote",
+				"patientnote",  "FamFinancial",
+				"patientnote",  "Medical",
+				"patientnote",  "MedicalComp",
+				"patientnote",  "Service",
+				"patientnote",  "Treatment",
+				"payment",      "PayNote",
+				"procnote",     "Note",
+			};
 
 		public static bool GetSuccess() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -342,14 +363,14 @@ namespace OpenDentBusiness {
 			foreach(char c in specialCharsFound) {
 				log+=c.ToString()+" doesn't work.\r\n";
 			}
-			command="SELECT COUNT(*) FROM adjustment WHERE AdjNote LIKE '%"+POut.String("\0")+"%'";
-			specialCharCount+=PIn.Int(Db.GetCount(command));
-			command="SELECT COUNT(*) FROM definition WHERE ItemName LIKE '%"+POut.String("\0")+"%'";
-			specialCharCount+=PIn.Int(Db.GetCount(command));
-			command="SELECT COUNT(*) FROM payment WHERE PayNote LIKE '%"+POut.String("\0")+"%'";
-			specialCharCount+=PIn.Int(Db.GetCount(command));
+			for(int i=0;i<_listTableAndColumns.Count;i+=2) {
+				string tableName=_listTableAndColumns[i];
+				string columnName=_listTableAndColumns[i+1];
+				command="SELECT COUNT(*) FROM "+tableName+" WHERE "+columnName+" LIKE '%"+POut.String("\0")+"%'";
+				specialCharCount+=PIn.Int(Db.GetCount(command));
+			}
 			if(specialCharCount!=0||verbose) {
-				log+=specialCharCount.ToString()+" "+Lans.g("FormDatabaseMaintenance","total special characters found.  The Spec Char button below will remove these characters.")+"\r\n";
+				log+=specialCharCount.ToString()+" "+Lans.g("FormDatabaseMaintenance","total special characters found.  The Spec Char tool will remove these characters.")+"\r\n";
 			}
 			return log;
 		}
@@ -5631,7 +5652,10 @@ HAVING cnt>1";
 			return log;
 		}
 
-		///<summary>Removes unsupported unicode characters from appointment.ProcDescript, appointment.Note, and patient.AddrNote.  Also removes mysql null character ("\0" or CHAR(0)) from adjustment.AdjNote, payment.PayNote, and definition.ItemName.  These null characters were causing the middle tier deserialization to fail as they are not UTF-16 supported characters.  They are, however, allowed in UTF-8.</summary>
+		///<summary>Removes unsupported unicode characters from appointment.ProcDescript, appointment.Note, and patient.AddrNote.
+		///Also removes mysql null character ("\0" or CHAR(0)) from several columns from several tables.
+		///These null characters were causing the middle tier deserialization to fail as they are not UTF-16 supported characters.
+		///They are, however, allowed in UTF-8.</summary>
 		public static void FixSpecialCharacters() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod());
@@ -5705,12 +5729,14 @@ HAVING cnt>1";
 					Db.NonQ(command);
 				}
 			}
-			command="UPDATE adjustment SET AdjNote=REPLACE(AdjNote,CHAR(0),'') WHERE AdjNote LIKE '%"+POut.String("\0")+"%'";
-			Db.NonQ(command);
-			command="UPDATE payment SET PayNote=REPLACE(PayNote,CHAR(0),'') WHERE PayNote LIKE '%"+POut.String("\0")+"%'";
-			Db.NonQ(command);
-			command="UPDATE definition SET ItemName=REPLACE(ItemName,CHAR(0),'') WHERE ItemName LIKE '%"+POut.String("\0")+"%'";
-			Db.NonQ(command);
+			for(int i=0;i<_listTableAndColumns.Count;i+=2) {
+				string tableName=_listTableAndColumns[i];
+				string columnName=_listTableAndColumns[i+1];
+				command="UPDATE "+tableName+" "
+					+"SET "+columnName+"=REPLACE("+columnName+",CHAR(0),'') "
+					+"WHERE "+columnName+" LIKE '%"+POut.String("\0")+"%'";
+				Db.NonQ(command);
+			}
 			return;
 		}
 
