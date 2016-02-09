@@ -1038,10 +1038,10 @@ namespace OpenDental.InternalTools.Job_Manager {
 					_jobCur.Documentation=jobMerge.Documentation;
 					_jobOld.Documentation=jobMerge.Documentation;
 					try {
-						textEditorMain.MainRtf=_jobCur.Documentation;
+						textEditorDocumentation.MainRtf=_jobCur.Documentation;
 					}
 					catch {
-						textEditorMain.MainText=_jobCur.Documentation;
+						textEditorDocumentation.MainText=_jobCur.Documentation;
 					}
 				}
 				else {
@@ -1158,6 +1158,9 @@ namespace OpenDental.InternalTools.Job_Manager {
 			job.Description=textEditorMain.MainRtf;
 			job.HoursActual=PIn.Int(textActualHours.Text);
 			job.HoursEstimate=PIn.Int(textEstHours.Text);
+			if(IsChangeRequest) {
+				job.IsApprovalNeeded=true;
+			}
 			//job.Priority=(JobPriority)comboPriority.SelectedIndex;
 			//job.JobStatus=(JobStat)comboStatus.SelectedIndex;
 			//job.Category=(JobCategory)comboCategory.SelectedIndex;
@@ -1582,6 +1585,9 @@ namespace OpenDental.InternalTools.Job_Manager {
 			else {
 				Job job = Jobs.GetOne(_jobCur.JobNum);
 				job.Description=textEditorMain.MainRtf;
+				if(IsChangeRequest) {
+					job.IsApprovalNeeded=true;
+				}
 				job.UserNumCheckout=0;
 				Jobs.Update(job);
 				Signalods.SetInvalid(InvalidType.Jobs,KeyType.Job,job.JobNum);
