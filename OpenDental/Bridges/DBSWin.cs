@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Collections.Generic;
 
 namespace OpenDental.Bridges{
 	/// <summary></summary>
@@ -21,7 +22,7 @@ namespace OpenDental.Bridges{
 				MsgBox.Show("DBSWin","Please select a patient first.");
 				return;
 			}
-			ArrayList ForProgram=ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
+			List<ProgramProperty> ForProgram =ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
 			ProgramProperty PPCur=ProgramProperties.GetCur(ForProgram, "Text file path");
 			string infoFile=PPCur.PropertyValue;
 			try{

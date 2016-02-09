@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Collections.Generic;
 
 namespace OpenDental.Bridges {
 	/// <summary></summary>
@@ -76,7 +77,7 @@ namespace OpenDental.Bridges {
 			string path=Programs.GetProgramPath(ProgramCur);
 			//Usage: mediadent.exe /P<Patient Name> /D<Practitioner> /L<Language> /F<Image folder> /B<Birthdate>
 			//Example: mediadent.exe /PJan Met De Pet /DOtté Gunter /L1 /Fc:\Mediadent\patients\1011 /B27071973
-			ArrayList ForProgram=ProgramProperties.GetForProgram(ProgramCur.ProgramNum); ;
+			List<ProgramProperty> ForProgram =ProgramProperties.GetForProgram(ProgramCur.ProgramNum); ;
 			if(pat==null) {
 				return;
 			}

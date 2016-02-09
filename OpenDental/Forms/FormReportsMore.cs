@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 using OpenDentalWpf;
 using OpenDental.Bridges;
+using System.Linq;
 
 namespace OpenDental {
 	/// <summary>
@@ -42,11 +43,11 @@ namespace OpenDental {
 		private UI.Button butUDS;
 		private UI.Button butPatList;
 		private UI.Button butPatExport;
-		private GroupBox groupBox1;
+		private GroupBox groupBusiness;
 		private ToolStripMenuItem setupToolStripMenuItem;
 		private UI.ODPictureBox picturePodium;
 		private UI.ODPictureBox pictureDentalIntel;
-		private GroupBox groupBox2;
+		private GroupBox groupPatientReviews;
 		///<summary>After this form closes, this value is checked to see if any non-modal dialog boxes are needed.</summary>
 		public ReportModalSelection RpModalSelection;
 
@@ -87,7 +88,7 @@ namespace OpenDental {
 			this.labelArizonaPrimaryCare = new System.Windows.Forms.Label();
 			this.menuMain = new System.Windows.Forms.MenuStrip();
 			this.setupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.groupBusiness = new System.Windows.Forms.GroupBox();
 			this.picturePodium = new OpenDental.UI.ODPictureBox();
 			this.butPatExport = new OpenDental.UI.Button();
 			this.butPatList = new OpenDental.UI.Button();
@@ -104,10 +105,10 @@ namespace OpenDental {
 			this.listMonthly = new OpenDental.UI.ListBoxClickable();
 			this.butClose = new OpenDental.UI.Button();
 			this.pictureDentalIntel = new OpenDental.UI.ODPictureBox();
-			this.groupBox2 = new System.Windows.Forms.GroupBox();
+			this.groupPatientReviews = new System.Windows.Forms.GroupBox();
 			this.menuMain.SuspendLayout();
-			this.groupBox1.SuspendLayout();
-			this.groupBox2.SuspendLayout();
+			this.groupBusiness.SuspendLayout();
+			this.groupPatientReviews.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -192,13 +193,13 @@ namespace OpenDental {
 			// 
 			// groupBox1
 			// 
-			this.groupBox1.Controls.Add(this.picturePodium);
-			this.groupBox1.Location = new System.Drawing.Point(532, 146);
-			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(113, 54);
-			this.groupBox1.TabIndex = 26;
-			this.groupBox1.TabStop = false;
-			this.groupBox1.Text = "Patient Reviews";
+			this.groupBusiness.Controls.Add(this.picturePodium);
+			this.groupBusiness.Location = new System.Drawing.Point(532, 146);
+			this.groupBusiness.Name = "groupBox1";
+			this.groupBusiness.Size = new System.Drawing.Size(113, 54);
+			this.groupBusiness.TabIndex = 26;
+			this.groupBusiness.TabStop = false;
+			this.groupBusiness.Text = "Patient Reviews";
 			// 
 			// picturePodium
 			// 
@@ -415,20 +416,20 @@ namespace OpenDental {
 			// 
 			// groupBox2
 			// 
-			this.groupBox2.Controls.Add(this.pictureDentalIntel);
-			this.groupBox2.Location = new System.Drawing.Point(532, 87);
-			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(113, 53);
-			this.groupBox2.TabIndex = 28;
-			this.groupBox2.TabStop = false;
-			this.groupBox2.Text = "Business Analytics";
+			this.groupPatientReviews.Controls.Add(this.pictureDentalIntel);
+			this.groupPatientReviews.Location = new System.Drawing.Point(532, 87);
+			this.groupPatientReviews.Name = "groupBox2";
+			this.groupPatientReviews.Size = new System.Drawing.Size(113, 53);
+			this.groupPatientReviews.TabIndex = 28;
+			this.groupPatientReviews.TabStop = false;
+			this.groupPatientReviews.Text = "Business Analytics";
 			// 
 			// FormReportsMore
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(680, 612);
-			this.Controls.Add(this.groupBox2);
-			this.Controls.Add(this.groupBox1);
+			this.Controls.Add(this.groupPatientReviews);
+			this.Controls.Add(this.groupBusiness);
 			this.Controls.Add(this.butPatExport);
 			this.Controls.Add(this.butPatList);
 			this.Controls.Add(this.butGraphicReports);
@@ -462,8 +463,8 @@ namespace OpenDental {
 			this.Load += new System.EventHandler(this.FormReportsMore_Load);
 			this.menuMain.ResumeLayout(false);
 			this.menuMain.PerformLayout();
-			this.groupBox1.ResumeLayout(false);
-			this.groupBox2.ResumeLayout(false);
+			this.groupBusiness.ResumeLayout(false);
+			this.groupPatientReviews.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -541,6 +542,12 @@ namespace OpenDental {
 				System.Windows.Forms.MessageBox.Show(Lan.g(this,"At least one insurance payment is not finalized")
 					+".  "+Lan.g(this,"Reports will be inaccurate until all payments are finalized")
 					+".\r\n"+Lan.g(this,"See query example in the online manual")+" #958, \"Claims with payments entered but no check, not finalized.\"");
+			}
+			if(ProgramProperties.IsAdvertisingDisabled(ProgramName.Podium)) {
+				groupPatientReviews.Visible=false;
+			}
+			if(ProgramProperties.IsAdvertisingDisabled(ProgramName.DentalIntel)) {
+				groupBusiness.Visible=false;
 			}
 		}
 

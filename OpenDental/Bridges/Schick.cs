@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Collections.Generic;
 
 namespace OpenDental.Bridges{
 	///<summary>Provides bridging functionality to Schick CDR.</summary>
@@ -19,7 +20,7 @@ namespace OpenDental.Bridges{
 			if(pat==null){
 				return;
 			}
-			ArrayList ForProgram=ProgramProperties.GetForProgram(ProgramCur.ProgramNum);;
+			List<ProgramProperty> ForProgram =ProgramProperties.GetForProgram(ProgramCur.ProgramNum);;
 			ProgramProperty PPCur=ProgramProperties.GetCur(ForProgram, "Enter 0 to use PatientNum, or 1 to use ChartNum");;
 			string patID="";
 			if(PPCur.PropertyValue=="0") {

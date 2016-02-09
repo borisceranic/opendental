@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Collections.Generic;
 
 namespace OpenDental.Bridges{
 	/// <summary></summary>
@@ -25,7 +26,7 @@ namespace OpenDental.Bridges{
 				MsgBox.Show("Dxis","Please select a patient first.");
 				return;
 			}
-			ArrayList ForProgram=ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
+			List<ProgramProperty> ForProgram =ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
 			string info="/i /t:"+pat.LName+" "+pat.FName+" "+pat.PatNum.ToString()+" - "+PrefC.GetString(PrefName.PracticeTitle);
 			Process process=new Process();
 			process.StartInfo=new ProcessStartInfo(path,info);

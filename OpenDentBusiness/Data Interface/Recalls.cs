@@ -81,7 +81,9 @@ namespace OpenDentBusiness{
 			return Crud.RecallCrud.SelectMany(command);
 		}
 
-		///<summary>Only used in FormRecallList to get a list of patients with recall.  Supply a date range, using min and max values if user left blank.  If provNum=0, then it will get all provnums.  It looks for both provider match in either PriProv or SecProv.</summary>
+		///<summary>Only used in FormRecallList and recall automation to get a list of patients with recall.  
+		///Supply a date range, using min and max values if user left blank.  If provNum=0, then it will get all provnums.  
+		///It looks for both provider match in either PriProv or SecProv.</summary>
 		public static DataTable GetRecallList(DateTime fromDate,DateTime toDate,bool groupByFamilies,long provNum,long clinicNum,
 			long siteNum,RecallListSort sortBy,RecallListShowNumberReminders showReminders,List<long> excludePatNums)
 		{

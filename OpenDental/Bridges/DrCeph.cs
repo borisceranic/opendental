@@ -41,7 +41,7 @@ namespace OpenDental.Bridges{
 				}
 				Thread.Sleep(TimeSpan.FromSeconds(4));
 			}
-			ArrayList ForProgram=ProgramProperties.GetForProgram(ProgramCur.ProgramNum);;
+			List<ProgramProperty> ForProgram =ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
 			ProgramProperty PPCur=ProgramProperties.GetCur(ForProgram, "Enter 0 to use PatientNum, or 1 to use ChartNum");;
 			string patID="";
 			if(PPCur.PropertyValue=="0"){

@@ -11,7 +11,7 @@ using CodeBase;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("15.4.26.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("15.4.29.0");//This value must be changed when a new conversion is to be triggered.
 
 		#region Helper Functions
 
@@ -11475,6 +11475,126 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				command="UPDATE preference SET ValueString='15.4.26.0' WHERE PrefName='DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			To15_4_29();
+		}
+
+		private static void To15_4_29() {
+			if(FromVersion<new Version("15.4.29.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 15.4.29.0"));
+				string command="";
+				//Podium Advertising block----------------------------------------------------------------------
+				command="SELECT ProgramNum from program WHERE ProgName='Podium'";
+				List<long> programNums = Db.GetListLong(command);
+				long programNum = 0;
+				if(programNums.Count>0) {
+					programNum=programNums[0];
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql && programNum>0) {
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"'"+POut.Long(programNum)+"', "
+						+"'Disable Advertising', "
+						+"'0')";
+					Db.NonQ(command);
+				}
+				else if(programNum>0){//oracle
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+						+"'"+POut.Long(programNum)+"', "
+						+"'Disable Advertising', "
+						+"'0')";
+					Db.NonQ(command);
+				}
+				//DentalIntel Advertising block----------------------------------------------------------------------
+				command="SELECT ProgramNum from program WHERE ProgName='DentalIntel'";
+				programNums = Db.GetListLong(command);
+				programNum = 0;
+				if(programNums.Count>0) {
+					programNum=programNums[0];
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql && programNum>0) {
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"'"+POut.Long(programNum)+"', "
+						+"'Disable Advertising', "
+						+"'0')";
+					Db.NonQ(command);
+				}
+				else if(programNum>0) {//oracle
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+						+"'"+POut.Long(programNum)+"', "
+						+"'Disable Advertising', "
+						+"'0')";
+					Db.NonQ(command);
+				}
+				//DentalTekSmartOfficePhone Advertising block----------------------------------------------------------------------
+				command="SELECT ProgramNum from program WHERE ProgName='DentalTekSmartOfficePhone'";
+				programNums = Db.GetListLong(command);
+				programNum = 0;
+				if(programNums.Count>0) {
+					programNum=programNums[0];
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql && programNum>0) {
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"'"+POut.Long(programNum)+"', "
+						+"'Disable Advertising', "
+						+"'0')";
+					Db.NonQ(command);
+				}
+				else if(programNum>0) {//oracle
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+						+"'"+POut.Long(programNum)+"', "
+						+"'Disable Advertising', "
+						+"'0')";
+					Db.NonQ(command);
+				}
+				//CentralDataStorage Advertising block----------------------------------------------------------------------
+				//Program link added to track the Disable Advertising property.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+						+") VALUES("
+						+"'CentralDataStorage', "
+						+"'Cental Data Storage from centraldatastorage.com', "
+						+"'0', "
+						+"'',"
+						+"'', "
+						+"'')";
+					programNum = Db.NonQ(command,true);
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"'"+POut.Long(programNum)+"', "
+						+"'Disable Advertising', "
+						+"'0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO program (ProgramNum,ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+						+") VALUES("
+						+"(SELECT MAX(ProgramNum)+1 FROM program),"
+						+"'CentralDataStorage', "
+						+"'Cental Data Storage from centraldatastorage.com', "
+						+"'0', "
+						+"'',"
+						+"'', "
+						+"'')";
+					programNum = Db.NonQ(command,true);
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+						+"'"+POut.Long(programNum)+"', "
+						+"'Disable Advertising', "
+						+"'0')";
+					Db.NonQ(command);
+				}//end CentralDataStorage bridge
+				command="UPDATE preference SET ValueString = '15.4.29.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			//To15_4_X();

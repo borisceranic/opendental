@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Collections.Generic;
 
 namespace OpenDental{
 	/// <summary></summary>
@@ -247,7 +248,7 @@ namespace OpenDental{
 			else
 				ToDate=PIn.Date(textDateTo.Text);
 			//Create the file and first row--------------------------------------------------------
-			ArrayList ForProgram=ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
+			List<ProgramProperty> ForProgram =ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
 			ProgramProperty PPCur=ProgramProperties.GetCur(ForProgram, "Export Path");
 			string fileName=PPCur.PropertyValue+"Appt.txt";
 			if(!Directory.Exists(PPCur.PropertyValue)){

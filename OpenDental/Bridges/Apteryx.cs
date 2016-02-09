@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Collections.Generic;
 
 namespace OpenDental.Bridges{
 	/// <summary></summary>
@@ -19,7 +20,7 @@ namespace OpenDental.Bridges{
 		///<summary>Launches the program using a combination of command line characters and the patient.Cur data.</summary>
 		public static void SendData(Program ProgramCur, Patient pat){
 			string path=Programs.GetProgramPath(ProgramCur);
-			ArrayList ForProgram=ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
+			List<ProgramProperty> ForProgram =ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
 			if(pat!=null){
 				//We remove double-quotes from the first and last name of the patient so extra double-quotes don't
 				//cause confusion in the command line parameters for Apteryx.

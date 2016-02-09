@@ -46,6 +46,7 @@ namespace OpenDentBusiness{
 		CallFire,
 		Camsight,
 		CaptureLink,
+		CentralDataStorage,
 		Cerec,
 		CliniView,
 		ClioSoft,
