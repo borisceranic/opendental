@@ -18,78 +18,69 @@ namespace OpenDental {
 		}
 
 		private void FormEtrans834Preview_Load(object sender,EventArgs e) {
+			Cursor=Cursors.WaitCursor;
 			FillGridInsPlans();
+			Cursor=Cursors.Default;
 		}
 
 		void FillGridInsPlans() {
 			int sortedByColumnIdx=gridInsPlans.SortedByColumnIdx;
 			bool isSortAscending=gridInsPlans.SortedIsAscending;
 			gridInsPlans.BeginUpdate();
-			if(gridInsPlans.Columns.Count==0) {	
+			if(gridInsPlans.Columns.Count==0) {
 				gridInsPlans.Columns.Clear();
-				gridInsPlans.Columns.Add(new UI.ODGridColumn("LName",150,HorizontalAlignment.Left));
-				gridInsPlans.Columns.Add(new UI.ODGridColumn("FName",100,HorizontalAlignment.Left));
-				gridInsPlans.Columns.Add(new UI.ODGridColumn("Middle",50,HorizontalAlignment.Left));
-				gridInsPlans.Columns.Add(new UI.ODGridColumn("Birthdate",80,HorizontalAlignment.Center));
-				gridInsPlans.Columns.Add(new UI.ODGridColumn("SSN",80,HorizontalAlignment.Center));
-				gridInsPlans.Columns.Add(new UI.ODGridColumn("Pat Maint",80,HorizontalAlignment.Center));
-				gridInsPlans.Columns.Add(new UI.ODGridColumn("Cov Maint",80,HorizontalAlignment.Center));
-				gridInsPlans.Columns.Add(new UI.ODGridColumn("Date Begin",84,HorizontalAlignment.Center));
-				gridInsPlans.Columns.Add(new UI.ODGridColumn("Date Term",84,HorizontalAlignment.Center));
-				gridInsPlans.Columns.Add(new UI.ODGridColumn("Relation",80,HorizontalAlignment.Left));
-				gridInsPlans.Columns.Add(new UI.ODGridColumn("SubscriberID",100,HorizontalAlignment.Left));
-				gridInsPlans.Columns.Add(new UI.ODGridColumn("GroupNum",100,HorizontalAlignment.Left));
-				//TODO: Contact information?
-				//TODO: Carrier information...
-				gridInsPlans.Columns.Add(new UI.ODGridColumn("",1));//Spacer
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("Name",200,HorizontalAlignment.Left,UI.GridSortingStrategy.StringCompare));
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("Birthdate",74,HorizontalAlignment.Center,UI.GridSortingStrategy.DateParse));
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("SSN",66,HorizontalAlignment.Center,UI.GridSortingStrategy.StringCompare));
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("Maint",54,HorizontalAlignment.Center,UI.GridSortingStrategy.StringCompare));
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("Date Begin",84,HorizontalAlignment.Center,UI.GridSortingStrategy.DateParse));
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("Date Term",84,HorizontalAlignment.Center,UI.GridSortingStrategy.DateParse));
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("Relation",70,HorizontalAlignment.Center,UI.GridSortingStrategy.StringCompare));
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("SubscriberID",96,HorizontalAlignment.Left,UI.GridSortingStrategy.StringCompare));
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("GroupNum",100,HorizontalAlignment.Left,UI.GridSortingStrategy.StringCompare));
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("Payer",0,HorizontalAlignment.Left,UI.GridSortingStrategy.StringCompare));
 				sortedByColumnIdx=0;//Sort by Patient Last Name by default.
 				isSortAscending=true;//Start with A and progress to Z.
 			}
 			gridInsPlans.Rows.Clear();
 			for(int i=0;i<_listX834s.Count;i++) {
 				X834 x834=_listX834s[i];
-				for(int j=0;j<x834.ListMembers.Count;j++) {
-					Hx834_Member member=x834.ListMembers[j];
-					UI.ODGridRow row;
-					if(member.ListHealthCoverage.Count==0) {
-						Hx834Ins eIns=new Hx834Ins(member,null);
-						row=new UI.ODGridRow();
-						row.Tag=eIns;
-						gridInsPlans.Rows.Add(row);
-						row.Cells.Add(eIns.Pat.LName);
-						row.Cells.Add(eIns.Pat.FName);
-						row.Cells.Add(eIns.Pat.MiddleI);
-						row.Cells.Add(eIns.Pat.Birthdate.ToShortDateString());
-						row.Cells.Add(eIns.Pat.SSN);
-						row.Cells.Add(eIns.GetPatMaintTypeDescript());
-						row.Cells.Add("");
-						row.Cells.Add(eIns.Sub.DateEffective.ToShortDateString());
-						row.Cells.Add(eIns.Sub.DateTerm.ToShortDateString());
-						row.Cells.Add(eIns.Plan.Relationship.ToString());
-						row.Cells.Add(eIns.Sub.SubscriberID);
-						row.Cells.Add(eIns.Ins.GroupNum);
-						row.Cells.Add("");//Spacer
-					}
-					else {
-						for(int k=0;k<member.ListHealthCoverage.Count;k++) {
-							Hx834_HealthCoverage healthCoverage=member.ListHealthCoverage[k];
-							Hx834Ins eIns=new Hx834Ins(member,healthCoverage);
-							row=new UI.ODGridRow();
-							row.Tag=eIns;
+				for(int j=0;j<x834.ListTransactions.Count;j++) {
+					Hx834_Tran tran=x834.ListTransactions[j];
+					for(int k=0;k<tran.ListMembers.Count;k++) {
+						Hx834_Member member=tran.ListMembers[k];						
+						if(member.ListHealthCoverage.Count==0) {
+							UI.ODGridRow row=new UI.ODGridRow();
+							row.Tag=member;
 							gridInsPlans.Rows.Add(row);
-							row.Cells.Add(eIns.Pat.LName);
-							row.Cells.Add(eIns.Pat.FName);
-							row.Cells.Add(eIns.Pat.MiddleI);
-							row.Cells.Add(eIns.Pat.Birthdate.ToShortDateString());
-							row.Cells.Add(eIns.Pat.SSN);
-							row.Cells.Add(eIns.GetPatMaintTypeDescript());
-							row.Cells.Add(eIns.GetCoverageMaintTypeDescript());
-							row.Cells.Add(eIns.Sub.DateEffective.ToShortDateString());
-							row.Cells.Add(eIns.Sub.DateTerm.ToShortDateString());
-							row.Cells.Add(eIns.Plan.Relationship.ToString());
-							row.Cells.Add(eIns.Sub.SubscriberID);
-							row.Cells.Add(eIns.Ins.GroupNum);
-							row.Cells.Add("");//Spacer
+							row.Cells.Add(member.Pat.GetNameLF());//Name
+							row.Cells.Add(member.Pat.Birthdate.ToShortDateString());//Birthdate
+							row.Cells.Add(member.Pat.SSN);//SSN
+							row.Cells.Add(member.GetPatMaintTypeDescript());//Maint
+							row.Cells.Add("");//Date Begin
+							row.Cells.Add("");//Date Term
+							row.Cells.Add(member.PlanRelat.ToString());//Relation
+							row.Cells.Add(member.SubscriberId);//SubscriberID
+							row.Cells.Add(member.GroupNum);//GroupNum
+							row.Cells.Add(tran.Payer.Name);//Payer
+						}
+						else {
+							for(int a=0;a<member.ListHealthCoverage.Count;a++) {
+								Hx834_HealthCoverage healthCoverage=member.ListHealthCoverage[a];
+								UI.ODGridRow row=new UI.ODGridRow();
+								row.Tag=healthCoverage;
+								gridInsPlans.Rows.Add(row);
+								row.Cells.Add(member.Pat.GetNameLF());//Name
+								row.Cells.Add(member.Pat.Birthdate.ToShortDateString());//Birthdate
+								row.Cells.Add(member.Pat.SSN);//SSN
+								row.Cells.Add(healthCoverage.GetCoverageMaintTypeDescript());//Maint
+								row.Cells.Add(healthCoverage.Sub.DateEffective.ToShortDateString());//Date Begin
+								row.Cells.Add(healthCoverage.Sub.DateTerm.ToShortDateString());//Date Term
+								row.Cells.Add(member.PlanRelat.ToString());//Relation
+								row.Cells.Add(member.SubscriberId);//SubscriberID
+								row.Cells.Add(member.GroupNum);//GroupNum
+								row.Cells.Add(tran.Payer.Name);//Payer
+							}
 						}
 					}
 				}
@@ -99,6 +90,16 @@ namespace OpenDental {
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
+			Cursor=Cursors.WaitCursor;
+			//TODO: Get a cache of all patients in order to save processing time.
+			for(int i=0;i<gridInsPlans.Rows.Count;i++) {
+				Hx834_Member member;
+				if(gridInsPlans.Rows[i].Tag is Hx834_Member) {
+					member=(Hx834_Member)gridInsPlans.Rows[i].Tag;
+				}
+				//TODO: Match the member based first on SSN, then on (last name) + (birthdate) + (partial first name)
+			}
+			Cursor=Cursors.Default;
 			DialogResult=DialogResult.OK;
 		}
 

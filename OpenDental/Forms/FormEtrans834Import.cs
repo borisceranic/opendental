@@ -64,19 +64,36 @@ namespace OpenDental {
 			FormEP.ShowDialog();
 		}
 
+		///<summary>Shows current status to user in title bar.  Useful for when processing for a few seconds or more.</summary>
+		private void ShowStatus(string message) {
+			int index=Text.IndexOf(" - ");
+			if(index >= 0) {
+				Text=Text.Substring(0,index+3);//Remove old status, but keep the dash and spaces.
+			}
+			else {
+				Text+=" - ";//Ensure there is a separating dash with spaces.
+			}
+			if(message.Trim()=="") {
+				index=Text.IndexOf(" - ");
+				if(index >= 0) {
+					Text=Text.Substring(0,index);//Remove dash a separating spaces if message is empty.
+				}
+			}
+			else {
+				Text+=message;
+			}
+			Application.DoEvents();
+		}
+
 		private void FillGridInsPlanFiles() {
 			int sortedByColumnIdx=gridInsPlanFiles.SortedByColumnIdx;
 			bool isSortAscending=gridInsPlanFiles.SortedIsAscending;
 			gridInsPlanFiles.BeginUpdate();
 			if(gridInsPlanFiles.Columns.Count==0) {
-				gridInsPlanFiles.Columns.Add(new UI.ODGridColumn("FileName",300));
-				gridInsPlanFiles.Columns[gridInsPlanFiles.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
-				gridInsPlanFiles.Columns.Add(new UI.ODGridColumn("PatCount",80));
-				gridInsPlanFiles.Columns[gridInsPlanFiles.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.AmountParse;
-				gridInsPlanFiles.Columns.Add(new UI.ODGridColumn("PlanCount",80));
-				gridInsPlanFiles.Columns[gridInsPlanFiles.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.AmountParse;
-				gridInsPlanFiles.Columns.Add(new UI.ODGridColumn("Errors",0));
-				gridInsPlanFiles.Columns[gridInsPlanFiles.Columns.Count-1].SortingStrategy=UI.GridSortingStrategy.StringCompare;
+				gridInsPlanFiles.Columns.Add(new UI.ODGridColumn("FileName",300,UI.GridSortingStrategy.StringCompare));
+				gridInsPlanFiles.Columns.Add(new UI.ODGridColumn("PatCount",80,UI.GridSortingStrategy.AmountParse));
+				gridInsPlanFiles.Columns.Add(new UI.ODGridColumn("PlanCount",80,UI.GridSortingStrategy.AmountParse));
+				gridInsPlanFiles.Columns.Add(new UI.ODGridColumn("Errors",0,UI.GridSortingStrategy.StringCompare));
 				_colErrorIndex=gridInsPlanFiles.Columns.Count-1;
 				sortedByColumnIdx=_colErrorIndex;//Sort by error messages when first loaded.
 				isSortAscending=true;//This will push files without errors to the top.
@@ -94,7 +111,9 @@ namespace OpenDental {
 				UI.ODGridRow row=new UI.ODGridRow();
 				gridInsPlanFiles.Rows.Add(row);
 				string filePath=_arrayImportFilePaths[i];
-				row.Cells.Add(Path.GetFileName(filePath));
+				string fileName=Path.GetFileName(filePath);
+				ShowStatus(Lan.g(this,"Parsing file")+" "+fileName);
+				row.Cells.Add(fileName);
 				string messageText=File.ReadAllText(filePath);
 				if(!X12object.IsX12(messageText)) {
 					row.Cells.Add("");//PatCount
@@ -119,11 +138,16 @@ namespace OpenDental {
 						continue;
 					}
 					row.Tag=x834;
-					row.Cells.Add(x834.ListMembers.Count.ToString());//PatCount
+					int memberCount=0;
 					int planCount=0;
-					for(int j=0;j<x834.ListMembers.Count;j++) {
-						planCount+=x834.ListMembers[j].ListHealthCoverage.Count;
+					for(int j=0;j<x834.ListTransactions.Count;j++) {
+						Hx834_Tran tran=x834.ListTransactions[j];
+						memberCount+=tran.ListMembers.Count;
+						for(int k=0;k<tran.ListMembers.Count;k++) {
+							planCount+=tran.ListMembers[k].ListHealthCoverage.Count;
+						}
 					}
+					row.Cells.Add(memberCount.ToString());//PatCount
 					row.Cells.Add(planCount.ToString());//PlanCount
 					row.Cells.Add("");//File was parsed successfully.  No errors.
 				}
@@ -146,6 +170,7 @@ namespace OpenDental {
 					gridInsPlanFiles.SetSelected(i,true);
 				}
 			}
+			ShowStatus("");
 			Cursor=Cursors.Default;
 		}
 

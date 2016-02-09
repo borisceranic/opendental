@@ -678,11 +678,11 @@ namespace OpenDentBusiness
 		///<summary>N101</summary>
 		public string EntityIdentifierCode;
 		///<summary>N102</summary>
-		private string Name;
+		public string Name;
 		///<summary>N103</summary>
-		private string IdentificationCodeQualifier;
+		public string IdentificationCodeQualifier;
 		///<summary>N104</summary>
-		private string IdentificationCode;
+		public string IdentificationCode;
 
 		public X12_N1(X12Segment seg,params string[] arrayElement01Values) {
 			seg.AssertType("N1",arrayElement01Values);

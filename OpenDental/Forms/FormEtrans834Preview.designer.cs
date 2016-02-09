@@ -71,7 +71,7 @@ namespace OpenDental{
 			this.gridInsPlans.Location = new System.Drawing.Point(12, 12);
 			this.gridInsPlans.Name = "gridInsPlans";
 			this.gridInsPlans.ScrollValue = 0;
-			this.gridInsPlans.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
+			this.gridInsPlans.SelectionMode = OpenDental.UI.GridSelectionMode.None;
 			this.gridInsPlans.Size = new System.Drawing.Size(950, 642);
 			this.gridInsPlans.TabIndex = 4;
 			this.gridInsPlans.Title = "Ins Plans";
@@ -85,7 +85,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(100, 100);
+			this.MinimumSize = new System.Drawing.Size(990, 734);
 			this.Name = "FormEtrans834Preview";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Import Ins Plans Preview";
