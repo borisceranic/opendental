@@ -131,8 +131,13 @@ namespace OpenDental {
 					row.Cells.Add(_listSmsFromMobile[i].PatNum==0?"Unassigned":dictPatNames[_listSmsFromMobile[i].PatNum]);//Patient
 					row.Cells.Add("0.00");//Cost
 					if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics
-						Clinic clinic=Clinics.GetClinic(_listSmsFromMobile[i].ClinicNum);
-						row.Cells.Add(clinic.Description);//Clinic
+						if(_listSmsFromMobile[i].ClinicNum==0) {
+							row.Cells.Add(PrefC.GetString(PrefName.PracticeTitle)+"("+Lan.g(this,"Practice")+")");
+						}
+						else { 
+							Clinic clinic=Clinics.GetClinic(_listSmsFromMobile[i].ClinicNum);
+							row.Cells.Add(clinic.Description);//Clinic
+						}
 					}
 					if(checkHidden.Checked) {
 						row.Cells.Add(_listSmsFromMobile[i].IsHidden?"X":"");//Hidden
@@ -176,8 +181,13 @@ namespace OpenDental {
 					row.Cells.Add(_listSmsToMobile[i].PatNum==0?"":dictPatNames[_listSmsToMobile[i].PatNum]);//Patient
 					row.Cells.Add(_listSmsToMobile[i].MsgChargeUSD.ToString("f"));//Cost
 					if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics
-						Clinic clinic=Clinics.GetClinic(_listSmsToMobile[i].ClinicNum);
-						row.Cells.Add(clinic.Description);//Clinic
+						if(_listSmsToMobile[i].ClinicNum==0) {
+							row.Cells.Add(PrefC.GetString(PrefName.PracticeTitle)+"("+Lan.g(this,"Practice")+")");
+						}
+						else { 
+							Clinic clinic=Clinics.GetClinic(_listSmsToMobile[i].ClinicNum);
+							row.Cells.Add(clinic.Description);//Clinic
+						}
 					}
 					if(checkHidden.Checked) {
 						row.Cells.Add(_listSmsToMobile[i].IsHidden?"X":"");//Hidden
