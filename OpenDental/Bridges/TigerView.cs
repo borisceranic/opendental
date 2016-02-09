@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Collections.Generic;
 
 namespace OpenDental.Bridges {
 	///<summary></summary>
@@ -126,7 +127,7 @@ namespace OpenDental.Bridges {
 		///</summary>
 		public static void SendData(Program ProgramCur,Patient pat) {
 			string path=Programs.GetProgramPath(ProgramCur);
-			ArrayList ForProgram=ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
+			List<ProgramProperty> ForProgram =ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
 			ProgramProperty PPCur=ProgramProperties.GetCur(ForProgram,"Tiger1.ini path");
 			iniFile=PPCur.PropertyValue;
 			System.Collections.Hashtable htKeyVals=new Hashtable();
@@ -198,7 +199,7 @@ namespace OpenDental.Bridges {
 			if(!prog.Enabled) {
 				return;
 			}
-			ArrayList propertiesForProgram=ProgramProperties.GetForProgram(prog.ProgramNum);
+			List<ProgramProperty> propertiesForProgram =ProgramProperties.GetForProgram(prog.ProgramNum);
 			ProgramProperty programProperty=ProgramProperties.GetCur(propertiesForProgram,"TigerView EMR folder path");
 			string returnFolder=programProperty.PropertyValue;
 			if(!Directory.Exists(returnFolder)) {
@@ -244,7 +245,7 @@ namespace OpenDental.Bridges {
 				}
 			}
 			if(!useChartNum) { //If it could be a valid patnum, check program pref
-				ArrayList propertiesForProgram=ProgramProperties.GetForProgram(Programs.GetProgramNum(ProgramName.TigerView));
+				List<ProgramProperty> propertiesForProgram =ProgramProperties.GetForProgram(Programs.GetProgramNum(ProgramName.TigerView));
 				ProgramProperty programProperty=ProgramProperties.GetCur(propertiesForProgram,"Enter 0 to use PatientNum, or 1 to use ChartNum");
 				if(programProperty.PropertyValue=="1") {//ChartNum
 					useChartNum=true;

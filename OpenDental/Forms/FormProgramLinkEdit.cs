@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 using OpenDental.UI;
 using CodeBase;
+using System.Linq;
 
 namespace OpenDental{
 	/// <summary> </summary>
@@ -40,13 +41,15 @@ namespace OpenDental{
 		private Label label5;
 		private TextBox textOverride;
 		private Label labelOverride;
-		private ArrayList ProgramPropertiesForProgram;
+		private List<ProgramProperty> ProgramPropertiesForProgram;
 		private UI.Button butClear;
 		private UI.Button butImport;
 		private Label label10;
 		private PictureBox pictureBox;
 		private UI.Button butOutputFile;
+		private CheckBox checkHideButtons;
 		private string pathOverrideOld;
+		private bool _isLoading = false;
 
 		///<summary></summary>
 		public FormProgramLinkEdit(){
@@ -109,6 +112,7 @@ namespace OpenDental{
 			this.label10 = new System.Windows.Forms.Label();
 			this.pictureBox = new System.Windows.Forms.PictureBox();
 			this.butOutputFile = new OpenDental.UI.Button();
+			this.checkHideButtons = new System.Windows.Forms.CheckBox();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
 			this.SuspendLayout();
 			// 
@@ -153,6 +157,7 @@ namespace OpenDental{
 			this.checkEnabled.TabIndex = 41;
 			this.checkEnabled.Text = "Enabled";
 			this.checkEnabled.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkEnabled.CheckedChanged += new System.EventHandler(this.checkEnabled_CheckedChanged);
 			// 
 			// butDelete
 			// 
@@ -299,6 +304,7 @@ namespace OpenDental{
 			// 
 			// gridMain
 			// 
+			this.gridMain.HasAddButton = false;
 			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(246, 247);
@@ -406,11 +412,24 @@ namespace OpenDental{
 			this.butOutputFile.Text = "Output File";
 			this.butOutputFile.Click += new System.EventHandler(this.butOutputFile_Click);
 			// 
+			// checkHideButtons
+			// 
+			this.checkHideButtons.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkHideButtons.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkHideButtons.Location = new System.Drawing.Point(358, 57);
+			this.checkHideButtons.Name = "checkHideButtons";
+			this.checkHideButtons.Size = new System.Drawing.Size(163, 18);
+			this.checkHideButtons.TabIndex = 74;
+			this.checkHideButtons.Text = "Hide Unused Button";
+			this.checkHideButtons.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkHideButtons.CheckedChanged += new System.EventHandler(this.checkHideButtons_CheckedChanged);
+			// 
 			// FormProgramLinkEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
 			this.ClientSize = new System.Drawing.Size(797, 560);
+			this.Controls.Add(this.checkHideButtons);
 			this.Controls.Add(this.butOutputFile);
 			this.Controls.Add(this.pictureBox);
 			this.Controls.Add(this.butClear);
@@ -457,6 +476,7 @@ namespace OpenDental{
 		#endregion
 
 		private void FormProgramLinkEdit_Load(object sender, System.EventArgs e) {
+			_isLoading=true;
 			if(ProgramCur.ProgName!=""){
 				//user not allowed to delete program links that we include, only their own.
 				butDelete.Enabled=false;
@@ -464,7 +484,25 @@ namespace OpenDental{
 			pathOverrideOld=ProgramProperties.GetLocalPathOverrideForProgram(ProgramCur.ProgramNum);
 			textOverride.Text=pathOverrideOld;
 			FillForm();
+			SetAdvertising();
 			ShowPopup();
+			_isLoading=false;
+		}
+
+		///<summary>Handles both visibility and checking of checkHideButtons.</summary>
+		private void SetAdvertising() {
+			checkHideButtons.Visible=true;
+			ProgramProperty prop = ProgramProperties.GetForProgram(ProgramCur.ProgramNum).FirstOrDefault(x => x.PropertyDesc=="Disable Advertising");
+			if(checkEnabled.Checked || prop==null) {
+				checkHideButtons.Visible=false;
+			}
+			if(prop!=null) {
+				checkHideButtons.Checked=(prop.PropertyValue=="1");
+			}
+		}
+
+		private void checkEnabled_CheckedChanged(object sender,EventArgs e) {
+			SetAdvertising();
 		}
 
 		private void FillForm(){
@@ -517,10 +555,13 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<ProgramPropertiesForProgram.Count;i++) {
+			foreach(ProgramProperty property in ProgramPropertiesForProgram) { 
+				if(property.PropertyDesc=="Disable Advertising") {
+					continue;
+				}
 				row=new ODGridRow();
-				row.Cells.Add(((ProgramProperty)ProgramPropertiesForProgram[i]).PropertyDesc);
-				row.Cells.Add(((ProgramProperty)ProgramPropertiesForProgram[i]).PropertyValue);
+				row.Cells.Add(property.PropertyDesc);
+				row.Cells.Add(property.PropertyValue);
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
@@ -535,7 +576,6 @@ namespace OpenDental{
 				return;
 			}
 			ProgramProperties.RefreshCache();
-			ProgramPropertiesForProgram=ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
 			FillGrid();
 		}
 
@@ -566,6 +606,23 @@ namespace OpenDental{
 
 		private void butClear_Click(object sender,EventArgs e) {
 			pictureBox.Image=null;
+		}
+
+		private void checkHideButtons_CheckedChanged(object sender,EventArgs e) {
+			if(_isLoading) {
+				return;
+			}
+			ProgramProperty property = ProgramProperties.GetForProgram(ProgramCur.ProgramNum).FirstOrDefault(x => x.PropertyDesc=="Disable Advertising");
+			if(property==null) {
+				return;//should never happen.
+			}
+			if(checkHideButtons.Checked) {
+				property.PropertyValue="1";
+			}
+			else {
+				property.PropertyValue="0";
+			}
+			ProgramProperties.Update(property);
 		}
 
 		private void butDelete_Click(object sender, System.EventArgs e) {
@@ -642,17 +699,6 @@ namespace OpenDental{
 				Programs.Delete(ProgramCur);
 			}
 		}
-
-		
-
-		
-
-		
-
-		
-		
-
-
 	}
 }
 

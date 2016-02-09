@@ -29,7 +29,7 @@ namespace OpenDental.Bridges{
 				}
 				return;
 			}
-			ArrayList ForProgram=ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
+			List<ProgramProperty> ForProgram =ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
 			ProgramProperty PPCur=ProgramProperties.GetCur(ForProgram,"Enter 0 to use PatientNum, or 1 to use ChartNum");
 			if(PPCur.PropertyValue=="1" && pat.ChartNumber=="") {
 				MessageBox.Show("This patient must have a ChartNumber entered first.");
@@ -50,7 +50,7 @@ namespace OpenDental.Bridges{
 		}
 
 		///<summary>XML file.</summary>
-		private static void SendDataServer(Program ProgramCur,ArrayList ForProgram,Patient pat) {
+		private static void SendDataServer(Program ProgramCur,List<ProgramProperty> ForProgram,Patient pat) {
 			ProgramProperty PPCur=ProgramProperties.GetCur(ForProgram,"Enter 0 to use PatientNum, or 1 to use ChartNum");
 			string id="";
 			if(PPCur.PropertyValue=="0") {
@@ -158,7 +158,7 @@ namespace OpenDental.Bridges{
 		}
 
 		///<summary>Command line.</summary>
-		private static void SendDataWorkstation(Program ProgramCur,ArrayList ForProgram,Patient pat) {
+		private static void SendDataWorkstation(Program ProgramCur,List<ProgramProperty> ForProgram,Patient pat) {
 			string path=Programs.GetProgramPath(ProgramCur);
 			ProgramProperty PPCur=ProgramProperties.GetCur(ForProgram,"Enter 0 to use PatientNum, or 1 to use ChartNum");
 			string id="";
@@ -178,7 +178,7 @@ namespace OpenDental.Bridges{
 			if(!prog.Enabled) {
 				return;
 			}
-			ArrayList ForProgram=ProgramProperties.GetForProgram(Programs.GetProgramNum(ProgramName.iCat));
+			List<ProgramProperty> ForProgram =ProgramProperties.GetForProgram(Programs.GetProgramNum(ProgramName.iCat));
 			ProgramProperty PPCur=ProgramProperties.GetCur(ForProgram,"Return folder path");
 			string returnFolder=PPCur.PropertyValue;
 			if(!Directory.Exists(returnFolder)) {
@@ -221,7 +221,7 @@ namespace OpenDental.Bridges{
 
 		private static void ProcessFile(string fullPath) {
 			string filename=Path.GetFileName(fullPath);
-			ArrayList ForProgram=ProgramProperties.GetForProgram(Programs.GetProgramNum(ProgramName.iCat));
+			List<ProgramProperty> ForProgram =ProgramProperties.GetForProgram(Programs.GetProgramNum(ProgramName.iCat));
 			ProgramProperty PPCur=ProgramProperties.GetCur(ForProgram,"XML output file path");
 			string xmlOutputFile=PPCur.PropertyValue;
 			if(!File.Exists(xmlOutputFile)){

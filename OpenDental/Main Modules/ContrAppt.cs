@@ -5008,6 +5008,9 @@ namespace OpenDental {
 		}
 
 		private void AutomaticCallDialingDisabledMessage() {
+			if(ProgramProperties.IsAdvertisingDisabled(ProgramName.DentalTekSmartOfficePhone)) {
+				return;
+			}
 			MessageBox.Show(Lan.g(this,"Automatic dialing of patient phone numbers requires an additional service")+".\r\n"
 							+Lan.g(this,"Contact Open Dental for more information")+".");
 			try {

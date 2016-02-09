@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Collections.Generic;
 
 namespace OpenDental.Bridges{
 	/// <summary></summary>
@@ -40,7 +41,7 @@ namespace OpenDental.Bridges{
 				MessageBox.Show("No patient selected.");
 				return;
 			}
-			ArrayList ForProgram=ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
+			List<ProgramProperty> ForProgram =ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
 			//if(pat!=null){
 			string info="$$DFWIN$$ OPEN -n\""+Tidy(pat.LName)+", "+Tidy(pat.FName)+"\" -c\"";
 			ProgramProperty PPCur=ProgramProperties.GetCur(ForProgram, "Enter 0 to use PatientNum, or 1 to use ChartNum");;

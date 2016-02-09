@@ -8,6 +8,7 @@ using System.Threading;
 using System.Windows.Forms;
 using CodeBase;
 using OpenDentBusiness;
+using System.Collections.Generic;
 
 namespace OpenDental.Bridges {
 	public class Progeny {
@@ -16,7 +17,7 @@ namespace OpenDental.Bridges {
 		public static void SendData(Program ProgramCur, Patient pat){
 			string path=Programs.GetProgramPath(ProgramCur);
 			Process pibridge;
-			ArrayList ForProgram=ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
+			List<ProgramProperty> ForProgram =ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
 			try{
 				if(pat!=null){
 					ProgramProperty PPCur=ProgramProperties.GetCur(ForProgram, "Enter 0 to use PatientNum, or 1 to use ChartNum");

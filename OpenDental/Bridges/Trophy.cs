@@ -7,6 +7,7 @@ using System.Text;
 //using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Collections.Generic;
 
 namespace OpenDental.Bridges{
 	/// <summary></summary>
@@ -20,7 +21,7 @@ namespace OpenDental.Bridges{
 		///<summary>Launches the program using a combination of command line characters and the patient.Cur data.</summary>
 		public static void SendData(Program ProgramCur, Patient pat){
 			string path=Programs.GetProgramPath(ProgramCur);
-			ArrayList ForProgram=ProgramProperties.GetForProgram(ProgramCur.ProgramNum);;
+			List<ProgramProperty> ForProgram =ProgramProperties.GetForProgram(ProgramCur.ProgramNum);;
 			if(pat!=null){
 				ProgramProperty PPCur=ProgramProperties.GetCur(ForProgram, "Storage Path");
 				string comline="-P"+PPCur.PropertyValue+@"\";

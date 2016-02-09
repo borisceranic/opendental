@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Collections.Generic;
 
 namespace OpenDental {
 	class EvaSoft {
@@ -24,7 +25,7 @@ namespace OpenDental {
 				MsgBox.Show("EvaSoft","EvaSoft is not running. EvaSoft must be running before the bridge will work.");
 				return;
 			}
-			ArrayList ForProgram=ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
+			List<ProgramProperty> ForProgram =ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
 			UdpClient udpClient=new UdpClient();
 			string udpMessage="REQUEST01123581321~~~0.1b~~~pmaddpatient~~~";
 			//Patient id can be any string format

@@ -47,6 +47,15 @@ namespace OpenDentBusiness {
 			return Crud.ProgramPropertyCrud.Insert(programProp);
 		}
 
+		///<summary>Safe to call on any program. Only returns true if the program is not enabled AND the program has a property of "Disable Advertising" = 1.</summary>
+		public static bool IsAdvertisingDisabled(ProgramName progName) {
+			Program program = Programs.GetCur(progName);
+			if(program==null || program.Enabled) {
+				return false;//do not block advertising
+			}
+			return GetListForProgram(program.ProgramNum).Any(x => x.PropertyDesc=="Disable Advertising" && x.PropertyValue=="1");
+		}
+
 		///<summary>Returns a List of ProgramProperties attached to the specified programNum.  Does not include path overrides.</summary>
 		public static List<ProgramProperty> GetListForProgram(long programNum) {
 			//No need to check RemotingRole; no call to db.
@@ -72,16 +81,9 @@ namespace OpenDentBusiness {
 
 		///<summary>Returns an ArrayList of ProgramProperties attached to the specified programNum.  Does not include path overrides.
 		///Uses thread-safe caching pattern.  Each call to this method creates an copy of the entire ProgramProperty cache.</summary>
-		public static ArrayList GetForProgram(long programNum) {
+		public static List<ProgramProperty> GetForProgram(long programNum) {
 			//No need to check RemotingRole; no call to db.
-			ArrayList ForProgram=new ArrayList();
-			List<ProgramProperty> listProgramProperties=ProgramPropertyC.GetListt();
-			for(int i=0;i<listProgramProperties.Count;i++) {
-				if(listProgramProperties[i].ProgramNum==programNum && listProgramProperties[i].PropertyDesc!="") {
-					ForProgram.Add(listProgramProperties[i]);
-				}
-			}
-			return ForProgram;
+			return ProgramPropertyC.GetListt().FindAll(x => x.ProgramNum==programNum && x.PropertyDesc!="");
 		}
 
 		public static void SetProperty(long programNum,string desc,string propval) {
@@ -96,14 +98,9 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>After GetForProgram has been run, this gets one of those properties.  DO NOT MODIFY the returned property.  Read only.</summary>
-		public static ProgramProperty GetCur(ArrayList arrayForProgram, string desc){
+		public static ProgramProperty GetCur(List<ProgramProperty> arrayForProgram,string desc) {
 			//No need to check RemotingRole; no call to db.
-			for(int i=0;i<arrayForProgram.Count;i++){
-				if(((ProgramProperty)arrayForProgram[i]).PropertyDesc==desc){
-					return (ProgramProperty)arrayForProgram[i];
-				}
-			}
-			return null;
+			return arrayForProgram.FirstOrDefault(x => x.PropertyDesc==desc);
 		}
 
 		public static string GetPropVal(long programNum,string desc) {

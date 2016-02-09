@@ -48,7 +48,7 @@ namespace OpenDental{
 		private GroupBox groupBox2;
 		private CheckBox checkExcludeImages;
 		private UI.ODPictureBox pictureCDS;
-		private GroupBox groupBox3;
+		private GroupBox groupManagedBackups;
 		//private bool usesInternalImages;
 		///<summary>This message will only get filled when a backup attempt has failed.  It will hold the message text that we want to show to the user giving them more information about the failure.</summary>
 		private string _errorMessage;
@@ -108,9 +108,9 @@ namespace OpenDental{
 			this.butBackup = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.pictureCDS = new OpenDental.UI.ODPictureBox();
-			this.groupBox3 = new System.Windows.Forms.GroupBox();
+			this.groupManagedBackups = new System.Windows.Forms.GroupBox();
 			this.groupBox1.SuspendLayout();
-			this.groupBox3.SuspendLayout();
+			this.groupManagedBackups.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -394,21 +394,21 @@ namespace OpenDental{
 			this.pictureCDS.TabIndex = 16;
 			this.pictureCDS.TextNullImage = null;
 			// 
-			// groupBox3
+			// groupManagedBackups
 			// 
-			this.groupBox3.Controls.Add(this.pictureCDS);
-			this.groupBox3.Location = new System.Drawing.Point(318, 481);
-			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(114, 57);
-			this.groupBox3.TabIndex = 17;
-			this.groupBox3.TabStop = false;
-			this.groupBox3.Text = "Managed Backups";
+			this.groupManagedBackups.Controls.Add(this.pictureCDS);
+			this.groupManagedBackups.Location = new System.Drawing.Point(318, 481);
+			this.groupManagedBackups.Name = "groupManagedBackups";
+			this.groupManagedBackups.Size = new System.Drawing.Size(114, 57);
+			this.groupManagedBackups.TabIndex = 17;
+			this.groupManagedBackups.TabStop = false;
+			this.groupManagedBackups.Text = "Managed Backups";
 			// 
 			// FormBackup
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(777, 550);
-			this.Controls.Add(this.groupBox3);
+			this.Controls.Add(this.groupManagedBackups);
 			this.Controls.Add(this.checkExcludeImages);
 			this.Controls.Add(this.butSave);
 			this.Controls.Add(this.textBox2);
@@ -432,7 +432,7 @@ namespace OpenDental{
 			this.Load += new System.EventHandler(this.FormBackup_Load);
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();
-			this.groupBox3.ResumeLayout(false);
+			this.groupManagedBackups.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -450,6 +450,9 @@ namespace OpenDental{
 			//usesInternalImages=(PrefC.GetString(PrefName.ImageStore)=="OpenDental.Imaging.SqlStore");
 			textBackupRestoreAtoZToPath.Enabled=ShouldUseAtoZFolder();
 			butBrowseRestoreAtoZTo.Enabled=ShouldUseAtoZFolder();
+			if(ProgramProperties.IsAdvertisingDisabled(ProgramName.CentralDataStorage)) {
+				groupManagedBackups.Visible=false;
+			}
 		}
 
 		private bool ShouldUseAtoZFolder(){

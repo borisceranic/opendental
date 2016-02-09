@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Collections.Generic;
 
 namespace OpenDental.Bridges{
 	/// <summary></summary>
@@ -34,7 +35,7 @@ namespace OpenDental.Bridges{
 		///<summary>Sends data for Patient to a mailbox file and launches the program.</summary>
 		public static void SendData(Program ProgramCur, Patient pat){
 			string path=Programs.GetProgramPath(ProgramCur);
-			ArrayList ForProgram=ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
+			List<ProgramProperty> ForProgram =ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
 			if(pat!=null){
 				//read file C:\sidexis\sifiledb.ini
 				iniFile=Path.GetDirectoryName(path)+"\\sifiledb.ini";
