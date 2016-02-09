@@ -1189,6 +1189,7 @@ namespace OpenDental{
 			List<Sheet> sheetList=Sheets.GetForPatient(PatCur.PatNum);
 			RepeatCharge[] repeatChargeList=RepeatCharges.Refresh(PatCur.PatNum);
 			List<CreditCard> listCreditCards=CreditCards.Refresh(PatCur.PatNum);
+			RegistrationKey[] arrayRegistrationKeys=RegistrationKeys.GetForPatient(PatCur.PatNum);
 			bool hasProcs=procList.Count>0;
 			bool hasAppt=apptList.Count>0;
 			bool hasClaims=claimList.Count>0;
@@ -1209,8 +1210,10 @@ namespace OpenDental{
 			bool hasSheets=sheetList.Count>0;
 			bool hasRepeat=repeatChargeList.Length>0;
 			bool hasCC=listCreditCards.Count>0;
+			bool hasRegKey=arrayRegistrationKeys.Length>0;
 			if(hasProcs || hasAppt || hasClaims || hasAdj || hasPay || hasClaimProcs || hasComm || hasPayPlans
-				|| hasInsPlans || hasRef || hasMeds || isSuperFamilyHead || hasSheets || hasRepeat || hasCC) {
+				|| hasInsPlans || hasRef || hasMeds || isSuperFamilyHead || hasSheets || hasRepeat || hasCC || hasRegKey) 
+			{
 				string message=Lan.g(this,"You cannot delete this patient without first deleting the following data:")+"\r";
 				if(hasProcs) {
 					message+=Lan.g(this,"Procedures")+"\r";
@@ -1256,6 +1259,9 @@ namespace OpenDental{
 				}
 				if(hasCC) {
 					message+=Lan.g(this,"Credit Cards")+"\r";
+				}
+				if(hasRegKey) {
+					message+=Lan.g(this,"Registration Keys")+"\r";
 				}
 				MessageBox.Show(message);
 				return;
