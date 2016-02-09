@@ -69,7 +69,13 @@ namespace OpenDental {
 				}
 				else if(!PrefC.GetBool(PrefName.EasyNoClinics) && !Clinics.IsTextingEnabled(clinicNum)) { //Checking for specific clinic.
 					//This is likely to happen a few times per office until they setup texting properly.
-					MessageBox.Show(Lans.g(this,"Integrated Texting has not been enabled for the following clinic")+":\r\n"+Clinics.GetClinic(clinicNum).Description+".");
+					if(clinicNum!=0) {
+						MessageBox.Show(Lans.g(this,"Integrated Texting has not been enabled for the following clinic")+":\r\n"+Clinics.GetClinic(clinicNum).Description+".");
+					}
+					else {
+						//Should never happen. This message is precautionary.
+						MessageBox.Show(Lans.g(this,"Integrated Texting has not been enabled for the following clinic")+":\r\nHeadquarters.");
+					}
 					return false;
 				}
 			}
