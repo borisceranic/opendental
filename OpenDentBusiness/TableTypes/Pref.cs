@@ -469,7 +469,7 @@ namespace OpenDentBusiness {
 		ProcessSigsIntervalInSecs,
 		ProcGroupNoteDoesAggregate,
 		ProgramAdditionalFeatures,
-		///<summary>Stores the DateTime of when the ProgramVersion preference last changed.</summary>
+		///<summary>Deprecated. Use updatehistory table instead.  Stored the DateTime of when the ProgramVersion preference last changed.</summary>		
 		ProgramVersionLastUpdated,
 		ProgramVersion,
 		ProviderIncomeTransferShows,

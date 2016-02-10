@@ -422,6 +422,7 @@
     <Compile Include="Crud\SiteCrud.cs" />
     <Compile Include="Crud\StateAbbrCrud.cs" />
     <Compile Include="Crud\TreatPlanAttachCrud.cs" />
+    <Compile Include="Crud\UpdateHistoryCrud.cs" />
     <Compile Include="Crud\UserClinicCrud.cs" />
     <Compile Include="Crud\UserOdPrefCrud.cs" />
     <Compile Include="Data Interface\ApptComms.cs" />
@@ -433,6 +434,7 @@
     <Compile Include="Data Interface\InsVerifies.cs" />
     <Compile Include="Data Interface\InsVerifyHists.cs" />
     <Compile Include="Data Interface\TreatPlanAttaches.cs" />
+    <Compile Include="Data Interface\UpdateHistories.cs" />
     <Compile Include="Data Interface\UserOdPrefs.cs" />
     <Compile Include="InternalTools\Job Manager\BugCrud.cs" />
     <Compile Include="InternalTools\Job Manager\Bugs.cs" />
@@ -996,6 +998,7 @@
     <Compile Include="Reports\RpProcSheet.cs" />
     <Compile Include="Reports\RpProdInc.cs" />
     <Compile Include="Reports\RpRouting.cs" />
+    <Compile Include="TableTypes\UpdateHistory.cs" />
     <Compile Include="TableTypes\ApptComm.cs" />
     <Compile Include="TableTypes\CDSPermission.cs" />
     <Compile Include="TableTypes\AppointmentType.cs" />

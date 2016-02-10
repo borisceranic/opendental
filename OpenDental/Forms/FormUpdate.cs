@@ -69,6 +69,7 @@ namespace OpenDental{
 		private OpenDental.UI.Button butDownloadMsiBuild;
 		private OpenDental.UI.Button butDownloadMsiBeta;
 		private OpenDental.UI.Button butDownloadMsiStable;
+		private UI.Button butShowPrev;
 		private static string betaAvailableDisplay;
 
 		///<summary></summary>
@@ -143,6 +144,7 @@ namespace OpenDental{
 			this.butCheck2 = new OpenDental.UI.Button();
 			this.butLicense = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
+			this.butShowPrev = new OpenDental.UI.Button();
 			this.panelClassic.SuspendLayout();
 			this.groupBuild.SuspendLayout();
 			this.groupBeta.SuspendLayout();
@@ -576,10 +578,25 @@ namespace OpenDental{
 			this.butClose.Text = "&Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
+			// butShowPrev
+			// 
+			this.butShowPrev.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butShowPrev.Autosize = true;
+			this.butShowPrev.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butShowPrev.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butShowPrev.CornerRadius = 4F;
+			this.butShowPrev.Location = new System.Drawing.Point(333, 32);
+			this.butShowPrev.Name = "butShowPrev";
+			this.butShowPrev.Size = new System.Drawing.Size(132, 25);
+			this.butShowPrev.TabIndex = 55;
+			this.butShowPrev.Text = "Show Previous Versions";
+			this.butShowPrev.Click += new System.EventHandler(this.butShowPrev_Click);
+			// 
 			// FormUpdate
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(647, 635);
+			this.Controls.Add(this.butShowPrev);
 			this.Controls.Add(this.panelClassic);
 			this.Controls.Add(this.butCheck2);
 			this.Controls.Add(this.groupStable);
@@ -619,8 +636,11 @@ namespace OpenDental{
 
 		private void FormUpdate_Load(object sender, System.EventArgs e) {
 			SetMsiVisibility();
-			labelVersion.Text=Lan.g(this,"Using Version:")+" "+Application.ProductVersion+"  "
-				+Lan.g(this,"Since")+": "+PrefC.GetDateT(PrefName.ProgramVersionLastUpdated).ToShortDateString();
+			labelVersion.Text=Lan.g(this,"Using Version:")+" "+Application.ProductVersion;
+			UpdateHistory updateHistory=UpdateHistories.GetForVersion(Application.ProductVersion);
+			if(updateHistory!=null) {
+				labelVersion.Text+="  "+Lan.g(this,"Since")+": "+updateHistory.DateTimeUpdated.ToShortDateString();
+			}
 			//keeps the trailing year up to date
 			this.label10.Text=PrefC.GetString(PrefName.SoftwareName)+" "+Lan.g(this,"Copyright 2003-")+DateTime.Now.ToString("yyyy")+Lan.g(this,", Jordan S. Sparks, D.M.D.");
 			this.label8.Text=Lan.g(this, "MySQL - Copyright 1995-")+DateTime.Now.ToString("yyyy")+Lan.g(this,", www.mysql.com");
@@ -918,6 +938,11 @@ namespace OpenDental{
 				return betaAvailableCode;
 			}
 			return "";
+		}
+
+		private void butShowPrev_Click(object sender,EventArgs e) {
+			FormPreviousVersions FormSPV=new FormPreviousVersions();
+			FormSPV.ShowDialog();
 		}
 
 		private void butInstallBuild_Click(object sender,EventArgs e) {
@@ -1302,26 +1327,6 @@ namespace OpenDental{
 				SavePrefs();
 			}
 		}
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-	
-
-	
-
-		
-
-	
 
 	}
 

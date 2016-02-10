@@ -286,8 +286,9 @@ namespace OpenDental {
 					return false;
 				}
 				Prefs.UpdateString(PrefName.ProgramVersion,currentVersion.ToString());
+				UpdateHistory updateHistory=new UpdateHistory(currentVersion.ToString());
+				UpdateHistories.Insert(updateHistory);
 				Prefs.UpdateString(PrefName.UpdateInProgressOnComputerName,"");//now, other workstations will be allowed to update.
-				Prefs.UpdateDateT(PrefName.ProgramVersionLastUpdated,DateTime.Now);
 				Cache.Refresh(InvalidType.Prefs);
 				bool needsEConnectorUpgrade=false;
 				//Check to see if the eConnector has ever been installed.  Warn them about potential complications due to converting to eConnector.
@@ -554,14 +555,15 @@ namespace OpenDental {
 			}
 		}
 
-		///<summary>Essentially no changes have been made to this since version 6.5.</summary>
+		///<summary></summary>
 		private static bool CheckProgramVersionClassic() {
 			Version storedVersion=new Version(PrefC.GetString(PrefName.ProgramVersion));
 			Version currentVersion=new Version(Application.ProductVersion);
 			string database=MiscData.GetCurrentDatabase();
 			if(storedVersion<currentVersion) {
 				Prefs.UpdateString(PrefName.ProgramVersion,currentVersion.ToString());
-				Prefs.UpdateDateT(PrefName.ProgramVersionLastUpdated,PIn.DateT(DateTime.Now.ToShortDateString()));
+				UpdateHistory updateHistory=new UpdateHistory(currentVersion.ToString());
+				UpdateHistories.Insert(updateHistory);
 				Cache.Refresh(InvalidType.Prefs);
 			}
 			if(storedVersion>currentVersion) {

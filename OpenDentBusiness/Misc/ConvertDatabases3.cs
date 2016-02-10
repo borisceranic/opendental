@@ -12918,6 +12918,29 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ProgramAdditionalFeatures','0001-01-01 00:00:00')";
 					Db.NonQ(command);
 				}
+				command="UPDATE preference SET ValueString='' WHERE prefname='ProgramVersionLastUpdated'";
+				Db.NonQ(command);
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS updatehistory";
+					Db.NonQ(command);
+					command=@"CREATE TABLE updatehistory (
+						UpdateHistoryNum bigint NOT NULL auto_increment PRIMARY KEY,
+						DateTimeUpdated datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+						ProgramVersion varchar(255) NOT NULL
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE updatehistory'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE updatehistory (
+						UpdateHistoryNum number(20) NOT NULL,
+						DateTimeUpdated date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						ProgramVersion varchar2(255),
+						CONSTRAINT updatehistory_UpdateHistoryNum PRIMARY KEY (UpdateHistoryNum)
+						)";
+					Db.NonQ(command);
+				}
 
 
 				command="UPDATE preference SET ValueString = '16.1.0.0' WHERE PrefName = 'DataBaseVersion'";
@@ -12929,3 +12952,6 @@ namespace OpenDentBusiness {
 
 	}
 }
+
+				
+				
