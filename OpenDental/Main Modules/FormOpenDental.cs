@@ -4278,16 +4278,6 @@ namespace OpenDental{
 				for(int i=0;i<sigList.Count;i++) {
 					if(sigList[i].ITypes==((int)InvalidType.ShutDownNow).ToString()) {
 						timerSignals.Enabled=false;//quit receiving signals.
-						//close the webcam if present so that it can be updated too.
-						if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {
-							Process[] processes=Process.GetProcessesByName("WebCamOD");
-							for(int p=0;p<processes.Length;p++) {
-								processes[p].Kill();
-							}
-						}
-						//start the thread that will kill the application
-						Thread killThread=new Thread(new ThreadStart(KillThread));
-						killThread.Start();
 						string msg="";
 						if(Process.GetCurrentProcess().ProcessName=="OpenDental") {
 							msg+="All copies of Open Dental ";
@@ -4299,7 +4289,10 @@ namespace OpenDental{
 						MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste(msg);
 						msgbox.Size=new Size(300,300);
 						msgbox.TopMost=true;
-						msgbox.ShowDialog();
+						msgbox.Show();
+						//start the thread that will kill the application
+						Thread killThread=new Thread(new ThreadStart(KillThread));
+						killThread.Start();
 						return;
 					}
 				}
@@ -4481,22 +4474,16 @@ namespace OpenDental{
 
 		///<summary>Gives users 15 seconds to finish what they were doing before the program shuts down.</summary>
 		private void KillThread() {
+			//close the webcam if present so that it can be updated too.
+			if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {
+				ODThread webCamKillThread = new ODThread((o) => { Process.GetProcessesByName("WebCamOD").ToList().ForEach(x => x.Kill()); });
+				webCamKillThread.AddExceptionHandler((ex) => { });
+				webCamKillThread.Start(true);
+			}
 			Thread.Sleep(15000);//15 seconds
-			//We have to call ProcessKillCommand with an Invoke, so that the Application.Exit()
-			//will run from the main thread and bypass all FormClosing events except 
-			//FormOpenDental.FormClosing. We need to bypass the closing events so that the closing
-			//events do not have the opportunity to prevent the program from closing.
-			Invoke(new ProcessKillCommandDelegate(ProcessKillCommand));
-		}
-
-		///<summary></summary>
-		protected delegate void ProcessKillCommandDelegate();
-
-		///<summary></summary>
-		public void ProcessKillCommand() {
-			//It is crucial that every form be forcefully closed so that they do not stay connected to a database that has been updated to a more recent version.
-			CloseOpenForms(true);
-			Application.Exit();//This will call FormOpenDental's closing event which will clean up all threads that are currently running.
+			BeginInvoke((Action)(() => { CloseOpenForms(true); }));
+			Thread.Sleep(1000);//1 second
+			Invoke((Action)Application.Exit);
 		}
 
 		private void PlaySounds(Object objSignalList){
