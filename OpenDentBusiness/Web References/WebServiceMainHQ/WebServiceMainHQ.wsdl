@@ -188,6 +188,20 @@
           </s:sequence>
         </s:complexType>
       </s:element>
+      <s:element name="EnableAdditionalFeatures">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="officeData" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="EnableAdditionalFeaturesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="EnableAdditionalFeaturesResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
       <s:element name="string" nillable="true" type="s:string" />
     </s:schema>
   </wsdl:types>
@@ -268,6 +282,12 @@
   </wsdl:message>
   <wsdl:message name="GetFeaturesForEServiceSoapOut">
     <wsdl:part name="parameters" element="tns:GetFeaturesForEServiceResponse" />
+  </wsdl:message>
+  <wsdl:message name="EnableAdditionalFeaturesSoapIn">
+    <wsdl:part name="parameters" element="tns:EnableAdditionalFeatures" />
+  </wsdl:message>
+  <wsdl:message name="EnableAdditionalFeaturesSoapOut">
+    <wsdl:part name="parameters" element="tns:EnableAdditionalFeaturesResponse" />
   </wsdl:message>
   <wsdl:message name="PerformRefreshCacheHttpPostIn">
     <wsdl:part name="officeData" type="s:string" />
@@ -351,6 +371,12 @@
   <wsdl:message name="GetFeaturesForEServiceHttpPostOut">
     <wsdl:part name="Body" element="tns:string" />
   </wsdl:message>
+  <wsdl:message name="EnableAdditionalFeaturesHttpPostIn">
+    <wsdl:part name="officeData" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="EnableAdditionalFeaturesHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
   <wsdl:portType name="WebServiceMainHQSoap">
     <wsdl:operation name="PerformRefreshCache">
       <wsdl:input message="tns:PerformRefreshCacheSoapIn" />
@@ -403,6 +429,10 @@
     <wsdl:operation name="GetFeaturesForEService">
       <wsdl:input message="tns:GetFeaturesForEServiceSoapIn" />
       <wsdl:output message="tns:GetFeaturesForEServiceSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="EnableAdditionalFeatures">
+      <wsdl:input message="tns:EnableAdditionalFeaturesSoapIn" />
+      <wsdl:output message="tns:EnableAdditionalFeaturesSoapOut" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:portType name="WebServiceMainHQHttpPost">
@@ -457,6 +487,10 @@
     <wsdl:operation name="GetFeaturesForEService">
       <wsdl:input message="tns:GetFeaturesForEServiceHttpPostIn" />
       <wsdl:output message="tns:GetFeaturesForEServiceHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="EnableAdditionalFeatures">
+      <wsdl:input message="tns:EnableAdditionalFeaturesHttpPostIn" />
+      <wsdl:output message="tns:EnableAdditionalFeaturesHttpPostOut" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="WebServiceMainHQSoap" type="tns:WebServiceMainHQSoap">
@@ -571,6 +605,15 @@
     </wsdl:operation>
     <wsdl:operation name="GetFeaturesForEService">
       <soap:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/GetFeaturesForEService" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="EnableAdditionalFeatures">
+      <soap:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/EnableAdditionalFeatures" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -698,6 +741,15 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="EnableAdditionalFeatures">
+      <soap12:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/EnableAdditionalFeatures" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:binding name="WebServiceMainHQHttpPost" type="tns:WebServiceMainHQHttpPost">
     <http:binding verb="POST" />
@@ -818,16 +870,25 @@
         <mime:mimeXml part="Body" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="EnableAdditionalFeatures">
+      <http:operation location="/EnableAdditionalFeatures" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:service name="WebServiceMainHQ">
     <wsdl:port name="WebServiceMainHQSoap" binding="tns:WebServiceMainHQSoap">
-      <soap:address location="http://localhost/OpenDentalWebServiceHQ/webservicemainhq.asmx" />
+      <soap:address location="http://localhost:64111/webservicemainhq.asmx" />
     </wsdl:port>
     <wsdl:port name="WebServiceMainHQSoap12" binding="tns:WebServiceMainHQSoap12">
-      <soap12:address location="http://localhost/OpenDentalWebServiceHQ/webservicemainhq.asmx" />
+      <soap12:address location="http://localhost:64111/webservicemainhq.asmx" />
     </wsdl:port>
     <wsdl:port name="WebServiceMainHQHttpPost" binding="tns:WebServiceMainHQHttpPost">
-      <http:address location="http://localhost/OpenDentalWebServiceHQ/webservicemainhq.asmx" />
+      <http:address location="http://localhost:64111/webservicemainhq.asmx" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

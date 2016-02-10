@@ -468,6 +468,7 @@ namespace OpenDentBusiness {
 		///<summary>Frequency at which signals are processed. Also used by HQ to determine triage label refresh frequency.</summary>		
 		ProcessSigsIntervalInSecs,
 		ProcGroupNoteDoesAggregate,
+		ProgramAdditionalFeatures,
 		///<summary>Stores the DateTime of when the ProgramVersion preference last changed.</summary>
 		ProgramVersionLastUpdated,
 		ProgramVersion,

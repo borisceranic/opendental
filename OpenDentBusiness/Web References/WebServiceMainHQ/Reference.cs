@@ -55,6 +55,8 @@ namespace OpenDentBusiness.WebServiceMainHQ {
         
         private System.Threading.SendOrPostCallback GetFeaturesForEServiceOperationCompleted;
         
+        private System.Threading.SendOrPostCallback EnableAdditionalFeaturesOperationCompleted;
+        
         private bool useDefaultCredentialsSetExplicitly;
         
         /// <remarks/>
@@ -131,6 +133,9 @@ namespace OpenDentBusiness.WebServiceMainHQ {
         
         /// <remarks/>
         public event GetFeaturesForEServiceCompletedEventHandler GetFeaturesForEServiceCompleted;
+        
+        /// <remarks/>
+        public event EnableAdditionalFeaturesCompletedEventHandler EnableAdditionalFeaturesCompleted;
         
         /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("https://www.opendental.com/OpenDentalWebServiceHQ/PerformRefreshCache", RequestNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/", ResponseNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
@@ -518,6 +523,35 @@ namespace OpenDentBusiness.WebServiceMainHQ {
         }
         
         /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("https://www.opendental.com/OpenDentalWebServiceHQ/EnableAdditionalFeatures", RequestNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/", ResponseNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string EnableAdditionalFeatures(string officeData) {
+            object[] results = this.Invoke("EnableAdditionalFeatures", new object[] {
+                        officeData});
+            return ((string)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void EnableAdditionalFeaturesAsync(string officeData) {
+            this.EnableAdditionalFeaturesAsync(officeData, null);
+        }
+        
+        /// <remarks/>
+        public void EnableAdditionalFeaturesAsync(string officeData, object userState) {
+            if ((this.EnableAdditionalFeaturesOperationCompleted == null)) {
+                this.EnableAdditionalFeaturesOperationCompleted = new System.Threading.SendOrPostCallback(this.OnEnableAdditionalFeaturesOperationCompleted);
+            }
+            this.InvokeAsync("EnableAdditionalFeatures", new object[] {
+                        officeData}, this.EnableAdditionalFeaturesOperationCompleted, userState);
+        }
+        
+        private void OnEnableAdditionalFeaturesOperationCompleted(object arg) {
+            if ((this.EnableAdditionalFeaturesCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.EnableAdditionalFeaturesCompleted(this, new EnableAdditionalFeaturesCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
         public new void CancelAsync(object userState) {
             base.CancelAsync(userState);
         }
@@ -861,6 +895,32 @@ namespace OpenDentBusiness.WebServiceMainHQ {
         private object[] results;
         
         internal GetFeaturesForEServiceCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public string Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1038.0")]
+    public delegate void EnableAdditionalFeaturesCompletedEventHandler(object sender, EnableAdditionalFeaturesCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1038.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class EnableAdditionalFeaturesCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal EnableAdditionalFeaturesCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
                 base(exception, cancelled, userState) {
             this.results = results;
         }

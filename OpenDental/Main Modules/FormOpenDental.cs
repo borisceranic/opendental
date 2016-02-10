@@ -52,6 +52,7 @@ using OpenDental.UI;
 using System.ServiceProcess;
 using System.Linq;
 using OpenDental.Bridges;
+using OpenDentBusiness.WebServiceMainHQ;
 #if EHRTEST
 using EHR;
 #endif
@@ -2325,6 +2326,9 @@ namespace OpenDental{
 			DataConnectionEvent.Fired+=DataConnection_ConnectionLost;//Hook up the connection lost event. Nothing prior to this point will have LostConnection events fired.
 			RefreshLocalData(InvalidType.Prefs);//should only refresh preferences so that SignalLastClearedDate preference can be used in ClearOldSignals()
 			Signalods.ClearOldSignals();
+			ODThread FeatureThread = new ODThread((o) => { EnableAdditionalFeatures(); });
+			FeatureThread.AddExceptionHandler((ex) => { });//silently fail.
+			FeatureThread.Start(true);
 			//We no longer do this shotgun approach because it can slow the loading time.
 			//RefreshLocalData(InvalidType.AllLocal);
 			List<InvalidType> invalidTypes=new List<InvalidType>();
@@ -2656,6 +2660,57 @@ namespace OpenDental{
 				}
 			}
 			Plugins.HookAddCode(this,"FormOpenDental.Load_end");
+		}
+
+		private void EnableAdditionalFeatures() {
+			Pref featurePref = Prefs.GetPref(PrefName.ProgramAdditionalFeatures.ToString());
+			if(featurePref==null || PrefC.GetDateT(PrefName.ProgramAdditionalFeatures)>MiscData.GetNowDateTime()) {
+				return;
+			}
+			DateTime dateOriginal = MiscData.GetNowDateTime().AddMinutes(-30);
+			featurePref.ValueString=dateOriginal.AddDays(1).ToString(CultureInfo.InvariantCulture);//default try again in one day unless set below.
+			Prefs.Update(featurePref);
+			Signalods.SetInvalid(InvalidType.Prefs);
+			WebServiceMainHQ service=WebServiceMainHQProxy.GetWebServiceMainHQInstance();
+			string response = service.EnableAdditionalFeatures(WebServiceMainHQProxy.CreateWebServiceHQPayload("",eServiceCode.Undefined));
+			XmlDocument doc = new XmlDocument();
+			doc.LoadXml(response);
+			XmlNode node;
+			bool refreshNeeded = false;
+			refreshNeeded|=SetAdvertising(ProgramName.CentralDataStorage,doc);
+			refreshNeeded|=SetAdvertising(ProgramName.DentalIntel,doc);
+			refreshNeeded|=SetAdvertising(ProgramName.DentalTekSmartOfficePhone,doc);
+			refreshNeeded|=SetAdvertising(ProgramName.Podium,doc);
+			if(refreshNeeded) {
+				Signalods.SetInvalid(InvalidType.Programs);
+			}
+			node = doc.SelectSingleNode("//NextIntervalDays");
+			if(node!=null) {
+				long days = 7;//default value;
+				long.TryParse(node.InnerText,out days);
+				Prefs.UpdateDateT(PrefName.ProgramAdditionalFeatures,dateOriginal.AddDays(days));
+				Prefs.Update(featurePref);
+			}
+		}
+
+		private bool SetAdvertising(ProgramName progName, XmlDocument doc) {
+			ProgramProperty property = ProgramProperties.GetForProgram(Programs.GetCur(progName).ProgramNum).FirstOrDefault(x => x.PropertyDesc=="Disable Advertising");
+			bool retVal = false;
+			if(property!=null) {
+				XmlNode node = doc.SelectSingleNode("//"+progName.ToString());
+				if(node!=null && node.InnerText=="false") {
+					retVal=(property.PropertyValue=="0");
+					property.PropertyValue="1";
+				}
+				else if(node!=null) {
+					retVal=(property.PropertyValue=="1");
+					property.PropertyValue="0";
+				}
+			}
+			if(retVal) {
+				ProgramProperties.Update(property);
+			}
+			return retVal;
 		}
 
 		private void comboTriageCoordinator_SelectionChangeCommitted(object sender,EventArgs e) {
