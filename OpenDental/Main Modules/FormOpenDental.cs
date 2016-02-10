@@ -4398,14 +4398,6 @@ namespace OpenDental{
 		///<summary>Called when a shutdown signal is found.</summary>
 		private void onShutdown() {
 			timerSignals.Enabled=false;//quit receiving signals.
-			if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {
-				Process.GetProcessesByName("WebCamOD").ToList().ForEach(x => x.Kill());
-			}
-			ODThread killThread = new ODThread((o) => {
-				Thread.Sleep(15000);//15 seconds
-				Invoke((Action)ProcessKillCommand);
-			});
-			killThread.Start();
 			string msg = "";
 			if(Process.GetCurrentProcess().ProcessName=="OpenDental") {
 				msg+="All copies of Open Dental ";
@@ -4418,6 +4410,18 @@ namespace OpenDental{
 			msgbox.Size=new Size(300,300);
 			msgbox.TopMost=true;
 			msgbox.Show();
+			ODThread killThread = new ODThread((o) => {
+				if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {
+					ODThread webCamKillThread = new ODThread(((o2) => { Process.GetProcessesByName("WebCamOD").ToList().ForEach(x => x.Kill()); }));
+					webCamKillThread.AddExceptionHandler((ex) => { });
+					webCamKillThread.Start(true);
+				}
+				Thread.Sleep(15000);//15 seconds
+				BeginInvoke((Action)(() => { CloseOpenForms(true); }));
+				Thread.Sleep(1000);//1 second
+				Invoke((Action)Application.Exit);
+			});
+			killThread.Start(true);
 			return;
 		}
 
@@ -4619,18 +4623,18 @@ namespace OpenDental{
 			TaskGoTo(FormT.GotoType,FormT.GotoKeyNum);
 		}
 
-		///<summary>Gives users 15 seconds to finish what they were doing before the program shuts down.</summary>
-		private void KillThread() {
-			Thread.Sleep(15000);//15 seconds
-			//We have to call ProcessKillCommand with an Invoke, so that the Application.Exit()
-			//will run from the main thread and bypass all FormClosing events except 
-			//FormOpenDental.FormClosing. We need to bypass the closing events so that the closing
-			//events do not have the opportunity to prevent the program from closing.
-			Invoke(new ProcessKillCommandDelegate(ProcessKillCommand));
-		}
+		/////<summary>Gives users 15 seconds to finish what they were doing before the program shuts down.</summary>
+		//private void KillThread() {
+		//	Thread.Sleep(15000);//15 seconds
+		//	//We have to call ProcessKillCommand with an Invoke, so that the Application.Exit()
+		//	//will run from the main thread and bypass all FormClosing events except 
+		//	//FormOpenDental.FormClosing. We need to bypass the closing events so that the closing
+		//	//events do not have the opportunity to prevent the program from closing.
+		//	Invoke(new ProcessKillCommandDelegate(ProcessKillCommand));
+		//}
 
-		///<summary></summary>
-		protected delegate void ProcessKillCommandDelegate();
+		/////<summary></summary>
+		//protected delegate void ProcessKillCommandDelegate();
 
 		///<summary></summary>
 		public void ProcessKillCommand() {
