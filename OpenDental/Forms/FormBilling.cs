@@ -219,12 +219,12 @@ namespace OpenDental{
 			this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuItemGoTo});
 			this.contextMenu.Name = "contextMenu";
-			this.contextMenu.Size = new System.Drawing.Size(107, 26);
+			this.contextMenu.Size = new System.Drawing.Size(106, 26);
 			// 
 			// menuItemGoTo
 			// 
 			this.menuItemGoTo.Name = "menuItemGoTo";
-			this.menuItemGoTo.Size = new System.Drawing.Size(106, 22);
+			this.menuItemGoTo.Size = new System.Drawing.Size(105, 22);
 			this.menuItemGoTo.Text = "Go To";
 			this.menuItemGoTo.Click += new System.EventHandler(this.menuItemGoTo_Click);
 			// 
@@ -263,7 +263,7 @@ namespace OpenDental{
 			// 
 			this.radioSent.Location = new System.Drawing.Point(31, 29);
 			this.radioSent.Name = "radioSent";
-			this.radioSent.Size = new System.Drawing.Size(79, 20);
+			this.radioSent.Size = new System.Drawing.Size(75, 20);
 			this.radioSent.TabIndex = 32;
 			this.radioSent.Text = "Sent";
 			this.radioSent.UseVisualStyleBackColor = true;
@@ -382,7 +382,7 @@ namespace OpenDental{
 			// comboOrder
 			// 
 			this.comboOrder.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboOrder.Location = new System.Drawing.Point(234, 8);
+			this.comboOrder.Location = new System.Drawing.Point(196, 8);
 			this.comboOrder.MaxDropDownItems = 40;
 			this.comboOrder.Name = "comboOrder";
 			this.comboOrder.Size = new System.Drawing.Size(173, 21);
@@ -391,9 +391,9 @@ namespace OpenDental{
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(149, 12);
+			this.label4.Location = new System.Drawing.Point(112, 12);
 			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(83, 14);
+			this.label4.Size = new System.Drawing.Size(82, 14);
 			this.label4.TabIndex = 40;
 			this.label4.Text = "Order by";
 			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -428,19 +428,19 @@ namespace OpenDental{
 			// comboClinic
 			// 
 			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboClinic.Location = new System.Drawing.Point(488, 8);
+			this.comboClinic.Location = new System.Drawing.Point(429, 8);
 			this.comboClinic.MaxDropDownItems = 40;
 			this.comboClinic.Name = "comboClinic";
-			this.comboClinic.Size = new System.Drawing.Size(133, 21);
+			this.comboClinic.Size = new System.Drawing.Size(187, 21);
 			this.comboClinic.TabIndex = 44;
 			this.comboClinic.Visible = false;
 			this.comboClinic.SelectionChangeCommitted += new System.EventHandler(this.comboClinic_SelectionChangeCommitted);
 			// 
 			// labelClinic
 			// 
-			this.labelClinic.Location = new System.Drawing.Point(413, 13);
+			this.labelClinic.Location = new System.Drawing.Point(375, 13);
 			this.labelClinic.Name = "labelClinic";
-			this.labelClinic.Size = new System.Drawing.Size(73, 14);
+			this.labelClinic.Size = new System.Drawing.Size(52, 14);
 			this.labelClinic.TabIndex = 45;
 			this.labelClinic.Text = "Clinic";
 			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -449,7 +449,7 @@ namespace OpenDental{
 			// comboEmailFrom
 			// 
 			this.comboEmailFrom.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboEmailFrom.Location = new System.Drawing.Point(234, 32);
+			this.comboEmailFrom.Location = new System.Drawing.Point(196, 32);
 			this.comboEmailFrom.MaxDropDownItems = 40;
 			this.comboEmailFrom.Name = "comboEmailFrom";
 			this.comboEmailFrom.Size = new System.Drawing.Size(173, 21);
@@ -457,9 +457,9 @@ namespace OpenDental{
 			// 
 			// label6
 			// 
-			this.label6.Location = new System.Drawing.Point(118, 36);
+			this.label6.Location = new System.Drawing.Point(112, 36);
 			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(110, 14);
+			this.label6.Size = new System.Drawing.Size(82, 14);
 			this.label6.TabIndex = 46;
 			this.label6.Text = "Email From";
 			this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleRight;

@@ -1112,7 +1112,7 @@ namespace OpenDental{
 			this.comboClinic.Location = new System.Drawing.Point(351, 11);
 			this.comboClinic.MaxDropDownItems = 100;
 			this.comboClinic.Name = "comboClinic";
-			this.comboClinic.Size = new System.Drawing.Size(126, 21);
+			this.comboClinic.Size = new System.Drawing.Size(170, 21);
 			this.comboClinic.TabIndex = 121;
 			// 
 			// labelClinic
@@ -1878,6 +1878,7 @@ namespace OpenDental{
 			// textNote
 			// 
 			this.textNote.AcceptsTab = true;
+			this.textNote.BackColor = System.Drawing.SystemColors.Window;
 			this.textNote.DetectUrls = false;
 			this.textNote.Location = new System.Drawing.Point(619, 22);
 			this.textNote.MaxLength = 255;
@@ -3242,6 +3243,7 @@ namespace OpenDental{
 			// 
 			// gridStatusHistory
 			// 
+			this.gridStatusHistory.HasAddButton = false;
 			this.gridStatusHistory.HasMultilineHeaders = false;
 			this.gridStatusHistory.HScrollVisible = false;
 			this.gridStatusHistory.Location = new System.Drawing.Point(52, 27);
@@ -3552,6 +3554,7 @@ namespace OpenDental{
 			// 
 			// gridPay
 			// 
+			this.gridPay.HasAddButton = false;
 			this.gridPay.HasMultilineHeaders = false;
 			this.gridPay.HScrollVisible = false;
 			this.gridPay.Location = new System.Drawing.Point(2, 389);
@@ -3583,6 +3586,7 @@ namespace OpenDental{
 			// 
 			// gridProc
 			// 
+			this.gridProc.HasAddButton = false;
 			this.gridProc.HasMultilineHeaders = false;
 			this.gridProc.HScrollVisible = false;
 			this.gridProc.Location = new System.Drawing.Point(2, 159);

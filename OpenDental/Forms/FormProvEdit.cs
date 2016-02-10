@@ -259,7 +259,7 @@ namespace OpenDental{
 			// 
 			// label5
 			// 
-			this.label5.Location = new System.Drawing.Point(552, 8);
+			this.label5.Location = new System.Drawing.Point(576, 8);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(116, 14);
 			this.label5.TabIndex = 16;
@@ -333,7 +333,7 @@ namespace OpenDental{
 			// 
 			this.listFeeSched.Location = new System.Drawing.Point(397, 25);
 			this.listFeeSched.Name = "listFeeSched";
-			this.listFeeSched.Size = new System.Drawing.Size(108, 173);
+			this.listFeeSched.Size = new System.Drawing.Size(168, 186);
 			this.listFeeSched.TabIndex = 13;
 			// 
 			// listSpecialty
@@ -353,7 +353,7 @@ namespace OpenDental{
             "Pathology, Oral & MaxFac",
             "Public Health",
             "Radiology"});
-			this.listSpecialty.Location = new System.Drawing.Point(552, 25);
+			this.listSpecialty.Location = new System.Drawing.Point(576, 25);
 			this.listSpecialty.Name = "listSpecialty";
 			this.listSpecialty.Size = new System.Drawing.Size(154, 186);
 			this.listSpecialty.TabIndex = 17;
@@ -712,7 +712,7 @@ namespace OpenDental{
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(549, 215);
+			this.label4.Location = new System.Drawing.Point(573, 215);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(154, 14);
 			this.label4.TabIndex = 96;
@@ -721,7 +721,7 @@ namespace OpenDental{
 			// 
 			// textTaxonomyOverride
 			// 
-			this.textTaxonomyOverride.Location = new System.Drawing.Point(552, 231);
+			this.textTaxonomyOverride.Location = new System.Drawing.Point(576, 231);
 			this.textTaxonomyOverride.MaxLength = 255;
 			this.textTaxonomyOverride.Name = "textTaxonomyOverride";
 			this.textTaxonomyOverride.Size = new System.Drawing.Size(154, 20);

@@ -144,7 +144,7 @@ namespace OpenDental{
 			// textUserNum
 			// 
 			this.textUserNum.BackColor = System.Drawing.SystemColors.Control;
-			this.textUserNum.Location = new System.Drawing.Point(56, 27);
+			this.textUserNum.Location = new System.Drawing.Point(28, 27);
 			this.textUserNum.Name = "textUserNum";
 			this.textUserNum.ReadOnly = true;
 			this.textUserNum.Size = new System.Drawing.Size(144, 20);
@@ -152,7 +152,7 @@ namespace OpenDental{
 			// 
 			// label27
 			// 
-			this.label27.Location = new System.Drawing.Point(56, 9);
+			this.label27.Location = new System.Drawing.Point(28, 9);
 			this.label27.Name = "label27";
 			this.label27.Size = new System.Drawing.Size(65, 17);
 			this.label27.TabIndex = 166;
@@ -172,14 +172,14 @@ namespace OpenDental{
 			// 
 			// listProv
 			// 
-			this.listProv.Location = new System.Drawing.Point(426, 113);
+			this.listProv.Location = new System.Drawing.Point(414, 110);
 			this.listProv.Name = "listProv";
-			this.listProv.Size = new System.Drawing.Size(124, 225);
+			this.listProv.Size = new System.Drawing.Size(185, 225);
 			this.listProv.TabIndex = 160;
 			// 
 			// label5
 			// 
-			this.label5.Location = new System.Drawing.Point(426, 92);
+			this.label5.Location = new System.Drawing.Point(414, 91);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(124, 20);
 			this.label5.TabIndex = 159;
@@ -197,14 +197,14 @@ namespace OpenDental{
 			// 
 			// listEmployee
 			// 
-			this.listEmployee.Location = new System.Drawing.Point(278, 113);
+			this.listEmployee.Location = new System.Drawing.Point(221, 110);
 			this.listEmployee.Name = "listEmployee";
-			this.listEmployee.Size = new System.Drawing.Size(124, 225);
+			this.listEmployee.Size = new System.Drawing.Size(185, 225);
 			this.listEmployee.TabIndex = 157;
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(278, 92);
+			this.label2.Location = new System.Drawing.Point(221, 91);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(124, 20);
 			this.label2.TabIndex = 156;
@@ -213,21 +213,21 @@ namespace OpenDental{
 			// 
 			// textUserName
 			// 
-			this.textUserName.Location = new System.Drawing.Point(56, 68);
+			this.textUserName.Location = new System.Drawing.Point(28, 68);
 			this.textUserName.Name = "textUserName";
 			this.textUserName.Size = new System.Drawing.Size(198, 20);
 			this.textUserName.TabIndex = 152;
 			// 
 			// listUserGroup
 			// 
-			this.listUserGroup.Location = new System.Drawing.Point(56, 110);
+			this.listUserGroup.Location = new System.Drawing.Point(28, 110);
 			this.listUserGroup.Name = "listUserGroup";
-			this.listUserGroup.Size = new System.Drawing.Size(197, 225);
+			this.listUserGroup.Size = new System.Drawing.Size(185, 225);
 			this.listUserGroup.TabIndex = 154;
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(56, 89);
+			this.label3.Location = new System.Drawing.Point(28, 91);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(197, 20);
 			this.label3.TabIndex = 153;
@@ -236,7 +236,7 @@ namespace OpenDental{
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(56, 47);
+			this.label1.Location = new System.Drawing.Point(28, 47);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(64, 20);
 			this.label1.TabIndex = 151;
