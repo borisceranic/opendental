@@ -4664,32 +4664,32 @@ namespace OpenDental{
 				row.Cells.Add(ClaimProcsForClaim[i].WriteOff.ToString("F"));
 				switch(ClaimProcsForClaim[i].Status){
 					case ClaimProcStatus.Received:
-						row.Cells.Add("Recd");
+						row.Cells.Add(Lan.g("TableClaimProc","Recd"));
 						break;
 					case ClaimProcStatus.NotReceived:
 						row.Cells.Add("");
 						break;
 					//adjustment would never show here
 					case ClaimProcStatus.Preauth:
-						row.Cells.Add("PreA");
+						row.Cells.Add(Lan.g("TableClaimProc","PreA"));
 						break;
 					case ClaimProcStatus.Supplemental:
-						row.Cells.Add("Supp");
+						row.Cells.Add(Lan.g("TableClaimProc","Supp"));
 						break;
 					case ClaimProcStatus.CapClaim:
-						row.Cells.Add("Cap");
+						row.Cells.Add(Lan.g("TableClaimProc","Cap"));
 						break;
 					case ClaimProcStatus.Estimate:
 						row.Cells.Add("");
-						MessageBox.Show("error. Estimate loaded.");
+						MsgBox.Show(this,"error. Estimate loaded.");
 						break;
 					case ClaimProcStatus.CapEstimate:
 						row.Cells.Add("");
-						MessageBox.Show("error. CapEstimate loaded.");
+						MsgBox.Show(this,"error. CapEstimate loaded.");
 						break;
 					case ClaimProcStatus.CapComplete:
 						row.Cells.Add("");
-						MessageBox.Show("error. CapComplete loaded.");
+						MsgBox.Show(this,"error. CapComplete loaded.");
 						break;
 					//Estimate would never show here
 					//Cap would never show here
