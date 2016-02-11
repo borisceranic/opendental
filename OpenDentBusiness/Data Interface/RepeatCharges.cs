@@ -27,6 +27,38 @@ namespace OpenDentBusiness{
 			Crud.RepeatChargeCrud.Update(charge);
 		}
 
+		///<summary>HQ only. Called from WebServiceMainHQ.SmsSignAgreement and internal Broadcast Monitor too.
+		///Create a monthly access repeating charge or update if already exists. 
+		///Provided vlnMonthlyChargeUSD will only be applied if the RepeatCharge does not already exist.</summary>
+		public static void UpsertForTextingAccess(long patNum,float vlnMonthlyChargeUSD) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),patNum,vlnMonthlyChargeUSD);
+				return;
+			}
+			RepeatCharge[] repeateCharges=RepeatCharges.Refresh(patNum);
+			RepeatCharge repeatCharge=null;
+			if(repeateCharges!=null) {
+				repeatCharge=repeateCharges.FirstOrDefault(x => x.ProcCode=="038");
+			}
+			if(repeatCharge==null) {
+				repeatCharge=new RepeatCharge();
+				repeatCharge.ProcCode="038";
+				repeatCharge.PatNum=patNum;
+				repeatCharge.IsEnabled=true;
+				repeatCharge.DateStart=System.DateTime.Today; //post start date of today. Billing Cycle day will determine when charges are posted.
+				repeatCharge.CreatesClaim=false;
+				repeatCharge.CopyNoteToProc=false;
+				//Previously, the charge was set to the default Fee.Amount for code 038. 
+				//Now the charge will come from a static rate set in SMSNexmoRate table for this country code.
+				repeatCharge.ChargeAmt=vlnMonthlyChargeUSD;
+				//repeatCharge.ChargeAmt=Fees.GetFeesAllShallow(Fees.GetDict()).FirstOrDefault(f => f.CodeNum==ProcedureCodes.GetProcCode("038").CodeNum).Amount;
+				repeatCharge.RepeatChargeNum=RepeatCharges.Insert(repeatCharge);
+			}
+			repeatCharge.IsEnabled=true;
+			repeatCharge.DateStop=System.DateTime.MinValue;
+			RepeatCharges.Update(repeatCharge);
+		}
+
 		///<summary></summary>
 		public static long Insert(RepeatCharge charge) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
