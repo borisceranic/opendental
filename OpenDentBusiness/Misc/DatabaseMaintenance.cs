@@ -4701,6 +4701,36 @@ namespace OpenDentBusiness {
 			}
 			return log;
 		}
+				
+		[DbmMethod]
+		public static string ProcedurelogWithInvalidAptNum(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			if(isCheck) {
+				command="SELECT COUNT(*) "
+					+"FROM procedurelog "
+					+"WHERE (AptNum NOT IN(SELECT AptNum FROM appointment) AND AptNum!=0) "
+					+"OR (PlannedAptNum NOT IN(SELECT AptNum FROM appointment) AND PlannedAptNum!=0)";
+				int numFound=PIn.Int(Db.GetCount(command));
+				if(numFound>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Procedures attached to invalid appointments")+": "+numFound+"\r\n";
+				}
+			}
+			else {
+				command="UPDATE procedurelog SET AptNum=0 "
+					+"WHERE AptNum NOT IN(SELECT AptNum FROM appointment) AND AptNum!=0";
+				long numberFixed=Db.NonQ(command);
+				command="UPDATE procedurelog SET PlannedAptNum=0 "
+					+"WHERE PlannedAptNum NOT IN(SELECT AptNum FROM appointment) AND PlannedAptNum!=0";
+				numberFixed+=Db.NonQ(command);
+				if(numberFixed>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Procedures with invalid appointments fixed")+": "+numberFixed.ToString()+"\r\n";//Do we care enough that this number could be inflated if a procedure had both an invalid AptNum AND PlannedNum?
+				}
+			}
+			return log;
+		}
 
 		[DbmMethod(HasBreakDown=true)]
 		public static string ProviderHiddenWithClaimPayments(bool verbose,bool isCheck) {
