@@ -433,6 +433,59 @@ namespace OpenDentBusiness{
 			}
 		}
 
+		public static void ClearBlockoutsForOp(long opNum, DateTime dateClear) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),opNum,dateClear);
+				return;
+			}
+			//A schedule may be attached to more than one operatory.
+			List<Schedule> listSchedules = Schedules.GetForDate(dateClear);
+			listSchedules.RemoveAll(x => x.SchedType!=ScheduleType.Blockout);
+			//Find the sched ops that we want to delete.
+			List<ScheduleOp> listSchedOps = ScheduleOps.GetForSchedList(listSchedules);
+			listSchedOps.RemoveAll(x => x.OperatoryNum!=opNum);
+			ScheduleOps.DeleteBatch(listSchedOps.Select(x => x.ScheduleOpNum).ToList());
+			//If deleting the sched op above caused the schedule to be orphaned it should be deleted.
+			Schedules.DeleteOrphanedBlockouts();
+		}
+
+		public static void ClearBlockoutsForClinic(long clinicNum,DateTime dateClear) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),clinicNum,dateClear);
+				return;
+			}
+			//A schedule may be attached to more than one operatory.
+			List<Schedule> listSchedules = Schedules.GetForDate(dateClear);
+			listSchedules.RemoveAll(x => x.SchedType!=ScheduleType.Blockout);
+			//Find the sched ops that we want to delete.
+			List<long> listOpNums = Operatories.GetOpsForClinic(clinicNum).Select(x=>x.OperatoryNum).ToList();
+			List<ScheduleOp> listSchedOps = ScheduleOps.GetForSchedList(listSchedules);
+			listSchedOps.RemoveAll(x => !listOpNums.Contains(x.OperatoryNum));
+			ScheduleOps.DeleteBatch(listSchedOps.Select(x => x.ScheduleOpNum).ToList());
+			//If deleting the sched op above caused the schedule to be orphaned it should be deleted.
+			Schedules.DeleteOrphanedBlockouts();
+		}
+
+		private static void DeleteOrphanedBlockouts() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod());
+				return;
+			}
+			string command = "DELETE FROM schedule WHERE SchedType="+POut.Int((int)ScheduleType.Blockout)
+				+" AND ScheduleNum NOT IN (SELECT ScheduleNum FROM ScheduleOp)";
+			Db.NonQ(command);
+		}
+
+		///<summary>Similar to GetDayList but uses Crud pattern and classes.</summary>
+		private static List<Schedule> GetForDate(DateTime dateClear) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Schedule>>(MethodBase.GetCurrentMethod(),dateClear);
+			}
+			string command="SELECT * FROM Schedule Where SchedDate="+POut.Date(dateClear);
+			return Crud.ScheduleCrud.SelectMany(command);
+		}
+		
+
 		public static bool DateIsHoliday(DateTime date){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetBool(MethodBase.GetCurrentMethod(),date);
@@ -831,8 +884,6 @@ namespace OpenDentBusiness{
 			command="DELETE FROM scheduleop WHERE NOT EXISTS(SELECT * FROM schedule WHERE scheduleop.ScheduleNum=schedule.ScheduleNum)";
 			long result=Db.NonQ(command);//we can test the result in debug
 		}
-
-
 	}
 
 	

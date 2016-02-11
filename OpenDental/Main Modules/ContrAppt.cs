@@ -1911,6 +1911,8 @@ namespace OpenDental {
 			menuBlockout.MenuItems.Add(Lan.g(this,"Add Blockout"),new EventHandler(menuBlockout_Click));
 			menuBlockout.MenuItems.Add(Lan.g(this,"Blockout Cut-Copy-Paste"),new EventHandler(menuBlockout_Click));
 			menuBlockout.MenuItems.Add(Lan.g(this,"Clear All Blockouts for Day"),new EventHandler(menuBlockout_Click));
+			menuBlockout.MenuItems.Add(Lan.g(this,"Clear All Blockouts for Day, Op only"),new EventHandler(menuBlockout_Click));
+			menuBlockout.MenuItems.Add(Lan.g(this,"Clear All Blockouts for Day, Clinic only"),new EventHandler(menuBlockout_Click));
 			menuBlockout.MenuItems.Add(Lan.g(this,"Edit Blockout Types"),new EventHandler(menuBlockout_Click));
 			Lan.C(this,new Control[]
 				{
@@ -5049,6 +5051,12 @@ namespace OpenDental {
 					OnClearBlockouts_Click();
 					break;
 				case 8:
+					OnClearBlockoutsOp_Click();
+					break;
+				case 9:
+					OnClearBlockoutsClinic_Click();
+					break;
+				case 10:
 					OnBlockTypes_Click();
 					break;
 			}
@@ -5745,6 +5753,39 @@ namespace OpenDental {
 				Schedules.ClearBlockoutsForDay(AppointmentL.DateSelected);
 			}
 			SecurityLogs.MakeLogEntry(Permissions.Blockouts,0,"Blockout clear.");
+			RefreshPeriod();
+		}
+
+		private void OnClearBlockoutsOp_Click() {
+			if(!Security.IsAuthorized(Permissions.Blockouts)) {
+				return;
+			}
+			if(!MsgBox.Show(this,true,"Clear all blockouts for day and operatory?")) {
+				return;
+			}
+			DateTime dateClear=AppointmentL.DateSelected;
+			if(ApptDrawing.IsWeeklyView) {
+				dateClear=WeekStartDate.AddDays(SheetClickedonDay);
+			}
+			Schedules.ClearBlockoutsForOp(SheetClickedonOp,dateClear);
+			SecurityLogs.MakeLogEntry(Permissions.Blockouts,0,"Blockout clear operatory: "+Operatories.GetAbbrev(SheetClickedonOp));
+			RefreshPeriod();
+		}
+
+		private void OnClearBlockoutsClinic_Click() {
+			if(!Security.IsAuthorized(Permissions.Blockouts)) {
+				return;
+			}
+			if(!MsgBox.Show(this,true,"Clear all blockouts for day and clinic?")) {
+				return;
+			}
+			DateTime dateClear = AppointmentL.DateSelected;
+			if(ApptDrawing.IsWeeklyView) {
+				dateClear=WeekStartDate.AddDays(SheetClickedonDay);
+			}
+			Operatory operatory=Operatories.GetOperatory(SheetClickedonOp);
+			Schedules.ClearBlockoutsForClinic(operatory.ClinicNum,dateClear);
+			SecurityLogs.MakeLogEntry(Permissions.Blockouts,0,"Blockout clear clinic: "+Operatories.GetAbbrev(SheetClickedonOp));
 			RefreshPeriod();
 		}
 

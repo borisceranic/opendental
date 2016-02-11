@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Reflection;
 
 namespace OpenDentBusiness{
@@ -32,24 +33,25 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<ScheduleOp>>(MethodBase.GetCurrentMethod(),schedules);
 			}
-			if(schedules.Count==0) {
+			if(schedules==null || schedules.Count==0) {
 				return new List<ScheduleOp>();
 			}
-			string command="SELECT * FROM scheduleop "
-				+"WHERE ScheduleNum IN ( ";
-			for(int i=0;i<schedules.Count;i++) {
-				if(i>0) {
-					command+=",";
-				}
-				command+=schedules[i].ScheduleNum.ToString();
-			}
-			command+=")";
+			string command="SELECT * FROM scheduleop WHERE ScheduleNum IN ("+string.Join(",",schedules.Select(x=>x.ScheduleNum))+")";
 			return Crud.ScheduleOpCrud.SelectMany(command);
 		}
 
-		
+		public static void DeleteBatch(List<long> listSchedOpNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listSchedOpNums);
+				return;
+			}
+			if(listSchedOpNums==null || listSchedOpNums.Count==0) {
+				return;
+			}
+			string command = "DELETE FROM scheduleop WHERE ScheduleOpNum IN ("+string.Join(",",listSchedOpNums)+")";
+			Db.NonQ(command);
+		}
 
-		
 	}
 
 	
