@@ -1010,7 +1010,7 @@ namespace OpenDental{
 				//we have decided not to show this button in other countries for now.
 				butInsRem.Visible=true;
 			}
-			if(_listTreatPlans.Count==0) {
+			if(_listTreatPlans!=null && _listTreatPlans.Count==0) {//_listTreatPlans will be null when no patient is selected.
 				textNote.Text="";
 			}
 		}
