@@ -31,7 +31,7 @@ namespace OpenDental{
 			// 
 			// labelClinic
 			// 
-			this.labelClinic.Location = new System.Drawing.Point(21, 9);
+			this.labelClinic.Location = new System.Drawing.Point(12, 9);
 			this.labelClinic.Name = "labelClinic";
 			this.labelClinic.Size = new System.Drawing.Size(179, 21);
 			this.labelClinic.TabIndex = 253;
@@ -40,10 +40,13 @@ namespace OpenDental{
 			// 
 			// listClinic
 			// 
+			this.listClinic.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.listClinic.FormattingEnabled = true;
-			this.listClinic.Location = new System.Drawing.Point(24, 34);
+			this.listClinic.Location = new System.Drawing.Point(12, 34);
 			this.listClinic.Name = "listClinic";
-			this.listClinic.Size = new System.Drawing.Size(176, 264);
+			this.listClinic.Size = new System.Drawing.Size(250, 264);
 			this.listClinic.TabIndex = 254;
 			this.listClinic.DoubleClick += new System.EventHandler(this.listClinic_DoubleClick);
 			// 
