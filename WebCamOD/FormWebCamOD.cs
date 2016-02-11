@@ -58,8 +58,8 @@ namespace WebCamOD {
 			timerPhoneWebCam.Interval=PrefC.GetInt(PrefName.WebCamFrequencyMS);
 			timerPhoneWebCam.Enabled=true;
 			timerPhoneWebCam_Tick(this,new EventArgs());//Force an initial picture
-			timerScreenShots.Enabled=true;
-			timerScreenShots_Tick(this,new EventArgs());//force an initial screenshot
+			//timerScreenShots.Enabled=true;
+			//timerScreenShots_Tick(this,new EventArgs());//force an initial screenshot
 		}
 
 		private void timerPhoneWebCam_Tick(object sender,EventArgs e) {
@@ -121,6 +121,7 @@ namespace WebCamOD {
 			catch { }//Prevents UE from losing MySQL service
 		}
 
+		///<summary>Currently does not tick due to users with three monitors complaining about WebCamOD crashing.</summary>
 		private void timerScreenShots_Tick(object sender,EventArgs e) {
 			//ticks every 5 minutes
 			try {
