@@ -204,7 +204,7 @@ namespace OpenDentalGraph {
 
 		[Description("Controls the 'Top Value' numeric control. Gets or sets number of series to include.")]
 		[Category("Graph")]
-		private int BreakdownVal {
+		public int BreakdownVal {
 			get { return (int)numericTop.Value; }
 			set { numericTop.Value=value; }
 		}
@@ -387,7 +387,7 @@ namespace OpenDentalGraph {
 					DateStamp=point==null?DateTime.Now:DateTime.FromOADate(point.XValue),
 					Val=point==null?0:point.YValues[0],
 					SeriesName=result.Series.Name,
-					Tag=result.Series.Tag
+					Tag=result.Series.Tag??new object()
 				};
 				DataPointDoubleClick(this,dp);
 			}
@@ -476,10 +476,9 @@ namespace OpenDentalGraph {
 			}
 			//1 grouping for each series name.
 			List<string> seriesNames=rawDataLocal.Select(x => x.SeriesName).Distinct().ToList();
-			//Project into a data type that is suitable for grouping and sorting.
-			//todo: finding the Tag item was taking way too long. Bring it back when we have a better way to link the tag to each series.
-			//var rawDataFormatted=seriesNames.Select(x => new { SeriesName=x,Dict=new Dictionary<DateTime,double>(),Tag=rawDataLocal.FirstOrDefault(y => y.SeriesName==x).Tag }).ToDictionary(x=>x.SeriesName,x=>x);
-			var rawDataFormatted=seriesNames.Select(x => new { SeriesName=x,Dict=new Dictionary<DateTime,double>(),Tag=new object()/*rawDataLocal.FirstOrDefault(y => y.SeriesName==x).Tag*/ }).ToDictionary(x=>x.SeriesName,x=>x);
+			//Project into a data types that are suitable for grouping and sorting.
+			var seriesTags=rawDataLocal.GroupBy(x => x.SeriesName).ToDictionary(x => x.Key,x => x.First().Tag);
+			var rawDataFormatted=seriesNames.Select(x => new { SeriesName=x,Dict=new Dictionary<DateTime,double>(),Tag=seriesTags[x] }).ToDictionary(x=>x.SeriesName,x=>x);
 			_intervals.Clear();
 			DateTime thisDate=DateFrom;
 			DateTime toDate=DateTo;
