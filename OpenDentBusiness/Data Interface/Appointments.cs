@@ -686,6 +686,7 @@ namespace OpenDentBusiness{
 			DataTable table=new DataTable("Appointments");
 			DataRow row;
 			//columns that start with lowercase are altered for display rather than being raw data.
+			table.Columns.Add("adjustmentTotal");
 			table.Columns.Add("age");
 			table.Columns.Add("address");
 			table.Columns.Add("addrNote");
@@ -960,6 +961,8 @@ namespace OpenDentBusiness{
 					dictRefToPatNums[listRefAttaches[j].PatNum]+=("\r\n"+nameLF);//Concatenate all refTo nameLF's to the refTo dict
 				}
 			}
+			command="SELECT * FROM adjustment WHERE AdjDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd.AddDays(1));
+			List<Adjustment> listAdjustments=Crud.AdjustmentCrud.SelectMany(command);
 			DateTime aptDate;
 			DateTime aptDateArrived;
 			TimeSpan span;
@@ -1206,6 +1209,11 @@ namespace OpenDentBusiness{
 				}
 				row["production"]=production.ToString("c");//PIn.Double(raw.Rows[i]["Production"].ToString()).ToString("c");
 				row["productionVal"]=production.ToString();//raw.Rows[i]["Production"].ToString();
+				decimal adjustmentAmt=0;
+				foreach(Adjustment adjust in listAdjustments) {
+					adjustmentAmt+=(decimal)adjust.AdjAmt;
+				}
+				row["adjustmentTotal"]=adjustmentAmt.ToString();
 				if(raw.Rows[i]["apptIsHygiene"].ToString()=="1"){
 					row["provider"]=raw.Rows[i]["HygAbbr"].ToString();
 					if(raw.Rows[i]["ProvAbbr"].ToString()!=""){

@@ -2225,6 +2225,9 @@ namespace OpenDental {
 					//when setting appointments.
 					grossproduction+=PIn.Decimal(DS.Tables["Appointments"].Rows[i]["productionVal"].ToString());
 					netproduction+=PIn.Decimal(DS.Tables["Appointments"].Rows[i]["productionVal"].ToString())-PIn.Decimal(DS.Tables["Appointments"].Rows[i]["writeoffPPO"].ToString());
+					if(PrefC.GetBool(PrefName.ApptModuleAdjustmentsInProd)) {
+						netproduction+=PIn.Decimal(DS.Tables["Appointments"].Rows[i]["adjustmentTotal"].ToString());
+					}
 				}
 			}
 			textProduction.Text=grossproduction.ToString("c0");

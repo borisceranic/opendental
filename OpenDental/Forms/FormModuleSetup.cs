@@ -156,6 +156,7 @@ namespace OpenDental{
 		private RadioButton radioImagesModuleTreeIsCollapsed;
 		private RadioButton radioImagesModuleTreeIsPersistentPerUser;
 		private CheckBox checkPaymentsUsePatClin;
+		private CheckBox checkApptModuleAdjInProd;
 		private GroupBox groupBox3;
 
 		///<summary>Default constructor.  Opens the form with the Appts tab selected.</summary>
@@ -261,6 +262,7 @@ namespace OpenDental{
 			this.label15 = new System.Windows.Forms.Label();
 			this.comboCobRule = new System.Windows.Forms.ComboBox();
 			this.tabAccount = new System.Windows.Forms.TabPage();
+			this.checkPaymentsUsePatClin = new System.Windows.Forms.CheckBox();
 			this.checkRecurChargPriProv = new System.Windows.Forms.CheckBox();
 			this.textInsWriteoffDescript = new System.Windows.Forms.TextBox();
 			this.label17 = new System.Windows.Forms.Label();
@@ -330,7 +332,7 @@ namespace OpenDental{
 			this.colorDialog = new System.Windows.Forms.ColorDialog();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.checkPaymentsUsePatClin = new System.Windows.Forms.CheckBox();
+			this.checkApptModuleAdjInProd = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -813,12 +815,13 @@ namespace OpenDental{
 			this.tabControl1.Location = new System.Drawing.Point(20, 10);
 			this.tabControl1.Name = "tabControl1";
 			this.tabControl1.SelectedIndex = 0;
-			this.tabControl1.Size = new System.Drawing.Size(474, 505);
+			this.tabControl1.Size = new System.Drawing.Size(474, 537);
 			this.tabControl1.TabIndex = 196;
 			// 
 			// tabAppts
 			// 
 			this.tabAppts.BackColor = System.Drawing.SystemColors.Window;
+			this.tabAppts.Controls.Add(this.checkApptModuleAdjInProd);
 			this.tabAppts.Controls.Add(this.checkApptTimeReset);
 			this.tabAppts.Controls.Add(this.groupBox2);
 			this.tabAppts.Controls.Add(this.checkApptModuleDefaultToWeek);
@@ -848,7 +851,7 @@ namespace OpenDental{
 			this.tabAppts.Location = new System.Drawing.Point(4, 22);
 			this.tabAppts.Name = "tabAppts";
 			this.tabAppts.Padding = new System.Windows.Forms.Padding(3);
-			this.tabAppts.Size = new System.Drawing.Size(466, 479);
+			this.tabAppts.Size = new System.Drawing.Size(466, 511);
 			this.tabAppts.TabIndex = 0;
 			this.tabAppts.Text = "Appts";
 			// 
@@ -1059,7 +1062,7 @@ namespace OpenDental{
 			this.tabFamily.Location = new System.Drawing.Point(4, 22);
 			this.tabFamily.Name = "tabFamily";
 			this.tabFamily.Padding = new System.Windows.Forms.Padding(3);
-			this.tabFamily.Size = new System.Drawing.Size(466, 479);
+			this.tabFamily.Size = new System.Drawing.Size(466, 511);
 			this.tabFamily.TabIndex = 1;
 			this.tabFamily.Text = "Family";
 			// 
@@ -1183,6 +1186,17 @@ namespace OpenDental{
 			this.tabAccount.Size = new System.Drawing.Size(466, 479);
 			this.tabAccount.TabIndex = 2;
 			this.tabAccount.Text = "Account";
+			// 
+			// checkPaymentsUsePatClin
+			// 
+			this.checkPaymentsUsePatClin.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkPaymentsUsePatClin.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkPaymentsUsePatClin.Location = new System.Drawing.Point(44, 298);
+			this.checkPaymentsUsePatClin.Name = "checkPaymentsUsePatClin";
+			this.checkPaymentsUsePatClin.Size = new System.Drawing.Size(396, 17);
+			this.checkPaymentsUsePatClin.TabIndex = 210;
+			this.checkPaymentsUsePatClin.Text = "Payments Use Patient Clinic";
+			this.checkPaymentsUsePatClin.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// checkRecurChargPriProv
 			// 
@@ -1957,7 +1971,7 @@ namespace OpenDental{
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(441, 533);
+			this.butCancel.Location = new System.Drawing.Point(441, 553);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 8;
@@ -1972,28 +1986,28 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(336, 533);
+			this.butOK.Location = new System.Drawing.Point(336, 553);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 7;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// checkPaymentsUsePatClin
+			// checkApptModuleAdjInProd
 			// 
-			this.checkPaymentsUsePatClin.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkPaymentsUsePatClin.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkPaymentsUsePatClin.Location = new System.Drawing.Point(44, 298);
-			this.checkPaymentsUsePatClin.Name = "checkPaymentsUsePatClin";
-			this.checkPaymentsUsePatClin.Size = new System.Drawing.Size(396, 17);
-			this.checkPaymentsUsePatClin.TabIndex = 210;
-			this.checkPaymentsUsePatClin.Text = "Payments Use Patient Clinic";
-			this.checkPaymentsUsePatClin.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkApptModuleAdjInProd.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkApptModuleAdjInProd.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkApptModuleAdjInProd.Location = new System.Drawing.Point(34, 465);
+			this.checkApptModuleAdjInProd.Name = "checkApptModuleAdjInProd";
+			this.checkApptModuleAdjInProd.Size = new System.Drawing.Size(406, 17);
+			this.checkApptModuleAdjInProd.TabIndex = 224;
+			this.checkApptModuleAdjInProd.Text = "Add daily adjustments to net production";
+			this.checkApptModuleAdjInProd.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// FormModuleSetup
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(543, 570);
+			this.ClientSize = new System.Drawing.Size(543, 590);
 			this.Controls.Add(this.tabControl1);
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.butOK);
@@ -2136,6 +2150,7 @@ namespace OpenDental{
 			butApptLineColor.BackColor=PrefC.GetColor(PrefName.AppointmentTimeLineColor);
 			checkApptModuleDefaultToWeek.Checked=PrefC.GetBool(PrefName.ApptModuleDefaultToWeek);
 			checkApptTimeReset.Checked=PrefC.GetBool(PrefName.AppointmentClinicTimeReset);
+			checkApptModuleAdjInProd.Checked=PrefC.GetBool(PrefName.ApptModuleAdjustmentsInProd);
 			#endregion
 			#region Family Module
 			//Family module-----------------------------------------------------------------------
@@ -2526,6 +2541,7 @@ namespace OpenDental{
 				| Prefs.UpdateInt(PrefName.AppointmentTimeLineColor,butApptLineColor.BackColor.ToArgb())
 				| Prefs.UpdateBool(PrefName.ApptModuleDefaultToWeek,checkApptModuleDefaultToWeek.Checked)
 				| Prefs.UpdateBool(PrefName.AppointmentClinicTimeReset,checkApptTimeReset.Checked)
+				| Prefs.UpdateBool(PrefName.ApptModuleAdjustmentsInProd,checkApptModuleAdjInProd.Checked)
 				#endregion
 				#region Family Module
 				//| Prefs.UpdateBool(PrefName.MedicalEclaimsEnabled,checkMedicalEclaimsEnabled.Checked)
