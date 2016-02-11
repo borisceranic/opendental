@@ -10,8 +10,22 @@ namespace OpenDentBusiness {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
 		public long InsVerifyHistNum;
+		
+		public InsVerifyHist() {
+		}
 
-		///<summary>TODO Should I "new" this method to get rid of the warning?? The warning wasn't removed from TaskHist.</summary>
+		public InsVerifyHist(InsVerify insVerify) {
+			this.InsVerifyNum=insVerify.InsVerifyNum;
+			this.DateLastVerified=insVerify.DateLastVerified;
+			this.UserNum=insVerify.UserNum;
+			this.VerifyType=insVerify.VerifyType;
+			this.FKey=insVerify.FKey;
+			this.DefNum=insVerify.DefNum;
+			this.Note=insVerify.Note;
+			this.DateLastAssigned=insVerify.DateLastAssigned;
+		}
+
+		///<summary></summary>
 		public InsVerifyHist Clone() {
 			return (InsVerifyHist)this.MemberwiseClone();
 		}

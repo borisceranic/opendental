@@ -1999,7 +1999,7 @@ namespace OpenDentBusiness{
 			List<Appointment> retVal=GetAppointmentsStartingWithinPeriod(start.Date,end);
 			//Now that we have all appointments that start within our period, make sure that the entire appointment fits within.
 			for(int i=retVal.Count-1;i>=0;i--) {
-				if(retVal[i].AptDateTime.AddMinutes(retVal[i].Pattern.Length*PrefC.GetInt(PrefName.AppointmentTimeIncrement))>start) {
+				if(retVal[i].AptDateTime.AddMinutes(retVal[i].Pattern.Length*PrefC.GetInt(PrefName.AppointmentTimeIncrement))>end) {
 					retVal.RemoveAt(i);
 				}
 			}

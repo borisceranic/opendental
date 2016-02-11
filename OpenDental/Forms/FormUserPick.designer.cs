@@ -29,6 +29,9 @@ namespace OpenDental{
 			this.listUser = new System.Windows.Forms.ListBox();
 			this.butShow = new OpenDental.UI.Button();
 			this.butNone = new OpenDental.UI.Button();
+			this.butAll = new OpenDental.UI.Button();
+			this.groupSelect = new System.Windows.Forms.GroupBox();
+			this.groupSelect.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// butOK
@@ -94,19 +97,46 @@ namespace OpenDental{
 			this.butNone.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butNone.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butNone.CornerRadius = 4F;
-			this.butNone.Location = new System.Drawing.Point(215, 409);
+			this.butNone.Location = new System.Drawing.Point(21, 49);
 			this.butNone.Name = "butNone";
 			this.butNone.Size = new System.Drawing.Size(75, 24);
 			this.butNone.TabIndex = 6;
-			this.butNone.Text = "None";
+			this.butNone.Text = "Select None";
 			this.butNone.Visible = false;
 			this.butNone.Click += new System.EventHandler(this.butNone_Click);
+			// 
+			// butAll
+			// 
+			this.butAll.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butAll.Autosize = true;
+			this.butAll.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAll.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAll.CornerRadius = 4F;
+			this.butAll.Location = new System.Drawing.Point(21, 19);
+			this.butAll.Name = "butAll";
+			this.butAll.Size = new System.Drawing.Size(75, 24);
+			this.butAll.TabIndex = 7;
+			this.butAll.Text = "Select All";
+			this.butAll.Visible = false;
+			this.butAll.Click += new System.EventHandler(this.butAll_Click);
+			// 
+			// groupSelect
+			// 
+			this.groupSelect.Controls.Add(this.butAll);
+			this.groupSelect.Controls.Add(this.butNone);
+			this.groupSelect.Location = new System.Drawing.Point(194, 48);
+			this.groupSelect.Name = "groupSelect";
+			this.groupSelect.Size = new System.Drawing.Size(110, 83);
+			this.groupSelect.TabIndex = 8;
+			this.groupSelect.TabStop = false;
+			this.groupSelect.Text = "Select";
 			// 
 			// FormUserPick
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(316, 534);
-			this.Controls.Add(this.butNone);
+			this.Controls.Add(this.groupSelect);
 			this.Controls.Add(this.butShow);
 			this.Controls.Add(this.listUser);
 			this.Controls.Add(this.butOK);
@@ -116,6 +146,7 @@ namespace OpenDental{
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Pick User";
 			this.Load += new System.EventHandler(this.FormUserPick_Load);
+			this.groupSelect.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
@@ -127,5 +158,7 @@ namespace OpenDental{
 		private System.Windows.Forms.ListBox listUser;
 		private UI.Button butShow;
 		private UI.Button butNone;
+		private UI.Button butAll;
+		private System.Windows.Forms.GroupBox groupSelect;
 	}
 }

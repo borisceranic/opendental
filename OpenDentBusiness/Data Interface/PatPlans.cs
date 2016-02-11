@@ -34,8 +34,11 @@ namespace OpenDentBusiness{
 				patPlan.PatPlanNum=Meth.GetLong(MethodBase.GetCurrentMethod(),patPlan);
 				return patPlan.PatPlanNum;
 			}
-//Cameron_ Possibly create outbound ADT message to update insurance info
-			return Crud.PatPlanCrud.Insert(patPlan);
+			//Cameron_ Possibly create outbound ADT message to update insurance info
+			long patPlanNum=Crud.PatPlanCrud.Insert(patPlan);
+			//Insert an InsVerify for the patplan to ensure that the patplan can be verified.
+			InsVerifies.InsertForPatPlanNum(patPlanNum);
+			return patPlanNum;
 		}
 
 		/*
@@ -61,8 +64,15 @@ namespace OpenDentBusiness{
 			return 0;
 		}
 
-		///<summary>Supply a PatPlan list.  This function loops through the list and returns the relationship of the specified ordinal.  If ordinal not valid, then it returns self (0).</summary>
-		public static Relat GetRelat(List <PatPlan> list,int ordinal){
+        public static PatPlan GetByPatPlanNum(long patPlanNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<PatPlan>(MethodBase.GetCurrentMethod(),patPlanNum);
+			}
+			return Crud.PatPlanCrud.SelectOne(patPlanNum);
+        }
+
+        ///<summary>Supply a PatPlan list.  This function loops through the list and returns the relationship of the specified ordinal.  If ordinal not valid, then it returns self (0).</summary>
+        public static Relat GetRelat(List <PatPlan> list,int ordinal) {
 			//No need to check RemotingRole; no call to db.
 			for(int i=0;i<list.Count;i++){
 				if(list[i].Ordinal==ordinal){
@@ -272,6 +282,7 @@ namespace OpenDentBusiness{
 					command="DELETE FROM benefit WHERE PatPlanNum=" +POut.Long(patPlanNum);
 					Db.NonQ(command);
 					doDecrement=true;
+					InsVerifies.DeleteByFKey(patPlanNum,VerifyTypes.PatientEnrollment);
 				}
 			}
 			Family fam=Patients.GetFamily(patNum);
@@ -297,6 +308,7 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 			command="DELETE FROM benefit WHERE PatPlanNum=" +POut.Long(patPlanNum);
 			Db.NonQ(command);
+			InsVerifies.DeleteByFKey(patPlanNum,VerifyTypes.PatientEnrollment);
 		}
 		
 	}

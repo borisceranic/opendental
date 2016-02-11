@@ -52,6 +52,7 @@ namespace OpenDentBusiness.Crud{
 				insVerify.VerifyType      = (OpenDentBusiness.VerifyTypes)PIn.Int(row["VerifyType"].ToString());
 				insVerify.FKey            = PIn.Long  (row["FKey"].ToString());
 				insVerify.DefNum          = PIn.Long  (row["DefNum"].ToString());
+				insVerify.DateLastAssigned= PIn.Date  (row["DateLastAssigned"].ToString());
 				insVerify.Note            = PIn.String(row["Note"].ToString());
 				retVal.Add(insVerify);
 			}
@@ -70,6 +71,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("VerifyType");
 			table.Columns.Add("FKey");
 			table.Columns.Add("DefNum");
+			table.Columns.Add("DateLastAssigned");
 			table.Columns.Add("Note");
 			foreach(InsVerify insVerify in listInsVerifys) {
 				table.Rows.Add(new object[] {
@@ -79,6 +81,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Int   ((int)insVerify.VerifyType),
 					POut.Long  (insVerify.FKey),
 					POut.Long  (insVerify.DefNum),
+					POut.Date  (insVerify.DateLastAssigned),
 					POut.String(insVerify.Note),
 				});
 			}
@@ -120,7 +123,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="InsVerifyNum,";
 			}
-			command+="DateLastVerified,UserNum,VerifyType,FKey,DefNum,Note) VALUES(";
+			command+="DateLastVerified,UserNum,VerifyType,FKey,DefNum,DateLastAssigned,Note) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(insVerify.InsVerifyNum)+",";
 			}
@@ -130,6 +133,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)insVerify.VerifyType)+","
 				+    POut.Long  (insVerify.FKey)+","
 				+    POut.Long  (insVerify.DefNum)+","
+				+    POut.Date  (insVerify.DateLastAssigned)+","
 				+    DbHelper.ParamChar+"paramNote)";
 			if(insVerify.Note==null) {
 				insVerify.Note="";
@@ -167,7 +171,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="InsVerifyNum,";
 			}
-			command+="DateLastVerified,UserNum,VerifyType,FKey,DefNum,Note) VALUES(";
+			command+="DateLastVerified,UserNum,VerifyType,FKey,DefNum,DateLastAssigned,Note) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(insVerify.InsVerifyNum)+",";
 			}
@@ -177,6 +181,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)insVerify.VerifyType)+","
 				+    POut.Long  (insVerify.FKey)+","
 				+    POut.Long  (insVerify.DefNum)+","
+				+    POut.Date  (insVerify.DateLastAssigned)+","
 				+    DbHelper.ParamChar+"paramNote)";
 			if(insVerify.Note==null) {
 				insVerify.Note="";
@@ -199,6 +204,7 @@ namespace OpenDentBusiness.Crud{
 				+"VerifyType      =  "+POut.Int   ((int)insVerify.VerifyType)+", "
 				+"FKey            =  "+POut.Long  (insVerify.FKey)+", "
 				+"DefNum          =  "+POut.Long  (insVerify.DefNum)+", "
+				+"DateLastAssigned=  "+POut.Date  (insVerify.DateLastAssigned)+", "
 				+"Note            =  "+DbHelper.ParamChar+"paramNote "
 				+"WHERE InsVerifyNum = "+POut.Long(insVerify.InsVerifyNum);
 			if(insVerify.Note==null) {
@@ -230,6 +236,10 @@ namespace OpenDentBusiness.Crud{
 			if(insVerify.DefNum != oldInsVerify.DefNum) {
 				if(command!=""){ command+=",";}
 				command+="DefNum = "+POut.Long(insVerify.DefNum)+"";
+			}
+			if(insVerify.DateLastAssigned.Date != oldInsVerify.DateLastAssigned.Date) {
+				if(command!=""){ command+=",";}
+				command+="DateLastAssigned = "+POut.Date(insVerify.DateLastAssigned)+"";
 			}
 			if(insVerify.Note != oldInsVerify.Note) {
 				if(command!=""){ command+=",";}

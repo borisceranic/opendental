@@ -370,7 +370,8 @@ namespace OpenDental{
 		private MenuItem menuItem4;
 		private MenuItem menuItemPassword;
 		private MenuItem menuItemEmailSettings;
-		private FormSmsTextMessaging _formSmsTextMessaging;
+        private MenuItem menuItemInsVerification;
+        private FormSmsTextMessaging _formSmsTextMessaging;
 		private FormQuery _formUserQuery;
 		private OpenDentalGraph.FormDashboardEditTab _formDashboardEditTab;
 		private MenuItem menuItemReportsStandard;
@@ -513,6 +514,7 @@ namespace OpenDental{
 			this.menuItemApptRules = new System.Windows.Forms.MenuItem();
 			this.menuItemApptTypes = new System.Windows.Forms.MenuItem();
 			this.menuItemApptViews = new System.Windows.Forms.MenuItem();
+			this.menuItemInsVerification = new System.Windows.Forms.MenuItem();
 			this.menuItemOperatories = new System.Windows.Forms.MenuItem();
 			this.menuItemRecall = new System.Windows.Forms.MenuItem();
 			this.menuItemRecallTypes = new System.Windows.Forms.MenuItem();
@@ -839,6 +841,7 @@ namespace OpenDental{
             this.menuItemApptRules,
             this.menuItemApptTypes,
             this.menuItemApptViews,
+            this.menuItemInsVerification,
             this.menuItemOperatories,
             this.menuItemRecall,
             this.menuItemRecallTypes});
@@ -879,21 +882,27 @@ namespace OpenDental{
 			this.menuItemApptViews.Text = "Appointment Views";
 			this.menuItemApptViews.Click += new System.EventHandler(this.menuItemApptViews_Click);
 			// 
+			// menuItemInsVerification
+			// 
+			this.menuItemInsVerification.Index = 6;
+			this.menuItemInsVerification.Text = "Insurance Verification";
+			this.menuItemInsVerification.Click += new System.EventHandler(this.menuItemInsVerify_Click);
+			// 
 			// menuItemOperatories
 			// 
-			this.menuItemOperatories.Index = 6;
+			this.menuItemOperatories.Index = 7;
 			this.menuItemOperatories.Text = "Operatories";
 			this.menuItemOperatories.Click += new System.EventHandler(this.menuItemOperatories_Click);
 			// 
 			// menuItemRecall
 			// 
-			this.menuItemRecall.Index = 7;
+			this.menuItemRecall.Index = 8;
 			this.menuItemRecall.Text = "Recall";
 			this.menuItemRecall.Click += new System.EventHandler(this.menuItemRecall_Click);
 			// 
 			// menuItemRecallTypes
 			// 
-			this.menuItemRecallTypes.Index = 8;
+			this.menuItemRecallTypes.Index = 9;
 			this.menuItemRecallTypes.Text = "Recall Types";
 			this.menuItemRecallTypes.Click += new System.EventHandler(this.menuItemRecallTypes_Click);
 			// 
@@ -4984,9 +4993,10 @@ namespace OpenDental{
 
 		private void ThreadPodiumSendInvitations(ODThread worker) {
 			//consider blocking re-entrance if this hasn't finished.
-			//Only send invitations if the program link is enabled and the computer name is set to this computer.
+			//Only send invitations if the program link is enabled, the computer name is set to this computer, and eConnector is not set to send invitations
 			if(!Programs.IsEnabled(ProgramName.Podium)
-				|| !ODEnvironment.IdIsThisComputer(ProgramProperties.GetPropVal(Programs.GetProgramNum(ProgramName.Podium),"Enter your computer name or IP (required)"))) 
+				|| !ODEnvironment.IdIsThisComputer(ProgramProperties.GetPropVal(Programs.GetProgramNum(ProgramName.Podium),"Enter your computer name or IP (required)"))
+				|| ProgramProperties.GetPropVal(Programs.GetProgramNum(ProgramName.Podium),"Enter 0 to use Open Dental for sending review invitations, or 1 to use eConnector")!="0")
 			{
 				return;
 			}
@@ -5896,7 +5906,16 @@ namespace OpenDental{
 			fap.ShowDialog();
 		}*/
 
-		private void menuItemQuestions_Click(object sender,EventArgs e) {
+        private void menuItemInsVerify_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.Setup)) {
+				return;
+			}
+			FormInsVerificationSetup FormIV=new FormInsVerificationSetup();
+			FormIV.ShowDialog();
+			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Insurance Verification");
+        }
+
+        private void menuItemQuestions_Click(object sender,EventArgs e) {
 			if(!Security.IsAuthorized(Permissions.Setup)) {
 				return;
 			}

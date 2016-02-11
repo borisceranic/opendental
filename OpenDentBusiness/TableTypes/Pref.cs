@@ -329,6 +329,12 @@ namespace OpenDentBusiness {
 		///<summary>0 by default.  If false, secondary PPO writeoffs will always be zero (normal).  At least one customer wants to see secondary writeoffs.</summary>
 		InsPPOsecWriteoffs,
 		InsurancePlansShared,
+		///<summary>7 by default.  Number of days before displaying insurances that need verified.</summary>
+        InsVerifyAppointmentScheduledDays,
+		///<summary>90 by default. Number of days before requiring insurance plans to be verified.</summary>
+        InsVerifyBenefitEligibilityDays,
+		///<summary>30 by default.  Number of days before requiring patient plans to be verified.</summary>
+        InsVerifyPatientEnrollmentDays,
 		///<summary>Writeoff description displayed in the Account Module and on statements.  If blank, the default is "Writeoff".
 		///We are using "Writeoff" since "PPO Discount" was only used for a brief time in 15.3 while it was Beta and no customer requested it</summary>
 		InsWriteoffDescript,

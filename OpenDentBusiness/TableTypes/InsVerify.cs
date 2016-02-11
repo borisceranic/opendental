@@ -15,18 +15,21 @@ namespace OpenDentBusiness {
 		public long UserNum;
 		///<summary>Enum:VerifyTypes The type of verification.</summary>
 		public VerifyTypes VerifyType;
-		///<summary>FK to any table defined in the VerifyType Enumeration.</summary>
+		///<summary>Foreign key to any table defined in the VerifyType Enumeration.</summary>
 		public long FKey;
 		///<summary>FK to definition.DefNum.  Links to the category InsVerifyStatus</summary>
 		public long DefNum;
+		///<summary>The date of the last assignment of this verification.</summary>
+		public DateTime DateLastAssigned;
 		///<summary>Note for this insurance verification.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClobNote)]
 		public string Note;
 
-    ///<summary></summary>
+
+		///<summary></summary>
 		public InsVerify Clone() {
 			return (InsVerify)this.MemberwiseClone();
-    }
+		}
 	}
 
 	///<summary></summary>

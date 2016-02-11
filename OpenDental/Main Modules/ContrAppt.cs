@@ -4444,8 +4444,25 @@ namespace OpenDental {
 			}
 		}
 
+		private void OnInsVerify_Click() {
+            List<FormInsVerificationList> listFormROLs=Application.OpenForms.OfType<FormInsVerificationList>().ToList();
+			if(listFormROLs.Count>0) {
+				listFormROLs[0].FillGrids();
+				listFormROLs[0].BringToFront();
+			}
+			else {
+				FormInsVerificationList FormIVL=new FormInsVerificationList();
+				FormIVL.FormClosing+=FormIVL_FormClosing;
+				FormIVL.Show();
+			}
+        }
+
 		private void FormPRL_FormClosing(object sender,FormClosingEventArgs e) {
 			ActionTaken.Invoke(sender,new ActionNeededEventArgs(ActionNeededTypes.RadiologyProcedures));
+		}
+
+		private void FormIVL_FormClosing(object sender,FormClosingEventArgs e) {
+            //Action does not currently need to be taken when leaving the insurance verification list window.
 		}
 
 		private void OnRecall_Click() {
@@ -4507,6 +4524,9 @@ namespace OpenDental {
 					break;
 				case ApptListSelection.Radiology:
 					OnRadiology_Click();
+					break;
+				case ApptListSelection.InsVerify:
+					OnInsVerify_Click();
 					break;
 			}
 		}

@@ -12949,6 +12949,42 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'LocalTimeOverridesServerTime','0')";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE insplan ADD RequireVerification tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE insplan ADD RequireVerification number(3)";
+					Db.NonQ(command);
+					command="UPDATE insplan SET RequireVerification = 0 WHERE RequireVerification IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE insplan MODIFY RequireVerification NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE insverify ADD DateLastAssigned date NOT NULL DEFAULT '0001-01-01'";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE insverify ADD DateLastAssigned date";
+					Db.NonQ(command);
+					command="UPDATE insverify SET DateLastAssigned = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE DateLastAssigned IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE insverify MODIFY DateLastAssigned NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE insverifyhist ADD DateLastAssigned date NOT NULL DEFAULT '0001-01-01'";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE insverifyhist ADD DateLastAssigned date";
+					Db.NonQ(command);
+					command="UPDATE insverifyhist SET DateLastAssigned = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE DateLastAssigned IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE insverifyhist MODIFY DateLastAssigned NOT NULL";
+					Db.NonQ(command);
+				}
 
 
 				command="UPDATE preference SET ValueString = '16.1.0.0' WHERE PrefName = 'DataBaseVersion'";

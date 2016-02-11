@@ -15,6 +15,23 @@ namespace OpenDentBusiness{
 			}
 			return Crud.InsVerifyCrud.SelectOne(insVerifyNum);
 		}
+		
+		///<summary>Gets one InsVerify from the db that has the given fkey and verify type.</summary>
+		public static InsVerify GetOneByFKey(long fkey,VerifyTypes verifyType) {
+			//TODO Remoting Role
+			string command="SELECT * FROM insverify WHERE FKey="+POut.Long(fkey)+" AND VerifyType="+POut.Int((int)verifyType)+"";
+			return Crud.InsVerifyCrud.SelectOne(command);
+		}
+		
+		///<summary>Gets one InsVerifyNum from the db that has the given fkey and verify type.</summary>
+		public static long GetInsVerifyNumByFKey(long fkey,VerifyTypes verifyType) {
+			string command="SELECT * FROM insverify WHERE FKey="+POut.Long(fkey)+" AND VerifyType="+POut.Int((int)verifyType)+"";
+			InsVerify insVerify=Crud.InsVerifyCrud.SelectOne(command);
+			if(insVerify==null) {
+				return 0;
+			}
+			return insVerify.InsVerifyNum;
+		}
 
 		///<summary></summary>
 		public static long Insert(InsVerify insVerify) {
@@ -42,6 +59,48 @@ namespace OpenDentBusiness{
 			}
 			Crud.InsVerifyCrud.Delete(insVerifyNum);
 		}
+		
+		///<summary>Inserts a default InsVerify into the database based on the passed in patplan.  Used when inserting a new patplan.
+		///Returns the primary key of the new InsVerify.</summary>
+		public static long InsertForPatPlanNum(long patPlanNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetLong(MethodBase.GetCurrentMethod(),patPlanNum);
+			}
+			InsVerify insVerify=new InsVerify();
+			insVerify.VerifyType=VerifyTypes.PatientEnrollment;
+			insVerify.FKey=patPlanNum;
+			return Crud.InsVerifyCrud.Insert(insVerify);
+		}
+		
+		///<summary>Inserts a default InsVerify into the database based on the passed in insplan.  Used when inserting a new insplan.
+		///Returns the primary key of the new InsVerify.</summary>
+		public static long InsertForPlanNum(long planNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetLong(MethodBase.GetCurrentMethod(),planNum);
+			}
+			InsVerify insVerify=new InsVerify();
+			insVerify.VerifyType=VerifyTypes.InsuranceBenefit;
+			insVerify.FKey=planNum;
+			return Crud.InsVerifyCrud.Insert(insVerify);
+		}
+		
+		///<summary>Deletes an InsVerify with the passed in FKey and VerifyType.</summary>
+		public static void DeleteByFKey(long fkey,VerifyTypes verifyType) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetLong(MethodBase.GetCurrentMethod(),fkey,verifyType);
+				return;
+			}
+			long insVerifyNum=GetInsVerifyNumByFKey(fkey,verifyType);
+			Crud.InsVerifyCrud.Delete(insVerifyNum);//Will do nothing if insVerifyNum was 0.
+		}
+
+		public static List<InsVerify> GetAll() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<InsVerify>>(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT * FROM insverify";
+			return Crud.InsVerifyCrud.SelectMany(command);
+        }
 
 		//If this table type will exist as cached data, uncomment the CachePattern region below and edit.
 		/*

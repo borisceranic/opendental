@@ -23,10 +23,15 @@ namespace OpenDentBusiness {
 				plan.PlanNum=Meth.GetLong(MethodBase.GetCurrentMethod(),plan,useExistingPK);
 				return plan.PlanNum;
 			}
+			long planNum=0;
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
-				return Crud.InsPlanCrud.Insert(plan);//Oracle ALWAYS uses existing PKs because they do not support auto-incrementing.
+				planNum=Crud.InsPlanCrud.Insert(plan);//Oracle ALWAYS uses existing PKs because they do not support auto-incrementing.
 			}
-			return Crud.InsPlanCrud.Insert(plan,useExistingPK);
+			else {
+				planNum=Crud.InsPlanCrud.Insert(plan,useExistingPK);
+			}
+			InsVerifies.InsertForPlanNum(planNum);
+			return planNum;
 		}
 
 		///<summary></summary>
@@ -147,7 +152,8 @@ namespace OpenDentBusiness {
 				&& plan1.MonthRenew==plan2.MonthRenew
 				&& plan1.FilingCodeSubtype==plan2.FilingCodeSubtype
 				&& plan1.CanadianPlanFlag==plan2.CanadianPlanFlag
-				&& plan1.CobRule==plan2.CobRule) 
+				&& plan1.CobRule==plan2.CobRule
+				&& plan1.RequireVerification==plan2.RequireVerification) 
 			{
 				return true;
 			}
@@ -1017,6 +1023,7 @@ namespace OpenDentBusiness {
 			command="DELETE FROM insplan "
 				+"WHERE PlanNum = '"+plan.PlanNum.ToString()+"'";
 			Db.NonQ(command);
+			InsVerifies.DeleteByFKey(plan.PlanNum,VerifyTypes.InsuranceBenefit);
 		}
 
 		/// <summary>Used from FormInsPlan and InsPlans.Merge. Does not check any dependencies.  Used when a new plan is created and then is no longer needed.  Also used if all dependencies have already been fixed.  Does not affect any other objects.</summary>
@@ -1026,6 +1033,7 @@ namespace OpenDentBusiness {
 				return;
 			}
 			Crud.InsPlanCrud.Delete(planNum);
+			InsVerifies.DeleteByFKey(planNum,VerifyTypes.InsuranceBenefit);
 		}
 
 		/// <summary>This changes PlanNum in every place in database where it's used.  It also deletes benefits for the old planNum.</summary>

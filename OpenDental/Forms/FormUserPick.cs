@@ -19,7 +19,10 @@ namespace OpenDental {
 		public long SuggestedUserNum=0;
 		public bool IsSelectionmode;
 		public bool IsShowAllAllowed;
+		///<summary>Will return 0 for SelectedUserNum if the None 
 		public bool IsPickNoneAllowed;
+		///<summary>Will return -1 for SelectedUserNum if the All 
+		public bool IsPickAllAllowed;
 
 		public FormUserPick() {
 			InitializeComponent();
@@ -30,8 +33,14 @@ namespace OpenDental {
 			if(IsShowAllAllowed && ListUserodsFiltered!=null && ListUserodsFiltered.Count>0) {
 				butShow.Visible=true;
 			}
+			if(IsPickAllAllowed) {
+				butAll.Visible=true;
+			}
 			if(IsPickNoneAllowed) {
 				butNone.Visible=true;
+			}
+			if(!butNone.Visible && !butAll.Visible) {
+				groupSelect.Visible=false;
 			}
 			FillList(ListUserodsFiltered);
 		}
@@ -67,6 +76,11 @@ namespace OpenDental {
 				return;
 			}
 			SelectedUserNum=ListUserodsShowing[listUser.SelectedIndex].UserNum;
+			DialogResult=DialogResult.OK;
+		}
+
+		private void butAll_Click(object sender,EventArgs e) {
+			SelectedUserNum=-1;
 			DialogResult=DialogResult.OK;
 		}
 
