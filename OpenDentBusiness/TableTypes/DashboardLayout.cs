@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace OpenDentBusiness {
 	///<summary>Each tab in the dashboard has a corresponding DashboardLayout. DashboardLayout and DashboardCell work in conjunction to form the dashboard layout.</summary>
+	[Serializable]
 	public class DashboardLayout:TableBase {
 		///<summary>PK.</summary>
 		[CrudColumn(IsPriKey=true)]

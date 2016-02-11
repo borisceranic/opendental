@@ -2,6 +2,7 @@
 
 namespace OpenDentBusiness {
 	///<summary>Each DashboardLayout can include multiple DashboardCell(s). DashboardLayout and DashboardCell work in conjunction to form the dashboard layout.</summary>
+	[Serializable]
 	public class DashboardCell:TableBase {
 		///<summary>PK.</summary>
 		[CrudColumn(IsPriKey=true)]
