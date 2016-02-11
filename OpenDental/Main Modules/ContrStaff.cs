@@ -23,8 +23,8 @@ namespace OpenDental{
 		private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.GroupBox groupBox2;
 		private System.Windows.Forms.TextBox textMessage;
-		private System.Windows.Forms.Label label2;
-		private System.ComponentModel.IContainer components;
+		private System.Windows.Forms.Label labelCurrentTime;
+    private System.ComponentModel.IContainer components;
 		private OpenDental.UI.Button butSendClaims;
 		private OpenDental.UI.Button butTasks;
 		private OpenDental.UI.Button butBackup;
@@ -99,404 +99,404 @@ namespace OpenDental{
 		#region Component Designer generated code
 
 		private void InitializeComponent(){
-			this.components = new System.ComponentModel.Container();
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ContrStaff));
-			this.listStatus = new System.Windows.Forms.ListBox();
-			this.textTime = new System.Windows.Forms.Label();
-			this.timer1 = new System.Windows.Forms.Timer(this.components);
-			this.groupBox1 = new System.Windows.Forms.GroupBox();
-			this.butManage = new OpenDental.UI.Button();
-			this.butBreaks = new OpenDental.UI.Button();
-			this.gridEmp = new OpenDental.UI.ODGrid();
-			this.label2 = new System.Windows.Forms.Label();
-			this.butClockOut = new OpenDental.UI.Button();
-			this.butTimeCard = new OpenDental.UI.Button();
-			this.butClockIn = new OpenDental.UI.Button();
-			this.groupBox2 = new System.Windows.Forms.GroupBox();
-			this.listMessages = new System.Windows.Forms.ListBox();
-			this.butSend = new OpenDental.UI.Button();
-			this.butAck = new OpenDental.UI.Button();
-			this.labelSending = new System.Windows.Forms.Label();
-			this.textDays = new System.Windows.Forms.TextBox();
-			this.labelDays = new System.Windows.Forms.Label();
-			this.label6 = new System.Windows.Forms.Label();
-			this.comboViewUser = new System.Windows.Forms.ComboBox();
-			this.gridMessages = new OpenDental.UI.ODGrid();
-			this.checkIncludeAck = new System.Windows.Forms.CheckBox();
-			this.label7 = new System.Windows.Forms.Label();
-			this.label5 = new System.Windows.Forms.Label();
-			this.listExtras = new System.Windows.Forms.ListBox();
-			this.label4 = new System.Windows.Forms.Label();
-			this.listFrom = new System.Windows.Forms.ListBox();
-			this.label3 = new System.Windows.Forms.Label();
-			this.listTo = new System.Windows.Forms.ListBox();
-			this.label1 = new System.Windows.Forms.Label();
-			this.textMessage = new System.Windows.Forms.TextBox();
-			this.groupBox3 = new System.Windows.Forms.GroupBox();
-			this.butEmailInbox = new OpenDental.UI.Button();
-			this.butSupply = new OpenDental.UI.Button();
-			this.butClaimPay = new OpenDental.UI.Button();
-			this.butBilling = new OpenDental.UI.Button();
-			this.butAccounting = new OpenDental.UI.Button();
-			this.butBackup = new OpenDental.UI.Button();
-			this.butDeposit = new OpenDental.UI.Button();
-			this.butSendClaims = new OpenDental.UI.Button();
-			this.butTasks = new OpenDental.UI.Button();
-			this.timerSending = new System.Windows.Forms.Timer(this.components);
-			this.butImportInsPlans = new OpenDental.UI.Button();
-			this.groupBox1.SuspendLayout();
-			this.groupBox2.SuspendLayout();
-			this.groupBox3.SuspendLayout();
-			this.SuspendLayout();
-			// 
-			// listStatus
-			// 
-			this.listStatus.Location = new System.Drawing.Point(367, 192);
-			this.listStatus.Name = "listStatus";
-			this.listStatus.Size = new System.Drawing.Size(107, 43);
-			this.listStatus.TabIndex = 12;
-			// 
-			// textTime
-			// 
-			this.textTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.textTime.Location = new System.Drawing.Point(365, 113);
-			this.textTime.Name = "textTime";
-			this.textTime.Size = new System.Drawing.Size(109, 21);
-			this.textTime.TabIndex = 17;
-			this.textTime.Text = "12:00:00 PM";
-			this.textTime.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-			// 
-			// timer1
-			// 
-			this.timer1.Enabled = true;
-			this.timer1.Interval = 1000;
-			this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-			// 
-			// groupBox1
-			// 
-			this.groupBox1.Controls.Add(this.butManage);
-			this.groupBox1.Controls.Add(this.butBreaks);
-			this.groupBox1.Controls.Add(this.gridEmp);
-			this.groupBox1.Controls.Add(this.label2);
-			this.groupBox1.Controls.Add(this.listStatus);
-			this.groupBox1.Controls.Add(this.butClockOut);
-			this.groupBox1.Controls.Add(this.butTimeCard);
-			this.groupBox1.Controls.Add(this.textTime);
-			this.groupBox1.Controls.Add(this.butClockIn);
-			this.groupBox1.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox1.Location = new System.Drawing.Point(349, 5);
-			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(510, 247);
-			this.groupBox1.TabIndex = 18;
-			this.groupBox1.TabStop = false;
-			this.groupBox1.Text = "Time Clock";
-			// 
-			// butManage
-			// 
-			this.butManage.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butManage.Autosize = true;
-			this.butManage.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butManage.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butManage.CornerRadius = 4F;
-			this.butManage.Location = new System.Drawing.Point(366, 13);
-			this.butManage.Name = "butManage";
-			this.butManage.Size = new System.Drawing.Size(108, 25);
-			this.butManage.TabIndex = 23;
-			this.butManage.Text = "Manage";
-			this.butManage.Click += new System.EventHandler(this.butManage_Click);
-			// 
-			// butBreaks
-			// 
-			this.butBreaks.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butBreaks.Autosize = true;
-			this.butBreaks.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butBreaks.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butBreaks.CornerRadius = 4F;
-			this.butBreaks.Location = new System.Drawing.Point(366, 67);
-			this.butBreaks.Name = "butBreaks";
-			this.butBreaks.Size = new System.Drawing.Size(108, 25);
-			this.butBreaks.TabIndex = 22;
-			this.butBreaks.Text = "View Breaks";
-			this.butBreaks.Click += new System.EventHandler(this.butBreaks_Click);
-			// 
-			// gridEmp
-			// 
-			this.gridEmp.AllowSelection = false;
-			this.gridEmp.HasAddButton = false;
-			this.gridEmp.HasMultilineHeaders = false;
-			this.gridEmp.HScrollVisible = false;
-			this.gridEmp.Location = new System.Drawing.Point(22, 22);
-			this.gridEmp.Name = "gridEmp";
-			this.gridEmp.ScrollValue = 0;
-			this.gridEmp.Size = new System.Drawing.Size(303, 213);
-			this.gridEmp.TabIndex = 21;
-			this.gridEmp.Title = "Employee";
-			this.gridEmp.TranslationName = "TableEmpClock";
-			this.gridEmp.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridEmp_CellDoubleClick);
-			this.gridEmp.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridEmp_CellClick);
-			// 
-			// label2
-			// 
-			this.label2.Location = new System.Drawing.Point(376, 94);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(88, 19);
-			this.label2.TabIndex = 20;
-			this.label2.Text = "Server Time";
-			this.label2.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-			// 
-			// butClockOut
-			// 
-			this.butClockOut.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butClockOut.Autosize = true;
-			this.butClockOut.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butClockOut.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butClockOut.CornerRadius = 4F;
-			this.butClockOut.Location = new System.Drawing.Point(366, 164);
-			this.butClockOut.Name = "butClockOut";
-			this.butClockOut.Size = new System.Drawing.Size(108, 25);
-			this.butClockOut.TabIndex = 14;
-			this.butClockOut.Text = "Clock Out For:";
-			this.butClockOut.Click += new System.EventHandler(this.butClockOut_Click);
-			// 
-			// butTimeCard
-			// 
-			this.butTimeCard.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butTimeCard.Autosize = true;
-			this.butTimeCard.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butTimeCard.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butTimeCard.CornerRadius = 4F;
-			this.butTimeCard.Location = new System.Drawing.Point(366, 40);
-			this.butTimeCard.Name = "butTimeCard";
-			this.butTimeCard.Size = new System.Drawing.Size(108, 25);
-			this.butTimeCard.TabIndex = 16;
-			this.butTimeCard.Text = "View Time Card";
-			this.butTimeCard.Click += new System.EventHandler(this.butTimeCard_Click);
-			// 
-			// butClockIn
-			// 
-			this.butClockIn.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butClockIn.Autosize = true;
-			this.butClockIn.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butClockIn.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butClockIn.CornerRadius = 4F;
-			this.butClockIn.Location = new System.Drawing.Point(366, 137);
-			this.butClockIn.Name = "butClockIn";
-			this.butClockIn.Size = new System.Drawing.Size(108, 25);
-			this.butClockIn.TabIndex = 11;
-			this.butClockIn.Text = "Clock In";
-			this.butClockIn.Click += new System.EventHandler(this.butClockIn_Click);
-			// 
-			// groupBox2
-			// 
-			this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+      this.components = new System.ComponentModel.Container();
+      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ContrStaff));
+      this.listStatus = new System.Windows.Forms.ListBox();
+      this.textTime = new System.Windows.Forms.Label();
+      this.timer1 = new System.Windows.Forms.Timer(this.components);
+      this.groupBox1 = new System.Windows.Forms.GroupBox();
+      this.butManage = new OpenDental.UI.Button();
+      this.butBreaks = new OpenDental.UI.Button();
+      this.gridEmp = new OpenDental.UI.ODGrid();
+      this.labelCurrentTime = new System.Windows.Forms.Label();
+      this.butClockOut = new OpenDental.UI.Button();
+      this.butTimeCard = new OpenDental.UI.Button();
+      this.butClockIn = new OpenDental.UI.Button();
+      this.groupBox2 = new System.Windows.Forms.GroupBox();
+      this.listMessages = new System.Windows.Forms.ListBox();
+      this.butSend = new OpenDental.UI.Button();
+      this.butAck = new OpenDental.UI.Button();
+      this.labelSending = new System.Windows.Forms.Label();
+      this.textDays = new System.Windows.Forms.TextBox();
+      this.labelDays = new System.Windows.Forms.Label();
+      this.label6 = new System.Windows.Forms.Label();
+      this.comboViewUser = new System.Windows.Forms.ComboBox();
+      this.gridMessages = new OpenDental.UI.ODGrid();
+      this.checkIncludeAck = new System.Windows.Forms.CheckBox();
+      this.label7 = new System.Windows.Forms.Label();
+      this.label5 = new System.Windows.Forms.Label();
+      this.listExtras = new System.Windows.Forms.ListBox();
+      this.label4 = new System.Windows.Forms.Label();
+      this.listFrom = new System.Windows.Forms.ListBox();
+      this.label3 = new System.Windows.Forms.Label();
+      this.listTo = new System.Windows.Forms.ListBox();
+      this.label1 = new System.Windows.Forms.Label();
+      this.textMessage = new System.Windows.Forms.TextBox();
+      this.groupBox3 = new System.Windows.Forms.GroupBox();
+      this.butImportInsPlans = new OpenDental.UI.Button();
+      this.butEmailInbox = new OpenDental.UI.Button();
+      this.butSupply = new OpenDental.UI.Button();
+      this.butClaimPay = new OpenDental.UI.Button();
+      this.butBilling = new OpenDental.UI.Button();
+      this.butAccounting = new OpenDental.UI.Button();
+      this.butBackup = new OpenDental.UI.Button();
+      this.butDeposit = new OpenDental.UI.Button();
+      this.butSendClaims = new OpenDental.UI.Button();
+      this.butTasks = new OpenDental.UI.Button();
+      this.timerSending = new System.Windows.Forms.Timer(this.components);
+      this.groupBox1.SuspendLayout();
+      this.groupBox2.SuspendLayout();
+      this.groupBox3.SuspendLayout();
+      this.SuspendLayout();
+      // 
+      // listStatus
+      // 
+      this.listStatus.Location = new System.Drawing.Point(367, 192);
+      this.listStatus.Name = "listStatus";
+      this.listStatus.Size = new System.Drawing.Size(107, 43);
+      this.listStatus.TabIndex = 12;
+      // 
+      // textTime
+      // 
+      this.textTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.textTime.Location = new System.Drawing.Point(365, 113);
+      this.textTime.Name = "textTime";
+      this.textTime.Size = new System.Drawing.Size(109, 21);
+      this.textTime.TabIndex = 17;
+      this.textTime.Text = "12:00:00 PM";
+      this.textTime.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+      // 
+      // timer1
+      // 
+      this.timer1.Enabled = true;
+      this.timer1.Interval = 1000;
+      this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+      // 
+      // groupBox1
+      // 
+      this.groupBox1.Controls.Add(this.butManage);
+      this.groupBox1.Controls.Add(this.butBreaks);
+      this.groupBox1.Controls.Add(this.gridEmp);
+      this.groupBox1.Controls.Add(this.labelCurrentTime);
+      this.groupBox1.Controls.Add(this.listStatus);
+      this.groupBox1.Controls.Add(this.butClockOut);
+      this.groupBox1.Controls.Add(this.butTimeCard);
+      this.groupBox1.Controls.Add(this.textTime);
+      this.groupBox1.Controls.Add(this.butClockIn);
+      this.groupBox1.FlatStyle = System.Windows.Forms.FlatStyle.System;
+      this.groupBox1.Location = new System.Drawing.Point(349, 5);
+      this.groupBox1.Name = "groupBox1";
+      this.groupBox1.Size = new System.Drawing.Size(510, 247);
+      this.groupBox1.TabIndex = 18;
+      this.groupBox1.TabStop = false;
+      this.groupBox1.Text = "Time Clock";
+      // 
+      // butManage
+      // 
+      this.butManage.AdjustImageLocation = new System.Drawing.Point(0, 0);
+      this.butManage.Autosize = true;
+      this.butManage.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+      this.butManage.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+      this.butManage.CornerRadius = 4F;
+      this.butManage.Location = new System.Drawing.Point(366, 13);
+      this.butManage.Name = "butManage";
+      this.butManage.Size = new System.Drawing.Size(108, 25);
+      this.butManage.TabIndex = 23;
+      this.butManage.Text = "Manage";
+      this.butManage.Click += new System.EventHandler(this.butManage_Click);
+      // 
+      // butBreaks
+      // 
+      this.butBreaks.AdjustImageLocation = new System.Drawing.Point(0, 0);
+      this.butBreaks.Autosize = true;
+      this.butBreaks.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+      this.butBreaks.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+      this.butBreaks.CornerRadius = 4F;
+      this.butBreaks.Location = new System.Drawing.Point(366, 67);
+      this.butBreaks.Name = "butBreaks";
+      this.butBreaks.Size = new System.Drawing.Size(108, 25);
+      this.butBreaks.TabIndex = 22;
+      this.butBreaks.Text = "View Breaks";
+      this.butBreaks.Click += new System.EventHandler(this.butBreaks_Click);
+      // 
+      // gridEmp
+      // 
+      this.gridEmp.AllowSelection = false;
+      this.gridEmp.HasAddButton = false;
+      this.gridEmp.HasMultilineHeaders = false;
+      this.gridEmp.HScrollVisible = false;
+      this.gridEmp.Location = new System.Drawing.Point(22, 22);
+      this.gridEmp.Name = "gridEmp";
+      this.gridEmp.ScrollValue = 0;
+      this.gridEmp.Size = new System.Drawing.Size(303, 213);
+      this.gridEmp.TabIndex = 21;
+      this.gridEmp.Title = "Employee";
+      this.gridEmp.TranslationName = "TableEmpClock";
+      this.gridEmp.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridEmp_CellDoubleClick);
+      this.gridEmp.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridEmp_CellClick);
+      // 
+      // labelTime
+      // 
+      this.labelCurrentTime.Location = new System.Drawing.Point(376, 94);
+      this.labelCurrentTime.Name = "labelTime";
+      this.labelCurrentTime.Size = new System.Drawing.Size(88, 19);
+      this.labelCurrentTime.TabIndex = 20;
+      this.labelCurrentTime.Text = "Server Time";
+      this.labelCurrentTime.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+      // 
+      // butClockOut
+      // 
+      this.butClockOut.AdjustImageLocation = new System.Drawing.Point(0, 0);
+      this.butClockOut.Autosize = true;
+      this.butClockOut.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+      this.butClockOut.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+      this.butClockOut.CornerRadius = 4F;
+      this.butClockOut.Location = new System.Drawing.Point(366, 164);
+      this.butClockOut.Name = "butClockOut";
+      this.butClockOut.Size = new System.Drawing.Size(108, 25);
+      this.butClockOut.TabIndex = 14;
+      this.butClockOut.Text = "Clock Out For:";
+      this.butClockOut.Click += new System.EventHandler(this.butClockOut_Click);
+      // 
+      // butTimeCard
+      // 
+      this.butTimeCard.AdjustImageLocation = new System.Drawing.Point(0, 0);
+      this.butTimeCard.Autosize = true;
+      this.butTimeCard.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+      this.butTimeCard.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+      this.butTimeCard.CornerRadius = 4F;
+      this.butTimeCard.Location = new System.Drawing.Point(366, 40);
+      this.butTimeCard.Name = "butTimeCard";
+      this.butTimeCard.Size = new System.Drawing.Size(108, 25);
+      this.butTimeCard.TabIndex = 16;
+      this.butTimeCard.Text = "View Time Card";
+      this.butTimeCard.Click += new System.EventHandler(this.butTimeCard_Click);
+      // 
+      // butClockIn
+      // 
+      this.butClockIn.AdjustImageLocation = new System.Drawing.Point(0, 0);
+      this.butClockIn.Autosize = true;
+      this.butClockIn.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+      this.butClockIn.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+      this.butClockIn.CornerRadius = 4F;
+      this.butClockIn.Location = new System.Drawing.Point(366, 137);
+      this.butClockIn.Name = "butClockIn";
+      this.butClockIn.Size = new System.Drawing.Size(108, 25);
+      this.butClockIn.TabIndex = 11;
+      this.butClockIn.Text = "Clock In";
+      this.butClockIn.Click += new System.EventHandler(this.butClockIn_Click);
+      // 
+      // groupBox2
+      // 
+      this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-			this.groupBox2.Controls.Add(this.listMessages);
-			this.groupBox2.Controls.Add(this.butSend);
-			this.groupBox2.Controls.Add(this.butAck);
-			this.groupBox2.Controls.Add(this.labelSending);
-			this.groupBox2.Controls.Add(this.textDays);
-			this.groupBox2.Controls.Add(this.labelDays);
-			this.groupBox2.Controls.Add(this.label6);
-			this.groupBox2.Controls.Add(this.comboViewUser);
-			this.groupBox2.Controls.Add(this.gridMessages);
-			this.groupBox2.Controls.Add(this.checkIncludeAck);
-			this.groupBox2.Controls.Add(this.label7);
-			this.groupBox2.Controls.Add(this.label5);
-			this.groupBox2.Controls.Add(this.listExtras);
-			this.groupBox2.Controls.Add(this.label4);
-			this.groupBox2.Controls.Add(this.listFrom);
-			this.groupBox2.Controls.Add(this.label3);
-			this.groupBox2.Controls.Add(this.listTo);
-			this.groupBox2.Controls.Add(this.label1);
-			this.groupBox2.Controls.Add(this.textMessage);
-			this.groupBox2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox2.Location = new System.Drawing.Point(3, 252);
-			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(902, 447);
-			this.groupBox2.TabIndex = 19;
-			this.groupBox2.TabStop = false;
-			this.groupBox2.Text = "Messaging";
-			// 
-			// listMessages
-			// 
-			this.listMessages.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+      this.groupBox2.Controls.Add(this.listMessages);
+      this.groupBox2.Controls.Add(this.butSend);
+      this.groupBox2.Controls.Add(this.butAck);
+      this.groupBox2.Controls.Add(this.labelSending);
+      this.groupBox2.Controls.Add(this.textDays);
+      this.groupBox2.Controls.Add(this.labelDays);
+      this.groupBox2.Controls.Add(this.label6);
+      this.groupBox2.Controls.Add(this.comboViewUser);
+      this.groupBox2.Controls.Add(this.gridMessages);
+      this.groupBox2.Controls.Add(this.checkIncludeAck);
+      this.groupBox2.Controls.Add(this.label7);
+      this.groupBox2.Controls.Add(this.label5);
+      this.groupBox2.Controls.Add(this.listExtras);
+      this.groupBox2.Controls.Add(this.label4);
+      this.groupBox2.Controls.Add(this.listFrom);
+      this.groupBox2.Controls.Add(this.label3);
+      this.groupBox2.Controls.Add(this.listTo);
+      this.groupBox2.Controls.Add(this.label1);
+      this.groupBox2.Controls.Add(this.textMessage);
+      this.groupBox2.FlatStyle = System.Windows.Forms.FlatStyle.System;
+      this.groupBox2.Location = new System.Drawing.Point(3, 252);
+      this.groupBox2.Name = "groupBox2";
+      this.groupBox2.Size = new System.Drawing.Size(902, 447);
+      this.groupBox2.TabIndex = 19;
+      this.groupBox2.TabStop = false;
+      this.groupBox2.Text = "Messaging";
+      // 
+      // listMessages
+      // 
+      this.listMessages.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-			this.listMessages.FormattingEnabled = true;
-			this.listMessages.Location = new System.Drawing.Point(252, 35);
-			this.listMessages.Name = "listMessages";
-			this.listMessages.Size = new System.Drawing.Size(98, 355);
-			this.listMessages.TabIndex = 10;
-			this.listMessages.Click += new System.EventHandler(this.listMessages_Click);
-			// 
-			// butSend
-			// 
-			this.butSend.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butSend.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.butSend.Autosize = true;
-			this.butSend.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butSend.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butSend.CornerRadius = 4F;
-			this.butSend.Location = new System.Drawing.Point(252, 417);
-			this.butSend.Name = "butSend";
-			this.butSend.Size = new System.Drawing.Size(98, 25);
-			this.butSend.TabIndex = 15;
-			this.butSend.Text = "Send Text";
-			this.butSend.Click += new System.EventHandler(this.butSend_Click);
-			// 
-			// butAck
-			// 
-			this.butAck.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAck.Autosize = true;
-			this.butAck.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butAck.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butAck.CornerRadius = 4F;
-			this.butAck.Location = new System.Drawing.Point(645, 10);
-			this.butAck.Name = "butAck";
-			this.butAck.Size = new System.Drawing.Size(67, 22);
-			this.butAck.TabIndex = 25;
-			this.butAck.Text = "Ack";
-			this.butAck.Click += new System.EventHandler(this.butAck_Click);
-			// 
-			// labelSending
-			// 
-			this.labelSending.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.labelSending.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labelSending.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-			this.labelSending.Location = new System.Drawing.Point(251, 393);
-			this.labelSending.Name = "labelSending";
-			this.labelSending.Size = new System.Drawing.Size(100, 21);
-			this.labelSending.TabIndex = 24;
-			this.labelSending.Text = "Sending";
-			this.labelSending.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-			this.labelSending.Visible = false;
-			// 
-			// textDays
-			// 
-			this.textDays.Location = new System.Drawing.Point(594, 12);
-			this.textDays.Name = "textDays";
-			this.textDays.Size = new System.Drawing.Size(45, 20);
-			this.textDays.TabIndex = 19;
-			this.textDays.Visible = false;
-			this.textDays.TextChanged += new System.EventHandler(this.textDays_TextChanged);
-			// 
-			// labelDays
-			// 
-			this.labelDays.Location = new System.Drawing.Point(531, 14);
-			this.labelDays.Name = "labelDays";
-			this.labelDays.Size = new System.Drawing.Size(61, 16);
-			this.labelDays.TabIndex = 18;
-			this.labelDays.Text = "Days";
-			this.labelDays.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.labelDays.Visible = false;
-			// 
-			// label6
-			// 
-			this.label6.Location = new System.Drawing.Point(725, 14);
-			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(57, 16);
-			this.label6.TabIndex = 17;
-			this.label6.Text = "To User";
-			this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// comboViewUser
-			// 
-			this.comboViewUser.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboViewUser.FormattingEnabled = true;
-			this.comboViewUser.Location = new System.Drawing.Point(783, 11);
-			this.comboViewUser.Name = "comboViewUser";
-			this.comboViewUser.Size = new System.Drawing.Size(114, 21);
-			this.comboViewUser.TabIndex = 16;
-			this.comboViewUser.SelectionChangeCommitted += new System.EventHandler(this.comboViewUser_SelectionChangeCommitted);
-			// 
-			// gridMessages
-			// 
-			this.gridMessages.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+      this.listMessages.FormattingEnabled = true;
+      this.listMessages.Location = new System.Drawing.Point(252, 35);
+      this.listMessages.Name = "listMessages";
+      this.listMessages.Size = new System.Drawing.Size(98, 355);
+      this.listMessages.TabIndex = 10;
+      this.listMessages.Click += new System.EventHandler(this.listMessages_Click);
+      // 
+      // butSend
+      // 
+      this.butSend.AdjustImageLocation = new System.Drawing.Point(0, 0);
+      this.butSend.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.butSend.Autosize = true;
+      this.butSend.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+      this.butSend.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+      this.butSend.CornerRadius = 4F;
+      this.butSend.Location = new System.Drawing.Point(252, 417);
+      this.butSend.Name = "butSend";
+      this.butSend.Size = new System.Drawing.Size(98, 25);
+      this.butSend.TabIndex = 15;
+      this.butSend.Text = "Send Text";
+      this.butSend.Click += new System.EventHandler(this.butSend_Click);
+      // 
+      // butAck
+      // 
+      this.butAck.AdjustImageLocation = new System.Drawing.Point(0, 0);
+      this.butAck.Autosize = true;
+      this.butAck.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+      this.butAck.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+      this.butAck.CornerRadius = 4F;
+      this.butAck.Location = new System.Drawing.Point(645, 10);
+      this.butAck.Name = "butAck";
+      this.butAck.Size = new System.Drawing.Size(67, 22);
+      this.butAck.TabIndex = 25;
+      this.butAck.Text = "Ack";
+      this.butAck.Click += new System.EventHandler(this.butAck_Click);
+      // 
+      // labelSending
+      // 
+      this.labelSending.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.labelSending.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+      this.labelSending.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+      this.labelSending.Location = new System.Drawing.Point(251, 393);
+      this.labelSending.Name = "labelSending";
+      this.labelSending.Size = new System.Drawing.Size(100, 21);
+      this.labelSending.TabIndex = 24;
+      this.labelSending.Text = "Sending";
+      this.labelSending.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+      this.labelSending.Visible = false;
+      // 
+      // textDays
+      // 
+      this.textDays.Location = new System.Drawing.Point(594, 12);
+      this.textDays.Name = "textDays";
+      this.textDays.Size = new System.Drawing.Size(45, 20);
+      this.textDays.TabIndex = 19;
+      this.textDays.Visible = false;
+      this.textDays.TextChanged += new System.EventHandler(this.textDays_TextChanged);
+      // 
+      // labelDays
+      // 
+      this.labelDays.Location = new System.Drawing.Point(531, 14);
+      this.labelDays.Name = "labelDays";
+      this.labelDays.Size = new System.Drawing.Size(61, 16);
+      this.labelDays.TabIndex = 18;
+      this.labelDays.Text = "Days";
+      this.labelDays.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+      this.labelDays.Visible = false;
+      // 
+      // label6
+      // 
+      this.label6.Location = new System.Drawing.Point(725, 14);
+      this.label6.Name = "label6";
+      this.label6.Size = new System.Drawing.Size(57, 16);
+      this.label6.TabIndex = 17;
+      this.label6.Text = "To User";
+      this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+      // 
+      // comboViewUser
+      // 
+      this.comboViewUser.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.comboViewUser.FormattingEnabled = true;
+      this.comboViewUser.Location = new System.Drawing.Point(783, 11);
+      this.comboViewUser.Name = "comboViewUser";
+      this.comboViewUser.Size = new System.Drawing.Size(114, 21);
+      this.comboViewUser.TabIndex = 16;
+      this.comboViewUser.SelectionChangeCommitted += new System.EventHandler(this.comboViewUser_SelectionChangeCommitted);
+      // 
+      // gridMessages
+      // 
+      this.gridMessages.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-			this.gridMessages.HasAddButton = false;
-			this.gridMessages.HasMultilineHeaders = false;
-			this.gridMessages.HScrollVisible = false;
-			this.gridMessages.Location = new System.Drawing.Point(356, 35);
-			this.gridMessages.Name = "gridMessages";
-			this.gridMessages.ScrollValue = 0;
-			this.gridMessages.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridMessages.Size = new System.Drawing.Size(540, 406);
-			this.gridMessages.TabIndex = 13;
-			this.gridMessages.Title = "Message History";
-			this.gridMessages.TranslationName = "TableTextMessages";
-			// 
-			// checkIncludeAck
-			// 
-			this.checkIncludeAck.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkIncludeAck.Location = new System.Drawing.Point(356, 16);
-			this.checkIncludeAck.Name = "checkIncludeAck";
-			this.checkIncludeAck.Size = new System.Drawing.Size(173, 18);
-			this.checkIncludeAck.TabIndex = 14;
-			this.checkIncludeAck.Text = "Include Acknowledged";
-			this.checkIncludeAck.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkIncludeAck.UseVisualStyleBackColor = true;
-			this.checkIncludeAck.Click += new System.EventHandler(this.checkIncludeAck_Click);
-			// 
-			// label7
-			// 
-			this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.label7.Location = new System.Drawing.Point(6, 402);
-			this.label7.Name = "label7";
-			this.label7.Size = new System.Drawing.Size(100, 16);
-			this.label7.TabIndex = 12;
-			this.label7.Text = "Text Message";
-			this.label7.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-			// 
-			// label5
-			// 
-			this.label5.Location = new System.Drawing.Point(250, 16);
-			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(100, 16);
-			this.label5.TabIndex = 9;
-			this.label5.Text = "Message (&& Send)";
-			this.label5.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-			// 
-			// listExtras
-			// 
-			this.listExtras.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+      this.gridMessages.HasAddButton = false;
+      this.gridMessages.HasMultilineHeaders = false;
+      this.gridMessages.HScrollVisible = false;
+      this.gridMessages.Location = new System.Drawing.Point(356, 35);
+      this.gridMessages.Name = "gridMessages";
+      this.gridMessages.ScrollValue = 0;
+      this.gridMessages.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
+      this.gridMessages.Size = new System.Drawing.Size(540, 406);
+      this.gridMessages.TabIndex = 13;
+      this.gridMessages.Title = "Message History";
+      this.gridMessages.TranslationName = "TableTextMessages";
+      // 
+      // checkIncludeAck
+      // 
+      this.checkIncludeAck.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+      this.checkIncludeAck.Location = new System.Drawing.Point(356, 16);
+      this.checkIncludeAck.Name = "checkIncludeAck";
+      this.checkIncludeAck.Size = new System.Drawing.Size(173, 18);
+      this.checkIncludeAck.TabIndex = 14;
+      this.checkIncludeAck.Text = "Include Acknowledged";
+      this.checkIncludeAck.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+      this.checkIncludeAck.UseVisualStyleBackColor = true;
+      this.checkIncludeAck.Click += new System.EventHandler(this.checkIncludeAck_Click);
+      // 
+      // label7
+      // 
+      this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+      this.label7.Location = new System.Drawing.Point(6, 402);
+      this.label7.Name = "label7";
+      this.label7.Size = new System.Drawing.Size(100, 16);
+      this.label7.TabIndex = 12;
+      this.label7.Text = "Text Message";
+      this.label7.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+      // 
+      // label5
+      // 
+      this.label5.Location = new System.Drawing.Point(250, 16);
+      this.label5.Name = "label5";
+      this.label5.Size = new System.Drawing.Size(100, 16);
+      this.label5.TabIndex = 9;
+      this.label5.Text = "Message (&& Send)";
+      this.label5.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+      // 
+      // listExtras
+      // 
+      this.listExtras.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-			this.listExtras.FormattingEnabled = true;
-			this.listExtras.Location = new System.Drawing.Point(171, 35);
-			this.listExtras.Name = "listExtras";
-			this.listExtras.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listExtras.Size = new System.Drawing.Size(75, 355);
-			this.listExtras.TabIndex = 8;
-			// 
-			// label4
-			// 
-			this.label4.Location = new System.Drawing.Point(169, 16);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(78, 16);
-			this.label4.TabIndex = 7;
-			this.label4.Text = "Extras";
-			this.label4.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-			// 
-			// listFrom
-			// 
-			this.listFrom.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+      this.listExtras.FormattingEnabled = true;
+      this.listExtras.Location = new System.Drawing.Point(171, 35);
+      this.listExtras.Name = "listExtras";
+      this.listExtras.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+      this.listExtras.Size = new System.Drawing.Size(75, 355);
+      this.listExtras.TabIndex = 8;
+      // 
+      // label4
+      // 
+      this.label4.Location = new System.Drawing.Point(169, 16);
+      this.label4.Name = "label4";
+      this.label4.Size = new System.Drawing.Size(78, 16);
+      this.label4.TabIndex = 7;
+      this.label4.Text = "Extras";
+      this.label4.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+      // 
+      // listFrom
+      // 
+      this.listFrom.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
-			this.listFrom.FormattingEnabled = true;
-			this.listFrom.Location = new System.Drawing.Point(90, 35);
-			this.listFrom.Name = "listFrom";
-			this.listFrom.Size = new System.Drawing.Size(75, 355);
-			this.listFrom.TabIndex = 6;
-			// 
-			// label3
-			// 
-			this.label3.Location = new System.Drawing.Point(88, 16);
-			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(78, 16);
-			this.label3.TabIndex = 5;
-			this.label3.Text = "From";
-			this.label3.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-			// 
-			// listTo
-			// 
-			this.listTo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+      this.listFrom.FormattingEnabled = true;
+      this.listFrom.Location = new System.Drawing.Point(90, 35);
+      this.listFrom.Name = "listFrom";
+      this.listFrom.Size = new System.Drawing.Size(75, 355);
+      this.listFrom.TabIndex = 6;
+      // 
+      // label3
+      // 
+      this.label3.Location = new System.Drawing.Point(88, 16);
+      this.label3.Name = "label3";
+      this.label3.Size = new System.Drawing.Size(78, 16);
+      this.label3.TabIndex = 5;
+      this.label3.Text = "From";
+      this.label3.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+      // 
+      // listTo
+      // 
+      this.listTo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
 			this.listTo.FormattingEnabled = true;
 			this.listTo.Location = new System.Drawing.Point(9, 35);
@@ -734,7 +734,7 @@ namespace OpenDental{
 				butSend,
 				groupBox1,
 				butTimeCard,
-				label2,
+				labelCurrentTime,
 				butClaimPay,
 				butClockIn,
 				butClockOut,
@@ -778,12 +778,23 @@ namespace OpenDental{
 		}
 
 		private void RefreshModuleData(long patNum) {
-			TimeDelta=MiscData.GetNowDateTime()-DateTime.Now;
+      if(PrefC.GetBool(PrefName.LocalTimeOverridesServerTime)) {
+        TimeDelta=new TimeSpan(0);
+      }
+      else {
+        TimeDelta=MiscData.GetNowDateTime()-DateTime.Now;
+      }
 			Employees.RefreshCache();
 			//RefreshModulePatient(patNum);
 		}
 
 		private void RefreshModuleScreen(){
+      if(PrefC.GetBool(PrefName.LocalTimeOverridesServerTime)) {
+        labelCurrentTime.Text="Local Time";
+      }
+      else {
+        labelCurrentTime.Text="Server Time";
+      }
 			textTime.Text=(DateTime.Now+TimeDelta).ToLongTimeString();
 			FillEmps();
 			FillMessageDefs();

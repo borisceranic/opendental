@@ -341,6 +341,8 @@ namespace OpenDentBusiness {
 		///<summary>Comma-delimited list of two-letter language names and custom language names.  The custom language names are the full string name and are not necessarily supported by Microsoft.</summary>
 		LanguagesUsedByPatients,
 		LetterMergePath,
+    ///<summary>Boolean. Only used to override server time in the following places: Time Cards.</summary>
+    LocalTimeOverridesServerTime,
 		MainWindowTitle,
 		///<summary>0=Meaningful Use Stage 1, 1=Meaningful Use Stage 2.  Global, affects all providers.  Changes the MU grid that is seen for individual patients and for summary reports.</summary>
 		MeaningfulUseTwo,
