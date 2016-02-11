@@ -4636,6 +4636,39 @@ namespace OpenDentBusiness {
 		}
 
 		[DbmMethod]
+		public static string ProcedurelogWithInvalidAptNum(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			if(isCheck) {
+				command="SELECT COUNT(*) "
+					+"FROM procedurelog "
+					+"WHERE procedurelog.AptNum!=0 AND procedurelog.AptNum NOT IN(SELECT appointment.AptNum FROM appointment)";
+				int numFound=PIn.Int(Db.GetCount(command));
+				command="SELECT COUNT(*) "
+					+"FROM procedurelog "
+					+"WHERE PlannedAptNum!=0 AND PlannedAptNum NOT IN(SELECT appointment.AptNum FROM appointment)";
+				numFound+=PIn.Int(Db.GetCount(command));
+				if(numFound>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Procedures with invalid AptNums found")+": "+numFound+"\r\n";
+				}
+			}
+			else {
+				command="UPDATE procedurelog SET procedurelog.AptNum=0 "
+					+"WHERE procedurelog.AptNum!=0 AND procedurelog.AptNum NOT IN(SELECT appointment.AptNum FROM appointment)";
+				long numberFixed=Db.NonQ(command);
+				command="UPDATE procedurelog SET PlannedAptNum=0 "
+					+"WHERE PlannedAptNum!=0 AND PlannedAptNum NOT IN(SELECT appointment.AptNum FROM appointment)";
+				numberFixed+=Db.NonQ(command);
+				if(numberFixed>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Procedures with invalid AptNums fixed")+": "+numberFixed+"\r\n";
+				}
+			}
+			return log;
+		}
+
+		[DbmMethod]
 		public static string ProcedurelogWithInvalidProvNum(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
