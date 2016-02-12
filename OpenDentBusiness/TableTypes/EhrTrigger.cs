@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using System.Drawing;
 
 namespace OpenDentBusiness {
-	///<summary>Used for CDS automation.  May later be expanded to replace "automation."</summary>
+	///<summary>CDS Triggers when referenced in UI. Used for CDS automation.  May later be expanded to replace "automation."
+	///</summary>
 	[Serializable]
 	public class EhrTrigger:TableBase {
 		///<summary>Primary key.</summary>

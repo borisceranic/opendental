@@ -49,6 +49,9 @@ namespace OpenDentBusiness{
 		#endregion*/
 
 		public static bool IsRxNormTableEmpty() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod());
+			}
 			string command="SELECT COUNT(*) FROM rxnorm";
 			if(Db.GetCount(command)=="0") {
 				return true;
@@ -57,6 +60,9 @@ namespace OpenDentBusiness{
 		}
 
 		public static RxNorm GetByRxCUI(string rxCui) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<RxNorm>(MethodBase.GetCurrentMethod(),rxCui);
+			}
 			string command="SELECT * FROM rxnorm WHERE RxCui='"+POut.String(rxCui)+"' AND MmslCode=''";
 			return Crud.RxNormCrud.SelectOne(command);
 		}

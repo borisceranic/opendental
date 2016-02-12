@@ -247,8 +247,8 @@ namespace OpenDental {
 			return result;
 		}
 
-		private void butEhrTriggers_Click(object sender,EventArgs e) {
-			FormEhrTriggers FormET=new FormEhrTriggers();
+		private void butCdsTriggers_Click(object sender,EventArgs e) {
+			FormCdsTriggers FormET=new FormCdsTriggers();
 			FormET.ShowDialog();
 		}
 

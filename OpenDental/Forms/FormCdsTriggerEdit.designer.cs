@@ -1,5 +1,5 @@
 namespace OpenDental{
-	partial class FormEhrTriggerEdit {
+	partial class FormCdsTriggerEdit {
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
@@ -23,7 +23,7 @@ namespace OpenDental{
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEhrTriggerEdit));
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormCdsTriggerEdit));
 			this.butCancel = new OpenDental.UI.Button();
 			this.butDelete = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
@@ -193,6 +193,8 @@ namespace OpenDental{
 			// gridMain
 			// 
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasAddButton = false;
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(138, 77);
 			this.gridMain.Name = "gridMain";
@@ -222,6 +224,7 @@ namespace OpenDental{
 			this.butAddCvx.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAddCvx.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAddCvx.CornerRadius = 4F;
+			this.butAddCvx.Enabled = false;
 			this.butAddCvx.Image = global::OpenDental.Properties.Resources.Add;
 			this.butAddCvx.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			this.butAddCvx.Location = new System.Drawing.Point(6, 73);
@@ -546,7 +549,7 @@ namespace OpenDental{
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormEhrTriggerEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "EHR Trigger Edit";
+			this.Text = "CDS Trigger Edit";
 			this.Load += new System.EventHandler(this.FormEhrTriggerEdit_Load);
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox2.ResumeLayout(false);

@@ -1,5 +1,5 @@
 namespace OpenDental{
-	partial class FormEhrTriggers {
+	partial class FormCdsTriggers {
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
@@ -24,7 +24,7 @@ namespace OpenDental{
 		/// </summary>
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEhrTriggers));
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormCdsTriggers));
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butAddTrigger = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
@@ -45,8 +45,8 @@ namespace OpenDental{
 			this.gridMain.ScrollValue = 0;
 			this.gridMain.Size = new System.Drawing.Size(683, 560);
 			this.gridMain.TabIndex = 199;
-			this.gridMain.Title = "EHR Triggers";
-			this.gridMain.TranslationName = "TableEHRTriggers";
+			this.gridMain.Title = "CDS Triggers";
+			this.gridMain.TranslationName = "TableCDSTriggers";
 			this.gridMain.WrapText = false;
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			// 
@@ -104,7 +104,7 @@ namespace OpenDental{
 			this.Menu = this.mainMenu1;
 			this.Name = "FormEhrTriggers";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "EHR Triggers";
+			this.Text = "CDS Triggers";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormEhrTriggers_FormClosing);
 			this.Load += new System.EventHandler(this.FormEhrTriggers_Load);
 			this.ResumeLayout(false);

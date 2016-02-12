@@ -427,7 +427,7 @@ namespace OpenDental {
 						FillGridMu();
 						break;
 					case EhrMeasureType.ClinicalInterventionRules:
-						FormEhrTriggers FormET=new FormEhrTriggers();
+						FormCdsTriggers FormET=new FormCdsTriggers();
 						FormET.ShowDialog();
 						FillGridMu();
 						break;

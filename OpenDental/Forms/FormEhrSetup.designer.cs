@@ -185,8 +185,8 @@ namespace OpenDental{
 			this.butEhrTriggers.Name = "butEhrTriggers";
 			this.butEhrTriggers.Size = new System.Drawing.Size(128, 24);
 			this.butEhrTriggers.TabIndex = 138;
-			this.butEhrTriggers.Text = "EHR Triggers";
-			this.butEhrTriggers.Click += new System.EventHandler(this.butEhrTriggers_Click);
+			this.butEhrTriggers.Text = "CDS Triggers";
+			this.butEhrTriggers.Click += new System.EventHandler(this.butCdsTriggers_Click);
 			// 
 			// butTimeSynch
 			// 

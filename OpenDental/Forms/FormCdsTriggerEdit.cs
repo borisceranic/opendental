@@ -15,12 +15,12 @@ using OpenDental.UI;
 using System.Text.RegularExpressions;
 
 namespace OpenDental {
-	public partial class FormEhrTriggerEdit:Form {
+	public partial class FormCdsTriggerEdit:Form {
 		public bool IsNew;
 		public EhrTrigger EhrTriggerCur;
 
 
-		public FormEhrTriggerEdit() {
+		public FormCdsTriggerEdit() {
 			InitializeComponent();
 			
 			Lan.F(this);

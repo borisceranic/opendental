@@ -14,10 +14,10 @@ using System.IO;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormEhrTriggers:Form {
+	public partial class FormCdsTriggers:Form {
 		public List<EhrTrigger> ListEhrTriggers;
 
-		public FormEhrTriggers() {
+		public FormCdsTriggers() {
 			InitializeComponent();
 			Lan.F(this);
 		}
@@ -37,11 +37,11 @@ namespace OpenDental {
 		private void FillGrid() {
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
-			ODGridColumn col=new ODGridColumn(Lan.g("TableEHRTriggers","Description"),200);
+			ODGridColumn col=new ODGridColumn(Lan.g("TableCDSTriggers","Description"),200);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableEHRTriggers","Cardinality"),140);
+			col=new ODGridColumn(Lan.g("TableCDSTriggers","Cardinality"),140);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableEHRTriggers","Trigger Categories"),200);
+			col=new ODGridColumn(Lan.g("TableCDSTriggers","Trigger Categories"),200);
 			gridMain.Columns.Add(col);
 			ListEhrTriggers=EhrTriggers.GetAll();
 			gridMain.Rows.Clear();
@@ -57,7 +57,7 @@ namespace OpenDental {
 		}
 
 		private void butAddTrigger_Click(object sender,EventArgs e) {
-			FormEhrTriggerEdit FormETE=new FormEhrTriggerEdit();
+			FormCdsTriggerEdit FormETE=new FormCdsTriggerEdit();
 			FormETE.EhrTriggerCur=new EhrTrigger();
 			FormETE.IsNew=true;
 			FormETE.ShowDialog();
@@ -69,7 +69,7 @@ namespace OpenDental {
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			FormEhrTriggerEdit FormETE=new FormEhrTriggerEdit();
+			FormCdsTriggerEdit FormETE=new FormCdsTriggerEdit();
 			FormETE.EhrTriggerCur=ListEhrTriggers[e.Row];
 			FormETE.ShowDialog();
 			if(FormETE.DialogResult!=DialogResult.OK) {

@@ -2538,7 +2538,7 @@ namespace OpenDentBusiness{
 							mu.Details="No triggers enabled";
 						}
 						mu.Action="Edit triggers";
-						mu.Action2="Screenshot EHR Triggers for audit";
+						mu.Action2="Screenshot CDS Triggers for audit";
 						break;
 					#endregion
 				}
@@ -4985,7 +4985,7 @@ namespace OpenDentBusiness{
 							mu.Details="Less than 5 triggers enabled";
 						}
 						mu.Action="Edit triggers";
-						mu.Action2="Screenshot EHR Triggers for audit";
+						mu.Action2="Screenshot CDS Triggers for audit";
 						break;
 					#endregion			
 				}
