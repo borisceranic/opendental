@@ -162,6 +162,8 @@ namespace OpenDental{
 			this.textPassword.Name = "textPassword";
 			this.textPassword.Size = new System.Drawing.Size(175, 20);
 			this.textPassword.TabIndex = 6;
+			this.textPassword.UseSystemPasswordChar = true;
+			this.textPassword.TextChanged += new System.EventHandler(this.textPassword_TextChanged);
 			// 
 			// comboClinic
 			// 
@@ -456,10 +458,12 @@ namespace OpenDental{
 			DialogResult=DialogResult.Cancel;
 		}
 
-		
-
-		
-
+		private void textPassword_TextChanged(object sender,EventArgs e) {
+			//Let the users see what they are typing if they clear out the password field completely
+			if(textPassword.Text.Trim().Length==0) {
+				textPassword.UseSystemPasswordChar=false;
+			}
+		}
 
 	}
 }
