@@ -830,11 +830,11 @@ namespace OpenDental{
 			_listFees=Fees.ClearFeeSched(feeSchedNum,clinicNum,provNum,_listFees);
 			string logText=Lan.g(this,"Procedures for Fee Schedule")+" "+FeeScheds.GetDescription(feeSchedNum)+" ";
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				if(Clinics.GetDesc(FormOpenDental.ClinicNum)=="") {
+				if(Clinics.GetDesc(Clinics.ClinicNum)=="") {
 					logText+=Lan.g(this,"at Headquarters");
 				}
 				else {
-					logText+=Lan.g(this,"at clinic")+" "+Clinics.GetDesc(FormOpenDental.ClinicNum);
+					logText+=Lan.g(this,"at clinic")+" "+Clinics.GetDesc(Clinics.ClinicNum);
 				}
 			}
 			logText+=" "+Lan.g(this,"were all cleared.");

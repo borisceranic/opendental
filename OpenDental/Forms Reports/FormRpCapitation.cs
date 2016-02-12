@@ -217,7 +217,7 @@ namespace OpenDental{
 			string queryString=@"SELECT carrier.CarrierName,CONCAT(CONCAT(patSub.LName,', '),patSub.FName) 
 				,patSub.SSN,CONCAT(CONCAT(patPat.LName,', '),patPat.FName)
 				,patPat.Birthdate,procedurecode.ProcCode,procedurecode.Descript";
-			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(!Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				queryString+=",procedurelog.ToothNum,procedurelog.Surf";
 			}
 			queryString+=@",procedurelog.ProcDate,procedurelog.ProcFee
@@ -247,7 +247,7 @@ namespace OpenDental{
 			query.GetColumnDetail("Subsc SSN").SuppressIfDuplicate=true;
 			query.AddColumn("Patient",120,FieldValueType.String,font);
 			query.AddColumn("Pat DOB",80,FieldValueType.Date,font);
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				query.AddColumn("Code",140,FieldValueType.String,font);
 				query.AddColumn("Proc Description",120,FieldValueType.String,font);
 				query.AddColumn("Date",80,FieldValueType.Date,font);

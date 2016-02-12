@@ -11,7 +11,7 @@ namespace TestCanada {
 		private static string Run(int scriptNum,Carrier carrier,Provider treatProv,Provider billingProv,DateTime reconciliationDate,out List<Etrans> etransAcks) { 
 			string retVal="";
 			Clearinghouse clearinghouseHq=Canadian.GetCanadianClearinghouseHq(carrier);
-			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,OpenDental.FormOpenDental.ClinicNum);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clinics.ClinicNum);
 			etransAcks=CanadianOutput.GetPaymentReconciliations(clearinghouseClin,carrier,treatProv,billingProv,reconciliationDate,0);
 			retVal+="Payment Reconciliation#"+scriptNum.ToString()+" successful.\r\n";
 			return retVal;

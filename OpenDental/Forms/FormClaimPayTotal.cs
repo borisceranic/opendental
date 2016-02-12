@@ -342,7 +342,7 @@ namespace OpenDental
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableClaimProc","Prov"),50);
 			gridMain.Columns.Add(col);
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				col=new ODGridColumn(Lan.g("TableClaimProc","Code"),75);
 				gridMain.Columns.Add(col);
 			}
@@ -391,7 +391,7 @@ namespace OpenDental
 				row.Cells.Add(Providers.GetAbbr(ClaimProcsToEdit[i].ProvNum));
 				if(ClaimProcsToEdit[i].ProcNum==0) {
 					row.Cells.Add("");
-					if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+					if(!Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 						row.Cells.Add("");
 					}
 					row.Cells.Add(Lan.g(this,"Total Payment"));
@@ -399,7 +399,7 @@ namespace OpenDental
 				else {
 					ProcCur=Procedures.GetProcFromList(ProcList,ClaimProcsToEdit[i].ProcNum);
 					row.Cells.Add(ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProcCode);
-					if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+					if(!Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 						row.Cells.Add(Tooth.ToInternat(ProcCur.ToothNum));
 					}
 					row.Cells.Add(ProcedureCodes.GetProcCode(ProcCur.CodeNum).Descript);

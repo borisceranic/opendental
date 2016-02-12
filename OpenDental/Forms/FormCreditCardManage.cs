@@ -62,8 +62,8 @@ namespace OpenDental {
 				if(Programs.IsEnabled(ProgramName.Xcharge)) {
 					Program prog=Programs.GetCur(ProgramName.Xcharge);
 					string path=Programs.GetProgramPath(prog);
-					string xUsername=ProgramProperties.GetPropVal(prog.ProgramNum,"Username",FormOpenDental.ClinicNum).Trim();
-					string xPassword=ProgramProperties.GetPropVal(prog.ProgramNum,"Password",FormOpenDental.ClinicNum).Trim();
+					string xUsername=ProgramProperties.GetPropVal(prog.ProgramNum,"Username",Clinics.ClinicNum).Trim();
+					string xPassword=ProgramProperties.GetPropVal(prog.ProgramNum,"Password",Clinics.ClinicNum).Trim();
 					//Force user to retry entering information until it's correct or they press cancel
 					while(!File.Exists(path) || string.IsNullOrEmpty(xPassword) || string.IsNullOrEmpty(xUsername)) {
 						MsgBox.Show(this,"The Path, Username, and/or Password for X-Charge have not been set or are invalid.");
@@ -77,8 +77,8 @@ namespace OpenDental {
 						}
 						prog=Programs.GetCur(ProgramName.Xcharge);//refresh local variable prog to reflect any changes made in setup window
 						path=Programs.GetProgramPath(prog);
-						xUsername=ProgramProperties.GetPropVal(prog.ProgramNum,"Username",FormOpenDental.ClinicNum).Trim();
-						xPassword=ProgramProperties.GetPropVal(prog.ProgramNum,"Password",FormOpenDental.ClinicNum).Trim();
+						xUsername=ProgramProperties.GetPropVal(prog.ProgramNum,"Username",Clinics.ClinicNum).Trim();
+						xPassword=ProgramProperties.GetPropVal(prog.ProgramNum,"Password",Clinics.ClinicNum).Trim();
 					}
 					xPassword=CodeBase.MiscUtils.Decrypt(xPassword);
 					ProcessStartInfo info=new ProcessStartInfo(path);

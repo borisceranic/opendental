@@ -22,11 +22,11 @@ namespace OpenDentBusiness {
 		public UserOdPref Clone() {
 			return (UserOdPref)this.MemberwiseClone();
 		}
-
 	}
 
 	public enum UserOdFkeyType {
 		///<summary>0</summary>
-		Definition
+		Definition,
+		ClinicLast
 	}
 }

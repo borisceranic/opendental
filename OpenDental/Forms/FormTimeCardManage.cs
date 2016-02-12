@@ -55,7 +55,7 @@ namespace OpenDental {
 				}
 				for(int i=0;i<_listClinics.Count;i++) {
 					int curIndex=comboClinic.Items.Add(_listClinics[i].Description);
-					if(_listClinics[i].ClinicNum==FormOpenDental.ClinicNum) {
+					if(_listClinics[i].ClinicNum==Clinics.ClinicNum) {
 						comboClinic.SelectedIndex=curIndex;
 					}
 				}

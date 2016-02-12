@@ -326,7 +326,7 @@ namespace OpenDental{
 				group3DToothChart.Enabled=true;
 				groupFilters.Enabled=true;
 			}
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				radioDirectXChart.Text="Use DirectX Graphics (recommended)";
 				radioSimpleChart.Text="Use Simple Graphics";
 				radioOpenGLChart.Text="Use OpenGL Graphics";

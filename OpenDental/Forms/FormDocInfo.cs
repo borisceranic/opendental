@@ -367,7 +367,7 @@ namespace OpenDental{
 			}
 			textToothNumbers.Text=Tooth.FormatRangeForDisplay(DocCur.ToothNumbers);
 			//textNote.Text=DocCur.Note;
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				labelToothNums.Visible=false;
 				textToothNumbers.Visible=false;
 			}

@@ -83,18 +83,18 @@ namespace OpenDental {
 			try {
 				if(radioVersion2.Checked) {
 					Clearinghouse clearinghouseHq=Canadian.GetCanadianClearinghouseHq(null);
-					Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,FormOpenDental.ClinicNum);
+					Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clinics.ClinicNum);
 					CanadianOutput.GetOutstandingTransactions(clearinghouseClin,true,false,null,prov,false);
 				}
 				else if(radioVersion4Itrans.Checked) {
 					Clearinghouse clearinghouseHq=Canadian.GetCanadianClearinghouseHq(null);
-					Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,FormOpenDental.ClinicNum);
+					Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clinics.ClinicNum);
 					CanadianOutput.GetOutstandingTransactions(clearinghouseClin,false,true,null,prov,false);
 				}
 				else if(radioVersion4ToCarrier.Checked) {
 					Carrier carrier=carriers[listCarriers.SelectedIndex];
 					Clearinghouse clearinghouseHq=Canadian.GetCanadianClearinghouseHq(carrier);
-					Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,FormOpenDental.ClinicNum);
+					Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clinics.ClinicNum);
 					CanadianOutput.GetOutstandingTransactions(clearinghouseClin,false,false,carrier,prov,false);
 				}
 				Cursor=Cursors.Default;

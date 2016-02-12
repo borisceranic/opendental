@@ -166,7 +166,7 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableProcSelect","Code"),55);
 			gridMain.Columns.Add(col);
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				col=new ODGridColumn(Lan.g("TableProcSelect","Description"),300);
 				gridMain.Columns.Add(col);
 			}
@@ -185,7 +185,7 @@ namespace OpenDental{
 				row.Cells.Add(ProcList[i].ProcDate.ToShortDateString());
 				row.Cells.Add(Providers.GetAbbr(ProcList[i].ProvNum));
 				row.Cells.Add(ProcedureCodes.GetStringProcCode(ProcList[i].CodeNum));
-				if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				if(!Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 					row.Cells.Add(Tooth.ToInternat(ProcList[i].ToothNum));
 				}		
 				string descript="";

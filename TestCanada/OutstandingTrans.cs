@@ -12,7 +12,7 @@ namespace TestCanada {
 			string retVal="";
 			Provider prov=Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv));
 			Clearinghouse clearinghouseHq=Canadian.GetCanadianClearinghouseHq(carrier);
-			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,OpenDental.FormOpenDental.ClinicNum);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clinics.ClinicNum);
 			etransRequests=CanadianOutput.GetOutstandingTransactions(clearinghouseClin,version2,sendToItrans,carrier,prov,false);
 			retVal+="Outstanding Transactions#"+scriptNum.ToString()+" successful.\r\n";
 			return retVal;

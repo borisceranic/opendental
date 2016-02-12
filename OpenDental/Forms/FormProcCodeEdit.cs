@@ -967,7 +967,7 @@ namespace OpenDental{
 					comboProvNumDefault.SelectedIndex=i+1;//List starts with None at the top.
 				}
 			}
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				labelTreatArea.Visible=false;
 				listTreatArea.Visible=false;
 			}

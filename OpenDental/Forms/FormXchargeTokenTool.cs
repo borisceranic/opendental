@@ -37,10 +37,10 @@ namespace OpenDental {
 			//In order for X-Charge to be enabled, the enabled flag must be set and there must be a valid Username, Password, and PaymentType
 			//If clinics are enabled, the Username, Password, and PaymentType fields are allowed to be blank/invalid for any clinic not using X-Charge
 			//Therefore, we will validate the credentials and payment type using FormOpenDental.ClinicNum
-			string paymentType=ProgramProperties.GetPropVal(prog.ProgramNum,"PaymentType",FormOpenDental.ClinicNum);
+			string paymentType=ProgramProperties.GetPropVal(prog.ProgramNum,"PaymentType",Clinics.ClinicNum);
 			List<Def> _listPayTypeDefs=DefC.Short[(int)DefCat.PaymentTypes].ToList().FindAll(x => x.DefNum.ToString()==paymentType);//should be a list of 0 or 1
-			_xUsername=ProgramProperties.GetPropVal(prog.ProgramNum,"Username",FormOpenDental.ClinicNum);
-			_xPassword=ProgramProperties.GetPropVal(prog.ProgramNum,"Password",FormOpenDental.ClinicNum);
+			_xUsername=ProgramProperties.GetPropVal(prog.ProgramNum,"Username",Clinics.ClinicNum);
+			_xPassword=ProgramProperties.GetPropVal(prog.ProgramNum,"Password",Clinics.ClinicNum);
 			if(string.IsNullOrEmpty(_xUsername) || string.IsNullOrEmpty(_xPassword) || _listPayTypeDefs.Count<1) {
 				MsgBox.Show(this,"X-Charge username, password, or payment type for this clinic is invalid.");
 				DialogResult=DialogResult.Cancel;
@@ -115,8 +115,8 @@ namespace OpenDental {
 				info.Arguments+="/TRANSACTIONTYPE:ARCHIVEVAULTQUERY ";
 				info.Arguments+="/XCACCOUNTID:"+_listCreditCards[i].XChargeToken+" ";
 				info.Arguments+="/RESULTFILE:\""+resultfile+"\" ";
-				info.Arguments+="/USERID:"+ProgramProperties.GetPropVal(prog.ProgramNum,"Username",FormOpenDental.ClinicNum)+" ";
-				info.Arguments+="/PASSWORD:"+CodeBase.MiscUtils.Decrypt(ProgramProperties.GetPropVal(prog.ProgramNum,"Password",FormOpenDental.ClinicNum))+" ";
+				info.Arguments+="/USERID:"+ProgramProperties.GetPropVal(prog.ProgramNum,"Username",Clinics.ClinicNum)+" ";
+				info.Arguments+="/PASSWORD:"+CodeBase.MiscUtils.Decrypt(ProgramProperties.GetPropVal(prog.ProgramNum,"Password",Clinics.ClinicNum))+" ";
 				info.Arguments+="/AUTOPROCESS ";
 				info.Arguments+="/AUTOCLOSE ";
 				info.Arguments+="/NORESULTDIALOG ";

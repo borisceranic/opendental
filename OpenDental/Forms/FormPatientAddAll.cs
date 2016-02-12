@@ -1903,7 +1903,7 @@ namespace OpenDental {
 			pat.Country=textCountry.Text;
 			pat.Zip=textZip.Text;
 			pat.AddrNote=textAddrNotes.Text;
-			pat.ClinicNum=FormOpenDental.ClinicNum;
+			pat.ClinicNum=Clinics.ClinicNum;
 			RefAttach refAttachCur=new RefAttach();
 			if(_refCur!=null) {
 				refAttachCur.ReferralNum=_refCur.ReferralNum;

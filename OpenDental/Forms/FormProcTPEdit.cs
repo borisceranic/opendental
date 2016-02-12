@@ -474,7 +474,7 @@ namespace OpenDental{
 			textPrognosis.Text=ProcCur.Prognosis;
 			textDx.Text=ProcCur.Dx;
 			textProcAbbr.Text=ProcCur.ProcAbbr;
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				labelToothNum.Visible=false;
 				textToothNumTP.Visible=false;
 				labelSurface.Visible=false;

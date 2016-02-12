@@ -1674,7 +1674,7 @@ namespace OpenDental{
 		}
 
 		private void FillProcedures(){
-			bool isMedical=Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum);
+			bool isMedical=Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum);
 			gridProc.BeginUpdate();
 			gridProc.Rows.Clear();
 			gridProc.Columns.Clear();

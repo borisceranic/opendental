@@ -3373,7 +3373,7 @@ namespace OpenDental {
 				}
 			}
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"LabCase"),-1,"","LabCase"));
-			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(!Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Perio Chart"),2,"","Perio"));
 				ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Ortho Chart"),-1,"","Ortho"));
 			}			
@@ -3384,7 +3384,7 @@ namespace OpenDental {
 			//if(PrefC.GetBool(PrefName.ToothChartMoveMenuToRight)) {
 			//	ToolBarMain.Buttons.Add(new ODToolBarButton("                   .",-1,"",""));
 			//}
-			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(!Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				button=new ODToolBarButton(Lan.g(this,"Tooth Chart"),-1,"","ToothChart");
 				button.Style=ODToolBarButtonStyle.DropDownButton;
 				button.DropDownMenu=menuToothChart;
@@ -3699,7 +3699,7 @@ namespace OpenDental {
 			}
 			if(!UsingEcwTightOrFull() && isClinicRefresh) {
 				ChartLayoutHelper.SetToothChartVisibleHelper(toothChart,textTreatmentNotes);
-				if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 					tabProc.TabPages.Remove(tabMissing);
 					tabProc.TabPages.Remove(tabMovements);
 					tabProc.TabPages.Remove(tabPrimary);
@@ -5924,7 +5924,7 @@ namespace OpenDental {
 				}
 			}
 			bool showSelectedTeeth=checkShowTeeth.Checked;
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				checkShowTeeth.Checked=false;
 			}
 			DataSetMain=null;

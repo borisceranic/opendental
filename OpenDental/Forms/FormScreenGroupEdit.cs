@@ -480,7 +480,7 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Urgency"),70);
 			gridMain.Columns.Add(col);
-			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(!Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				col=new ODGridColumn(Lan.g(this,"Caries"),45,HorizontalAlignment.Center);
 				gridMain.Columns.Add(col);
 				col=new ODGridColumn(Lan.g(this,"ECC"),30,HorizontalAlignment.Center);
@@ -508,7 +508,7 @@ namespace OpenDental{
 				row.Cells.Add(screen.RaceOld.ToString());
 				row.Cells.Add(screen.Gender.ToString());
 				row.Cells.Add(screen.Urgency.ToString());
-				if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				if(!Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 					row.Cells.Add(screen.HasCaries==YN.Yes ? "X":"");
 					row.Cells.Add(screen.EarlyChildCaries==YN.Yes ? "X":"");
 					row.Cells.Add(screen.CariesExperience==YN.Yes ? "X":"");

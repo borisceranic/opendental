@@ -1047,7 +1047,7 @@ namespace OpenDental{
 			FillComboBoxes();
 			//Try to select the currently set Clinic.
 			for(int i=0;i<_arrayClinics.Length;i++) {
-				if(_arrayClinics[i].ClinicNum==FormOpenDental.ClinicNum) {
+				if(_arrayClinics[i].ClinicNum==Clinics.ClinicNum) {
 					comboClinic1.SelectedIndex=i+1;
 				}
 			}
@@ -1554,7 +1554,7 @@ namespace OpenDental{
 				return false;
 			}
 			//Make sure the user logged in has permission to edit the clinic of the fee schedule being edited.
-			if(Security.CurUser.ClinicIsRestricted && clinicNum!=FormOpenDental.ClinicNum) {
+			if(Security.CurUser.ClinicIsRestricted && clinicNum!=Clinics.ClinicNum) {
 				return false;
 			}
 			return true;

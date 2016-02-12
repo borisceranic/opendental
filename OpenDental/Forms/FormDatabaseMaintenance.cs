@@ -624,7 +624,7 @@ namespace OpenDental {
 			if(Security.IsAuthorized(Permissions.SecurityAdmin,true)){
 				butEtrans.Enabled=true;
 			}
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				butApptProcs.Visible=false;
 				labelApptProcs.Visible=false;
 			}
@@ -646,7 +646,7 @@ namespace OpenDental {
 			ODGridRow row;
 			//_listDbmMethodsGrid has already been filled on load with the correct methods to display in the grid.
 			for(int i=0;i<_listDbmMethodsGrid.Count;i++) {
-				if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 					if(Regex.IsMatch(_listDbmMethodsGrid[i].Name,"tooth|ortho",RegexOptions.IgnoreCase)) {
 						continue;
 					}

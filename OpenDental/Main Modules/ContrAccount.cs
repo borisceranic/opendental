@@ -2952,7 +2952,7 @@ namespace OpenDental {
 				PaymentCur.ClinicNum=PatCur.ClinicNum;
 			}
 			else {
-				PaymentCur.ClinicNum=FormOpenDental.ClinicNum;
+				PaymentCur.ClinicNum=Clinics.ClinicNum;
 			}
 			PaymentCur.DateEntry=DateTimeOD.Today;//So that it will show properly in the new window.
 			if(DefC.Short[(int)DefCat.PaymentTypes].Length>0){
@@ -4481,7 +4481,7 @@ namespace OpenDental {
 			Fee fee=Fees.GetFee(procCode.CodeNum,provFeeSched.FeeSchedNum);
 			Procedure proc=new Procedure();
 			proc.ProcStatus=ProcStat.C;
-			proc.ClinicNum=FormOpenDental.ClinicNum;
+			proc.ClinicNum=Clinics.ClinicNum;
 			proc.CodeNum=procCode.CodeNum;
 			proc.DateEntryC=DateTime.Now;
 			proc.DateTP=DateTime.Now;
@@ -4696,7 +4696,7 @@ namespace OpenDental {
 			gridProg.Columns.Clear();
 			ODGridColumn col = new ODGridColumn(Lan.g("TableProg", "Date"), 67);
 			gridProg.Columns.Add(col);
-			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(!Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				col = new ODGridColumn(Lan.g("TableProg","Th"),27);
 				gridProg.Columns.Add(col);
 				col = new ODGridColumn(Lan.g("TableProg","Surf"),40);
@@ -4763,7 +4763,7 @@ namespace OpenDental {
 				row.ColorLborder = Color.Black;
 				//remember that columns that start with lowercase are already altered for display rather than being raw data.
 				row.Cells.Add(table.Rows[i]["procDate"].ToString());
-				if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				if(!Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 					row.Cells.Add(table.Rows[i]["toothNum"].ToString());
 					row.Cells.Add(table.Rows[i]["Surf"].ToString());
 				}

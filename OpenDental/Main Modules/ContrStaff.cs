@@ -874,7 +874,7 @@ namespace OpenDental{
 				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics.
 					//Have user choose which clinic they want to see billing for.
 					FormBillingClinic FormBC=new FormBillingClinic();
-					FormBC.ClinicNum=FormOpenDental.ClinicNum;
+					FormBC.ClinicNum=Clinics.ClinicNum;
 					FormBC.ShowDialog();
 					if(FormBC.DialogResult==DialogResult.OK) {
 						if(Statements.UnsentClinicStatementsExist(FormBC.ClinicNum)) {//Check if clinic has unsent bills.
@@ -894,7 +894,7 @@ namespace OpenDental{
 			}
 			else {//No unsent statements exist.  Have user create a billing list.
 				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-					ShowBillingOptions(FormOpenDental.ClinicNum);
+					ShowBillingOptions(Clinics.ClinicNum);
 				}
 				else {
 					ShowBillingOptions(0);
@@ -1081,7 +1081,7 @@ namespace OpenDental{
 			gridEmp.Columns.Add(col);
 			gridEmp.Rows.Clear();
 			UI.ODGridRow row;
-			_listEmployees=Employees.GetEmpsForClinic(FormOpenDental.ClinicNum);
+			_listEmployees=Employees.GetEmpsForClinic(Clinics.ClinicNum);
 			for(int i=0;i<_listEmployees.Count;i++) {
 				row=new OpenDental.UI.ODGridRow();
 				row.Cells.Add(Employees.GetNameFL(_listEmployees[i]));

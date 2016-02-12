@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
-	public class UserOdPrefs{
+	public class UserOdPrefs {
 
 		/*
 		//If this table type will exist as cached data, uncomment the CachePattern region below and edit.
@@ -64,6 +65,7 @@ namespace OpenDentBusiness{
 			}
 			return Crud.UserOdPrefCrud.SelectOne(userOdPrefNum);
 		}
+		*/
 
 		///<summary></summary>
 		public static void Update(UserOdPref userOdPref){
@@ -73,11 +75,10 @@ namespace OpenDentBusiness{
 			}
 			Crud.UserOdPrefCrud.Update(userOdPref);
 		}
-		*/
 
 		///<summary></summary>
-		public static long Insert(UserOdPref userOdPref){
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
+		public static long Insert(UserOdPref userOdPref) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				userOdPref.UserOdPrefNum=Meth.GetLong(MethodBase.GetCurrentMethod(),userOdPref);
 				return userOdPref.UserOdPrefNum;
 			}
@@ -97,7 +98,7 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<UserOdPref>>(MethodBase.GetCurrentMethod(),userNum,fkeyType);
 			}
-			string command="SELECT * FROM userodpref WHERE UserNum="+POut.Long(userNum)+" AND FkeyType="+POut.Int((int)fkeyType);
+			string command = "SELECT * FROM userodpref WHERE UserNum="+POut.Long(userNum)+" AND FkeyType="+POut.Int((int)fkeyType);
 			return Crud.UserOdPrefCrud.SelectMany(command);
 		}
 
@@ -107,12 +108,14 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),userNum,fkeyType,fkey);
 				return;
 			}
-			string command="DELETE FROM userodpref "
+			string command = "DELETE FROM userodpref "
 				+"WHERE Fkey="+POut.Long(fkey)+" AND FkeyType="+POut.Int((int)fkeyType);
 			if(userNum!=0) {
 				command+=" AND UserNum="+POut.Long(userNum);
 			}
 			Db.NonQ(command);
 		}
+
 	}
+
 }

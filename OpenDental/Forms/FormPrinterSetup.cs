@@ -539,7 +539,7 @@ namespace OpenDental{
 			checkSimple.Checked=PrefC.GetBool(PrefName.EasyHidePrinters);
 			SetSimple();
 			SetControls(this);
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				labelTPandPerio.Text=Lan.g(this,"Treatment Plans");
 			}
 		}

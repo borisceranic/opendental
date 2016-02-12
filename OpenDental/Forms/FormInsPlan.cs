@@ -2064,7 +2064,7 @@ namespace OpenDental{
 			else {
 				textElectBenLastDate.Text=dateLast270.ToShortDateString();
 			}
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				checkCodeSubst.Visible=false;
 			}
 			Cursor=Cursors.Default;
@@ -3299,7 +3299,7 @@ namespace OpenDental{
 				return;
 			}
 			Clearinghouse clearinghouseHq=Eclaims.Canadian.GetCanadianClearinghouseHq(carrier);
-			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,FormOpenDental.ClinicNum);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clinics.ClinicNum);
 			Cursor=Cursors.WaitCursor;
 			//string result="";
 			DateTime date=DateTime.Today;
@@ -3661,7 +3661,7 @@ namespace OpenDental{
 			}
 			Cursor=Cursors.WaitCursor;
 			try {
-				Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,FormOpenDental.ClinicNum);
+				Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clinics.ClinicNum);
 				Eclaims.x270Controller.RequestBenefits(clearinghouseClin,PlanCur,PatPlanCur.PatNum,CarrierCur,benefitList,PatPlanCur.PatPlanNum,_subCur);
 			}
 			catch(Exception ex) {//although many errors will be caught and result in a response etrans.
@@ -3716,7 +3716,7 @@ namespace OpenDental{
 			string passWord;
 			// Get Login / Password
 			Clearinghouse clearinghouseHq=Clearinghouses.GetDefaultDental();
-			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,FormOpenDental.ClinicNum);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clinics.ClinicNum);
 			if(clearinghouseClin!=null) {
 				loginID=clearinghouseClin.LoginID;
 				passWord=clearinghouseClin.Password;

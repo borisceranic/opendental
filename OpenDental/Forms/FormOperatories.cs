@@ -238,7 +238,7 @@ namespace OpenDental{
 				_arrayClinics=Clinics.GetList();
 				for(int i=0;i<_arrayClinics.Length;i++) {
 					comboClinic.Items.Add(_arrayClinics[i].Description);
-					if(_arrayClinics[i].ClinicNum==FormOpenDental.ClinicNum) {
+					if(_arrayClinics[i].ClinicNum==Clinics.ClinicNum) {
 						comboClinic.SelectedIndex=i+1;
 					}
 				}

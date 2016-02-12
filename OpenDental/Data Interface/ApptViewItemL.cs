@@ -60,8 +60,8 @@ namespace OpenDental{
 				//make visible ops exactly the same as the short ops list (all except hidden)
 				for(int i=0;i<OperatoryC.ListShort.Count;i++) {
 					if(PrefC.GetBool(PrefName.EasyNoClinics) //if clinics disabled
-						|| FormOpenDental.ClinicNum==0 //or if program level ClinicNum set to Headquarters
-						|| OperatoryC.ListShort[i].ClinicNum==FormOpenDental.ClinicNum) //or if the op is assigned to the program level ClinicNum
+						|| Clinics.ClinicNum==0 //or if program level ClinicNum set to Headquarters
+						|| OperatoryC.ListShort[i].ClinicNum==Clinics.ClinicNum) //or if the op is assigned to the program level ClinicNum
 					{
 						visOps.Add(OperatoryC.ListShort[i]);
 					}

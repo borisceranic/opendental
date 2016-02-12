@@ -1368,7 +1368,7 @@ namespace OpenDental {
 				//there cannot be a selected appointment if no patient is loaded.
 				ContrApptSingle.SelectedAptNum=-1;//fixes a minor bug.
 			}
-			DS=Appointments.RefreshPeriod(startDate,endDate,FormOpenDental.ClinicNum);
+			DS=Appointments.RefreshPeriod(startDate,endDate,Clinics.ClinicNum);
 			LastTimeDataRetrieved=DateTime.Now;
 			SchedListPeriod=Schedules.ConvertTableToList(DS.Tables["Schedule"]);
 			ApptView viewCur=null;
@@ -1999,9 +1999,9 @@ namespace OpenDental {
 			}
 			if(saveToDb) {
 				ComputerPrefs.LocalComputer.ApptViewNum=apptViewNum;
-				ComputerPrefs.LocalComputer.ClinicNum=FormOpenDental.ClinicNum;
+				ComputerPrefs.LocalComputer.ClinicNum=Clinics.ClinicNum;
 				ComputerPrefs.Update(ComputerPrefs.LocalComputer);
-				UserodApptViews.InsertOrUpdate(Security.CurUser.UserNum,FormOpenDental.ClinicNum,apptViewNum);
+				UserodApptViews.InsertOrUpdate(Security.CurUser.UserNum,Clinics.ClinicNum,apptViewNum);
 			}
 			if(PatCur==null) {
 				ModuleSelected(0);
@@ -2018,7 +2018,7 @@ namespace OpenDental {
 			comboView.Items.Add(Lan.g(this,"none"));
 			string f="";
 			for(int i=0;i<ApptViewC.List.Length;i++) {
-				if(!PrefC.GetBool(PrefName.EasyNoClinics) && FormOpenDental.ClinicNum!=ApptViewC.List[i].ClinicNum) {
+				if(!PrefC.GetBool(PrefName.EasyNoClinics) && Clinics.ClinicNum!=ApptViewC.List[i].ClinicNum) {
 					//This is intentional, we do NOT want 'Headquarters' to have access to clinic specific apptviews.  
 					//Likewise, we do not want clinic specific views to be accessible from specific clinic filters.
 					continue;
@@ -2032,17 +2032,17 @@ namespace OpenDental {
 			}
 			//load the recently used apptview from the db, either the userodapptview table if an entry exists or the computerpref table if an entry for this computer exists
 			ApptView apptViewCur=null;
-			UserodApptView userodApptViewCur=UserodApptViews.GetOneForUserAndClinic(Security.CurUser.UserNum,FormOpenDental.ClinicNum);
+			UserodApptView userodApptViewCur=UserodApptViews.GetOneForUserAndClinic(Security.CurUser.UserNum,Clinics.ClinicNum);
 			if(userodApptViewCur!=null) { //if there is an entry in the userodapptview table for this user
 				if(InitializedOnStartup //if either ContrAppt has already been initialized
 					|| (Security.CurUser.ClinicIsRestricted //or the current user is restricted
-					&& FormOpenDental.ClinicNum!=ComputerPrefs.LocalComputer.ClinicNum)) //and FormOpenDental.ClinicNum (set to the current user's clinic) is not the computerpref clinic
+					&& Clinics.ClinicNum!=ComputerPrefs.LocalComputer.ClinicNum)) //and FormOpenDental.ClinicNum (set to the current user's clinic) is not the computerpref clinic
 				{
 					apptViewCur=ApptViews.GetApptView(userodApptViewCur.ApptViewNum); //then load the view for the user in the userodapptview table
 				}
 			}
 			if(apptViewCur==null //if no entry in the userodapptview table
-				&& FormOpenDental.ClinicNum==ComputerPrefs.LocalComputer.ClinicNum) //and if the program level ClinicNum is the stored recent ClinicNum for this computer 
+				&& Clinics.ClinicNum==ComputerPrefs.LocalComputer.ClinicNum) //and if the program level ClinicNum is the stored recent ClinicNum for this computer 
 			{
 				apptViewCur=ApptViews.GetApptView(ComputerPrefs.LocalComputer.ApptViewNum);//use the computerpref for this computer and user
 			}
@@ -2216,8 +2216,8 @@ namespace OpenDental {
 					long clinicNum=PIn.Long(DS.Tables["Appointments"].Rows[i]["ClinicNum"].ToString());
 					//When the program is restricted to a specific clinic, only count up production for the corresponding clinic.
 					if(!PrefC.GetBool(PrefName.EasyNoClinics) 
-						&& FormOpenDental.ClinicNum!=0
-						&& FormOpenDental.ClinicNum!=clinicNum) {
+						&& Clinics.ClinicNum!=0
+						&& Clinics.ClinicNum!=clinicNum) {
 						continue;//This appointment is for a different clinic.  Do not include this production in the daily prod.
 					}
 					//In order to get production numbers split by provider, it would require generating total production numbers
@@ -2279,7 +2279,7 @@ namespace OpenDental {
 				listOpsForApptView=ApptViewItemL.GetOpsForApptView(viewCur,ApptDrawing.IsWeeklyView,listSchedulesForToday);
 			}
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics
-				listOpsForClinic=Operatories.GetOpsForClinic(FormOpenDental.ClinicNum);
+				listOpsForClinic=Operatories.GetOpsForClinic(Clinics.ClinicNum);
 			}
 			gridWaiting.BeginUpdate();
 			gridWaiting.Columns.Clear();
@@ -2307,7 +2307,7 @@ namespace OpenDental {
 					}
 				}
 				//We only want to filter the waiting room by the clinic's operatories when clinics are enabled and they are not using 'Headquarters' mode.
-				if(!PrefC.GetBool(PrefName.EasyNoClinics) && FormOpenDental.ClinicNum!=0) {
+				if(!PrefC.GetBool(PrefName.EasyNoClinics) && Clinics.ClinicNum!=0) {
 					bool isInView=false;
 					for(int j=0;j<listOpsForClinic.Count;j++) {
 						if(listOpsForClinic[j].OperatoryNum==PIn.Long(table.Rows[i]["OpNum"].ToString())) {
@@ -2351,10 +2351,10 @@ namespace OpenDental {
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics.
 				//For phase one we are only filtering employees, not providers.  Show all providers for now.
 				//listProvs=Providers.GetProvsByClinic(FormOpenDental.ClinicNum);
-				listEmps=Employees.GetEmpsForClinic(FormOpenDental.ClinicNum);
+				listEmps=Employees.GetEmpsForClinic(Clinics.ClinicNum);
 			}
 			//Get the providers and employees for the currently selected clinic.
-			FormScheduleDayEdit FormS=new FormScheduleDayEdit(AppointmentL.DateSelected,FormOpenDental.ClinicNum);
+			FormScheduleDayEdit FormS=new FormScheduleDayEdit(AppointmentL.DateSelected,Clinics.ClinicNum);
 			FormS.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.Schedules,0,"");
 			SetWeeklyView(false);//to refresh
@@ -5662,7 +5662,7 @@ namespace OpenDental {
 				MessageBox.Show("Blockout not found.");
 				return;//should never happen
 			}
-			FormScheduleBlockEdit FormSB=new FormScheduleBlockEdit(SchedCur,FormOpenDental.ClinicNum);
+			FormScheduleBlockEdit FormSB=new FormScheduleBlockEdit(SchedCur,Clinics.ClinicNum);
 			FormSB.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.Blockouts,0,"Blockout edit.");
 			RefreshPeriod();
@@ -5735,7 +5735,7 @@ namespace OpenDental {
 				SchedCur.SchedDate=WeekStartDate.AddDays(SheetClickedonDay);
 			}
 			SchedCur.SchedType=ScheduleType.Blockout;
-			FormScheduleBlockEdit FormSB=new FormScheduleBlockEdit(SchedCur,FormOpenDental.ClinicNum);
+			FormScheduleBlockEdit FormSB=new FormScheduleBlockEdit(SchedCur,Clinics.ClinicNum);
 			FormSB.IsNew=true;
 			FormSB.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.Blockouts,0,"Blockout add.");

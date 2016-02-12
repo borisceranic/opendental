@@ -169,7 +169,7 @@ namespace OpenDental
 
 		private void FormClaimPayTotal_Shown(object sender,EventArgs e) {
 			int toothIndexOffset=0;
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				toothIndexOffset=1;
 			}
 			InsPlan plan=InsPlans.GetPlan(ClaimProcsToEdit[0].PlanNum,PlanList);
@@ -184,7 +184,7 @@ namespace OpenDental
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col;
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				col=new ODGridColumn(Lan.g(this,"Code"),85);
 				gridMain.Columns.Add(col);
 			}
@@ -210,7 +210,7 @@ namespace OpenDental
 				//for pre-auths, there are no total payments, so ProcNum must be >0
 				ProcCur=Procedures.GetProcFromList(ProcList,ClaimProcsToEdit[i].ProcNum);
 				row.Cells.Add(ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProcCode);
-				if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+				if(!Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 					row.Cells.Add(Tooth.ToInternat(ProcCur.ToothNum));
 				}
 				row.Cells.Add(ProcedureCodes.GetProcCode(ProcCur.CodeNum).Descript);
@@ -252,7 +252,7 @@ namespace OpenDental
 		private void FillTotals(){
 			double insPayEst=0;
 			int toothIndexOffset=0;
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				toothIndexOffset=1;
 			}
 			for(int i=0;i<gridMain.Rows.Count;i++){
@@ -271,7 +271,7 @@ namespace OpenDental
 			//validate all grid cells
 			double dbl;
 			int toothIndexOffset=0;
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				toothIndexOffset=1;
 			}
 			for(int i=0;i<gridMain.Rows.Count;i++){

@@ -89,7 +89,7 @@ namespace OpenDental {
 				comboClinic.Items.Clear();
 				_listClinics=new List<Clinic>();
 				//Add "Unassigned/Default" option if the user isn't restricted or the selected clinic is 0.
-				if(!Security.CurUser.ClinicIsRestricted || FormOpenDental.ClinicNum==0) {
+				if(!Security.CurUser.ClinicIsRestricted || Clinics.ClinicNum==0) {
 					Clinic clinicUnassigned=new Clinic();
 					clinicUnassigned.ClinicNum=0;
 					clinicUnassigned.Description="Unassigned/Default";
@@ -99,10 +99,10 @@ namespace OpenDental {
 				for(int i=0;i<_listClinics.Count;i++) {
 					comboClinic.Items.Add(_listClinics[i].Description);
 					//If the clinic we're adding is the one currently selected in OD, attempt to find its Ebill entry.
-					if(_listClinics[i].ClinicNum==FormOpenDental.ClinicNum) {
+					if(_listClinics[i].ClinicNum==Clinics.ClinicNum) {
 						comboClinic.SelectedIndex=i;
 						Ebill eBill=null;
-						if(FormOpenDental.ClinicNum==0) {//Use the default Ebill if OD has Headquarters selected or if clinics are disabled.
+						if(Clinics.ClinicNum==0) {//Use the default Ebill if OD has Headquarters selected or if clinics are disabled.
 							eBill=_eBillDefault;
 						}
 						else {
@@ -230,7 +230,7 @@ namespace OpenDental {
 		private void comboClinic_SelectionChangeCommitted(object sender,EventArgs e) {
 			SaveEbill(_eBillCur);
 			Ebill eBill=null;
-			if((!Security.CurUser.ClinicIsRestricted || FormOpenDental.ClinicNum==0) && comboClinic.SelectedIndex==0) {//Unassigned/Default
+			if((!Security.CurUser.ClinicIsRestricted || Clinics.ClinicNum==0) && comboClinic.SelectedIndex==0) {//Unassigned/Default
 				eBill=_eBillDefault;
 			}
 			else {//Otherwise locate the Ebill from the cache.

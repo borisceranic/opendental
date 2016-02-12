@@ -4095,7 +4095,7 @@ namespace OpenDental{
 			if(comboProvTreat.SelectedIndex==-1) {//The provider exists but is hidden (exclude this block of code if provider selection is optional)
 				comboProvTreat.Text=Providers.GetProv(_provNumTreatSelected).GetAbbr();//Appends "(hidden)" to the end of the abbr.
 			}
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				groupProsth.Visible=false;
 				groupOrtho.Visible=false;
 				labelOralImages.Visible=false;
@@ -4398,11 +4398,11 @@ namespace OpenDental{
 			comboReferralReason.Items.Add("Seizure Disorders");
 			comboReferralReason.Items.Add("Extensive Surgery");
 			comboReferralReason.Items.Add("Surgical Complexity");
-			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(!Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				comboReferralReason.Items.Add("Rampant decay");
 			}
 			comboReferralReason.Items.Add("Medical History (to provide details upon request)");
-			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(!Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				comboReferralReason.Items.Add("Temporal Mandibular Joint Anomalies");
 			}
 			comboReferralReason.Items.Add("Accidental Injury");
@@ -4507,7 +4507,7 @@ namespace OpenDental{
 				missingstr+=Tooth.ToInternat(al[i]);
 			}
 			textMissingTeeth.Text=missingstr;
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				checkCanadianIsOrtho.Visible=false;
 				groupCanadaOrthoPredeterm.Visible=false;
 				groupMaxPros.Visible=false;
@@ -4565,7 +4565,7 @@ namespace OpenDental{
 			gridProc.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableClaimProc","Prov"),50);
 			gridProc.Columns.Add(col);
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				col=new ODGridColumn(Lan.g("TableClaimProc","Code"),75);
 				gridProc.Columns.Add(col);
 			}
@@ -4626,7 +4626,7 @@ namespace OpenDental{
 				row.Cells.Add(Providers.GetAbbr(((ClaimProc)ClaimProcsForClaim[i]).ProvNum));
 				if(ClaimProcsForClaim[i].ProcNum==0) {
 					row.Cells.Add("");//code
-					if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+					if(!Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 						row.Cells.Add("");//tooth
 					}
 					if(ClaimProcsForClaim[i].Status==ClaimProcStatus.NotReceived)
@@ -4638,7 +4638,7 @@ namespace OpenDental{
 					//claimProcsForClaim list already handles ProcNum=0 above
 					ProcCur=Procedures.GetProcFromList(ProcList,ClaimProcsForClaim[i].ProcNum);
 					row.Cells.Add(ClaimProcsForClaim[i].CodeSent);
-					if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+					if(!Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 						row.Cells.Add(Tooth.ToInternat(ProcCur.ToothNum));
 					}
 					ProcedureCode procCodeSent=ProcedureCodes.GetProcCode(ClaimProcsForClaim[i].CodeSent);
@@ -5683,7 +5683,7 @@ namespace OpenDental{
 				return;
 			}
 			Clearinghouse clearinghouseHq=ClearinghouseL.GetClearinghouseHq(listQueue[0].ClearinghouseNum);
-			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,FormOpenDental.ClinicNum);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clinics.ClinicNum);
 			//string warnings;
 			//string missingData=
 			Eclaims.Eclaims.GetMissingData(clearinghouseClin,listQueue[0]);//,out warnings);
@@ -5761,7 +5761,7 @@ namespace OpenDental{
 			InsSub insSub=InsSubs.GetOne(ClaimCur.InsSubNum);
 			Carrier carrier=Carriers.GetCarrier(insPlan.CarrierNum);
 			Clearinghouse clearinghouseHq=Canadian.GetCanadianClearinghouseHq(carrier);
-			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,FormOpenDental.ClinicNum);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clinics.ClinicNum);
 			try {
 				long etransNumAck=CanadianOutput.SendClaimReversal(clearinghouseClin,ClaimCur,insPlan,insSub);
 				Etrans etransAck=Etranss.GetEtrans(etransNumAck);
@@ -5974,7 +5974,7 @@ namespace OpenDental{
 				//string warnings;
 				//string missingData=
 				Clearinghouse clearinghouseHq=ClearinghouseL.GetClearinghouseHq(listQueue[0].ClearinghouseNum);
-				Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,FormOpenDental.ClinicNum);
+				Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clinics.ClinicNum);
 				Eclaims.Eclaims.GetMissingData(clearinghouseClin,listQueue[0]);//,out warnings);
 				if(listQueue[0].MissingData!="") {
 					if(MessageBox.Show(Lan.g(this,"Cannot send claim until missing data is fixed:")+"\r\n"+listQueue[0].MissingData+"\r\n\r\nContinue anyway?",

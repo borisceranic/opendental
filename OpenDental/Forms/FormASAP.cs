@@ -259,7 +259,7 @@ namespace OpenDental{
 				_listUserClinics=Clinics.GetForUserod(Security.CurUser);
 				for(int i=0;i<_listUserClinics.Count;i++) {
 					comboClinic.Items.Add(_listUserClinics[i].Description);
-					if(_listUserClinics[i].ClinicNum==FormOpenDental.ClinicNum) {
+					if(_listUserClinics[i].ClinicNum==Clinics.ClinicNum) {
 						comboClinic.SelectedIndex=i;
 						if(!Security.CurUser.ClinicIsRestricted) {
 							comboClinic.SelectedIndex++;//add 1 for "All"

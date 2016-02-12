@@ -561,7 +561,7 @@ namespace OpenDental{
 					}
 				}
 				int curIndex=comboClinic.Items.Add(_listClinics[i].Description+"  ("+_listNumberOfClaims[i]+")");
-				if(_listClinics[i].ClinicNum==FormOpenDental.ClinicNum) {
+				if(_listClinics[i].ClinicNum==Clinics.ClinicNum) {
 					comboClinic.SelectedIndex=curIndex;
 				}
 			}
@@ -1120,7 +1120,7 @@ namespace OpenDental{
 				queueItems.Add(queueitem);
 			}
 			Clearinghouse clearinghouseHq=ClearinghouseL.GetClearinghouseHq(queueItems[0].ClearinghouseNum);
-			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,FormOpenDental.ClinicNum);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clinics.ClinicNum);
 			EnumClaimMedType medType=Claims.GetClaim(_arrayQueueFiltered[gridMain.SelectedIndices[0]].ClaimNum).MedType;
 			//Already validated that all claims are for the same clearinghouse, clinic, and medType.
 			//Validated that medtype matches clearinghouse e-format
@@ -1162,7 +1162,7 @@ namespace OpenDental{
 			List<ClaimSendQueueItem> listClaimsToValidate=listClaimSendQueueItems.FindAll(x => !x.IsValid && !x.NoSendElect);
 			//Loop through and validate all claims.
 			Clearinghouse clearinghouseHq=ClearinghouseL.GetClearinghouseHq(listClaimsToValidate[0].ClearinghouseNum);
-			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,FormOpenDental.ClinicNum);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clinics.ClinicNum);
 			for(int i=0;i<listClaimsToValidate.Count;i++) {
 				Eclaims.Eclaims.GetMissingData(clearinghouseClin,listClaimsToValidate[i]);
 				if(listClaimsToValidate[i].MissingData=="") {

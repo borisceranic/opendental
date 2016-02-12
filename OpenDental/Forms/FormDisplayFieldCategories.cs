@@ -140,7 +140,7 @@ namespace OpenDental{
 			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","ChartPatientInformation"));//4
 			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","FamilyRecallGrid"));//5
 			//skip None because user not allowed to select that
-			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(!Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","OrthoChart"));
 			}
 			listCategory.Items.Add(Lan.g("enumDisplayFieldCategory","PatientInformation"));
@@ -156,7 +156,7 @@ namespace OpenDental{
 		private void listCategory_DoubleClick(object sender,EventArgs e) {
 			DisplayFieldCategory selectedCategory=DisplayFieldCategory.None;
 			int index=listCategory.SelectedIndex;
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum) && index >= 6) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum) && index >= 6) {
 				index++;
 			}
 			//When new display fields are added this switch statement will need to be changed to match the order set in the load.
@@ -188,7 +188,7 @@ namespace OpenDental{
 		private void butOK_Click(object sender,EventArgs e) {
 			DisplayFieldCategory selectedCategory=DisplayFieldCategory.None;
 			int index=listCategory.SelectedIndex;
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum) && index >= 6) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum) && index >= 6) {
 				index++;
 			}
 			//When new display fields are added this switch statement will need to be changed to match the order set in the load.

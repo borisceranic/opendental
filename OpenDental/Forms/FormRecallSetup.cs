@@ -1880,7 +1880,7 @@ namespace OpenDental{
 				row.Cells.Add(((CommType)enumNum).ToString());//Adding in the enums in order that the preference was.
 				if((CommType)enumNum==CommType.Email) {
 					//Either gets an address based on cascading priority or an empty address object
-					EmailAddress emailAddress=EmailAddresses.GetByClinic(FormOpenDental.ClinicNum);
+					EmailAddress emailAddress=EmailAddresses.GetByClinic(Clinics.ClinicNum);
 					if(emailAddress.EmailUsername=="") {//There are no email addresses set up at all
 						row.Cells[row.Cells.Count-1].ColorText=Color.Gray;
 						labelNotSetup.Visible=true;

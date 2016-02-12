@@ -204,7 +204,7 @@ namespace OpenDental{
 				}
 			}
 			checkIsHidden.Checked=FeeSchedCur.IsHidden;
-			if(FormOpenDental.ClinicNum==0) {//HQ clinic, let them change if a fee sched can be localized or not.
+			if(Clinics.ClinicNum==0) {//HQ clinic, let them change if a fee sched can be localized or not.
 				checkIsGlobal.Enabled=true;
 			}
 			if(FeeSchedCur.IsNew) {

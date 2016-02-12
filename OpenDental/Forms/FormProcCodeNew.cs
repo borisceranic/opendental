@@ -424,7 +424,7 @@ namespace OpenDental{
 			listType.Items.Add(Lan.g(this,"Extraction"));
 			listType.Items.Add(Lan.g(this,"Ortho"));
 			listType.Items.Add(Lan.g(this,"Nitrous"));
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				labelListType.Visible=false;
 				listType.Visible=false;
 				labelTreatArea.Visible=false;

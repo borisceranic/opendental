@@ -133,7 +133,7 @@ namespace OpenDental{
 			ReportSimpleGrid report=new ReportSimpleGrid();
 			report.Query=@"SELECT ScreenDate,ProvName,County,county.CountyCode,
 				site.Description AS schoolName,site.Note AS schoolCode,PlaceService,GradeLevel,Age,Birthdate,RaceOld,Gender,Urgency,";
-			if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)){
+			if(!Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)){
 				report.Query+="HasCaries,EarlyChildCaries,CariesExperience,ExistingSealants,NeedsSealants,MissingAllTeeth,";
 			}
 			report.Query+=@"Comments FROM screen

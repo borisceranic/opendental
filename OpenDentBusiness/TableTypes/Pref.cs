@@ -188,6 +188,8 @@ namespace OpenDentBusiness {
 		ClaimsValidateACN,
 		ClearinghouseDefaultDent,
 		ClearinghouseDefaultMed,
+		///<summary>String, "Workstation"(default), "User", "None". See FormMisc. Determines how recently viewed clinics should be tracked.</summary>
+		ClinicTrackLast,
 		ColorTheme,
 		ConfirmEmailMessage,
 		ConfirmEmailSubject,

@@ -11,7 +11,7 @@ namespace TestCanada {
 		private static string Run(int scriptNum,Carrier carrier,CanadianNetwork network,Provider prov,out Etrans etrans,DateTime reconciliationDate) {
 			string retVal="";
 			Clearinghouse clearinghouseHq=Canadian.GetCanadianClearinghouseHq(carrier);
-			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,OpenDental.FormOpenDental.ClinicNum);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clinics.ClinicNum);
 			etrans=CanadianOutput.GetSummaryReconciliation(clearinghouseClin,carrier,network,prov,reconciliationDate);
 			retVal+="Summary Reconciliation#"+scriptNum.ToString()+" successful.\r\n";
 			return retVal;

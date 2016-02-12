@@ -155,7 +155,7 @@ namespace OpenDental{
 				Cursor=Cursors.WaitCursor;
 				Clearinghouse[] arrayHqClearinghouses=Clearinghouses.GetHqListt();
 				Clearinghouse clearinghouseHq=arrayHqClearinghouses[comboClearhouse.SelectedIndex];
-				Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,FormOpenDental.ClinicNum);
+				Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clinics.ClinicNum);
 				string errorMessage=RetrieveAndImport(clearinghouseClin,AutomaticMode);
 				if(errorMessage!="") {
 					MessageBox.Show(errorMessage);
@@ -172,7 +172,7 @@ namespace OpenDental{
 			}
 			Clearinghouse[] arrayClearinghouses=Clearinghouses.GetHqListt();
 			Clearinghouse clearhouseHq=arrayClearinghouses[comboClearhouse.SelectedIndex];
-			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearhouseHq,FormOpenDental.ClinicNum);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearhouseHq,Clinics.ClinicNum);
 
 			if(!Directory.Exists(clearinghouseClin.ResponsePath)) {
 				MsgBox.Show(this,"Clearinghouse does not have a valid Report Path set.");

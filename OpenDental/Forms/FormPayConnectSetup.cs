@@ -302,7 +302,7 @@ namespace OpenDental{
 				for(int i=0;i<listClinics.Count;i++) {
 					comboClinic.Items.Add(listClinics[i].Description);
 					_listUserClinicNums.Add(listClinics[i].ClinicNum);
-					if(FormOpenDental.ClinicNum==listClinics[i].ClinicNum) {
+					if(Clinics.ClinicNum==listClinics[i].ClinicNum) {
 						comboClinic.SelectedIndex=i;
 						if(!Security.CurUser.ClinicIsRestricted) {
 							comboClinic.SelectedIndex++;//increment the SelectedIndex to account for 'Headquarters' in the list at position 0 if the user is not restricted.

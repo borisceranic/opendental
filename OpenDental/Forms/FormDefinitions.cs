@@ -379,7 +379,7 @@ namespace OpenDental{
 					//SelectedCat=3;
 					FormDefEdit.EnableValue=true;
 					FormDefEdit.ValueText=Lan.g(this,"ADA Code(s)");
-					if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+					if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 						FormDefEdit.HelpText=Lan.g(this,"These are the procedures that you can quickly add to the treatment plan from within the appointment editing window.  Multiple procedures may be separated by commas with no spaces. These definitions may be freely edited without affecting any patient records.");
 					}
 					else {
@@ -401,7 +401,7 @@ namespace OpenDental{
 					//SelectedCat=22;
 					FormDefEdit.EnableColor=true;
 					FormDefEdit.CanEditName=false;
-					if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+					if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 						FormDefEdit.HelpText=Lan.g(this,"These colors will be used to graphically display treatments.");
 					}
 					else {

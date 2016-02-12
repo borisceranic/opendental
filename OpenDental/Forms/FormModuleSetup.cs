@@ -2195,7 +2195,7 @@ namespace OpenDental{
 			textTreatNote.Text=PrefC.GetString(PrefName.TreatmentPlanNote);
 			checkTreatPlanShowGraphics.Checked=PrefC.GetBool(PrefName.TreatPlanShowGraphics);
 			checkTreatPlanShowCompleted.Checked=PrefC.GetBool(PrefName.TreatPlanShowCompleted);
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				checkTreatPlanShowGraphics.Visible=false;
 				checkTreatPlanShowCompleted.Visible=false;
 			}
@@ -2214,7 +2214,7 @@ namespace OpenDental{
 			comboToothNomenclature.Items.Add(Lan.g(this,"Haderup (Danish)"));
 			comboToothNomenclature.Items.Add(Lan.g(this,"Palmer (Ortho)"));
 			comboToothNomenclature.SelectedIndex = PrefC.GetInt(PrefName.UseInternationalToothNumbers);
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				labelToothNomenclature.Visible=false;
 				comboToothNomenclature.Visible=false;
 			}

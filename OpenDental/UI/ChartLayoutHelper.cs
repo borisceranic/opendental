@@ -14,7 +14,7 @@ namespace OpenDental {
 		///<summary>If medical only, this will hide the tooth chart and fill the space with the treatement notes text box.  Not for eCWTightOrFull.
 		///This is made public so that it can be called from ContrChart.</summary>
 		public static void SetToothChartVisibleHelper(ToothChartWrapper toothChart,RichTextBox textTreatmentNotes) {
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				toothChart.Visible=false;
 				textTreatmentNotes.Location=new Point(0,toothChart.Top);
 				textTreatmentNotes.Height=toothChart.Height+72;//textTreatmentNotes height is 71, +1 for distance between toothChart and textTreatmentNotes

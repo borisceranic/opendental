@@ -282,7 +282,7 @@ namespace OpenDental{
 				labelClinic.Visible=false;
 			}
 			else {
-				_clinicNum=FormOpenDental.ClinicNum;
+				_clinicNum=Clinics.ClinicNum;
 				_listClinics=Clinics.GetForUserod(Security.CurUser);
 				comboClinic.Items.Clear();
 				if(!Security.CurUser.ClinicIsRestricted) {

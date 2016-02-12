@@ -233,7 +233,7 @@ namespace OpenDental {
 			}
 			else {//Using clinics.
 				//Set the patients primary provider to the clinic default provider.
-				newPat.PriProv=Providers.GetDefaultProvider(FormOpenDental.ClinicNum).ProvNum;
+				newPat.PriProv=Providers.GetDefaultProvider(Clinics.ClinicNum).ProvNum;
 			}
 			Type t=newPat.GetType();
 			FieldInfo[] fi=t.GetFields();

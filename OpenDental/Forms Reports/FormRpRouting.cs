@@ -295,11 +295,11 @@ namespace OpenDental {
 				}
 				for(int i=0;i<_listClinics.Count;i++) {
 					int curIndex=listClin.Items.Add(_listClinics[i].Description);
-					if(FormOpenDental.ClinicNum==0) {
+					if(Clinics.ClinicNum==0) {
 						//listBoxClin.SetSelected(curIndex,true); //Do not select all clinics because we are checking the checkbox.
 						checkClinAll.Checked=true;
 					}
-					if(_listClinics[i].ClinicNum==FormOpenDental.ClinicNum) {
+					if(_listClinics[i].ClinicNum==Clinics.ClinicNum) {
 						listClin.SelectedIndices.Clear();
 						listClin.SetSelected(curIndex,true);
 					}

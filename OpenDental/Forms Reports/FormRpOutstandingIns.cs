@@ -373,10 +373,10 @@ namespace OpenDental {
 			}
 			for(int i=0;i<_listClinics.Count;i++) {
 				int curIndex=comboBoxMultiClinics.Items.Add(_listClinics[i].Description);
-				if(FormOpenDental.ClinicNum==0) {
+				if(Clinics.ClinicNum==0) {
 					comboBoxMultiClinics.SetSelected(curIndex,true);
 				}
-				if(_listClinics[i].ClinicNum==FormOpenDental.ClinicNum) {
+				if(_listClinics[i].ClinicNum==Clinics.ClinicNum) {
 					comboBoxMultiClinics.SelectedIndices.Clear();
 					comboBoxMultiClinics.SetSelected(curIndex,true);
 				}

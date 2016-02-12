@@ -999,7 +999,7 @@ namespace OpenDental{
 			FillSummary();
       FillPreAuth();
 			//FillMisc();
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				checkShowCompleted.Visible=false;
 			}
 			else {
@@ -2148,7 +2148,7 @@ namespace OpenDental{
 			//notePrinted=false;
 			//pagesPrinted=0;
 			if(!PrefC.GetBool(PrefName.TreatPlanShowGraphics) 
-				|| Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum))
+				|| Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum))
 			{
 				return;
 			}
@@ -2614,7 +2614,7 @@ namespace OpenDental{
 			TextFrame frame;
 			int widthDoc=MigraDocHelper.GetDocWidth();
 			if(PrefC.GetBool(PrefName.TreatPlanShowGraphics)
-				&& !Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum))
+				&& !Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum))
 			{	
 				frame=MigraDocHelper.CreateContainer(section);
 				MigraDocHelper.DrawString(frame,Lan.g(this,"Your")+"\r\n"+Lan.g(this,"Right"),bodyFontx,

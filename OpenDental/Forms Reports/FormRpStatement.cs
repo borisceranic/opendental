@@ -1150,7 +1150,7 @@ namespace OpenDental{
 			gcol=new ODGridColumn(Lan.g(this,"Patient"),100);
 			gridPat.Columns.Add(gcol);
 			//prov
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				gcol=new ODGridColumn(Lan.g(this,"Code"),87);
 				gridPat.Columns.Add(gcol);
 			}
@@ -1236,14 +1236,14 @@ namespace OpenDental{
 						}
 						else {
 							grow.Cells.Add(tableAccount.Rows[p]["ProcCode"].ToString());
-							if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+							if(!Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 								grow.Cells.Add(tableAccount.Rows[p]["tth"].ToString());
 							}
 						}
 					}
 					else {
 						grow.Cells.Add(tableAccount.Rows[p]["ProcCode"].ToString());
-						if(!Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+						if(!Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 							grow.Cells.Add(tableAccount.Rows[p]["tth"].ToString());
 						}
 					}

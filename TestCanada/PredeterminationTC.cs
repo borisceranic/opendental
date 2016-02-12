@@ -411,7 +411,7 @@ namespace TestCanada {
 		  string retVal="";
 		  ClaimSendQueueItem queueItem=Claims.GetQueueList(claim.ClaimNum,claim.ClinicNum,0)[0];
 			Clearinghouse clearinghouseHq=ClearinghouseL.GetClearinghouseHq(queueItem.ClearinghouseNum);
-			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,FormOpenDental.ClinicNum);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clinics.ClinicNum);
 			Eclaims.GetMissingData(clearinghouseClin,queueItem);//,out warnings);
 			if(queueItem.MissingData!="") {
 				return "Cannot send predetermination until missing data is fixed:\r\n"+queueItem.MissingData+"\r\n";

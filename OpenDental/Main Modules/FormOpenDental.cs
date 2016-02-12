@@ -312,8 +312,8 @@ namespace OpenDental{
 		private Dictionary<string,object> dictChartPrefsCache=new Dictionary<string,object>();
 		///<summary>A secondary cache only used to determine if preferences related to the redrawing of the non-modal task list have been changed.</summary>
 		private Dictionary<string,object> dictTaskListPrefsCache=new Dictionary<string,object>();
-		///<summary>Defaulted to 0 - Headquarters.  This is used by other modules to filter some areas of the program to the selected clinic. If a user is restricted to a specific clinic, this value will be set to that clinic and the user will not be able to select a different clinic.</summary>
-		public static long ClinicNum=0;
+		//(Deprecated) Moved to Clinics.ClinicNum
+		//public static long ClinicNum=0;
 		///<summary>This is used to determine how Open Dental closed.  If this is set to anything but 0 then some kind of error occurred and Open Dental was forced to close.  Currently only used when updating Open Dental silently.</summary>
 		public static int ExitCode=0;
 		///<summary>Will be set to true if the STOP SLAVE SQL was run on the replication server for which the local replication monitor is watching.
@@ -2377,7 +2377,7 @@ namespace OpenDental{
 			//myOutlookBar.Buttons[4].Caption=Lan.g(this,"Chart");//??done in RefreshLocalData
 			myOutlookBar.Buttons[5].Caption=Lan.g(this,"Images");
 			myOutlookBar.Buttons[6].Caption=Lan.g(this,"Manage");
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) { //Changes the Chart and Treatment Plan icons to ones without teeth
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum/*Always 0 at this point*/)) { //Changes the Chart and Treatment Plan icons to ones without teeth
 				myOutlookBar.Buttons[3].ImageIndex=7;
 				myOutlookBar.Buttons[4].ImageIndex=8;
 			}
@@ -2502,21 +2502,7 @@ namespace OpenDental{
 			//If the user is not restricted, or if the user is restricted but has access to the computerpref clinic, the computerpref clinic will be selected
 			//The ClinicNum will determine which view is loaded, either from the computerpref table or from the userodapptview table
 			if(!PrefC.GetBool(PrefName.EasyNoClinics) && Security.CurUser!=null) {//If block must be run before SetModuleSelected() so correct clinic filtration occurs.
-				List<Clinic> listClinics=Clinics.GetForUserod(Security.CurUser);
-				bool isCompClinicAllowed=false;
-				for(int i=0;i<listClinics.Count;i++) {
-					if(listClinics[i].ClinicNum==ComputerPrefs.LocalComputer.ClinicNum) {
-						isCompClinicAllowed=true;
-						break;
-					}
-				}
-				if(Security.CurUser.ClinicIsRestricted && !isCompClinicAllowed) {//user is restricted and does not have access to the computerpref clinic
-					ClinicNum=Security.CurUser.ClinicNum;
-				}
-				else {//the user is either not restricted to a clinic(s) or the user is restricted but has access to the computerpref clinic
-					ClinicNum=ComputerPrefs.LocalComputer.ClinicNum;
-				}
-				Clinics.ClinicNum=ClinicNum;
+				Clinics.LoadClinicNumForUser();
 				RefreshMenuClinics();
 			}
 			Cursor=Cursors.Default;
@@ -2597,7 +2583,7 @@ namespace OpenDental{
 			//		}
 			//	#endif
 			//}
-			Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),ClinicNum);
+			Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),Clinics.ClinicNum);
 			dateTimeLastActivity=DateTime.Now;
 			timerLogoff.Enabled=true;
 			timerReplicationMonitor.Enabled=true;
@@ -3354,7 +3340,7 @@ namespace OpenDental{
 				ToolBarMain.Buttons["Popups"].Enabled=true;
 			}
 			ToolBarMain.Invalidate();
-			Text=PatientL.GetMainTitle(pat,ClinicNum);
+			Text=PatientL.GetMainTitle(pat,Clinics.ClinicNum);
 			if(PopupEventList==null){
 				PopupEventList=new List<PopupEvent>();
 			}
@@ -3905,7 +3891,7 @@ namespace OpenDental{
 			if(!Security.CurUser.ClinicIsRestricted) {
 				menuItem=new MenuItem(Lan.g(this,"Headquarters"),menuClinic_Click);
 				menuItem.Tag=new Clinic();//Having a ClinicNum of 0 will make OD act like 'Headquarters'.  This allows the user to see unassigned appt views, all operatories, etc.
-				if(ClinicNum==0) {
+				if(Clinics.ClinicNum==0) {
 					menuItem.Checked=true;
 				}
 				menuClinics.MenuItems.Add(menuItem);
@@ -3915,7 +3901,7 @@ namespace OpenDental{
 			for(int i=0;i<listClinics.Count;i++) {
 				menuItem=new MenuItem(listClinics[i].Description,menuClinic_Click);
 				menuItem.Tag=listClinics[i];
-				if(ClinicNum==listClinics[i].ClinicNum) {
+				if(Clinics.ClinicNum==listClinics[i].ClinicNum) {
 					menuItem.Checked=true;
 				}
 				menuClinics.MenuItems.Add(menuItem);
@@ -3924,7 +3910,7 @@ namespace OpenDental{
 			if(!ContrAppt2.Visible) {
 				RefreshCurrentModule();//calls ModuleSelected of the current module, don't do this if ContrAppt2 is visible since it was just done above
 			}
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) { //Changes the Chart and Treatment Plan icons to ones without teeth
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) { //Changes the Chart and Treatment Plan icons to ones without teeth
 				myOutlookBar.Buttons[3].ImageIndex=7;
 				myOutlookBar.Buttons[4].ImageIndex=8;
 			}
@@ -3941,9 +3927,8 @@ namespace OpenDental{
 				return;
 			}
 			Clinic clinicCur=(Clinic)((MenuItem)sender).Tag;
-			ClinicNum=clinicCur.ClinicNum;
-			Clinics.ClinicNum=ClinicNum;
-			Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),ClinicNum);
+			Clinics.ClinicNum=clinicCur.ClinicNum;
+			Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),Clinics.ClinicNum);
 			if(PrefC.GetBool(PrefName.AppointmentClinicTimeReset)) {
 				AppointmentL.DateSelected=DateTimeOD.Today;
 				if(AppointmentL.DateSelected.DayOfWeek==DayOfWeek.Sunday) {
@@ -4943,7 +4928,7 @@ namespace OpenDental{
 			long defaultClearingHouseNum=PrefC.GetLong(PrefName.ClearinghouseDefaultDent);
 			for(int i=0;i<arrayClearinghousesHq.Length;i++) {
 				Clearinghouse clearinghouseHq=arrayClearinghousesHq[i];
-				Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,ClinicNum);
+				Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clinics.ClinicNum);
 				if(clearinghouseHq.CommBridge==EclaimsCommBridge.BCBSGA) {//Skip BCBSGA since it has a form that shows up.
 					continue;
 				}
@@ -4972,7 +4957,7 @@ namespace OpenDental{
 							listOfficeNums.Add(listProvs[j].CanadianOfficeNum);
 							try {
 								clearinghouseHq=Eclaims.Canadian.GetCanadianClearinghouseHq(null);
-								clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,ClinicNum);
+								clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clinics.ClinicNum);
 								Eclaims.CanadianOutput.GetOutstandingTransactions(clearinghouseClin,false,true,null,listProvs[j],true);
 							}
 							catch {
@@ -5850,7 +5835,7 @@ namespace OpenDental{
 			if(FormPr.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) { //Changes the Chart and Treatment Plan icons to ones without teeth
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) { //Changes the Chart and Treatment Plan icons to ones without teeth
 				myOutlookBar.Buttons[3].ImageIndex=7;
 				myOutlookBar.Buttons[4].ImageIndex=8;
 			}
@@ -6005,10 +5990,9 @@ namespace OpenDental{
 			}
 			//clinics is enabled
 			if(Security.CurUser.ClinicIsRestricted) {
-				ClinicNum=Security.CurUser.ClinicNum;
+				Clinics.ClinicNum=Security.CurUser.ClinicNum;
 			}
-			Clinics.ClinicNum=ClinicNum;
-			Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),ClinicNum);
+			Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),Clinics.ClinicNum);
 			RefreshMenuClinics();//this calls ModuleSelected, so no need to call RefreshCurrentModule
 		}
 
@@ -6070,15 +6054,14 @@ namespace OpenDental{
 			FormC.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Clinics");
 			//this menu item is only visible if the clinics show feature is enabled (!EasyNoClinics)
-			if(Clinics.GetDesc(ClinicNum)=="") {//will be empty string if ClinicNum is not valid, in case they deleted the clinic
-				ClinicNum=Security.CurUser.ClinicNum;
-				Clinics.ClinicNum=ClinicNum;
-				Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),ClinicNum);
+			if(Clinics.GetDesc(Clinics.ClinicNum)=="") {//will be empty string if ClinicNum is not valid, in case they deleted the clinic
+				Clinics.ClinicNum=Security.CurUser.ClinicNum;
+				Text=PatientL.GetMainTitle(Patients.GetPat(CurPatNum),Clinics.ClinicNum);
 			}
 			RefreshMenuClinics();
 			//reset the main title bar in case the user changes the clinic description for the selected clinic
 			Patient pat=Patients.GetPat(CurPatNum);
-			Text=PatientL.GetMainTitle(pat,ClinicNum);
+			Text=PatientL.GetMainTitle(pat,Clinics.ClinicNum);
 			//reset the tip text in case the user changes the clinic description
 		}
 		
@@ -7109,7 +7092,7 @@ namespace OpenDental{
 				myOutlookBar.Invalidate();
 				SetModuleSelected();
 				Patient pat=Patients.GetPat(CurPatNum);//pat could be null
-				Text=PatientL.GetMainTitle(pat,ClinicNum);//handles pat==null by not displaying pat name in title bar
+				Text=PatientL.GetMainTitle(pat,Clinics.ClinicNum);//handles pat==null by not displaying pat name in title bar
 				if(userControlTasks1.Visible) {
 					userControlTasks1.InitializeOnStartup();
 				}
@@ -7558,11 +7541,10 @@ namespace OpenDental{
 			else {
 				SecurityLogs.MakeLogEntry(Permissions.UserLogOnOff,0,"User: "+Security.CurUser.UserName+" has logged off.");
 			}
+			Clinics.LogOff();
 			Userod oldUser=Security.CurUser;
 			Security.CurUser=null;
-			ClinicNum=0;
-			Clinics.ClinicNum=ClinicNum;
-			Text=PatientL.GetMainTitle(null,ClinicNum);
+			Text=PatientL.GetMainTitle(null,0);
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Security.CurUser=oldUser;//so that the queries in FormLogOn() will work for the web service, since the web service requires a valid user to run queries.
 			}
@@ -7582,19 +7564,13 @@ namespace OpenDental{
 			}
 			myOutlookBar.SelectedIndex=Security.GetModule(LastModule);
 			myOutlookBar.Invalidate();
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				if(Security.CurUser.ClinicIsRestricted) {
-					ClinicNum=Security.CurUser.ClinicNum;
-				}
-				else {
-					ClinicNum=ComputerPrefs.LocalComputer.ClinicNum;
-				}
-				Clinics.ClinicNum=ClinicNum;
+			if(PrefC.HasClinicsEnabled) {
+				Clinics.LoadClinicNumForUser();
 				RefreshMenuClinics();
 			}
 			SetModuleSelected();
 			Patient pat=Patients.GetPat(CurPatNum);//pat could be null
-			Text=PatientL.GetMainTitle(pat,ClinicNum);//handles pat==null by not displaying pat name in title bar
+			Text=PatientL.GetMainTitle(pat,Clinics.ClinicNum);//handles pat==null by not displaying pat name in title bar
 			FillPatientButton(pat);
 			if(userControlTasks1.Visible) {
 				userControlTasks1.InitializeOnStartup();
@@ -7733,6 +7709,7 @@ namespace OpenDental{
 			ODThread.QuitSyncAllOdThreads();
 			if(Security.CurUser!=null) {
 				SecurityLogs.MakeLogEntry(Permissions.UserLogOnOff,0,"User: "+Security.CurUser.UserName+" has logged off.");
+				Clinics.LogOff();
 			}
 			//if(PrefC.GetBool(PrefName.DistributorKey)) {//for OD HQ
 			//  for(int f=Application.OpenForms.Count-1;f>=0;f--) {

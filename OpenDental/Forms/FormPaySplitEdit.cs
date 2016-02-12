@@ -803,7 +803,7 @@ namespace OpenDental
 			else{
 				checkPayPlan.Checked=true;
 			}
-			if(Clinics.IsMedicalPracticeOrClinic(FormOpenDental.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				textProcTooth.Visible=false;
 				labelProcTooth.Visible=false;
 			}

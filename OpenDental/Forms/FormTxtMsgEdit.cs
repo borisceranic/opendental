@@ -157,7 +157,7 @@ namespace OpenDental {
 						+"will be created and any replies to this message will not be automatically associated with any patient.  Continue?")) {
 					return;
 				}
-				long clinicNum=FormOpenDental.ClinicNum;
+				long clinicNum= Clinics.ClinicNum;
 				if(clinicNum==0) {  //If no clinic selected, follow logic from SmsPhones.GetClinicNumForTexting()
 					if(PrefC.GetBool(PrefName.EasyNoClinics) || Clinics.List.Length==0) {
 						clinicNum=0;//0 used for no clinics

@@ -836,7 +836,7 @@ namespace OpenDental{
 				_listClinics=Clinics.GetForUserod(Security.CurUser);//could be only one if the user is restricted
 				for(int i=0;i<_listClinics.Count;i++) {
 					comboClinic.Items.Add(_listClinics[i].Description);
-					if(FormOpenDental.ClinicNum==_listClinics[i].ClinicNum) {
+					if(Clinics.ClinicNum==_listClinics[i].ClinicNum) {
 						comboClinic.SelectedIndex=i+1;
 					}
 				}
@@ -1440,7 +1440,7 @@ namespace OpenDental{
 			if(PrefC.GetBool(PrefName.ShowFeatureEhr)) {
 				PatCur.Gender=PatientGender.Unknown;
 			}
-			PatCur.ClinicNum=FormOpenDental.ClinicNum;
+			PatCur.ClinicNum=Clinics.ClinicNum;
 			Patients.Insert(PatCur,false);
 			CustReference custRef=new CustReference();
 			custRef.PatNum=PatCur.PatNum;
