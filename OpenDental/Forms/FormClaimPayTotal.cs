@@ -739,6 +739,7 @@ namespace OpenDental
 			Fee FeeCur=null;
 			long codeNum;
 			List<Procedure> ProcList=Procedures.Refresh(PatCur.PatNum);
+			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
 			Procedure proc;
 			for(int i=0;i<ClaimProcsToEdit.Length;i++){
 				proc=Procedures.GetProcFromList(ProcList,ClaimProcsToEdit[i].ProcNum);
@@ -752,8 +753,8 @@ namespace OpenDental
 					FeeCur=new Fee();
 					FeeCur.FeeSched=feeSched;
 					FeeCur.CodeNum=codeNum;
-					FeeCur.ClinicNum=proc.ClinicNum;
-					FeeCur.ProvNum=proc.ProvNum;
+					FeeCur.ClinicNum=(FeeScheds.GetOne(feeSched,listFeeScheds).IsGlobal) ? 0 : proc.ClinicNum;
+					FeeCur.ProvNum=(FeeScheds.GetOne(feeSched,listFeeScheds).IsGlobal) ? 0 : proc.ProvNum;
 					FeeCur.Amount=PIn.Double(gridMain.Rows[i].Cells[_allowedIdx].Text);
 					Fees.Insert(FeeCur);
 				}
@@ -762,7 +763,7 @@ namespace OpenDental
 					Fees.Update(FeeCur);
 				}
 				SecurityLogs.MakeLogEntry(Permissions.ProcFeeEdit,0,Lan.g(this,"Procedure")+": "+ProcedureCodes.GetStringProcCode(FeeCur.CodeNum)
-					+", "+Lan.g(this,"Fee: ")+""+FeeCur.Amount.ToString("c")+", "+Lan.g(this,"Fee Schedule")+" "+FeeScheds.GetDescription(FeeCur.FeeSched)
+					+", "+Lan.g(this,"Fee")+": "+FeeCur.Amount.ToString("c")+", "+Lan.g(this,"Fee Schedule")+" "+FeeScheds.GetDescription(FeeCur.FeeSched)
 					+". "+Lan.g(this,"Automatic change to allowed fee in Enter Payment window.  Confirmed by user."),FeeCur.CodeNum);
 			}
 			DataValid.SetInvalid(InvalidType.Fees);
