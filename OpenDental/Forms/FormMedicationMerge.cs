@@ -67,13 +67,13 @@ namespace OpenDental {
 				return;
 			}
 			if(textMedNameFrom.Text!=textMedNameInto.Text) {
-				differentFields+="\r\nMedication Name";
+				differentFields+="\r\n"+Lan.g(this,"Medication Name");
 			}
 			if(textGenNumFrom.Text!=textGenNumInto.Text) {
-				differentFields+="\r\nGenericNum";
+				differentFields+="\r\n"+Lan.g(this,"GenericNum");
 			}
 			if(textRxFrom.Text!=textRxInto.Text) {
-				differentFields+="\r\nRxCui";
+				differentFields+="\r\n"+Lan.g(this,"RxCui");
 			}
 			long numPats=Medications.CountPats(_medFrom.MedicationNum);
 			if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"Are you sure?  The results are permanent and cannot be undone.")) {
@@ -84,7 +84,7 @@ namespace OpenDental {
 				msgText=Lan.g(this,"The following medication fields do not match")+": "+differentFields+"\r\n";
 			}
 			msgText+=Lan.g(this,"This change is irreversible")+".  "+Lan.g(this,"This medication is assigned to")+" "+numPats+" "
-				+Lan.g(this," patients")+".  "+Lan.g(this,"Continue anyways?");
+				+Lan.g(this,"patients")+".  "+Lan.g(this,"Continue anyways?");
 			if(MessageBox.Show(msgText,"",MessageBoxButtons.OKCancel)!=DialogResult.OK) {
 				return;
 			}

@@ -411,7 +411,10 @@ namespace OpenDentBusiness{
 
 		///<summary>Returns the number of patients associated with the passed-in medicationNum.</summary>
 		public static long CountPats(long medNum) {
-			string command="SELECT COUNT(DISTINCT medicationpat.PatNum) from medicationpat WHERE MedicationNum="+medNum;
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetLong(MethodBase.GetCurrentMethod(),medNum);
+			}
+			string command="SELECT COUNT(DISTINCT medicationpat.PatNum) FROM medicationpat WHERE MedicationNum="+POut.Long(medNum);
 			return PIn.Long(Db.GetScalar(command));
 		}
 
