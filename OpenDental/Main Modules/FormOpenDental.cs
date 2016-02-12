@@ -2434,20 +2434,6 @@ namespace OpenDental{
 			odThreadServiceStarter.AddExceptionHandler(new ODThread.ExceptionDelegate((Exception ex) => { }));
 			odThreadServiceStarter.Start(true);
 			Splash.Dispose();
-			//Choose a default DirectX format when no DirectX format has been specified and running in DirectX tooth chart mode.
-			//ComputerPref localComputerPrefs=ComputerPrefs.GetForLocalComputer();
-			if(ComputerPrefs.LocalComputer.GraphicsSimple==DrawingMode.DirectX && ComputerPrefs.LocalComputer.DirectXFormat=="") {
-				//MessageBox.Show(Lan.g(this,"Optimizing tooth chart graphics. This may take a few minutes. You will be notified when the process is complete."));
-				ComputerPrefs.LocalComputer.DirectXFormat=FormGraphics.GetPreferredDirectXFormat(this);
-				if(ComputerPrefs.LocalComputer.DirectXFormat=="invalid") {
-					//No valid local DirectX format could be found.
-					//Simply revert to OpenGL.
-					ComputerPrefs.LocalComputer.GraphicsSimple=DrawingMode.Simple2D;
-				}
-				ComputerPrefs.Update(ComputerPrefs.LocalComputer);
-				ContrChart2.InitializeOnStartup();
-				//MsgBox.Show(this,"Done optimizing tooth chart graphics.");
-			}
 			if(ODEnvironment.IsRunningOnDbServer(MiscData.GetODServer()) && PrefC.GetBool(PrefName.ShowFeatureEhr)) {//OpenDental has EHR enabled and is running on the same machine as the mysql server it is connected to.*/
 				_threadTimeSynch=new Thread(new ThreadStart(ThreadTimeSynch_Synch));
 				_threadTimeSynch.Start();
@@ -2666,6 +2652,23 @@ namespace OpenDental{
 				{
 					FormLanguageAndRegion FormLAR=new FormLanguageAndRegion();
 					FormLAR.ShowDialog();
+				}
+			}
+			//Choose a default DirectX format when no DirectX format has been specified and running in DirectX tooth chart mode.
+			if(ComputerPrefs.LocalComputer.GraphicsSimple==DrawingMode.DirectX && ComputerPrefs.LocalComputer.DirectXFormat=="") {
+				try {
+					ComputerPrefs.LocalComputer.DirectXFormat=FormGraphics.GetPreferredDirectXFormat(this);
+					if(ComputerPrefs.LocalComputer.DirectXFormat=="invalid") {
+						//No valid local DirectX format could be found.
+						//Simply revert to OpenGL.
+						ComputerPrefs.LocalComputer.GraphicsSimple=DrawingMode.Simple2D;
+					}
+					ComputerPrefs.Update(ComputerPrefs.LocalComputer);
+					//Reinitialize the tooth chart because the graphics mode was probably changed which should change the tooth chart appearence.
+					ContrChart2.InitializeOnStartup();
+				}
+				catch(Exception ex) {
+					//The tooth chart will default to Simple2D mode if the above code fails for any reason.  This will at least get the user into the program.
 				}
 			}
 			Plugins.HookAddCode(this,"FormOpenDental.Load_end");
