@@ -52,6 +52,10 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MySql.Data, Version=6.2.4.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Required dlls\MySql.Data.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\Required dlls\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -87,6 +91,8 @@
     </Compile>
     <Compile Include="Base\ODGraph.cs" />
     <Compile Include="Base\ODGraphExtensions.cs" />
+    <Compile Include="Cache\DashboardCacheBrokenAdj.cs" />
+    <Compile Include="Cache\DashboardCacheBrokenProc.cs" />
     <Compile Include="Cache\DashboardCacheBrokenAppt.cs" />
     <Compile Include="Cache\DashboardCache.cs" />
     <Compile Include="Cache\DashboardCacheAdjustment.cs" />
@@ -221,6 +227,10 @@
     <ProjectReference Include="..\CodeBase\xCodeBase.csproj">
       <Project>{18f7bc78-4b99-48d3-a1f1-0d13a63e3cf9}</Project>
       <Name>xCodeBase</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ODR\xODR.csproj">
+      <Project>{84688345-BB6A-4F2F-8672-A82B52FD433B}</Project>
+      <Name>xODR</Name>
     </ProjectReference>
     <ProjectReference Include="..\OpenDentBusiness\OpenDentBusiness.csproj">
       <Project>{3d0fc76e-803c-4de2-bdb1-47d63a4e2357}</Project>

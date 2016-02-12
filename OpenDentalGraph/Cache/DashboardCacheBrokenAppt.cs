@@ -3,30 +3,29 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using OpenDentBusiness;
 
 namespace OpenDentalGraph.Cache {
 	public class DashboardCacheBrokenAppt:DashboardCacheWithQuery<BrokenAppt> {
 		protected override string GetCommand(DashboardFilter filter) {
-			string where="";
+			string where="WHERE AptStatus="+(int)ApptStatus.Broken+" ";
 			if(filter.UseDateFilter) {
-				//where="WHERE AdjDate>"+POut.Date(filter.DateFrom)+" AND AdjDate<"+POut.Date(filter.DateTo)+" ";
+				where+="AND DATE(AptDateTime) BETWEEN "+POut.Date(filter.DateFrom)+" AND "+POut.Date(filter.DateTo)+" ";
 			}
 			return
-				"SELECT ProcDate,ProvNum,ClinicNum,COUNT(ProcNum) ApptCount "
-				+"FROM procedurelog "
-				+"INNER JOIN procedurecode ON procedurecode.CodeNum=procedurelog.CodeNum AND procedurecode.ProcCode='D9986' "
+				"SELECT DATE(AptDateTime) ApptDate,ProvNum,ClinicNum,COUNT(AptNum) ApptCount "
+				+"FROM appointment "
 				+where
-				+"GROUP BY ProcDate,ProvNum,ClinicNum ";
+				+"GROUP BY ApptDate,ProvNum,ClinicNum ";
 		}
 
 		protected override BrokenAppt GetInstanceFromDataRow(DataRow x) {
 			return new BrokenAppt() {
 				ProvNum=x.Field<long>("ProvNum"),
 				ClinicNum=x.Field<long>("ClinicNum"),
-				DateStamp=x.Field<DateTime>("ProcDate"),
-				Val=x.Field<long>("ApptCount"),
-				//Should be set at runtime in GraphQuantityOverTimeFilter.FilterData().
-				//SeriesName="",
+				DateStamp=x.Field<DateTime>("ApptDate"),
+				Count=x.Field<long>("ApptCount"),
+				Val=0, //appointments do not have their own value.
 			};
 		}
 	}

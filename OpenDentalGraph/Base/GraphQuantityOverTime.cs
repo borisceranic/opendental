@@ -65,10 +65,8 @@ namespace OpenDentalGraph {
 		public class GraphPointBase:ODGraphPointBase {
 			public DateTime DateStamp;
 			public double Val;
-			public virtual bool IncludeInCountMode() {
-				return true;
-			}
-			
+			public long Count=0;//1; //default to having one data point count for one unit when in Count mode.
+						
 			public GraphPointBase() {
 			}
 
@@ -76,6 +74,7 @@ namespace OpenDentalGraph {
 				SeriesName=dataPoint.SeriesName;
 				DateStamp=dataPoint.DateStamp;
 				Val=dataPoint.Val;
+				Count=dataPoint.Count;
 				Tag=dataPoint.Tag;
 			}
 
@@ -463,16 +462,17 @@ namespace OpenDentalGraph {
 			chart1.Series.Clear();
 			if(_rawData.Count<=0) {
 				return;
-			}			
+			}
 			List<GraphPointBase> rawDataLocal;
 			switch(QtyType) {
-				case Enumerations.QuantityType.count: //Each DataPoint represents count of 1.
-					rawDataLocal=_rawData.Where(x => x.IncludeInCountMode()).Select(x => new GraphPointBase(x) { Val=1 }).ToList();
+				case Enumerations.QuantityType.count: //YVal in count mode will come from Count instead of Val.
+					rawDataLocal=_rawData.Select(x => new GraphPointBase(x) { Val=x.Count }).ToList();
 					break;
-				case Enumerations.QuantityType.money: //Each DataPoint is unchanged.
-				default:
+				case Enumerations.QuantityType.money: //YVal will come from the Val. Nothing is changed.
 					rawDataLocal=_rawData.Select(x => new GraphPointBase(x)).ToList();
 					break;
+				default:
+					throw new Exception("Unsupported QtyType.");
 			}
 			//1 grouping for each series name.
 			List<string> seriesNames=rawDataLocal.Select(x => x.SeriesName).Distinct().ToList();
@@ -628,6 +628,7 @@ namespace OpenDentalGraph {
 			else if(BreakdownPref==Enumerations.BreakdownType.none) {  //Don't take any. This will leave all to be grouped into 1 single group below.
 				topGrossingCount=0;
 			}
+			topGrossingCount=Math.Min(topGrossingCount,100);
 			//Add each individual series that is withing the filtered range.
 			rawDataFormatted.OrderByDescending(x => x.Value.Dict.Sum(y => y.Value))
 				.Take(topGrossingCount).ToList()
@@ -665,7 +666,12 @@ namespace OpenDentalGraph {
 			_yAxisMaxVal=_yAxisMaxVal.RoundSignificant();
 			_chartAreaDefault.AxisX.IntervalOffsetType=_selectedMajorGridInterval;
 			_chartAreaDefault.AxisX.LabelStyle.Format=_xAxisFormat;
-			_yAxisMaxVal=_yAxisMaxVal<=0 ? 0 : _yAxisMaxVal;
+			if(_yAxisMaxVal<=0) {
+				_yAxisMaxVal=0;
+			}
+			else if(_yAxisMaxVal<10){
+				_yAxisMaxVal=10;
+			}
 			_yAxisMinVal=_yAxisMinVal.RoundSignificant();
 			_yAxisMinVal=_yAxisMinVal>=0?0:_yAxisMinVal;
 			double yAxisMinMax=Math.Max(Math.Abs(_yAxisMaxVal),Math.Abs(_yAxisMinVal));
@@ -673,9 +679,9 @@ namespace OpenDentalGraph {
 				_yAxisFormat="D";
 			}
 			else {
-				int max=(int)yAxisMinMax;
+				int max=(int)yAxisMinMax;				
 				string scaleFactor="".PadRight((max.ToString().Length-2)/3,',');
-				string[] factors=new[] { "","K","M","B","T","?" };
+				string[] factors=new[] { "","K","M","B","T","?" };				
 				if(yAxisMinMax>=10) {
 					_yAxisFormat="{0:0"+scaleFactor+"}"+factors[Math.Min(factors.Length-1,scaleFactor.Length)];
 				}

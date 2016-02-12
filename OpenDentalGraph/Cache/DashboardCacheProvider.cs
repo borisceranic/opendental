@@ -11,7 +11,7 @@ namespace OpenDentalGraph.Cache {
 		protected override List<Provider> GetCache(DashboardFilter filter) {
 			List<Provider> list=ProviderC.GetListLong();
 			_dictProvNames=list.ToDictionary(x => x.ProvNum,x => string.IsNullOrEmpty(x.Abbr)?x.ProvNum.ToString():x.Abbr);
-			_dictProvColors=list.ToDictionary(x => string.IsNullOrEmpty(x.Abbr) ? x.ProvNum.ToString() : x.Abbr,x => x.ProvColor);
+			_dictProvColors=list.GroupBy(x => x.Abbr).ToDictionary(x => string.IsNullOrEmpty(x.Key) ? x.First().ProvNum.ToString() : x.Key ,x => x.First().ProvColor);
 			return list;
 		}
 

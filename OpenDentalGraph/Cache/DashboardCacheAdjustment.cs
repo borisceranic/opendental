@@ -7,7 +7,7 @@ namespace OpenDentalGraph.Cache {
 		protected override string GetCommand(DashboardFilter filter) {
 			string where="";
 			if(filter.UseDateFilter) {
-				where="WHERE AdjDate>"+POut.Date(filter.DateFrom)+" AND AdjDate<"+POut.Date(filter.DateTo)+" ";
+				where="WHERE AdjDate BETWEEN "+POut.Date(filter.DateFrom)+" AND "+POut.Date(filter.DateTo)+" ";
 			}
 			return
 				"SELECT AdjDate,ProvNum,SUM(AdjAmt) AdjTotal "
@@ -24,15 +24,13 @@ namespace OpenDentalGraph.Cache {
 			return new Adjustment() {
 				ProvNum=provNum,
 				DateStamp=x.Field<DateTime>("AdjDate"),
-				Val=x.Field<double>("AdjTotal"),				
+				Val=x.Field<double>("AdjTotal"),	
+				Count=0, //count procedures, not adjustments.			
 				SeriesName=seriesName,
 			};
 		}
 	}
 
 	public class Adjustment:GraphQuantityOverTime.GraphDataPointProv {
-		public override bool IncludeInCountMode() {
-			return false;
-		}
 	}
 }

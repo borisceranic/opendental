@@ -26,8 +26,8 @@ namespace OpenDentalGraph {
 					case DashboardCellType.IncomeGraph:
 					case DashboardCellType.NewPatientsGraph:
 					case DashboardCellType.BrokenApptGraph:
-						return true;
 					case DashboardCellType.AccountsReceivableGraph:
+						return true;
 					default:
 						return false;
 				}
@@ -73,29 +73,31 @@ namespace OpenDentalGraph {
 						Graph.BreakdownPref=BreakdownType.none;
 						Graph.LegendDock=LegendDockType.None;
 						Graph.QuickRangePref=QuickRange.last12Months;
+						Graph.QtyType=QuantityType.money;
 						break;
 					case DashboardCellType.IncomeGraph:
 						filterCtrl=_incomeOptionsCtrl;
 						Graph.GraphTitle="Income";
 						Graph.MoneyItemDescription="Income $";
-						Graph.CountItemDescription="Count Payments";
+						Graph.CountItemDescription="Not Used";
 						Graph.GroupByType=System.Windows.Forms.DataVisualization.Charting.IntervalType.Months;
 						Graph.SeriesType=System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
 						Graph.BreakdownPref=BreakdownType.none;
 						Graph.LegendDock=LegendDockType.None;
 						Graph.QuickRangePref=QuickRange.last12Months;
+						Graph.QtyType=QuantityType.money;
 						break;
 					case DashboardCellType.BrokenApptGraph:
 						filterCtrl=_brokenApptsCtrl;
 						Graph.GraphTitle="Broken Appointments";
-						Graph.MoneyItemDescription="Not Used";
-						Graph.CountItemDescription="Count Appointments";
+						Graph.MoneyItemDescription="Fees";
+						Graph.CountItemDescription="Count";
 						Graph.GroupByType=System.Windows.Forms.DataVisualization.Charting.IntervalType.Months;
 						Graph.SeriesType=System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
 						Graph.BreakdownPref=BreakdownType.none;
 						Graph.LegendDock=LegendDockType.None;
 						Graph.QuickRangePref=QuickRange.last12Months;
-						Graph.QtyType=QuantityType.count;						
+						Graph.QtyType=QuantityType.count;
 						break;
 					case DashboardCellType.AccountsReceivableGraph:
 						Graph.GraphTitle="Accounts Receivable";
@@ -106,6 +108,7 @@ namespace OpenDentalGraph {
 						Graph.BreakdownPref=BreakdownType.none;
 						Graph.LegendDock=LegendDockType.None;
 						Graph.QuickRangePref=QuickRange.last12Months;
+						Graph.QtyType=QuantityType.money;
 						break;
 					case DashboardCellType.NewPatientsGraph:
 						Graph.GraphTitle="New Patients";
@@ -182,10 +185,11 @@ namespace OpenDentalGraph {
 						if(_productionOptionsCtrl.IncludeAdjustments) {
 							rawData.AddRange(DashboardCache.Adjustments.Cache);
 						}
-						if(_productionOptionsCtrl.IncludeCompletedProcs||_productionOptionsCtrl.IncludeWriteoffs) {
-							rawData.AddRange(DashboardCache.CompletedProcs.Cache
-								.Select(x => GetProcDataPoint(x))
-								.ToList());
+						if(_productionOptionsCtrl.IncludeCompletedProcs) {
+							rawData.AddRange(DashboardCache.CompletedProcs.Cache);
+						}
+						if(_productionOptionsCtrl.IncludeWriteoffs) {
+							rawData.AddRange(DashboardCache.Writeoffs.Cache);
 						}
 					}
 					break;
@@ -202,6 +206,7 @@ namespace OpenDentalGraph {
 						rawData.AddRange(DashboardCache.AR.Cache
 							.Select(x => new GraphQuantityOverTime.GraphPointBase() {
 								Val=x.BalTotal,
+								Count=0,
 								SeriesName="All",
 								DateStamp=x.DateCalc,
 							})
@@ -214,16 +219,30 @@ namespace OpenDentalGraph {
 					break;
 				case DashboardCellType.BrokenApptGraph: {
 						switch(_brokenApptsCtrl.CurGrouping) {
-							case BrokenApptGraphOptionsCtrl.Grouping.proc:
+							case BrokenApptGraphOptionsCtrl.Grouping.provider:
 								Graph.UseBuiltInColors=false;
 								break;
-							case BrokenApptGraphOptionsCtrl.Grouping.adjustment:
-							case BrokenApptGraphOptionsCtrl.Grouping.apptStatus:
+							case BrokenApptGraphOptionsCtrl.Grouping.clinic:
 							default:
 								Graph.UseBuiltInColors=true;
 								break;
 						}
-						rawData.AddRange(DashboardCache.BrokenAppts.Cache.Select(x => GetBrokenApptDataPoint(x)));
+						switch(_brokenApptsCtrl.CurRunFor) {
+							case BrokenApptGraphOptionsCtrl.RunFor.appointment:
+								//use the broken appointment cache to get all relevant broken appts.
+								rawData.AddRange(DashboardCache.BrokenAppts.Cache.Select(x => GetBrokenApptDataPoint(x)));
+								break;
+							case BrokenApptGraphOptionsCtrl.RunFor.adjustment:
+								//use the broken adjustment cache to get all broken adjustments filtered by the selected adjType.
+								rawData.AddRange(DashboardCache.BrokenAdjs.Cache.Where(x => x.AdjType==_brokenApptsCtrl.AdjTypeCur).Select(x => GetBrokenApptDataPoint(x)));
+								break;
+							case BrokenApptGraphOptionsCtrl.RunFor.procedure:
+								//use the broken proc cache to get all relevant broken procedures.
+								rawData.AddRange(DashboardCache.BrokenProcs.Cache.Select(x => GetBrokenApptDataPoint(x)));
+								break;
+							default:
+								throw new Exception("Unsupported CurRunFor: "+_brokenApptsCtrl.CurRunFor.ToString());
+						}
 					}
 					break;
 				default:
@@ -248,43 +267,26 @@ namespace OpenDentalGraph {
 		#endregion
 
 		#region GraphDataPoint Conversions
-		private GraphQuantityOverTime.GraphPointBase GetBrokenApptDataPoint(BrokenAppt x) {
+		private GraphQuantityOverTime.GraphPointBase GetBrokenApptDataPoint(GraphQuantityOverTime.GraphDataPointClinic x) {
 			switch(_brokenApptsCtrl.CurGrouping) {
-				case BrokenApptGraphOptionsCtrl.Grouping.proc:
+				case BrokenApptGraphOptionsCtrl.Grouping.provider:
 					return new GraphQuantityOverTime.GraphPointBase() {
 						DateStamp=x.DateStamp,
 						SeriesName=DashboardCache.Providers.GetProvName(x.ProvNum),
-						Val=x.Val
+						Val=x.Val,
+						Count=x.Count
 					};
-				case BrokenApptGraphOptionsCtrl.Grouping.adjustment:
-				case BrokenApptGraphOptionsCtrl.Grouping.apptStatus:
+				case BrokenApptGraphOptionsCtrl.Grouping.clinic:
 				default:
 					return new GraphQuantityOverTime.GraphPointBase() {
 						DateStamp=x.DateStamp,
 						SeriesName=DashboardCache.Clinics.GetClinicName(x.ClinicNum),
-						Val=x.Val
+						Val=x.Val,
+						Count=x.Count
 					};
 			}
 		}
 
-		private GraphQuantityOverTime.GraphPointBase GetProcDataPoint(CompletedProc x) {
-			double finalValue=0;
-			//Val will be the sum of the completed proc and the writeoff, depending on user preference.
-			if(_productionOptionsCtrl.IncludeCompletedProcs) {
-				finalValue+=x.Val;
-			}
-			if(_productionOptionsCtrl.IncludeWriteoffs) { //Writeoffs are always attached to completed procs so if we don't have a completed proc, we won't have a writeoff.
-				Writeoff writeoff=DashboardCache.Writeoffs.Cache.FirstOrDefault(y => y.ProvNum==x.ProvNum && y.DateStamp==x.DateStamp);
-				if(writeoff!=null) {
-					finalValue-=writeoff.Val;
-				}
-			}
-			return new GraphQuantityOverTime.GraphPointBase() {
-				Val=finalValue,
-				SeriesName=x.SeriesName,
-				DateStamp=x.DateStamp,
-			};
-		}
 		#endregion
 
 		#region IDashboardDockContainer Implementation

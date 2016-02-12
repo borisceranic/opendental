@@ -23,10 +23,11 @@
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
-			System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-			System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
-			System.Windows.Forms.DataVisualization.Charting.Title title3 = new System.Windows.Forms.DataVisualization.Charting.Title();
-			System.Windows.Forms.DataVisualization.Charting.Title title4 = new System.Windows.Forms.DataVisualization.Charting.Title();
+			System.Windows.Forms.DataVisualization.Charting.HorizontalLineAnnotation horizontalLineAnnotation1 = new System.Windows.Forms.DataVisualization.Charting.HorizontalLineAnnotation();
+			System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+			System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+			System.Windows.Forms.DataVisualization.Charting.Title title1 = new System.Windows.Forms.DataVisualization.Charting.Title();
+			System.Windows.Forms.DataVisualization.Charting.Title title2 = new System.Windows.Forms.DataVisualization.Charting.Title();
 			this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
 			this.comboGroupBy = new System.Windows.Forms.ComboBox();
 			this.dateTimeFrom = new System.Windows.Forms.DateTimePicker();
@@ -54,9 +55,9 @@
 			this.textChartTitle = new System.Windows.Forms.TextBox();
 			this.label8 = new System.Windows.Forms.Label();
 			this.splitContainerChart = new System.Windows.Forms.SplitContainer();
-			this.chartLegend1 = new OpenDentalGraph.Legend();
-			this.pictureBoxLoading = new System.Windows.Forms.PictureBox();
 			this.panelChart = new System.Windows.Forms.Panel();
+			this.pictureBoxLoading = new System.Windows.Forms.PictureBox();
+			this.chartLegend1 = new OpenDentalGraph.Legend();
 			((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
 			this.groupBoxBreakdown.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.numericTop)).BeginInit();
@@ -70,69 +71,75 @@
 			this.splitContainerChart.Panel1.SuspendLayout();
 			this.splitContainerChart.Panel2.SuspendLayout();
 			this.splitContainerChart.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.pictureBoxLoading)).BeginInit();
 			this.panelChart.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.pictureBoxLoading)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// chart1
 			// 
+			horizontalLineAnnotation1.AnchorY = 0D;
+			horizontalLineAnnotation1.ClipToChartArea = "Default";
+			horizontalLineAnnotation1.IsInfinitive = true;
+			horizontalLineAnnotation1.LineColor = System.Drawing.Color.Red;
+			horizontalLineAnnotation1.Name = "HorizontalLineAnnotation1";
+			horizontalLineAnnotation1.YAxisName = "Default\\rY";
+			this.chart1.Annotations.Add(horizontalLineAnnotation1);
 			this.chart1.BorderlineColor = System.Drawing.Color.Silver;
 			this.chart1.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
 			this.chart1.BorderlineWidth = 2;
 			this.chart1.BorderSkin.PageColor = System.Drawing.Color.Transparent;
-			chartArea2.Area3DStyle.Inclination = 40;
-			chartArea2.Area3DStyle.IsClustered = true;
-			chartArea2.Area3DStyle.IsRightAngleAxes = false;
-			chartArea2.Area3DStyle.LightStyle = System.Windows.Forms.DataVisualization.Charting.LightStyle.Realistic;
-			chartArea2.Area3DStyle.Rotation = 25;
-			chartArea2.Area3DStyle.WallWidth = 3;
-			chartArea2.AxisX.Interval = 7D;
-			chartArea2.AxisX.IntervalType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Days;
-			chartArea2.AxisX.IsMarginVisible = false;
-			chartArea2.AxisX.LabelAutoFitStyle = ((System.Windows.Forms.DataVisualization.Charting.LabelAutoFitStyles)(((System.Windows.Forms.DataVisualization.Charting.LabelAutoFitStyles.DecreaseFont | System.Windows.Forms.DataVisualization.Charting.LabelAutoFitStyles.StaggeredLabels) 
+			chartArea1.Area3DStyle.Inclination = 40;
+			chartArea1.Area3DStyle.IsClustered = true;
+			chartArea1.Area3DStyle.IsRightAngleAxes = false;
+			chartArea1.Area3DStyle.LightStyle = System.Windows.Forms.DataVisualization.Charting.LightStyle.Realistic;
+			chartArea1.Area3DStyle.Rotation = 25;
+			chartArea1.Area3DStyle.WallWidth = 3;
+			chartArea1.AxisX.Interval = 7D;
+			chartArea1.AxisX.IntervalType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Days;
+			chartArea1.AxisX.IsMarginVisible = false;
+			chartArea1.AxisX.LabelAutoFitStyle = ((System.Windows.Forms.DataVisualization.Charting.LabelAutoFitStyles)(((System.Windows.Forms.DataVisualization.Charting.LabelAutoFitStyles.DecreaseFont | System.Windows.Forms.DataVisualization.Charting.LabelAutoFitStyles.StaggeredLabels) 
             | System.Windows.Forms.DataVisualization.Charting.LabelAutoFitStyles.LabelsAngleStep45)));
-			chartArea2.AxisX.LabelStyle.Font = new System.Drawing.Font("Trebuchet MS", 8.25F, System.Drawing.FontStyle.Bold);
-			chartArea2.AxisX.LabelStyle.Format = "MM/dd/yy";
-			chartArea2.AxisX.LineColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-			chartArea2.AxisX.MajorGrid.LineColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-			chartArea2.AxisX.ScaleView.MinSize = 14D;
-			chartArea2.AxisX.ScaleView.MinSizeType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Days;
-			chartArea2.AxisX.ScaleView.Position = 1D;
-			chartArea2.AxisX.ScaleView.Size = 1D;
-			chartArea2.AxisX.ScaleView.SizeType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Days;
-			chartArea2.AxisY.LabelStyle.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			chartArea2.AxisY.LabelStyle.Format = "C0";
-			chartArea2.AxisY.LineColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-			chartArea2.AxisY.MajorGrid.LineColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-			chartArea2.AxisY.MajorTickMark.Enabled = false;
-			chartArea2.AxisY2.LabelStyle.Format = "C";
-			chartArea2.BackColor = System.Drawing.Color.White;
-			chartArea2.BackSecondaryColor = System.Drawing.Color.White;
-			chartArea2.BorderDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
-			chartArea2.BorderWidth = 2;
-			chartArea2.CursorX.IsUserSelectionEnabled = true;
-			chartArea2.Name = "Default";
-			this.chart1.ChartAreas.Add(chartArea2);
+			chartArea1.AxisX.LabelStyle.Font = new System.Drawing.Font("Trebuchet MS", 8.25F, System.Drawing.FontStyle.Bold);
+			chartArea1.AxisX.LabelStyle.Format = "MM/dd/yy";
+			chartArea1.AxisX.LineColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+			chartArea1.AxisX.MajorGrid.LineColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+			chartArea1.AxisX.ScaleView.MinSize = 14D;
+			chartArea1.AxisX.ScaleView.MinSizeType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Days;
+			chartArea1.AxisX.ScaleView.Position = 1D;
+			chartArea1.AxisX.ScaleView.Size = 1D;
+			chartArea1.AxisX.ScaleView.SizeType = System.Windows.Forms.DataVisualization.Charting.DateTimeIntervalType.Days;
+			chartArea1.AxisY.LabelStyle.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			chartArea1.AxisY.LabelStyle.Format = "C0";
+			chartArea1.AxisY.LineColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+			chartArea1.AxisY.MajorGrid.LineColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+			chartArea1.AxisY.MajorTickMark.Enabled = false;
+			chartArea1.AxisY2.LabelStyle.Format = "C";
+			chartArea1.BackColor = System.Drawing.Color.White;
+			chartArea1.BackSecondaryColor = System.Drawing.Color.White;
+			chartArea1.BorderDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
+			chartArea1.CursorX.IsUserSelectionEnabled = true;
+			chartArea1.Name = "Default";
+			this.chart1.ChartAreas.Add(chartArea1);
 			this.chart1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.chart1.Location = new System.Drawing.Point(0, 0);
 			this.chart1.Name = "chart1";
-			series2.ChartArea = "Default";
-			series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StackedArea;
-			series2.Color = System.Drawing.Color.Red;
-			series2.LabelFormat = "C0";
-			series2.Name = "Daily";
-			this.chart1.Series.Add(series2);
+			series1.ChartArea = "Default";
+			series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.StackedArea;
+			series1.Color = System.Drawing.Color.Red;
+			series1.LabelFormat = "C0";
+			series1.Name = "Daily";
+			this.chart1.Series.Add(series1);
 			this.chart1.Size = new System.Drawing.Size(789, 302);
 			this.chart1.TabIndex = 2;
-			title3.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
-			title3.Name = "ChartTitle";
-			title3.Text = "Procedure Log Income";
-			title3.TextOrientation = System.Windows.Forms.DataVisualization.Charting.TextOrientation.Horizontal;
-			title4.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
-			title4.Name = "ChartSubTitle";
-			title4.Visible = false;
-			this.chart1.Titles.Add(title3);
-			this.chart1.Titles.Add(title4);
+			title1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
+			title1.Name = "ChartTitle";
+			title1.Text = "Procedure Log Income";
+			title1.TextOrientation = System.Windows.Forms.DataVisualization.Charting.TextOrientation.Horizontal;
+			title2.Docking = System.Windows.Forms.DataVisualization.Charting.Docking.Bottom;
+			title2.Name = "ChartSubTitle";
+			title2.Visible = false;
+			this.chart1.Titles.Add(title1);
+			this.chart1.Titles.Add(title2);
 			this.chart1.GetToolTipText += new System.EventHandler<System.Windows.Forms.DataVisualization.Charting.ToolTipEventArgs>(this.chart1_GetToolTipText);
 			this.chart1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.chart1_MouseDoubleClick);
 			// 
@@ -444,17 +451,15 @@
 			this.splitContainerChart.SplitterWidth = 1;
 			this.splitContainerChart.TabIndex = 3;
 			// 
-			// chartLegend1
+			// panelChart
 			// 
-			this.chartLegend1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.chartLegend1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.chartLegend1.LegendDock = OpenDentalGraph.Enumerations.LegendDockType.Left;
-			this.chartLegend1.Location = new System.Drawing.Point(0, 0);
-			this.chartLegend1.Margin = new System.Windows.Forms.Padding(0);
-			this.chartLegend1.Name = "chartLegend1";
-			this.chartLegend1.PaddingPx = 3F;
-			this.chartLegend1.Size = new System.Drawing.Size(110, 302);
-			this.chartLegend1.TabIndex = 1;
+			this.panelChart.Controls.Add(this.chart1);
+			this.panelChart.Controls.Add(this.pictureBoxLoading);
+			this.panelChart.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.panelChart.Location = new System.Drawing.Point(0, 0);
+			this.panelChart.Name = "panelChart";
+			this.panelChart.Size = new System.Drawing.Size(789, 302);
+			this.panelChart.TabIndex = 4;
 			// 
 			// pictureBoxLoading
 			// 
@@ -467,15 +472,17 @@
 			this.pictureBoxLoading.TabIndex = 3;
 			this.pictureBoxLoading.TabStop = false;
 			// 
-			// panelChart
+			// chartLegend1
 			// 
-			this.panelChart.Controls.Add(this.pictureBoxLoading);
-			this.panelChart.Controls.Add(this.chart1);
-			this.panelChart.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.panelChart.Location = new System.Drawing.Point(0, 0);
-			this.panelChart.Name = "panelChart";
-			this.panelChart.Size = new System.Drawing.Size(789, 302);
-			this.panelChart.TabIndex = 4;
+			this.chartLegend1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.chartLegend1.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.chartLegend1.LegendDock = OpenDentalGraph.Enumerations.LegendDockType.Left;
+			this.chartLegend1.Location = new System.Drawing.Point(0, 0);
+			this.chartLegend1.Margin = new System.Windows.Forms.Padding(0);
+			this.chartLegend1.Name = "chartLegend1";
+			this.chartLegend1.PaddingPx = 3F;
+			this.chartLegend1.Size = new System.Drawing.Size(110, 302);
+			this.chartLegend1.TabIndex = 1;
 			// 
 			// GraphQuantityOverTime
 			// 
@@ -501,8 +508,8 @@
 			this.splitContainerChart.Panel2.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.splitContainerChart)).EndInit();
 			this.splitContainerChart.ResumeLayout(false);
-			((System.ComponentModel.ISupportInitialize)(this.pictureBoxLoading)).EndInit();
 			this.panelChart.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)(this.pictureBoxLoading)).EndInit();
 			this.ResumeLayout(false);
 
 		}

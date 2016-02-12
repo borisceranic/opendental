@@ -6,45 +6,122 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using OpenDentBusiness;
 
 namespace OpenDentalGraph {
 	public partial class BrokenApptGraphOptionsCtrl:BaseGraphOptionsCtrl {
-		public enum Grouping { proc, adjustment, apptStatus };
+
+		public List<Def> ListAdjTypes;
+		public enum Grouping { provider, clinic };
+		public enum RunFor { appointment, procedure, adjustment };
 		public Grouping CurGrouping {
 			get {
-				if(radioButton2.Checked) {
-					return Grouping.adjustment;
+				if(radioGroupProvs.Checked) {
+					return Grouping.provider;
 				}
-				else if(radioButton3.Checked) {
-					return Grouping.apptStatus;
+				else{
+					return Grouping.clinic;
 				}
-				return Grouping.proc;				
 			}
 			set {
 				switch(value) {
-					case Grouping.proc:
-						radioButton1.Checked=true;
+					case Grouping.provider:
+						radioGroupProvs.Checked=true;
 						break;
-					case Grouping.adjustment:
-						radioButton2.Checked=true;
-						break;
-					case Grouping.apptStatus:
-						radioButton3.Checked=true;
+					case Grouping.clinic:
+						radioGroupClinics.Checked=true;
 						break;
 				}
 			}
 		}
 
-		public BrokenApptGraphOptionsCtrl() {
-			InitializeComponent();
+		public RunFor CurRunFor
+		{
+			get
+			{
+				if(radioRunAdjs.Checked) {
+					return RunFor.adjustment;
+				}
+				else if(radioRunApts.Checked) {
+					return RunFor.appointment;
+				}
+				else {
+					return RunFor.procedure;
+				}
+			}
+			set
+			{
+				switch(value) {
+					case RunFor.adjustment:
+						radioRunAdjs.Checked=true;
+						break;
+					case RunFor.appointment:
+						radioRunApts.Checked=true;
+						break;
+					case RunFor.procedure:
+						radioRunProcs.Checked=true;
+						break;
+				}
+			}
 		}
 
+		public long AdjTypeCur
+		{
+			get
+			{ return ListAdjTypes[comboAdjType.SelectedIndex].DefNum; }
+			set
+			{
+				for(int i=0;i>ListAdjTypes.Count();i++) {
+					if(ListAdjTypes[i].DefNum==value) {
+						comboAdjType.SelectedIndex=i;
+						return;
+					}
+				}
+			}
+		}
 
-		private void radioChanged(object sender,EventArgs e) {
+		
+		public BrokenApptGraphOptionsCtrl() {
+			InitializeComponent();
+			ListAdjTypes=DefC.GetPositiveAdjTypes();
+			FillComboAdj();
+		}
+
+		public override int GetPanelHeight() {
+			return this.Height;
+		}
+
+		private void radioRunForChanged(object sender,EventArgs e) {
+			if((sender is RadioButton) && !((RadioButton)sender).Checked) {
+				return;
+			}
+			if(radioRunAdjs.Checked) {
+				comboAdjType.Enabled=true;
+			}
+			else {
+				comboAdjType.Enabled=false;
+			}
+			OnBaseInputsChanged(sender,e);
+		}
+
+		private void radioGroupByChanged(object sender,EventArgs e) {
 			if((sender is RadioButton) && !((RadioButton)sender).Checked) {
 				return;
 			}
 			OnBaseInputsChanged(sender,e);
+		}
+
+		private void FillComboAdj() {
+			foreach(Def adjType in ListAdjTypes) {
+				comboAdjType.Items.Add(adjType.ItemName);
+			}
+			if(comboAdjType.Items.Count>0) {
+				comboAdjType.SelectedIndex=0;
+			}
+			else {
+				comboAdjType.Items.Add(Lans.g(this,"Adj types not setup"));
+				radioRunAdjs.Enabled=false;
+			}
 		}
 	}
 }

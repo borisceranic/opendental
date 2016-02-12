@@ -5,16 +5,19 @@ using System.Data;
 namespace OpenDentalGraph.Cache {
 	public class DashboardCacheCompletedProc:DashboardCacheWithQuery<CompletedProc> {
 		protected override string GetCommand(DashboardFilter filter) {
-			string where="";
+			string where="WHERE procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+" ";
 			if(filter.UseDateFilter) {
-				where="ProcDate>"+POut.Date(filter.DateFrom)+" AND ProcDate<"+POut.Date(filter.DateTo)+" AND ";
+				where+="AND procedurelog.ProcDate BETWEEN "+POut.Date(filter.DateFrom)+" AND "+POut.Date(filter.DateTo)+" ";
 			}
 			return
-				"SELECT ProcDate,ProvNum,SUM(ProcFee*(UnitQty+BaseUnits)) AS GrossProd "
+				"SELECT procedurelog.ProcDate,procedurelog.ProvNum,"
+				+"SUM(procedurelog.ProcFee*(procedurelog.UnitQty+procedurelog.BaseUnits))-IFNULL(SUM(claimproc.WriteOff),0) AS GrossProd, "
+				+"COUNT(procedurelog.ProcNum) AS ProcCount "
 				+"FROM procedurelog USE INDEX(indexPNPD) "
-				+"WHERE "+where+"ProcStatus="+POut.Int((int)ProcStat.C)+" "
-				+"GROUP BY ProcDate,ProvNum "
-				+"HAVING GrossProd<>0 ";
+				+"LEFT JOIN claimproc ON claimproc.ProcNum = procedurelog.ProcNum "
+				+"AND claimproc.Status="+POut.Int((int)ClaimProcStatus.CapComplete)+" "
+				+where
+				+"GROUP BY procedurelog.ProcDate,procedurelog.ProvNum ";
 		}
 
 		protected override CompletedProc GetInstanceFromDataRow(DataRow x) {
@@ -24,6 +27,7 @@ namespace OpenDentalGraph.Cache {
 				ProvNum=provNum,
 				DateStamp=x.Field<DateTime>("ProcDate"),
 				Val=x.Field<double>("GrossProd"),
+				Count=x.Field<long>("ProcCount"),
 				SeriesName=seriesName,
 			};
 		}

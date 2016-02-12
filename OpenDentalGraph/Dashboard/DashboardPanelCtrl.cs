@@ -52,11 +52,6 @@ namespace OpenDentalGraph {
 						if(!dashboardCell.HasDockedControl) {
 							continue;
 						}
-						DashboardCell cell=new DashboardCell();
-						if(dashboardCell.DockedControlTag==null) { //Insert.
-							//This cell was not linked to a db row on init so it has to be new.
-							return true;
-						}
 					}
 				}
 				return false;

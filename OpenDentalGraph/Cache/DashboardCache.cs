@@ -22,6 +22,9 @@ namespace OpenDentalGraph.Cache {
 		private static DashboardCacheAR _aR=new DashboardCacheAR();
 		private static DashboardCacheProvider _providers=new DashboardCacheProvider();
 		private static DashboardCacheBrokenAppt _brokenAppts=new DashboardCacheBrokenAppt();
+		private static DashboardCacheBrokenProcedure _brokenProcs=new DashboardCacheBrokenProcedure();
+		private static DashboardCacheBrokenAdj _brokenAdjs=new DashboardCacheBrokenAdj();
+
 		private static DashboardCacheClinic _clinics=new DashboardCacheClinic();
 		#endregion
 
@@ -53,6 +56,14 @@ namespace OpenDentalGraph.Cache {
 		public static DashboardCacheBrokenAppt BrokenAppts {
 			get { return _brokenAppts; }
 		}
+		public static DashboardCacheBrokenProcedure BrokenProcs{
+			get { return _brokenProcs; }
+		}
+		public static DashboardCacheBrokenAdj BrokenAdjs
+		{
+			get { return _brokenAdjs; }
+		}
+
 		public static DashboardCacheClinic Clinics {
 			get { return _clinics; }
 		}
@@ -93,7 +104,7 @@ namespace OpenDentalGraph.Cache {
 			//It doesn't hurt to block momentarily here as the queries will run very quickly.
 			Providers.Run(new DashboardFilter() { UseDateFilter=false },invalidateFirst);
 			Clinics.Run(new DashboardFilter() { UseDateFilter=false },invalidateFirst);
-			//Start certain cache threads depending on which cellType we are interested in. Each cache will have it's own thread.
+			//Start certain cache threads depending on which cellType we are interested in. Each cache will have its own thread.
 			switch(cellType) {
 				case DashboardCellType.ProductionGraph:
 					FillCacheThreaded(CompletedProcs,filter,groupName,invalidateFirst);
@@ -112,10 +123,12 @@ namespace OpenDentalGraph.Cache {
 					break;
 				case DashboardCellType.BrokenApptGraph:
 					FillCacheThreaded(BrokenAppts,filter,groupName,invalidateFirst);
+					FillCacheThreaded(BrokenProcs,filter,groupName,invalidateFirst);
+					FillCacheThreaded(BrokenAdjs,filter,groupName,invalidateFirst);
 					break;
 				case DashboardCellType.NotDefined:
 				default:
-					throw new Exception("Unsupported DashboardCellType: "+cellType.ToString());				
+					throw new Exception("Unsupported DashboardCellType: "+cellType.ToString());
 			}
 			if(waitToReturn) { //Block until all threads have completed.
 				ODThread.JoinThreadsByGroupName(System.Threading.Timeout.Infinite,groupName,true);

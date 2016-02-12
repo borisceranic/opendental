@@ -9,14 +9,17 @@ namespace OpenDentalGraph.Cache {
 			return
 				"SELECT PatNum, MIN(ProcDate) FirstProc "
 				+"FROM procedurelog USE INDEX(indexPNPSCN) "
+				+"INNER JOIN procedurecode ON procedurecode.CodeNum = procedurelog.CodeNum "
 				+"WHERE ProcStatus="+POut.Int((int)ProcStat.C)+" "
+				+"AND procedurecode.ProcCode NOT IN ('D9986','D9987')"
 				+"GROUP BY PatNum";
 		}
 
 		protected override NewPatient GetInstanceFromDataRow(DataRow x) {
 			return new NewPatient() {
 				DateStamp=x.Field<DateTime>("FirstProc"),
-				Val=1, //Each row counts as 1.
+				Count=1, //Each row counts as 1.
+				Val=0, //there are no fees
 				SeriesName="All", //Only 1 series.
 			};
 		}

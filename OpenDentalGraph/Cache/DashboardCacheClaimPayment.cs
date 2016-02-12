@@ -7,7 +7,7 @@ namespace OpenDentalGraph.Cache {
 		protected override string GetCommand(DashboardFilter filter) {
 			string where="";
 			if(filter.UseDateFilter) {
-				where="DateCP>"+POut.Date(filter.DateFrom)+" AND DateCP<"+POut.Date(filter.DateTo)+" AND ";
+				where="DateCP BETWEEN "+POut.Date(filter.DateFrom)+" AND "+POut.Date(filter.DateTo)+" AND ";
 			}
 			return
 				"SELECT ProvNum,DateCP,SUM(InsPayAmt) AS GrossIncome "
@@ -23,6 +23,7 @@ namespace OpenDentalGraph.Cache {
 				ProvNum=provNum,
 				DateStamp=x.Field<DateTime>("DateCP"),
 				Val=x.Field<double>("GrossIncome"),
+				Count=0, //nothing to count for income.
 				SeriesName=provName,
 			};
 		}

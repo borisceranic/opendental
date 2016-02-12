@@ -7,7 +7,7 @@ namespace OpenDentalGraph.Cache {
 		protected override string GetCommand(DashboardFilter filter) {
 			string where="";
 			if(filter.UseDateFilter) {
-				where="DatePay>"+POut.Date(filter.DateFrom)+" AND DatePay<"+POut.Date(filter.DateTo)+" AND ";
+				where="DatePay BETWEEN "+POut.Date(filter.DateFrom)+" AND "+POut.Date(filter.DateTo)+" AND ";
 			}
 			return
 				"SELECT ProvNum,DatePay,SUM(SplitAmt) AS GrossSplit "
@@ -23,6 +23,7 @@ namespace OpenDentalGraph.Cache {
 				ProvNum=provNum,
 				DateStamp=x.Field<DateTime>("DatePay"),
 				Val=x.Field<double>("GrossSplit"),
+				Count=0, //counting paysplits is not useful
 				SeriesName=seriesName,
 			};
 		}
