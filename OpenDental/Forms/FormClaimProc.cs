@@ -1736,20 +1736,21 @@ namespace OpenDental
 				return;
 			}
 			Fee FeeCur=Fees.GetFee(proc.CodeNum,feeSched,proc.ClinicNum,proc.ProvNum);
+			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
 			FormFeeEdit FormFE=new FormFeeEdit();
 			if(FeeCur==null){
 				FeeCur=new Fee();
 				FeeCur.FeeSched=feeSched;
 				FeeCur.CodeNum=proc.CodeNum;
-				FeeCur.ClinicNum=proc.ClinicNum;
-				FeeCur.ProvNum=proc.ProvNum;
+				FeeCur.ClinicNum=(FeeScheds.GetOne(feeSched,listFeeScheds).IsGlobal) ? 0 : proc.ClinicNum;
+				FeeCur.ProvNum=(FeeScheds.GetOne(feeSched,listFeeScheds).IsGlobal) ? 0 : proc.ProvNum;
 				Fees.Insert(FeeCur);
 				//SecurityLog is updated in FormFeeEdit.
 				FormFE.IsNew=true;
 			}
 			//Make an audit entry that the user manually launched the Fee Edit window from this location.
 			SecurityLogs.MakeLogEntry(Permissions.ProcFeeEdit,0,Lan.g(this,"Procedure")+": "+ProcedureCodes.GetStringProcCode(FeeCur.CodeNum)
-				+", "+Lan.g(this,"Fee: ")+""+FeeCur.Amount.ToString("c")+", "+Lan.g(this,"Fee Schedule")+": "+FeeScheds.GetDescription(FeeCur.FeeSched)
+				+", "+Lan.g(this,"Fee")+": "+FeeCur.Amount.ToString("c")+", "+Lan.g(this,"Fee Schedule")+": "+FeeScheds.GetDescription(FeeCur.FeeSched)
 				+". "+Lan.g(this,"Manually launched Edit Fee window via Edit Claim Procedure window."),FeeCur.CodeNum);
 			FormFE.FeeCur=FeeCur;
 			FormFE.ShowDialog();
