@@ -39,7 +39,7 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<ApptComm>>(MethodBase.GetCurrentMethod(),dateTimeStart,dateTimeEnd);
 			}
-			string command="SELECT * FROM apptcomm WHERE DateTimeSend BETWEEN "+POut.DateT(dateTimeStart)+" AND "+POut.DateT(dateTimeEnd)+")";
+			string command="SELECT * FROM apptcomm WHERE DateTimeSend BETWEEN "+POut.DateT(dateTimeStart)+" AND "+POut.DateT(dateTimeEnd);
 			return Crud.ApptCommCrud.SelectMany(command);
 		}
 
