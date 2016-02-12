@@ -1038,7 +1038,7 @@ namespace OpenDentBusiness
 				//2300 HI: PR (institutional) Patient's Reason for Visit. Situational. Required for outpatient visits.
 				if(medType==EnumClaimMedType.Institutional && listDiagnoses.Count>0 && listDiagnoses[0]!="") {//Ensure at least one (principal) diagnosis exists.
 					sw.Write("HI"+s
-						+"PR"+isa16//HI01-1 1/3 Code List Qualifier Code: PR=ICD-9 Patient's Reason for Visit.
+						+((listDiagnosesVersions[0]==9)?"PR":"APR")+isa16//HI01-1 1/3 Code List Qualifier Code: PR=ICD-9,APR=ICD-10 Patient's Reason for Visit.
 						+Sout(listDiagnoses[0].Replace(".",""),30));//HI01-2 1/30 Industry Code: No periods. This is not really principal diagnosis but is close to the same, so someday we will add this field to claim.
 					EndSegment(sw);
 				}
