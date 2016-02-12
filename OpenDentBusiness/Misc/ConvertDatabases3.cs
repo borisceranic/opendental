@@ -12993,6 +12993,57 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ApptModuleAdjustmentsInProd','0')";
 					Db.NonQ(command);
 				}
+				//Insert Romexis bridge-----------------------------------------------------------------
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+							+") VALUES("
+							+"'Romexis', "
+							+"'Romexis from www.planmeca.com', "
+							+"'0', "
+							+"'"+POut.String(@"C:\Program Files\Planmeca\Romexis")+"', "
+							+"'', "//leave blank if none
+							+"'')";
+					long programNum=Db.NonQ(command,true);
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+							+") VALUES("
+							+"'"+POut.Long(programNum)+"', "
+							+"'Enter 0 to use PatientNum, or 1 to use ChartNum', "
+							+"'0')";
+					Db.NonQ(command);
+					command="INSERT INTO toolbutitem (ProgramNum,ToolBar,ButtonText) "
+							+"VALUES ("
+							+"'"+POut.Long(programNum)+"', "
+							+"'2', "//ToolBarsAvail.ChartModule
+							+"'Romexis')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO program (ProgramNum,ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+							+") VALUES("
+							+"(SELECT MAX(ProgramNum)+1 FROM program),"
+							+"'Romexis', "
+							+"'Romexis from www.planmeca.com', "
+							+"'0', "
+							+"'"+POut.String(@"C:\Program Files\Planmeca\Romexis")+"', "
+							+"'', "//leave blank if none
+							+"'')";
+					long programNum=Db.NonQ(command,true);
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ClinicNum"
+							+") VALUES("
+							+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+							+"'"+POut.Long(programNum)+"', "
+							+"'Enter 0 to use PatientNum, or 1 to use ChartNum', "
+							+"'0', "
+							+"0)";
+					Db.NonQ(command);
+					command="INSERT INTO toolbutitem (ToolButItemNum,ProgramNum,ToolBar,ButtonText) "
+							+"VALUES ("
+							+"(SELECT MAX(ToolButItemNum)+1 FROM toolbutitem),"
+							+"'"+POut.Long(programNum)+"', "
+							+"'2', "//ToolBarsAvail.ChartModule
+							+"'Romexis')";
+					Db.NonQ(command);
+				}//end Romexis bridge
 				command="UPDATE preference SET ValueString = '16.1.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}

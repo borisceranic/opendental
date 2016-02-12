@@ -5,11 +5,11 @@ using OpenDentBusiness;
 using System.Collections.Generic;
 
 namespace OpenDental.Bridges{
-	///<summary>This bridge is now known as "Dimaxis" in the program links list.</summary>
-	public class Planmeca{
+	/// <summary></summary>
+	public class Romexis{
 
 		/// <summary></summary>
-		public Planmeca(){
+		public Romexis(){
 			
 		}
 
@@ -33,7 +33,7 @@ namespace OpenDental.Bridges{
 			}
 			info+="\""+pat.LName.Replace("\"","")+"\" "
 				+"\""+pat.FName.Replace("\"","")+"\" "
-				+"\""+pat.Birthdate.ToString("dd/MM/yyyy")+"\"";//Planmeca is a Finland based company, so their date format is dd/MM/yyyy. We used to send date format "MM/dd/yyyy" for our American customers before 12/19/2011.
+				+"\""+pat.Birthdate.ToString("yyyyMMdd")+"\"";
 			try{
 				Process.Start(path,info);
 			}

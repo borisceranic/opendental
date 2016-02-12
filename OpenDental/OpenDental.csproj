@@ -251,6 +251,7 @@
     <Compile Include="Bridges\CDS.cs" />
     <Compile Include="Bridges\CleaRay.cs" />
     <Compile Include="Bridges\DentalIntel.cs" />
+    <Compile Include="Bridges\Romexis.cs" />
     <Compile Include="Bridges\Podium.cs" />
     <Compile Include="Bridges\DentalTek.cs" />
     <Compile Include="Bridges\DemandForce.cs">

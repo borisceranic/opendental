@@ -129,6 +129,10 @@ namespace OpenDental{
 				Digora.SendData(prog,pat);
 				return;
 			}
+			else if(prog.ProgName==ProgramName.Dimaxis.ToString()) {
+				Planmeca.SendData(prog,pat);
+				return;
+			}
 			else if(prog.ProgName==ProgramName.Office.ToString()) {
 				Office.SendData(prog,pat);
 				return;
@@ -207,10 +211,6 @@ namespace OpenDental{
 				PerioPal.SendData(prog,pat);
 				return;
 			}
-			else if(prog.ProgName==ProgramName.Planmeca.ToString()) {
-				Planmeca.SendData(prog,pat);
-				return;
-			}
 			else if(prog.ProgName==ProgramName.Progeny.ToString()) {
 				Progeny.SendData(prog,pat);
 				return;
@@ -225,6 +225,10 @@ namespace OpenDental{
 			}
 			else if(prog.ProgName==ProgramName.RayMage.ToString()) {
 				RayMage.SendData(prog,pat);
+				return;
+			}
+			else if(prog.ProgName==ProgramName.Romexis.ToString()) {
+				Romexis.SendData(prog,pat);
 				return;
 			}
 			else if(prog.ProgName==ProgramName.Scanora.ToString()) {
