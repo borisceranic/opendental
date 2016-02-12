@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace OpenDentBusiness {
 	///<summary>X12 834 Benefit Enrollment and Maintenance.  This transaction is used to push insurance plan information to pseudo clearinghouses.</summary>
@@ -475,7 +476,8 @@ namespace OpenDentBusiness {
 			//NM108 & NM109:
 			member.Pat.SSN="";
 			if(member.MemberName.IdentificationCodeQualifier=="34") {//The only other code is "ZZ" which is useless to us.
-				member.Pat.SSN=member.MemberName.IdentificationCode;
+				//Ignore puncuation (digits only) as required for this column when saved to the database.
+				member.Pat.SSN=Regex.Replace(member.MemberName.IdentificationCode,"[^0-9]","");
 			}
 			//NM110 through NM112: Not used
 			member.Pat.Preferred="";
@@ -493,6 +495,11 @@ namespace OpenDentBusiness {
 				member.MemberCommunicationsNumbers.CommunicationNumberQualifier2,member.MemberCommunicationsNumbers.CommunicationNumber2,
 				member.MemberCommunicationsNumbers.CommunicationNumberQualifier3,member.MemberCommunicationsNumbers.CommunicationNumber3,
 			};
+			member.Pat.AddrNote=null;
+			member.Pat.WirelessPhone=null;
+			member.Pat.Email=null;
+			member.Pat.HmPhone=null;
+			member.Pat.WkPhone=null;
 			for(int i=0;i<arrayNumbers.Length;i+=2) {
 				string qualifier=arrayNumbers[i];
 				string number=arrayNumbers[i+1];
@@ -613,7 +620,6 @@ namespace OpenDentBusiness {
 				member.Pat.Position=PatientPosition.Married;//We do not have this status currently.  Closest match used instead.
 			}
 			//DMG05:
-			//TODO: After inserting Pat, call: PatientRaces.Reconcile(PatCur.PatNum,listPatRaces);//Insert, Update, Delete if needed.
 			member.ListPatRaces.Clear();
 			if(member.MemberDemographics.CompositeRaceOrEthnicityInformation.StartsWith("7")) {//Not Provided
 				member.ListPatRaces.Add(PatRace.DeclinedToSpecifyRace);
@@ -1579,6 +1585,7 @@ namespace OpenDentBusiness {
 			}
 			return "";
 		}
+
 	}
 
 	///<summary>Loop 2000</summary>
@@ -1689,6 +1696,165 @@ namespace OpenDentBusiness {
 				return "Audit";
 			}
 			return "";
+		}
+
+		///<summary>Returns a merged patient corresponding to the member.
+		///Uupdates/inserts the patient in to the database and also updates/inserts into listPatients.
+		///Returns null if the patient does not exist in the database yet and the Ins834IsPatientCreate preference is false.
+		///Also returns null when the multiple possible matches are located, in which case no insert/update is performed.</summary>
+		public Patient GetPatientMatch(List <Patient> listPatients) {
+			//Match the member based on SSN.
+			List<Patient> listPatMatches=new List<Patient>();
+			if(!String.IsNullOrEmpty(Pat.SSN) && Pat.SSN!="000000000") {
+				for(int i=0;i<listPatients.Count;i++) {
+					if(listPatients[i].SSN==Pat.SSN) {
+						listPatMatches.Add(listPatients[i]);
+						break;
+					}
+				}
+			}
+			if(listPatMatches.Count==1) {
+				return MergePatientIntoDbPatient(listPatMatches[0]);//Exactly 1 SSN match.
+			}
+			else if(listPatMatches.Count > 1) {
+				return null;//Multiple SSN matches -_-  We cannot decide who the patient is.
+			}
+			//No SSN matches.  Find patients with same last name, ignoring case and leading/trailing space.
+			List <Patient> listPatLastNameMatches=new List<Patient>();
+			for(int i=0;i<listPatients.Count;i++) {
+				if(listPatients[i].LName.Trim().ToLower()==Pat.LName.Trim().ToLower()) {//Last name match.
+					listPatLastNameMatches.Add(listPatients[i]);
+				}
+			}
+			//Find patients with same first name (full or partial match, full preferred).  Ignore case and leading/trailing space.
+			List <Patient> listPatFirstNameMatches=new List<Patient>();
+			List <Patient> listPatFirstNamePartialMatches=new List<Patient>();
+			for(int i=0;i<listPatLastNameMatches.Count;i++) {
+				string firstNameInDb=listPatLastNameMatches[i].FName.Trim().ToLower();
+				if(firstNameInDb==Pat.FName.Trim().ToLower()) {
+					listPatFirstNameMatches.Add(listPatLastNameMatches[i]);
+				}
+				else if(firstNameInDb.Length>=2 && Pat.FName.Trim().ToLower().StartsWith(firstNameInDb)) {
+					//Unfortunately, in the real world when processing 835s (not necessarily 834s), we have observed carriers returning the patient's first name 
+					//followed by a space followed by the patient middle name all within the first name field.  This issue is probably due to human error when
+					//the carrier's staff typed the patient name into their system.  All we can do is try to cope with this situation.  We mimic the behavior 
+					//of 835s here in anticipation of similar human errors.
+					listPatFirstNamePartialMatches.Add(listPatLastNameMatches[i]);
+				}
+			}
+			if(listPatFirstNameMatches.Count > 0) {
+				listPatMatches=listPatFirstNameMatches;
+			}
+			else if(listPatFirstNamePartialMatches.Count > 0) {
+				listPatMatches=listPatFirstNamePartialMatches;
+			}
+			else {
+				//An SSN or name match is required.  Insert patient since not found by any of the primary identifiers.
+				if(!PrefC.GetBool(PrefName.Ins834IsPatientCreate)) {
+					return null;//The user does not want to insert any patients.
+				}
+				Patients.Insert(Pat,false);
+				listPatients.Add(Pat);
+				//TODO: Securitylog entry.
+				return Pat;
+			}
+			//At this point, we have found a match by name.  For those patients with a name match, find those patients with matching birtdate.
+			//We prefer a patient with a mathcing birthdate and name over a match by name only.
+			List <Patient> listPatBirthdateMatches=new List<Patient>();
+			for(int i=0;i<listPatMatches.Count;i++) {
+				if(Pat.Birthdate.Year > 1880 && listPatMatches[i].Birthdate.Year > 1880 
+					&& listPatMatches[i].Birthdate.Date==Pat.Birthdate.Date)
+				{
+					listPatBirthdateMatches.Add(listPatMatches[i]);
+				}
+			}
+			if(listPatBirthdateMatches.Count==1) {
+				return MergePatientIntoDbPatient(listPatBirthdateMatches[0]);
+			}
+			else if(listPatBirthdateMatches.Count > 1) {
+				return null;//More than one name and birthdate match -_-  We cannot decide who the correct patient is.
+			}
+			//No birthdate matches.  A name only match will suffice.
+			if(listPatMatches.Count==1) {
+				return MergePatientIntoDbPatient(listPatMatches[0]);
+			}
+			return null;//Multiple name matches.  We cannot decide who the correct patient is.
+		}
+
+		///<summary>Copies the data from applicable member fields into the given patDb and updates the database.</summary>
+		private Patient MergePatientIntoDbPatient(Patient patDb) {
+			if(Pat.StudentStatus!=null) {//Student status is situational information.  Only overwrite existing value if a new value was specified.
+				patDb.StudentStatus=Pat.StudentStatus;
+			}
+			if(Pat.DateTimeDeceased.Year > 1880) {//Date deceased is situational information.  Only overwrite existing value if a new value was specified.
+				patDb.DateTimeDeceased=Pat.DateTimeDeceased;
+			}
+			patDb.LName=Pat.LName;//Last Name is a required field.  This will only change the patDb if the patDb was matched based on SSN.
+			if(Pat.SSN!="") {//SSN is situational information.  Only overwrite existing value if a new value was specified.
+				patDb.SSN=Pat.SSN;
+				patDb.MiddleI=Pat.MiddleI;//The patinet Middle Initial must have been specified, as required by the format.  May be blank.
+				patDb.FName=Pat.FName;//The patinet First Name must have been specified, as required by the format.  May be blank.
+			}
+			else if(Pat.MiddleI!="") {//Middle Name is situational information.  Only overwrite existing value if a new value was specified.
+				patDb.MiddleI=Pat.MiddleI;
+				patDb.FName=Pat.FName;//The patinet First Name must have been specified, as required by the format.  May be blank.
+			}
+			else if(Pat.FName!="") {//First Name is situational information.  Only overwrite existing value if a new value was specified.
+				patDb.FName=Pat.FName;
+			}			
+			if(Pat.AddrNote!=null) {//Additinal contact information is situational information.  Only overwrite existing value if a new value was specified.
+				//For now we will not import because this information is not very useful.
+				//Additionally, importing this data is problematic because we do not know if we should overwrite, or if we should append to the existing data.
+				//patDb.AddrNote=Pat.AddrNote;
+			}
+			if(Pat.WirelessPhone!=null) {//Wireless Phone is situational information.  Only overwrite existing value if a new value was specified.
+				patDb.WirelessPhone=Pat.WirelessPhone;
+			}
+			if(Pat.Email!=null) {//Email is situational information.  Only overwrite existing value if a new value was specified.
+				patDb.Email=Pat.Email;
+			}
+			if(Pat.HmPhone!=null) {//Home Phone is situational information.  Only overwrite existing value if a new value was specified.
+				patDb.HmPhone=Pat.HmPhone;
+			}
+			if(Pat.WkPhone!=null) {//Work Phone is situational information.  Only overwrite existing value if a new value was specified.
+				patDb.WkPhone=Pat.WkPhone;
+			}
+			if(Pat.Address2!=null) {//Address is situational information.  Only overwrite existing value if a new value was specified.
+				patDb.Address2=Pat.Address2;
+				patDb.Address=Pat.Address;//The patient Address must have been specified, as required by the format.  May be blank.
+			}
+			else if(Pat.Address!=null) {//Address is situational information.  Only overwrite existing value if a new value was specified.
+				patDb.Address=Pat.Address;
+			}
+			if(Pat.Zip!=null) {
+				patDb.Zip=Pat.Zip;
+				patDb.State=Pat.State;//The patient State must have been specified, as required by the format.  May be blank.
+				patDb.City=Pat.City;//The patient City must have been specified, as required by the format.  May be blank.
+			}
+			else if(Pat.State!=null) {
+				patDb.State=Pat.State;
+				patDb.City=Pat.City;//The patient City must have been specified, as required by the format.  May be blank.
+			}
+			else if(Pat.City!=null) {
+				patDb.City=Pat.City;
+			}
+			if(MemberDemographics!=null) {
+				patDb.Birthdate=Pat.Birthdate;//Birthdate is a required field.
+				patDb.Gender=Pat.Gender;//Gender is a required field.
+				if(MemberDemographics.MaritalStatusCode!="") {//The patient marital status is situational information.  Only overwrite if specified.
+					patDb.Position=Pat.Position;
+				}
+				if(MemberDemographics.CompositeRaceOrEthnicityInformation!="") {
+					PatientRaces.Reconcile(patDb.PatNum,ListPatRaces);//Insert, Update, Delete if needed.
+				}
+			}
+			if(ListMemberLanguages.Count > 0) {//The patient language is situational information.  Only overwrite if specified.
+				patDb.Language=Pat.Language;
+			}
+			if(ListMemberSchools.Count > 0) {//The patient school is situational information.  Only overwrite if specified.
+				patDb.SchoolName=Pat.SchoolName;
+			}
+			return patDb;
 		}
 
 	}

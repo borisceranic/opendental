@@ -27,6 +27,7 @@ namespace OpenDental{
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.gridInsPlans = new OpenDental.UI.ODGrid();
+			this.checkIsPatientCreate = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// butOK
@@ -68,19 +69,29 @@ namespace OpenDental{
 			this.gridInsPlans.HasAddButton = false;
 			this.gridInsPlans.HasMultilineHeaders = false;
 			this.gridInsPlans.HScrollVisible = false;
-			this.gridInsPlans.Location = new System.Drawing.Point(12, 12);
+			this.gridInsPlans.Location = new System.Drawing.Point(12, 28);
 			this.gridInsPlans.Name = "gridInsPlans";
 			this.gridInsPlans.ScrollValue = 0;
 			this.gridInsPlans.SelectionMode = OpenDental.UI.GridSelectionMode.None;
-			this.gridInsPlans.Size = new System.Drawing.Size(950, 642);
+			this.gridInsPlans.Size = new System.Drawing.Size(950, 626);
 			this.gridInsPlans.TabIndex = 4;
 			this.gridInsPlans.Title = "Ins Plans";
 			this.gridInsPlans.TranslationName = null;
+			// 
+			// checkIsPatientCreate
+			// 
+			this.checkIsPatientCreate.Location = new System.Drawing.Point(12, 7);
+			this.checkIsPatientCreate.Name = "checkIsPatientCreate";
+			this.checkIsPatientCreate.Size = new System.Drawing.Size(434, 20);
+			this.checkIsPatientCreate.TabIndex = 8;
+			this.checkIsPatientCreate.Text = "Create new patient when importing plans for an unknown patient.";
+			this.checkIsPatientCreate.UseVisualStyleBackColor = true;
 			// 
 			// FormEtrans834Preview
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 696);
+			this.Controls.Add(this.checkIsPatientCreate);
 			this.Controls.Add(this.gridInsPlans);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
@@ -100,5 +111,6 @@ namespace OpenDental{
 		private OpenDental.UI.Button butOK;
 		private OpenDental.UI.Button butCancel;
 		private UI.ODGrid gridInsPlans;
+		private System.Windows.Forms.CheckBox checkIsPatientCreate;
 	}
 }

@@ -26,7 +26,6 @@ namespace OpenDental{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEtrans834Import));
 			this.label1 = new System.Windows.Forms.Label();
 			this.folderBrowserImportPath = new System.Windows.Forms.FolderBrowserDialog();
-			this.checkIsPatientCreate = new System.Windows.Forms.CheckBox();
 			this.gridInsPlanFiles = new OpenDental.UI.ODGrid();
 			this.butImport = new OpenDental.UI.Button();
 			this.butRefresh = new OpenDental.UI.Button();
@@ -44,15 +43,6 @@ namespace OpenDental{
 			this.label1.TabIndex = 5;
 			this.label1.Text = "Import Path";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-			// 
-			// checkIsPatientCreate
-			// 
-			this.checkIsPatientCreate.Location = new System.Drawing.Point(204, 66);
-			this.checkIsPatientCreate.Name = "checkIsPatientCreate";
-			this.checkIsPatientCreate.Size = new System.Drawing.Size(434, 20);
-			this.checkIsPatientCreate.TabIndex = 7;
-			this.checkIsPatientCreate.Text = "Create new patient when importing plans for an unknown patient.";
-			this.checkIsPatientCreate.UseVisualStyleBackColor = true;
 			// 
 			// gridInsPlanFiles
 			// 
@@ -168,7 +158,6 @@ namespace OpenDental{
 			this.Controls.Add(this.butImport);
 			this.Controls.Add(this.butRefresh);
 			this.Controls.Add(this.gridInsPlanFiles);
-			this.Controls.Add(this.checkIsPatientCreate);
 			this.Controls.Add(this.butImportPathPick);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.textImportPath);
@@ -193,7 +182,6 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label1;
 		private UI.Button butImportPathPick;
 		private System.Windows.Forms.FolderBrowserDialog folderBrowserImportPath;
-		private System.Windows.Forms.CheckBox checkIsPatientCreate;
 		private UI.ODGrid gridInsPlanFiles;
 		private UI.Button butRefresh;
 		private UI.Button butImport;

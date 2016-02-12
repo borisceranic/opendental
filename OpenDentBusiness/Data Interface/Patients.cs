@@ -858,6 +858,16 @@ namespace OpenDentBusiness{
 			return table;
 		}
 
+		///<summary>Useful when you expect to individually examine most of the patients in the database during a data import.
+		///Saves time and database calls to call this method once and keep a short term cache than it is to run a services of select statements.</summary>
+		public static List<Patient> GetAllPatients() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Patient>>(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT * FROM patient WHERE PatStatus != 4";
+			return Crud.PatientCrud.SelectMany(command);
+		}
+
 		///<summary></summary>
 		public static void UpdateAddressForFam(Patient pat){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

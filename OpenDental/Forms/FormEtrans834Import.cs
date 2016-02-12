@@ -21,7 +21,6 @@ namespace OpenDental {
 
 		private void FormEtrans834Import_Load(object sender,EventArgs e) {
 			textImportPath.Text=PrefC.GetString(PrefName.Ins834ImportPath);
-			checkIsPatientCreate.Checked=PrefC.GetBool(PrefName.Ins834IsPatientCreate);
 			FillGridInsPlanFiles();
 		}
 
@@ -184,7 +183,6 @@ namespace OpenDental {
 				return;
 			}
 			Prefs.UpdateString(PrefName.Ins834ImportPath,textImportPath.Text);
-			Prefs.UpdateBool(PrefName.Ins834IsPatientCreate,checkIsPatientCreate.Checked);
 			DialogResult=DialogResult.OK;
 		}
 

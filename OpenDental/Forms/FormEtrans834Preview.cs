@@ -19,6 +19,7 @@ namespace OpenDental {
 
 		private void FormEtrans834Preview_Load(object sender,EventArgs e) {
 			Cursor=Cursors.WaitCursor;
+			checkIsPatientCreate.Checked=PrefC.GetBool(PrefName.Ins834IsPatientCreate);
 			FillGridInsPlans();
 			Cursor=Cursors.Default;
 		}
@@ -54,7 +55,12 @@ namespace OpenDental {
 							row.Tag=member;
 							gridInsPlans.Rows.Add(row);
 							row.Cells.Add(member.Pat.GetNameLF());//Name
-							row.Cells.Add(member.Pat.Birthdate.ToShortDateString());//Birthdate
+							if(member.Pat.Birthdate.Year > 1880) {
+								row.Cells.Add(member.Pat.Birthdate.ToShortDateString());//Birthdate
+							}
+							else {
+								row.Cells.Add("");//Birthdate
+							}
 							row.Cells.Add(member.Pat.SSN);//SSN
 							row.Cells.Add(member.GetPatMaintTypeDescript());//Maint
 							row.Cells.Add("");//Date Begin
@@ -71,11 +77,26 @@ namespace OpenDental {
 								row.Tag=healthCoverage;
 								gridInsPlans.Rows.Add(row);
 								row.Cells.Add(member.Pat.GetNameLF());//Name
-								row.Cells.Add(member.Pat.Birthdate.ToShortDateString());//Birthdate
+								if(member.Pat.Birthdate.Year > 1880) {
+									row.Cells.Add(member.Pat.Birthdate.ToShortDateString());//Birthdate
+								}
+								else {
+									row.Cells.Add("");//Birthdate
+								}
 								row.Cells.Add(member.Pat.SSN);//SSN
 								row.Cells.Add(healthCoverage.GetCoverageMaintTypeDescript());//Maint
-								row.Cells.Add(healthCoverage.Sub.DateEffective.ToShortDateString());//Date Begin
-								row.Cells.Add(healthCoverage.Sub.DateTerm.ToShortDateString());//Date Term
+								if(healthCoverage.Sub.DateEffective.Year > 1880) {
+									row.Cells.Add(healthCoverage.Sub.DateEffective.ToShortDateString());//Date Begin
+								}
+								else {
+									row.Cells.Add("");//Date Begin
+								}
+								if(healthCoverage.Sub.DateTerm.Year > 1880) {
+									row.Cells.Add(healthCoverage.Sub.DateTerm.ToShortDateString());//Date Term
+								}
+								else {
+									row.Cells.Add("");//Date Term
+								}
 								row.Cells.Add(member.PlanRelat.ToString());//Relation
 								row.Cells.Add(member.SubscriberId);//SubscriberID
 								row.Cells.Add(member.GroupNum);//GroupNum
@@ -91,15 +112,30 @@ namespace OpenDental {
 
 		private void butOK_Click(object sender,EventArgs e) {
 			Cursor=Cursors.WaitCursor;
-			//TODO: Get a cache of all patients in order to save processing time.
+			Prefs.UpdateBool(PrefName.Ins834IsPatientCreate,checkIsPatientCreate.Checked);
+			List<Patient> listPatients=Patients.GetAllPatients();//Testing this on an average sized database took about 1 second to run on a dev machine.
+			int updatedCount=0;
 			for(int i=0;i<gridInsPlans.Rows.Count;i++) {
-				Hx834_Member member;
+				Hx834_Member member=null;
+				Hx834_HealthCoverage healthCoverage=null;
 				if(gridInsPlans.Rows[i].Tag is Hx834_Member) {
 					member=(Hx834_Member)gridInsPlans.Rows[i].Tag;
 				}
-				//TODO: Match the member based first on SSN, then on (last name) + (birthdate) + (partial first name)
+				else if(gridInsPlans.Rows[i].Tag is Hx834_HealthCoverage) {
+					healthCoverage=(Hx834_HealthCoverage)gridInsPlans.Rows[i].Tag;
+					member=healthCoverage.Member;
+				}
+				//The patient's status is not affected by the maintenance code.  After reviewing all of the possible maintenance codes in 
+				//member.MemberLevelDetail.MaintenanceTypeCode, we believe that all statuses suggest either insert or update, except for "Cancel".
+				//Nathan and Derek feel that archiving the patinet in response to a Cancel request is a bit drastic.
+				//Thus we ignore the patient maintenance code and always assume insert/update.
+				Patient patMatch=member.GetPatientMatch(listPatients);
+				if(patMatch!=null) {
+					updatedCount++;
+				}
 			}
 			Cursor=Cursors.Default;
+			MessageBox.Show(Lan.g(this,"Done.  Number of patients updated: ")+updatedCount);
 			DialogResult=DialogResult.OK;
 		}
 
