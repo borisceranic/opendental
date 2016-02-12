@@ -3157,6 +3157,7 @@ namespace UnitTests {
 			procs.FindAll(x => x.ProcDate.Month==11)
 				.ForEach(x => Procedures.Delete(x.ProcNum));
 			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
+			procs=Procedures.Refresh(pat.PatNum);
 			//Make sure that the correct number of procedures were added using the correct repeating charges
 			if(procs.Count!=6
 				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #1").Count!=1
@@ -3178,6 +3179,7 @@ namespace UnitTests {
 			procs.FindAll(x => x.ProcDate.Month==12)
 				.ForEach(x => Procedures.Delete(x.ProcNum));
 			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
+			procs=Procedures.Refresh(pat.PatNum);
 			//Make sure that the correct number of procedures were added using the correct repeating charges
 			if(procs.Count!=6
 				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #1").Count!=1
@@ -3199,6 +3201,7 @@ namespace UnitTests {
 			procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #1")
 				.ForEach(x => Procedures.Delete(x.ProcNum));
 			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
+			procs=Procedures.Refresh(pat.PatNum);
 			//Make sure that the correct number of procedures were added using the correct repeating charges
 			if(procs.Count!=6
 				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #1").Count!=1
@@ -3220,6 +3223,7 @@ namespace UnitTests {
 			procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #1")
 				.ForEach(x => Procedures.Delete(x.ProcNum));
 			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
+			procs=Procedures.Refresh(pat.PatNum);
 			//Make sure that the correct number of procedures were added using the correct repeating charges
 			if(procs.Count!=6
 				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #1").Count!=1
