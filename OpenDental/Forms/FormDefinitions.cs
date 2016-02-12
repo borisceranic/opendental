@@ -450,7 +450,7 @@ namespace OpenDental{
 					//SelectedCat=18;
 					//FormDefEdit.EnableValue=true;
 					FormDefEdit.ValueText=Lan.g(this,"Usage");
-					FormDefEdit.HelpText=Lan.g(this,"These are the categories that will be available in the image and chart modules.  If you hide a category, images in that category will be hidden, so only hide a category if you are certain it has never been used.  Multiple categories can be set to show in the Chart module, but only one category should set for patient pictures, statements, and tooth chart. Affects all patient records.");
+					FormDefEdit.HelpText=Lan.g(this,"These are the categories that will be available in the image and chart modules.  If you hide a category, images in that category will be hidden, so only hide a category if you are certain it has never been used.  Multiple categories can be set to show in the Chart module, but only one category should be set for patient pictures, statements, and tooth charts. Selecting multiple categories for treatment plans will save the treatment plan in each category. Affects all patient records.");
 					break;
 				case 16://"Insurance Payment Types":
 					butHide.Visible=false;

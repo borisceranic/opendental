@@ -3318,7 +3318,8 @@ namespace OpenDental{
 			}
 			List<Document> retVal=new List<Document>();
 			//Determine each of the document categories that this TP should be saved to.
-			List<long> categories=DefC.Short[(int)DefCat.ImageCats].Where(x => x.ItemValue=="R" || x.ItemValue=="XR").Select(x=>x.DefNum).ToList();
+			//"R"==TreatmentPlan; see FormDefEditImages.cs
+			List<long> categories=DefC.Short[(int)DefCat.ImageCats].Where(x => x.ItemValue.Contains("R")).Select(x=>x.DefNum).ToList();
 			if(isSigSave && categories.Count==0 && PrefC.GetBool(PrefName.TreatPlanSaveSignedToPdf)) {
 				//we must save at least one document, pick first non-hidden image category.
 				Def imgCat=DefC.Short[(int)DefCat.ImageCats].FirstOrDefault(x => !x.IsHidden);
