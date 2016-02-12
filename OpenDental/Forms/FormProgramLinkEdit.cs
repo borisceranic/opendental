@@ -41,7 +41,6 @@ namespace OpenDental{
 		private Label label5;
 		private TextBox textOverride;
 		private Label labelOverride;
-		private List<ProgramProperty> ProgramPropertiesForProgram;
 		private UI.Button butClear;
 		private UI.Button butImport;
 		private Label label10;
@@ -546,7 +545,7 @@ namespace OpenDental{
 		}
 
 		private void FillGrid(){
-			ProgramPropertiesForProgram=ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
+			List<ProgramProperty> ProgramPropertiesForProgram=ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g(this,"Property"),260);
@@ -562,6 +561,7 @@ namespace OpenDental{
 				row=new ODGridRow();
 				row.Cells.Add(property.PropertyDesc);
 				row.Cells.Add(property.PropertyValue);
+				row.Tag=property;
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
@@ -570,7 +570,7 @@ namespace OpenDental{
 
 		private void gridMain_CellDoubleClick(object sender,OpenDental.UI.ODGridClickEventArgs e) {
 			FormProgramProperty FormPP=new FormProgramProperty();
-			FormPP.ProgramPropertyCur=(ProgramProperty)ProgramPropertiesForProgram[e.Row];
+			FormPP.ProgramPropertyCur=(ProgramProperty)gridMain.Rows[e.Row].Tag;
 			FormPP.ShowDialog();
 			if(FormPP.DialogResult!=DialogResult.OK) {
 				return;
