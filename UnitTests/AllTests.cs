@@ -3390,7 +3390,96 @@ namespace UnitTests {
 			return "56: Passed.  Repeat charges not posting before the start date.\r\n";
 		}
 
+		///<summary>Fees logic: #1: For PPOInsPlan1, Dr. Jones, Dr. Smith, and Dr. Wilson have different fees.</summary>
+		public static string TestFiftySeven(int specificTest) {
+			if(specificTest!=0 && specificTest!=57) {
+				return "";
+			}
+			Patient pat=PatientT.CreatePatient("57");
+			long feeSchedNum=FeeSchedT.CreateFeeSched(FeeScheduleType.Normal,"PPOInsPlan1");
+			long codeNum=ProcedureCodes.GetCodeNum("D2750");
+			long provNum1=ProviderT.CreateProvider("1-57");
+			long provNum2=ProviderT.CreateProvider("2-57");
+			long provNum3=ProviderT.CreateProvider("3-57");
+			FeeT.CreateFee(feeSchedNum,codeNum,50,0,provNum1);
+			FeeT.CreateFee(feeSchedNum,codeNum,55,0,provNum2);
+			FeeT.CreateFee(feeSchedNum,codeNum,60,0,provNum3);
+			double fee1=Fees.GetFee(codeNum,feeSchedNum,0,provNum1).Amount;
+			double fee2=Fees.GetFee(codeNum,feeSchedNum,0,provNum2).Amount;
+			double fee3=Fees.GetFee(codeNum,feeSchedNum,0,provNum3).Amount;
+			if(fee1!=50
+				|| fee2!=55
+				|| fee3!=60) 
+			{
+				throw new Exception("Incorrect fees returned:\r\n"
+					+"\tFee #1 should be $50, returned value:"+fee1.ToString("C")+"\r\n"
+					+"\tFee #2 should be $55, returned value:"+fee2.ToString("C")+"\r\n"
+					+"\tFee #3 should be $60, returned value:"+fee3.ToString("C")+"\r\n");
+			}
+			return "57: Passed.  Provider specific fees were correctly returned.\r\n";
+		}
+
+		///<summary>Fees logic: #2: Clinic A, B, and C have different standard UCR fees.</summary>
+		public static string TestFiftyEight(int specificTest) {
+			if(specificTest!=0 && specificTest!=58) {
+				return "";
+			}
+			Patient pat=PatientT.CreatePatient("58");
+			long feeSchedNum=FeeSchedT.CreateFeeSched(FeeScheduleType.Normal,"Standard UCR");
+			long codeNum=ProcedureCodes.GetCodeNum("D2750");
+			long clinicNum1=ClinicT.CreateClinic("1-58");
+			long clinicNum2=ClinicT.CreateClinic("2-58");
+			long clinicNum3=ClinicT.CreateClinic("3-58");
+			FeeT.CreateFee(feeSchedNum,codeNum,65,clinicNum1,0);
+			FeeT.CreateFee(feeSchedNum,codeNum,70,clinicNum2,0);
+			FeeT.CreateFee(feeSchedNum,codeNum,75,clinicNum3,0);
+			double fee1=Fees.GetFee(codeNum,feeSchedNum,clinicNum1,0).Amount;
+			double fee2=Fees.GetFee(codeNum,feeSchedNum,clinicNum2,0).Amount;
+			double fee3=Fees.GetFee(codeNum,feeSchedNum,clinicNum3,0).Amount;
+			if(fee1!=65
+				|| fee2!=70
+				|| fee3!=75) 
+			{
+				throw new Exception("Incorrect fees returned:\r\n"
+					+"\tFee #1 should be $65, returned value:"+fee1.ToString("C")+"\r\n"
+					+"\tFee #2 should be $70, returned value:"+fee2.ToString("C")+"\r\n"
+					+"\tFee #3 should be $75, returned value:"+fee3.ToString("C")+"\r\n");
+			}
+			return "58: Passed.  Clinic specific fees were correctly returned.\r\n";
+		}
+
+		///<summary>Fees logic: #3: Dr. Jane and Dr. George have different standard UCR fees. Dr. George's works in two clinics (A and B),
+		///and his standard fees are different depending on the clinic.</summary>
+		public static string TestFiftyNine(int specificTest) {
+			if(specificTest!=0 && specificTest!=59) {
+				return "";
+			}
+			Patient pat=PatientT.CreatePatient("59");
+			long feeSchedNum=FeeSchedT.CreateFeeSched(FeeScheduleType.Normal,"Standard");
+			long codeNum=ProcedureCodes.GetCodeNum("D2750");
+			long provNum1=ProviderT.CreateProvider("1-59");
+			long provNum2=ProviderT.CreateProvider("2-59");
+			long clinicNum1=ClinicT.CreateClinic("1-59");
+			long clinicNum2=ClinicT.CreateClinic("2-59");
+			FeeT.CreateFee(feeSchedNum,codeNum,80,clinicNum1,provNum1);
+			FeeT.CreateFee(feeSchedNum,codeNum,85,clinicNum1,provNum2);
+			FeeT.CreateFee(feeSchedNum,codeNum,90,clinicNum2,provNum2);
+			double fee1=Fees.GetFee(codeNum,feeSchedNum,clinicNum1,provNum1).Amount;
+			double fee2=Fees.GetFee(codeNum,feeSchedNum,clinicNum1,provNum2).Amount;
+			double fee3=Fees.GetFee(codeNum,feeSchedNum,clinicNum2,provNum2).Amount;
+			if(fee1!=80
+				|| fee2!=85
+				|| fee3!=90) 
+			{
+				throw new Exception("Incorrect fees returned:\r\n"
+					+"\tFee #1 should be $80, returned value:"+fee1.ToString("C")+"\r\n"
+					+"\tFee #2 should be $85, returned value:"+fee2.ToString("C")+"\r\n"
+					+"\tFee #3 should be $90, returned value:"+fee3.ToString("C")+"\r\n");
+			}
+			return "59: Passed.  The mixture of providers with multiple clinic specific fees were correctly returned.\r\n";
+		}
 
 
-	}
+
+		}
 }
