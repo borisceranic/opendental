@@ -20,6 +20,7 @@ namespace OpenDental {
 		}
 
 		private void FormEtrans834Import_Load(object sender,EventArgs e) {
+			ShowStatus("Loading...");
 			textImportPath.Text=PrefC.GetString(PrefName.Ins834ImportPath);
 			FillGridInsPlanFiles();
 		}
@@ -81,7 +82,6 @@ namespace OpenDental {
 			else {
 				Text+=message;
 			}
-			Application.DoEvents();
 		}
 
 		private void FillGridInsPlanFiles() {

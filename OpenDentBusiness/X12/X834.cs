@@ -721,6 +721,7 @@ namespace OpenDentBusiness {
 			List<string> listLangWrite=new List<string>();
 			List<string> listLangSpeak=new List<string>();
 			List<string> listLangNative=new List<string>();
+			List<string> listLangPrimary=new List<string>();
 			while(_segCur.IsType("LUI")) {
 				X12_LUI lui=new X12_LUI(_segCur);
 				member.ListMemberLanguages.Add(lui);
@@ -750,11 +751,17 @@ namespace OpenDentBusiness {
 				else if(lui.UseOfLanguageIndicator=="8") {//Native Language
 					listLangNative.Add(lang);
 				}
+				else {//Unspecified usage.  Assume primary.
+					listLangPrimary.Add(lang);
+				}
 				//LUI05: Not used.
 			}
 			//We currently only support one language per patient.  Try to figure out what their primary language is.
 			member.Pat.Language="";
-			if(listLangNative.Count > 0) {
+			if(listLangPrimary.Count > 0) {
+				member.Pat.Language=listLangPrimary[0];
+			}
+			else if(listLangNative.Count > 0) {
 				member.Pat.Language=listLangNative[0];
 			}
 			else if(listLangSpeak.Count > 0) {
@@ -1675,6 +1682,8 @@ namespace OpenDentBusiness {
 		public string SubscriberId;
 		///<summary>The insurance plan group number.  Specified at member level in format.</summary>
 		public string GroupNum;
+		///<summary>This value is set by GetPatientMatch() when a match could not be found.</summary>
+		public string MatchErrorMessage;
 
 		public string GetPatMaintTypeDescript() {
 			if(MemberLevelDetail==null) {
@@ -1703,20 +1712,22 @@ namespace OpenDentBusiness {
 		///Returns null if the patient does not exist in the database yet and the Ins834IsPatientCreate preference is false.
 		///Also returns null when the multiple possible matches are located, in which case no insert/update is performed.</summary>
 		public Patient GetPatientMatch(List <Patient> listPatients) {
+			MatchErrorMessage="";
 			//Match the member based on SSN.
-			List<Patient> listPatMatches=new List<Patient>();
+			List<Patient> listPatSsnMatches=new List<Patient>();
 			if(!String.IsNullOrEmpty(Pat.SSN) && Pat.SSN!="000000000") {
 				for(int i=0;i<listPatients.Count;i++) {
 					if(listPatients[i].SSN==Pat.SSN) {
-						listPatMatches.Add(listPatients[i]);
+						listPatSsnMatches.Add(listPatients[i]);
 						break;
 					}
 				}
 			}
-			if(listPatMatches.Count==1) {
-				return MergePatientIntoDbPatient(listPatMatches[0]);//Exactly 1 SSN match.
+			if(listPatSsnMatches.Count==1) {
+				return MergePatientIntoDbPatient(listPatSsnMatches[0]);//Exactly 1 SSN match.
 			}
-			else if(listPatMatches.Count > 1) {
+			else if(listPatSsnMatches.Count > 1) {
+				MatchErrorMessage=Lans.g(this,"Multiple patients match SSN")+" "+Pat.SSN;
 				return null;//Multiple SSN matches -_-  We cannot decide who the patient is.
 			}
 			//No SSN matches.  Find patients with same last name, ignoring case and leading/trailing space.
@@ -1728,61 +1739,56 @@ namespace OpenDentBusiness {
 			}
 			//Find patients with same first name (full or partial match, full preferred).  Ignore case and leading/trailing space.
 			List <Patient> listPatFirstNameMatches=new List<Patient>();
-			List <Patient> listPatFirstNamePartialMatches=new List<Patient>();
 			for(int i=0;i<listPatLastNameMatches.Count;i++) {
 				string firstNameInDb=listPatLastNameMatches[i].FName.Trim().ToLower();
 				if(firstNameInDb==Pat.FName.Trim().ToLower()) {
 					listPatFirstNameMatches.Add(listPatLastNameMatches[i]);
 				}
-				else if(firstNameInDb.Length>=2 && Pat.FName.Trim().ToLower().StartsWith(firstNameInDb)) {
-					//Unfortunately, in the real world when processing 835s (not necessarily 834s), we have observed carriers returning the patient's first name 
-					//followed by a space followed by the patient middle name all within the first name field.  This issue is probably due to human error when
-					//the carrier's staff typed the patient name into their system.  All we can do is try to cope with this situation.  We mimic the behavior 
-					//of 835s here in anticipation of similar human errors.
-					listPatFirstNamePartialMatches.Add(listPatLastNameMatches[i]);
-				}
 			}
-			if(listPatFirstNameMatches.Count > 0) {
-				listPatMatches=listPatFirstNameMatches;
-			}
-			else if(listPatFirstNamePartialMatches.Count > 0) {
-				listPatMatches=listPatFirstNamePartialMatches;
-			}
-			else {
+			if(listPatFirstNameMatches.Count==0) {
 				//An SSN or name match is required.  Insert patient since not found by any of the primary identifiers.
 				if(!PrefC.GetBool(PrefName.Ins834IsPatientCreate)) {
+					MatchErrorMessage=Lans.g(this,"Patient not found by name or SSN")+" "+Pat.GetNameLF()+" "+Pat.SSN;
 					return null;//The user does not want to insert any patients.
 				}
 				Patients.Insert(Pat,false);
 				listPatients.Add(Pat);
-				//TODO: Securitylog entry.
+				//Create a security log so that the office knows where this patient came from.
+				SecurityLogs.MakeLogEntry(Permissions.PatientCreate,Pat.PatNum,"Created via Insurance Import 834",0,LogSources.InsPlanImport834);
 				return Pat;
 			}
 			//At this point, we have found a match by name.  For those patients with a name match, find those patients with matching birtdate.
 			//We prefer a patient with a mathcing birthdate and name over a match by name only.
 			List <Patient> listPatBirthdateMatches=new List<Patient>();
-			for(int i=0;i<listPatMatches.Count;i++) {
-				if(Pat.Birthdate.Year > 1880 && listPatMatches[i].Birthdate.Year > 1880 
-					&& listPatMatches[i].Birthdate.Date==Pat.Birthdate.Date)
+			for(int i=0;i<listPatFirstNameMatches.Count;i++) {
+				if(Pat.Birthdate.Year > 1880 && listPatFirstNameMatches[i].Birthdate.Year > 1880 
+					&& listPatFirstNameMatches[i].Birthdate.Date==Pat.Birthdate.Date)
 				{
-					listPatBirthdateMatches.Add(listPatMatches[i]);
+					listPatBirthdateMatches.Add(listPatFirstNameMatches[i]);
 				}
 			}
 			if(listPatBirthdateMatches.Count==1) {
 				return MergePatientIntoDbPatient(listPatBirthdateMatches[0]);
 			}
 			else if(listPatBirthdateMatches.Count > 1) {
+				MatchErrorMessage=Lans.g(this,"Multiple patients match name and birthdate")+" "+Pat.GetNameFL()+" "+Pat.Birthdate.ToShortDateString();
 				return null;//More than one name and birthdate match -_-  We cannot decide who the correct patient is.
 			}
 			//No birthdate matches.  A name only match will suffice.
-			if(listPatMatches.Count==1) {
-				return MergePatientIntoDbPatient(listPatMatches[0]);
+			if(listPatFirstNameMatches.Count==1) {
+				return MergePatientIntoDbPatient(listPatFirstNameMatches[0]);
 			}
-			return null;//Multiple name matches.  We cannot decide who the correct patient is.
+			else if(listPatFirstNameMatches.Count > 1) {
+				MatchErrorMessage=Lans.g(this,"Multiple patients match first and last name")+" "+Pat.GetNameFL();
+				return null;//We cannot decide who the correct patient is.
+			}
+			MatchErrorMessage=Lans.g(this,"No patients match first and last name")+" "+Pat.GetNameFL();
+			return null;//No full name matches.
 		}
 
 		///<summary>Copies the data from applicable member fields into the given patDb and updates the database.</summary>
 		private Patient MergePatientIntoDbPatient(Patient patDb) {
+			Patient patDbOld=patDb.Copy();
 			if(Pat.StudentStatus!=null) {//Student status is situational information.  Only overwrite existing value if a new value was specified.
 				patDb.StudentStatus=Pat.StudentStatus;
 			}
@@ -1854,6 +1860,7 @@ namespace OpenDentBusiness {
 			if(ListMemberSchools.Count > 0) {//The patient school is situational information.  Only overwrite if specified.
 				patDb.SchoolName=Pat.SchoolName;
 			}
+			Patients.Update(patDb,patDbOld);
 			return patDb;
 		}
 

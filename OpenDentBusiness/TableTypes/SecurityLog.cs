@@ -34,7 +34,7 @@ namespace OpenDentBusiness{
 		///	The PatNum column will represent the patient who is taking the action.  
 		///PlanNum with PermType InsPlanChangeCarrierName tracks carrier name changes.</summary>
 		public long FKey;
-		///<summary>Enum:LogSources None, WebSched.</summary>
+		///<summary>Enum:LogSources None, WebSched, InsPlanImport834.</summary>
 		public LogSources LogSource;
 
 		///<summary>PatNum-NameLF</summary>
@@ -53,7 +53,9 @@ namespace OpenDentBusiness{
 		///<summary>0 - Open Dental and unknown entities.</summary>
 		None,
 		///<summary>1 - GWT Web Sched application.</summary>
-		WebSched
+		WebSched,
+		///<summary>2 - X12 834 Insurance Plan Import from the Manage Module.</summary>
+		InsPlanImport834,
 	}
 
 	

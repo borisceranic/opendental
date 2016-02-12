@@ -242,7 +242,9 @@ namespace OpenDentBusiness{
 		///<summary>104- Allow users to send claims.</summary>
 		ClaimSend,
 		///<summary>105- Allow users to create new task lists.</summary>
-		TaskListCreate
+		TaskListCreate,
+		///<summary>106 - Audit when a new patient is added.</summary>
+		PatientCreate,
 	}
 
 	

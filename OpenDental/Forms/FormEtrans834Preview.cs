@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using CodeBase;
 
 namespace OpenDental {
 	public partial class FormEtrans834Preview:Form {
@@ -19,9 +20,31 @@ namespace OpenDental {
 
 		private void FormEtrans834Preview_Load(object sender,EventArgs e) {
 			Cursor=Cursors.WaitCursor;
+			ShowStatus("Loading...");
 			checkIsPatientCreate.Checked=PrefC.GetBool(PrefName.Ins834IsPatientCreate);
 			FillGridInsPlans();
+			ShowStatus("");
 			Cursor=Cursors.Default;
+		}
+
+		///<summary>Shows current status to user in title bar.  Useful for when processing for a few seconds or more.</summary>
+		private void ShowStatus(string message) {
+			int index=Text.IndexOf(" - ");
+			if(index >= 0) {
+				Text=Text.Substring(0,index+3);//Remove old status, but keep the dash and spaces.
+			}
+			else {
+				Text+=" - ";//Ensure there is a separating dash with spaces.
+			}
+			if(message.Trim()=="") {
+				index=Text.IndexOf(" - ");
+				if(index >= 0) {
+					Text=Text.Substring(0,index);//Remove dash a separating spaces if message is empty.
+				}
+			}
+			else {
+				Text+=message;
+			}
 		}
 
 		void FillGridInsPlans() {
@@ -115,6 +138,8 @@ namespace OpenDental {
 			Prefs.UpdateBool(PrefName.Ins834IsPatientCreate,checkIsPatientCreate.Checked);
 			List<Patient> listPatients=Patients.GetAllPatients();//Testing this on an average sized database took about 1 second to run on a dev machine.
 			int updatedCount=0;
+			int skippedCount=0;
+			StringBuilder sbErrorMessages=new StringBuilder();
 			for(int i=0;i<gridInsPlans.Rows.Count;i++) {
 				Hx834_Member member=null;
 				Hx834_HealthCoverage healthCoverage=null;
@@ -125,17 +150,29 @@ namespace OpenDental {
 					healthCoverage=(Hx834_HealthCoverage)gridInsPlans.Rows[i].Tag;
 					member=healthCoverage.Member;
 				}
+				ShowStatus("Progress "+(i+1).ToString().PadLeft(6)+"/"+gridInsPlans.Rows.Count.ToString().PadLeft(6)
+					+"  Importing plans for patient "+member.Pat.GetNameLF());
 				//The patient's status is not affected by the maintenance code.  After reviewing all of the possible maintenance codes in 
 				//member.MemberLevelDetail.MaintenanceTypeCode, we believe that all statuses suggest either insert or update, except for "Cancel".
 				//Nathan and Derek feel that archiving the patinet in response to a Cancel request is a bit drastic.
 				//Thus we ignore the patient maintenance code and always assume insert/update.
 				Patient patMatch=member.GetPatientMatch(listPatients);
-				if(patMatch!=null) {
+				if(patMatch==null) {
+					sbErrorMessages.Append("\r\n"+member.MatchErrorMessage);
+					skippedCount++;
+				}
+				else {
 					updatedCount++;
 				}
 			}
 			Cursor=Cursors.Default;
-			MessageBox.Show(Lan.g(this,"Done.  Number of patients updated: ")+updatedCount);
+			string msg=Lan.g(this,"Done.  Number of patients updated:")+" "+updatedCount;
+			if(skippedCount > 0) {
+				msg+="  "+Lan.g(this,"Number of patients skipped:")+" "+skippedCount;
+				msg+=sbErrorMessages.ToString();
+			}
+			MsgBoxCopyPaste msgBox=new MsgBoxCopyPaste(msg);
+			msgBox.ShowDialog();
 			DialogResult=DialogResult.OK;
 		}
 
