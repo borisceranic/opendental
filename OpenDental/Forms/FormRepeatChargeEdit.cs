@@ -589,6 +589,7 @@ namespace OpenDental{
 			proc.MedicalCode=ProcedureCodes.GetProcCode(proc.CodeNum).MedicalCode;
 			proc.BaseUnits=ProcedureCodes.GetProcCode(proc.CodeNum).BaseUnits;
 			proc.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
+			proc.RepeatChargeNum=RepeatCur.RepeatChargeNum;
 			//Check if the repeating charge has been flagged to copy it's note into the billing note of the procedure.
 			if(RepeatCur.CopyNoteToProc) {
 				proc.BillingNote=RepeatCur.Note;
@@ -597,7 +598,6 @@ namespace OpenDental{
 				Patient pat=Patients.GetPat(RepeatCur.PatNum);
 				proc.SiteNum=pat.SiteNum;
 			}
-			Procedures.Insert(proc);
 			Recalls.Synch(RepeatCur.PatNum);
 			MsgBox.Show(this,"Procedure added.");
 		}

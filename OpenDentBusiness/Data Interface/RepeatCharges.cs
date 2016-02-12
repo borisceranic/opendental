@@ -74,9 +74,7 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),charge);
 				return;
 			}
-			string command="UPDATE procedurelog SET RepeatChargeNum=0 WHERE RepeatChargeNum="+POut.Long(charge.RepeatChargeNum);
-			Db.NonQ(command);
-			command="DELETE FROM repeatcharge WHERE RepeatChargeNum ="+POut.Long(charge.RepeatChargeNum);
+			string command="DELETE FROM repeatcharge WHERE RepeatChargeNum ="+POut.Long(charge.RepeatChargeNum);
 			Db.NonQ(command);
 		}
 

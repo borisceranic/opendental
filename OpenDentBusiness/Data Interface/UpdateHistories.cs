@@ -54,11 +54,27 @@ namespace OpenDentBusiness{
 		///<summary>Returns the latest version information.</summary>
 		public static UpdateHistory GetForVersion(string version) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<UpdateHistory>(MethodBase.GetCurrentMethod());
+				return Meth.GetObject<UpdateHistory>(MethodBase.GetCurrentMethod(),version);
 			}
 			string command="SELECT * FROM updatehistory WHERE ProgramVersion='"+POut.String(version.ToString())+"'";
 			return Crud.UpdateHistoryCrud.SelectOne(command);
 		}
+
+		///<summary>Returns the earliest datetime that a version was reached. If that version has not been reached, returns the MinDate.</summary>
+		public static DateTime GetDateForVersion(Version version) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<DateTime>(MethodBase.GetCurrentMethod(),version);
+			}
+			List<UpdateHistory> listUpdates=UpdateHistories.GetAll();
+			foreach(UpdateHistory update in listUpdates) {
+				if(new Version(update.ProgramVersion) >= version) {
+					return update.DateTimeUpdated;
+				}
+			}
+			//The earliest version was later than the version passed in.
+			return new DateTime(1,1,1);
+		}
+
 
 
 	}

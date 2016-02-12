@@ -113,8 +113,9 @@ namespace OpenDentBusiness {
 		public bool IsLocked;
 		///<summary>A note that will show directly in the Account module.  Also used for repeating charges. Helps distinguish between charges for the same proccode in the same month.</summary>
 		public string BillingNote;
-		///<summary>FK to repeatcharge.RepeatChargeNum.  Used in repeating charges to determine which procedures belong to each repeating charge. This column
-		///makes is possible to have two or more repeating charges for the same exact procedure code.</summary>
+		///<summary>FK to repeatcharge.RepeatChargeNum.  Used in repeating charges to determine which procedures belong to each repeating charge. If the
+		///repeat charge that this RepeatChargeNum points to is deleted, this column will not be set to 0 so that a record will still exist that this
+		///procedure came from a repeat charge.</summary>
 		public long RepeatChargeNum;
 		///<summary>Simple text for ICD-9 code. Gets sent with medical claims.</summary>
 		public string DiagnosticCode2;
