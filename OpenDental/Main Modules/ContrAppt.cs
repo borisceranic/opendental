@@ -1696,7 +1696,11 @@ namespace OpenDental {
 			ContrApptSheet2.CreateShadow();
 			CreateAptShadowsOnMain();
 			ContrApptSheet2.DrawShadow();
-			List<LabCase> labCaseList=LabCases.GetForPeriod(startDate,endDate);
+			List<long> opNums = null;
+			if(PrefC.HasClinicsEnabled && Clinics.ClinicNum>0) {
+				opNums = Operatories.GetOpsForClinic(Clinics.ClinicNum).Select(x => x.OperatoryNum).ToList();
+			}
+			List<LabCase> labCaseList=LabCases.GetForPeriod(startDate,endDate,opNums);
 			FillLab(labCaseList);
 			FillProduction();
 			FillEmpSched();

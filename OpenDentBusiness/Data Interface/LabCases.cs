@@ -19,6 +19,7 @@ namespace OpenDentBusiness{
 			table.Columns.Add("AptDateTime",typeof(DateTime));
 			table.Columns.Add("aptDateTime");
 			table.Columns.Add("AptNum");
+			table.Columns.Add("OpNum");
 			table.Columns.Add("lab");
 			table.Columns.Add("LabCaseNum");
 			table.Columns.Add("patient");
@@ -28,7 +29,7 @@ namespace OpenDentBusiness{
 			table.Columns.Add("Instructions");
 			List<DataRow> rows=new List<DataRow>();
 			//the first query only gets labcases that are attached to scheduled appointments
-			string command="SELECT AptDateTime,appointment.AptNum,DateTimeChecked,DateTimeRecd,DateTimeSent,"
+			string command="SELECT AptDateTime,appointment.AptNum,appointment.Op,DateTimeChecked,DateTimeRecd,DateTimeSent,"
 				+"LabCaseNum,laboratory.Description,LName,FName,Preferred,MiddleI,Phone,ProcDescript,Instructions "
 				+"FROM labcase "
 				+"LEFT JOIN appointment ON labcase.AptNum=appointment.AptNum "
@@ -52,6 +53,7 @@ namespace OpenDentBusiness{
 				row["AptDateTime"]=AptDateTime;
 				row["aptDateTime"]=AptDateTime.ToShortDateString()+" "+AptDateTime.ToShortTimeString();
 				row["AptNum"]=raw.Rows[i]["AptNum"].ToString();
+				row["OpNum"]=raw.Rows[i]["Op"].ToString();
 				row["lab"]=raw.Rows[i]["Description"].ToString();
 				row["LabCaseNum"]=raw.Rows[i]["LabCaseNum"].ToString();
 				row["patient"]=PatientLogic.GetNameLF(raw.Rows[i]["LName"].ToString(),raw.Rows[i]["FName"].ToString(),
@@ -132,16 +134,22 @@ namespace OpenDentBusiness{
 			return table;
 		}
 
-		///<summary>Used when drawing the appointments for a day.</summary>
-		public static List<LabCase> GetForPeriod(DateTime startDate,DateTime endDate) {
+		///<summary>Used when drawing the appointments for a day. Send in operatory nums to limit selection, null for all, useful for clinic filtering.</summary>
+		public static List<LabCase> GetForPeriod(DateTime startDate,DateTime endDate,List<long> opNums) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<LabCase>>(MethodBase.GetCurrentMethod(),startDate,endDate);
 			} 
+			if(opNums!=null && opNums.Count==0) {
+				return new List<LabCase>();
+			}
 			string command="SELECT labcase.* FROM labcase,appointment "
 				+"WHERE labcase.AptNum=appointment.AptNum "
 				+"AND (appointment.AptStatus=1 OR appointment.AptStatus=2 OR appointment.AptStatus=4) "//scheduled,complete,or ASAP
 				+"AND AptDateTime >= "+POut.Date(startDate)
 				+" AND AptDateTime < "+POut.Date(endDate.AddDays(1));//midnight of the next morning.
+			if(opNums!=null) {
+				command+=" AND Op IN ("+string.Join(",",opNums)+")";//count is at least 1 at this point
+			}
 			return Crud.LabCaseCrud.SelectMany(command);
 		}
 
