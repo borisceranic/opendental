@@ -427,7 +427,11 @@ namespace OpenDental{
 				List<InsSub> subList=InsSubs.RefreshForFam(fam);
 				List<InsPlan> planList=InsPlans.RefreshForSubList(subList);
 				List<PatPlan> patPlanList=PatPlans.Refresh(pat.PatNum);
-				long subNum=PatPlans.GetInsSubNum(patPlanList,PatPlans.GetOrdinal(PriSecMed.Primary,patPlanList,planList,subList));
+				int ordinal=PatPlans.GetOrdinal(PriSecMed.Primary,patPlanList,planList,subList);
+				if(ordinal==0) { //No primary dental plan. See if they have a medical plan instead.
+					ordinal=PatPlans.GetOrdinal(PriSecMed.Medical,patPlanList,planList,subList);
+				}
+				long subNum=PatPlans.GetInsSubNum(patPlanList,ordinal);
 				long patPlanNum=PatPlans.GetPatPlanNum(subNum,patPlanList);
 				InsSub sub=InsSubs.GetSub(subNum,subList);
 				Patient subscriber=Patients.GetPat(sub.Subscriber);
