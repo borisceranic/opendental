@@ -11428,6 +11428,14 @@ namespace OpenDentBusiness {
 			if(FromVersion<new Version("15.4.26.0")) {
 				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 15.4.26.0"));//No translation in convert script.
 				string command="";
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('ReportPandIhasClinicInfo','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ReportPandIhasClinicInfo','0')";
+					Db.NonQ(command);
+				}
 				command="UPDATE preference SET ValueString='15.4.26.0' WHERE PrefName='DataBaseVersion'";
 				Db.NonQ(command);
 			}
