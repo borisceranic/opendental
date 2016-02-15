@@ -122,5 +122,15 @@ namespace OpenDental.Properties {
                 return ((string)(this["OpenDental_NewCrop_Update1"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://webservices.dentalxchange.com:443/dws/DwsService")]
+        public string OpenDental_dentalxchange2016_DwsService {
+            get {
+                return ((string)(this["OpenDental_dentalxchange2016_DwsService"]));
+            }
+        }
     }
 }

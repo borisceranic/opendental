@@ -243,16 +243,9 @@ namespace OpenDental{
 				}
 			}
 			else if(clearinghouseClin.CommBridge==EclaimsCommBridge.ClaimConnect){
-				if(isAutomaticMode){
-					return "";
+				if(!ClaimConnect.Retrieve(clearinghouseClin)) {
+					return Lan.g("FormClaimReports","Error retrieving.")+"\r\n"+ClaimConnect.ErrorMessage;
 				}
-				try{
-					Process.Start(@"http://www.dentalxchange.com");
-				}
-				catch{
-					return "Could not locate the site.";
-				}
-				return "";
 			}
 			else if(clearinghouseClin.CommBridge==EclaimsCommBridge.AOS){
 				try{

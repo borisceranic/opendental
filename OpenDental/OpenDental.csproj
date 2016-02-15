@@ -3954,6 +3954,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
+    <Compile Include="Web References\Dentalxchange2016\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
     <Compile Include="Web References\EmdeonITSTest\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -6797,6 +6802,29 @@
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
     <None Include="Web References\CallFireService\SMSService.wsdl" />
+    <None Include="Web References\Dentalxchange2016\ClaimPaymentListResponse1.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\Dentalxchange2016\DwsService.wsdl" />
+    <None Include="Web References\Dentalxchange2016\DwsService.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Web References\Dentalxchange2016\DwsService0.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Web References\Dentalxchange2016\PayerListResponse1.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\Dentalxchange2016\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\Dentalxchange2016\textResponse1.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\Dentalxchange2016\UnProcessedEraResponse1.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
     <None Include="Web References\EmdeonITSTest\ITSReturn.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
@@ -7652,6 +7680,17 @@
       </CachedDynamicPropName>
       <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
       <CachedSettingsPropName>OpenDental_NewCrop_Update1</CachedSettingsPropName>
+    </WebReferenceUrl>
+    <WebReferenceUrl Include="https://webservices.dentalxchange.com/dws/DwsService%3fwsdl">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\Dentalxchange2016\</RelPath>
+      <UpdateFromURL>https://webservices.dentalxchange.com/dws/DwsService%3fwsdl</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
+      <CachedSettingsPropName>OpenDental_dentalxchange2016_DwsService</CachedSettingsPropName>
     </WebReferenceUrl>
     <WebReferenceUrl Include="https://webservices.dentalxchange.com/dws/webservice/wsdl.jsp">
       <UrlBehavior>Dynamic</UrlBehavior>

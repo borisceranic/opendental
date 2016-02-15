@@ -11,6 +11,8 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.Xml.XPath;
 using OpenDentBusiness;
+using System.Collections.Generic;
+using CodeBase;
 
 namespace OpenDental.Eclaims
 {
@@ -233,6 +235,7 @@ namespace OpenDental.Eclaims
 			return pair[1];
 		}
 
+		///<summary>Might be able to use newer Dentalxchange2016 web reference instead of using com.dentalexchange.webservices.</summary>
 		public static string Benefits270(Clearinghouse clearinghouseClin,string x12message) {
 			com.dentalxchange.webservices.Credentials cred = new com.dentalxchange.webservices.Credentials();
 			if(PrefC.GetBool(PrefName.CustomizedForPracticeWeb)) {//even though they currently use code from a different part of the program.
@@ -324,7 +327,73 @@ namespace OpenDental.Eclaims
 			*/
 		}
 
-
+		public static bool Retrieve(Clearinghouse clearinghouse) {
+			Dentalxchange2016.Credentials cred=new Dentalxchange2016.Credentials();
+			if(PrefC.GetBool(PrefName.CustomizedForPracticeWeb)) {//even though they currently use code from a different part of the program.
+				cred.Client="Practice-Web";
+				cred.ServiceID="DCI Web Service ID: 001513";
+			}
+			else {
+				cred.Client="OpenDental";
+				cred.ServiceID="DCI Web Service ID: 002778";
+			}
+			cred.Username=clearinghouse.LoginID; 
+			cred.Password=clearinghouse.Password;
+			Dentalxchange2016.unProcessedEraRequest request=new Dentalxchange2016.unProcessedEraRequest();
+			Dentalxchange2016.DwsService service=new Dentalxchange2016.DwsService();
+#if DEBUG
+			service.Url="https://prelive2.dentalxchange.com/dws/DwsService?wsdl";
+#else
+			service.Url="https://webservices.dentalxchange.com/dws/DwsService?wsdl";
+#endif
+			ErrorMessage="";
+			List<string> listEraStrings=new List<string>();
+			try {
+				Dentalxchange2016.UnProcessedEraResponse response;
+				do {
+					response=service.getUnProcessedEra(cred,request);
+					if(response.Status.code==0 && response.ClaimPaymentAdvice.EdiContent!=null) {
+						listEraStrings.Add(response.ClaimPaymentAdvice.EdiContent);//X12 835 ERA raw content
+					}
+				} while(response.Status.code==0 && response.ClaimPaymentAdvice!=null && response.ClaimPaymentAdvice.AdditionalEraExists);
+				if(response.Status.code!=0) {//!=Approved
+					ErrorMessage="Era request unsuccessful."
+						+"\r\nError message received directly from Claim Connect: "+response.Status.code
+						+"\r\n\r\n"+response.Status.description;
+					return false;
+				}
+				/*
+				Code Description
+				0    Approved
+				1    Operation Failed
+				90   Invalid Group
+				100  Invalid User
+				110  Invalid Client
+				120  Service Not Allowed
+				130  User Not Allowed
+				140  Invalid PMS
+				150  Service Not Contracted by User
+				1000 Internal server error has occurred. The problem is being investigated.
+				2000 Generic Host Error
+				2001 Malformed document sent. Please insure that the format is correct and all required data is present.
+				2002 Deficient request - required data is missing.
+				2003 No insurers found for this selection.
+				2004 Unable to contact the payer at this time. Please try again later.
+				2005 Only the relationship self is supported at this time.
+				2007 Original request patient info reflected back
+				2008 Claim submission failed.
+				*/
+			}
+			catch(Exception ex) {
+				ErrorMessage="If this is a new customer, this error might be due to an invalid Username or Password.  Servers may need a few hours before ready to accept new user information.\r\n"
+					+"Error message received directly from Claim Connect:  "+ex.ToString();
+				return false;
+			}
+			string path=clearinghouse.ResponsePath;
+			//write each message to a distinct file in the export path.			
+			listEraStrings.ForEach(x => File.WriteAllText(ODFileUtils.CreateRandomFile(path,".txt"),x));
+			return true;
+		}
 	}
 
 	/*
