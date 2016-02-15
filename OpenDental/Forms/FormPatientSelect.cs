@@ -1442,6 +1442,7 @@ namespace OpenDental{
 			}
 			PatCur.ClinicNum=Clinics.ClinicNum;
 			Patients.Insert(PatCur,false);
+			SecurityLogs.MakeLogEntry(Permissions.PatientCreate,PatCur.PatNum,"Created from Select Patient window.");
 			CustReference custRef=new CustReference();
 			custRef.PatNum=PatCur.PatNum;
 			CustReferences.Insert(custRef);

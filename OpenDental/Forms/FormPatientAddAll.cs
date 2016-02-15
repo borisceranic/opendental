@@ -2027,6 +2027,7 @@ namespace OpenDental {
 						break;
 				}
 				Patients.Insert(pat,false);
+				SecurityLogs.MakeLogEntry(Permissions.PatientCreate,pat.PatNum,"Created from Add Family window.");
 				//if this is the first family member it is the guarantor, so set pat.Guarantor=pat.PatNum and update
 				//if this is not the first family member, the guarantor has been inserted and pat.Guarantor will already be set before inserting
 				if(i==0) {

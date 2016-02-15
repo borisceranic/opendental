@@ -56,6 +56,11 @@ namespace OpenDentBusiness{
 		WebSched,
 		///<summary>2 - X12 834 Insurance Plan Import from the Manage Module.</summary>
 		InsPlanImport834,
+		///<summary>3 - HL7 is an automated process which the user may not be aware of.</summary>
+		HL7,
+		///<summary>4 - Database maintenance.  This process creates patients which are known to be missing,
+		///but the user may not be aware that the fix involves patient recreation.</summary>
+		DBM,
 	}
 
 	

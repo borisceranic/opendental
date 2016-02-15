@@ -358,6 +358,7 @@ namespace OpenDental{
 			}//if patient already exists
 			else{//patient is new, so insert
 				Patients.Insert(pat,false);
+				SecurityLogs.MakeLogEntry(Permissions.PatientCreate,pat.PatNum,"Created from Import Patient XML tool.");
 				existingPatOld=pat.Copy();
 				pat.Guarantor=pat.PatNum;//this can be changed later.
 				Patients.Update(pat,existingPatOld);
@@ -388,6 +389,7 @@ namespace OpenDental{
 					}
 					else{//we need to completely create guar, then attach
 						Patients.Insert(guar,false);
+						SecurityLogs.MakeLogEntry(Permissions.PatientCreate,guar.PatNum,"Created from Import Patient XML tool.");
 						//set guar for guar
 						existingPatOld=guar.Copy();
 						guar.Guarantor=guar.PatNum;
@@ -419,6 +421,7 @@ namespace OpenDental{
 				}
 				else{//need to create and attach a subscriber
 					Patients.Insert(subsc,false);
+					SecurityLogs.MakeLogEntry(Permissions.PatientCreate,subsc.PatNum,"Created from Import Patient XML tool.");
 					//set guar to same guar as patient
 					existingPatOld=subsc.Copy();
 					subsc.Guarantor=pat.Guarantor;

@@ -100,6 +100,7 @@ namespace OpenDentBusiness.HL7 {
 					EventLog.WriteEntry("OpenDentHL7","Inserted patient: "+pat.FName+" "+pat.LName,EventLogEntryType.Information);
 				}
 				pat.PatNum=Patients.Insert(pat,!isStandalone);//use existing PK if not standalone, standalone will have PatNum=0, so set PatNum here
+				SecurityLogs.MakeLogEntry(Permissions.PatientCreate,pat.PatNum,"Created from HL7 for eCW.",LogSources.HL7);
 				if(pat.Guarantor==0) {
 					patOld=pat.Copy();
 					pat.Guarantor=pat.PatNum;

@@ -402,9 +402,11 @@ namespace OpenDentBusiness.HL7 {
 			if(_isNewPat) {
 				if(pat.PatNum==0) {//Only eCWTight or eCWFull internal types will allow the HL7 message to dictate our PatNums.
 					pat.PatNum=Patients.Insert(pat,false);
+					SecurityLogs.MakeLogEntry(Permissions.PatientCreate,pat.PatNum,"Created from HL7.",LogSources.HL7);
 				}
 				else {
 					pat.PatNum=Patients.Insert(pat,true);
+					SecurityLogs.MakeLogEntry(Permissions.PatientCreate,pat.PatNum,"Created from HL7.",LogSources.HL7);
 				}
 				if(_isVerboseLogging) {
 					EventLog.WriteEntry("OpenDentHL7","Inserted patient "+pat.GetNameFLnoPref(),EventLogEntryType.Information);
@@ -1174,11 +1176,13 @@ namespace OpenDentBusiness.HL7 {
 				if(guar.PatNum==0) {
 					guarOld=guar.Copy();
 					guar.PatNum=Patients.Insert(guar,false);
+					SecurityLogs.MakeLogEntry(Permissions.PatientCreate,guar.PatNum,"Created from HL7.",LogSources.HL7);
 					guar.Guarantor=guar.PatNum;
 					Patients.Update(guar,guarOld);
 				}
 				else {
 					guar.PatNum=Patients.Insert(guar,true);
+					SecurityLogs.MakeLogEntry(Permissions.PatientCreate,guar.PatNum,"Created from HL7.",LogSources.HL7);
 				}
 				if(_isVerboseLogging) {
 					EventLog.WriteEntry("OpenDentHL7","Inserted patient "+guar.GetNameFLnoPref()+" when processing a GT1 segment.",EventLogEntryType.Information);

@@ -71,9 +71,9 @@ namespace OpenDental{
 			this.butImport.CornerRadius = 4F;
 			this.butImport.Location = new System.Drawing.Point(93, 63);
 			this.butImport.Name = "butImport";
-			this.butImport.Size = new System.Drawing.Size(75, 24);
+			this.butImport.Size = new System.Drawing.Size(105, 24);
 			this.butImport.TabIndex = 10;
-			this.butImport.Text = "Import";
+			this.butImport.Text = "Preview Import";
 			this.butImport.Click += new System.EventHandler(this.butImport_Click);
 			// 
 			// butRefresh
@@ -167,7 +167,7 @@ namespace OpenDental{
 			this.MinimumSize = new System.Drawing.Size(700, 600);
 			this.Name = "FormEtrans834Import";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "Import Ins Plans";
+			this.Text = "Import Ins Plans 834";
 			this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
 			this.Load += new System.EventHandler(this.FormEtrans834Import_Load);
 			this.ResumeLayout(false);

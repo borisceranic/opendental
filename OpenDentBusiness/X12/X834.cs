@@ -1682,8 +1682,6 @@ namespace OpenDentBusiness {
 		public string SubscriberId;
 		///<summary>The insurance plan group number.  Specified at member level in format.</summary>
 		public string GroupNum;
-		///<summary>This value is set by GetPatientMatch() when a match could not be found.</summary>
-		public string MatchErrorMessage;
 
 		public string GetPatMaintTypeDescript() {
 			if(MemberLevelDetail==null) {
@@ -1707,87 +1705,8 @@ namespace OpenDentBusiness {
 			return "";
 		}
 
-		///<summary>Returns a merged patient corresponding to the member.
-		///Uupdates/inserts the patient in to the database and also updates/inserts into listPatients.
-		///Returns null if the patient does not exist in the database yet and the Ins834IsPatientCreate preference is false.
-		///Also returns null when the multiple possible matches are located, in which case no insert/update is performed.</summary>
-		public Patient GetPatientMatch(List <Patient> listPatients) {
-			MatchErrorMessage="";
-			//Match the member based on SSN.
-			List<Patient> listPatSsnMatches=new List<Patient>();
-			if(!String.IsNullOrEmpty(Pat.SSN) && Pat.SSN!="000000000") {
-				for(int i=0;i<listPatients.Count;i++) {
-					if(listPatients[i].SSN==Pat.SSN) {
-						listPatSsnMatches.Add(listPatients[i]);
-						break;
-					}
-				}
-			}
-			if(listPatSsnMatches.Count==1) {
-				return MergePatientIntoDbPatient(listPatSsnMatches[0]);//Exactly 1 SSN match.
-			}
-			else if(listPatSsnMatches.Count > 1) {
-				MatchErrorMessage=Lans.g(this,"Multiple patients match SSN")+" "+Pat.SSN;
-				return null;//Multiple SSN matches -_-  We cannot decide who the patient is.
-			}
-			//No SSN matches.  Find patients with same last name, ignoring case and leading/trailing space.
-			List <Patient> listPatLastNameMatches=new List<Patient>();
-			for(int i=0;i<listPatients.Count;i++) {
-				if(listPatients[i].LName.Trim().ToLower()==Pat.LName.Trim().ToLower()) {//Last name match.
-					listPatLastNameMatches.Add(listPatients[i]);
-				}
-			}
-			//Find patients with same first name (full or partial match, full preferred).  Ignore case and leading/trailing space.
-			List <Patient> listPatFirstNameMatches=new List<Patient>();
-			for(int i=0;i<listPatLastNameMatches.Count;i++) {
-				string firstNameInDb=listPatLastNameMatches[i].FName.Trim().ToLower();
-				if(firstNameInDb==Pat.FName.Trim().ToLower()) {
-					listPatFirstNameMatches.Add(listPatLastNameMatches[i]);
-				}
-			}
-			if(listPatFirstNameMatches.Count==0) {
-				//An SSN or name match is required.  Insert patient since not found by any of the primary identifiers.
-				if(!PrefC.GetBool(PrefName.Ins834IsPatientCreate)) {
-					MatchErrorMessage=Lans.g(this,"Patient not found by name or SSN")+" "+Pat.GetNameLF()+" "+Pat.SSN;
-					return null;//The user does not want to insert any patients.
-				}
-				Patients.Insert(Pat,false);
-				listPatients.Add(Pat);
-				//Create a security log so that the office knows where this patient came from.
-				SecurityLogs.MakeLogEntry(Permissions.PatientCreate,Pat.PatNum,"Created via Insurance Import 834",0,LogSources.InsPlanImport834);
-				return Pat;
-			}
-			//At this point, we have found a match by name.  For those patients with a name match, find those patients with matching birtdate.
-			//We prefer a patient with a mathcing birthdate and name over a match by name only.
-			List <Patient> listPatBirthdateMatches=new List<Patient>();
-			for(int i=0;i<listPatFirstNameMatches.Count;i++) {
-				if(Pat.Birthdate.Year > 1880 && listPatFirstNameMatches[i].Birthdate.Year > 1880 
-					&& listPatFirstNameMatches[i].Birthdate.Date==Pat.Birthdate.Date)
-				{
-					listPatBirthdateMatches.Add(listPatFirstNameMatches[i]);
-				}
-			}
-			if(listPatBirthdateMatches.Count==1) {
-				return MergePatientIntoDbPatient(listPatBirthdateMatches[0]);
-			}
-			else if(listPatBirthdateMatches.Count > 1) {
-				MatchErrorMessage=Lans.g(this,"Multiple patients match name and birthdate")+" "+Pat.GetNameFL()+" "+Pat.Birthdate.ToShortDateString();
-				return null;//More than one name and birthdate match -_-  We cannot decide who the correct patient is.
-			}
-			//No birthdate matches.  A name only match will suffice.
-			if(listPatFirstNameMatches.Count==1) {
-				return MergePatientIntoDbPatient(listPatFirstNameMatches[0]);
-			}
-			else if(listPatFirstNameMatches.Count > 1) {
-				MatchErrorMessage=Lans.g(this,"Multiple patients match first and last name")+" "+Pat.GetNameFL();
-				return null;//We cannot decide who the correct patient is.
-			}
-			MatchErrorMessage=Lans.g(this,"No patients match first and last name")+" "+Pat.GetNameFL();
-			return null;//No full name matches.
-		}
-
-		///<summary>Copies the data from applicable member fields into the given patDb and updates the database.</summary>
-		private Patient MergePatientIntoDbPatient(Patient patDb) {
+		///<summary>Copies the data from applicable member fields into the given patDb and updates patDb in the database.</summary>
+		public Patient MergePatientIntoDbPatient(Patient patDb) {
 			Patient patDbOld=patDb.Copy();
 			if(Pat.StudentStatus!=null) {//Student status is situational information.  Only overwrite existing value if a new value was specified.
 				patDb.StudentStatus=Pat.StudentStatus;

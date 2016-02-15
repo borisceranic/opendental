@@ -24,11 +24,39 @@ namespace OpenDental{
 		/// </summary>
 		private void InitializeComponent() {
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEtrans834Preview));
+			this.checkIsPatientCreate = new System.Windows.Forms.CheckBox();
+			this.gridInsPlans = new OpenDental.UI.ODGrid();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
-			this.gridInsPlans = new OpenDental.UI.ODGrid();
-			this.checkIsPatientCreate = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
+			// 
+			// checkIsPatientCreate
+			// 
+			this.checkIsPatientCreate.Location = new System.Drawing.Point(12, 7);
+			this.checkIsPatientCreate.Name = "checkIsPatientCreate";
+			this.checkIsPatientCreate.Size = new System.Drawing.Size(950, 20);
+			this.checkIsPatientCreate.TabIndex = 8;
+			this.checkIsPatientCreate.Text = "Automatically create new patients when importing plans unknown patients.  If unch" +
+    "ecked, you can still add patients manually.";
+			this.checkIsPatientCreate.UseVisualStyleBackColor = true;
+			// 
+			// gridInsPlans
+			// 
+			this.gridInsPlans.AllowSortingByColumn = true;
+			this.gridInsPlans.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridInsPlans.HasAddButton = false;
+			this.gridInsPlans.HasMultilineHeaders = false;
+			this.gridInsPlans.HScrollVisible = false;
+			this.gridInsPlans.Location = new System.Drawing.Point(12, 28);
+			this.gridInsPlans.Name = "gridInsPlans";
+			this.gridInsPlans.ScrollValue = 0;
+			this.gridInsPlans.SelectionMode = OpenDental.UI.GridSelectionMode.None;
+			this.gridInsPlans.Size = new System.Drawing.Size(950, 626);
+			this.gridInsPlans.TabIndex = 4;
+			this.gridInsPlans.Title = "Ins Plans";
+			this.gridInsPlans.TranslationName = null;
 			// 
 			// butOK
 			// 
@@ -60,33 +88,6 @@ namespace OpenDental{
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
-			// gridInsPlans
-			// 
-			this.gridInsPlans.AllowSortingByColumn = true;
-			this.gridInsPlans.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridInsPlans.HasAddButton = false;
-			this.gridInsPlans.HasMultilineHeaders = false;
-			this.gridInsPlans.HScrollVisible = false;
-			this.gridInsPlans.Location = new System.Drawing.Point(12, 28);
-			this.gridInsPlans.Name = "gridInsPlans";
-			this.gridInsPlans.ScrollValue = 0;
-			this.gridInsPlans.SelectionMode = OpenDental.UI.GridSelectionMode.None;
-			this.gridInsPlans.Size = new System.Drawing.Size(950, 626);
-			this.gridInsPlans.TabIndex = 4;
-			this.gridInsPlans.Title = "Ins Plans";
-			this.gridInsPlans.TranslationName = null;
-			// 
-			// checkIsPatientCreate
-			// 
-			this.checkIsPatientCreate.Location = new System.Drawing.Point(12, 7);
-			this.checkIsPatientCreate.Name = "checkIsPatientCreate";
-			this.checkIsPatientCreate.Size = new System.Drawing.Size(434, 20);
-			this.checkIsPatientCreate.TabIndex = 8;
-			this.checkIsPatientCreate.Text = "Create new patient when importing plans for an unknown patient.";
-			this.checkIsPatientCreate.UseVisualStyleBackColor = true;
-			// 
 			// FormEtrans834Preview
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -99,7 +100,7 @@ namespace OpenDental{
 			this.MinimumSize = new System.Drawing.Size(990, 734);
 			this.Name = "FormEtrans834Preview";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "Import Ins Plans Preview";
+			this.Text = "Import Ins Plans 834 Preview";
 			this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
 			this.Load += new System.EventHandler(this.FormEtrans834Preview_Load);
 			this.ResumeLayout(false);

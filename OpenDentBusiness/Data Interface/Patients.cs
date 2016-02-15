@@ -1488,6 +1488,15 @@ namespace OpenDentBusiness{
 			return PIn.Long(Db.GetScalar(command));
 		}
 
+		///<summary>Returns a list of all (not deleted) patients within listPatients which match the given first name, last name, and birthdate.
+		///Ignores case and leading/trailing space.</summary>
+		public static List<Patient> GetPatientsByNameAndBirthday(string lName,string fName,DateTime birthdate,List <Patient> listPatients) {
+			return listPatients.FindAll(x => x.PatStatus!=PatientStatus.Deleted
+				&& x.LName.Trim().ToLower()==lName.Trim().ToLower()
+				&& x.FName.Trim().ToLower()==fName.Trim().ToLower()
+				&& x.Birthdate.Date==birthdate.Date && birthdate.Year > 1880);
+		}
+
 		///<summary>Will return 0 if can't find an exact matching pat.  Because it does not include birthdate, it's not specific enough for most situations.</summary>
 		public static long GetPatNumByName(string lName,string fName) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

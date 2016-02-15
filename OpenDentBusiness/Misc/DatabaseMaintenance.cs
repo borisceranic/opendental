@@ -540,6 +540,7 @@ namespace OpenDentBusiness {
 						};
 						tempPat.SecUserNumEntry=userNum;
 						Patients.Insert(tempPat,false);
+						SecurityLogs.MakeLogEntry(Permissions.PatientCreate,tempPat.PatNum,"Recreated from DBM fix for AppointmentsNoPatients.",LogSources.DBM);
 						Patient oldPat=tempPat.Copy();
 						tempPat.Guarantor=tempPat.PatNum;
 						Patients.Update(tempPat,oldPat);//update guarantor
@@ -561,6 +562,7 @@ namespace OpenDentBusiness {
 							PriProv=PrefC.GetLong(PrefName.PracticeDefaultProv),
 							SecUserNumEntry=userNum
 						},true);
+						SecurityLogs.MakeLogEntry(Permissions.PatientCreate,patnum,"Recreated from DBM fix for AppointmentsNoPatients.",LogSources.DBM);
 						patientsAdded++;
 					}
 				}
@@ -1440,6 +1442,7 @@ namespace OpenDentBusiness {
 						dummyPatient.PriProv=PrefC.GetLong(PrefName.PracticeDefaultProv);
 						dummyPatient.SecUserNumEntry=userNum;
 						long dummyPatNum=Patients.Insert(dummyPatient,true);
+						SecurityLogs.MakeLogEntry(Permissions.PatientCreate,dummyPatNum,"Recreated from DBM fix for ClaimPaymentCheckAmt.",LogSources.DBM);
 						pat=Patients.GetPat(dummyPatient.PatNum);
 					}
 					log+="   Patient: #"+table.Rows[i]["PatNum"].ToString()+":"+pat.GetNameFirstOrPrefL()
@@ -2724,6 +2727,7 @@ namespace OpenDentBusiness {
 					pat.BillingType=billType;
 					pat.SecUserNumEntry=userNum;
 					Patients.Insert(pat,true);
+					SecurityLogs.MakeLogEntry(Permissions.PatientCreate,pat.PatNum,"Recreated from DBM fix for InsSubInvalidSubscriber.",LogSources.DBM);
 				}
 				int numberFixed=table.Rows.Count;
 				if(numberFixed>0 || verbose) {

@@ -253,6 +253,7 @@ namespace OpenDental {
 			}
 			try{
 				Patients.Insert(newPat,false);
+				SecurityLogs.MakeLogEntry(Permissions.PatientCreate,newPat.PatNum,"Created from Web Forms.");
 				//set Guarantor field the same as PatNum
 				Patient patOld=newPat.Copy();
 				newPat.Guarantor=newPat.PatNum;
