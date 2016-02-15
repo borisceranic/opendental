@@ -137,7 +137,7 @@ namespace OpenDentBusiness{
 		///<summary>Used when drawing the appointments for a day. Send in operatory nums to limit selection, null for all, useful for clinic filtering.</summary>
 		public static List<LabCase> GetForPeriod(DateTime startDate,DateTime endDate,List<long> opNums) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<LabCase>>(MethodBase.GetCurrentMethod(),startDate,endDate);
+				return Meth.GetObject<List<LabCase>>(MethodBase.GetCurrentMethod(),startDate,endDate,opNums);
 			} 
 			if(opNums!=null && opNums.Count==0) {
 				return new List<LabCase>();
