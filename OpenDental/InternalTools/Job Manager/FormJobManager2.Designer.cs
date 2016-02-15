@@ -34,6 +34,7 @@
 			this.checkShowUnassinged = new System.Windows.Forms.CheckBox();
 			this.gridAction = new OpenDental.UI.ODGrid();
 			this.tabTree = new System.Windows.Forms.TabPage();
+			this.checkResults = new System.Windows.Forms.CheckBox();
 			this.treeJobs = new System.Windows.Forms.TreeView();
 			this.checkCollapse = new System.Windows.Forms.CheckBox();
 			this.comboCategorySearch = new System.Windows.Forms.ComboBox();
@@ -43,16 +44,16 @@
 			this.comboGroup = new System.Windows.Forms.ComboBox();
 			this.tabControlMain = new System.Windows.Forms.TabControl();
 			this.tabJobDetails = new System.Windows.Forms.TabPage();
+			this.userControlJobEdit = new OpenDental.InternalTools.Job_Manager.UserControlJobEdit();
 			this.tabManage = new System.Windows.Forms.TabPage();
 			this.gridWorkSummary = new OpenDental.UI.ODGrid();
 			this.tabMyJobs = new System.Windows.Forms.TabPage();
 			this.checkShowComplete = new System.Windows.Forms.CheckBox();
 			this.gridMyJobs = new OpenDental.UI.ODGrid();
-			this.checkResults = new System.Windows.Forms.CheckBox();
-			this.userControlJobEdit = new OpenDental.InternalTools.Job_Manager.UserControlJobEdit();
 			this.butSearch = new OpenDental.UI.Button();
 			this.butMe = new OpenDental.UI.Button();
 			this.butAddJob = new OpenDental.UI.Button();
+			this.checkShowVersion = new System.Windows.Forms.CheckBox();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
@@ -196,6 +197,20 @@
 			this.tabTree.Text = "Tree View";
 			this.tabTree.UseVisualStyleBackColor = true;
 			// 
+			// checkResults
+			// 
+			this.checkResults.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.checkResults.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkResults.Location = new System.Drawing.Point(115, 97);
+			this.checkResults.Name = "checkResults";
+			this.checkResults.Size = new System.Drawing.Size(125, 20);
+			this.checkResults.TabIndex = 235;
+			this.checkResults.Text = "Search Results";
+			this.checkResults.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkResults.UseVisualStyleBackColor = true;
+			this.checkResults.Visible = false;
+			this.checkResults.CheckedChanged += new System.EventHandler(this.checkResults_CheckedChanged);
+			// 
 			// treeJobs
 			// 
 			this.treeJobs.AllowDrop = true;
@@ -303,6 +318,18 @@
 			this.tabJobDetails.TabIndex = 2;
 			this.tabJobDetails.Text = "Job";
 			// 
+			// userControlJobEdit
+			// 
+			this.userControlJobEdit.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.userControlJobEdit.Enabled = false;
+			this.userControlJobEdit.IsOverride = false;
+			this.userControlJobEdit.Location = new System.Drawing.Point(3, 3);
+			this.userControlJobEdit.Name = "userControlJobEdit";
+			this.userControlJobEdit.Size = new System.Drawing.Size(1012, 640);
+			this.userControlJobEdit.TabIndex = 0;
+			this.userControlJobEdit.SaveClick += new System.EventHandler(this.userControlJobEdit_SaveClick);
+			this.userControlJobEdit.JobOverride += new OpenDental.InternalTools.Job_Manager.UserControlJobEdit.JobOverrideEvent(this.userControlJobEdit_JobOverride);
+			// 
 			// tabManage
 			// 
 			this.tabManage.BackColor = System.Drawing.SystemColors.Control;
@@ -334,6 +361,7 @@
 			// tabMyJobs
 			// 
 			this.tabMyJobs.BackColor = System.Drawing.SystemColors.Control;
+			this.tabMyJobs.Controls.Add(this.checkShowVersion);
 			this.tabMyJobs.Controls.Add(this.checkShowComplete);
 			this.tabMyJobs.Controls.Add(this.gridMyJobs);
 			this.tabMyJobs.Location = new System.Drawing.Point(4, 22);
@@ -347,7 +375,7 @@
 			// 
 			this.checkShowComplete.Location = new System.Drawing.Point(6, 6);
 			this.checkShowComplete.Name = "checkShowComplete";
-			this.checkShowComplete.Size = new System.Drawing.Size(184, 20);
+			this.checkShowComplete.Size = new System.Drawing.Size(116, 20);
 			this.checkShowComplete.TabIndex = 244;
 			this.checkShowComplete.Text = "Show Complete";
 			this.checkShowComplete.UseVisualStyleBackColor = true;
@@ -371,32 +399,6 @@
 			this.gridMyJobs.TranslationName = "FormTaskEdit";
 			this.gridMyJobs.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMyJobs_CellDoubleClick);
 			this.gridMyJobs.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMyJobs_CellClick);
-			// 
-			// checkResults
-			// 
-			this.checkResults.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.checkResults.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkResults.Location = new System.Drawing.Point(115, 97);
-			this.checkResults.Name = "checkResults";
-			this.checkResults.Size = new System.Drawing.Size(125, 20);
-			this.checkResults.TabIndex = 235;
-			this.checkResults.Text = "Search Results";
-			this.checkResults.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkResults.UseVisualStyleBackColor = true;
-			this.checkResults.Visible = false;
-			this.checkResults.CheckedChanged += new System.EventHandler(this.checkResults_CheckedChanged);
-			// 
-			// userControlJobEdit
-			// 
-			this.userControlJobEdit.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.userControlJobEdit.Enabled = false;
-			this.userControlJobEdit.IsOverride = false;
-			this.userControlJobEdit.Location = new System.Drawing.Point(3, 3);
-			this.userControlJobEdit.Name = "userControlJobEdit";
-			this.userControlJobEdit.Size = new System.Drawing.Size(1012, 640);
-			this.userControlJobEdit.TabIndex = 0;
-			this.userControlJobEdit.SaveClick += new System.EventHandler(this.userControlJobEdit_SaveClick);
-			this.userControlJobEdit.JobOverride += new OpenDental.InternalTools.Job_Manager.UserControlJobEdit.JobOverrideEvent(this.userControlJobEdit_JobOverride);
 			// 
 			// butSearch
 			// 
@@ -440,6 +442,16 @@
 			this.butAddJob.TabIndex = 227;
 			this.butAddJob.Text = "Add Job";
 			this.butAddJob.Click += new System.EventHandler(this.butAddJob_Click);
+			// 
+			// checkShowVersion
+			// 
+			this.checkShowVersion.Location = new System.Drawing.Point(128, 6);
+			this.checkShowVersion.Name = "checkShowVersion";
+			this.checkShowVersion.Size = new System.Drawing.Size(184, 20);
+			this.checkShowVersion.TabIndex = 245;
+			this.checkShowVersion.Text = "Show Version";
+			this.checkShowVersion.UseVisualStyleBackColor = true;
+			this.checkShowVersion.CheckedChanged += new System.EventHandler(this.checkShowVersion_CheckedChanged);
 			// 
 			// FormJobManager2
 			// 
@@ -507,5 +519,6 @@
 		private UI.ODGrid gridMyJobs;
 		private System.Windows.Forms.CheckBox checkShowComplete;
 		private System.Windows.Forms.CheckBox checkResults;
+		private System.Windows.Forms.CheckBox checkShowVersion;
 	}
 }

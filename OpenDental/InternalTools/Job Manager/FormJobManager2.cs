@@ -180,6 +180,9 @@ namespace OpenDental {
 			gridMyJobs.Columns.Add(new ODGridColumn("Documentor",75) { TextAlign=HorizontalAlignment.Center });// X for yes, - for unassigned
 			gridMyJobs.Columns.Add(new ODGridColumn("Customer\r\nContact",75) { TextAlign=HorizontalAlignment.Center });// X for yes, - for unassigned
 			gridMyJobs.Columns.Add(new ODGridColumn("Watchers",75) { TextAlign=HorizontalAlignment.Center });// X for yes, - for unassigned
+			if(checkShowVersion.Checked) {
+				gridMyJobs.Columns.Add(new ODGridColumn("Version",75) { TextAlign=HorizontalAlignment.Center });
+			}
 			gridMyJobs.Rows.Clear();
 			List<Job> _listJobsSorted = _listJobsAll
 				.OrderBy(x => x.PhaseCur)
@@ -312,6 +315,9 @@ namespace OpenDental {
 				watchers+=string.Format("(+{0})",watcherNums.Count-1);
 			}
 			row.Cells.Add(new ODGridCell(watchers) { CellColor=(watcherNums.Contains(userNumHighlight) ? cLightGreen : Color.Empty) });
+			if(checkShowVersion.Checked) {
+				row.Cells.Add(job.JobVersion.Replace(";","\r\n").Trim());
+			}
 			row.Tag=job;
 			return row;
 		}
@@ -829,6 +835,10 @@ namespace OpenDental {
 		}
 
 		private void checkShowComplete_CheckedChanged(object sender,EventArgs e) {
+			FillGridMyJobs();
+		}
+
+		private void checkShowVersion_CheckedChanged(object sender,EventArgs e) {
 			FillGridMyJobs();
 		}
 
