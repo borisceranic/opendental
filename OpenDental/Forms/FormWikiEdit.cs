@@ -386,6 +386,10 @@ namespace OpenDental {
 				if(!ValidateWikiPage(true)) {
 				return;
 			}
+      if(_isInvalidPreview) {
+        MsgBox.Show(this,"This page is in an invalid state and cannot be saved as a draft.");
+        return;
+      }
 			WikiPageCur.PageContent=textContent.Text;
 			//Fix case on all internal links
 			MatchCollection matches=Regex.Matches(WikiPageCur.PageContent,@"\[\[.+?\]\]");
