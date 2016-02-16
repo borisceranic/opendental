@@ -791,6 +791,18 @@ namespace OpenDental {
 			}
 		}
 
+		public void GoToJob(long jobNum) {
+			Job job=_listJobsAll.FirstOrDefault(x => x.JobNum==jobNum)??Jobs.GetOneFilled(jobNum);
+			if(job==null) {
+				MessageBox.Show("Job not found.");
+				return;
+			}
+			if(JobUnsavedChangesCheck()) {
+				return;//there ARE unsaved changes that the user decided not to save.
+			}
+			userControlJobEdit.LoadJob(job);
+		}
+
 		///<summary>For UI only. Never saved to DB.</summary>
 		private enum GroupJobsBy {
 			None,

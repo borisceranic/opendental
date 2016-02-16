@@ -380,7 +380,7 @@ namespace OpenDental{
 
 		[Category("Data"),Description("Occurs when a user has taken action on an item needing action taken.")]
 		public event ActionNeededEventHandler ActionTaken=null;
-		private FormJobManager2 _formJobManager2; //singleton
+		private static FormJobManager2 _formJobManager2; //singleton
 
 		///<summary></summary>
 		public FormOpenDental(string[] cla){
@@ -6141,6 +6141,20 @@ namespace OpenDental{
 				_formJobManager2.WindowState=FormWindowState.Normal;
 			}
 			_formJobManager2.BringToFront();
+		}
+
+		///<summary>Can be called from anywhere in OD layer to load job. 
+		///It is in FormOpenDental because this is where the static reference to theJob Manager is.</summary>
+		public static void GoToJob(long jobNum) {
+			if(_formJobManager2==null || _formJobManager2.IsDisposed) {
+				_formJobManager2=new FormJobManager2();
+			}
+			_formJobManager2.Show();
+			if(_formJobManager2.WindowState==FormWindowState.Minimized) {
+				_formJobManager2.WindowState=FormWindowState.Normal;
+			}
+			_formJobManager2.BringToFront();
+			_formJobManager2.GoToJob(jobNum);
 		}
 
 		private void menuItemLabCases_Click(object sender,EventArgs e) {

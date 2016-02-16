@@ -149,7 +149,7 @@ namespace OpenDental {
 					foreach(string token in searchTokens.Distinct()) {
 						bool isFound = false;
 						//JOB MATCHES
-						if(jobCur.Title.ToLower().Contains(token) || jobCur.Description.ToLower().Contains(token)) {
+						if(jobCur.Title.ToLower().Contains(token) || jobCur.Description.ToLower().Contains(token) || jobCur.JobNum.ToString().Contains(token)) {
 							isFound=true;
 							isJobMatch=true;
 						}

@@ -37,6 +37,18 @@ namespace OpenDentBusiness{
 			return Crud.JobLinkCrud.SelectMany(command);
 		}
 
+		///<summary>Gets JobLinks for a specified JobNum. Only gets Bugs, Feature Requests, Quotes, and Tasks.</summary>
+		public static List<JobLink> GetForTask(long taskNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<JobLink>>(MethodBase.GetCurrentMethod(),taskNum);
+			}
+			if(taskNum==0) {
+				return new List<JobLink>();
+			}
+			string command = "SELECT * FROM joblink WHERE FKey="+POut.Long(taskNum)+" AND LinkType="+POut.Int((int)JobLinkType.Task);
+			return Crud.JobLinkCrud.SelectMany(command);
+		}
+
 		///<summary>Gets JobLinks for a specified JobNum. Only gets Bugs, Feature Requests, and Tasks.</summary>
 		public static List<JobLink> GetJobLinks(long jobNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
