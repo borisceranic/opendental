@@ -196,6 +196,28 @@ namespace OpenDentBusiness{
 			}
 		}
 
+		///<summary>Similar to Crud.ScheduleCrud.Update except this also handles ScheduleOps.</summary>
+		public static void Update(Schedule schedNew,Schedule schedOld,bool validate) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),schedNew,schedOld);
+				return;
+			}
+			if(validate) {
+				Validate(schedNew);
+			}
+			Crud.ScheduleCrud.Update(schedNew,schedOld); //may not cause an update, but we still need to check for updates to ScheduleOps below.
+			//Sort Ops for SequenceEqual call below.
+			schedNew.Ops.Sort();
+			schedOld.Ops.Sort();
+			if(schedNew.Ops.SequenceEqual(schedOld.Ops)) {  //If both lists contain exactly the same ops.
+				return;//no updates to ScheduleOps needed
+			}
+			string command = "DELETE FROM scheduleop WHERE ScheduleNum="+POut.Long(schedNew.ScheduleNum);
+			Db.NonQ(command);
+			//re-insert ScheduleOps based on the list of opnums in schedNew.Ops
+			schedNew.Ops.ForEach(x => ScheduleOps.Insert(new ScheduleOp() { ScheduleNum=schedNew.ScheduleNum, OperatoryNum=x }));
+		}
+
 		///<summary>Set validate to true to throw an exception if start and stop times need to be validated.  If validate is set to false, then the calling code is responsible for the validation.  Also inserts necessary scheduleop enteries.</summary>
 		public static long Insert(Schedule sched,bool validate){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -692,39 +714,107 @@ namespace OpenDentBusiness{
 			return retVal.Date;
 		}
 
-		///<summary>Surround with try/catch.  Deletes all existing practice schedules for the provided date.  Deletes all provider and employee schedules for the day for the ones passed in.  After deleting all of those schedule entries, this method will loop through the provided list of schedules and insert them into the database.</summary>
-		public static void SetForDay(List<Schedule> listScheds,DateTime dateSched,List<long> listProvNums,List<long> listEmpNums) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),listScheds,dateSched,listProvNums,listEmpNums);
-				return;
-			}
-			for(int i=0;i<listScheds.Count;i++) {
+		///<summary>Surround with try/catch.  Uses Sync to update the database with the changes made to listScheds from the stale listSchedsOld.</summary>
+		public static void SetForDay(List<Schedule> listScheds,List<Schedule> listSchedsOld) {
+			for(int i = 0;i<listScheds.Count;i++) {
 				if(listScheds[i].StartTime > listScheds[i].StopTime) {
 					throw new Exception(Lans.g("Schedule","Stop time must be later than start time."));
 				}
 			}
-			//make deleted entries for synch purposes:
-			List<Schedule> listSchedsDb=RefreshDayEditForPracticeProvsEmps(dateSched,listProvNums,listEmpNums);
-			List<long> listScheduleNums=new List<long>();  //Used for deleting scheduleops below
-			for(int i=0;i<listSchedsDb.Count;i++) {
-				//Add entry to deletedobjects table if it is a provider schedule type
-				if(listSchedsDb[i].SchedType==ScheduleType.Provider) {
-					DeletedObjects.SetDeleted(DeletedObjectType.ScheduleProv,listSchedsDb[i].ScheduleNum);
+			Sync(listScheds,listSchedsOld);
+		}
+
+		///<summary>Inserts, updates, or deletes the passed in listNew against the stale listOld.  Returns true if db changes were made.
+		///This does not call the normal crud.Sync due to the special cases of DeletedObject and ScheduleOps.
+		///This sends less data across middle teir for update logic, which is why remoting role occurs after we have filtered both lists.</summary>
+		public static bool Sync(List<Schedule> listNew,List<Schedule> listOld) {
+			//No call to DB yet, remoting role to be checked later.
+			//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.
+			List<Schedule> listIns = new List<Schedule>();
+			List<Schedule> listUpdNew = new List<Schedule>();
+			List<Schedule> listUpdDB = new List<Schedule>();
+			List<Schedule> listDel = new List<Schedule>();
+			listNew.Sort((Schedule x,Schedule y) => { return x.ScheduleNum.CompareTo(y.ScheduleNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
+			listOld.Sort((Schedule x,Schedule y) => { return x.ScheduleNum.CompareTo(y.ScheduleNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
+			int idxNew = 0;
+			int idxDB = 0;
+			Schedule fieldNew;
+			Schedule fieldDB;
+			//Because both lists have been sorted using the same criteria, we can now walk each list to determine which list contians the next element.  The next element is determined by Primary Key.
+			//If the New list contains the next item it will be inserted.  If the DB contains the next item, it will be deleted.  If both lists contain the next item, the item will be updated.
+			while(idxNew<listNew.Count || idxDB<listOld.Count) {
+				fieldNew=null;
+				if(idxNew<listNew.Count) {
+					fieldNew=listNew[idxNew];
 				}
-				//regardless of the type, practice, provider or employee, add to the list to delete scheduleop entries below
-				listScheduleNums.Add(listSchedsDb[i].ScheduleNum);
+				fieldDB=null;
+				if(idxDB<listOld.Count) {
+					fieldDB=listOld[idxDB];
+				}
+				//begin compare
+				if(fieldNew!=null && fieldDB==null) {//listNew has more items, listDB does not.
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew==null && fieldDB!=null) {//listDB has more items, listNew does not.
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				else if(fieldNew.ScheduleNum<fieldDB.ScheduleNum) {//newPK less than dbPK, newItem is 'next'
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew.ScheduleNum>fieldDB.ScheduleNum) {//dbPK less than newPK, dbItem is 'next'
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				//This filters out schedules that do not need to be updated, instead of relying on the update new/old pattern to filter.
+				//Everything past this point needs to increment idxNew and idxDB.
+				else if(Crud.ScheduleCrud.UpdateComparison(fieldNew,fieldDB) || !fieldNew.Ops.OrderBy(x=>x).SequenceEqual(fieldDB.Ops.OrderBy(x=>x)))  //if the two lists are not identical
+				{
+					//Both lists contain the 'next' item, update required
+					listUpdNew.Add(fieldNew);
+					listUpdDB.Add(fieldDB);
+				}
+				idxNew++;
+				idxDB++;
+				//There is nothing to do with this schedule?
 			}
-			if(listScheduleNums.Count>0) {
-				//Then, bulk delete.
-				string command="DELETE FROM schedule WHERE ScheduleNum IN("+String.Join(",",listScheduleNums)+")";
-				Db.NonQ(command);
-				//Delete scheduleops for the deleted schedules.
-				command="DELETE FROM scheduleop WHERE ScheduleNum IN("+String.Join(",",listScheduleNums)+")";
-				Db.NonQ(command);
+			if(listIns.Count==0 && listUpdNew.Count==0 && listUpdDB.Count==0 && listDel.Count==0) {
+				return false;//No need to go through remoting role check and following code because it will do nothing
 			}
-			for(int i=0;i<listScheds.Count;i++) {
-				Insert(listScheds[i],false);
+			//This sync logic was split up from the typical sync logic in order to restrict payload sizes that are sent over middle tier.
+			//If this method starts having issues in the future we will need to serialize the lists into DataTables to further save size.
+			return SyncToDbHelper(listIns,listUpdNew,listUpdDB,listDel);
+		}
+
+		///<summary>Inserts, updates, or deletes database rows sepcified in the supplied lists.  Returns true if db changes were made.
+		///This was split from the list building logic to limit the payload that needed to be sent over middle tier.</summary>
+		public static bool SyncToDbHelper(List<Schedule> listIns,List<Schedule> listUpdNew,List<Schedule> listUpdDB,List<Schedule> listDel) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),listIns,listUpdNew,listUpdDB,listDel);
 			}
+			//Commit changes to DB 
+			//to foreach loops
+			for(int i = 0;i<listIns.Count;i++) {
+				Insert(listIns[i],false);
+			}
+			for(int i = 0;i<listUpdNew.Count;i++) {
+				Update(listUpdNew[i],listUpdDB[i],false);
+			}
+			for(int i = 0;i<listDel.Count;i++) {
+				Delete(listDel[i]);
+			}
+			if(listIns.Count>0 || listUpdNew.Count>0 || listDel.Count>0) {
+				//Unlike base Sync pattern, we already know that anything in the listUpdNew should be updated.
+				//filtering for update should have already been performed, otherwise the return value may be a false positive.
+				return true;
+			}
+			return false;
 		}
 
 		///<summary>Clears all schedule entries for the given date range and the given providers, employees, and practice.</summary>

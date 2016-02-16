@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using OpenDental.UI;
+using System.Linq;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -32,7 +33,10 @@ namespace OpenDental{
 		private TabPage tabPage1;
 		private TabPage tabPage2;
 		private GraphScheduleDay graphScheduleDay;
+		///<summary>Working copy of schedule entries.</summary>
 		private List<Schedule> _listScheds;
+		///<summary>Stale copy of schedule entries.</summary>
+		private List<Schedule> _listSchedsOld;
 		private long _clinicNum;
 		private List<Provider> _listProvs;
 		private List<Employee> _listEmps;
@@ -455,6 +459,7 @@ namespace OpenDental{
 				_listEmpNums.Add(_listEmps[i].EmployeeNum);
 			}
 			_listScheds=Schedules.RefreshDayEditForPracticeProvsEmps(_dateSched,_listProvNums,_listEmpNums);//only does this on startup
+			_listSchedsOld=_listScheds.Select(x => x.Copy()).ToList();
 			for(int i=0;i<_listProvs.Count;i++) {
 				listProv.Items.Add(_listProvs[i].Abbr);
 			}
@@ -734,7 +739,7 @@ namespace OpenDental{
 
 		private void butOK_Click(object sender,EventArgs e) {
 			try {
-				Schedules.SetForDay(_listScheds,_dateSched,_listProvNums,_listEmpNums);
+				Schedules.SetForDay(_listScheds,_listSchedsOld);
 			}
 			catch(Exception ex) {
 				MsgBox.Show(this,ex.Message);
