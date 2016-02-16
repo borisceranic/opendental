@@ -321,11 +321,11 @@ namespace OpenDental {
 		}
 
 		private void Save_Click() {
-      if(_isInvalidPreview) {
-        MsgBox.Show(this,"This page is in an invalid state an cannot be saved.");
+      if(!ValidateWikiPage(true)) {
         return;
       }
-      if(!ValidateWikiPage(true)) {
+      if(_isInvalidPreview) {
+        MsgBox.Show(this,"This page is in an invalid state and cannot be saved.");
         return;
       }
 			WikiPage wikiPageDB=WikiPages.GetByTitle(WikiPageCur.PageTitle);
