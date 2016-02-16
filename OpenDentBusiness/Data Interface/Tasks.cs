@@ -276,11 +276,13 @@ namespace OpenDentBusiness{
 					+",1 AS IsUnread,";//we fill the IsUnread column with 1's because we already know that they are all unread
 			}
 			command+="tasklist.Descript ParentDesc, "	/*Renamed to keep same column name as old query*/
-					+"patient.LName,patient.FName,patient.Preferred "
+					+"patient.LName,patient.FName,patient.Preferred, "
+					+"COALESCE(MAX(tasknote.DateTimeNote),task.DateTimeEntry) AS 'LastUpdated' "
 				+"FROM task "
 				+"INNER JOIN taskunread ON task.TaskNum=taskunread.TaskNum "
 					+"AND taskunread.UserNum = "+POut.Long(userNum)+" "
 				+"LEFT JOIN tasklist ON task.TaskListNum=tasklist.TaskListNum "
+				+"LEFT JOIN tasknote ON task.TaskNum=tasknote.TaskNum "
 				+"LEFT JOIN patient ON task.KeyNum=patient.PatNum "
 					+"AND task.ObjectType="+POut.Int((int)TaskObjectType.Patient)+" ";
 			if(DataConnection.DBtype==DatabaseType.MySql) {
