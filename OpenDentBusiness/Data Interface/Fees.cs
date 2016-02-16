@@ -668,6 +668,9 @@ namespace OpenDentBusiness{
 				idxDB++;
 				//There is nothing to do with this fee?
 			}
+			if(listIns.Count==0 && listUpdNew.Count==0 && listUpdDB.Count==0 && listDel.Count==0) {
+				return false;//No need to go through remoting role check and following code because it will do nothing.
+			}
 			//This sync logic was split up from the typical sync logic in order to restrict payload sizes that are sent over middle tier.
 			//Without first making the lists of fees as small as possible, some fee lists were so large that the maximum SOAP payload size was getting met.
 			//If this method starts having issues in the future we will need to serialize the lists of fees into DataTables to further save size.
