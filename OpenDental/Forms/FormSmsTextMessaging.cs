@@ -568,12 +568,17 @@ namespace OpenDental {
 				return;
 			}
 			try {
+        if(Plugins.HookMethod(this,"FormSmsTextMessaging.butReply_Click_sendSmsSingle",patNum,mobileNumber,textReply.Text,YN.Yes))
+        {
+          goto HookSkipSmsCall;
+        }
 				SmsToMobiles.SendSmsSingle(patNum,mobileNumber,textReply.Text,clinicNum);
 			}
 			catch(Exception ex) {
 				MessageBox.Show(ex.Message);
 				return;
 			}
+      HookSkipSmsCall: { }
 			textReply.Text="";
 			FillGridMessageThread(patNum);
 		}
