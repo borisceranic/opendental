@@ -20,6 +20,7 @@ namespace OpenDental {
 		private bool closingIsSave;//used to differentiate what action caused the form to close.
 		private string AggregateContent;
 		private int ScrollTop;
+    private bool _isInvalidPreview;
 		
 		public FormWikiEdit() {
 			InitializeComponent();
@@ -74,8 +75,10 @@ namespace OpenDental {
 					ScrollTop=webBrowserWiki.Document.GetElementsByTagName("HTML")[0].ScrollTop;
 				}
 				webBrowserWiki.DocumentText=WikiPages.TranslateToXhtml(textContent.Text,true);
+        _isInvalidPreview=false;
 			}
 			catch(Exception ex) {
+        _isInvalidPreview=true;
 				//don't refresh
 			}
 			//textContent.Focus();//this was causing a bug where it would re-highlight text after a backspace.
@@ -312,6 +315,10 @@ namespace OpenDental {
 		}
 
 		private void Save_Click() {
+      if(_isInvalidPreview) {
+        MsgBox.Show(this,"This page is in an invalid state an cannot be saved.");
+        return;
+      }
 			if(!ValidateWikiPage(true)) {
 				return;
 			}
