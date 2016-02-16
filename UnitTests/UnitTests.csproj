@@ -156,6 +156,7 @@
     <Compile Include="Sandbox.cs" />
     <Compile Include="SchemaT.cs" />
     <Compile Include="ToothT.cs" />
+    <Compile Include="UpdateHistoryT.cs" />
     <Compile Include="WebServiceT.cs" />
   </ItemGroup>
   <ItemGroup>

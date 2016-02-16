@@ -2977,6 +2977,7 @@ namespace UnitTests {
 			pat.BillingCycleDay=11;
 			Patients.Update(pat,patOld);
 			Prefs.UpdateBool(PrefName.BillingUseBillingCycleDay,true);
+			UpdateHistoryT.CreateUpdateHistory("16.1.1.0");
 			DataValid.SetInvalid(InvalidType.Prefs);
 			//delete all existing repeating charges
 			List<RepeatCharge> listRepeatingCharges=RepeatCharges.Refresh(0).ToList();
@@ -3115,17 +3116,18 @@ namespace UnitTests {
 			pat.BillingCycleDay=11;
 			Patients.Update(pat,patOld);
 			Prefs.UpdateBool(PrefName.BillingUseBillingCycleDay,true);
+			UpdateHistoryT.CreateUpdateHistory("16.1.1.0");//Sets a timestamp that determines which logic we use to calculate repeate charge procedures
 			DataValid.SetInvalid(InvalidType.Prefs);
 			List<RepeatCharge> listRepeatingCharges=RepeatCharges.Refresh(0).ToList();
 			listRepeatingCharges.ForEach(x => RepeatCharges.Delete(x));
-			DateTime dateRun=new DateTime(2015,12,15);
+			DateTime dateRun=new DateTime(DateTime.Today.AddMonths(2).Year,DateTime.Today.AddMonths(2).Month,15);//The 15th of two months from now
 			List<int> listFailedTests=new List<int>();
 			RepeatCharge rc=new RepeatCharge();
 			rc.ChargeAmt=99;
 			rc.PatNum=pat.PatNum;
 			rc.ProcCode="D2750";
 			rc.IsEnabled=true;
-			rc.DateStart=new DateTime(2015,11,1);
+			rc.DateStart=new DateTime(DateTime.Today.Year,DateTime.Today.Month,15);//The 15th of this month
 			rc.Note="Charge #1";
 			rc.CopyNoteToProc=true;
 			rc.RepeatChargeNum=RepeatCharges.Insert(rc);
@@ -3134,7 +3136,7 @@ namespace UnitTests {
 			rc.PatNum=pat.PatNum;
 			rc.ProcCode="D2750";
 			rc.IsEnabled=true;
-			rc.DateStart=new DateTime(2015,11,1);
+			rc.DateStart=new DateTime(DateTime.Today.Year,DateTime.Today.Month,15);
 			rc.Note="Charge #2";
 			rc.CopyNoteToProc=true;
 			rc.RepeatChargeNum=RepeatCharges.Insert(rc);
@@ -3143,95 +3145,97 @@ namespace UnitTests {
 			rc.PatNum=pat.PatNum;
 			rc.ProcCode="D2750";
 			rc.IsEnabled=true;
-			rc.DateStart=new DateTime(2015,11,1);
+			rc.DateStart=new DateTime(DateTime.Today.Year,DateTime.Today.Month,15);
 			rc.Note="Charge #3";
 			rc.CopyNoteToProc=true;
 			rc.RepeatChargeNum=RepeatCharges.Insert(rc);
 			//Subtest 1 ===============================================================
 			//There are three procedures with the same amount, proc code, and start date. Run the repeat charge tool. Delete all procedures from 
-			//November. Run the repeat charge tool again. Make sure that the correct repeat charges were added back.
+			//last month. Run the repeat charge tool again. Make sure that the correct repeat charges were added back.
 			FormRepeatChargesUpdate FormRCU =new FormRepeatChargesUpdate();
 			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
 			List<Procedure> procs=Procedures.Refresh(pat.PatNum);
-			//Delete all procedures from November
-			procs.FindAll(x => x.ProcDate.Month==11)
+			int lastMonth=dateRun.AddMonths(-1).Month;
+			int thisMonth=dateRun.Month;
+			//Delete all procedures from last month
+			procs.FindAll(x => x.ProcDate.Month==lastMonth)
 				.ForEach(x => Procedures.Delete(x.ProcNum));
 			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
 			procs=Procedures.Refresh(pat.PatNum);
 			//Make sure that the correct number of procedures were added using the correct repeating charges
 			if(procs.Count!=6
-				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #1").Count!=1
-				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #2").Count!=1
-				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #3").Count!=1
-				|| procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #1").Count!=1
-				|| procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #2").Count!=1
-				|| procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #3").Count!=1) 
+				|| procs.FindAll(x => x.ProcDate.Month==lastMonth && x.BillingNote=="Charge #1").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==lastMonth && x.BillingNote=="Charge #2").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==lastMonth && x.BillingNote=="Charge #3").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==thisMonth && x.BillingNote=="Charge #1").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==thisMonth && x.BillingNote=="Charge #2").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==thisMonth && x.BillingNote=="Charge #3").Count!=1) 
 			{
 				listFailedTests.Add(1);
 			}
 			//Subtest 2 ===============================================================
-			//Run the repeat charge tool. Delete all procedures from December. Run the repeat charge tool again. Make sure that the correct
+			//Run the repeat charge tool. Delete all procedures from this month. Run the repeat charge tool again. Make sure that the correct
 			//repeat charges were added back.
 			procs.ForEach(x => Procedures.Delete(x.ProcNum));
 			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
 			procs=Procedures.Refresh(pat.PatNum);
-			//Delete all procedures from December
-			procs.FindAll(x => x.ProcDate.Month==12)
+			//Delete all procedures from this month
+			procs.FindAll(x => x.ProcDate.Month==thisMonth)
 				.ForEach(x => Procedures.Delete(x.ProcNum));
 			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
 			procs=Procedures.Refresh(pat.PatNum);
 			//Make sure that the correct number of procedures were added using the correct repeating charges
 			if(procs.Count!=6
-				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #1").Count!=1
-				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #2").Count!=1
-				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #3").Count!=1
-				|| procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #1").Count!=1
-				|| procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #2").Count!=1
-				|| procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #3").Count!=1) 
+				|| procs.FindAll(x => x.ProcDate.Month==lastMonth && x.BillingNote=="Charge #1").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==lastMonth && x.BillingNote=="Charge #2").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==lastMonth && x.BillingNote=="Charge #3").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==thisMonth && x.BillingNote=="Charge #1").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==thisMonth && x.BillingNote=="Charge #2").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==thisMonth && x.BillingNote=="Charge #3").Count!=1) 
 			{
 				listFailedTests.Add(2);
 			}
 			//Subtest 3 ===============================================================
-			//Run the repeat charge tool. Delete one procedure from December. Run the repeat charge tool again. Make sure that the correct
+			//Run the repeat charge tool. Delete one procedure from this month. Run the repeat charge tool again. Make sure that the correct
 			//repeat charges were added back.
 			procs.ForEach(x => Procedures.Delete(x.ProcNum));
 			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
 			procs=Procedures.Refresh(pat.PatNum);
-			//Delete one procedure from December
-			procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #1")
+			//Delete one procedure from this month
+			procs.FindAll(x => x.ProcDate.Month==thisMonth && x.BillingNote=="Charge #1")
 				.ForEach(x => Procedures.Delete(x.ProcNum));
 			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
 			procs=Procedures.Refresh(pat.PatNum);
 			//Make sure that the correct number of procedures were added using the correct repeating charges
 			if(procs.Count!=6
-				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #1").Count!=1
-				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #2").Count!=1
-				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #3").Count!=1
-				|| procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #1").Count!=1
-				|| procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #2").Count!=1
-				|| procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #3").Count!=1) 
+				|| procs.FindAll(x => x.ProcDate.Month==lastMonth && x.BillingNote=="Charge #1").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==lastMonth && x.BillingNote=="Charge #2").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==lastMonth && x.BillingNote=="Charge #3").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==thisMonth && x.BillingNote=="Charge #1").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==thisMonth && x.BillingNote=="Charge #2").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==thisMonth && x.BillingNote=="Charge #3").Count!=1) 
 			{
 				listFailedTests.Add(3);
 			}
 			//Subtest 4 ===============================================================
-			//Run the repeat charge tool. Delete one procedure from November. Run the repeat charge tool again. Make sure that the correct
+			//Run the repeat charge tool. Delete one procedure from last month. Run the repeat charge tool again. Make sure that the correct
 			//repeat charges were added back.
 			procs.ForEach(x => Procedures.Delete(x.ProcNum));
 			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
 			procs=Procedures.Refresh(pat.PatNum);
-			//Delete one procedure from November
-			procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #1")
+			//Delete one procedure from last month
+			procs.FindAll(x => x.ProcDate.Month==lastMonth && x.BillingNote=="Charge #1")
 				.ForEach(x => Procedures.Delete(x.ProcNum));
 			FormRCU.RunRepeatingChargesForUnitTests(dateRun);
 			procs=Procedures.Refresh(pat.PatNum);
 			//Make sure that the correct number of procedures were added using the correct repeating charges
 			if(procs.Count!=6
-				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #1").Count!=1
-				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #2").Count!=1
-				|| procs.FindAll(x => x.ProcDate.Month==11 && x.BillingNote=="Charge #3").Count!=1
-				|| procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #1").Count!=1
-				|| procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #2").Count!=1
-				|| procs.FindAll(x => x.ProcDate.Month==12 && x.BillingNote=="Charge #3").Count!=1) 
+				|| procs.FindAll(x => x.ProcDate.Month==lastMonth && x.BillingNote=="Charge #1").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==lastMonth && x.BillingNote=="Charge #2").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==lastMonth && x.BillingNote=="Charge #3").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==thisMonth && x.BillingNote=="Charge #1").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==thisMonth && x.BillingNote=="Charge #2").Count!=1
+				|| procs.FindAll(x => x.ProcDate.Month==thisMonth && x.BillingNote=="Charge #3").Count!=1) 
 			{
 				listFailedTests.Add(4);
 			}
@@ -3254,6 +3258,7 @@ namespace UnitTests {
 			pat.BillingCycleDay=11;
 			Patients.Update(pat,patOld);
 			Prefs.UpdateBool(PrefName.BillingUseBillingCycleDay,true);
+			UpdateHistoryT.CreateUpdateHistory("16.1.1.0");
 			DataValid.SetInvalid(InvalidType.Prefs);
 			List<RepeatCharge> listRepeatingCharges=RepeatCharges.Refresh(0).ToList();
 			listRepeatingCharges.ForEach(x => RepeatCharges.Delete(x));
@@ -3325,6 +3330,7 @@ namespace UnitTests {
 			pat.BillingCycleDay=15;
 			Patients.Update(pat,patOld);
 			Prefs.UpdateBool(PrefName.BillingUseBillingCycleDay,true);
+			UpdateHistoryT.CreateUpdateHistory("16.1.1.0");
 			DataValid.SetInvalid(InvalidType.Prefs);
 			List<RepeatCharge> listRepeatingCharges=RepeatCharges.Refresh(0).ToList();
 			listRepeatingCharges.ForEach(x => RepeatCharges.Delete(x));
