@@ -48,6 +48,27 @@ namespace OpenDentBusiness{
 			return Crud.PayPlanCrud.SelectMany(command);
 		}
 
+		///<summary>Returns true if the patient passed in has any outstanding non-ins payment plans with them as the guarantor.</summary>
+		public static bool HasOutstandingPayPlansNoIns(long guarNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),guarNum);
+			}
+			string command="SELECT SUM(paysplit.SplitAmt) FROM paysplit "
+				+"INNER JOIN payplan ON paysplit.PayPlanNum=payplan.PayPlanNum "
+				+"WHERE payplan.PlanNum=0 "
+				+"AND payplan.Guarantor="+POut.Long(guarNum);
+			double amtPaid=PIn.Double(Db.GetScalar(command));
+			command="SELECT SUM(payplancharge.Principal+payplancharge.Interest) FROM payplancharge "
+				+"INNER JOIN payplan ON payplancharge.PayPlanNum=payplan.PayPlanNum "
+				+"WHERE payplan.PlanNum=0 "
+				+"AND payplan.Guarantor="+POut.Long(guarNum);
+			double totalCost=PIn.Double(Db.GetScalar(command));
+			if(totalCost-amtPaid < .01) {
+				return false;
+			}
+			return true;
+		}
+
 		///<summary>Get all payment plans for this patient with the insurance plan identified by PlanNum and InsSubNum attached (marked used for tracking expected insurance payments) that have not been paid in full.  Only returns plans with no claimprocs currently attached or claimprocs from the claim identified by the claimNum sent in attached.  If claimNum is 0 all payment plans with planNum, insSubNum, and patNum not paid in full will be returned.</summary>
 		public static List<PayPlan> GetValidInsPayPlans(long patNum,long planNum,long insSubNum,long claimNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

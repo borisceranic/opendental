@@ -312,6 +312,7 @@ namespace OpenDental {
 			// 
 			// checkPayPlan
 			// 
+			this.checkPayPlan.Enabled = false;
 			this.checkPayPlan.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.checkPayPlan.Location = new System.Drawing.Point(694, 116);
 			this.checkPayPlan.Name = "checkPayPlan";
@@ -528,6 +529,7 @@ namespace OpenDental {
 			// 
 			// gridBal
 			// 
+			this.gridBal.HasAddButton = false;
 			this.gridBal.HasMultilineHeaders = false;
 			this.gridBal.HScrollVisible = false;
 			this.gridBal.Location = new System.Drawing.Point(588, 234);
@@ -542,6 +544,7 @@ namespace OpenDental {
 			// 
 			// gridMain
 			// 
+			this.gridMain.HasAddButton = false;
 			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(7, 234);
@@ -852,9 +855,6 @@ namespace OpenDental {
 			if(_paymentCur.PayType==0) {
 				checkPayTypeNone.Checked=true;
 			}
-			//if(listPayType.SelectedIndex==-1) {
-			//	listPayType.SelectedIndex=0;
-			//}
 			textNote.Text=_paymentCur.PayNote;
 			if(_paymentCur.DepositNum==0) {
 				labelDeposit.Visible=false;
@@ -868,41 +868,21 @@ namespace OpenDental {
 			}
 			_listPaySplits=PaySplits.GetForPayment(_paymentCur.PayNum);//Count might be 0
 			_listPaySplitsOld=new List<PaySplit>();
-			//SplitListOld.AddRange(SplitList);//Do NOT do this.  It's a shallow copy only.  Not what we want.
 			for(int i=0;i<_listPaySplits.Count;i++) {
 				_listPaySplitsOld.Add(_listPaySplits[i].Copy());
 			}
-			if(IsNew) {
-				List<PayPlan> payPlanList=PayPlans.GetValidPlansNoIns(_patCur.PatNum);
-				if(payPlanList.Count==0) {
-					//
-				}
-				else if(payPlanList.Count==1) { //if there is only one valid payplan
-					if(!PayPlans.PlanIsPaidOff(payPlanList[0].PayPlanNum)) {
-						AddOneSplit();//the amount and date will be updated upon closing
-						_listPaySplits[_listPaySplits.Count-1].PayPlanNum=payPlanList[0].PayPlanNum;
-						SetPaySplitProvAndClinicForPayPlan(_listPaySplits[_listPaySplits.Count-1]);
+			//If not new but this payment was attached to payplan, check and enable the box.
+			if(_listPaySplits.Count > 0 && _listPaySplits[0].PayPlanNum!=0) {
+				checkPayPlan.Enabled=true;
+				checkPayPlan.Checked=true;
+			}
+			else {//Either a new payment or is an old payment that was not for a payment plan.
+				if(PayPlans.HasOutstandingPayPlansNoIns(_patCur.PatNum)) {
+					checkPayPlan.Enabled=true;//Allows the user to attach an old payment to a payment plan.
+					if(IsNew) {//If it's a new payment, check the box by default (Old behavior).
+						checkPayPlan.Checked=true;
 					}
 				}
-				else {
-					List<PayPlanCharge> chargeList=PayPlanCharges.Refresh(_patCur.PatNum);
-					//enhancement needed to weed out payment plans that are all paid off
-					//more than one valid PayPlan
-					FormPayPlanSelect FormPPS=new FormPayPlanSelect(payPlanList,chargeList);
-					FormPPS.ShowDialog();
-					if(FormPPS.DialogResult==DialogResult.OK) {
-						//return PayPlanList[FormPPS.IndexSelected].Clone();
-						AddOneSplit();//the amount and date will be updated upon closing
-						_listPaySplits[_listPaySplits.Count-1].PayPlanNum=payPlanList[FormPPS.IndexSelected].PayPlanNum;
-						SetPaySplitProvAndClinicForPayPlan(_listPaySplits[_listPaySplits.Count-1]);
-					}
-				}
-				/*
-				PayPlan payPlanCur=GetValidPlan(PatCur.PatNum,false);// PayPlans.GetValidPlan(PatCur.PatNum,false);
-				if(payPlanCur!=null) {//a valid payPlan was located
-					AddOneSplit();//the amount and date will be updated upon closing
-					SplitList[SplitList.Count-1].PayPlanNum=payPlanCur.PayPlanNum;
-				}*/
 			}
 			FillMain();
 			if(InitialPaySplit!=0) {
@@ -1047,19 +1027,6 @@ namespace OpenDental {
 			}
 			gridMain.EndUpdate();
 			textTotal.Text=splitTotal.ToString("F");
-			if(_listPaySplits.Count==1) {
-				checkPayPlan.Enabled=true;
-				if(((PaySplit)_listPaySplits[0]).PayPlanNum>0) {
-					checkPayPlan.Checked=true;
-				}
-				else {
-					checkPayPlan.Checked=false;
-				}
-			}
-			else {
-				checkPayPlan.Checked=false;
-				checkPayPlan.Enabled=false;
-			}
 			FillGridBal();
 		}
 
@@ -1267,54 +1234,11 @@ namespace OpenDental {
 			textAmount.Text=textTotal.Text;
 		}
 
-		private void checkPayPlan_Click(object sender,System.EventArgs e) {
-			//*****if there is more than one split, then this checkbox is not even available.
-			if(_listPaySplits.Count==0) {
-				AddOneSplit();//won't use returned value
-				FillMain();
-				checkPayPlan.Checked=true;
-				//now there is exactly one.  The amount will be updated as the form closes.
+		private void checkPayPlan_Click(object sender,EventArgs e) {
+			if(checkPayPlan.Checked && _listPaySplits.Count>1) {//Trying to check box when there's more than one paysplit in the payment.
+				MsgBox.Show(this,"Cannot apply payment to a payment plan when there is more than one paysplit.");
+				checkPayPlan.Checked=false;
 			}
-			if(checkPayPlan.Checked) {
-				//PayPlan payPlanCur=PayPlans.GetValidPlan(SplitList[0].PatNum);
-				List<PayPlan> payPlanList=PayPlans.GetValidPlansNoIns(_listPaySplits[0].PatNum);
-				if(payPlanList.Count==0) {
-					MsgBox.Show(this,"The selected patient is not the guarantor for any payment plans.");
-					checkPayPlan.Checked=false;
-					return;
-				}
-				else if(payPlanList.Count==1) { //if there is only one valid payplan
-					_listPaySplits[0].PayPlanNum=payPlanList[0].PayPlanNum;
-					SetPaySplitProvAndClinicForPayPlan(_listPaySplits[0]);
-				}
-				else {//multiple valid plans
-					List<PayPlanCharge> chargeList=PayPlanCharges.Refresh(_listPaySplits[0].PatNum);
-					//enhancement needed to weed out payment plans that are all paid off
-					//more than one valid PayPlan
-					FormPayPlanSelect FormPPS=new FormPayPlanSelect(payPlanList,chargeList);
-					FormPPS.ShowDialog();
-					if(FormPPS.DialogResult==DialogResult.OK) {
-						_listPaySplits[0].PayPlanNum=payPlanList[FormPPS.IndexSelected].PayPlanNum;
-						SetPaySplitProvAndClinicForPayPlan(_listPaySplits[0]);
-					}
-					else {
-						checkPayPlan.Checked=false;
-						return;
-					}
-				}
-				/*
-				if(payPlanCur==null){//no valid plans
-					MsgBox.Show(this,"The selected patient is not the guarantor for any payment plans.");
-					checkPayPlan.Checked=false;
-					return;
-				}
-				SplitList[0].PayPlanNum=payPlanCur.PayPlanNum;*/
-			}
-			else {//payPlan unchecked
-				_listPaySplits[0].PayPlanNum=0;
-				//User can go in and manually edit the provider and clinic if they need to at this point.
-			}
-			FillMain();
 		}
 
 		/// <summary>Adds one split to work with.  Called when checkPayPlan click, or upon load if auto attaching to payplan, or upon OK click if no splits were created.</summary>
@@ -2344,6 +2268,15 @@ namespace OpenDental {
 					return false;
 				}
 			}
+			if(checkPayPlan.Checked) {//This checkbox is disabled if there are no payplans.  This checkbox can't be checked if there's more than 1 paysplit in the list.
+				if(!CreateSplitForPayPlan()) {
+					return false;
+				}
+				FillMain();//Shows the user the new paysplit that was created and updates the textTotal text box (error checked below).
+			}
+			else if(_listPaySplits.Count>0 && _listPaySplits[0].PayPlanNum!=0) {
+				_listPaySplits[0].PayPlanNum=0;
+			}
 			bool accountingSynchRequired=false;
 			double accountingOldAmt=_paymentCur.PayAmt;
 			long accountingNewAcct=-1;//the old acctNum will be retrieved inside the validation code.
@@ -2507,6 +2440,37 @@ namespace OpenDental {
 			return true;
 		}
 
+		///<summary>Can return false if the user cancels out of picking which payment plan to apply the paysplit to.</summary>
+		private bool CreateSplitForPayPlan() {
+			List<PayPlan> payPlanList=PayPlans.GetValidPlansNoIns(_patCur.PatNum);
+			long payPlanNum=0;
+			if(payPlanList.Count==1) { //if there is only one valid payplan
+				payPlanNum=payPlanList[0].PayPlanNum;
+			}
+			else {//multiple valid plans
+				List<PayPlanCharge> chargeList=PayPlanCharges.Refresh(_patCur.PatNum);
+				//enhancement needed to weed out payment plans that are all paid off
+				//more than one valid PayPlan
+				FormPayPlanSelect FormPPS=new FormPayPlanSelect(payPlanList,chargeList);
+				FormPPS.ShowDialog();
+				if(FormPPS.DialogResult==DialogResult.OK) {
+					payPlanNum=payPlanList[FormPPS.IndexSelected].PayPlanNum;
+				}
+				else {
+					return false;
+				}
+			}
+			if(_listPaySplits.Count==0) {//Generate a paysplit
+				AddOneSplit();
+				_listPaySplits[0].PayPlanNum=payPlanNum;
+				SetPaySplitProvAndClinicForPayPlan(_listPaySplits[0]);
+			}
+			else {
+				_listPaySplits[0].PayPlanNum=payPlanNum;
+			}
+			return true;
+		}
+
 		private void butOK_Click(object sender,System.EventArgs e) {
 			if(!SavePaymentToDb()) {
 				return;
@@ -2627,30 +2591,5 @@ namespace OpenDental {
 			}
 			DialogResult=DialogResult.Cancel;
 		}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	}
 }
