@@ -299,15 +299,16 @@ namespace OpenDental{
 					row.Cells.Add("");
 				}
 				row.Cells.Add(_listOps[i].IsWebSched?"X":"");
+        row.Tag=_listOps[i];
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
 		}
 
 		private void gridMain_CellDoubleClick(object sender, OpenDental.UI.ODGridClickEventArgs e) {
-			FormOperatoryEdit FormE=new FormOperatoryEdit(_listOps[e.Row]);
-			FormE.ListOps=_listOps;
-			FormE.ShowDialog();
+			FormOperatoryEdit FormOE=new FormOperatoryEdit((Operatory)gridMain.Rows[e.Row].Tag);
+			FormOE.ListOps=_listOps;
+			FormOE.ShowDialog();
 			FillGrid();
 		}
 
@@ -322,6 +323,7 @@ namespace OpenDental{
 				butDown.Enabled=true;
 			}
 		}
+
 		private void butPickClinic_Click(object sender,EventArgs e) {
 			FormClinics FormC=new FormClinics();
 			FormC.IsSelectionMode=true;
