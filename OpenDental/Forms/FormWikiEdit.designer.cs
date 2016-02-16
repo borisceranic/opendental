@@ -63,7 +63,7 @@ namespace OpenDental{
 			this.imageListMain.Images.SetKeyName(15, "table.gif");
 			this.imageListMain.Images.SetKeyName(16, "image.gif");
 			this.imageListMain.Images.SetKeyName(17, "fontbutton.gif");
-			this.imageListMain.Images.SetKeyName(18, "scanDoc.gif");
+			this.imageListMain.Images.SetKeyName(18, "SaveDraft_2.png");
 			// 
 			// contextMenuMain
 			// 
