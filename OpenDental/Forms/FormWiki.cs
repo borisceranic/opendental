@@ -118,7 +118,7 @@ namespace OpenDental {
 		private void LayoutToolBar() {
 			ToolBarMain.Buttons.Clear();
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Back"),0,"","Back"));
-			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Forward"),1,"","Forward"));
+			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Fwd"),1,"","Forward"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Setup"),2,Lan.g(this,"Setup master page and styles."),"Setup"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Home"),3,"","Home"));
@@ -126,9 +126,9 @@ namespace OpenDental {
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Print"),5,"","Print"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Rename"),6,"","Rename"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Archive"),7,"","Archive"));
-			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"History"),8,"","History"));
+			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Hist"),8,"","History"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Drafts"),14,"","Drafts"));
-			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Incoming Links"),9,"","Inc Links"));
+			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"In-Links"),9,"","Inc Links"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Add"),10,"","Add"));
 			if(DataConnection.DBtype==DatabaseType.MySql) {//not supported in oracle.
