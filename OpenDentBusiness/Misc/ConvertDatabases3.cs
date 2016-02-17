@@ -12,7 +12,7 @@ using CodeBase;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("16.1.0.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("16.1.1.0");//This value must be changed when a new conversion is to be triggered.
 
 		#region Helper Functions
 
@@ -11424,7 +11424,7 @@ namespace OpenDentBusiness {
 			To15_4_26();
 		}
 
-    private static void To15_4_26() {
+		private static void To15_4_26() {
 			if(FromVersion<new Version("15.4.26.0")) {
 				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 15.4.26.0"));//No translation in convert script.
 				string command="";
@@ -11559,12 +11559,12 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '15.4.29.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
-			To16_1_0();
+			To16_1_1();
 		}
 
-		private static void To16_1_0() {
-			if(FromVersion<new Version("16.1.0.0")) {
-				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.0"));//No translation in convert script.
+		private static void To16_1_1() {
+			if(FromVersion<new Version("16.1.1.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1"));//No translation in convert script.
 				string command="";
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE emailattach ADD EmailTemplateNum bigint NOT NULL";
@@ -13060,11 +13060,11 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ClinicTrackLast','Workstation')";
 					Db.NonQ(command);
 				}
-				command="UPDATE preference SET ValueString = '16.1.0.0' WHERE PrefName = 'DataBaseVersion'";
+				command="UPDATE preference SET ValueString = '16.1.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			//To16_2_X();
 		}
-
 
 
 	}
