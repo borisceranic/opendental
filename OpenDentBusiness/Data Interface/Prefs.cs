@@ -148,6 +148,12 @@ namespace OpenDentBusiness{
 			else{
 				Db.NonQ(command);
 			}
+			Pref pref=new Pref();
+			pref.PrefName=prefName.ToString();
+			pref.ValueString=newValue.ToString();
+			Dictionary<string,Pref> dictPrefsUpdated=dictPrefs;
+			dictPrefsUpdated[prefName.ToString()]=pref;
+			PrefC.Dict=dictPrefsUpdated;
 			return retVal;
 		}
 
