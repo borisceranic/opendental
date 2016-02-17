@@ -7784,10 +7784,6 @@
       <Project>{5abf1d9d-2b93-4217-afa6-9eeccf6f525f}</Project>
       <Name>xEHR</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Shared Projects Subversion\OpenDentalHelp\head\OpenDentalHelp\OpenDentalHelp.csproj">
-      <Project>{98b2999c-8a9f-4795-b452-7f6231ed56b4}</Project>
-      <Name>OpenDentalHelp</Name>
-    </ProjectReference>
     <ProjectReference Include="..\CodeBase\xCodeBase.csproj">
       <Project>{18F7BC78-4B99-48D3-A1F1-0D13A63E3CF9}</Project>
       <Name>xCodeBase</Name>
