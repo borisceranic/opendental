@@ -244,7 +244,7 @@ namespace OpenDentBusiness{
 				//case Permissions.RefAttachAdd:
 				//case Permissions.RefAttachDelete:
 				case Permissions.CarrierCreate:
-				case Permissions.ReportDashboard:
+				case Permissions.GraphicalReports:
 				case Permissions.AutoNoteQuickNoteEdit:
 				case Permissions.EquipmentSetup:
 				//case Permissions.Billing:
@@ -296,7 +296,8 @@ namespace OpenDentBusiness{
 				//case Permissions.AccountQuickCharge:
 				//case Permissions.ClaimSend:
 				//case Permissions.TaskListCreate:
-				//case Permissions.PatientCreate
+				//case Permissions.PatientCreate:
+				//case Permissions.GraphicalReportSetup:
 				return false;//Does not have audit Trail if uncommented.
 			}
 			return true;
@@ -446,8 +447,10 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Referral Add");
 				case Permissions.ReferralMerge:
 					return Lans.g("enumPermissions","Referral Merge");
-				case Permissions.ReportDashboard:
-					return Lans.g("enumPermissions","Reports - Dashboard");
+				case Permissions.GraphicalReports:
+					return Lans.g("enumPermissions","Reports - Graphical");
+				case Permissions.GraphicalReportSetup:
+					return Lans.g("enumPermissions","Reports - Graphical Setup");
 				case Permissions.ReportProdInc:
 					return Lans.g("enumPermissions","Reports - Production and Income, Aging");
 				case Permissions.RequiredFields:

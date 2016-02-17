@@ -146,7 +146,7 @@ namespace OpenDentBusiness{
 		///<summary>58</summary>
 		CarrierCreate,
 		///<summary>59</summary>
-		ReportDashboard,
+		GraphicalReports,
 		///<summary>60</summary>
 		AutoNoteQuickNoteEdit,
 		///<summary>61</summary>
@@ -245,6 +245,8 @@ namespace OpenDentBusiness{
 		TaskListCreate,
 		///<summary>106 - Audit when a new patient is added.</summary>
 		PatientCreate,
+		///<summary>107- Allows changing the settings for graphical repots.</summary>
+		GraphicalReportSetup,
 	}
 
 	

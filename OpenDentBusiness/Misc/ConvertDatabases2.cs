@@ -9370,7 +9370,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 					for(int i=0;i<table.Rows.Count;i++) {
 						groupNum=PIn.Long(table.Rows[i]["UserGroupNum"].ToString());
 						command="INSERT INTO grouppermission (UserGroupNum,PermType) "
-							+"VALUES("+POut.Long(groupNum)+","+POut.Long((int)Permissions.ReportDashboard)+")";
+							+"VALUES("+POut.Long(groupNum)+","+POut.Long((int)Permissions.GraphicalReports)+")";
 						Db.NonQ(command);
 					}
 				}
@@ -9378,7 +9378,7 @@ VALUES('MercuryDE','"+POut.String(@"C:\MercuryDE\Temp\")+@"','0','','1','','','1
 					for(int i=0;i<table.Rows.Count;i++) {
 						groupNum=PIn.Long(table.Rows[i]["UserGroupNum"].ToString());
 						command="INSERT INTO grouppermission (GroupPermNum,NewerDays,UserGroupNum,PermType) "
-							+"VALUES((SELECT MAX(GroupPermNum)+1 FROM grouppermission),0,"+POut.Long(groupNum)+","+POut.Long((int)Permissions.ReportDashboard)+")";
+							+"VALUES((SELECT MAX(GroupPermNum)+1 FROM grouppermission),0,"+POut.Long(groupNum)+","+POut.Long((int)Permissions.GraphicalReports)+")";
 						Db.NonQ(command);
 					}
 				}
