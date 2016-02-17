@@ -9,17 +9,21 @@ namespace OpenDentBusiness{
 	public class Sheets{
 		
 		///<Summary>Gets one Sheet from the database.</Summary>
-		public static Sheet CreateObject(long sheetNum) {
+		public static Sheet GetOne(long sheetNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<Sheet>(MethodBase.GetCurrentMethod(),sheetNum);
 			}
 			return Crud.SheetCrud.SelectOne(sheetNum);
 		}
 
-		///<summary>Gets a single sheet from the database.  Then, gets all the fields and parameters for it.  So it returns a fully functional sheet.</summary>
+		///<summary>Gets a single sheet from the database.  Then, gets all the fields and parameters for it.  So it returns a fully functional sheet.
+		///Returns null if the sheet isn't found in the database.</summary>
 		public static Sheet GetSheet(long sheetNum) {
 			//No need to check RemotingRole; no call to db.
-			Sheet sheet=CreateObject(sheetNum);
+			Sheet sheet=GetOne(sheetNum);
+			if(sheet==null) {
+				return null;//Sheet was deleted.
+			}
 			SheetFields.GetFieldsAndParameters(sheet);
 			return sheet;
 		}

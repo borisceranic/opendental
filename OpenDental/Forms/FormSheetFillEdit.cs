@@ -145,6 +145,8 @@ namespace OpenDental {
 			RichTextBox textbox;//has to be richtextbox due to MS bug that doesn't show cursor.
 			FontStyle style;
 			SheetCheckBox checkbox;
+			SheetComboBox comboBox;
+			ScreenToothChart toothChart;
 			//first, draw images---------------------------------------------------------------------------------------
 			//might change this to only happen once when first loading form:
 			if(pictDraw!=null) {
@@ -257,6 +259,34 @@ namespace OpenDental {
 				panelMain.Controls.Add(checkbox);
 				checkbox.BringToFront();
 			}
+			//draw comboboxes---------------------------------------------------------------------------------------------------
+			foreach(SheetField field in SheetCur.SheetFields) {
+				if(field.FieldType!=SheetFieldType.ComboBox) {
+					continue;
+				}
+				comboBox=new SheetComboBox(field.FieldValue);
+				comboBox.Location=new Point(field.XPos,field.YPos);
+				comboBox.BackColor=Color.FromArgb(245,245,200);
+				comboBox.Width=field.Width;
+				comboBox.Height=field.Height;
+				comboBox.Tag=field;
+				comboBox.MouseUp+=new MouseEventHandler(comboBox_MouseUp);
+				panelMain.Controls.Add(comboBox);
+				comboBox.BringToFront();
+			}
+			//draw toothcharts--------------------------------------------------------------------------------------------------
+			foreach(SheetField field in SheetCur.SheetFields) {
+				if(field.FieldType!=SheetFieldType.ScreenChart) {
+					continue;
+				}
+				toothChart=new ScreenToothChart(field.FieldValue);//Need to pass in value here to set tooth chart items.
+				toothChart.Location=new Point(field.XPos,field.YPos);
+				toothChart.Width=field.Width;
+				toothChart.Height=field.Height;
+				toothChart.Tag=field;
+				panelMain.Controls.Add(toothChart);
+				panelMain.Controls.SetChildIndex(toothChart,panelMain.Controls.Count-2);//Ensures it's in the right order but in front of the picture frame.
+			}
 			//draw signature boxes----------------------------------------------------------------------------------------------
 			foreach(SheetField field in SheetCur.SheetFields) {
 				if(field.FieldType!=SheetFieldType.SigBox) {
@@ -304,6 +334,10 @@ namespace OpenDental {
 		}
 
 		private void checkbox_MouseUp(object sender,MouseEventArgs e) {
+			FieldValueChanged(sender);
+		}
+
+		private void comboBox_MouseUp(object sender,MouseEventArgs e) {
 			FieldValueChanged(sender);
 		}
 
@@ -793,7 +827,7 @@ namespace OpenDental {
 			SheetCur.Description=textDescription.Text;
 			SheetCur.InternalNote=textNote.Text;
 			SheetCur.ShowInTerminal=PIn.Byte(textShowInTerminal.Text);
-			FillFieldsFromControls();//But SheetNums will still be 0 for a new sheet.
+			FillFieldsFromControls(true);//But SheetNums will still be 0 for a new sheet.
 			if(SheetCur.IsNew) {
 				Sheets.Insert(SheetCur);
 				Sheets.SaveParameters(SheetCur);
@@ -843,7 +877,7 @@ namespace OpenDental {
 		}
 
 		///<summary>This is always done before the save process.  But it's also done before bumping down fields due to growth behavior.</summary>
-		private void FillFieldsFromControls(){			
+		private void FillFieldsFromControls(bool isSave=false){			
 			//SheetField field;
 			//Images------------------------------------------------------
 				//Images can't be changed in this UI
@@ -873,6 +907,37 @@ namespace OpenDental {
 				else{
 					((SheetField)control.Tag).FieldValue="";
 				}
+			}
+			//ComboBoxes-----------------------------------------------
+			foreach(Control control in panelMain.Controls) {
+				if(control.GetType()!=typeof(SheetComboBox)) {
+					continue;
+				}
+				if(control.Tag==null) {
+					continue;
+				}
+				SheetComboBox comboBox=(SheetComboBox)control;
+				//FieldValue will contain the selected option, followed by a semicolon, followed by a | delimited list of all options.
+				((SheetField)control.Tag).FieldValue=comboBox.SelectedOption+";"+String.Join("|",comboBox.ComboOptions);
+			}
+			//ToothChart------------------------------------------------
+			foreach(Control control in panelMain.Controls) {
+				if(control.GetType()!=typeof(ScreenToothChart)) {
+					continue;
+				}
+				if(control.Tag==null) {
+					continue;
+				}
+				ScreenToothChart toothChart=(ScreenToothChart)control;
+				List<UserControlScreenTooth> listTeeth=toothChart.GetTeeth;
+				string value="";
+				for(int i=0;i<listTeeth.Count;i++) {
+					if(i > 0) {
+						value+=";";//Don't add ';' at very end or it will mess with .Split() logic.
+					}
+					value+=String.Join(",",listTeeth[i].GetSelected());
+				}
+				((SheetField)control.Tag).FieldValue=value;
 			}
 			//Rectangles and lines-----------------------------------------
 				//Rectangles and lines can't be changed in this UI

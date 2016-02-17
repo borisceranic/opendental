@@ -116,6 +116,7 @@ namespace OpenDental{
 					break;
 				case SheetTypeEnum.Screening:
 					ScreenGroup screenGroup=ScreenGroups.GetScreenGroup((long)GetParamByName(sheet,"ScreenGroupNum").ParamValue);
+					//GetForScreen((long)GetParamByName(sheet,"ScreenNum").ParamValue);
 					//Look for the optional PatNum param:
 					SheetParameter paraPatNum=GetParamByName(sheet,"PatNum");
 					if(paraPatNum!=null && paraPatNum.ParamValue!=null) {
@@ -2874,7 +2875,7 @@ namespace OpenDental{
 						field.FieldValue=screenGroup.ProvName;
 						break;
 					case "PlaceOfService":
-						field.FieldValue=screenGroup.PlaceService.ToString();
+						field.FieldValue=screenGroup.PlaceService.ToString()+field.FieldValue;
 						break;
 					case "County":
 						field.FieldValue=screenGroup.County;
@@ -2905,17 +2906,17 @@ namespace OpenDental{
 							field.FieldValue=pat.Preferred;
 							break;
 						case "Gender":
-							field.FieldValue=pat.Gender.ToString();
+							field.FieldValue=pat.Gender.ToString()+field.FieldValue;
 							break;
 						case "GradeLevel":
-							field.FieldValue=pat.GradeLevel.ToString();
+							field.FieldValue=pat.GradeLevel.ToString()+field.FieldValue;
 							break;
 						case "Race/Ethnicity":
 							//The patient object no longer has the same type of race so default to Unknown.
-							field.FieldValue=PatientRaceOld.Unknown.ToString();
+							field.FieldValue=PatientRaceOld.Unknown.ToString()+field.FieldValue;
 							break;
 						case "Urgency":
-							field.FieldValue=pat.Urgency.ToString();
+							field.FieldValue=pat.Urgency.ToString()+field.FieldValue;
 							break;
 					}
 				}

@@ -45,6 +45,8 @@ namespace OpenDental {
 		///<summary>Only used here to draw the dashed margin lines.</summary>
 		private System.Drawing.Printing.Margins _printMargin=new System.Drawing.Printing.Margins(0,0,40,60);
 		private Image _toothChart;
+		private bool _hasChartSealantComplete;
+		private bool _hasChartSealantTreatment;
 
 		///<summary>Some controls (panels in this case) do not pass key events to the parent (the form in this case) even when the property KeyPreview is set.  Instead, the default key functionality occurs.  An example would be the arrow keys.  By default, arrow keys set focus to the "next" control.  Instead, want all key presses on this form and all of it's child controls to always call the FormSheetDefEdit_KeyDown method.</summary>
 		protected override bool ProcessCmdKey(ref Message msg,Keys keyData) {
@@ -174,6 +176,9 @@ namespace OpenDental {
 						}
 						listFields.Items.Add(txt);
 						break;
+					case SheetFieldType.ComboBox:
+						listFields.Items.Add(Lan.g(this,"ComboBox:")+SheetDefCur.SheetFieldDefs[i].XPos.ToString()+","+SheetDefCur.SheetFieldDefs[i].YPos.ToString()+","+"W:"+SheetDefCur.SheetFieldDefs[i].Width.ToString());
+						break;
 					case SheetFieldType.InputField:
 						listFields.Items.Add(SheetDefCur.SheetFieldDefs[i].TabOrder.ToString()+": "+SheetDefCur.SheetFieldDefs[i].FieldName);
 						break;
@@ -278,6 +283,12 @@ namespace OpenDental {
 					case SheetFieldType.CheckBox:
 						DrawCheckBoxHelper(g,i);
 						continue;
+					case SheetFieldType.ComboBox:
+						DrawComboBoxHelper(g,i);
+						continue;
+					case SheetFieldType.ScreenChart:
+						DrawToothChartHelper(g,i);
+						continue;
 					case SheetFieldType.SigBox:
 						DrawSigBoxHelper(g,i);
 						continue;
@@ -349,6 +360,38 @@ namespace OpenDental {
 					g.DrawString(SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),tabOrderFont,Brushes.White,tabRect.X,tabRect.Y-1);
 					//GraphicsHelper.DrawString(g,g,SheetDefCur.SheetFieldDefs[i].TabOrder.ToString(),SheetDefCur.GetFont(),Brushes.White,tabRect);
 				}
+			}
+		}
+
+		private void DrawComboBoxHelper(Graphics g,int i) {
+			if(listFields.SelectedIndices.Contains(i)) {
+				_argsDF.pen=_argsDF.penRed;
+				_argsDF.brush=_argsDF.brushRed;
+			}
+			else {
+				_argsDF.pen=_argsDF.penBlue;
+				_argsDF.brush=_argsDF.brushBlue;
+			}
+			g.DrawRectangle(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
+			g.DrawString("(combo box)",Font,_argsDF.brush,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos);
+		}
+
+		private void DrawToothChartHelper(Graphics g,int i) {
+			if(listFields.SelectedIndices.Contains(i)) {
+				_argsDF.pen=_argsDF.penRed;
+				_argsDF.brush=_argsDF.brushRed;
+			}
+			else {
+				_argsDF.pen=_argsDF.penBlue;
+				_argsDF.brush=_argsDF.brushBlue;
+			}
+			g.DrawRectangle(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
+			g.DrawString("(tooth chart "+SheetDefCur.SheetFieldDefs[i].FieldName+")",Font,_argsDF.brush,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos);
+			if(SheetDefCur.SheetFieldDefs[i].FieldName=="ChartSealantTreatment") {
+				_hasChartSealantTreatment=true;
+			}
+			if(SheetDefCur.SheetFieldDefs[i].FieldName=="ChartSealantComplete") {
+				_hasChartSealantComplete=true;
 			}
 		}
 
@@ -951,6 +994,38 @@ namespace OpenDental {
 			panelMain.Refresh();
 		}
 
+		private void butAddCombo_Click(object sender,EventArgs e) {
+			FormSheetFieldComboBox FormS=new FormSheetFieldComboBox();
+			FormS.SheetDefCur=SheetDefCur;
+			FormS.SheetFieldDefCur=SheetFieldDef.NewComboBox("","",0,0);
+			if(this.IsInternal) {
+				FormS.IsReadOnly=true;
+			}
+			FormS.ShowDialog();
+			if(FormS.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			SheetDefCur.SheetFieldDefs.Add(FormS.SheetFieldDefCur);
+			FillFieldList();
+			panelMain.Refresh();
+		}
+
+		private void butScreenChart_Click(object sender,EventArgs e) {
+			string fieldValue="d,m,ling;d,m,ling;,,;,,;,,;,,;m,d,ling;m,d,ling;m,d,buc;m,d,buc;,,;,,;,,;,,;d,m,buc;d,m,buc";
+			if(!_hasChartSealantComplete) {
+				SheetDefCur.SheetFieldDefs.Add(SheetFieldDef.NewScreenChart("ChartSealantComplete",fieldValue,0,0));
+			}
+			else if(!_hasChartSealantTreatment) {
+				SheetDefCur.SheetFieldDefs.Add(SheetFieldDef.NewScreenChart("ChartSealantTreatment",fieldValue,0,0));
+			}
+			else {
+				MsgBox.Show(this,"Only two charts are allowed per screening sheet.");
+				return;
+			}
+			FillFieldList();
+			panelMain.Refresh();
+		}
+
 		private void butAddSigBox_Click(object sender,EventArgs e) {
 			FormSheetFieldSigBox FormS=new FormSheetFieldSigBox();
 			FormS.SheetDefCur=SheetDefCur;
@@ -1169,6 +1244,21 @@ namespace OpenDental {
 						return;
 					}
 					if(FormSB.SheetFieldDefCur==null) {
+						SheetDefCur.SheetFieldDefs.RemoveAt(idx);
+					}
+					break;
+				case SheetFieldType.ComboBox:
+					FormSheetFieldComboBox FormSCB=new FormSheetFieldComboBox();
+					FormSCB.SheetDefCur=SheetDefCur;
+					FormSCB.SheetFieldDefCur=field;
+					if(this.IsInternal) {
+						FormSCB.IsReadOnly=true;
+					}
+					FormSCB.ShowDialog();
+					if(FormSCB.DialogResult!=DialogResult.OK) {
+						return;
+					}
+					if(FormSCB.SheetFieldDefCur==null) {
 						SheetDefCur.SheetFieldDefs.RemoveAt(idx);
 					}
 					break;
@@ -1474,6 +1564,14 @@ namespace OpenDental {
 						MsgBox.Show(this,"Cannot delete the last main grid from treatment plan.");
 						continue;//skip this one.
 					}
+					if(fieldI.FieldType==SheetFieldType.ScreenChart) {
+						if(fieldI.FieldName=="ChartSealantComplete") {
+							_hasChartSealantComplete=false;
+						}
+						if(fieldI.FieldName=="ChartSealantTreatment") {
+							_hasChartSealantTreatment=false;
+						}
+					}
 					SheetDefCur.SheetFieldDefs.RemoveAt(listFields.SelectedIndices[i]);
 				}
 				FillFieldList();
@@ -1556,6 +1654,7 @@ namespace OpenDental {
 					case SheetFieldType.Rectangle:
 					case SheetFieldType.SigBox:
 					case SheetFieldType.StaticText:
+					case SheetFieldType.ComboBox:
 						break; //it will always be ok to copy the types of fields above.
 					case SheetFieldType.CheckBox:
 						if(fielddef.FieldName!="misc") { //custom fields should be okay to copy

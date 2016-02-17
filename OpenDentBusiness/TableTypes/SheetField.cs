@@ -28,7 +28,9 @@ namespace OpenDentBusiness{
 		///<para>Drawing fieldtype: this will be the point data for the lines.  The format would look similar to this: 45,68;48,70;49,72;0,0;55,88;etc.  It's simply a sequence of points, separated by semicolons.</para>
 		///<para>CheckBox: it will either be an X or empty.</para>
 		///<para>SigBox: the first char will be 0 or 1 to indicate SigIsTopaz, and all subsequent chars will be the Signature itself.</para>
-		///<para>PatImage: Docnum or blank, FK to document.DocNum.</para></summary>
+		///<para>PatImage: Docnum or blank, FK to document.DocNum.</para>
+		///<para>ComboBox: The chosen option, semicolon, then a pipe delimited list of options such as: March;January|February|March|April</para>
+		///<para>ScreenChart: Contains a semicolon delimited list of comma separated surfaces.  It may look like S,P,N;S,S,S;... etc.</para></summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
 		public string FieldValue;
 		///<summary>The fontSize for this field regardless of the default for the sheet.  The actual font must be saved with each sheetField.</summary>

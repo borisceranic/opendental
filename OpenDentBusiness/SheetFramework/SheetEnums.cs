@@ -83,7 +83,11 @@ namespace OpenDentBusiness {
 		///<Summary>11-Special: Currently only used for Toothgrid</Summary>
 		Special,
 		///<summary>12-Grid: Placable grids similar to ODGrids. Used primarily in statements.</summary>
-		Grid
+		Grid,
+		///<summary>13-ComboBox: Placeable combo box for selecting filled options.</summary>
+		ComboBox,
+		///<summary>14-ScreenChart: A tooth chart that is desiged for screenings.</summary>
+		ScreenChart
 		//<summary></summary>
 		//RadioButton
 		

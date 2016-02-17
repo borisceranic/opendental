@@ -34,7 +34,9 @@ namespace OpenDentBusiness{
 		///<summary>For StaticText, this text can include bracketed fields, like [nameLF].
 		///<para>For OutputText and InputField, this will be blank.  </para>
 		///<para>For CheckBoxes, either X or blank.  Even if the checkbox is set to behave like a radio button.  </para>
-		///<para>For Pat Images, this is blank.  The filename of a PatImage will later be stored in SheetField.FieldValue.</para></summary>
+		///<para>For Pat Images, this is blank.  The filename of a PatImage will later be stored in SheetField.FieldValue.</para>
+		///<para>For ComboBoxes, the chosen option, semicolon, then a pipe delimited list of options such as: March;January|February|March|April</para>
+		///<para>For ScreenCharts, a semicolon delimited list of comma separated surfaces.  It may look like S,P,N;S,S,S;... etc.</para></summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
 		public string FieldValue;
 		///<summary>The fontSize for this field regardless of the default for the sheet.  The actual font must be saved with each sheetField.</summary>
@@ -209,6 +211,16 @@ namespace OpenDentBusiness{
 		public static SheetFieldDef NewCheckBox(string fieldName,int xPos,int yPos,int width,int height) {
 			return new SheetFieldDef(SheetFieldType.CheckBox,fieldName,"",0,"",false,
 				xPos,yPos,width,height,GrowthBehaviorEnum.None,"");
+		}
+
+		public static SheetFieldDef NewComboBox(string fieldName,string fieldValue,int xPos,int yPos) {
+			return new SheetFieldDef(SheetFieldType.ComboBox,fieldName,fieldValue,0,"",false,
+				xPos,yPos,155,19,GrowthBehaviorEnum.None,"");
+		}
+
+		public static SheetFieldDef NewScreenChart(string fieldName,string fieldValue,int xPos,int yPos) {
+			return new SheetFieldDef(SheetFieldType.ScreenChart,fieldName,fieldValue,0,"",false,
+				xPos,yPos,731,128,GrowthBehaviorEnum.None,"");
 		}
 
 		public static SheetFieldDef NewRadioButton(string fieldName,string radioButtonValue,int xPos,int yPos,int width,int height) {

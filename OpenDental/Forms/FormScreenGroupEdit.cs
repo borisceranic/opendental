@@ -597,10 +597,10 @@ namespace OpenDental{
 				foreach(SheetField field in sheet.SheetFields) {
 					switch(field.FieldName) {
 						case "Race/Ethnicity":
-							field.FieldValue="Unknown";
+							field.FieldValue="Unknown"+field.FieldValue;
 							break;
 						case "Gender":
-							field.FieldValue="Unknown";
+							field.FieldValue="Unknown"+field.FieldValue;
 							break;
 					}
 				}
@@ -609,13 +609,17 @@ namespace OpenDental{
 				if(FormSFE.DialogResult!=DialogResult.OK) {
 					return;
 				}
-				Screens.ImportScreenFromSheet(sheet,screen);
+				Screens.CreateScreenFromSheet(sheet,screen);
 				screen.ScreenGroupOrder++;
 				FillGrid();
 			}
 		}
 
 		private void StartScreensForPats() {
+			if(_listScreenPats.Count==0) {
+				MsgBox.Show(this,"No patients for screening.");
+				return;
+			}
 			FormScreenEdit FormSE=new FormScreenEdit();
 			FormSE.ScreenGroupCur=_screenGroup;
 			FormSE.IsNew=true;
@@ -711,7 +715,7 @@ namespace OpenDental{
 				Sheet sheet=SheetUtil.CreateSheet(sheetDef);
 				sheet.IsNew=true;
 				sheet.PatNum=screenPat.PatNum;
-				SheetParameter.SetParameter(sheet,"ScreenGroupNum",_screenGroup.ScreenGroupNum);
+				SheetParameter.SetParameter(sheet,"ScreenGroupNum",_screenGroup.ScreenGroupNum);//I think we may need this.
 				SheetParameter.SetParameter(sheet,"PatNum",screenPat.PatNum);
 				SheetFiller.FillFields(sheet);
 				using(Graphics g=CreateGraphics()) {
@@ -730,7 +734,7 @@ namespace OpenDental{
 				if(FormSFE.DialogResult!=DialogResult.OK) {
 					break;
 				}
-				Screens.ImportScreenFromSheet(sheet,screen);
+				Screens.CreateScreenFromSheet(sheet,screen);
 				screen.ScreenGroupOrder++;
 				FillGrid();
 				i=(i+1)%_listScreenPats.Count;//Causes the index to loop around when it gets to the end of the list so we can get to the beginning again.
@@ -755,10 +759,21 @@ namespace OpenDental{
 		}
 
 		private void ViewScreenForPatWithSheets(OpenDentBusiness.Screen screenCur) {
-			MsgBox.Show(this,"Viewing screens taken via sheets is not currently supported.");
-			//TODO: Using the SheetNum from the screen get all corresponding data for the sheet from the db.
-			//TODO: Display the sheet fill edit window.
-			//TODO: Consider importing certain data from the sheet?  We do not want to re-process the entire sheet as it will duplicate procedures.
+			Sheet sheet=Sheets.GetSheet(screenCur.SheetNum);
+			if(sheet==null) {
+				MsgBox.Show(this,"Sheet no longer exists.  It may have been deleted from the Chart Module.");
+				return;
+			}
+			FormSheetFillEdit FormSFE=new FormSheetFillEdit(sheet);
+			if(FormSFE.ShowDialog()==DialogResult.OK) {
+				//Digest the Sealant Chart
+				foreach(SheetField field in sheet.SheetFields) {
+					if(field.FieldName=="ChartSealantComplete") {
+						Screens.ProcessScreenChart(sheet,new List<string>() { "ChartSealantComplete" });
+						break;
+					}
+				}
+			}
 		}
 
 		private void gridScreenPats_MouseClick(object sender,MouseEventArgs e) {
@@ -911,6 +926,10 @@ namespace OpenDental{
 		}
 
 		private void butStartScreens_Click(object sender,EventArgs e) {
+			if(_listScreenPats.Count==0) {
+				MsgBox.Show(this,"No patients to screen.");
+				return;
+			}
 			if(PrefC.GetBool(PrefName.ScreeningsUseSheets)) {
 				StartScreensForPatsWithSheets();
 			}

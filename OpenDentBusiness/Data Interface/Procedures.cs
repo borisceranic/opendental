@@ -179,6 +179,60 @@ namespace OpenDentBusiness {
 			Db.NonQ(command);
 		}
 
+
+		///<summary>Creates a new procedure with the patient, surface, toothnum, and status for the specified procedure code.</summary>
+		public static void CreateProcForPat(long patNum,long codeNum,string surf,int toothNum,ProcStat procStatus) {
+			//No need to check RemotingRole; no call to db.
+			Patient pat=Patients.GetPat(patNum);
+			Procedure proc=new Procedure();
+			proc.PatNum=pat.PatNum;
+			proc.ClinicNum=Clinics.ClinicNum;
+			proc.ProcStatus=procStatus;
+			proc.ProvNum=pat.PriProv;
+			proc.Surf=surf; //Note: Sealant code D1351 is not a surface code by default, but can be manually set.  For screens they will be surface specific.
+			proc.ToothNum=toothNum.ToString();
+			proc.UserNum=Security.CurUser.UserNum;
+			proc.CodeNum=codeNum;
+			proc.ProcDate=DateTime.Today;
+			proc.DateTP=DateTime.Today;
+			//The below logic is a trimmed down version of the code existing in ContrChart.AddQuick()
+			InsPlan insPlanPrimary=null;
+			InsSub insSubPrimary=null;
+			List <InsSub> subList=InsSubs.RefreshForFam(Patients.GetFamily(pat.PatNum));
+			List <InsPlan> insPlanList=InsPlans.RefreshForSubList(subList);
+			List <PatPlan> patPlanList=PatPlans.Refresh(pat.PatNum);
+			List <Benefit> benefitList=Benefits.Refresh(patPlanList,subList);
+			if(patPlanList.Count>0) {
+				insSubPrimary=InsSubs.GetSub(patPlanList[0].InsSubNum,subList);
+				insPlanPrimary=InsPlans.GetPlan(insSubPrimary.PlanNum,insPlanList);
+			}
+			//Check if it is also a medical procedure.
+			double procFee;
+			//Get fee schedule for dental.
+			long feeSch;
+			feeSch=Fees.GetFeeSched(pat,insPlanList,patPlanList,subList);
+			//Get the fee amount for medical or dental.
+			procFee=Fees.GetAmount0(proc.CodeNum,feeSch,proc.ClinicNum,proc.ProvNum);
+			if(insPlanPrimary!=null && insPlanPrimary.PlanType=="p") {//PPO
+				double provFee=Fees.GetAmount0(proc.CodeNum,Providers.GetProv(Patients.GetProvNum(pat)).FeeSched,proc.ClinicNum,proc.ProvNum);
+				if(provFee>procFee) {
+					proc.ProcFee=provFee;
+				}
+				else {
+					proc.ProcFee=procFee;
+				}
+			}
+			else {
+				proc.ProcFee=procFee;
+			}
+			proc.BaseUnits=ProcedureCodes.GetProcCode(proc.CodeNum).BaseUnits;
+			proc.SiteNum=pat.SiteNum;
+			proc.RevCode=ProcedureCodes.GetProcCode(proc.CodeNum).RevenueCodeDefault;
+			proc.DateEntryC=DateTime.Now;
+			proc.ProcNum=Procedures.Insert(proc);
+			Procedures.ComputeEstimates(proc,pat.PatNum,new List<ClaimProc>(),true,insPlanList,patPlanList,benefitList,pat.Age,subList);
+		}
+
 		public static void UpdateAptNum(long procNum,long newAptNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),procNum,newAptNum);
@@ -726,7 +780,19 @@ namespace OpenDentBusiness {
 			string command="UPDATE procedurelog SET StatementNum=0 WHERE StatementNum='"+POut.Long(statementNum)+"'";
 			Db.NonQ(command);
 		}
-		
+
+		public static Procedure GetProcForPatByToothSurfStat(long patNum,int toothNum,string surf,ProcStat procStat) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<Procedure>(MethodBase.GetCurrentMethod(),patNum,toothNum,surf,procStat);
+			}
+			string command="SELECT * FROM procedurelog "
+				+"WHERE PatNum="+POut.Long(patNum)+" "
+				+"AND Surf='"+POut.String(surf)+"' "
+				+"AND ToothNum='"+POut.Int(toothNum)+"' "
+				+"AND ProcStatus="+POut.Int((int)procStat);
+			return Crud.ProcedureCrud.SelectOne(command);
+		}
+
 
 
 		//--------------------Taken from Procedure class--------------------------------------------------

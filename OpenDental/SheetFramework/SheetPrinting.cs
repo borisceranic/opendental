@@ -319,6 +319,12 @@ namespace OpenDental {
 					case SheetFieldType.CheckBox:
 						drawFieldCheckBox(field,g,null);
 						break;
+					case SheetFieldType.ComboBox:
+						drawFieldComboBox(field,sheet,g,null);
+						break;
+					case SheetFieldType.ScreenChart:
+						drawFieldScreenChart(field,sheet,g,null);
+						break;
 					case SheetFieldType.SigBox:
 						drawFieldSigBox(field,sheet,g,null);
 						break;
@@ -1331,6 +1337,171 @@ namespace OpenDental {
 			}
 		}
 
+		public static void drawFieldScreenChart(SheetField field,Sheet sheet,Graphics g,XGraphics gx) {
+			string[] toothValues=field.FieldValue.Split(';');
+			//The PDF and Print versions of the drawing are nearly identical, one uses PDF elements and the other uses general Graphics elements.
+		  //The sizing is a bit different because PDF's take pixels so we have to convert the sizes.  
+			//Additionally the inner boxes are done differently.  For printing it's one horizontal and one vertical line.  For PDF's they're all rectangles.
+			if(gx==null) {
+				int xPos=field.XPos;//Start positions.
+				int yPos=field.YPos-_yPosPrint-15;
+				int toothWidth=field.Width/8;
+				int toothHeight=(field.Height/2)-10;
+				Pen surfacePen=new Pen(Color.Black,0.5f);
+				StringFormat stringFormat=new StringFormat();
+				stringFormat.Alignment=StringAlignment.Center;
+				stringFormat.LineAlignment=StringAlignment.Center;
+				RectangleF rectFormat=new RectangleF();
+				Font font=new Font(FontFamily.GenericMonospace.ToString(),10,FontStyle.Regular);
+				for(int i=0;i<8;i++) {
+					int topToothNum=0;
+					int botToothNum=0;
+					if(i<4) {
+						topToothNum=i+2;//2, 3, 4, 5
+						botToothNum=31-i;//31, 30, 29, 28
+					}
+					else {
+						topToothNum=i+8;//12, 13, 14, 15
+						botToothNum=25-i;//21, 20, 19, 18
+					}
+					string[] topToothSurfaces=toothValues[i].Split(',');//Getting teeth from indexes 0 to 7
+					string[] botToothSurfaces=toothValues[toothValues.Length-(i+1)].Split(',');//Getting teeth from indexes 15 to 8
+					rectFormat.Location=new PointF((float)xPos,(float)yPos);
+					rectFormat.Size=new Size((int)toothWidth,15);
+					g.DrawString(topToothNum.ToString(),font,Brushes.Black,rectFormat,stringFormat);
+					rectFormat.Location=new PointF((float)xPos,(float)(yPos+2*toothHeight+15));//20 for top tooth, 2xtoothHeight to get to the bottom of the two teeth rectangles.
+					g.DrawString(botToothNum.ToString(),font,Brushes.Black,rectFormat,stringFormat);
+					g.DrawRectangle(Pens.Black,xPos,yPos+15,toothWidth,toothHeight);//Draw top tooth box
+					g.DrawRectangle(Pens.Black,xPos,yPos+15+toothHeight,toothWidth,toothHeight);//Draw bottom tooth box
+					if(i<2 || i>5) { //Only molar teeth have multiple surfaces.
+						g.DrawLine(surfacePen,xPos,yPos+15+(toothHeight/2),xPos+toothWidth,yPos+15+(toothHeight/2));//Draw top tooth horizontal line
+						g.DrawLine(surfacePen,xPos+(toothWidth/2),yPos+15,xPos+(toothWidth/2),yPos+15+(toothHeight/2));//Draw top tooth vertical line
+						g.DrawLine(surfacePen,xPos,yPos+15+(toothHeight/2)+toothHeight,xPos+toothWidth,yPos+15+(toothHeight/2)+toothHeight);//Draw bottom tooth horizontal line
+						g.DrawLine(surfacePen,xPos+(toothWidth/2),yPos+15+toothHeight,xPos+(toothWidth/2),yPos+15+(toothHeight/2)+toothHeight);//Draw bottom tooth vertical line
+						rectFormat.Location=new PointF((float)xPos,(float)yPos+15);
+						rectFormat.Size=new Size((int)toothWidth/2,(int)(toothHeight/2));
+						g.DrawString(topToothSurfaces[0],font,(topToothSurfaces[0]=="d" || topToothSurfaces[0]=="m")?Brushes.LightGray : Brushes.Black,rectFormat,stringFormat);//Surface information
+						rectFormat.Location=new PointF((float)(xPos+(toothWidth/2)),(float)yPos+15);
+						rectFormat.Size=new Size((int)toothWidth/2,(int)(toothHeight/2));
+						g.DrawString(topToothSurfaces[1],font,(topToothSurfaces[1]=="d" || topToothSurfaces[1]=="m")?Brushes.LightGray : Brushes.Black,rectFormat,stringFormat);
+						rectFormat.Location=new PointF((float)xPos,(float)(yPos+(toothHeight/2)+15));
+						rectFormat.Size=new Size((int)toothWidth,(int)(toothHeight/2));
+						g.DrawString(topToothSurfaces[2],font,(topToothSurfaces[2]=="ling" || topToothSurfaces[2]=="buc")?Brushes.LightGray : Brushes.Black,rectFormat,stringFormat);
+						rectFormat.Location=new PointF((float)xPos,(float)(yPos+15+toothHeight));
+						rectFormat.Size=new Size((int)toothWidth/2,(int)(toothHeight/2));
+						g.DrawString(botToothSurfaces[0],font,(botToothSurfaces[0]=="d" || botToothSurfaces[0]=="m")?Brushes.LightGray : Brushes.Black,rectFormat,stringFormat);//Surface information
+						rectFormat.Location=new PointF((float)(xPos+(toothWidth/2)),(float)(yPos+15+toothHeight));
+						rectFormat.Size=new Size((int)toothWidth/2,(int)(toothHeight/2));
+						g.DrawString(botToothSurfaces[1],font,(botToothSurfaces[1]=="d" || botToothSurfaces[1]=="m")?Brushes.LightGray : Brushes.Black,rectFormat,stringFormat);
+						rectFormat.Location=new PointF((float)xPos,(float)(yPos+15+toothHeight+(toothHeight/2)));
+						rectFormat.Size=new Size((int)toothWidth,(int)(toothHeight/2));
+						g.DrawString(botToothSurfaces[2],font,(botToothSurfaces[2]=="ling" || botToothSurfaces[2]=="buc")?Brushes.LightGray : Brushes.Black,rectFormat,stringFormat);
+					}
+					else {
+						rectFormat.Location=new PointF((float)xPos,(float)yPos+15);
+						rectFormat.Size=new Size((int)toothWidth,(int)toothHeight);
+						g.DrawString(topToothSurfaces[2],font,Brushes.Black,rectFormat,stringFormat);//Will be empty or a selected option
+						rectFormat.Location=new PointF((float)xPos,(float)(yPos+toothHeight+15));
+						rectFormat.Size=new Size((int)toothWidth,(int)toothHeight);
+						g.DrawString(botToothSurfaces[2],font,Brushes.Black,rectFormat,stringFormat);//Will be empty or a selected option
+					}
+					xPos+=toothWidth;
+				}
+			}
+			else {
+				double xPos=p(field.XPos);
+				double yPos=p(field.YPos-_yPosPrint-15);//Start section for tooth chart control
+				double toothWidth=p(field.Width/8);
+				double toothHeight=p((field.Height/2)-20);
+				XPen surfacePen=new XPen(Color.Black,0.5);
+				XStringFormat stringFormat=new XStringFormat();
+				stringFormat.Alignment=XStringAlignment.Center;	
+				stringFormat.LineAlignment=XLineAlignment.Center;
+				RectangleF rectFormat=new RectangleF();
+				XFont xfont=new XFont(FontFamily.GenericMonospace.ToString(),toothHeight-20,XFontStyle.Regular);
+				for(int i=0;i<8;i++) {
+					int topToothNum=0;
+					int botToothNum=0;
+					if(i<4) {
+						topToothNum=i+2;//2, 3, 4, 5
+						botToothNum=31-i;//31, 30, 29, 28
+					}
+					else {
+						topToothNum=i+8;//12, 13, 14, 15
+						botToothNum=25-i;//21, 20, 19, 18
+					}
+					string[] topToothSurfaces=toothValues[i].Split(',');//Getting teeth from indexes 0 to 7
+					string[] botToothSurfaces=toothValues[toothValues.Length-(i+1)].Split(',');//Getting teeth from indexes 15 to 8
+					rectFormat.Location=new PointF((float)xPos,(float)yPos);
+					rectFormat.Size=new Size((int)toothWidth,15);
+					gx.DrawString(topToothNum.ToString(),xfont,XBrushes.Black,rectFormat,stringFormat);
+					rectFormat.Location=new PointF((float)xPos,(float)(yPos+2*toothHeight+15));//20 for top tooth, 2xtoothHeight to get to the bottom of the two teeth rectangles.
+					gx.DrawString(botToothNum.ToString(),xfont,XBrushes.Black,rectFormat,stringFormat);
+					gx.DrawRectangle(XPens.Black,xPos,yPos+15,toothWidth,toothHeight);//Draw top tooth box
+					gx.DrawRectangle(XPens.Black,xPos,yPos+15+toothHeight,toothWidth,toothHeight);//Draw bottom tooth box
+					if(i<2 || i>5) { //Only molar teeth have multiple surfaces.
+						gx.DrawRectangle(surfacePen,xPos,yPos+15,toothWidth/2,toothHeight/2);//Draw one top tooth surface
+						gx.DrawRectangle(surfacePen,xPos+(toothWidth/2),yPos+15,toothWidth/2,toothHeight/2);//Draw second top tooth surface.
+						gx.DrawRectangle(surfacePen,xPos,yPos+toothHeight+15,toothWidth/2,toothHeight/2);//Draw one bottom tooth surface
+						gx.DrawRectangle(surfacePen,xPos+(toothWidth/2),yPos+toothHeight+15,toothWidth/2,toothHeight/2);//Draw second bottom tooth surface.
+						rectFormat.Location=new PointF((float)xPos,(float)yPos+15);
+						rectFormat.Size=new Size((int)toothWidth/2,(int)(toothHeight/2));
+						gx.DrawString(topToothSurfaces[0],xfont,(topToothSurfaces[0]=="d" || topToothSurfaces[0]=="m")?XBrushes.LightGray : XBrushes.Black,rectFormat,stringFormat);//Surface information
+						rectFormat.Location=new PointF((float)(xPos+(toothWidth/2)),(float)yPos+15);
+						rectFormat.Size=new Size((int)toothWidth/2,(int)(toothHeight/2));
+						gx.DrawString(topToothSurfaces[1],xfont,(topToothSurfaces[1]=="d" || topToothSurfaces[1]=="m")?XBrushes.LightGray : XBrushes.Black,rectFormat,stringFormat);
+						rectFormat.Location=new PointF((float)xPos,(float)(yPos+(toothHeight/2)+15));
+						rectFormat.Size=new Size((int)toothWidth,(int)(toothHeight/2));
+						gx.DrawString(topToothSurfaces[2],xfont,(topToothSurfaces[2]=="ling" || topToothSurfaces[2]=="buc")?XBrushes.LightGray : XBrushes.Black,rectFormat,stringFormat);
+						rectFormat.Location=new PointF((float)xPos,(float)(yPos+15+toothHeight));
+						rectFormat.Size=new Size((int)toothWidth/2,(int)(toothHeight/2));
+						gx.DrawString(botToothSurfaces[0],xfont,(botToothSurfaces[0]=="d" || botToothSurfaces[0]=="m")?XBrushes.LightGray : XBrushes.Black,rectFormat,stringFormat);//Surface information
+						rectFormat.Location=new PointF((float)(xPos+(toothWidth/2)),(float)(yPos+15+toothHeight));
+						rectFormat.Size=new Size((int)toothWidth/2,(int)(toothHeight/2));
+						gx.DrawString(botToothSurfaces[1],xfont,(botToothSurfaces[1]=="d" || botToothSurfaces[1]=="m")?XBrushes.LightGray : XBrushes.Black,rectFormat,stringFormat);
+						rectFormat.Location=new PointF((float)xPos,(float)(yPos+15+toothHeight+(toothHeight/2)));
+						rectFormat.Size=new Size((int)toothWidth,(int)(toothHeight/2));
+						gx.DrawString(botToothSurfaces[2],xfont,(botToothSurfaces[2]=="ling" || botToothSurfaces[2]=="buc")?XBrushes.LightGray : XBrushes.Black,rectFormat,stringFormat);
+					}
+					else {
+						rectFormat.Location=new PointF((float)xPos,(float)yPos+15);
+						rectFormat.Size=new Size((int)toothWidth,(int)toothHeight);
+						gx.DrawString(topToothSurfaces[2],xfont,XBrushes.Black,rectFormat,stringFormat);//Will be empty or a selected option
+						rectFormat.Location=new PointF((float)xPos,(float)(yPos+toothHeight+15));
+						rectFormat.Size=new Size((int)toothWidth,(int)toothHeight);
+						gx.DrawString(botToothSurfaces[2],xfont,XBrushes.Black,rectFormat,stringFormat);//Will be empty or a selected option
+					}
+					xPos+=toothWidth;
+				}
+			}
+		}
+
+		public static void drawFieldComboBox(SheetField field,Sheet sheet,Graphics g,XGraphics gx) {
+			string comboChoice=field.FieldValue.Split(';')[0];
+			Bitmap doubleBuffer=new Bitmap(sheet.Width,sheet.Height);//IsLandscape??
+			Graphics gfx=Graphics.FromImage(doubleBuffer);
+			if(gx==null){
+				Font font=new Font(FontFamily.GenericMonospace,field.Height-7,FontStyle.Regular);
+				Rectangle bounds=new Rectangle(field.XPos,field.YPos-_yPosPrint,field.Width,field.Height);
+				StringAlignment sa=StringAlignment.Near;
+				GraphicsHelper.DrawString(g,gfx,comboChoice,font,Brushes.Black,bounds,sa);
+				font.Dispose();
+				font=null;
+			}
+			else{
+				XFont xfont=new XFont(FontFamily.GenericMonospace.ToString(),field.Height-10,XFontStyle.Regular);
+				XStringAlignment xsa=XStringAlignment.Near;
+				int tempX=field.XPos;
+				XRect xrect=new XRect(p(tempX),p(field.YPos-_yPosPrint),p(field.Width),p(field.Height));
+				GraphicsHelper.DrawStringX(gx,gfx,1d/p(1),comboChoice,xfont,XBrushes.Black,xrect,xsa);
+				xfont=null;
+			}
+			doubleBuffer.Dispose();
+			doubleBuffer=null;
+			gfx.Dispose();
+			gfx=null;
+		}
+
 		public static void drawFieldSigBox(SheetField field,Sheet sheet,Graphics g,XGraphics gx) {
 			Bitmap sigImage=new Bitmap(field.Width,field.Height);
 			if(sheet.SheetType==SheetTypeEnum.TreatmentPlan) {
@@ -1871,6 +2042,12 @@ namespace OpenDental {
 						break;
 					case SheetFieldType.CheckBox:
 						drawFieldCheckBox(field,null,gx);
+						break;
+					case SheetFieldType.ComboBox:
+						drawFieldComboBox(field,sheet,null,gx);
+						break;
+					case SheetFieldType.ScreenChart:
+						drawFieldScreenChart(field,sheet,null,gx);
 						break;
 					case SheetFieldType.SigBox:
 						drawFieldSigBox(field,sheet,null,gx);
