@@ -3583,7 +3583,11 @@ namespace OpenDental{
 		}
 
 		private void gridPreAuth_CellClick(object sender, OpenDental.UI.ODGridClickEventArgs e) {
-			if(!new[] { TreatPlanStatus.Active,TreatPlanStatus.Inactive }.Contains(_listTreatPlans[gridPlans.SelectedIndices[0]].TPStatus)) {
+			if(_listTreatPlans==null 
+				|| _listTreatPlans.Count==0
+				|| _listTreatPlans[gridPlans.SelectedIndices[0]].TPStatus!=TreatPlanStatus.Active
+				|| _listTreatPlans[gridPlans.SelectedIndices[0]].TPStatus!=TreatPlanStatus.Inactive)
+			{
 				return;
 			}
 			gridMain.SetSelected(false);
