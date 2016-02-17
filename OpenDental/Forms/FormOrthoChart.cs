@@ -20,9 +20,13 @@ namespace OpenDental {
 		private bool _hasChanged;
 		///<summary>Each row in this table has a date as the first cell.  There will be additional rows that are not yet in the db.  Each blank cell will be an empty string.  It will also store changes made by the user prior to closing the form.  When the form is closed, this table will be compared with the original listOrthoCharts and a synch process will take place to save to db.  An empty string in a cell will result in no db row or a deletion of existing db row.</summary>
 		DataTable table;
+		private bool _showSigBox;
+		private int _prevRow;
+		private bool _sigClearWasClicked;
 
 		public FormOrthoChart(Patient patCur) {
 			_patCur = patCur;
+			_prevRow=-1;
 			InitializeComponent();
 			Lan.F(this);
 		}
@@ -33,6 +37,7 @@ namespace OpenDental {
 			//define columns----------------------------------------------------------------------------------------------------------
 			table.Columns.Add("Date",typeof(DateTime));
 			_listOrthDisplayFields = DisplayFields.GetForCategory(DisplayFieldCategory.OrthoChart);
+			_showSigBox=_listOrthDisplayFields.Any(x => x.InternalName=="Signature");//'Signature Box' is a field selected for display.
 			for(int i=0;i<_listOrthDisplayFields.Count;i++) {
 				table.Columns.Add((i+1).ToString());//named by number, but probably refer to by index
 			}
@@ -81,6 +86,9 @@ namespace OpenDental {
 					}
 				}
 			}
+			if(!_showSigBox) {
+				signatureBoxWrapper.Visible=false;
+			}
 			FillGrid();
 			FillGridPat();
 		}
@@ -113,7 +121,10 @@ namespace OpenDental {
 				row.Cells.Add(tempDate.ToShortDateString());
 				row.Tag=tempDate;
 				for(int j=0;j<_listOrthDisplayFields.Count;j++) {
-					string cellValue=table.Rows[i][j+1].ToString();
+					string cellValue="";
+					if(_listOrthDisplayFields[j].InternalName != "Signature") {
+						cellValue=table.Rows[i][j+1].ToString();
+					}
 					if(_listOrthDisplayFields[j].PickList!="") {
 						List<string> listComboOptions=_listOrthDisplayFields[j].PickList.Split(new string[] { "\r\n" },StringSplitOptions.None).ToList();
 						int selectedIndex=listComboOptions.FindIndex(x => x==cellValue);
@@ -132,6 +143,12 @@ namespace OpenDental {
 			else {
 				gridMain.ScrollValue=gridMainScrollValue;
 				gridMainScrollValue=0;
+			}
+			if(_showSigBox) {
+				for(int i=0;i<gridMain.Rows.Count;i++) {
+					SetSignature(i);
+				}
+				signatureBoxWrapper.ClearSignature();
 			}
 		}
 
@@ -190,12 +207,65 @@ namespace OpenDental {
 			return orthoChartNums;
 		}
 
+		private void gridMain_CellEnter(object sender,ODGridClickEventArgs e) {
+			
+
+
+		}
+
 		private void gridMain_CellTextChanged(object sender,EventArgs e) {
 			_hasChanged=true;
 		}
 
+		private void signatureBoxWrapper_SignatureChanged(object sender,EventArgs e) {
+			//labelEvents.Text+="SignatureChanged";
+
+		}
+
+		private void signatureBoxWrapper_ClearSignatureClicked(object sender,EventArgs e) {
+			labelEvents.Text+="ClearSignatureClicked";
+			if(gridMain.SelectedCell.Y==-1) {
+				return;
+			}
+			int sigIdx=gridMain.Columns.GetIndex(Lan.g(this,"Signature"));
+			table.Rows[gridMain.SelectedCell.Y][sigIdx]="";
+			//SaveSignatureToTable(gridMain.SelectedCell.Y);
+			SetSignature(gridMain.SelectedCell.Y);
+			gridMain.Focus();
+			_prevRow=gridMain.SelectedCell.Y;
+			_sigClearWasClicked=true;
+		}
+
+		private void signatureBoxWrapper_SignTopazClicked(object sender,EventArgs e) {
+			labelEvents.Text+="SignTopazClicked";
+			if(gridMain.SelectedCell.Y==-1) {
+				return;
+			}
+			int sigIdx=gridMain.Columns.GetIndex(Lan.g(this,"Signature"));
+			table.Rows[gridMain.SelectedCell.Y][sigIdx]="";
+			//SaveSignatureToTable(gridMain.SelectedCell.Y);
+			SetSignature(gridMain.SelectedCell.Y);
+		}
+
+		private void gridMain_CellClick(object sender,ODGridClickEventArgs e) {
+			labelEvents.Text+="CellClick Row "+e.Row+"\t";
+			if(!_showSigBox) {
+				return;
+			}
+			if(_sigClearWasClicked) {
+				SaveSignatureToTable(_prevRow);
+				SetSignature(_prevRow);
+				_sigClearWasClicked=false;
+			}
+			SetSignature(e.Row);
+			_prevRow=e.Row;
+			_hasChanged=true;
+		}
+
 		private void gridMain_CellLeave(object sender,ODGridClickEventArgs e) {
-			//Get the the date for the ortho chart that was just edited.
+			labelEvents.Text+="CellLeave Row "+e.Row+"\t";
+			//Get the date for the ortho chart that was just edited.
+			//SaveSignatureToTable(e.Row);
 			DateTime orthoDate=PIn.Date(gridMain.Rows[e.Row].Cells[0].Text);//First column will always be the date.
 			string oldText="";//If the selected cell is not in listOrthoCharts then it started out blank.  This will put it back to an empty string.
 			for(int i=0;i<_listOrthoCharts.Count;i++) {
@@ -211,9 +281,31 @@ namespace OpenDental {
 			}
 			//Suppress the security message because it's crazy annoying if the user is simply clicking around in cells.  They might be copying a cell and not changing it.
 			if(Security.IsAuthorized(Permissions.OrthoChartEdit,orthoDate,true)) {
-				if(gridMain.Rows[e.Row].Cells[e.Col].Text!=oldText) {
-					_hasChanged=true;//They had permission and they made a change.
+				//If this is a new ortho chart field, add it to the list of ortho charts so that we can use it when hashing the signature.
+				if(!_listOrthoCharts.Any(x=>x.DateService==orthoDate && x.FieldName==gridMain.Columns[e.Col].Heading)) {
+					OrthoChart orthoChart=new OrthoChart();
+					orthoChart.PatNum=_patCur.PatNum;
+					orthoChart.DateService=orthoDate;
+					orthoChart.FieldName=gridMain.Columns[e.Col].Heading;
+					orthoChart.FieldValue=gridMain.Rows[e.Row].Cells[e.Col].Text;
+					_listOrthoCharts.Add(orthoChart);
 				}
+				string newText=gridMain.Rows[e.Row].Cells[e.Col].Text;
+				if(newText != oldText) {
+					if(newText=="") {
+						_listOrthoCharts.RemoveAll(x=>x.DateService==orthoDate && x.FieldName==gridMain.Columns[e.Col].Heading);
+					}
+					else { 
+						_listOrthoCharts.FindAll(x=>x.DateService==orthoDate && x.FieldName==gridMain.Columns[e.Col].Heading)
+							.ForEach(x=>x.FieldValue=newText);
+					}
+					_hasChanged=true;//They had permission and they made a change.
+					//if(_prevRow != gridMain.SelectedCell.Y) {
+					//	SetSignature(_prevRow);
+					//}
+				}
+				SaveSignatureToTable(e.Row);
+				SetSignature(e.Row);
 				return;//The user has permission.  No need to waste time doing logic below.
 			}
 			//User is not authorized to edit this cell.  Check if they changed the old value and if they did, put it back to the way it was and warn them about security.
@@ -224,6 +316,39 @@ namespace OpenDental {
 				Security.IsAuthorized(Permissions.OrthoChartEdit,orthoDate);//This will pop up the message.
 			}
 			return;
+		}
+
+		private void SetSignature(int gridRow) {
+			DateTime orthoDate=PIn.Date(table.Rows[gridRow][0].ToString());
+			int sigIdx=gridMain.Columns.GetIndex(Lan.g(this,"Signature"));
+			string sigString=table.Rows[gridRow][sigIdx].ToString();
+			if(sigString=="") {
+				signatureBoxWrapper.ClearSignature();
+				gridMain.Rows[gridRow].ColorBackG=SystemColors.Window;
+				gridMain.Rows[gridRow].Cells[sigIdx].Text="";
+				return;
+			}
+			string keyData=OrthoCharts.GetKeyDataForSignatureSaving(_patCur,_listOrthoCharts.FindAll(x => x.DateService==orthoDate && x.FieldName!="Signature"),orthoDate);
+			signatureBoxWrapper.FillSignature(false,keyData,sigString);
+			if(signatureBoxWrapper.IsValid) {
+				gridMain.Rows[gridRow].ColorBackG=Color.FromArgb(175,0,250,158);//A lighter version of Color.MediumSpringGreen
+				gridMain.Rows[gridRow].Cells[sigIdx].Text=Lan.g(this,"Valid");
+			}
+			else {
+				gridMain.Rows[gridRow].ColorBackG=Color.FromArgb(255,140,143);//A darker version of Color.LightPink
+				gridMain.Rows[gridRow].Cells[sigIdx].Text=Lan.g(this,"Invalid");
+			}
+		}
+
+		private void SaveSignatureToTable(int gridRow) {
+			int sigIdx=gridMain.Columns.GetIndex(Lan.g(this,"Signature"));
+			string keyData;
+			DateTime orthoDate;
+			if(signatureBoxWrapper.GetSigChanged() && signatureBoxWrapper.IsValid) {
+				orthoDate=PIn.Date(table.Rows[gridRow][0].ToString());//First column will always be the date.
+				keyData=OrthoCharts.GetKeyDataForSignatureSaving(_patCur,_listOrthoCharts.FindAll(x => x.DateService==orthoDate && x.FieldName!="Signature"),orthoDate);
+				table.Rows[gridRow][sigIdx]=signatureBoxWrapper.GetSignature(keyData);
+			}
 		}
 
 		private void gridPat_CellDoubleClick(object sender,ODGridClickEventArgs e) {
@@ -391,6 +516,9 @@ namespace OpenDental {
 			for(int i=0;i<gridMain.Rows.Count;i++) {
 				table.Rows[i]["Date"]=gridMain.Rows[i].Tag;//store date
 				for(int j=0;j<_listOrthDisplayFields.Count;j++) {
+					if(_listOrthDisplayFields[j].InternalName=="Signature") {
+						continue;//Already saved to table
+					}
 					table.Rows[i][j+1]=gridMain.Rows[i].Cells[j+1].Text;
 				}
 			}

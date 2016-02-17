@@ -302,7 +302,7 @@ namespace OpenDental{
 				textCustomField.Visible=true;
 				labelCustomField.Visible=true;
 				listAvailable.Height=227;//227px for short, 412px for tall
-				labelAvailable.Text=Lan.g(this,"Previously Used Fields");
+				//labelAvailable.Text=Lan.g(this,"Previously Used Fields");
 			}
 			FillGrids();
 		}
@@ -333,8 +333,16 @@ namespace OpenDental{
 				if(Category!=DisplayFieldCategory.OrthoChart) {
 					row.Cells.Add(ListShowing[i].InternalName);
 				}
+				//if(Category==DisplayFieldCategory.OrthoChart && ListShowing[i].InternalName=="Signature Box") {
+				//	row.Cells.Add(Lan.g(this,ListShowing[i].InternalName));
+				//}
 				row.Cells.Add(ListShowing[i].Description);
-				row.Cells.Add(ListShowing[i].ColumnWidth.ToString());
+				if(Category==DisplayFieldCategory.OrthoChart && ListShowing[i].InternalName=="Signature Box") {
+					row.Cells.Add("");
+				}
+				else {
+					row.Cells.Add(ListShowing[i].ColumnWidth.ToString());
+				}
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
@@ -373,6 +381,9 @@ namespace OpenDental{
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			DisplayField tempField=ListShowing[e.Row].Copy();
 			if(tempField.Category==DisplayFieldCategory.OrthoChart) {
+				if(tempField.InternalName=="Signature Box") {
+					return;//There is nothing to edit for the Signature Box field.
+				}
 				FormDisplayFieldOrthoEdit FormDFOE=new FormDisplayFieldOrthoEdit();
 				FormDFOE.FieldCur=ListShowing[e.Row];
 				FormDFOE.ShowDialog();

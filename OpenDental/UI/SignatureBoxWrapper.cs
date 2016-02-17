@@ -16,6 +16,12 @@ namespace OpenDental.UI {
 		///<summary>The reason for this event is so that if a different user is signing, that it properly records the change in users.  See the example pattern in FormProcGroup.</summary>
 		[Category("Action"),Description("Event raised when signature is cleared or altered.")]
 		public event EventHandler SignatureChanged=null;
+		///<summary>Event raised when the X button is clicked.</summary>
+		[Category("Action"),Description("Event raised when the X button is clicked.")]
+		public event EventHandler ClearSignatureClicked=null;
+		///<summary>Event raised when the Sign Topaz button is clicked.</summary>
+		[Category("Action"),Description("Event raised when the Sign Topaz button is clicked.")]
+		public event EventHandler SignTopazClicked=null;
 		///<summary>Used for special cases where signature logic varies from our default.</summary>
 		public SigMode SignatureMode=SigMode.Default;
 
@@ -325,12 +331,18 @@ namespace OpenDental.UI {
 		}
 
 		private void butClearSig_Click(object sender,EventArgs e) {
+			if(ClearSignatureClicked!=null) {
+				ClearSignatureClicked(this,new EventArgs());
+			}
 			ClearSignature();
 			OnSignatureChanged();
 		}
 
 		private void butTopazSign_Click(object sender,EventArgs e) {
 			//this button is not even visible if Topaz is not allowed
+			if(SignTopazClicked!=null) {
+				SignTopazClicked(this,new EventArgs());
+			}
 			sigBox.Visible=false;
 			sigBoxTopaz.Visible=true;
 			//if(allowTopaz){

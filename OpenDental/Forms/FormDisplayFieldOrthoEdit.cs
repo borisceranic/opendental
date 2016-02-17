@@ -22,8 +22,6 @@ namespace OpenDental{
 		public DisplayField FieldCur;
 		private Label labelWarning;
 		private TextBox textPickList;
-		private ComboBox comboFieldType;
-		private Label label1;
 		private UI.Button butDown;
 		private UI.Button butUp;
 		private Font headerFont=new Font(FontFamily.GenericSansSerif,8.5f,FontStyle.Bold);
@@ -68,8 +66,6 @@ namespace OpenDental{
 			this.label5 = new System.Windows.Forms.Label();
 			this.labelWarning = new System.Windows.Forms.Label();
 			this.textPickList = new System.Windows.Forms.TextBox();
-			this.comboFieldType = new System.Windows.Forms.ComboBox();
-			this.label1 = new System.Windows.Forms.Label();
 			this.butDown = new OpenDental.UI.Button();
 			this.butUp = new OpenDental.UI.Button();
 			this.textWidth = new OpenDental.ValidNum();
@@ -112,6 +108,7 @@ namespace OpenDental{
 			this.textWidthMin.ReadOnly = true;
 			this.textWidthMin.Size = new System.Drawing.Size(71, 20);
 			this.textWidthMin.TabIndex = 9;
+			this.textWidthMin.TabStop = false;
 			// 
 			// label4
 			// 
@@ -134,7 +131,7 @@ namespace OpenDental{
 			// labelWarning
 			// 
 			this.labelWarning.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.labelWarning.Location = new System.Drawing.Point(5, 122);
+			this.labelWarning.Location = new System.Drawing.Point(5, 93);
 			this.labelWarning.Name = "labelWarning";
 			this.labelWarning.Size = new System.Drawing.Size(130, 14);
 			this.labelWarning.TabIndex = 89;
@@ -148,34 +145,12 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textPickList.HideSelection = false;
-			this.textPickList.Location = new System.Drawing.Point(141, 122);
+			this.textPickList.Location = new System.Drawing.Point(141, 93);
 			this.textPickList.Multiline = true;
 			this.textPickList.Name = "textPickList";
 			this.textPickList.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
 			this.textPickList.Size = new System.Drawing.Size(249, 301);
-			this.textPickList.TabIndex = 88;
-			// 
-			// comboFieldType
-			// 
-			this.comboFieldType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboFieldType.DropDownWidth = 177;
-			this.comboFieldType.FormattingEnabled = true;
-			this.comboFieldType.Location = new System.Drawing.Point(141, 93);
-			this.comboFieldType.MaxDropDownItems = 30;
-			this.comboFieldType.Name = "comboFieldType";
-			this.comboFieldType.Size = new System.Drawing.Size(177, 21);
-			this.comboFieldType.TabIndex = 86;
-			this.comboFieldType.Visible = false;
-			// 
-			// label1
-			// 
-			this.label1.Location = new System.Drawing.Point(5, 94);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(134, 17);
-			this.label1.TabIndex = 90;
-			this.label1.Text = "Field Type";
-			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.label1.Visible = false;
+			this.textPickList.TabIndex = 20;
 			// 
 			// butDown
 			// 
@@ -185,10 +160,10 @@ namespace OpenDental{
 			this.butDown.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butDown.CornerRadius = 4F;
 			this.butDown.Image = global::OpenDental.Properties.Resources.down;
-			this.butDown.Location = new System.Drawing.Point(440, 122);
+			this.butDown.Location = new System.Drawing.Point(440, 93);
 			this.butDown.Name = "butDown";
 			this.butDown.Size = new System.Drawing.Size(25, 24);
-			this.butDown.TabIndex = 128;
+			this.butDown.TabIndex = 30;
 			this.butDown.Click += new System.EventHandler(this.butDown_Click);
 			// 
 			// butUp
@@ -199,10 +174,10 @@ namespace OpenDental{
 			this.butUp.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butUp.CornerRadius = 4F;
 			this.butUp.Image = global::OpenDental.Properties.Resources.up;
-			this.butUp.Location = new System.Drawing.Point(414, 122);
+			this.butUp.Location = new System.Drawing.Point(414, 93);
 			this.butUp.Name = "butUp";
 			this.butUp.Size = new System.Drawing.Size(25, 24);
-			this.butUp.TabIndex = 127;
+			this.butUp.TabIndex = 25;
 			this.butUp.Click += new System.EventHandler(this.butUp_Click);
 			// 
 			// textWidth
@@ -212,7 +187,7 @@ namespace OpenDental{
 			this.textWidth.MinVal = 1;
 			this.textWidth.Name = "textWidth";
 			this.textWidth.Size = new System.Drawing.Size(71, 20);
-			this.textWidth.TabIndex = 7;
+			this.textWidth.TabIndex = 10;
 			// 
 			// butOK
 			// 
@@ -222,10 +197,10 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(414, 362);
+			this.butOK.Location = new System.Drawing.Point(414, 333);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 26);
-			this.butOK.TabIndex = 1;
+			this.butOK.TabIndex = 35;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
@@ -237,23 +212,21 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(414, 397);
+			this.butCancel.Location = new System.Drawing.Point(414, 368);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 26);
-			this.butCancel.TabIndex = 0;
+			this.butCancel.TabIndex = 40;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
 			// FormDisplayFieldOrthoEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(510, 448);
+			this.ClientSize = new System.Drawing.Size(510, 406);
 			this.Controls.Add(this.butDown);
 			this.Controls.Add(this.butUp);
-			this.Controls.Add(this.label1);
 			this.Controls.Add(this.labelWarning);
 			this.Controls.Add(this.textPickList);
-			this.Controls.Add(this.comboFieldType);
 			this.Controls.Add(this.label5);
 			this.Controls.Add(this.textWidthMin);
 			this.Controls.Add(this.label4);
