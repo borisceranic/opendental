@@ -26,6 +26,7 @@ namespace OpenDental {
 			ShowStatus("Loading patient information");
 			checkIsPatientCreate.Checked=PrefC.GetBool(PrefName.Ins834IsPatientCreate);
 			_listPatients=Patients.GetAllPatients();//Testing this on an average sized database took about 1 second to run on a dev machine.
+			_listPatients.Sort();
 			FillGridInsPlans();
 			ShowStatus("");
 			Cursor=Cursors.Default;
@@ -61,7 +62,7 @@ namespace OpenDental {
 				gridInsPlans.Columns.Add(new UI.ODGridColumn("Birthdate",74,HorizontalAlignment.Center,UI.GridSortingStrategy.DateParse));
 				gridInsPlans.Columns.Add(new UI.ODGridColumn("SSN",66,HorizontalAlignment.Center,UI.GridSortingStrategy.StringCompare));
 				_patNumCol=gridInsPlans.Columns.Count;
-				gridInsPlans.Columns.Add(new UI.ODGridColumn("PatNum",54,HorizontalAlignment.Center,UI.GridSortingStrategy.StringCompare));
+				gridInsPlans.Columns.Add(new UI.ODGridColumn("PatNum",68,HorizontalAlignment.Center,UI.GridSortingStrategy.StringCompare));
 				gridInsPlans.Columns.Add(new UI.ODGridColumn("Date Begin",84,HorizontalAlignment.Center,UI.GridSortingStrategy.DateParse));
 				gridInsPlans.Columns.Add(new UI.ODGridColumn("Date Term",84,HorizontalAlignment.Center,UI.GridSortingStrategy.DateParse));
 				gridInsPlans.Columns.Add(new UI.ODGridColumn("Relation",70,HorizontalAlignment.Center,UI.GridSortingStrategy.StringCompare));
@@ -72,7 +73,7 @@ namespace OpenDental {
 				isSortAscending=true;//Start with A and progress to Z.
 			}
 			gridInsPlans.EndUpdate();
-			Application.DoEvents();//To show the blank grid.
+			Application.DoEvents();//To show empty grid while the window is loading.
 			gridInsPlans.BeginUpdate();
 			gridInsPlans.Rows.Clear();
 			int rowCount=0;
@@ -92,9 +93,8 @@ namespace OpenDental {
 					for(int k=0;k<tran.ListMembers.Count;k++) {
 						Hx834_Member member=tran.ListMembers[k];
 						ShowStatus("Loading "+(gridInsPlans.Rows.Count+1).ToString().PadLeft(6)+"/"+rowCount.ToString().PadLeft(6)
-							+"  Patient "+member.Pat.GetNameLF());						
-						//Locate a match within the database based on first name, last name, and birthdate.
-						List <Patient> listPatientMatches=Patients.GetPatientsByNameAndBirthday(member.Pat.LName,member.Pat.FName,member.Pat.Birthdate,_listPatients);
+							+"  Patient "+member.Pat.GetNameLF());
+						List <Patient> listPatientMatches=Patients.GetPatientsByNameAndBirthday(member.Pat,_listPatients);
 						if(member.Pat.PatNum==0 && listPatientMatches.Count==1) {
 							member.Pat.PatNum=listPatientMatches[0].PatNum;
 						}
@@ -194,27 +194,45 @@ namespace OpenDental {
 				}
 				ShowStatus("Progress "+(i+1).ToString().PadLeft(6)+"/"+gridInsPlans.Rows.Count.ToString().PadLeft(6)
 					+"  Importing plans for patient "+member.Pat.GetNameLF());
-				//The patient's status is not affected by the maintenance code.  After reviewing all of the possible maintenance codes in 
-				//member.MemberLevelDetail.MaintenanceTypeCode, we believe that all statuses suggest either insert or update, except for "Cancel".
-				//Nathan and Derek feel that archiving the patinet in response to a Cancel request is a bit drastic.
-				//Thus we ignore the patient maintenance code and always assume insert/update.
-				//Even if the status was "Cancel", then updating the patient does not hurt.
-				if(member.Pat.PatNum==0 && gridInsPlans.Rows[i].Cells[_patNumCol].Text!="") {//Multiple matches
-					skippedPatsCount++;
-				}
-				else if(member.Pat.PatNum==0 && checkIsPatientCreate.Checked) {
-					//TODO: How are patinets being duplicated?  Probably due to multiple plans for the same patient.
-					Patients.Insert(member.Pat,false);
-					SecurityLogs.MakeLogEntry(Permissions.PatientCreate,member.Pat.PatNum,"Created from Import Ins Plans 834.",LogSources.InsPlanImport834);
-					createdPatsCount++;
-				}
-				else if(member.Pat.PatNum==0 && !checkIsPatientCreate.Checked) {
-					skippedPatsCount++;
-				}
-				else {//member.Pat.PatNum!=0
-					Patient patDb=_listPatients.FirstOrDefault(x => x.PatNum==member.Pat.PatNum);
-					member.MergePatientIntoDbPatient(patDb);
-					updatedPatsCount++;
+				if(!member.IsImported) {
+					//The patient's status is not affected by the maintenance code.  After reviewing all of the possible maintenance codes in 
+					//member.MemberLevelDetail.MaintenanceTypeCode, we believe that all statuses suggest either insert or update, except for "Cancel".
+					//Nathan and Derek feel that archiving the patinet in response to a Cancel request is a bit drastic.
+					//Thus we ignore the patient maintenance code and always assume insert/update.
+					//Even if the status was "Cancel", then updating the patient does not hurt.
+					if(member.Pat.PatNum==0 && checkIsPatientCreate.Checked) {
+						//The patient may need to be created below.  However, the patient may have already been inserted in a pervious iteration of this loop
+						//in following scenario: Two different 834s include updates for the same patient and both documents are being imported at the same time.
+						//If the patient was already inserted, then they would show up in _listPatients and also in the database.  Attempt to locate the patient
+						//in _listPatients again before inserting.
+						List <Patient> listPatientMatches=Patients.GetPatientsByNameAndBirthday(member.Pat,_listPatients);
+						if(listPatientMatches.Count==1) {
+							member.Pat.PatNum=listPatientMatches[0].PatNum;
+						}
+					}
+					if(member.Pat.PatNum==0 && gridInsPlans.Rows[i].Cells[_patNumCol].Text!="") {//Multiple matches
+						skippedPatsCount++;
+					}
+					else if(member.Pat.PatNum==0 && checkIsPatientCreate.Checked) {
+						Patients.Insert(member.Pat,false);
+						int patIdx=_listPatients.BinarySearch(member.Pat);//Preserve sort order by locating the index in which to insert the newly added patient.
+						_listPatients.Insert(~patIdx,member.Pat);//According to MSDN, the index returned by BinarySearch() is a "bitwise compliment"
+						SecurityLogs.MakeLogEntry(Permissions.PatientCreate,member.Pat.PatNum,"Created from Import Ins Plans 834.",LogSources.InsPlanImport834);
+						member.IsImported=true;
+						createdPatsCount++;
+					}
+					else if(member.Pat.PatNum==0 && !checkIsPatientCreate.Checked) {
+						skippedPatsCount++;
+					}
+					else {//member.Pat.PatNum!=0
+						Patient patDb=_listPatients.FirstOrDefault(x => x.PatNum==member.Pat.PatNum);//Locate by PatNum, in case user selected manually.
+						member.MergePatientIntoDbPatient(patDb);
+						_listPatients.Remove(patDb);//Remove the patient from the list so we can add it back in the correct location (in case name or bday changed).
+						int patIdx=_listPatients.BinarySearch(patDb);//Preserve sort order by locating the index in which to insert the newly added patient.
+						_listPatients.Insert(~patIdx,patDb);//According to MSDN, the index returned by BinarySearch() is a "bitwise compliment"
+						member.IsImported=true;
+						updatedPatsCount++;
+					}
 				}
 				if(healthCoverage==null) {
 					continue;

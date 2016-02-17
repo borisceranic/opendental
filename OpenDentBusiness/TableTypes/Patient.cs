@@ -7,7 +7,7 @@ namespace OpenDentBusiness{
 	///<summary>One row for each patient.  Includes deleted patients.</summary>
 	[Serializable()]
 	[CrudTable(AuditPerms=CrudAuditPerm.PatientPortal,IsSecurityStamped=true)]
-	public class Patient : TableBase {
+	public class Patient : TableBase, IComparable {
 		/// <summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
 		public long PatNum;
@@ -303,6 +303,28 @@ namespace OpenDentBusiness{
 		public string GetSalutation(){
 			return Patients.GetSalutation(Salutation,Preferred,FName);
 		}
+
+		///<summary>Useful for sorting and binary searching.  The X12 834 implementation uses this for binary searching to improve efficiency.
+		///If this function is changed in the future, it will heavily impact our X12 834 implementation.  Be cautious.  In the end, this function
+		///will probably not need to change anyway, since it will only be used for comparing patients when the PatNums are not known.</summary>
+		public int CompareTo(object patOther) {
+			Patient p1=this;
+			Patient p2=(Patient)patOther;
+			string lname1=(p1.LName==null)?"":p1.LName;
+			string lname2=(p2.LName==null)?"":p2.LName;
+			int comp=lname1.Trim().ToLower().CompareTo(lname2.Trim().ToLower());
+			if(comp!=0) {
+				return comp;
+			}
+			string fname1=(p1.FName==null)?"":p1.FName;
+			string fname2=(p2.FName==null)?"":p2.FName;
+			comp=fname1.Trim().ToLower().CompareTo(fname2.Trim().ToLower());
+			if(comp!=0) {
+				return comp;
+			}
+			return p1.Birthdate.Date.CompareTo(p2.Birthdate.Date);
+		}
+
 	}
 
 }

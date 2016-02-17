@@ -858,7 +858,7 @@ namespace OpenDentBusiness{
 			return table;
 		}
 
-		///<summary>Useful when you expect to individually examine most of the patients in the database during a data import.
+		///<summary>Useful when you expect to individually examine most of the patients in the database during a data import.  Excludes deleted patients.
 		///Saves time and database calls to call this method once and keep a short term cache than it is to run a services of select statements.</summary>
 		public static List<Patient> GetAllPatients() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -1488,13 +1488,34 @@ namespace OpenDentBusiness{
 			return PIn.Long(Db.GetScalar(command));
 		}
 
-		///<summary>Returns a list of all (not deleted) patients within listPatients which match the given first name, last name, and birthdate.
-		///Ignores case and leading/trailing space.</summary>
-		public static List<Patient> GetPatientsByNameAndBirthday(string lName,string fName,DateTime birthdate,List <Patient> listPatients) {
-			return listPatients.FindAll(x => x.PatStatus!=PatientStatus.Deleted
-				&& x.LName.Trim().ToLower()==lName.Trim().ToLower()
-				&& x.FName.Trim().ToLower()==fName.Trim().ToLower()
-				&& x.Birthdate.Date==birthdate.Date && birthdate.Year > 1880);
+		///<summary>Returns a list of all patients within listSortedPatients which match the given pat.LName, pat.FName and pat.Birthdate.
+		///Ignores case and leading/trailing space.  The listSortedPatients MUST be sorted by LName, then FName, then Birthdate or else the result will be
+		///wrong.  Call listSortedPatients.Sort() before calling this function.  This function uses a binary search to much more efficiently locate
+		///matches than a linear search would be able to.</summary>
+		public static List<Patient> GetPatientsByNameAndBirthday(Patient pat,List <Patient> listSortedPatients) {
+			if(pat.LName.Trim().ToLower().Length==0 || pat.FName.Trim().ToLower().Length==0 || pat.Birthdate.Year < 1880) {
+				//We do not allow a match unless Last Name, First Name, AND birthdate are specified.  Otherwise at match could be meaningless.
+				return new List<Patient>();
+			}
+			int patIdx=listSortedPatients.BinarySearch(pat);//If there are multiple matches, then this will only return one of the indexes randomly.
+			if(patIdx < 0) {
+				//No matches found.
+				return new List<Patient>();
+			}
+			//The matched indicies will all be consecutive and will include the returned index from the binary search, because the list is sorted.
+			int beginIdx=patIdx;
+			for(int i=patIdx-1;i >= 0 && pat.CompareTo(listSortedPatients[i])==0;i--) {
+				beginIdx=i;
+			}
+			int endIdx=patIdx;
+			for(int i=patIdx+1;i < listSortedPatients.Count && pat.CompareTo(listSortedPatients[i])==0;i++) {
+				endIdx=i;
+			}
+			List <Patient> listPatientMatches=new List<Patient>();
+			for(int i=beginIdx;i<=endIdx;i++) {
+				listPatientMatches.Add(listSortedPatients[i]);
+			}
+			return listPatientMatches;
 		}
 
 		///<summary>Will return 0 if can't find an exact matching pat.  Because it does not include birthdate, it's not specific enough for most situations.</summary>

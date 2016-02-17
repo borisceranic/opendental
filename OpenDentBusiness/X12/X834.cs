@@ -1682,6 +1682,8 @@ namespace OpenDentBusiness {
 		public string SubscriberId;
 		///<summary>The insurance plan group number.  Specified at member level in format.</summary>
 		public string GroupNum;
+		///<summary>Used externally to track whether or not this member has been imported into the database.</summary>
+		public bool IsImported;
 
 		public string GetPatMaintTypeDescript() {
 			if(MemberLevelDetail==null) {

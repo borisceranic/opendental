@@ -23,6 +23,7 @@ namespace OpenDental {
 			ShowStatus("Loading...");
 			textImportPath.Text=PrefC.GetString(PrefName.Ins834ImportPath);
 			FillGridInsPlanFiles();
+			ShowStatus("");
 		}
 
 		private void butImportPathPick_Click(object sender,EventArgs e) {
@@ -33,35 +34,6 @@ namespace OpenDental {
 
 		private void butRefresh_Click(object sender,EventArgs e) {
 			FillGridInsPlanFiles();
-		}
-
-		private void butImport_Click(object sender,EventArgs e) {
-			//Deselect files which have errors.
-			int deselectedCount=0;
-			List <int> listSelectedIndicies=new List<int>(gridInsPlanFiles.SelectedIndices);//Since we will be modifying the selection array dynamically.
-			for(int i=0;i<listSelectedIndicies.Count;i++) {
-				int index=listSelectedIndicies[i];
-				if(gridInsPlanFiles.Rows[index].Cells[_colErrorIndex].Text!="") {
-					gridInsPlanFiles.SetSelected(index,false);
-					deselectedCount++;
-				}
-			}
-			if(deselectedCount > 0) {
-				MessageBox.Show(Lan.g(this,"Number of files containing errors deselected")+": "+deselectedCount);
-			}
-			if(gridInsPlanFiles.SelectedIndices.Length==0) {
-				MsgBox.Show(this,"No files selected for import.");
-				return;
-			}
-			//Import all selected, valid files at the same time.
-			List <X834> listX834s=new List<X834>();
-			for(int i=0;i<gridInsPlanFiles.SelectedIndices.Length;i++) {
-				int index=gridInsPlanFiles.SelectedIndices[i];
-				X834 x834=(X834)gridInsPlanFiles.Rows[index].Tag;
-				listX834s.Add(x834);
-			}
-			FormEtrans834Preview FormEP=new FormEtrans834Preview(listX834s);
-			FormEP.ShowDialog();
 		}
 
 		///<summary>Shows current status to user in title bar.  Useful for when processing for a few seconds or more.</summary>
@@ -183,6 +155,32 @@ namespace OpenDental {
 				return;
 			}
 			Prefs.UpdateString(PrefName.Ins834ImportPath,textImportPath.Text);
+			//Deselect files which have errors.
+			int deselectedCount=0;
+			List <int> listSelectedIndicies=new List<int>(gridInsPlanFiles.SelectedIndices);//Since we will be modifying the selection array dynamically.
+			for(int i=0;i<listSelectedIndicies.Count;i++) {
+				int index=listSelectedIndicies[i];
+				if(gridInsPlanFiles.Rows[index].Cells[_colErrorIndex].Text!="") {
+					gridInsPlanFiles.SetSelected(index,false);
+					deselectedCount++;
+				}
+			}
+			if(deselectedCount > 0) {
+				MessageBox.Show(Lan.g(this,"Number of files containing errors deselected")+": "+deselectedCount);
+			}
+			if(gridInsPlanFiles.SelectedIndices.Length==0) {
+				MsgBox.Show(this,"No files selected for import.");
+				return;
+			}
+			//Import all selected, valid files at the same time.
+			List <X834> listX834s=new List<X834>();
+			for(int i=0;i<gridInsPlanFiles.SelectedIndices.Length;i++) {
+				int index=gridInsPlanFiles.SelectedIndices[i];
+				X834 x834=(X834)gridInsPlanFiles.Rows[index].Tag;
+				listX834s.Add(x834);
+			}
+			FormEtrans834Preview FormEP=new FormEtrans834Preview(listX834s);
+			FormEP.ShowDialog();
 			DialogResult=DialogResult.OK;
 		}
 
