@@ -26,18 +26,18 @@
 			this.components = new System.ComponentModel.Container();
 			this.timer = new System.Windows.Forms.Timer(this.components);
 			this.panelPrint = new System.Windows.Forms.Panel();
-			this.panelEditCell = new System.Windows.Forms.Panel();
-			this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-			this.butDrag = new System.Windows.Forms.Button();
-			this.butDeleteCell = new System.Windows.Forms.Button();
-			this.butDeleteRow = new System.Windows.Forms.Button();
-			this.butDeleteColumn = new System.Windows.Forms.Button();
 			this.butRefresh = new System.Windows.Forms.Button();
 			this.butSaveImage = new System.Windows.Forms.Button();
 			this.butEdit = new System.Windows.Forms.Button();
 			this.butPrint = new System.Windows.Forms.Button();
 			this.butPrintPreview = new System.Windows.Forms.Button();
 			this.butPageSetup = new System.Windows.Forms.Button();
+			this.panelEditCell = new System.Windows.Forms.Panel();
+			this.butDrag = new System.Windows.Forms.Button();
+			this.butDeleteCell = new System.Windows.Forms.Button();
+			this.butDeleteRow = new System.Windows.Forms.Button();
+			this.butDeleteColumn = new System.Windows.Forms.Button();
+			this.toolTip = new System.Windows.Forms.ToolTip(this.components);
 			this.pictureBox = new System.Windows.Forms.PictureBox();
 			this.panelPrint.SuspendLayout();
 			this.panelEditCell.SuspendLayout();
@@ -63,6 +63,93 @@
 			this.panelPrint.Name = "panelPrint";
 			this.panelPrint.Size = new System.Drawing.Size(210, 30);
 			this.panelPrint.TabIndex = 20;
+			// 
+			// butRefresh
+			// 
+			this.butRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butRefresh.BackColor = System.Drawing.SystemColors.Control;
+			this.butRefresh.Image = global::OpenDentalGraph.Properties.Resources.refresh;
+			this.butRefresh.Location = new System.Drawing.Point(1, 0);
+			this.butRefresh.Name = "butRefresh";
+			this.butRefresh.Size = new System.Drawing.Size(30, 30);
+			this.butRefresh.TabIndex = 9;
+			this.butRefresh.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.toolTip.SetToolTip(this.butRefresh, "Refresh");
+			this.butRefresh.UseVisualStyleBackColor = false;
+			this.butRefresh.Click += new System.EventHandler(this.butRefresh_Click);
+			// 
+			// butSaveImage
+			// 
+			this.butSaveImage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butSaveImage.BackColor = System.Drawing.SystemColors.Control;
+			this.butSaveImage.Image = global::OpenDentalGraph.Properties.Resources.image;
+			this.butSaveImage.Location = new System.Drawing.Point(37, 0);
+			this.butSaveImage.Name = "butSaveImage";
+			this.butSaveImage.Size = new System.Drawing.Size(30, 30);
+			this.butSaveImage.TabIndex = 8;
+			this.butSaveImage.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.toolTip.SetToolTip(this.butSaveImage, "Save Image");
+			this.butSaveImage.UseVisualStyleBackColor = false;
+			this.butSaveImage.Click += new System.EventHandler(this.butSaveImage_Click);
+			// 
+			// butEdit
+			// 
+			this.butEdit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butEdit.BackColor = System.Drawing.SystemColors.Control;
+			this.butEdit.Enabled = false;
+			this.butEdit.Image = global::OpenDentalGraph.Properties.Resources.editPencil;
+			this.butEdit.Location = new System.Drawing.Point(180, 0);
+			this.butEdit.Name = "butEdit";
+			this.butEdit.Size = new System.Drawing.Size(30, 30);
+			this.butEdit.TabIndex = 3;
+			this.butEdit.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.toolTip.SetToolTip(this.butEdit, "Edit Cell Contents");
+			this.butEdit.UseVisualStyleBackColor = false;
+			this.butEdit.Click += new System.EventHandler(this.butEdit_Click);
+			this.butEdit.MouseEnter += new System.EventHandler(this.DashboardCell_MouseEnterLeave);
+			this.butEdit.MouseLeave += new System.EventHandler(this.DashboardCell_MouseEnterLeave);
+			// 
+			// butPrint
+			// 
+			this.butPrint.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butPrint.BackColor = System.Drawing.SystemColors.Control;
+			this.butPrint.Image = global::OpenDentalGraph.Properties.Resources.print;
+			this.butPrint.Location = new System.Drawing.Point(145, 0);
+			this.butPrint.Name = "butPrint";
+			this.butPrint.Size = new System.Drawing.Size(30, 30);
+			this.butPrint.TabIndex = 5;
+			this.butPrint.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.toolTip.SetToolTip(this.butPrint, "Print");
+			this.butPrint.UseVisualStyleBackColor = false;
+			this.butPrint.Click += new System.EventHandler(this.butPrint_Click);
+			// 
+			// butPrintPreview
+			// 
+			this.butPrintPreview.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butPrintPreview.BackColor = System.Drawing.SystemColors.Control;
+			this.butPrintPreview.Image = global::OpenDentalGraph.Properties.Resources.printpreview;
+			this.butPrintPreview.Location = new System.Drawing.Point(109, 0);
+			this.butPrintPreview.Name = "butPrintPreview";
+			this.butPrintPreview.Size = new System.Drawing.Size(30, 30);
+			this.butPrintPreview.TabIndex = 6;
+			this.butPrintPreview.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.toolTip.SetToolTip(this.butPrintPreview, "Print Preview");
+			this.butPrintPreview.UseVisualStyleBackColor = false;
+			this.butPrintPreview.Click += new System.EventHandler(this.butPrintPreview_Click);
+			// 
+			// butPageSetup
+			// 
+			this.butPageSetup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butPageSetup.BackColor = System.Drawing.SystemColors.Control;
+			this.butPageSetup.Image = global::OpenDentalGraph.Properties.Resources.printsetup;
+			this.butPageSetup.Location = new System.Drawing.Point(73, 0);
+			this.butPageSetup.Name = "butPageSetup";
+			this.butPageSetup.Size = new System.Drawing.Size(30, 30);
+			this.butPageSetup.TabIndex = 7;
+			this.butPageSetup.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.toolTip.SetToolTip(this.butPageSetup, "Page Setup");
+			this.butPageSetup.UseVisualStyleBackColor = false;
+			this.butPageSetup.Click += new System.EventHandler(this.butPageSetup_Click);
 			// 
 			// panelEditCell
 			// 
@@ -142,93 +229,6 @@
 			this.butDeleteColumn.Click += new System.EventHandler(this.butDeleteColumn_Click);
 			this.butDeleteColumn.MouseEnter += new System.EventHandler(this.butDeleteColumn_MouseEnter);
 			this.butDeleteColumn.MouseLeave += new System.EventHandler(this.butDeleteColumn_MouseLeave);
-			// 
-			// butRefresh
-			// 
-			this.butRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.butRefresh.BackColor = System.Drawing.SystemColors.Control;
-			this.butRefresh.Image = global::OpenDentalGraph.Properties.Resources.refresh;
-			this.butRefresh.Location = new System.Drawing.Point(1, 0);
-			this.butRefresh.Name = "butRefresh";
-			this.butRefresh.Size = new System.Drawing.Size(30, 30);
-			this.butRefresh.TabIndex = 9;
-			this.butRefresh.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.toolTip.SetToolTip(this.butRefresh, "Save Image");
-			this.butRefresh.UseVisualStyleBackColor = false;
-			this.butRefresh.Click += new System.EventHandler(this.butRefresh_Click);
-			// 
-			// butSaveImage
-			// 
-			this.butSaveImage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.butSaveImage.BackColor = System.Drawing.SystemColors.Control;
-			this.butSaveImage.Image = global::OpenDentalGraph.Properties.Resources.image;
-			this.butSaveImage.Location = new System.Drawing.Point(37, 0);
-			this.butSaveImage.Name = "butSaveImage";
-			this.butSaveImage.Size = new System.Drawing.Size(30, 30);
-			this.butSaveImage.TabIndex = 8;
-			this.butSaveImage.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.toolTip.SetToolTip(this.butSaveImage, "Save Image");
-			this.butSaveImage.UseVisualStyleBackColor = false;
-			this.butSaveImage.Click += new System.EventHandler(this.butSaveImage_Click);
-			// 
-			// butEdit
-			// 
-			this.butEdit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.butEdit.BackColor = System.Drawing.SystemColors.Control;
-			this.butEdit.Enabled = false;
-			this.butEdit.Image = global::OpenDentalGraph.Properties.Resources.editPencil;
-			this.butEdit.Location = new System.Drawing.Point(180, 0);
-			this.butEdit.Name = "butEdit";
-			this.butEdit.Size = new System.Drawing.Size(30, 30);
-			this.butEdit.TabIndex = 3;
-			this.butEdit.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.toolTip.SetToolTip(this.butEdit, "Edit Cell Contents");
-			this.butEdit.UseVisualStyleBackColor = false;
-			this.butEdit.Click += new System.EventHandler(this.butEdit_Click);
-			this.butEdit.MouseEnter += new System.EventHandler(this.DashboardCell_MouseEnterLeave);
-			this.butEdit.MouseLeave += new System.EventHandler(this.DashboardCell_MouseEnterLeave);
-			// 
-			// butPrint
-			// 
-			this.butPrint.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.butPrint.BackColor = System.Drawing.SystemColors.Control;
-			this.butPrint.Image = global::OpenDentalGraph.Properties.Resources.print;
-			this.butPrint.Location = new System.Drawing.Point(145, 0);
-			this.butPrint.Name = "butPrint";
-			this.butPrint.Size = new System.Drawing.Size(30, 30);
-			this.butPrint.TabIndex = 5;
-			this.butPrint.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.toolTip.SetToolTip(this.butPrint, "Print");
-			this.butPrint.UseVisualStyleBackColor = false;
-			this.butPrint.Click += new System.EventHandler(this.butPrint_Click);
-			// 
-			// butPrintPreview
-			// 
-			this.butPrintPreview.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.butPrintPreview.BackColor = System.Drawing.SystemColors.Control;
-			this.butPrintPreview.Image = global::OpenDentalGraph.Properties.Resources.printpreview;
-			this.butPrintPreview.Location = new System.Drawing.Point(109, 0);
-			this.butPrintPreview.Name = "butPrintPreview";
-			this.butPrintPreview.Size = new System.Drawing.Size(30, 30);
-			this.butPrintPreview.TabIndex = 6;
-			this.butPrintPreview.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.toolTip.SetToolTip(this.butPrintPreview, "Print Preview");
-			this.butPrintPreview.UseVisualStyleBackColor = false;
-			this.butPrintPreview.Click += new System.EventHandler(this.butPrintPreview_Click);
-			// 
-			// butPageSetup
-			// 
-			this.butPageSetup.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.butPageSetup.BackColor = System.Drawing.SystemColors.Control;
-			this.butPageSetup.Image = global::OpenDentalGraph.Properties.Resources.printsetup;
-			this.butPageSetup.Location = new System.Drawing.Point(73, 0);
-			this.butPageSetup.Name = "butPageSetup";
-			this.butPageSetup.Size = new System.Drawing.Size(30, 30);
-			this.butPageSetup.TabIndex = 7;
-			this.butPageSetup.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.toolTip.SetToolTip(this.butPageSetup, "Page Setup");
-			this.butPageSetup.UseVisualStyleBackColor = false;
-			this.butPageSetup.Click += new System.EventHandler(this.butPageSetup_Click);
 			// 
 			// pictureBox
 			// 

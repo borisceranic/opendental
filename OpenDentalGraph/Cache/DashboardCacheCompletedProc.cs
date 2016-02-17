@@ -10,12 +10,10 @@ namespace OpenDentalGraph.Cache {
 				where+="AND procedurelog.ProcDate BETWEEN "+POut.Date(filter.DateFrom)+" AND "+POut.Date(filter.DateTo)+" ";
 			}
 			return
-				"SELECT procedurelog.ProcDate,procedurelog.ProvNum,"
-				+"SUM(procedurelog.ProcFee*(procedurelog.UnitQty+procedurelog.BaseUnits))-IFNULL(SUM(claimproc.WriteOff),0) AS GrossProd, "
+				"SELECT procedurelog.ProcDate,procedurelog.ProvNum, "
+				+"SUM(procedurelog.ProcFee*(procedurelog.UnitQty+procedurelog.BaseUnits)) AS GrossProd, "
 				+"COUNT(procedurelog.ProcNum) AS ProcCount "
-				+"FROM procedurelog USE INDEX(indexPNPD) "
-				+"LEFT JOIN claimproc ON claimproc.ProcNum = procedurelog.ProcNum "
-				+"AND claimproc.Status="+POut.Int((int)ClaimProcStatus.CapComplete)+" "
+				+"FROM procedurelog "
 				+where
 				+"GROUP BY procedurelog.ProcDate,procedurelog.ProvNum ";
 		}

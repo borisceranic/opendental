@@ -10,8 +10,8 @@ namespace OpenDentalGraph.Cache {
 				"SELECT PatNum, MIN(ProcDate) FirstProc "
 				+"FROM procedurelog USE INDEX(indexPNPSCN) "
 				+"INNER JOIN procedurecode ON procedurecode.CodeNum = procedurelog.CodeNum "
+												+"AND procedurecode.ProcCode NOT IN ('D9986','D9987')"
 				+"WHERE ProcStatus="+POut.Int((int)ProcStat.C)+" "
-				+"AND procedurecode.ProcCode NOT IN ('D9986','D9987')"
 				+"GROUP BY PatNum";
 		}
 

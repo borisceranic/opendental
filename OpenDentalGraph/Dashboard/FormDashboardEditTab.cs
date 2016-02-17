@@ -72,7 +72,7 @@ Double-click tab header to rename tab.";
 			}
 			dashboardTabControl.SetDashboardLayout(DashboardLayouts.GetDashboardLayout(DashboardGroupName),invalidateFirst);
 		}
-
+				
 		private void SetTitle() {
 			string title="Graphic Reports - "+DashboardGroupName;
 			if(IsEditMode) {
@@ -95,12 +95,12 @@ Double-click tab header to rename tab.";
 		}
 				
 		private void setupToolStripMenuItem_Click(object sender,EventArgs e) {
-			//todo: security check?
-			//if(!Security.IsAuthorized(Permissions.ReportDashboardSetup)) {
-			//	return;
-			//}
-			//todo: log entry?
-			//SecurityLogs.MakeLogEntry(Permissions.ReportDashboardSetup,0,"");
+			if(!IsEditMode) {
+				if(!Security.IsAuthorized(Permissions.GraphicalReportSetup)) {
+					return;
+				}
+				SecurityLogs.MakeLogEntry(Permissions.GraphicalReportSetup,0,"Accessed graphical reports setup controls.");
+			}
 			IsEditMode=!IsEditMode;
 		}
 		

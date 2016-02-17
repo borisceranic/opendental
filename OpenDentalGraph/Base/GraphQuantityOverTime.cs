@@ -8,6 +8,7 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using OpenDentalGraph.Enumerations;
+using System.Drawing.Printing;
 
 namespace OpenDentalGraph {
 	public partial class GraphQuantityOverTime:UserControl, IODGraph<GraphQuantityOverTime.GraphPointBase,GraphQuantityOverTime.QuantityOverTimeGraphSettings> {
@@ -827,6 +828,7 @@ namespace OpenDentalGraph {
 
 		public void PrintPreview() {
 			chart1.Printing.PrintPreview();
+			//new FormPrintSettings(chart1).ShowDialog(); //currently working on. -andrew 2/16
 		}
 		#endregion
 

@@ -5,18 +5,20 @@ using System.Data;
 namespace OpenDentalGraph.Cache {
 	public class DashboardCacheWriteoff:DashboardCacheWithQuery<Writeoff> {
 		protected override string GetCommand(DashboardFilter filter) {
-			string where="";
+			string where="WHERE TRUE ";
 			if(filter.UseDateFilter) {
-				where="ProcDate BETWEEN "+POut.Date(filter.DateFrom)+" AND "+POut.Date(filter.DateTo)+" AND ";
+				where+="AND ProcDate BETWEEN "+POut.Date(filter.DateFrom)+" AND "+POut.Date(filter.DateTo)+" ";
 			}
 			return
-				"SELECT ProcDate,ProvNum,SUM(WriteOff) AS WriteOffs "
+				"SELECT ProcDate,ProvNum,SUM(WriteOff) AS WriteOffs, IF(claimproc.Status="+(int)ClaimProcStatus.CapComplete+",'1','0') AS IsCap "
 				+"FROM claimproc "
-				+"WHERE "+where+"claimproc.Status IN ("
+				+where
+				+"AND claimproc.Status IN ("
 				+POut.Int((int)ClaimProcStatus.Received)+","
 				+POut.Int((int)ClaimProcStatus.Supplemental)+","
-				+POut.Int((int)ClaimProcStatus.NotReceived)+") "
-				+"GROUP BY ProcDate,ProvNum "
+				+POut.Int((int)ClaimProcStatus.NotReceived)+","
+				+POut.Int((int)ClaimProcStatus.CapComplete)+") "
+				+"GROUP BY ProcDate,ProvNum,(claimproc.Status="+(int)ClaimProcStatus.CapComplete+") "
 				+"HAVING WriteOffs<>0 ";
 		}
 
@@ -29,9 +31,12 @@ namespace OpenDentalGraph.Cache {
 				Val=-x.Field<double>("WriteOffs"),
 				Count=0, //count procedures, not writeoffs.
 				SeriesName=seriesName,
+				IsCap=PIn.Bool(x.Field<string>("IsCap")),
 			};
 		}
 	}
 
-	public class Writeoff:GraphQuantityOverTime.GraphDataPointProv { }
+	public class Writeoff:GraphQuantityOverTime.GraphDataPointProv {
+		public bool IsCap;
+	}
 }

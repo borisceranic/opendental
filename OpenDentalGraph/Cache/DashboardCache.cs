@@ -63,7 +63,6 @@ namespace OpenDentalGraph.Cache {
 		{
 			get { return _brokenAdjs; }
 		}
-
 		public static DashboardCacheClinic Clinics {
 			get { return _clinics; }
 		}
@@ -79,6 +78,7 @@ namespace OpenDentalGraph.Cache {
 				List<DashboardFilter> filters=layouts
 					.SelectMany(x => x.Cells)
 					.Where(x => x.CellType==cellType)
+					//todo: save DashboardFilter fields to DashboardCell table type instead of saving them to the CellSettings json. This will make this much faster.
 					.Select(x => ODGraphBaseSettingsAbs.Deserialize(ODGraphJson.Deserialize(x.CellSettings).GraphJson).Filter)
 					.ToList();
 				if(filters.Count<=0) {

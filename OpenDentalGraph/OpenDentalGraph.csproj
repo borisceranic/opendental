@@ -153,6 +153,12 @@
     <Compile Include="Dashboard\DashboardTabCtrl.Designer.cs">
       <DependentUpon>DashboardTabCtrl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Dashboard\FormPrintSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dashboard\FormPrintSettings.Designer.cs">
+      <DependentUpon>FormPrintSettings.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dashboard\FormDashboardEditCell.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -208,6 +214,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Dashboard\DashboardTabCtrl.resx">
       <DependentUpon>DashboardTabCtrl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dashboard\FormPrintSettings.resx">
+      <DependentUpon>FormPrintSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dashboard\FormDashboardEditCell.resx">
       <DependentUpon>FormDashboardEditCell.cs</DependentUpon>

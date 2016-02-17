@@ -490,9 +490,10 @@ namespace OpenDental{
 		#region Windows Form Designer generated code
 
 		private void InitializeComponent(){
+			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormOpenDental));
-			this.timerTimeIndic = new System.Windows.Forms.Timer();
-			this.mainMenu = new System.Windows.Forms.MainMenu();
+			this.timerTimeIndic = new System.Windows.Forms.Timer(this.components);
+			this.mainMenu = new System.Windows.Forms.MainMenu(this.components);
 			this.menuItemLogOff = new System.Windows.Forms.MenuItem();
 			this.menuItemFile = new System.Windows.Forms.MenuItem();
 			this.menuItem4 = new System.Windows.Forms.MenuItem();
@@ -659,22 +660,22 @@ namespace OpenDental{
 			this.menuItemRequestFeatures = new System.Windows.Forms.MenuItem();
 			this.menuItemUpdate = new System.Windows.Forms.MenuItem();
 			this.menuItemActionNeeded = new System.Windows.Forms.MenuItem();
-			this.imageList32 = new System.Windows.Forms.ImageList();
-			this.timerSignals = new System.Windows.Forms.Timer();
+			this.imageList32 = new System.Windows.Forms.ImageList(this.components);
+			this.timerSignals = new System.Windows.Forms.Timer(this.components);
 			this.panelSplitter = new System.Windows.Forms.Panel();
 			this.menuSplitter = new System.Windows.Forms.ContextMenu();
 			this.menuItemDockBottom = new System.Windows.Forms.MenuItem();
 			this.menuItemDockRight = new System.Windows.Forms.MenuItem();
-			this.imageListMain = new System.Windows.Forms.ImageList();
+			this.imageListMain = new System.Windows.Forms.ImageList(this.components);
 			this.menuPatient = new System.Windows.Forms.ContextMenu();
 			this.menuLabel = new System.Windows.Forms.ContextMenu();
 			this.menuEmail = new System.Windows.Forms.ContextMenu();
 			this.menuLetter = new System.Windows.Forms.ContextMenu();
-			this.timerDisabledKey = new System.Windows.Forms.Timer();
-			this.timerHeartBeat = new System.Windows.Forms.Timer();
-			this.timerWebHostSynch = new System.Windows.Forms.Timer();
-			this.timerLogoff = new System.Windows.Forms.Timer();
-			this.timerReplicationMonitor = new System.Windows.Forms.Timer();
+			this.timerDisabledKey = new System.Windows.Forms.Timer(this.components);
+			this.timerHeartBeat = new System.Windows.Forms.Timer(this.components);
+			this.timerWebHostSynch = new System.Windows.Forms.Timer(this.components);
+			this.timerLogoff = new System.Windows.Forms.Timer(this.components);
+			this.timerReplicationMonitor = new System.Windows.Forms.Timer(this.components);
 			this.panelPhoneSmall = new System.Windows.Forms.Panel();
 			this.labelFieldType = new System.Windows.Forms.Label();
 			this.comboTriageCoordinator = new System.Windows.Forms.ComboBox();

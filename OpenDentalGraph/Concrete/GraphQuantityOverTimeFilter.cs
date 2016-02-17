@@ -187,9 +187,10 @@ namespace OpenDentalGraph {
 						}
 						if(_productionOptionsCtrl.IncludeCompletedProcs) {
 							rawData.AddRange(DashboardCache.CompletedProcs.Cache);
+							rawData.AddRange(DashboardCache.Writeoffs.Cache.Where(x => x.IsCap==true));
 						}
 						if(_productionOptionsCtrl.IncludeWriteoffs) {
-							rawData.AddRange(DashboardCache.Writeoffs.Cache);
+							rawData.AddRange(DashboardCache.Writeoffs.Cache.Where(x => x.IsCap==false));
 						}
 					}
 					break;
