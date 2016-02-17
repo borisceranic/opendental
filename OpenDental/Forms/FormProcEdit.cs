@@ -96,7 +96,6 @@ namespace OpenDental{
 		private System.Windows.Forms.Label labelClinic;
 		///<summary>List of all payments (not paysplits) that this procedure is attached to.</summary>
 		private List<Payment> PaymentsForProc;
-		private Userod CurUser;
 		//private uint m_autoAPIMsg;//ENP
 		private const string APPBAR_AUTOMATION_API_MESSAGE = "EZNotes.AppBarStandalone.Auto.API.Message"; 
 		private const uint MSG_RESTORE=2;
@@ -265,10 +264,14 @@ namespace OpenDental{
 		private ODGrid gridPay;
 		private long _provNumOrderingSelected;
 		private SignatureBoxWrapper signatureBoxWrapper;
+		private UI.Button butChangeUser;
 		private bool _isQuickAdd=false;
-		
+		///<summary>Users can temporarily log in on this form.  Defaults to Security.CurUser.</summary>
+		private Userod _curUser;
+
 		///<summary>Inserts are not done within this dialog, but must be done ahead of time from outside.  You must specify a procedure to edit, and only the changes that are made in this dialog get saved.  Only used when double click in Account, Chart, TP, and in ContrChart.AddProcedure().  The procedure may be deleted if new, and user hits Cancel.</summary>
 		public FormProcEdit(Procedure proc,Patient patCur,Family famCur,bool isQuickAdd=false){
+			_curUser=Security.CurUser;
 			ProcCur=proc;
 			ProcOld=proc.Copy();
 			PatCur=patCur;
@@ -496,6 +499,7 @@ namespace OpenDental{
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
 			this.signatureBoxWrapper = new OpenDental.UI.SignatureBoxWrapper();
+			this.butChangeUser = new OpenDental.UI.Button();
 			this.groupQuadrant.SuspendLayout();
 			this.groupArch.SuspendLayout();
 			this.panelSurfaces.SuspendLayout();
@@ -1407,9 +1411,9 @@ namespace OpenDental{
 			// 
 			this.labelIncomplete.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.labelIncomplete.ForeColor = System.Drawing.Color.DarkRed;
-			this.labelIncomplete.Location = new System.Drawing.Point(724, 138);
+			this.labelIncomplete.Location = new System.Drawing.Point(547, 115);
 			this.labelIncomplete.Name = "labelIncomplete";
-			this.labelIncomplete.Size = new System.Drawing.Size(123, 18);
+			this.labelIncomplete.Size = new System.Drawing.Size(155, 18);
 			this.labelIncomplete.TabIndex = 73;
 			this.labelIncomplete.Text = "Incomplete";
 			this.labelIncomplete.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -2616,7 +2620,7 @@ namespace OpenDental{
 			this.buttonUseAutoNote.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.buttonUseAutoNote.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.buttonUseAutoNote.CornerRadius = 4F;
-			this.buttonUseAutoNote.Location = new System.Drawing.Point(622, 136);
+			this.buttonUseAutoNote.Location = new System.Drawing.Point(704, 135);
 			this.buttonUseAutoNote.Name = "buttonUseAutoNote";
 			this.buttonUseAutoNote.Size = new System.Drawing.Size(80, 22);
 			this.buttonUseAutoNote.TabIndex = 106;
@@ -2724,10 +2728,25 @@ namespace OpenDental{
 			this.signatureBoxWrapper.TabIndex = 181;
 			this.signatureBoxWrapper.SignatureChanged += new System.EventHandler(this.signatureBoxWrapper_SignatureChanged);
 			// 
+			// butChangeUser
+			// 
+			this.butChangeUser.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butChangeUser.Autosize = true;
+			this.butChangeUser.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butChangeUser.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butChangeUser.CornerRadius = 4F;
+			this.butChangeUser.Location = new System.Drawing.Point(622, 135);
+			this.butChangeUser.Name = "butChangeUser";
+			this.butChangeUser.Size = new System.Drawing.Size(23, 22);
+			this.butChangeUser.TabIndex = 182;
+			this.butChangeUser.Text = "...";
+			this.butChangeUser.Click += new System.EventHandler(this.butChangeUser_Click);
+			// 
 			// FormProcEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(962, 696);
+			this.Controls.Add(this.butChangeUser);
 			this.Controls.Add(this.signatureBoxWrapper);
 			this.Controls.Add(this.butSearch);
 			this.Controls.Add(this.butLock);
@@ -4267,7 +4286,7 @@ namespace OpenDental{
 
 		private void signatureBoxWrapper_SignatureChanged(object sender,EventArgs e) {
 			SigChanged=true;
-			ProcCur.UserNum=Security.CurUser.UserNum;
+			ProcCur.UserNum=_curUser.UserNum;
 			textUser.Text=Userods.GetName(ProcCur.UserNum);
 		}
 
@@ -5676,6 +5695,17 @@ namespace OpenDental{
 			//it is assumed that we will do an immediate refresh after closing this window.
 		}
 
+		private void butChangeUser_Click(object sender,EventArgs e) {
+			FormLogOn FormChangeUser=new FormLogOn();
+			FormChangeUser.IsSimpleSwitch=true;
+			FormChangeUser.ShowDialog();
+			if(FormChangeUser.DialogResult==DialogResult.OK) {
+				_curUser=FormChangeUser.CurUserSimpleSwitch;
+				signatureBoxWrapper.ClearSignature();
+				textUser.Text=_curUser.UserName;
+			}
+		}
+
 		private void SaveSignature(){
 			if(SigChanged){
 				string keyData=GetSignatureKey();
@@ -5729,7 +5759,7 @@ namespace OpenDental{
 
 		private void FormProcEdit_FormClosing(object sender,FormClosingEventArgs e) {
 			//We need to update the CPOE status even if the user is cancelling out of the window.
-			if(Userods.IsUserCpoe(Security.CurUser) && !ProcOld.IsCpoe) {
+			if(Userods.IsUserCpoe(_curUser) && !ProcOld.IsCpoe) {
 				//There's a possibility that we are making a second, unnecessary call to the database here but it is worth it to help meet EHR measures.
 				Procedures.UpdateCpoeForProc(ProcCur.ProcNum,true);
 				//Make a log that we edited this procedure's CPOE flag.
@@ -5764,39 +5794,5 @@ namespace OpenDental{
 				}
 			}
 		}
-
-
-
-		
-
-		
-
-		
-	
-
-		
-
-		
-
-		
-
-
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-	
-
-	
-
 	}
 }

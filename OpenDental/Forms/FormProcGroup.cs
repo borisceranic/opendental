@@ -81,7 +81,10 @@ namespace OpenDental{
 		private UI.Button butAppend;
 		private Label labelLocked;
 		private Label labelInvalid;
+		private UI.Button butChangeUser;
 		private DataTable TablePlanned;
+		///<summary>Users can temporarily log in on this form.  Defaults to Security.CurUser.</summary>
+		private Userod _curUser;
 
 		public FormProcGroup() {
 			InitializeComponent();
@@ -144,6 +147,7 @@ namespace OpenDental{
 			this.butAppend = new OpenDental.UI.Button();
 			this.labelLocked = new System.Windows.Forms.Label();
 			this.labelInvalid = new System.Windows.Forms.Label();
+			this.butChangeUser = new OpenDental.UI.Button();
 			this.panelPlanned.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -220,7 +224,6 @@ namespace OpenDental{
 			// signatureBoxWrapper
 			// 
 			this.signatureBoxWrapper.BackColor = System.Drawing.SystemColors.ControlDark;
-			this.signatureBoxWrapper.LabelText = "Invalid Signature";
 			this.signatureBoxWrapper.Location = new System.Drawing.Point(98, 276);
 			this.signatureBoxWrapper.Name = "signatureBoxWrapper";
 			this.signatureBoxWrapper.Size = new System.Drawing.Size(364, 81);
@@ -232,6 +235,8 @@ namespace OpenDental{
 			this.gridProc.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridProc.HasAddButton = false;
+			this.gridProc.HasMultilineHeaders = false;
 			this.gridProc.HScrollVisible = true;
 			this.gridProc.Location = new System.Drawing.Point(10, 367);
 			this.gridProc.Name = "gridProc";
@@ -257,7 +262,7 @@ namespace OpenDental{
 			this.buttonUseAutoNote.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.buttonUseAutoNote.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.buttonUseAutoNote.CornerRadius = 4F;
-			this.buttonUseAutoNote.Location = new System.Drawing.Point(220, 51);
+			this.buttonUseAutoNote.Location = new System.Drawing.Point(296, 50);
 			this.buttonUseAutoNote.Name = "buttonUseAutoNote";
 			this.buttonUseAutoNote.Size = new System.Drawing.Size(80, 22);
 			this.buttonUseAutoNote.TabIndex = 106;
@@ -267,6 +272,7 @@ namespace OpenDental{
 			// textNotes
 			// 
 			this.textNotes.AcceptsTab = true;
+			this.textNotes.BackColor = System.Drawing.SystemColors.Window;
 			this.textNotes.DetectUrls = false;
 			this.textNotes.Location = new System.Drawing.Point(98, 72);
 			this.textNotes.Name = "textNotes";
@@ -329,6 +335,8 @@ namespace OpenDental{
 			// 
 			this.gridPat.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridPat.HasAddButton = false;
+			this.gridPat.HasMultilineHeaders = false;
 			this.gridPat.HScrollVisible = false;
 			this.gridPat.Location = new System.Drawing.Point(468, 276);
 			this.gridPat.Name = "gridPat";
@@ -472,6 +480,8 @@ namespace OpenDental{
 			this.gridPlanned.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridPlanned.HasAddButton = false;
+			this.gridPlanned.HasMultilineHeaders = false;
 			this.gridPlanned.HScrollVisible = false;
 			this.gridPlanned.Location = new System.Drawing.Point(0, 28);
 			this.gridPlanned.Name = "gridPlanned";
@@ -653,10 +663,25 @@ namespace OpenDental{
 			this.labelInvalid.TextAlign = System.Drawing.ContentAlignment.BottomRight;
 			this.labelInvalid.Visible = false;
 			// 
+			// butChangeUser
+			// 
+			this.butChangeUser.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butChangeUser.Autosize = true;
+			this.butChangeUser.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butChangeUser.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butChangeUser.CornerRadius = 4F;
+			this.butChangeUser.Location = new System.Drawing.Point(218, 50);
+			this.butChangeUser.Name = "butChangeUser";
+			this.butChangeUser.Size = new System.Drawing.Size(23, 22);
+			this.butChangeUser.TabIndex = 207;
+			this.butChangeUser.Text = "...";
+			this.butChangeUser.Click += new System.EventHandler(this.butChangeUser_Click);
+			// 
 			// FormProcGroup
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(880, 645);
+			this.Controls.Add(this.butChangeUser);
 			this.Controls.Add(this.labelInvalid);
 			this.Controls.Add(this.butLock);
 			this.Controls.Add(this.butInvalidate);
@@ -711,6 +736,7 @@ namespace OpenDental{
 		#endregion
 
 		private void FormProcGroup_Load(object sender, System.EventArgs e){
+			_curUser=Security.CurUser;
 			IsOpen=true;
 			IsStartingUp=true;
 			//ProcList gets set in ContrChart where this form is created.
@@ -1253,6 +1279,15 @@ namespace OpenDental{
 			return keyData;
 		}
 
+		private void butChangeUser_Click(object sender,EventArgs e) {
+			FormLogOn FormChangeUser=new FormLogOn();
+			FormChangeUser.IsSimpleSwitch=true;
+			FormChangeUser.ShowDialog();
+			if(FormChangeUser.DialogResult==DialogResult.OK) {
+				_curUser=FormChangeUser.CurUserSimpleSwitch;
+			}
+		}
+
 		private void SaveSignature(){
 			if(SigChanged){
 				string keyData=GetSignatureKey();
@@ -1262,7 +1297,7 @@ namespace OpenDental{
 		}
 
 		private void signatureBoxWrapper_SignatureChanged(object sender,EventArgs e) {
-			GroupCur.UserNum=Security.CurUser.UserNum;
+			GroupCur.UserNum=_curUser.UserNum;
 			textUser.Text=Userods.GetName(GroupCur.UserNum);
 			SigChanged=true;
 		}
@@ -1494,17 +1529,5 @@ namespace OpenDental{
 			DialogResult=DialogResult.Cancel;
 			IsOpen=false;
 		}
-
-		
-
-
-
-
-
-
-
-
-
-
 	}
 }

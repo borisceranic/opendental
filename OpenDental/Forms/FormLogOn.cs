@@ -25,6 +25,10 @@ namespace OpenDental{
 		private TextBox textUser;
 		private CheckBox checkShowCEMTUsers;
 		private List<Userod> _listUsers;
+		///<summary>Used when temporarily switching users. Currently only used when overriding signed notes.
+		///The user will not be logged on (Security.CurUser is untouched) but CurUserSimpleSwitch will be set to the desired user.</summary>
+		public bool IsSimpleSwitch=false;
+		public Userod CurUserSimpleSwitch;
 
 		///<summary></summary>
 		public FormLogOn()
@@ -262,7 +266,13 @@ namespace OpenDental{
 				MsgBox.Show(this,"When using the web service, not allowed to log in with no password.  A password should be added for this user.");
 				return;
 			}
-			Security.CurUser = selectedUser.Copy();
+			//successful login.
+			if(!IsSimpleSwitch) {
+				Security.CurUser=selectedUser.Copy();
+			}
+			else {
+				CurUserSimpleSwitch=selectedUser.Copy();
+			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
 				string password=textPassword.Text;
 				if(Programs.UsingEcwTightOrFullMode()) {//ecw requires hash, but non-ecw requires actual password
@@ -270,11 +280,16 @@ namespace OpenDental{
 				}
 				Security.PasswordTyped=password;
 			}
+			if(IsSimpleSwitch) {
+				SecurityLogs.MakeLogEntry(Permissions.UserLogOnOff,0,"User: "+CurUserSimpleSwitch.UserName+" has temporarily logged on.");
+			}
 			SecurityLogs.MakeLogEntry(Permissions.UserLogOnOff,0,"User: "+Security.CurUser.UserName+" has logged on.");
-			if(PrefC.GetBool(PrefName.TasksCheckOnStartup)){
-				int taskcount=Tasks.UserTasksCount(Security.CurUser.UserNum);
-				if(taskcount>0){
-					MessageBox.Show(Lan.g(this,"There are ")+taskcount+Lan.g(this," unread tasks on your tasklists."));
+			if(!IsSimpleSwitch) {
+				if(PrefC.GetBool(PrefName.TasksCheckOnStartup)) {
+					int taskcount=Tasks.UserTasksCount(Security.CurUser.UserNum);
+					if(taskcount>0) {
+						MessageBox.Show(Lan.g(this,"There are ")+taskcount+Lan.g(this," unread tasks on your tasklists."));
+					}
 				}
 			}
 			Plugins.HookAddCode(this,"FormLogOn.butOK_Click_end");
