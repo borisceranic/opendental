@@ -18,11 +18,7 @@ namespace OpenDentalGraph {
 
 	///<summary>Must be implemented in order to facilitate printing from dashboard.</summary>
 	public interface IODGraphPrinter {
-		void PrintPageSetup();
-		void Print();
 		void PrintPreview();
-		bool CanPrint();
-		void SaveImage();
 	}
 
 	///<summary>Must be implemented in order to facilitate printing from dashboard cell editor.</summary>

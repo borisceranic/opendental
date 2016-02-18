@@ -206,30 +206,12 @@ namespace OpenDentalGraph {
 			_onRefreshCache(this,e);
 		}
 
-		private void butSaveImage_Click(object sender,EventArgs e) {
-			if(_dockedControlHolder!=null &&_dockedControlHolder.Printer!=null) {
-				_dockedControlHolder.Printer.SaveImage();
-			}
-		}
-
-		private void butPageSetup_Click(object sender,EventArgs e) {
-			if(_dockedControlHolder!=null&&_dockedControlHolder.Printer!=null) {
-				_dockedControlHolder.Printer.PrintPageSetup();
-			}
-		}
-
 		private void butPrintPreview_Click(object sender,EventArgs e) {
-			if(_dockedControlHolder!=null&&_dockedControlHolder.Printer!=null) {
+			if(_dockedControlHolder!=null &&_dockedControlHolder.Printer!=null) {
 				_dockedControlHolder.Printer.PrintPreview();
 			}
 		}
-
-		private void butPrint_Click(object sender,EventArgs e) {
-			if(_dockedControlHolder!=null&&_dockedControlHolder.Printer!=null) {
-				_dockedControlHolder.Printer.Print();
-			}
-		}
-
+		
 		private void butEdit_Click(object sender,EventArgs e) {
 			if(DockedControl==null) {
 				return;

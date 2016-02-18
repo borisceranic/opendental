@@ -23,6 +23,7 @@
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormDashboardEditTab));
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
 			this.butSaveChanges = new System.Windows.Forms.Button();
 			this.label2 = new System.Windows.Forms.Label();
@@ -147,6 +148,7 @@
 			this.ClientSize = new System.Drawing.Size(1061, 520);
 			this.Controls.Add(this.menuStrip);
 			this.Controls.Add(this.splitContainer1);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormDashboardEditTab";
 			this.Text = "Dashboard";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormDashboardEditTab_FormClosing);
