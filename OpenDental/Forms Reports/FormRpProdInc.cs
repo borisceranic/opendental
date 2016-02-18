@@ -575,37 +575,45 @@ namespace OpenDental{
 
 		private void SetDates(){
       if(radioDaily.Checked) {
-        checkClinicInfo.Visible=true;
-        if(checkClinicInfo.Checked) {
-          checkClinicBreakdown.Visible=true;
-        }
-        else {
-          //Clinic info not checked so hide the clinic breakdown
-          checkClinicBreakdown.Checked=false;
-          checkClinicBreakdown.Visible=false;
-        }
+				if(PrefC.HasClinicsEnabled) {
+					checkClinicInfo.Visible=true;
+					if(checkClinicInfo.Checked) {
+						checkClinicBreakdown.Visible=true;
+					}
+					else {
+						//Clinic info not checked so hide the clinic breakdown
+						checkClinicBreakdown.Checked=false;
+						checkClinicBreakdown.Visible=false;
+					}
+				}
         textDateFrom.Text=DateTime.Today.ToShortDateString();
         textDateTo.Text=DateTime.Today.ToShortDateString();
         butThis.Text=Lan.g(this,"Today");
       }
       else if(radioProvider.Checked) {
-        checkClinicInfo.Visible=false;
-        checkClinicBreakdown.Visible=true;
+				if(PrefC.HasClinicsEnabled) {
+					checkClinicInfo.Visible=false;
+					checkClinicBreakdown.Visible=true;
+				}
         textDateFrom.Text=DateTime.Today.ToShortDateString();
         textDateTo.Text=DateTime.Today.ToShortDateString();
         butThis.Text=Lan.g(this,"Today");
       }
 			else if(radioMonthly.Checked) {
-        checkClinicInfo.Visible=false;
-        checkClinicBreakdown.Visible=true;
+				if(PrefC.HasClinicsEnabled) {
+					checkClinicInfo.Visible=false;
+					checkClinicBreakdown.Visible=true;
+				}
 				textDateFrom.Text=new DateTime(DateTime.Today.Year,DateTime.Today.Month,1).ToShortDateString();
 				textDateTo.Text=new DateTime(DateTime.Today.Year,DateTime.Today.Month
 					,DateTime.DaysInMonth(DateTime.Today.Year,DateTime.Today.Month)).ToShortDateString();
 				butThis.Text=Lan.g(this,"This Month");
 			}
 			else{//annual
-        checkClinicInfo.Visible=false;
-        checkClinicBreakdown.Visible=true;
+				if(PrefC.HasClinicsEnabled) {
+					checkClinicInfo.Visible=false;
+					checkClinicBreakdown.Visible=true;
+				}
 				textDateFrom.Text=new DateTime(DateTime.Today.Year,1,1).ToShortDateString();
 				textDateTo.Text=new DateTime(DateTime.Today.Year,12,31).ToShortDateString();
 				butThis.Text=Lan.g(this,"This Year");
@@ -683,13 +691,15 @@ namespace OpenDental{
 		}
     
     private void checkClinicInfo_CheckedChanged(object sender,EventArgs e) {
-      if(checkClinicInfo.Checked) {
-        checkClinicBreakdown.Visible=true;
-      }
-      else {
-        checkClinicBreakdown.Checked=false;
-        checkClinicBreakdown.Visible=false;
-      }
+			if(PrefC.HasClinicsEnabled) {
+				if(checkClinicInfo.Checked) {
+					checkClinicBreakdown.Visible=true;
+				}
+				else {
+					checkClinicBreakdown.Checked=false;
+					checkClinicBreakdown.Visible=false;
+				}
+			}
     }
 
 		private void RunDaily() {
