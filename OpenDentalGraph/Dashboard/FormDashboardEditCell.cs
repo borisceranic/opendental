@@ -17,30 +17,11 @@ namespace OpenDentalGraph {
 			if(!allowSave) {
 				this.Text=this.Text+ " (Changes Will Not Be Saved)";
 			}
-			panelPrint.Enabled=_printer!=null && _printer.CanPrint();
-		}
-
-		private void butSaveImage_Click(object sender,EventArgs e) {
-			if(_printer!=null) {
-				_printer.SaveImage();
-			}
-		}
-
-		private void butPageSetup_Click(object sender,EventArgs e) {
-			if(_printer!=null) {
-				_printer.PrintPageSetup();
-			}
 		}
 
 		private void butPrintPreview_Click(object sender,EventArgs e) {
 			if(_printer!=null) {
 				_printer.PrintPreview();
-			}
-		}
-
-		private void butPrint_Click(object sender,EventArgs e) {
-			if(_printer!=null) {
-				_printer.Print();
 			}
 		}
 	}

@@ -783,52 +783,8 @@ namespace OpenDentalGraph {
 		#endregion
 
 		#region Printing
-		public void SaveImage() {
-			SaveFileDialog sd=new SaveFileDialog() {
-				Filter="Bitmap (*.bmp)|*.bmp|JPEG (*.jpg)|*.jpg|EMF (*.emf)|*.emf|PNG (*.png)|*.png|GIF (*.gif)|*.gif|TIFF (*.tif)|*.tif",
-				FilterIndex=2,
-				RestoreDirectory=true,
-			};			
-			if(sd.ShowDialog()!=DialogResult.OK) {
-				return;
-			}
-			ChartImageFormat format = ChartImageFormat.Bmp;
-			if(sd.FileName.EndsWith("bmp")) {
-				format=ChartImageFormat.Bmp;
-			}
-			else if(sd.FileName.EndsWith("jpg")) {
-				format=ChartImageFormat.Jpeg;
-			}
-			else if(sd.FileName.EndsWith("emf")) {
-				format=ChartImageFormat.Emf;
-			}
-			else if(sd.FileName.EndsWith("gif")) {
-				format=ChartImageFormat.Gif;
-			}
-			else if(sd.FileName.EndsWith("png")) {
-				format=ChartImageFormat.Png;
-			}
-			else if(sd.FileName.EndsWith("tif")) {
-				format=ChartImageFormat.Tiff;
-			}
-			chart1.SaveImage(sd.FileName,format);
-		}
-
-		public bool CanPrint() {
-			return true;
-		}
-
-		public void PrintPageSetup() {
-			chart1.Printing.PageSetup();
-		}
-
-		public void Print() {
-			chart1.Printing.Print(true);
-		}
-
 		public void PrintPreview() {
-			chart1.Printing.PrintPreview();
-			//new FormPrintSettings(chart1).ShowDialog(); //currently working on. -andrew 2/16
+			new FormPrintSettings(chart1).ShowDialog();
 		}
 		#endregion
 
