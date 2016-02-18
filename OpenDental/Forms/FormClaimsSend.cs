@@ -1155,9 +1155,12 @@ namespace OpenDental{
 		///<summary>Validates all non-validated e-claims passed in.  Directly manipulates the corresponding ClaimSendQueueItem in _arrayQueueAll
 		///If any information has changed, the grid will be refreshed and the selected items will remain selected.</summary>
 		private void ValidateClaims(List<ClaimSendQueueItem> listClaimSendQueueItems) {
-			Cursor.Current=Cursors.WaitCursor;
 			//Only get a list of non-validated e-claims from the list passed in.
 			List<ClaimSendQueueItem> listClaimsToValidate=listClaimSendQueueItems.FindAll(x => !x.IsValid && !x.NoSendElect);
+			if(listClaimsToValidate.Count==0) {
+				return;
+			}
+			Cursor.Current=Cursors.WaitCursor;
 			//Loop through and validate all claims.
 			Clearinghouse clearinghouseHq=ClearinghouseL.GetClearinghouseHq(listClaimsToValidate[0].ClearinghouseNum);
 			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,FormOpenDental.ClinicNum);
@@ -1167,16 +1170,14 @@ namespace OpenDental{
 					listClaimsToValidate[i].IsValid=true;
 				}
 			}
-			if(listClaimsToValidate.Count!=0) {
-				//Push any changes made to the ClaimSendQueueItems passed in to _arrayQueueAll 
-				for(int i=0;i<_arrayQueueAll.Length;i++) {
-					ClaimSendQueueItem validatedClaimSendQueueItem=listClaimsToValidate.Find(x => x.ClaimNum==_arrayQueueAll[i].ClaimNum);
-					if(validatedClaimSendQueueItem!=null) {
-						_arrayQueueAll[i]=validatedClaimSendQueueItem.Copy();
-					}
+			//Push any changes made to the ClaimSendQueueItems passed in to _arrayQueueAll 
+			for(int i=0;i<_arrayQueueAll.Length;i++) {
+				ClaimSendQueueItem validatedClaimSendQueueItem=listClaimsToValidate.Find(x => x.ClaimNum==_arrayQueueAll[i].ClaimNum);
+				if(validatedClaimSendQueueItem!=null) {
+					_arrayQueueAll[i]=validatedClaimSendQueueItem.Copy();
 				}
-				FillGrid(true);//Used here to display changes immediately
 			}
+			FillGrid(true);//Used here to display changes immediately
 			Cursor.Current=Cursors.Default;
 		}
 
