@@ -409,6 +409,7 @@ namespace OpenDentBusiness {
 		OpenDentalVendor,
 		OracleInsertId,
 		PasswordsMustBeStrong,
+		PatientAllSuperFamilySync,
 		PatientFormsShowConsent,
 		///<summary>Free-form 'Body' text of the notification sent by this practice when a new secure EmailMessage is sent to patient.</summary>
 		PatientPortalNotifyBody,

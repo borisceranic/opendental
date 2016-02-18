@@ -205,6 +205,7 @@ namespace OpenDental{
 		private bool _isLoad;//To keep track if ListBoxes' selected index is changed by the user
 		private ErrorProvider _errorProv=new ErrorProvider();
 		private CheckBox checkSuperBilling;
+		private CheckBox checkSameForSuperFam;
 		private bool _isValidating=false;
 
 		///<summary></summary>
@@ -448,6 +449,7 @@ namespace OpenDental{
 			this.labelReferredFrom = new System.Windows.Forms.Label();
 			this.textMedicaidState = new System.Windows.Forms.TextBox();
 			this.labelRequiredField = new System.Windows.Forms.Label();
+			this.checkSameForSuperFam = new System.Windows.Forms.CheckBox();
 			this.groupBox2.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.groupNotes.SuspendLayout();
@@ -919,6 +921,7 @@ namespace OpenDental{
 			// 
 			// groupBox1
 			// 
+			this.groupBox1.Controls.Add(this.checkSameForSuperFam);
 			this.groupBox1.Controls.Add(this.butShowMap);
 			this.groupBox1.Controls.Add(this.textHmPhone);
 			this.groupBox1.Controls.Add(this.butEditZip);
@@ -998,9 +1001,9 @@ namespace OpenDental{
 			// checkSame
 			// 
 			this.checkSame.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkSame.Location = new System.Drawing.Point(161, 13);
+			this.checkSame.Location = new System.Drawing.Point(161, 14);
 			this.checkSame.Name = "checkSame";
-			this.checkSame.Size = new System.Drawing.Size(254, 17);
+			this.checkSame.Size = new System.Drawing.Size(162, 17);
 			this.checkSame.TabIndex = 1;
 			this.checkSame.TabStop = false;
 			this.checkSame.Text = "Same for entire family";
@@ -2007,6 +2010,17 @@ namespace OpenDental{
 			this.labelRequiredField.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			this.labelRequiredField.Visible = false;
 			// 
+			// checkBox1
+			// 
+			this.checkSameForSuperFam.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkSameForSuperFam.Location = new System.Drawing.Point(288, 14);
+			this.checkSameForSuperFam.Name = "checkBox1";
+			this.checkSameForSuperFam.Size = new System.Drawing.Size(168, 17);
+			this.checkSameForSuperFam.TabIndex = 62;
+			this.checkSameForSuperFam.TabStop = false;
+			this.checkSameForSuperFam.Text = "Same for entire super family";
+			this.checkSameForSuperFam.Visible = false;
+			// 
 			// FormPatientEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
@@ -2573,6 +2587,15 @@ namespace OpenDental{
 				//If the patient is a guarantor in a superfamily then enable the checkbox to opt into superfamily billing.
 				checkSuperBilling.Visible=true;
 				checkSuperBilling.Checked=PatCur.HasSuperBilling;
+			}
+			//SuperFamilies is enabled, Syncing SuperFam Info is enabled, and this is the superfamily head.  Show the sync checkbox.
+			if(PrefC.GetBool(PrefName.ShowFeatureSuperfamilies)
+				&& PrefC.GetBool(PrefName.PatientAllSuperFamilySync)
+				&& PatCur.SuperFamily!=0
+				&& PatCur.PatNum==PatCur.SuperFamily) 
+			{
+				checkSameForSuperFam.Visible=true;
+				checkSameForSuperFam.Checked=Patients.SuperFamHasSameAddrPhone(PatCur);//Check all superfam members for any with differing information
 			}
 			SetRequiredFields();
 			_isLoad=false;
@@ -4706,9 +4729,12 @@ namespace OpenDental{
 			if(checkArriveEarlySame.Checked){
 				Patients.UpdateArriveEarlyForFam(PatCur);
 			}
-			if(checkSame.Checked){
+			if(checkSame.Checked && !checkSameForSuperFam.Checked){
 				//might want to include a mechanism for comparing fields to be overwritten
 				Patients.UpdateAddressForFam(PatCur);
+			}
+			else if(checkSameForSuperFam.Checked) {
+				Patients.UpdateAddressForSuperFam(PatCur);
 			}
 			if(checkBillProvSame.Checked) {
 				Patients.UpdateBillingProviderForFam(PatCur);

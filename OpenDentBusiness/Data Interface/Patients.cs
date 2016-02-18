@@ -868,6 +868,25 @@ namespace OpenDentBusiness{
 			return Crud.PatientCrud.SelectMany(command);
 		}
 
+		public static bool SuperFamHasSameAddrPhone(Patient pat) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),pat);
+			}
+			string command="SELECT HmPhone,Address,Addres2,City,State,Zip FROM patient WHERE PatNum="+POut.Long(pat.SuperFamily);
+			DataTable result=Db.GetTable(command);
+			command="SELECT COUNT(*) FROM patient WHERE SuperFamily="+POut.Long(pat.SuperFamily)+" "
+				+"AND (HmPhone!="+POut.String(result.Rows[0]["HmPhone"].ToString())+" "
+							+"OR Address!="+POut.String(result.Rows[0]["Address"].ToString())+" "
+							+"OR Address2!="+POut.String(result.Rows[0]["Address2"].ToString())+" "
+							+"OR City!="+POut.String(result.Rows[0]["City"].ToString())+" "
+							+"OR State!="+POut.String(result.Rows[0]["State"].ToString())+" "
+							+"OR Zip!="+POut.String(result.Rows[0]["Zip"].ToString())+")";
+			if(PIn.Int(Db.GetCount(command))==0) {//Everybody in the superfamily has the same information
+				return true;
+			}
+			return false;//At least one patient in the superfamily has different information
+		}
+
 		///<summary></summary>
 		public static void UpdateAddressForFam(Patient pat){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -883,6 +902,23 @@ namespace OpenDentBusiness{
 				+",Zip = '"        +POut.String(pat.Zip)+"'"
 				+",HmPhone = '"    +POut.String(pat.HmPhone)+"'"
 				+" WHERE guarantor = '"+POut.Long(pat.Guarantor)+"'";
+			Db.NonQ(command);
+		}
+
+		public static void UpdateAddressForSuperFam(Patient pat){
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),pat);
+				return;
+			}
+			string command= "UPDATE patient SET " 
+				+"Address = '"    +POut.String(pat.Address)+"'"
+				+",Address2 = '"   +POut.String(pat.Address2)+"'"
+				+",City = '"       +POut.String(pat.City)+"'"
+				+",State = '"      +POut.String(pat.State)+"'"
+				+",Country = '"    +POut.String(pat.Country)+"'"
+				+",Zip = '"        +POut.String(pat.Zip)+"'"
+				+",HmPhone = '"    +POut.String(pat.HmPhone)+"'"
+				+" WHERE SuperFamily = '"+POut.Long(pat.SuperFamily)+"'";
 			Db.NonQ(command);
 		}
 

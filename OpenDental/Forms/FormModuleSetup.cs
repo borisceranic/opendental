@@ -159,6 +159,7 @@ namespace OpenDental{
 		private CheckBox checkApptModuleAdjInProd;
 		private Label label26;
 		private ComboBox comboSuperFamSort;
+		private CheckBox checkSuperFamSync;
 		private GroupBox groupBox3;
 
 		///<summary>Default constructor.  Opens the form with the Appts tab selected.</summary>
@@ -256,6 +257,8 @@ namespace OpenDental{
 			this.comboSearchBehavior = new System.Windows.Forms.ComboBox();
 			this.checkAppointmentTimeIsLocked = new System.Windows.Forms.CheckBox();
 			this.tabFamily = new System.Windows.Forms.TabPage();
+			this.label26 = new System.Windows.Forms.Label();
+			this.comboSuperFamSort = new System.Windows.Forms.ComboBox();
 			this.checkSelectProv = new System.Windows.Forms.CheckBox();
 			this.checkGoogleAddress = new System.Windows.Forms.CheckBox();
 			this.checkInsPPOsecWriteoffs = new System.Windows.Forms.CheckBox();
@@ -335,8 +338,7 @@ namespace OpenDental{
 			this.colorDialog = new System.Windows.Forms.ColorDialog();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.label26 = new System.Windows.Forms.Label();
-			this.comboSuperFamSort = new System.Windows.Forms.ComboBox();
+			this.checkSuperFamSync = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -1060,6 +1062,7 @@ namespace OpenDental{
 			// tabFamily
 			// 
 			this.tabFamily.BackColor = System.Drawing.SystemColors.Window;
+			this.tabFamily.Controls.Add(this.checkSuperFamSync);
 			this.tabFamily.Controls.Add(this.label26);
 			this.tabFamily.Controls.Add(this.comboSuperFamSort);
 			this.tabFamily.Controls.Add(this.checkSelectProv);
@@ -1082,6 +1085,26 @@ namespace OpenDental{
 			this.tabFamily.Size = new System.Drawing.Size(466, 511);
 			this.tabFamily.TabIndex = 1;
 			this.tabFamily.Text = "Family";
+			// 
+			// label26
+			// 
+			this.label26.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.label26.Location = new System.Drawing.Point(61, 241);
+			this.label26.Name = "label26";
+			this.label26.Size = new System.Drawing.Size(247, 15);
+			this.label26.TabIndex = 218;
+			this.label26.Text = "Superfamily sorting strategy";
+			this.label26.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// comboSuperFamSort
+			// 
+			this.comboSuperFamSort.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboSuperFamSort.FormattingEnabled = true;
+			this.comboSuperFamSort.Location = new System.Drawing.Point(312, 237);
+			this.comboSuperFamSort.MaxDropDownItems = 30;
+			this.comboSuperFamSort.Name = "comboSuperFamSort";
+			this.comboSuperFamSort.Size = new System.Drawing.Size(128, 21);
+			this.comboSuperFamSort.TabIndex = 217;
 			// 
 			// checkSelectProv
 			// 
@@ -2010,25 +2033,16 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// label26
+			// checkSuperFamSync
 			// 
-			this.label26.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label26.Location = new System.Drawing.Point(61, 241);
-			this.label26.Name = "label26";
-			this.label26.Size = new System.Drawing.Size(247, 15);
-			this.label26.TabIndex = 218;
-			this.label26.Text = "Superfamily sorting strategy";
-			this.label26.TextAlign = System.Drawing.ContentAlignment.TopRight;
-			// 
-			// comboSuperFamSort
-			// 
-			this.comboSuperFamSort.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboSuperFamSort.FormattingEnabled = true;
-			this.comboSuperFamSort.Location = new System.Drawing.Point(312, 237);
-			this.comboSuperFamSort.MaxDropDownItems = 30;
-			this.comboSuperFamSort.Name = "comboSuperFamSort";
-			this.comboSuperFamSort.Size = new System.Drawing.Size(128, 21);
-			this.comboSuperFamSort.TabIndex = 217;
+			this.checkSuperFamSync.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkSuperFamSync.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkSuperFamSync.Location = new System.Drawing.Point(6, 259);
+			this.checkSuperFamSync.Name = "checkSuperFamSync";
+			this.checkSuperFamSync.Size = new System.Drawing.Size(434, 17);
+			this.checkSuperFamSync.TabIndex = 219;
+			this.checkSuperFamSync.Text = "Allow syncing patient information to all super family members";
+			this.checkSuperFamSync.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// FormModuleSetup
 			// 
@@ -2200,6 +2214,7 @@ namespace OpenDental{
 				comboSuperFamSort.Items.Add(option);
 			}
 			comboSuperFamSort.SelectedIndex=PrefC.GetInt(PrefName.SuperFamSortStrategy);
+			checkSuperFamSync.Checked=PrefC.GetBool(PrefName.PatientAllSuperFamilySync);
 			#endregion
 			#region Account Module
 			//Account module-----------------------------------------------------------------------
@@ -2589,6 +2604,7 @@ namespace OpenDental{
 				| Prefs.UpdateBool(PrefName.ShowFeatureGoogleMaps,checkGoogleAddress.Checked)
 				| Prefs.UpdateBool(PrefName.PriProvDefaultToSelectProv,checkSelectProv.Checked)
 				| Prefs.UpdateInt(PrefName.SuperFamSortStrategy,comboSuperFamSort.SelectedIndex)
+				| Prefs.UpdateBool(PrefName.PatientAllSuperFamilySync,checkSuperFamSync.Checked)
 				#endregion
 				#region Account Module
 				| Prefs.UpdateBool(PrefName.BalancesDontSubtractIns,checkBalancesDontSubtractIns.Checked)
