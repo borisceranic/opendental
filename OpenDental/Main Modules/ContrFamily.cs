@@ -47,6 +47,7 @@ namespace OpenDental{
 		private List<Patient> SuperFamilyMembers;
 		///<summary>Gets updated to PatCur.PatNum that the last security log was made with so that we don't make too many security logs for this patient.  When _patNumLast no longer matches PatCur.PatNum (e.g. switched to a different patient within a module), a security log will be entered.  Gets reset (cleared and the set back to PatCur.PatNum) any time a module button is clicked which will cause another security log to be entered.</summary>
 		private long _patNumLast;
+		private SortStrategy _superFamSortStrat;
 
 		///<summary></summary>
 		public ContrFamily(){
@@ -262,6 +263,8 @@ namespace OpenDental{
 				SecurityLogs.MakeLogEntry(Permissions.FamilyModule,patNum,"");
 				_patNumLast=patNum;//Stops module from making too many logs
 			}
+			//Takes the preference string and converts it to an enum object
+			_superFamSortStrat=(SortStrategy)PrefC.GetInt(PrefName.SuperFamSortStrategy);
 		}
 
 		private void RefreshModuleScreen(){
@@ -2065,17 +2068,24 @@ namespace OpenDental{
 		}
 
 		private int sortPatientListBySuperFamily(Patient pat1,Patient pat2) {
-			if(pat1.PatNum==pat2.PatNum) {
-				return 0;
+			if(pat1.PatNum==pat1.SuperFamily) {//Superheads always go to the top no matter what.
+						return -1;
 			}
-			if(pat1.PatNum==pat1.SuperFamily) {//if pat1 is superhead
-				return -1;//pat1 comes first
+			if(pat2.PatNum==pat2.SuperFamily) {
+						return 1;
 			}
-			if(pat2.PatNum==pat2.SuperFamily) {//if pat2 is superhead
-				return 1;
+			switch(_superFamSortStrat) {
+				case SortStrategy.NameAsc:
+					return pat1.GetNameFL().CompareTo(pat2.GetNameFL());
+				case SortStrategy.NameDesc:
+					return pat2.GetNameFL().CompareTo(pat1.GetNameFL());
+				case SortStrategy.PatNumAsc:
+					return pat1.PatNum.CompareTo(pat2.PatNum);
+				case SortStrategy.PatNumDesc:
+					return pat2.PatNum.CompareTo(pat1.PatNum);
+				default:
+					return pat1.PatNum.CompareTo(pat2.PatNum);//Default behavior
 			}
-			return (int)(pat1.PatNum-pat2.PatNum);//sort by patnums.
-			//return pat1.GetNameFL().CompareTo(pat2.GetNameFL());//Alphabetize them if nothing else.
 		}
 
 		private void gridSuperFam_CellClick(object sender,ODGridClickEventArgs e) {

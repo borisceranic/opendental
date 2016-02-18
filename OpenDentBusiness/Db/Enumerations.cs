@@ -48,7 +48,9 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		EZTwainErrorCode,
 		///<summary></summary>
-		ScaleType
+		ScaleType,
+		///<summary></summary>
+		SortStrategy
 	}
 	///<summary>Unknown,Yes, or No.</summary>
 	public enum YN{
@@ -1518,6 +1520,18 @@ namespace OpenDentBusiness{
 		DisabledByHQ,
 		///<summary>3.  Customer listener is off and awaiting customer consent.</summary>
 		NoListener
+	}
+
+	///<summary>Defines a user-friendly way of describing sorting strategies.  Intended for user selection for sorting grids.  Can easily be added to.</summary>
+	public enum SortStrategy {
+		///<summary>0.</summary>
+		NameAsc,
+		///<summary>1.</summary>
+		NameDesc,
+		///<summary>2.</summary>
+		PatNumAsc,
+		///<summary>3.</summary>
+		PatNumDesc
 	}
 
 	

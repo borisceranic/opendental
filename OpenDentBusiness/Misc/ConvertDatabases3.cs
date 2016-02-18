@@ -13060,6 +13060,15 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ClinicTrackLast','Workstation')";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference (PrefName,ValueString) VALUES('SuperFamSortStrategy','2')";//2=PatNumAsc
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference (PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'SuperFamSortStrategy','2')";//2=PatNumAsc
+					Db.NonQ(command);
+				}
+
 				command="UPDATE preference SET ValueString = '16.1.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
