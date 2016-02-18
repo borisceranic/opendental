@@ -617,6 +617,7 @@ namespace OpenDentBusiness {
 		StoreCCnumbers,
 		StoreCCtokens,
 		SubscriberAllowChangeAlways,
+		SuperFamSortStrategy,
 		TaskAncestorsAllSetInVersion55,
 		TaskListAlwaysShowsAtBottom,
 		TasksCheckOnStartup,

@@ -157,6 +157,8 @@ namespace OpenDental{
 		private RadioButton radioImagesModuleTreeIsPersistentPerUser;
 		private CheckBox checkPaymentsUsePatClin;
 		private CheckBox checkApptModuleAdjInProd;
+		private Label label26;
+		private ComboBox comboSuperFamSort;
 		private GroupBox groupBox3;
 
 		///<summary>Default constructor.  Opens the form with the Appts tab selected.</summary>
@@ -234,6 +236,7 @@ namespace OpenDental{
 			this.checkRxSendNewToQueue = new System.Windows.Forms.CheckBox();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabAppts = new System.Windows.Forms.TabPage();
+			this.checkApptModuleAdjInProd = new System.Windows.Forms.CheckBox();
 			this.checkApptTimeReset = new System.Windows.Forms.CheckBox();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.checkBrokenApptProcedure = new System.Windows.Forms.CheckBox();
@@ -332,7 +335,8 @@ namespace OpenDental{
 			this.colorDialog = new System.Windows.Forms.ColorDialog();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.checkApptModuleAdjInProd = new System.Windows.Forms.CheckBox();
+			this.label26 = new System.Windows.Forms.Label();
+			this.comboSuperFamSort = new System.Windows.Forms.ComboBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -855,6 +859,17 @@ namespace OpenDental{
 			this.tabAppts.TabIndex = 0;
 			this.tabAppts.Text = "Appts";
 			// 
+			// checkApptModuleAdjInProd
+			// 
+			this.checkApptModuleAdjInProd.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkApptModuleAdjInProd.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkApptModuleAdjInProd.Location = new System.Drawing.Point(34, 465);
+			this.checkApptModuleAdjInProd.Name = "checkApptModuleAdjInProd";
+			this.checkApptModuleAdjInProd.Size = new System.Drawing.Size(406, 17);
+			this.checkApptModuleAdjInProd.TabIndex = 224;
+			this.checkApptModuleAdjInProd.Text = "Add daily adjustments to net production";
+			this.checkApptModuleAdjInProd.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// checkApptTimeReset
 			// 
 			this.checkApptTimeReset.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -1045,6 +1060,8 @@ namespace OpenDental{
 			// tabFamily
 			// 
 			this.tabFamily.BackColor = System.Drawing.SystemColors.Window;
+			this.tabFamily.Controls.Add(this.label26);
+			this.tabFamily.Controls.Add(this.comboSuperFamSort);
 			this.tabFamily.Controls.Add(this.checkSelectProv);
 			this.tabFamily.Controls.Add(this.checkGoogleAddress);
 			this.tabFamily.Controls.Add(this.checkInsPPOsecWriteoffs);
@@ -1183,7 +1200,7 @@ namespace OpenDental{
 			this.tabAccount.Controls.Add(this.checkProviderIncomeShows);
 			this.tabAccount.Location = new System.Drawing.Point(4, 22);
 			this.tabAccount.Name = "tabAccount";
-			this.tabAccount.Size = new System.Drawing.Size(466, 479);
+			this.tabAccount.Size = new System.Drawing.Size(466, 511);
 			this.tabAccount.TabIndex = 2;
 			this.tabAccount.Text = "Account";
 			// 
@@ -1298,7 +1315,7 @@ namespace OpenDental{
 			this.tabTreatPlan.Controls.Add(this.checkTreatPlanShowGraphics);
 			this.tabTreatPlan.Location = new System.Drawing.Point(4, 22);
 			this.tabTreatPlan.Name = "tabTreatPlan";
-			this.tabTreatPlan.Size = new System.Drawing.Size(466, 479);
+			this.tabTreatPlan.Size = new System.Drawing.Size(466, 511);
 			this.tabTreatPlan.TabIndex = 3;
 			this.tabTreatPlan.Text = "Treat\' Plan";
 			// 
@@ -1423,7 +1440,7 @@ namespace OpenDental{
 			this.tabChart.Controls.Add(this.checkAllowSettingProcsComplete);
 			this.tabChart.Location = new System.Drawing.Point(4, 22);
 			this.tabChart.Name = "tabChart";
-			this.tabChart.Size = new System.Drawing.Size(466, 479);
+			this.tabChart.Size = new System.Drawing.Size(466, 511);
 			this.tabChart.TabIndex = 4;
 			this.tabChart.Text = "Chart";
 			// 
@@ -1688,7 +1705,7 @@ namespace OpenDental{
 			this.tabImages.Controls.Add(this.groupBox3);
 			this.tabImages.Location = new System.Drawing.Point(4, 22);
 			this.tabImages.Name = "tabImages";
-			this.tabImages.Size = new System.Drawing.Size(466, 479);
+			this.tabImages.Size = new System.Drawing.Size(466, 511);
 			this.tabImages.TabIndex = 5;
 			this.tabImages.Text = "Images";
 			// 
@@ -1748,7 +1765,7 @@ namespace OpenDental{
 			this.tabManage.Controls.Add(this.checkRxSendNewToQueue);
 			this.tabManage.Location = new System.Drawing.Point(4, 22);
 			this.tabManage.Name = "tabManage";
-			this.tabManage.Size = new System.Drawing.Size(466, 479);
+			this.tabManage.Size = new System.Drawing.Size(466, 511);
 			this.tabManage.TabIndex = 6;
 			this.tabManage.Text = "Manage";
 			// 
@@ -1993,16 +2010,25 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// checkApptModuleAdjInProd
+			// label26
 			// 
-			this.checkApptModuleAdjInProd.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkApptModuleAdjInProd.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkApptModuleAdjInProd.Location = new System.Drawing.Point(34, 465);
-			this.checkApptModuleAdjInProd.Name = "checkApptModuleAdjInProd";
-			this.checkApptModuleAdjInProd.Size = new System.Drawing.Size(406, 17);
-			this.checkApptModuleAdjInProd.TabIndex = 224;
-			this.checkApptModuleAdjInProd.Text = "Add daily adjustments to net production";
-			this.checkApptModuleAdjInProd.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.label26.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.label26.Location = new System.Drawing.Point(61, 241);
+			this.label26.Name = "label26";
+			this.label26.Size = new System.Drawing.Size(247, 15);
+			this.label26.TabIndex = 218;
+			this.label26.Text = "Superfamily sorting strategy";
+			this.label26.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// comboSuperFamSort
+			// 
+			this.comboSuperFamSort.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboSuperFamSort.FormattingEnabled = true;
+			this.comboSuperFamSort.Location = new System.Drawing.Point(312, 237);
+			this.comboSuperFamSort.MaxDropDownItems = 30;
+			this.comboSuperFamSort.Name = "comboSuperFamSort";
+			this.comboSuperFamSort.Size = new System.Drawing.Size(128, 21);
+			this.comboSuperFamSort.TabIndex = 217;
 			// 
 			// FormModuleSetup
 			// 
@@ -2169,6 +2195,11 @@ namespace OpenDental{
 			checkFamPhiAccess.Checked=PrefC.GetBool(PrefName.FamPhiAccess);
 			checkGoogleAddress.Checked=PrefC.GetBool(PrefName.ShowFeatureGoogleMaps);
 			checkSelectProv.Checked=PrefC.GetBool(PrefName.PriProvDefaultToSelectProv);
+			string[] superFamComboOptions=Enum.GetNames(typeof(SortStrategy));
+			foreach(string option in superFamComboOptions) {
+				comboSuperFamSort.Items.Add(option);
+			}
+			comboSuperFamSort.SelectedIndex=PrefC.GetInt(PrefName.SuperFamSortStrategy);
 			#endregion
 			#region Account Module
 			//Account module-----------------------------------------------------------------------
@@ -2557,6 +2588,7 @@ namespace OpenDental{
 				| Prefs.UpdateBool(PrefName.InsPPOsecWriteoffs,checkInsPPOsecWriteoffs.Checked)
 				| Prefs.UpdateBool(PrefName.ShowFeatureGoogleMaps,checkGoogleAddress.Checked)
 				| Prefs.UpdateBool(PrefName.PriProvDefaultToSelectProv,checkSelectProv.Checked)
+				| Prefs.UpdateInt(PrefName.SuperFamSortStrategy,comboSuperFamSort.SelectedIndex)
 				#endregion
 				#region Account Module
 				| Prefs.UpdateBool(PrefName.BalancesDontSubtractIns,checkBalancesDontSubtractIns.Checked)
