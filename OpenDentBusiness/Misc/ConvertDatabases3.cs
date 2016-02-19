@@ -11423,7 +11423,7 @@ namespace OpenDentBusiness {
 			To15_4_26();
 		}
 
-    private static void To15_4_26() {
+		private static void To15_4_26() {
 			if(FromVersion<new Version("15.4.26.0")) {
 				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 15.4.26.0"));//No translation in convert script.
 				string command="";
@@ -12957,15 +12957,15 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="ALTER TABLE insplan ADD RequireVerification tinyint NOT NULL";
+					command="ALTER TABLE insplan ADD HideFromVerifyList tinyint NOT NULL";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="ALTER TABLE insplan ADD RequireVerification number(3)";
+					command="ALTER TABLE insplan ADD HideFromVerifyList number(3)";
 					Db.NonQ(command);
-					command="UPDATE insplan SET RequireVerification = 0 WHERE RequireVerification IS NULL";
+					command="UPDATE insplan SET HideFromVerifyList = 0 WHERE HideFromVerifyList IS NULL";
 					Db.NonQ(command);
-					command="ALTER TABLE insplan MODIFY RequireVerification NOT NULL";
+					command="ALTER TABLE insplan MODIFY HideFromVerifyList NOT NULL";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -13067,13 +13067,19 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference (PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'SuperFamSortStrategy','2')";//2=PatNumAsc
 					Db.NonQ(command);
 				}
-
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('InsVerifyDefaultToCurrentUser','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'InsVerifyDefaultToCurrentUser','0')";
+					Db.NonQ(command);
+				}
 				command="UPDATE preference SET ValueString = '16.1.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			To16_2_0();
 		}
-
 
 
 	}

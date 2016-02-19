@@ -78,7 +78,7 @@ namespace OpenDentBusiness.Crud{
 				insPlan.SecUserNumEntry        = PIn.Long  (row["SecUserNumEntry"].ToString());
 				insPlan.SecDateEntry           = PIn.Date  (row["SecDateEntry"].ToString());
 				insPlan.SecDateTEdit           = PIn.DateT (row["SecDateTEdit"].ToString());
-				insPlan.RequireVerification    = PIn.Bool  (row["RequireVerification"].ToString());
+				insPlan.HideFromVerifyList     = PIn.Bool  (row["HideFromVerifyList"].ToString());
 				retVal.Add(insPlan);
 			}
 			return retVal;
@@ -122,7 +122,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("SecUserNumEntry");
 			table.Columns.Add("SecDateEntry");
 			table.Columns.Add("SecDateTEdit");
-			table.Columns.Add("RequireVerification");
+			table.Columns.Add("HideFromVerifyList");
 			foreach(InsPlan insPlan in listInsPlans) {
 				table.Rows.Add(new object[] {
 					POut.Long  (insPlan.PlanNum),
@@ -157,7 +157,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (insPlan.SecUserNumEntry),
 					POut.Date  (insPlan.SecDateEntry),
 					POut.DateT (insPlan.SecDateTEdit),
-					POut.Bool  (insPlan.RequireVerification),
+					POut.Bool  (insPlan.HideFromVerifyList),
 				});
 			}
 			return table;
@@ -198,7 +198,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="PlanNum,";
 			}
-			command+="GroupName,GroupNum,PlanNote,FeeSched,PlanType,ClaimFormNum,UseAltCode,ClaimsUseUCR,CopayFeeSched,EmployerNum,CarrierNum,AllowedFeeSched,TrojanID,DivisionNo,IsMedical,FilingCode,DentaideCardSequence,ShowBaseUnits,CodeSubstNone,IsHidden,MonthRenew,FilingCodeSubtype,CanadianPlanFlag,CanadianDiagnosticCode,CanadianInstitutionCode,RxBIN,CobRule,SopCode,SecUserNumEntry,SecDateEntry,RequireVerification) VALUES(";
+			command+="GroupName,GroupNum,PlanNote,FeeSched,PlanType,ClaimFormNum,UseAltCode,ClaimsUseUCR,CopayFeeSched,EmployerNum,CarrierNum,AllowedFeeSched,TrojanID,DivisionNo,IsMedical,FilingCode,DentaideCardSequence,ShowBaseUnits,CodeSubstNone,IsHidden,MonthRenew,FilingCodeSubtype,CanadianPlanFlag,CanadianDiagnosticCode,CanadianInstitutionCode,RxBIN,CobRule,SopCode,SecUserNumEntry,SecDateEntry,HideFromVerifyList) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(insPlan.PlanNum)+",";
 			}
@@ -234,7 +234,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (insPlan.SecUserNumEntry)+","
 				+    DbHelper.Now()+","
 				//SecDateTEdit can only be set by MySQL
-				+    POut.Bool  (insPlan.RequireVerification)+")";
+				+    POut.Bool  (insPlan.HideFromVerifyList)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -267,7 +267,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="PlanNum,";
 			}
-			command+="GroupName,GroupNum,PlanNote,FeeSched,PlanType,ClaimFormNum,UseAltCode,ClaimsUseUCR,CopayFeeSched,EmployerNum,CarrierNum,AllowedFeeSched,TrojanID,DivisionNo,IsMedical,FilingCode,DentaideCardSequence,ShowBaseUnits,CodeSubstNone,IsHidden,MonthRenew,FilingCodeSubtype,CanadianPlanFlag,CanadianDiagnosticCode,CanadianInstitutionCode,RxBIN,CobRule,SopCode,SecUserNumEntry,SecDateEntry,RequireVerification) VALUES(";
+			command+="GroupName,GroupNum,PlanNote,FeeSched,PlanType,ClaimFormNum,UseAltCode,ClaimsUseUCR,CopayFeeSched,EmployerNum,CarrierNum,AllowedFeeSched,TrojanID,DivisionNo,IsMedical,FilingCode,DentaideCardSequence,ShowBaseUnits,CodeSubstNone,IsHidden,MonthRenew,FilingCodeSubtype,CanadianPlanFlag,CanadianDiagnosticCode,CanadianInstitutionCode,RxBIN,CobRule,SopCode,SecUserNumEntry,SecDateEntry,HideFromVerifyList) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(insPlan.PlanNum)+",";
 			}
@@ -303,7 +303,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (insPlan.SecUserNumEntry)+","
 				+    DbHelper.Now()+","
 				//SecDateTEdit can only be set by MySQL
-				+    POut.Bool  (insPlan.RequireVerification)+")";
+				+    POut.Bool  (insPlan.HideFromVerifyList)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -347,7 +347,7 @@ namespace OpenDentBusiness.Crud{
 				//SecUserNumEntry excluded from update
 				//SecDateEntry not allowed to change
 				//SecDateTEdit can only be set by MySQL
-				+"RequireVerification    =  "+POut.Bool  (insPlan.RequireVerification)+" "
+				+"HideFromVerifyList     =  "+POut.Bool  (insPlan.HideFromVerifyList)+" "
 				+"WHERE PlanNum = "+POut.Long(insPlan.PlanNum);
 			Db.NonQ(command);
 		}
@@ -470,9 +470,9 @@ namespace OpenDentBusiness.Crud{
 			//SecUserNumEntry excluded from update
 			//SecDateEntry not allowed to change
 			//SecDateTEdit can only be set by MySQL
-			if(insPlan.RequireVerification != oldInsPlan.RequireVerification) {
+			if(insPlan.HideFromVerifyList != oldInsPlan.HideFromVerifyList) {
 				if(command!=""){ command+=",";}
-				command+="RequireVerification = "+POut.Bool(insPlan.RequireVerification)+"";
+				command+="HideFromVerifyList = "+POut.Bool(insPlan.HideFromVerifyList)+"";
 			}
 			if(command==""){
 				return false;
@@ -573,6 +573,9 @@ namespace OpenDentBusiness.Crud{
 			//SecUserNumEntry excluded from update
 			//SecDateEntry not allowed to change
 			//SecDateTEdit can only be set by MySQL
+			if(insPlan.HideFromVerifyList != oldInsPlan.HideFromVerifyList) {
+				return true;
+			}
 			return false;
 		}
 

@@ -76,8 +76,8 @@ namespace OpenDentBusiness{
 		///updates.  Not user editable with the UI.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.TimeStamp)]
 		public DateTime SecDateTEdit;
-		///<summary>Is true if this plan needs to be verified.</summary>
-		public bool RequireVerification;
+		///<summary>Is false if this plan needs to be verified.</summary>
+		public bool HideFromVerifyList;
 
 		///<summary>This is not a database column.  It is just used to display the number of plans with the same info.</summary>
 		[CrudColumn(IsNotDbColumn=true)]

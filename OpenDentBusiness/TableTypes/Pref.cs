@@ -334,11 +334,13 @@ namespace OpenDentBusiness {
 		InsPPOsecWriteoffs,
 		InsurancePlansShared,
 		///<summary>7 by default.  Number of days before displaying insurances that need verified.</summary>
-        InsVerifyAppointmentScheduledDays,
+		InsVerifyAppointmentScheduledDays,
 		///<summary>90 by default. Number of days before requiring insurance plans to be verified.</summary>
-        InsVerifyBenefitEligibilityDays,
+		InsVerifyBenefitEligibilityDays,
+		///<summary>Boolean, false by default.  When true, defaults a filter to the current user instead of All when opening the InsVerifyList.</summary>
+		InsVerifyDefaultToCurrentUser,
 		///<summary>30 by default.  Number of days before requiring patient plans to be verified.</summary>
-        InsVerifyPatientEnrollmentDays,
+		InsVerifyPatientEnrollmentDays,
 		///<summary>Writeoff description displayed in the Account Module and on statements.  If blank, the default is "Writeoff".
 		///We are using "Writeoff" since "PPO Discount" was only used for a brief time in 15.3 while it was Beta and no customer requested it</summary>
 		InsWriteoffDescript,
@@ -409,7 +411,6 @@ namespace OpenDentBusiness {
 		OpenDentalVendor,
 		OracleInsertId,
 		PasswordsMustBeStrong,
-		PatientAllSuperFamilySync,
 		PatientFormsShowConsent,
 		///<summary>Free-form 'Body' text of the notification sent by this practice when a new secure EmailMessage is sent to patient.</summary>
 		PatientPortalNotifyBody,
