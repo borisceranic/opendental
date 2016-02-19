@@ -50,7 +50,7 @@ namespace OpenDental {
 		/// <summary>May be called from other parts of the program without showing this form. You must still create an instance of this form though. 
 		/// Checks CallFire bridge, if it is OK to send a text, etc. (Buttons to load this form are usually disabled if it is not OK, 
 		/// but this is needed for Confirmations, Recalls, etc.) </summary>
-		public bool SendText(long patNum,string wirelessPhone,string message,YN txtMsgOk,long clinicNum) {
+		public bool SendText(long patNum,string wirelessPhone,string message,YN txtMsgOk,long clinicNum,SmsMessageSource smsMessageSource) {
 			if(Plugins.HookMethod(this,"FormTxtMsgEdit.SendText_Start",patNum,wirelessPhone,message,txtMsgOk)) {
 				return false;
 			}
@@ -93,7 +93,7 @@ namespace OpenDental {
 			}
 			if(SmsPhones.IsIntegratedTextingEnabled()) {
 				try {
-					return SmsToMobiles.SendSmsSingle(patNum,wirelessPhone,message,clinicNum);  //Can pass in 0 as PatNum if no patient selected.
+					return SmsToMobiles.SendSmsSingle(patNum,wirelessPhone,message,clinicNum,smsMessageSource);  //Can pass in 0 as PatNum if no patient selected.
 				}
 				catch(Exception ex) {
 					MsgBox.Show(this,ex.Message);
@@ -166,7 +166,7 @@ namespace OpenDental {
 						clinicNum=Clinics.List[0].ClinicNum;
 					}
 				}
-				if(!SendText(0,textWirelessPhone.Text,textMessage.Text,YN.Unknown,clinicNum)) {  //0 as PatNum to denote no pat specified
+				if(!SendText(0,textWirelessPhone.Text,textMessage.Text,YN.Unknown,clinicNum,SmsMessageSource.DirectSms)) {  //0 as PatNum to denote no pat specified
 					return;//Allow the user to try again.  A message was already shown to the user inside SendText().
 				}
 			}
@@ -180,7 +180,7 @@ namespace OpenDental {
 						+"you can send a text message.");
 					return;
 				}
-				if(!SendText(PatNum,textWirelessPhone.Text,textMessage.Text,TxtMsgOk,SmsPhones.GetClinicNumForTexting(PatNum))) {
+				if(!SendText(PatNum,textWirelessPhone.Text,textMessage.Text,TxtMsgOk,SmsPhones.GetClinicNumForTexting(PatNum),SmsMessageSource.DirectSms)) {
 					return;//Allow the user to try again.  A message was already shown to the user inside SendText().
 				}
 			}

@@ -168,7 +168,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Surround with Try/Catch.  Sent as time sensitive message.</summary>
-		public static bool SendSmsSingle(long patNum,string wirelessPhone,string message,long clinicNum) {
+		public static bool SendSmsSingle(long patNum,string wirelessPhone,string message,long clinicNum,SmsMessageSource smsMessageSource) {
 			double balance=SmsPhones.GetClinicBalance(clinicNum);
 			if(balance-0.04<0) {
 				throw new Exception("To send this message first increase spending limit for integrated texting from eServices Setup.");
@@ -181,7 +181,7 @@ namespace OpenDentBusiness{
 			smsToMobile.MobilePhoneNumber=ConvertPhoneToInternational(wirelessPhone,CultureInfo.CurrentCulture.Name.Substring(CultureInfo.CurrentCulture.Name.Length-2));//Example "en-US"="US"
 			smsToMobile.PatNum=patNum;
 			smsToMobile.MsgText=message;
-			smsToMobile.MsgType=SmsMessageSource.DirectSms;
+			smsToMobile.MsgType=smsMessageSource;
 			SmsToMobiles.SendSms(new List<SmsToMobile>() { smsToMobile });//Will throw if failed.
 			smsToMobile.SmsStatus=SmsDeliveryStatus.Pending;
 			smsToMobile.DateTimeSent=DateTime.Now;

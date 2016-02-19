@@ -13124,6 +13124,46 @@ namespace OpenDentBusiness {
 						Db.NonQ(command);
 					}
 				}
+				//Add automated Reminders email message preference (Also run in 15.4.32. okay to run again here.)
+				//Convert old messages into new messages
+				//Day Message======================================================================================
+				command="SELECT ValueString FROM preference WHERE PrefName='ApptReminderDayMessage'";
+				string reminderText = Db.GetScalar(command);
+				if(reminderText=="[nameFL],\r\nYou have an upcoming appointment on[apptDate] at[apptTime] with[practiceName] with[provName].\r\nThanks!") {//old default mesage.
+					reminderText=@"Appointment Reminder: [nameF] is scheduled for [apptTime] on [apptDate] at [clinicName]. Call [clinicPhone] if issue. No Reply";
+				}
+				reminderText=reminderText.Replace("[nameFL]","[nameF]");
+				reminderText=reminderText.Replace("[nameL]","[nameF]");
+				reminderText=reminderText.Replace("[nameFLnoPref]","[nameF]");
+				command="UPDATE preference SET ValueString = '"+POut.String(reminderText)+"' WHERE PrefName = 'ApptReminderDayMessage'";
+				Db.NonQ(command);
+				//Hour message (deprecated, but convert it anyway)=================================================
+				command="SELECT ValueString FROM preference WHERE PrefName='ApptReminderHourMessage'";
+				reminderText = Db.GetScalar(command);
+				if(reminderText=="[nameFL],\r\nYou have an upcoming appointment on[apptDate] at[apptTime] with[practiceName] with[provName].\r\nThanks!") {//old default mesage.
+					reminderText=@"Appointment Reminder: [nameF] is scheduled for [apptTime] on [apptDate] at [clinicName]. Call [clinicPhone] if issue. No Reply";
+				}
+				reminderText=reminderText.Replace("[nameFL]","[nameF]");
+				reminderText=reminderText.Replace("[nameL]","[nameF]");
+				reminderText=reminderText.Replace("[nameFLnoPref]","[nameF]");
+				command="UPDATE preference SET ValueString = '"+POut.String(reminderText)+"' WHERE PrefName = 'ApptReminderHourMessage'";
+				Db.NonQ(command);
+				//This pref was also added to the 15.4.32 conversion.
+				command = "SELECT COUNT(*) FROM preference WHERE PrefName='ApptReminderEmailMessage'";
+				if(Db.GetScalar(command)=="0") {//only add if not already exists.
+					reminderText = @"Dental appointment reminder from [clinicName]:
+[nameF] is scheduled for an appointment at [apptTime] on [apptDate]. 
+There is no need to reply if you are going to make this appointment, but if there is any issue please call [clinicPhone] as soon as possible.
+Thanks!";
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						command="INSERT INTO preference(PrefName,ValueString) VALUES('ApptReminderEmailMessage','"+reminderText+"')";
+						Db.NonQ(command);
+					}
+					else {//oracle
+						command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ApptReminderEmailMessage','"+reminderText+"')";
+						Db.NonQ(command);
+					}
+				}
 				command="UPDATE preference SET ValueString = '16.1.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}

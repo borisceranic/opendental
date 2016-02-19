@@ -78,6 +78,7 @@ namespace OpenDentBusiness {
 		ApptPrintTimeStop,
 		ApptReminderDayInterval,
 		ApptReminderDayMessage,
+		ApptReminderEmailMessage,
 		ApptReminderHourInterval,
 		ApptReminderHourMessage,
 		///<summary>Boolean defaults to 0.</summary>
