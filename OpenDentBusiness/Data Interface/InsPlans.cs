@@ -153,7 +153,7 @@ namespace OpenDentBusiness {
 				&& plan1.FilingCodeSubtype==plan2.FilingCodeSubtype
 				&& plan1.CanadianPlanFlag==plan2.CanadianPlanFlag
 				&& plan1.CobRule==plan2.CobRule
-				&& plan1.RequireVerification==plan2.RequireVerification) 
+				&& plan1.HideFromVerifyList==plan2.HideFromVerifyList) 
 			{
 				return true;
 			}

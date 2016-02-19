@@ -196,7 +196,7 @@ namespace OpenDental{
 		private GroupBox groupBox1;
 		private Label label30;
 		private Label label34;
-		private CheckBox checkVerifyRequired;
+		private CheckBox checkDontVerify;
 		private InsSub _subOld;
 		//<summary>This is a field that is accessed only by clicking on the button because there's not room for it otherwise.  This variable should be treated just as if it was a visible textBox.</summary>
 		//private string BenefitNotes;
@@ -398,7 +398,7 @@ namespace OpenDental{
 			this.radioCreateNew = new System.Windows.Forms.RadioButton();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.label34 = new System.Windows.Forms.Label();
-			this.checkVerifyRequired = new System.Windows.Forms.CheckBox();
+			this.checkDontVerify = new System.Windows.Forms.CheckBox();
 			this.butVerifyBenefits = new OpenDental.UI.Button();
 			this.textDateLastVerifiedBenefits = new OpenDental.ValidDate();
 			this.gridBenefits = new OpenDental.UI.ODGrid();
@@ -1214,7 +1214,7 @@ namespace OpenDental{
 			this.label30.Name = "label30";
 			this.label30.Size = new System.Drawing.Size(138, 17);
 			this.label30.TabIndex = 148;
-			this.label30.Text = "Pat Plan Last Verified";
+			this.label30.Text = "Eligibility Last Verified";
 			this.label30.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textDateLastVerifiedPatPlan
@@ -1699,23 +1699,23 @@ namespace OpenDental{
 			// label34
 			// 
 			this.label34.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label34.Location = new System.Drawing.Point(738, 314);
+			this.label34.Location = new System.Drawing.Point(634, 314);
 			this.label34.Name = "label34";
 			this.label34.Size = new System.Drawing.Size(126, 17);
 			this.label34.TabIndex = 149;
 			this.label34.Text = "Benefits Last Verified";
 			this.label34.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// checkVerifyRequired
+			// checkDontVerify
 			// 
-			this.checkVerifyRequired.AutoSize = true;
-			this.checkVerifyRequired.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkVerifyRequired.Location = new System.Drawing.Point(638, 314);
-			this.checkVerifyRequired.Name = "checkVerifyRequired";
-			this.checkVerifyRequired.Size = new System.Drawing.Size(98, 17);
-			this.checkVerifyRequired.TabIndex = 161;
-			this.checkVerifyRequired.Text = "Verify Required";
-			this.checkVerifyRequired.UseVisualStyleBackColor = true;
+			this.checkDontVerify.AutoSize = true;
+			this.checkDontVerify.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkDontVerify.Location = new System.Drawing.Point(888, 314);
+			this.checkDontVerify.Name = "checkDontVerify";
+			this.checkDontVerify.Size = new System.Drawing.Size(80, 17);
+			this.checkDontVerify.TabIndex = 161;
+			this.checkDontVerify.Text = "Don\'t Verify";
+			this.checkDontVerify.UseVisualStyleBackColor = true;
 			// 
 			// butVerifyBenefits
 			// 
@@ -1724,7 +1724,7 @@ namespace OpenDental{
 			this.butVerifyBenefits.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butVerifyBenefits.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butVerifyBenefits.CornerRadius = 4F;
-			this.butVerifyBenefits.Location = new System.Drawing.Point(937, 310);
+			this.butVerifyBenefits.Location = new System.Drawing.Point(833, 310);
 			this.butVerifyBenefits.Name = "butVerifyBenefits";
 			this.butVerifyBenefits.Size = new System.Drawing.Size(32, 23);
 			this.butVerifyBenefits.TabIndex = 150;
@@ -1734,7 +1734,7 @@ namespace OpenDental{
 			// 
 			// textDateLastVerifiedBenefits
 			// 
-			this.textDateLastVerifiedBenefits.Location = new System.Drawing.Point(866, 312);
+			this.textDateLastVerifiedBenefits.Location = new System.Drawing.Point(762, 312);
 			this.textDateLastVerifiedBenefits.Name = "textDateLastVerifiedBenefits";
 			this.textDateLastVerifiedBenefits.Size = new System.Drawing.Size(70, 20);
 			this.textDateLastVerifiedBenefits.TabIndex = 149;
@@ -1866,7 +1866,7 @@ namespace OpenDental{
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(982, 700);
-			this.Controls.Add(this.checkVerifyRequired);
+			this.Controls.Add(this.checkDontVerify);
 			this.Controls.Add(this.label34);
 			this.Controls.Add(this.butVerifyBenefits);
 			this.Controls.Add(this.textDateLastVerifiedBenefits);
@@ -1958,7 +1958,7 @@ namespace OpenDental{
 					radioChangeAll.Checked=true;
 				}
 			}
-			checkVerifyRequired.Checked=PlanCur.RequireVerification;
+			checkDontVerify.Checked=PlanCur.HideFromVerifyList;
 			InsVerify insVerifyBenefitsCur=InsVerifies.GetOneByFKey(PlanCur.PlanNum,VerifyTypes.InsuranceBenefit);
 			if(insVerifyBenefitsCur!=null) {
 				textDateLastVerifiedBenefits.Text=insVerifyBenefitsCur.DateLastVerified.ToShortDateString();
@@ -2201,7 +2201,7 @@ namespace OpenDental{
 			textPlanFlag.Text=PlanCur.CanadianPlanFlag;
 			textCanadianDiagCode.Text=PlanCur.CanadianDiagnosticCode;
 			textCanadianInstCode.Text=PlanCur.CanadianInstitutionCode;
-			checkVerifyRequired.Checked=PlanCur.RequireVerification;
+			checkDontVerify.Checked=PlanCur.HideFromVerifyList;
 			//if(PlanCur.BenefitNotes==""){
 			//	butBenefitNotes.Enabled=false;
 			//}
@@ -4272,7 +4272,7 @@ namespace OpenDental{
 			//Canadian end---------------------------------------------------------------------------------------
 			PlanCur.TrojanID=textTrojanID.Text;
 			PlanCur.PlanNote=textPlanNote.Text;
-			PlanCur.RequireVerification=checkVerifyRequired.Checked;
+			PlanCur.HideFromVerifyList=checkDontVerify.Checked;
 			return true;
 		}
 

@@ -276,6 +276,9 @@ namespace OpenDentBusiness.Crud{
 			if(insVerify.DefNum != oldInsVerify.DefNum) {
 				return true;
 			}
+			if(insVerify.DateLastAssigned.Date != oldInsVerify.DateLastAssigned.Date) {
+				return true;
+			}
 			if(insVerify.Note != oldInsVerify.Note) {
 				return true;
 			}

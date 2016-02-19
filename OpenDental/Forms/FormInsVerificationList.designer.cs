@@ -26,16 +26,17 @@ namespace OpenDental{
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormInsVerificationList));
 			this.label23 = new System.Windows.Forms.Label();
-			this.label3 = new System.Windows.Forms.Label();
 			this.label4 = new System.Windows.Forms.Label();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
+			this.comboVerifyClinics = new System.Windows.Forms.ComboBox();
+			this.labelClinic = new System.Windows.Forms.Label();
 			this.comboFilterVerifyStatus = new System.Windows.Forms.ComboBox();
 			this.label15 = new System.Windows.Forms.Label();
 			this.textVerifyCarrier = new System.Windows.Forms.TextBox();
 			this.textVerifyUser = new System.Windows.Forms.TextBox();
 			this.label6 = new System.Windows.Forms.Label();
 			this.comboVerifyRegions = new System.Windows.Forms.ComboBox();
-			this.label5 = new System.Windows.Forms.Label();
+			this.labelRegion = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.butVerifyUserPick = new OpenDental.UI.Button();
 			this.textAppointmentScheduledDays = new OpenDental.ValidNumber();
@@ -83,6 +84,7 @@ namespace OpenDental{
 			this.butAssignUser = new OpenDental.UI.Button();
 			this._menuRightClick = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.butClose = new OpenDental.UI.Button();
+			this.label3 = new System.Windows.Forms.Label();
 			this.groupBox3.SuspendLayout();
 			this.groupBox4.SuspendLayout();
 			this.groupBox5.SuspendLayout();
@@ -101,15 +103,6 @@ namespace OpenDental{
 			this.label23.Text = "Days until scheduled appointment:";
 			this.label23.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// label3
-			// 
-			this.label3.Location = new System.Drawing.Point(9, 40);
-			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(261, 20);
-			this.label3.TabIndex = 86;
-			this.label3.Text = "Days since insurance benefits eligibility:";
-			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
 			// label4
 			// 
 			this.label4.Location = new System.Drawing.Point(9, 65);
@@ -121,13 +114,16 @@ namespace OpenDental{
 			// 
 			// groupBox3
 			// 
+			this.groupBox3.Controls.Add(this.label3);
+			this.groupBox3.Controls.Add(this.comboVerifyClinics);
+			this.groupBox3.Controls.Add(this.labelClinic);
 			this.groupBox3.Controls.Add(this.comboFilterVerifyStatus);
 			this.groupBox3.Controls.Add(this.label15);
 			this.groupBox3.Controls.Add(this.textVerifyCarrier);
 			this.groupBox3.Controls.Add(this.textVerifyUser);
 			this.groupBox3.Controls.Add(this.label6);
 			this.groupBox3.Controls.Add(this.comboVerifyRegions);
-			this.groupBox3.Controls.Add(this.label5);
+			this.groupBox3.Controls.Add(this.labelRegion);
 			this.groupBox3.Controls.Add(this.label2);
 			this.groupBox3.Controls.Add(this.butVerifyUserPick);
 			this.groupBox3.Controls.Add(this.label23);
@@ -135,13 +131,30 @@ namespace OpenDental{
 			this.groupBox3.Controls.Add(this.textAppointmentScheduledDays);
 			this.groupBox3.Controls.Add(this.textPatientEnrollmentDays);
 			this.groupBox3.Controls.Add(this.textInsBenefitEligibilityDays);
-			this.groupBox3.Controls.Add(this.label3);
 			this.groupBox3.Location = new System.Drawing.Point(12, 4);
 			this.groupBox3.Name = "groupBox3";
 			this.groupBox3.Size = new System.Drawing.Size(961, 92);
 			this.groupBox3.TabIndex = 90;
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Verification Filters";
+			// 
+			// comboVerifyClinics
+			// 
+			this.comboVerifyClinics.FormattingEnabled = true;
+			this.comboVerifyClinics.Location = new System.Drawing.Point(451, 64);
+			this.comboVerifyClinics.Name = "comboVerifyClinics";
+			this.comboVerifyClinics.Size = new System.Drawing.Size(150, 21);
+			this.comboVerifyClinics.TabIndex = 229;
+			this.comboVerifyClinics.SelectionChangeCommitted += new System.EventHandler(this.comboVerifyClinic_SelectionChangeCommitted);
+			// 
+			// labelClinic
+			// 
+			this.labelClinic.Location = new System.Drawing.Point(373, 64);
+			this.labelClinic.Name = "labelClinic";
+			this.labelClinic.Size = new System.Drawing.Size(75, 20);
+			this.labelClinic.TabIndex = 228;
+			this.labelClinic.Text = "Clinic:";
+			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// comboFilterVerifyStatus
 			// 
@@ -179,9 +192,9 @@ namespace OpenDental{
 			// 
 			// label6
 			// 
-			this.label6.Location = new System.Drawing.Point(325, 15);
+			this.label6.Location = new System.Drawing.Point(373, 15);
 			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(120, 20);
+			this.label6.Size = new System.Drawing.Size(75, 20);
 			this.label6.TabIndex = 223;
 			this.label6.Text = "Carrier:";
 			this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -189,20 +202,20 @@ namespace OpenDental{
 			// comboVerifyRegions
 			// 
 			this.comboVerifyRegions.FormattingEnabled = true;
-			this.comboVerifyRegions.Location = new System.Drawing.Point(451, 40);
+			this.comboVerifyRegions.Location = new System.Drawing.Point(451, 39);
 			this.comboVerifyRegions.Name = "comboVerifyRegions";
 			this.comboVerifyRegions.Size = new System.Drawing.Size(150, 21);
 			this.comboVerifyRegions.TabIndex = 222;
 			this.comboVerifyRegions.SelectionChangeCommitted += new System.EventHandler(this.comboVerifyRegions_SelectionChangeCommitted);
 			// 
-			// label5
+			// labelRegion
 			// 
-			this.label5.Location = new System.Drawing.Point(325, 40);
-			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(120, 20);
-			this.label5.TabIndex = 221;
-			this.label5.Text = "Region:";
-			this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelRegion.Location = new System.Drawing.Point(373, 39);
+			this.labelRegion.Name = "labelRegion";
+			this.labelRegion.Size = new System.Drawing.Size(75, 20);
+			this.labelRegion.TabIndex = 221;
+			this.labelRegion.Text = "Region:";
+			this.labelRegion.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// label2
 			// 
@@ -696,6 +709,15 @@ namespace OpenDental{
 			this.butClose.Text = "&Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
+			// label3
+			// 
+			this.label3.Location = new System.Drawing.Point(19, 39);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(250, 20);
+			this.label3.TabIndex = 230;
+			this.label3.Text = "Plan benefits haven\'t been verified in";
+			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormInsVerificationList
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -730,7 +752,6 @@ namespace OpenDental{
         private UI.ODGrid gridMain;
         private System.Windows.Forms.Label label23;
         private ValidNumber textAppointmentScheduledDays;
-        private System.Windows.Forms.Label label3;
         private ValidNumber textInsBenefitEligibilityDays;
         private System.Windows.Forms.Label label4;
         private ValidNumber textPatientEnrollmentDays;
@@ -766,8 +787,8 @@ namespace OpenDental{
         private System.Windows.Forms.Label label16;
         private UI.Button butVerifyUserPick;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.ComboBox comboVerifyRegions;
+        private System.Windows.Forms.Label labelRegion;
+		private System.Windows.Forms.ComboBox comboVerifyRegions;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox textVerifyUser;
         private System.Windows.Forms.TextBox textVerifyCarrier;
@@ -784,5 +805,8 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textInsVerifyReadOnlyNote;
 		private System.Windows.Forms.Label label20;
 		private System.Windows.Forms.ContextMenuStrip _menuRightClick;
+		private System.Windows.Forms.ComboBox comboVerifyClinics;
+		private System.Windows.Forms.Label labelClinic;
+		private System.Windows.Forms.Label label3;
 	}
 }
