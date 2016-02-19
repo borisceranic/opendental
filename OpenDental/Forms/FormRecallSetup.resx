@@ -117,11 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="label27.Text" xml:space="preserve">
-    <value>These variable fields can be used in the message boxes and will use the patient's information when sending the reminder:   [nameF], [nameL], [nameFL], [nameFLnoPref], [namePref], [title], [apptDate], [apptTime], [practiceName], [clinicName], [provName].  
-
-*Note that if you include fields like [nameFL], each patient has a unique name and some messages will be split into two or more:  each text message can only be 150 characters per part and will be auto split if it exceeds 160 characters.</value>
-  </data>
   <data name="label16.Text" xml:space="preserve">
     <value>Appointment reminders are e-mails and/or text messages sent to the patient at defined intervals prior to the appointment.  Enable one or both messages to begin reminding patients of appointments. 
 Make sure texting is turned on in order to get the most from this feature.  

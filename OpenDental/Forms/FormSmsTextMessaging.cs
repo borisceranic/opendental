@@ -572,7 +572,7 @@ namespace OpenDental {
         {
           goto HookSkipSmsCall;
         }
-				SmsToMobiles.SendSmsSingle(patNum,mobileNumber,textReply.Text,clinicNum);
+				SmsToMobiles.SendSmsSingle(patNum,mobileNumber,textReply.Text,clinicNum,SmsMessageSource.DirectSms);
 			}
 			catch(Exception ex) {
 				MessageBox.Show(ex.Message);

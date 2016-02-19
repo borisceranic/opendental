@@ -6,8 +6,9 @@ using System.Text;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
-	public class ApptComms{
-		
+	public class ApptComms {
+		public const string ApptReminderMsgUS = @"Appointment Reminder: [nameF] is scheduled for [apptTime] on [apptDate] at [clinicName]. Call [clinicPhone] if issue. No Reply";
+
 		///<summary></summary>
 		public static List<ApptComm> Refresh(long patNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -278,28 +279,33 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Generates text by replacing variable strings (such as [nameF]) with their corresponding parts.</summary>
-		private static string GenerateText(string text,Patient pat,Appointment appt) {
-			text=text.Replace("[title]",pat.Title);
+		private static string FillMessage(string text,Patient pat,Appointment appt) {
+			Clinic clinic= Clinics.GetClinic(appt.ClinicNum);
 			text=text.Replace("[nameF]",pat.GetNameFirst());//includes preferred.  Not sure I like this.
-			text=text.Replace("[nameL]",pat.LName);
-			text=text.Replace("[nameFLnoPref]",pat.GetNameFLnoPref());//Not sure how to handle the preferred.  Statements do it this way. ex. Statements line 320
-			text=text.Replace("[nameFL]",pat.GetNameFL());
 			text=text.Replace("[namePref]",pat.Preferred);
-			text=text.Replace("[apptDate]",appt.AptDateTime.ToShortDateString());//Do we want to put logic in here to do "ask time arrive" instead of normal aptdatetime?
-			text=text.Replace("[apptTime]",appt.AptDateTime.ToShortTimeString());
+			text=text.Replace("[apptDate]",appt.AptDateTime.ToString("MMM d"));//Do we want to put logic in here to do "ask time arrive" instead of normal aptdatetime?
+			text=text.Replace("[apptTime]",appt.AptDateTime.ToString("hh:mmtt"));
 			if(text.Contains("[practiceName]")) {//Don't do extra work if we don't have to..
 				text=text.Replace("[practiceName]",PrefC.GetString(PrefName.PracticeTitle));
 			}
 			if(text.Contains("[clinicName]")) {
-				if(PrefC.HasClinicsEnabled) {
-					text=text.Replace("[clinicName]",Clinics.GetDesc(pat.ClinicNum));
+				if(clinic!=null) {
+					text=text.Replace("[clinicName]",clinic.Description);
 				}
 				else {
 					text=text.Replace("[clinicName]",PrefC.GetString(PrefName.PracticeTitle));//Clinics disabled but put clinicName.  Use practice info.
 				}
 			}
-			if(text.Contains("[provName]")) {
-				text=text.Replace("[provName]",Providers.GetFormalName(pat.PriProv));
+			if(text.Contains("[clinicPhone]")) {
+				if(clinic!=null) {
+					text=text.Replace("[clinicPhone]",clinic.Phone);//Clinics disabled but put clinicName.
+				}
+				else {
+					text=text.Replace("[clinicPhone]",PrefC.GetString(PrefName.PracticePhone));//Clinics disabled but put clinicName.
+				}
+			}
+				if(text.Contains("[provName]")) {
+				text=text.Replace("[provName]",Providers.GetFormalName(appt.ProvNum));
 			}
 			return text;
 		}
@@ -329,14 +335,7 @@ namespace OpenDentBusiness{
 			emailMessage.Subject="Appointment Reminder";
 			emailMessage.CcAddress="";
 			emailMessage.BccAddress="";
-			//Determine if we should use the day or hour message.
-			//Amount of time until the appointment.
-			if(intervalType==IntervalType.Hourly) {
-				emailMessage.BodyText=GenerateText(PrefC.GetString(PrefName.ApptReminderHourMessage),pat,appt);
-			}
-			else {
-				emailMessage.BodyText=GenerateText(PrefC.GetString(PrefName.ApptReminderDayMessage),pat,appt);
-			}
+			emailMessage.BodyText=FillMessage(PrefC.GetString(PrefName.ApptReminderEmailMessage),pat,appt);
 			emailMessage.FromAddress=emailAddress.SenderAddress;
 			try {
 				EmailMessages.SendEmailUnsecure(emailMessage,emailAddress);
@@ -370,15 +369,15 @@ namespace OpenDentBusiness{
 			if(patPhone=="") {
 				return pat.LName+", "+pat.FName+" "+Lans.g("ApptComms","cannot be sent texts")+".  ";
 			}
-			string textMsg;
-			if(intervalType==IntervalType.Hourly) {
-				textMsg=GenerateText(PrefC.GetString(PrefName.ApptReminderHourMessage),pat,appt);
+			string message;
+			if(SmsPhones.IsIntegratedTextingEnabled() && SmsPhones.IsTextingForCountry("US","CA")) {
+				message=ApptComms.ApptReminderMsgUS;
 			}
 			else {
-				textMsg=GenerateText(PrefC.GetString(PrefName.ApptReminderDayMessage),pat,appt);
+				message=PrefC.GetString(PrefName.ApptReminderDayMessage);
 			}
 			try {
-				SmsToMobiles.SendSmsSingle(pat.PatNum,patPhone,textMsg,pat.ClinicNum);
+				SmsToMobiles.SendSmsSingle(pat.PatNum,patPhone,message,pat.ClinicNum,SmsMessageSource.Reminder);
 			}
 			catch(Exception ex) {
 				return ex.Message+"  ";
