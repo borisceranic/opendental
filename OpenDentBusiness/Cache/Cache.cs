@@ -397,6 +397,9 @@ namespace OpenDentBusiness {
 				LetterMergeFields.FillCache(ds.Tables["LetterMergeField"]);
 				LetterMerges.FillCache(ds.Tables["LetterMerge"]);
 			}
+			if(itypes.Contains((int)InvalidType.Medications) || isAll) {
+				Medications.FillCache(ds.Tables["Medications"]);
+			}
 			if(itypes.Contains((int)InvalidType.Operatories) || isAll) {
 				Operatories.FillCache(ds.Tables["Operatory"]);
 			}
