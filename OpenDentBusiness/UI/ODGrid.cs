@@ -2776,9 +2776,9 @@ namespace OpenDental.UI {
 			if(!editableAcceptsCR) {
 				editBox.SelectAll();//Only select all when not multiline (editableAcceptsCR) i.e. proc list for editing fees selects all for easy overwriting.
 			}
-			editBox.Focus();
 			//Set the cell of the current editBox so that the value of that cell is saved when it looses focus (used for mouse click).
 			SelectedCellOld=new Point(selectedCell.X,selectedCell.Y);
+			editBox.Focus();
 		}
 
 		void editBox_LostFocus(object sender,EventArgs e) {

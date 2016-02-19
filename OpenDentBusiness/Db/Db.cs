@@ -24,12 +24,27 @@ namespace OpenDentBusiness {
 		internal static List<long> GetListLong(string command) {
 			List<long> retVal=new List<long>();
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				throw new ApplicationException("No longer allowed to send sql directly.  For user sql, use GetTableLow.  Othewise, rewrite the calling class to not use this query:\r\n"+command);
+				throw new ApplicationException("No longer allowed to send sql directly.  For user sql, use GetTableLow.  Otherwise, rewrite the calling class to not use this query:\r\n"+command);
 			}
 			else {
 				DataTable Table=DataCore.GetTable(command);
 				for(int i=0;i<Table.Rows.Count;i++) {
 					retVal.Add(PIn.Long(Table.Rows[i][0].ToString()));
+				}
+			}
+			return retVal;
+		}
+
+		///<summary>Performs PIn.String on first column of table returned. Returns empty list if nothing found.</summary>
+		internal static List<string> GetListString(string command) {
+			List<string> retVal=new List<string>();
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				throw new ApplicationException("No longer allowed to send sql directly.  For user sql, use GetTableLow.  Otherwise, rewrite the calling class to not use this query:\r\n"+command);
+			}
+			else {
+				DataTable Table=DataCore.GetTable(command);
+				for(int i=0;i<Table.Rows.Count;i++) {
+					retVal.Add(PIn.String(Table.Rows[i][0].ToString()));
 				}
 			}
 			return retVal;

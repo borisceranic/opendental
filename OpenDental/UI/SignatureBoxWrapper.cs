@@ -217,6 +217,12 @@ namespace OpenDental.UI {
 			sigBox.SetTabletState(0);//not accepting input.  To accept input, change the note, or clear the sig.
 		}
 
+		///<summary>Helper method to manipulate the visibility of all buttons on the signature wrapper.</summary>
+		public void SetButtonVisibility(bool isVisible) {
+			butClearSig.Visible=isVisible;
+			butTopazSign.Visible=isVisible;
+		}
+
 		public int GetNumberOfTabletPoints(bool sigIsTopaz) {
 			if(sigIsTopaz) {
 				return CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz);

@@ -20,10 +20,11 @@ namespace OpenDental{
 		/// <summary>Required designer variable.</summary>
 		private System.ComponentModel.Container components = null;
 		public DisplayField FieldCur;
-		private Label labelWarning;
+		private Label labelLine;
 		private TextBox textPickList;
 		private UI.Button butDown;
 		private UI.Button butUp;
+		private Label labelSignature;
 		private Font headerFont=new Font(FontFamily.GenericSansSerif,8.5f,FontStyle.Bold);
 
 		public FormDisplayFieldOrthoEdit()
@@ -64,20 +65,21 @@ namespace OpenDental{
 			this.textWidthMin = new System.Windows.Forms.TextBox();
 			this.label4 = new System.Windows.Forms.Label();
 			this.label5 = new System.Windows.Forms.Label();
-			this.labelWarning = new System.Windows.Forms.Label();
+			this.labelLine = new System.Windows.Forms.Label();
 			this.textPickList = new System.Windows.Forms.TextBox();
 			this.butDown = new OpenDental.UI.Button();
 			this.butUp = new OpenDental.UI.Button();
 			this.textWidth = new OpenDental.ValidNum();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.labelSignature = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// textDescription
 			// 
 			this.textDescription.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.textDescription.Location = new System.Drawing.Point(141, 15);
+			this.textDescription.Location = new System.Drawing.Point(142, 30);
 			this.textDescription.Name = "textDescription";
 			this.textDescription.Size = new System.Drawing.Size(249, 20);
 			this.textDescription.TabIndex = 5;
@@ -85,7 +87,7 @@ namespace OpenDental{
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(5, 16);
+			this.label2.Location = new System.Drawing.Point(6, 31);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(134, 17);
 			this.label2.TabIndex = 4;
@@ -94,7 +96,7 @@ namespace OpenDental{
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(5, 68);
+			this.label3.Location = new System.Drawing.Point(6, 83);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(134, 17);
 			this.label3.TabIndex = 6;
@@ -103,7 +105,7 @@ namespace OpenDental{
 			// 
 			// textWidthMin
 			// 
-			this.textWidthMin.Location = new System.Drawing.Point(141, 41);
+			this.textWidthMin.Location = new System.Drawing.Point(142, 56);
 			this.textWidthMin.Name = "textWidthMin";
 			this.textWidthMin.ReadOnly = true;
 			this.textWidthMin.Size = new System.Drawing.Size(71, 20);
@@ -112,7 +114,7 @@ namespace OpenDental{
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(8, 42);
+			this.label4.Location = new System.Drawing.Point(9, 57);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(131, 17);
 			this.label4.TabIndex = 8;
@@ -121,22 +123,22 @@ namespace OpenDental{
 			// 
 			// label5
 			// 
-			this.label5.Location = new System.Drawing.Point(215, 42);
+			this.label5.Location = new System.Drawing.Point(216, 57);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(175, 17);
 			this.label5.TabIndex = 10;
 			this.label5.Text = "(based on text above)";
 			this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
-			// labelWarning
+			// labelLine
 			// 
-			this.labelWarning.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.labelWarning.Location = new System.Drawing.Point(5, 93);
-			this.labelWarning.Name = "labelWarning";
-			this.labelWarning.Size = new System.Drawing.Size(130, 14);
-			this.labelWarning.TabIndex = 89;
-			this.labelWarning.Text = "One Entry Per Line";
-			this.labelWarning.TextAlign = System.Drawing.ContentAlignment.BottomRight;
+			this.labelLine.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.labelLine.Location = new System.Drawing.Point(6, 108);
+			this.labelLine.Name = "labelLine";
+			this.labelLine.Size = new System.Drawing.Size(130, 14);
+			this.labelLine.TabIndex = 89;
+			this.labelLine.Text = "One Entry Per Line";
+			this.labelLine.TextAlign = System.Drawing.ContentAlignment.BottomRight;
 			// 
 			// textPickList
 			// 
@@ -145,11 +147,11 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textPickList.HideSelection = false;
-			this.textPickList.Location = new System.Drawing.Point(141, 93);
+			this.textPickList.Location = new System.Drawing.Point(142, 108);
 			this.textPickList.Multiline = true;
 			this.textPickList.Name = "textPickList";
 			this.textPickList.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-			this.textPickList.Size = new System.Drawing.Size(249, 301);
+			this.textPickList.Size = new System.Drawing.Size(249, 286);
 			this.textPickList.TabIndex = 20;
 			// 
 			// butDown
@@ -160,7 +162,7 @@ namespace OpenDental{
 			this.butDown.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butDown.CornerRadius = 4F;
 			this.butDown.Image = global::OpenDental.Properties.Resources.down;
-			this.butDown.Location = new System.Drawing.Point(440, 93);
+			this.butDown.Location = new System.Drawing.Point(445, 164);
 			this.butDown.Name = "butDown";
 			this.butDown.Size = new System.Drawing.Size(25, 24);
 			this.butDown.TabIndex = 30;
@@ -174,7 +176,7 @@ namespace OpenDental{
 			this.butUp.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butUp.CornerRadius = 4F;
 			this.butUp.Image = global::OpenDental.Properties.Resources.up;
-			this.butUp.Location = new System.Drawing.Point(414, 93);
+			this.butUp.Location = new System.Drawing.Point(414, 164);
 			this.butUp.Name = "butUp";
 			this.butUp.Size = new System.Drawing.Size(25, 24);
 			this.butUp.TabIndex = 25;
@@ -182,7 +184,7 @@ namespace OpenDental{
 			// 
 			// textWidth
 			// 
-			this.textWidth.Location = new System.Drawing.Point(141, 67);
+			this.textWidth.Location = new System.Drawing.Point(142, 82);
 			this.textWidth.MaxVal = 2000;
 			this.textWidth.MinVal = 1;
 			this.textWidth.Name = "textWidth";
@@ -219,13 +221,25 @@ namespace OpenDental{
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
+			// labelSignature
+			// 
+			this.labelSignature.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.labelSignature.Location = new System.Drawing.Point(12, 10);
+			this.labelSignature.Name = "labelSignature";
+			this.labelSignature.Size = new System.Drawing.Size(486, 16);
+			this.labelSignature.TabIndex = 90;
+			this.labelSignature.Text = "This display field will also cause a signature box to show in the Ortho Chart win" +
+    "dow.";
+			this.labelSignature.Visible = false;
+			// 
 			// FormDisplayFieldOrthoEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(510, 406);
+			this.Controls.Add(this.labelSignature);
 			this.Controls.Add(this.butDown);
 			this.Controls.Add(this.butUp);
-			this.Controls.Add(this.labelWarning);
+			this.Controls.Add(this.labelLine);
 			this.Controls.Add(this.textPickList);
 			this.Controls.Add(this.label5);
 			this.Controls.Add(this.textWidthMin);
@@ -254,6 +268,12 @@ namespace OpenDental{
 			textDescription.Text=FieldCur.Description;
 			textWidth.Text=FieldCur.ColumnWidth.ToString();
 			textPickList.Text=FieldCur.PickList;
+			if(FieldCur.InternalName=="Signature") {
+				labelSignature.Visible=true;
+				textPickList.Visible=false;
+				butUp.Visible=false;
+				butDown.Visible=false;
+			}
 			FillWidth();
 		}
 
