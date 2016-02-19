@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using OpenDentBusiness;
@@ -290,7 +291,10 @@ namespace OpenDentBusiness {
 				//list.Add(new DisplayField("Abbr",110,category){Description="Abbr"});
 			}
 			else if(category==DisplayFieldCategory.OrthoChart) {
-				//Ortho chart has no default columns.  User must explicitly set up columns.
+				//Ortho charts have only one predefined column.  Most display fields are user defined.
+				DisplayField df=new DisplayField("Signature",100,DisplayFieldCategory.OrthoChart);
+				df.Description=Lans.g("FormDisplayFields","Signature");
+				list.Add(df);
 			}
 			else if(category==DisplayFieldCategory.AppointmentBubble) {
 				list.Add(new DisplayField("Patient Name",0,category));
@@ -587,18 +591,18 @@ namespace OpenDentBusiness {
 			}
 			else if(category==DisplayFieldCategory.OrthoChart) {
 				list=GetForCategory(DisplayFieldCategory.OrthoChart); //The display fields that the user has already saved
-				List<OrthoChart> listDistinctOrthoCharts=OrthoCharts.GetByDistinctFieldNames();
-				for(int i=0;i<listDistinctOrthoCharts.Count;i++) {
-					bool addToList=true;
-					for(int j=0;j<list.Count;j++) {
-						if(list[j].Description==listDistinctOrthoCharts[i].FieldName) {
-							addToList=false;
-						}
-					}
-					if(addToList) {
-						DisplayField df=new DisplayField("",20,DisplayFieldCategory.OrthoChart);
-						df.Description=listDistinctOrthoCharts[i].FieldName;
-						list.Add(df);
+				//If there are any ortho charts with a signature column present, the Signature display field will already be present.
+				if(!list.Any(x => x.InternalName=="Signature")) {
+					DisplayField disField=new DisplayField("Signature",100,DisplayFieldCategory.OrthoChart);
+					list.Add(disField);
+				}
+				List<string> listDistinctFieldNames=OrthoCharts.GetDistinctFieldNames();
+				foreach(string fieldName in listDistinctFieldNames) {
+					//If there aren't any display fields with the current field name, create one and add it to the list of available fields.
+					if(!list.Any(x => x.Description==fieldName)) {
+						DisplayField displayField=new DisplayField("",20,DisplayFieldCategory.OrthoChart);
+						displayField.Description=fieldName;
+						list.Add(displayField);
 					}
 				}
 			}

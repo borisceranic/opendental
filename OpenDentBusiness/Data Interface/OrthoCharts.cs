@@ -28,16 +28,13 @@ namespace OpenDentBusiness{
 			return Crud.OrthoChartCrud.SelectMany(command);
 		}
 
-		///<summary>Useful for distinct display fields.</summary>
-		public static List<OrthoChart> GetByDistinctFieldNames() {
+		///<summary>Gets all distinct field names used by any ortho chart.  Useful for displaying the "available" display fields.</summary>
+		public static List<string> GetDistinctFieldNames() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<OrthoChart>>(MethodBase.GetCurrentMethod());
+				return Meth.GetObject<List<string>>(MethodBase.GetCurrentMethod());
 			}
-			//This is the simple querry that doesn't work with oracle
-			//string command="SELECT * FROM orthochart GROUP BY FieldName";
-			//This query was rewritten for Oracle support, it will provide the same results weather it is run in MySql or Oracle.
-			string command="SELECT * FROM orthochart, (SELECT MAX(OrthoChartNum) OrthoChartNum, FieldName FROM orthochart GROUP BY FieldName) uniqueSubTable WHERE orthochart.OrthoChartNum = uniqueSubTable.OrthoChartNum";
-			return Crud.OrthoChartCrud.SelectMany(command);
+			string command="SELECT FieldName FROM orthochart GROUP BY FieldName";
+			return Db.GetListString(command);
 		}
 
 		///<summary></summary>
@@ -157,6 +154,7 @@ namespace OpenDentBusiness{
 		///<summary>Gets the hashstring for generating signatures.
 		///Should only be used when saving signatures, for validating see GetKeyDataForSignatureHash() and GetHashStringForSignature()</summary>
 		public static string GetKeyDataForSignatureSaving(Patient pat,List<OrthoChart> listOrthoCharts,DateTime dateService) {
+			//No need to check RemotingRole; no call to db.
 			string keyData=GetKeyDataForSignatureHash(pat,listOrthoCharts,dateService);
 			return GetHashStringForSignature(keyData);
 		}
@@ -165,10 +163,6 @@ namespace OpenDentBusiness{
 		///This is done seperate of the hashing so that new line replacements can be done when validating signatures before hashing.</summary>
 		public static string GetKeyDataForSignatureHash(Patient pat,List<OrthoChart> listOrthoCharts,DateTime dateService) {
 			//No need to check RemotingRole; no call to db.
-			//the key data is a concatenation of the following:
-			//tp: Note, DateTP
-			//each proctp: Descript,PatAmt
-			//The procedures MUST be in the correct order, and we'll use ItemOrder to order them.
 			StringBuilder strb=new StringBuilder();
 			strb.Append(pat.FName);
 			strb.Append(pat.LName);

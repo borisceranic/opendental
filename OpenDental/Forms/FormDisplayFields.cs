@@ -302,7 +302,6 @@ namespace OpenDental{
 				textCustomField.Visible=true;
 				labelCustomField.Visible=true;
 				listAvailable.Height=227;//227px for short, 412px for tall
-				//labelAvailable.Text=Lan.g(this,"Previously Used Fields");
 			}
 			FillGrids();
 		}
@@ -333,16 +332,8 @@ namespace OpenDental{
 				if(Category!=DisplayFieldCategory.OrthoChart) {
 					row.Cells.Add(ListShowing[i].InternalName);
 				}
-				//if(Category==DisplayFieldCategory.OrthoChart && ListShowing[i].InternalName=="Signature Box") {
-				//	row.Cells.Add(Lan.g(this,ListShowing[i].InternalName));
-				//}
 				row.Cells.Add(ListShowing[i].Description);
-				if(Category==DisplayFieldCategory.OrthoChart && ListShowing[i].InternalName=="Signature Box") {
-					row.Cells.Add("");
-				}
-				else {
-					row.Cells.Add(ListShowing[i].ColumnWidth.ToString());
-				}
+				row.Cells.Add(ListShowing[i].ColumnWidth.ToString());
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
