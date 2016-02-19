@@ -55,7 +55,7 @@ namespace OpenDental{
 			this.gridInsPlanFiles.Location = new System.Drawing.Point(12, 58);
 			this.gridInsPlanFiles.Name = "gridInsPlanFiles";
 			this.gridInsPlanFiles.ScrollValue = 0;
-			this.gridInsPlanFiles.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
+			this.gridInsPlanFiles.SelectionMode = OpenDental.UI.GridSelectionMode.None;
 			this.gridInsPlanFiles.Size = new System.Drawing.Size(950, 596);
 			this.gridInsPlanFiles.TabIndex = 8;
 			this.gridInsPlanFiles.Title = "Ins Plan Files To Import";

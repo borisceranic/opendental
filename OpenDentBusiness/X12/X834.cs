@@ -8,6 +8,8 @@ namespace OpenDentBusiness {
 	///<summary>X12 834 Benefit Enrollment and Maintenance.  This transaction is used to push insurance plan information to pseudo clearinghouses.</summary>
 	public class X834:X12object {
 
+		///<summary>External reference to the file corresponding to this 834.</summary>
+		public string FilePath;
 		///<summary>All segments within the current transaction set (ST) of the 834 report.</summary>
     private List<X12Segment> _listSegments;
 		///<summary>The current segment within _listSegments.</summary>
@@ -15,7 +17,7 @@ namespace OpenDentBusiness {
 		///<summary>List of all transactions (ST loops) within the 834.</summary>
 		public List<Hx834_Tran> ListTransactions=new List<Hx834_Tran>();
 		///<summary>The current transaction within ListTransactions.</summary>
-		Hx834_Tran _tranCur;
+		private Hx834_Tran _tranCur;
 		
 		///<summary>Shortcut to get current segment based on _segNum.</summary>
 		private X12Segment _segCur {
@@ -174,6 +176,7 @@ namespace OpenDentBusiness {
 			_tranCur.ListMembers.Clear();
 			while(_segCur.IsType("INS")) {
 				Hx834_Member member=new Hx834_Member();
+				member.Tran=_tranCur;
 				ReadLoop2000_INS(member);
 				ReadLoop2000_REF_1(member);
 				ReadLoop2000_REF_2(member);
@@ -1597,6 +1600,8 @@ namespace OpenDentBusiness {
 
 	///<summary>Loop 2000</summary>
 	public class Hx834_Member {
+		///<summary>A reference to the transaction who owns this member.</summary>
+		public Hx834_Tran Tran;
 		///<summary>Loop 2000 INS</summary>
 		public X12_INS MemberLevelDetail;
 		///<summary>Loop 2000 REF_1</summary>
@@ -1682,8 +1687,6 @@ namespace OpenDentBusiness {
 		public string SubscriberId;
 		///<summary>The insurance plan group number.  Specified at member level in format.</summary>
 		public string GroupNum;
-		///<summary>Used externally to track whether or not this member has been imported into the database.</summary>
-		public bool IsImported;
 
 		public string GetPatMaintTypeDescript() {
 			if(MemberLevelDetail==null) {
