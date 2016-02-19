@@ -1029,22 +1029,41 @@ namespace OpenDentBusiness {
 			#endregion Adjustments
 			#region Paysplits
 			//paysplits-----------------------------------------------------------------------------------------
+			string whereClause="";//create whereClause variable so both queries get the same paysplits
+			if(fam!=null && fam.ListPats!=null && fam.ListPats.Length>0) {
+				whereClause="WHERE paysplit.PatNum IN("+string.Join(",",fam.ListPats.Select(x => POut.Long(x.PatNum)))+") ";
+			}
 			DataTable rawPay;
-			command="SELECT MAX(CheckNum) CheckNum,paysplit.ClinicNum,MAX(DatePay) DatePay,paysplit.PatNum,MAX(payment.PatNum) patNumPayment_,MAX(PayAmt) PayAmt,"//MAX function used to preserve behavior in Oracle.
-				+"paysplit.PayNum,paysplit.PayPlanNum,"
-				+"MAX(PayType) PayType,MAX(ProcDate) ProcDate,"+DbHelper.GroupConcat("ProcNum")+" ProcNums_, "
-				+"MAX(ProvNum) ProvNum,SUM(SplitAmt) splitAmt_,MAX(payment.PayNote) PayNote,MAX(paysplit.UnearnedType) UnearnedType "//Column names with MAX left the same as they should not be considered aggregate (even though they are).
+			//Column names with MAX left the same as they should not be considered aggregate (even though they are).
+			//MAX function used to preserve behavior in Oracle.
+			command="SELECT MAX(CheckNum) CheckNum,paysplit.ClinicNum,MAX(DatePay) DatePay,paysplit.PatNum,MAX(payment.PatNum) patNumPayment_,"
+				+"MAX(PayAmt) PayAmt,paysplit.PayNum,paysplit.PayPlanNum,MAX(PayType) PayType,MAX(ProcDate) ProcDate,'' AS ProcNums_,MAX(ProvNum) ProvNum,"
+				+"SUM(SplitAmt) splitAmt_,MAX(payment.PayNote) PayNote,MAX(paysplit.UnearnedType) UnearnedType "
 				+"FROM paysplit "
 				+"LEFT JOIN payment ON paysplit.PayNum=payment.PayNum "
-				+"WHERE (";
-			for(int i=0;i<fam.ListPats.Length;i++) {
-				if(i!=0) {
-					command+="OR ";
-				}
-				command+="paysplit.PatNum ="+POut.Long(fam.ListPats[i].PatNum)+" ";
-			}
-			command+=") GROUP BY DatePay,paysplit.PayPlanNum,paysplit.PayNum,paysplit.PatNum,paysplit.ClinicNum ORDER BY DatePay";//ProcDate ORDER BY ProcDate";
+				+whereClause
+				//if this GROUP BY changes, the foreach loop below must be changed to match
+				+"GROUP BY paysplit.DatePay,paysplit.PayPlanNum,paysplit.PayNum,paysplit.PatNum,paysplit.ClinicNum ORDER BY DatePay";//ProcDate ORDER BY ProcDate";
 			rawPay=dcon.GetTable(command);
+			command="SELECT * FROM paysplit "+whereClause;
+			List<PaySplit> listPaysplits=Crud.PaySplitCrud.SelectMany(command).FindAll(x => x.ProcNum>0);
+			foreach(DataRow rowRp in rawPay.Rows) {
+				if(listPaysplits.Count==0) {
+					break;
+				}
+				//these are the GROUP BY columns from the rawPay query above, used to select the ProcNums from all of the paysplits using the same grouping
+				DateTime rpDatePay=PIn.Date(rowRp["DatePay"].ToString());
+				long rpPayPlanNum=PIn.Long(rowRp["PayPlanNum"].ToString());
+				long rpPayNum=PIn.Long(rowRp["PayNum"].ToString());
+				long rpPatNum=PIn.Long(rowRp["PatNum"].ToString());
+				long rpClinicNum=PIn.Long(rowRp["ClinicNum"].ToString());
+				//if the GROUP BY for the query used to fill table rawPay changes, this Linq needs to be changed to match exactly
+				List<PaySplit> listPaySplitMatches=listPaysplits.FindAll(x => x.DatePay==rpDatePay && x.PayPlanNum==rpPayPlanNum && x.PayNum==rpPayNum
+					&& x.PatNum==rpPatNum && x.ClinicNum==rpClinicNum);
+				if(listPaySplitMatches.Count>0) {
+					rowRp["ProcNums_"]=string.Join(",",listPaySplitMatches.Select(x => x.ProcNum));
+				}
+			}
 			decimal payamt;
 			for(int i=0;i<rawPay.Rows.Count;i++){
 				if(isInvoice) {
@@ -1118,7 +1137,7 @@ namespace OpenDentBusiness {
 				}
 				row["ProcNum"]="0";
 				row["ProcNumLab"]="";
-				row["procsOnObj"]=PIn.ByteArray(rawPay.Rows[i]["ProcNums_"]);
+				row["procsOnObj"]=rawPay.Rows[i]["ProcNums_"];
 				//Odd that this shows only one provider on the payment when there could be multiple, but there is no easy way to fix this currently.
 				row["prov"]=Providers.GetAbbr(PIn.Long(rawPay.Rows[i]["ProvNum"].ToString()));
 				row["StatementNum"]="0";
@@ -1131,30 +1150,42 @@ namespace OpenDentBusiness {
 			#region Claims
 			//claims (do not affect balance)-------------------------------------------------------------------------
 			DataTable rawClaim;
+			string whereAndClause="";
+			if(fam!=null&&fam.ListPats!=null&&fam.ListPats.Length>0) {
+				whereAndClause="AND claim.PatNum IN ("+string.Join(",",fam.ListPats.Select(x => x.PatNum))+") ";
+			}
 			command="SELECT CarrierName,ClaimFee,claim.ClaimNum,ClaimStatus,ClaimType,claim.ClinicNum,DateReceived,DateService,"
-				+"claim.DedApplied,claim.InsPayEst,"
-				+"claim.InsPayAmt,claim.PatNum,SUM(ProcFee*(BaseUnits+(CASE WHEN UnitQty<1 THEN 1 ELSE UnitQty END))) procAmt_,"
-				+DbHelper.GroupConcat("claimproc.ProcNum")+" ProcNums_,ProvTreat,"
-				+"claim.ReasonUnderPaid,claim.WriteOff "
+				+"claim.DedApplied,claim.InsPayEst,claim.InsPayAmt,claim.PatNum,'' ProcNums_,ProvTreat,claim.ReasonUnderPaid,claim.WriteOff,"
+				+"SUM(ProcFee*(BaseUnits+(CASE WHEN UnitQty<1 THEN 1 ELSE UnitQty END))) procAmt_ "
 				+"FROM claim "
 				+"LEFT JOIN insplan ON claim.PlanNum=insplan.PlanNum "
 				+"LEFT JOIN carrier ON carrier.CarrierNum=insplan.CarrierNum "
 				+"INNER JOIN claimproc ON claimproc.ClaimNum=claim.ClaimNum "
 				+"LEFT JOIN procedurelog ON claimproc.ProcNum=procedurelog.ProcNum "
 				+"WHERE ClaimType != 'PreAuth' "
-				+"AND (";
-			for(int i=0;i<fam.ListPats.Length;i++){
-				if(i!=0){
-					command+="OR ";
-				}
-				command+="claim.PatNum ="+POut.Long(fam.ListPats[i].PatNum)+" ";
-			}
-			command+=") GROUP BY CarrierName,claim.ClaimNum,ClaimFee,claim.ClaimNum,ClaimStatus,ClaimType,claim.ClinicNum,DateReceived,DateService,"
-				+"claim.DedApplied,claim.InsPayEst,"
-				+"claim.InsPayAmt,claim.PatNum,ProvTreat,"
-				+"claim.ReasonUnderPaid,claim.WriteOff "
+				+whereAndClause
+				+"GROUP BY carrier.CarrierName,claim.ClaimNum,claim.ClaimFee,claim.ClaimStatus,claim.ClaimType,"
+				+"claim.ClinicNum,claim.DateReceived,claim.DateService,claim.DedApplied,claim.InsPayEst,claim.InsPayAmt,"
+				+"claim.PatNum,claim.ProvTreat,claim.ReasonUnderPaid,claim.WriteOff "
 				+"ORDER BY DateService";
 			rawClaim=dcon.GetTable(command);
+			//Select the claimprocs attached to claims for this patient using the same list of pats from family where the claim is not a preauth
+			//and there is a ProcNum on the claimproc.  Used to highlight the procs attached to a claim when the claim is selected.
+			command="SELECT claim.ClaimNum,claimproc.ProcNum "
+				+"FROM claim "
+				+"INNER JOIN claimproc ON claimproc.ClaimNum=claim.ClaimNum AND claimproc.ProcNum>0 "
+				+"WHERE claim.ClaimType!='PreAuth' "
+				+whereAndClause;
+			DataTable rawProcNumsClaim=dcon.GetTable(command);
+			foreach(DataRow rcRow in rawClaim.Rows) {
+				if(rawProcNumsClaim.Rows.Count==0) {
+					break;
+				}
+				List<DataRow> listRowMatches=rawProcNumsClaim.Rows.OfType<DataRow>().ToList().FindAll(x => x["ClaimNum"].ToString()==rcRow["ClaimNum"].ToString());
+				if(listRowMatches.Count>0) {
+					rcRow["ProcNums_"]=string.Join(",",listRowMatches.Select(x => PIn.Long(x["ProcNum"].ToString())));
+				}
+			}
 			DateTime daterec;
 			decimal amtpaid;//can be different than amt if claims show UCR.
 			decimal procAmt;
@@ -1301,7 +1332,7 @@ namespace OpenDentBusiness {
 				row["ProcCode"]=Lans.g("AccountModule","Claim");
 				row["ProcNum"]="0";
 				row["ProcNumLab"]="";
-				row["procsOnObj"]=PIn.ByteArray(rawClaim.Rows[i]["ProcNums_"]);
+				row["procsOnObj"]=rawClaim.Rows[i]["ProcNums_"];
 				row["prov"]=Providers.GetAbbr(PIn.Long(rawClaim.Rows[i]["ProvTreat"].ToString()));
 				row["StatementNum"]="0";
 				row["ToothNum"]="";
