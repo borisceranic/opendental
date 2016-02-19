@@ -11581,6 +11581,7 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX emailattach_EmailTemplateNum ON emailattach (EmailTemplateNum)";
 					Db.NonQ(command);
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - emailaddresses"));//No translation in convert script.
 				command="SELECT emailaddress.EmailAddressNum, emailaddress.EmailPassword FROM emailaddress";
 				DataTable table=Db.GetTable(command);
 				for(int i=0;i < table.Rows.Count;i++) {
@@ -11648,6 +11649,7 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'PerioSkipMissingTeeth','1')";
 					Db.NonQ(command);
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - CDT 2016"));//No translation in convert script.
 				//Moving codes to the Obsolete category that were deleted in CDT 2016.
 				if(CultureInfo.CurrentCulture.Name.EndsWith("US")) {//United States
 					//Move deprecated codes to the Obsolete procedure code category.
@@ -11827,6 +11829,7 @@ namespace OpenDentBusiness {
 						+"VALUES ((SELECT MAX(DefNum)+1 FROM definition),38,'Provider',1,'')";
 					Db.NonQ(command);
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - insverify / insplans"));//No translation in convert script.
 				string insBenefitEnumValue="1";//VerifyTypes.InsuranceBenefit
 				string patientEnrollmentEnumValue="2";//VerifyTypes.PatientEnrollment
 				command="SELECT * FROM insplan";
@@ -11844,6 +11847,7 @@ namespace OpenDentBusiness {
 						Db.NonQ(command);
 					}
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - insverify / patplans"));//No translation in convert script.
 				command="SELECT * FROM patplan";
 				DataTable dtPatPlans=Db.GetTable(command);
 				for(int i=0;i<dtPatPlans.Rows.Count;i++) {
@@ -11859,6 +11863,7 @@ namespace OpenDentBusiness {
 						Db.NonQ(command);
 					}
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - perio"));//No translation in convert script.
 				//Perio exams treat implants as not missing
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES('PerioTreatImplantsAsNotMissing','1')";
@@ -11987,6 +11992,7 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'AppointmentClinicTimeReset','0')";
 					Db.NonQ(command);
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - screenings"));//No translation in convert script.
 				//Screen Groups need the ability to be set up ahead of time prior to the actual screenings.
 				//Therefore we need to move the information regarding the screen group from the screen table to the screengroup table,
 				//since we used to save location and screener information on the screen instead of the screen group.
@@ -12073,6 +12079,7 @@ namespace OpenDentBusiness {
 				Db.NonQ(command);
 				command="ALTER TABLE screen DROP COLUMN GradeSchool";
 				Db.NonQ(command);
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - proctp add abbr column"));//No translation in convert script.
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE proctp ADD ProcAbbr varchar(50) NOT NULL";
 					Db.NonQ(command);
@@ -12081,6 +12088,7 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE proctp ADD ProcAbbr varchar2(50)";
 					Db.NonQ(command);
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - proctp update abbr column"));//No translation in convert script.
 				//Update the new ProcAbbr column on the proctp column to match the AbbrDesc of the corresponding procedurecode.
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="UPDATE proctp,procedurecode SET proctp.ProcAbbr=procedurecode.AbbrDesc WHERE proctp.ProcCode=procedurecode.ProcCode";
@@ -12114,6 +12122,7 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX screen_SheetNum ON screen (SheetNum)";
 					Db.NonQ(command);
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - signalod"));//No translation in convert script.
 				//Form Level Signal Processing Phase I
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE signalod ADD FKey bigint NOT NULL";
@@ -12140,6 +12149,7 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				#region Security Timestamp Tables (grouped by table instead of by column)
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - adjustment security"));//No translation in convert script.
 				//adjustment table
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE adjustment ADD SecUserNumEntry bigint NOT NULL";
@@ -12165,6 +12175,7 @@ namespace OpenDentBusiness {
 					command="UPDATE adjustment SET SecDateTEdit = SYSTIMESTAMP";
 					Db.NonQ(command);
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - appointment security"));//No translation in convert script.
 				//appointment table
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE appointment ADD SecUserNumEntry bigint NOT NULL";
@@ -12190,6 +12201,7 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE appointment MODIFY SecDateEntry NOT NULL";
 					Db.NonQ(command);
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - carrier security"));//No translation in convert script.
 				//carrier table
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE carrier ADD SecUserNumEntry bigint NOT NULL";
@@ -12223,6 +12235,7 @@ namespace OpenDentBusiness {
 					command="UPDATE carrier SET SecDateTEdit = SYSTIMESTAMP";
 					Db.NonQ(command);
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - claim security"));//No translation in convert script.
 				//claim table
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE claim ADD SecUserNumEntry bigint NOT NULL";
@@ -12256,6 +12269,7 @@ namespace OpenDentBusiness {
 					command="UPDATE claim SET SecDateTEdit = SYSTIMESTAMP";
 					Db.NonQ(command);
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - claimpayment security"));//No translation in convert script.
 				//claimpayment table
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE claimpayment ADD SecUserNumEntry bigint NOT NULL";
@@ -12289,6 +12303,7 @@ namespace OpenDentBusiness {
 					command="UPDATE claimpayment SET SecDateTEdit = SYSTIMESTAMP";
 					Db.NonQ(command);
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - claimproc security"));//No translation in convert script.
 				//claimproc table
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE claimproc ADD SecUserNumEntry bigint NOT NULL";
@@ -12322,6 +12337,7 @@ namespace OpenDentBusiness {
 					command="UPDATE claimproc SET SecDateTEdit = SYSTIMESTAMP";
 					Db.NonQ(command);
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - fee security"));//No translation in convert script.
 				//fee table
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE fee ADD SecUserNumEntry bigint NOT NULL";
@@ -12355,6 +12371,7 @@ namespace OpenDentBusiness {
 					command="UPDATE fee SET SecDateTEdit = SYSTIMESTAMP";
 					Db.NonQ(command);
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - feesched security"));//No translation in convert script.
 				//feesched table
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE feesched ADD SecUserNumEntry bigint NOT NULL";
@@ -12388,6 +12405,7 @@ namespace OpenDentBusiness {
 					command="UPDATE feesched SET SecDateTEdit = SYSTIMESTAMP";
 					Db.NonQ(command);
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - insplan security"));//No translation in convert script.
 				//insplan table
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE insplan ADD SecUserNumEntry bigint NOT NULL";
@@ -12421,6 +12439,7 @@ namespace OpenDentBusiness {
 					command="UPDATE insplan SET SecDateTEdit = SYSTIMESTAMP";
 					Db.NonQ(command);
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - inssub security"));//No translation in convert script.
 				//inssub table
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE inssub ADD SecUserNumEntry bigint NOT NULL";
@@ -12454,6 +12473,7 @@ namespace OpenDentBusiness {
 					command="UPDATE inssub SET SecDateTEdit = SYSTIMESTAMP";
 					Db.NonQ(command);
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - patfield security"));//No translation in convert script.
 				//patfield table
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE patfield ADD SecUserNumEntry bigint NOT NULL";
@@ -12487,6 +12507,7 @@ namespace OpenDentBusiness {
 					command="UPDATE patfield SET SecDateTEdit = SYSTIMESTAMP";
 					Db.NonQ(command);
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - patient security"));//No translation in convert script.
 				//patient table
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE patient ADD SecUserNumEntry bigint NOT NULL";
@@ -12512,6 +12533,7 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE patient MODIFY SecDateEntry NOT NULL";
 					Db.NonQ(command);
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - payment security"));//No translation in convert script.
 				//payment table
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE payment ADD SecUserNumEntry bigint NOT NULL";
@@ -12537,6 +12559,7 @@ namespace OpenDentBusiness {
 					command="UPDATE payment SET SecDateTEdit = SYSTIMESTAMP";
 					Db.NonQ(command);
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - paysplit security"));//No translation in convert script.
 				//paysplit table
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE paysplit ADD SecUserNumEntry bigint NOT NULL";
@@ -12562,6 +12585,7 @@ namespace OpenDentBusiness {
 					command="UPDATE paysplit SET SecDateTEdit = SYSTIMESTAMP";
 					Db.NonQ(command);
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - procedurelog security"));//No translation in convert script.
 				//procedurelog table
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE procedurelog ADD SecUserNumEntry bigint NOT NULL";
@@ -12587,6 +12611,7 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE procedurelog MODIFY SecDateEntry NOT NULL";
 					Db.NonQ(command);
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - proctp security"));//No translation in convert script.
 				//proctp table
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE proctp ADD SecUserNumEntry bigint NOT NULL";
@@ -12620,6 +12645,7 @@ namespace OpenDentBusiness {
 					command="UPDATE proctp SET SecDateTEdit = SYSTIMESTAMP";
 					Db.NonQ(command);
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - treatplan security"));//No translation in convert script.
 				//treatplan table
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE treatplan ADD SecUserNumEntry bigint NOT NULL";
@@ -12654,6 +12680,7 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				#endregion Security Timestamp Tables (grouped by table instead of by column)
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - tasklists"));//No translation in convert script.
 				//Add TaskListCreate permission to everyone
 				command="SELECT DISTINCT UserGroupNum FROM grouppermission";
 				table = Db.GetTable(command);
@@ -12827,6 +12854,7 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX statement_SuperFamily ON statement (SuperFamily)";
 					Db.NonQ(command);
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - super billing"));//No translation in convert script.
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE patient ADD HasSuperBilling tinyint NOT NULL";
 					Db.NonQ(command);
@@ -12956,6 +12984,7 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'LocalTimeOverridesServerTime','0')";
 					Db.NonQ(command);
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - insplan require verify"));//No translation in convert script.
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE insplan ADD HideFromVerifyList tinyint NOT NULL";
 					Db.NonQ(command);
