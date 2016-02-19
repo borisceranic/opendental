@@ -14,6 +14,7 @@ using OpenDental.UI;
 
 namespace OpenDental {
 	public partial class FormSheetFillEdit:Form {
+		///<summary>Will be null if deleted.</summary>
 		public Sheet SheetCur;
 		private bool mouseIsDown;
 		///<summary>A list of points for a line currently being drawn.  Once the mouse is raised, this list gets cleared.</summary>
@@ -1049,8 +1050,13 @@ namespace OpenDental {
 			if(!MsgBox.Show(this,true,"Delete?")){
 				return;
 			}
-			Sheets.DeleteObject(SheetCur.SheetNum);
-			SecurityLogs.MakeLogEntry(Permissions.SheetEdit,SheetCur.PatNum,SheetCur.Description+" deleted from "+SheetCur.DateTimeSheet.ToShortDateString());
+			if(SheetCur.SheetType==SheetTypeEnum.Screening) {
+				Screens.DeleteForSheet(SheetCur.SheetNum);
+			}
+			Sheets.Delete(SheetCur.SheetNum);
+			SecurityLogs.MakeLogEntry(Permissions.SheetEdit,SheetCur.PatNum,SheetCur.Description
+				+" "+Lan.g(this,"deleted from")+" "+SheetCur.DateTimeSheet.ToShortDateString());
+			SheetCur=null;
 			DialogResult=DialogResult.OK;
 		}
 

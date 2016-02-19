@@ -112,14 +112,6 @@ namespace OpenDentBusiness{
 					case "Comments":
 						screen.Comments=field.FieldValue;
 						break;
-					case "ChartSealantTreatment":
-						if(sheet.PatNum!=0) {
-							//Digest any TP'd sealants here
-							ProcessScreenChart(sheet,new List<string>() { "ChartSealantTreatment" });
-						}
-						break;
-					case "ChartSealantComplete"://Do nothing.
-						break;
 				}
 			}
 			if(screen.ScreenNum==0) {
@@ -131,136 +123,144 @@ namespace OpenDentBusiness{
 			return screen;
 		}
 
-		///<summary>Takes a screening sheet that is associated to a patient and processes any corresponding ScreenChart found.
+		///<summary>Takes a screening sheet that is associated to a patient and processes any corresponding ScreenCharts found.
 		///Processing will create treatment planned or completed procedures for the patient.
-		///Supply the sheet and then a list of the toothcharts to digest.  This way it can be done one at a time or all at once as desired.</summary>
-		public static void ProcessScreenChart(Sheet sheet,List<string> listScreenChartNames) {
+		///Supply the sheet and then a bitwise enum of screen chart types to digest.</summary>
+		public static void ProcessScreenChart(Sheet sheet,ScreenChartType chartTypes) {
 			//No need to check RemotingRole; no call to db.
 			if(sheet==null || sheet.PatNum==0) {
 				return;//An invalid screening sheet was passed in.
 			}
-			foreach(string chartName in listScreenChartNames) {//For each chart specified for digestion
-				string[] toothValues=null;
-				foreach(SheetField field in sheet.SheetFields) {//Go through the supplied sheet's fields and find that field.
-					if(field.FieldName!=chartName) {
-						continue;
-					}
-					toothValues=field.FieldValue.Split(';');//When found, start digesting it.
-					break;				
-				}
-				if(toothValues==null) {
+			string[] toothValues=new string[0];
+			foreach(SheetField field in sheet.SheetFields) {//Go through the supplied sheet's fields and find that field.
+				if((chartTypes.HasFlag(ScreenChartType.TP) && field.FieldName=="ChartSealantTreatment")
+					|| (chartTypes.HasFlag(ScreenChartType.C) && field.FieldName=="ChartSealantComplete")) 
+				{
+					toothValues=field.FieldValue.Split(';');
+					ScreenChartType chartType=(field.FieldName=="ChartSealantTreatment") ? ScreenChartType.TP : ScreenChartType.C;
+					ProcessScreenChartHelper(sheet.PatNum,toothValues,chartType);
 					continue;
 				}
-				for(int i=0;i<toothValues.Length;i++) {//toothValues is in the order from low to high tooth number in the chart
-					if(!toothValues[i].Contains("S")) {
-						continue;
-					}
-					string surf="";
-					#region Parse ScreenChart FieldValues
-					int toothNum=0;
-					bool isMolar=false;
-					bool isRight=false;
-					bool isLing=false;
-					if(i<=1) {//Top left quadrant of toothchart
-						toothNum=i+2;
-						isMolar=true;
-						isRight=true;
-						isLing=true;
-					}
-					else if(i>1 && i<=3) {//Top middle-left quadrant of toothchart
-						toothNum=i+2;
-						isMolar=false;
-						isRight=true;
-						isLing=true;
-					}
-					else if(i>3 && i<=5) {//Top middle-right quadrant of toothchart
-						toothNum=i+8;
-						isMolar=false;
-						isRight=false;
-						isLing=true;
-					}
-					else if(i>5 && i<=7) {//Top right quadrant of toothchart
-						toothNum=i+8;
-						isMolar=true;
-						isRight=false;
-						isLing=true;
-					}
-					else if(i>7 && i<=9) {//Lower right quadrant of toothchart
-						toothNum=i+10;
-						isMolar=true;
-						isRight=false;
-						isLing=false;
-					}
-					else if(i>9 && i<=11) {//Lower middle-right quadrant of toothchart
-						toothNum=i+10;
-						isMolar=false;
-						isRight=false;
-						isLing=false;
-					}
-					else if(i>11 && i<=13) {//Lower middle-left quadrant of toothchart
-						toothNum=i+16;
-						isMolar=false;
-						isRight=true;
-						isLing=false;
-					}
-					else if(i>13) {//Lower left quadrant of toothchart
-						toothNum=i+16;
-						isMolar=true;
-						isRight=true;
-						isLing=false;
-					}
-					string[] surfaces=toothValues[i].Split(',');
-					if(isMolar) {
-						if(isRight) {
-							if(surfaces[0]=="S") {
-								surf+="D";
-							}
-							if(surfaces[1]=="S") {
-								surf+="M";
-							}
+			}
+		}
+
+		///<summary>Helper method so that we do not have to duplicate code.</summary>
+		private static void ProcessScreenChartHelper(long patNum,string[] toothValues,ScreenChartType chartType) {
+			for(int i=0;i<toothValues.Length;i++) {//toothValues is in the order from low to high tooth number in the chart
+				if(!toothValues[i].Contains("S")) {
+					continue;
+				}
+				string surf="";
+				#region Parse ScreenChart FieldValues
+				int toothNum=0;
+				bool isMolar=false;
+				bool isRight=false;
+				bool isLing=false;
+				if(i<=1) {//Top left quadrant of toothchart
+					toothNum=i+2;
+					isMolar=true;
+					isRight=true;
+					isLing=true;
+				}
+				else if(i>1 && i<=3) {//Top middle-left quadrant of toothchart
+					toothNum=i+2;
+					isMolar=false;
+					isRight=true;
+					isLing=true;
+				}
+				else if(i>3 && i<=5) {//Top middle-right quadrant of toothchart
+					toothNum=i+8;
+					isMolar=false;
+					isRight=false;
+					isLing=true;
+				}
+				else if(i>5 && i<=7) {//Top right quadrant of toothchart
+					toothNum=i+8;
+					isMolar=true;
+					isRight=false;
+					isLing=true;
+				}
+				else if(i>7 && i<=9) {//Lower right quadrant of toothchart
+					toothNum=i+10;
+					isMolar=true;
+					isRight=false;
+					isLing=false;
+				}
+				else if(i>9 && i<=11) {//Lower middle-right quadrant of toothchart
+					toothNum=i+10;
+					isMolar=false;
+					isRight=false;
+					isLing=false;
+				}
+				else if(i>11 && i<=13) {//Lower middle-left quadrant of toothchart
+					toothNum=i+16;
+					isMolar=false;
+					isRight=true;
+					isLing=false;
+				}
+				else if(i>13) {//Lower left quadrant of toothchart
+					toothNum=i+16;
+					isMolar=true;
+					isRight=true;
+					isLing=false;
+				}
+				string[] surfaces=toothValues[i].Split(',');
+				if(isMolar) {
+					if(isRight) {
+						if(surfaces[0]=="S") {
+							surf+="D";
 						}
-						else {//Is Left side
-							if(surfaces[0]=="S") {
-								surf+="M";
-							}
-							if(surfaces[1]=="S") {
-								surf+="D";
-							}
-						}
-						if(isLing && surfaces[2]=="S") {
-							surf+="L";
-						}
-						if(!isLing && surfaces[2]=="S") {
-							surf+="B";
+						if(surfaces[1]=="S") {
+							surf+="M";
 						}
 					}
-					else {//Front teeth, only look at 3rd surface position in control as that's the only one the user can see.
-						if(surfaces[2]=="S") {
-							surf="O";//NOTE: Not sure what surface to enter here... This is just a placeholder for now until we figure it out...
+					else {//Is Left side
+						if(surfaces[0]=="S") {
+							surf+="M";
+						}
+						if(surfaces[1]=="S") {
+							surf+="D";
 						}
 					}
-					#endregion Parse Toothchart FieldValues
-					surf=Tooth.SurfTidyForDisplay(surf,toothNum.ToString());
-					if(chartName=="ChartSealantTreatment") {//Create TP'd sealant procs if they don't already exist for this patient.
-						if(Procedures.GetProcForPatByToothSurfStat(sheet.PatNum,toothNum,surf,ProcStat.TP)!=null) {
-							continue;
-						}
-						Procedures.CreateProcForPat(sheet.PatNum,ProcedureCodes.GetCodeNum("D1351"),surf,toothNum,ProcStat.TP);
+					if(isLing && surfaces[2]=="S") {
+						surf+="L";
 					}
-					else {//Sealant chart, create complete sealants.
-						Procedure proc=Procedures.GetProcForPatByToothSurfStat(sheet.PatNum,toothNum,surf,ProcStat.TP);
-						if(proc==null) {//A TP procedure does not already exist.
-							Procedures.CreateProcForPat(sheet.PatNum,ProcedureCodes.GetCodeNum("D1351"),surf,toothNum,ProcStat.C);
-						}
-						else {//TP proc already exists, set it complete.
-							Procedure procOld=proc.Copy();
-							proc.ProcStatus=ProcStat.C;
-							proc.DateEntryC=DateTime.Now;
-							Procedures.Update(proc,procOld);
-						}
-						Recalls.Synch(sheet.PatNum);
+					if(!isLing && surfaces[2]=="S") {
+						surf+="B";
 					}
 				}
+				else {//Front teeth, only look at 3rd surface position in control as that's the only one the user can see.
+					if(surfaces[2]=="S") {
+						surf="O";//NOTE: Not sure what surface to enter here... This is just a placeholder for now until we figure it out...
+					}
+				}
+				#endregion Parse Toothchart FieldValues
+				surf=Tooth.SurfTidyForDisplay(surf,toothNum.ToString());
+				if(chartType==ScreenChartType.TP) {//Create TP'd sealant procs if they don't already exist for this patient.
+					if(Procedures.GetProcForPatByToothSurfStat(patNum,toothNum,surf,ProcStat.TP)!=null) {
+						continue;
+					}
+					Procedure proc=Procedures.CreateProcForPat(patNum,ProcedureCodes.GetCodeNum("D1351"),surf,toothNum,ProcStat.TP);
+					SecurityLogs.MakeLogEntry(Permissions.ProcEdit,patNum,"D1351 "+Lans.g("Screens","treatment planned during screening with tooth")
+						+" "+proc.ToothNum.ToString()+" "+Lans.g("Screens","and surface")+" "+proc.Surf);
+				}
+				else if(chartType==ScreenChartType.C) {
+					Procedure proc=Procedures.GetProcForPatByToothSurfStat(patNum,toothNum,surf,ProcStat.TP);
+					if(proc==null) {//A TP procedure does not already exist.
+						proc=Procedures.CreateProcForPat(patNum,ProcedureCodes.GetCodeNum("D1351"),surf,toothNum,ProcStat.C);
+					}
+					else {//TP proc already exists, set it complete.
+						Procedure procOld=proc.Copy();
+						proc.ProcStatus=ProcStat.C;
+						proc.DateEntryC=DateTime.Now;
+						Procedures.Update(proc,procOld);
+					}
+					SecurityLogs.MakeLogEntry(Permissions.ProcComplCreate,patNum,"D1351 "+Lans.g("Screens","set complete during screening with tooth")
+						+" "+proc.ToothNum.ToString()+" "+Lans.g("Screens","and surface")+" "+proc.Surf);
+				}
+			}
+			if(chartType==ScreenChartType.C) {
+				Recalls.Synch(patNum);
 			}
 		}
 
@@ -315,6 +315,15 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
+		///<summary>Deletes a Screen that has the attached sheetNum.  Deleting screen sheets are the same as deleting the screen itself.</summary>
+		public static void DeleteForSheet(long sheetNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),sheetNum);
+				return;
+			}
+			string command="DELETE FROM screen WHERE SheetNum="+POut.Long(sheetNum);
+			Db.NonQ(command);
+		}
 
 	}
 

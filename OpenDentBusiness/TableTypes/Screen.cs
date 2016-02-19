@@ -49,7 +49,14 @@ namespace OpenDentBusiness{
 		}
 	}
 
-	
+	///<summary></summary>
+	[Flags]
+	public enum ScreenChartType {
+		///<summary></summary>
+		TP=1,
+		///<summary></summary>
+		C=2
+	}
 
 	
 

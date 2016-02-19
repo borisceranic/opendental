@@ -180,15 +180,18 @@ namespace OpenDentBusiness {
 		}
 
 
-		///<summary>Creates a new procedure with the patient, surface, toothnum, and status for the specified procedure code.</summary>
-		public static void CreateProcForPat(long patNum,long codeNum,string surf,int toothNum,ProcStat procStatus) {
+		///<summary>Creates a new procedure with the patient, surface, toothnum, and status for the specified procedure code.
+		///Make sure to make a security log after calling this method.
+		///This method requires that Security.CurUser be set prior to invoking.</summary>
+		public static Procedure CreateProcForPat(long patNum,long codeNum,string surf,int toothNum,ProcStat procStatus) {
 			//No need to check RemotingRole; no call to db.
 			Patient pat=Patients.GetPat(patNum);
+			long provNum=Patients.GetProvNum(pat);
 			Procedure proc=new Procedure();
 			proc.PatNum=pat.PatNum;
 			proc.ClinicNum=Clinics.ClinicNum;
 			proc.ProcStatus=procStatus;
-			proc.ProvNum=pat.PriProv;
+			proc.ProvNum=provNum;
 			proc.Surf=surf; //Note: Sealant code D1351 is not a surface code by default, but can be manually set.  For screens they will be surface specific.
 			proc.ToothNum=toothNum.ToString();
 			proc.UserNum=Security.CurUser.UserNum;
@@ -212,9 +215,9 @@ namespace OpenDentBusiness {
 			long feeSch;
 			feeSch=Fees.GetFeeSched(pat,insPlanList,patPlanList,subList);
 			//Get the fee amount for medical or dental.
-			procFee=Fees.GetAmount0(proc.CodeNum,feeSch,proc.ClinicNum,proc.ProvNum);
+			procFee=Fees.GetAmount0(proc.CodeNum,feeSch,proc.ClinicNum,provNum);
 			if(insPlanPrimary!=null && insPlanPrimary.PlanType=="p") {//PPO
-				double provFee=Fees.GetAmount0(proc.CodeNum,Providers.GetProv(Patients.GetProvNum(pat)).FeeSched,proc.ClinicNum,proc.ProvNum);
+				double provFee=Fees.GetAmount0(proc.CodeNum,Providers.GetProv(provNum).FeeSched,proc.ClinicNum,provNum);
 				if(provFee>procFee) {
 					proc.ProcFee=provFee;
 				}
@@ -231,6 +234,7 @@ namespace OpenDentBusiness {
 			proc.DateEntryC=DateTime.Now;
 			proc.ProcNum=Procedures.Insert(proc);
 			Procedures.ComputeEstimates(proc,pat.PatNum,new List<ClaimProc>(),true,insPlanList,patPlanList,benefitList,pat.Age,subList);
+			return proc;
 		}
 
 		public static void UpdateAptNum(long procNum,long newAptNum) {
