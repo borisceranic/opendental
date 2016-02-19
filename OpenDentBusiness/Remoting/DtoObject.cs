@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
@@ -8,6 +9,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using Newtonsoft.Json;
 
 namespace OpenDentBusiness {
 	///<summary>Packages any object with a TypeName so that it can be serialized and deserialized better.</summary>
@@ -50,6 +52,11 @@ namespace OpenDentBusiness {
 			</Obj>
 			*/
 			writer.WriteStartElement("TypeName");
+			Type type=ConvertNameToType(TypeName);
+			if(type==typeof(object)) {
+				type=Obj.GetType();
+				TypeName=type.FullName;
+			}
 			writer.WriteString(TypeName);
 			writer.WriteEndElement();//TypeName
 			writer.WriteStartElement("Obj");
@@ -62,8 +69,7 @@ namespace OpenDentBusiness {
 			}
 			else {
 				//string assemb=Assembly.GetAssembly(typeof(Db)).FullName;//"OpenDentBusiness, Version=14.3.0.0, Culture=neutral, PublicKeyToken=null"
-				Type type=ConvertNameToType(TypeName);//,assemb);
-				XmlSerializer serializer = new XmlSerializer(type);
+				XmlSerializer serializer=new XmlSerializer(type);
 				serializer.Serialize(writer,Obj);
 			}
 			writer.WriteEndElement();//Obj
@@ -111,7 +117,7 @@ namespace OpenDentBusiness {
 			else {
 				Obj=serializer.Deserialize(reader2);
 			}
-				//Convert.ChangeType(serializer.Deserialize(reader2),type);
+			//Convert.ChangeType(serializer.Deserialize(reader2),type);
 		}
 
 		///<summary>Required by IXmlSerializable</summary>
@@ -119,11 +125,31 @@ namespace OpenDentBusiness {
 			return (null);
 		}
 
-		///<summary>We must pass in a matching array of types for situations where nulls are used in parameters.  Otherwise, we won't know the parameter type.</summary>
+		///<summary>We must pass in a matching array of types for situations where nulls are used in parameters.
+		///Otherwise, we won't know the parameter type.
+		///This method needs to create a "deep copy" of all objects passed in because we will be escaping characters within string variables.
+		///Since we do not know what objects are being passed in, we decided to use JSON to generically serialize each object.
+		///JSON seems to handle invalid characters better than XML even though it has its own quirks.</summary>
 		public static DtoObject[] ConstructArray(object[] objArray,Type[] objTypes) {
 			DtoObject[] retVal=new DtoObject[objArray.Length];
+			JsonSerializerSettings jsonSettings=new JsonSerializerSettings() { TypeNameHandling=TypeNameHandling.Auto };
 			for(int i=0;i<objArray.Length;i++) {
-				retVal[i]=new DtoObject(objArray[i],objTypes[i]);
+				object objCur=objArray[i];
+				Type typeCur=objTypes[i];
+				DtoObject dtoCur=new DtoObject(objCur,typeCur);
+				Type typeElement=typeCur;
+				if(typeCur!=typeof(string) && typeCur.IsGenericType) {//get the type of the items in the List
+					typeElement=typeCur.GetGenericArguments()[0];
+				}
+				if(objCur==null
+					|| (typeCur==typeof(string) && string.IsNullOrEmpty(objCur.ToString()))//if object is a string and is null or empty, just add as-is
+					|| (typeElement!=typeof(string) && typeElement.IsValueType))//if object is either value typed or a list of value typed objs, just add as-is
+				{
+					retVal[i]=dtoCur;
+					continue;
+				}
+				//we only need to create a deep copy of all objects that are strings or complex objects which may contain strings.
+				retVal[i]=JsonConvert.DeserializeObject<DtoObject>(JsonConvert.SerializeObject(dtoCur,jsonSettings),jsonSettings);
 			}
 			return retVal;
 		}

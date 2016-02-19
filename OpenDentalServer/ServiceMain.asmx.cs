@@ -22,10 +22,6 @@ namespace OpenDentalServer {
 		/// <summary>Pass in a serialized dto.  It returns a dto which must be deserialized by the client.</summary>
 		[WebMethod]
 		public string ProcessRequest(string dtoString) {
-			//The web service (xml) serializer/deserializer is removing the '\r' portion of our newlines during the data transfer. 
-			//Replacing the string is not the best solution but it works for now. The replacing happens here (server side) and after result is returned on the client side.
-			//It's done server side for usage purposes within the methods being called (exampe: inserting into db) and then on the client side for displaying purposes.
-			dtoString=dtoString.Replace("\n","\r\n");
 			#if DEBUG
 				//System.Threading.Thread.Sleep(100);//to test slowness issues with web service.
 			#endif
@@ -269,8 +265,7 @@ namespace OpenDentalServer {
 					}
 					object[] paramObjs=DtoObject.GenerateObjects(parameters);
 					string strResult=(string)methodInfo.Invoke(null,paramObjs);
-					//strResult=strResult.Replace("\r","\\r");
-					//return XmlConverter.Serialize(typeof(string),strResult);
+					strResult=XmlConverter.XmlEscape(strResult);
 					return strResult;
 				}
 				else if(type == typeof(DtoGetBool)) {

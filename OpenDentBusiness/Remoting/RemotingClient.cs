@@ -137,7 +137,7 @@ namespace OpenDentBusiness {
 				exception=(DtoException)DataTransferObject.Deserialize(result);
 			}
 			catch {
-				return result;
+				return XmlConverter.XmlUnescape(result);
 			}
 			throw ThrowExceptionForDto(exception);
 		}
@@ -169,14 +169,7 @@ namespace OpenDentBusiness {
 			//Mozilla/4.0 (compatible; MSIE 6.0; MS Web Services Client Protocol 4.0.30319.296)
 			//But DHS firewall doesn't allow that.  MSIE 6.0 is probably too old, and their firewall also looks for IE8Mercury.
 			service.UserAgent="Mozilla/4.0 (compatible; MSIE 7.0; MS Web Services Client Protocol 4.0.30319.296; IE8Mercury)";
-			string result=service.ProcessRequest(dtoString);
-			//The web service (xml) serializer/deserializer is removing the '\r' portion of our newlines during the data transfer. 
-			//Replacing the string is not the best solution but it works for now. The replacing happens inside ProcessRequest() (server side) and here (client side).
-			//It's done server side for usage purposes within the methods being called (exampe: inserting into db) and then on the client side for displaying purposes.
-			if(result!=null) {
-			  result=result.Replace("\n","\r\n");
-			}
-			return result;
+			return service.ProcessRequest(dtoString);
 		}
 
 		///<summary>Open Dental can require specific exceptions to be thrown.  This is a helper method that throws the correct exception type.

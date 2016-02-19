@@ -6,6 +6,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Diagnostics;
+using System.Linq;
 
 namespace OpenDentBusiness {
 	///<summary>Provides a base class for DTO classes.  A DTO class is a simple data storage object.  A DTO is the only format accepted by OpenDentBusiness.dll.</summary>
@@ -17,7 +18,13 @@ namespace OpenDentBusiness {
 		///<summary>This is a list of parameters that we are passing.  They can be various kinds of objects.</summary>
 		public DtoObject[] Params;
 		
+
 		public string Serialize(){
+			if(this.Params!=null) {
+				foreach(DtoObject dtoCur in Params.Where(x => x!=null && x.Obj!=null)) {
+					dtoCur.Obj=XmlConverter.XmlEscapeRecursion(dtoCur.Obj.GetType(),dtoCur.Obj);
+				}
+			}
 			StringBuilder strBuild=new StringBuilder();
 			XmlWriter writer=XmlWriter.Create(strBuild);
 			XmlSerializer serializer = new XmlSerializer(this.GetType());
@@ -47,6 +54,11 @@ namespace OpenDentBusiness {
 			DataTransferObject retVal=(DataTransferObject)serializer.Deserialize(reader);
 			strReader.Close();
 			reader.Close();
+			if(retVal.Params!=null) {
+				foreach(DtoObject dtoCur in retVal.Params.Where(x => x!=null && x.Obj!=null)) {
+					dtoCur.Obj=XmlConverter.XmlUnescapeRecursion(dtoCur.Obj.GetType(),dtoCur.Obj);
+				}
+			}
 			return retVal;
 		}
 	}
