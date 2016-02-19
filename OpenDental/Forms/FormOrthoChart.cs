@@ -477,7 +477,7 @@ namespace OpenDental {
 		}
 
 		private void butUseAutoNote_Click(object sender,EventArgs e) {
-			if(gridMain.SelectedCell.X==-1 || gridMain.SelectedCell.X==0) {
+			if(gridMain.SelectedCell.X==-1 || gridMain.SelectedCell.X==0 || gridMain.SelectedCell.X==_sigColIdx) {
 				MsgBox.Show(this,"Please select an editable Ortho Chart cell first.");
 				return;
 			}
