@@ -280,11 +280,8 @@ namespace OpenDental{
 				}
 				Security.PasswordTyped=password;
 			}
-			if(IsSimpleSwitch) {
-				SecurityLogs.MakeLogEntry(Permissions.UserLogOnOff,0,"User: "+CurUserSimpleSwitch.UserName+" has temporarily logged on.");
-			}
-			SecurityLogs.MakeLogEntry(Permissions.UserLogOnOff,0,"User: "+Security.CurUser.UserName+" has logged on.");
 			if(!IsSimpleSwitch) {
+				SecurityLogs.MakeLogEntry(Permissions.UserLogOnOff,0,"User: "+Security.CurUser.UserName+" has logged on.");
 				if(PrefC.GetBool(PrefName.TasksCheckOnStartup)) {
 					int taskcount=Tasks.UserTasksCount(Security.CurUser.UserNum);
 					if(taskcount>0) {

@@ -267,11 +267,12 @@ namespace OpenDental{
 		private UI.Button butChangeUser;
 		private bool _isQuickAdd=false;
 		///<summary>Users can temporarily log in on this form.  Defaults to Security.CurUser.</summary>
-		private Userod _curUser;
+		private Userod _curUser=Security.CurUser;
+		///<summary>True if the user clicked the Change User button.</summary>
+		private bool _hasUserChanged;
 
 		///<summary>Inserts are not done within this dialog, but must be done ahead of time from outside.  You must specify a procedure to edit, and only the changes that are made in this dialog get saved.  Only used when double click in Account, Chart, TP, and in ContrChart.AddProcedure().  The procedure may be deleted if new, and user hits Cancel.</summary>
 		public FormProcEdit(Procedure proc,Patient patCur,Family famCur,bool isQuickAdd=false){
-			_curUser=Security.CurUser;
 			ProcCur=proc;
 			ProcOld=proc.Copy();
 			PatCur=patCur;
@@ -2620,7 +2621,7 @@ namespace OpenDental{
 			this.buttonUseAutoNote.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.buttonUseAutoNote.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.buttonUseAutoNote.CornerRadius = 4F;
-			this.buttonUseAutoNote.Location = new System.Drawing.Point(704, 135);
+			this.buttonUseAutoNote.Location = new System.Drawing.Point(663, 135);
 			this.buttonUseAutoNote.Name = "buttonUseAutoNote";
 			this.buttonUseAutoNote.Size = new System.Drawing.Size(80, 22);
 			this.buttonUseAutoNote.TabIndex = 106;
@@ -4287,7 +4288,7 @@ namespace OpenDental{
 		private void signatureBoxWrapper_SignatureChanged(object sender,EventArgs e) {
 			SigChanged=true;
 			ProcCur.UserNum=_curUser.UserNum;
-			textUser.Text=Userods.GetName(ProcCur.UserNum);
+			textUser.Text=_curUser.UserName;
 		}
 
 		private void buttonUseAutoNote_Click(object sender,EventArgs e) {
@@ -5699,10 +5700,12 @@ namespace OpenDental{
 			FormLogOn FormChangeUser=new FormLogOn();
 			FormChangeUser.IsSimpleSwitch=true;
 			FormChangeUser.ShowDialog();
-			if(FormChangeUser.DialogResult==DialogResult.OK) {
-				_curUser=FormChangeUser.CurUserSimpleSwitch;
-				signatureBoxWrapper.ClearSignature();
-				textUser.Text=_curUser.UserName;
+			if(FormChangeUser.DialogResult==DialogResult.OK) { //if successful
+				_curUser=FormChangeUser.CurUserSimpleSwitch; //assign temp user
+				signatureBoxWrapper.ClearSignature(); //clear sig
+				textUser.Text=_curUser.UserName; //update user textbox.
+				SigChanged=true;
+				_hasUserChanged=true;
 			}
 		}
 
@@ -5748,6 +5751,10 @@ namespace OpenDental{
 					MsgBox.Show(this,"DPC should not be \"Not Specified\".");
 					return;
 				}
+			}
+			if(_hasUserChanged && signatureBoxWrapper.SigIsBlank && !MsgBox.Show(this,MsgBoxButtons.OKCancel,
+				"The signature box has not been re-signed.  Continuing will remove the previous signature from this procedure.  Exit anyway?")) {
+				return;
 			}
 			SaveAndClose();
 			Plugins.HookAddCode(this,"FormProcEdit.butOK_Click_end",ProcCur); 
