@@ -24,7 +24,6 @@ namespace UnitTests {
 		/// </summary>
 		private void InitializeComponent() {
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormUnitTests));
-			this.textResults = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.butNewDb = new System.Windows.Forms.Button();
 			this.label2 = new System.Windows.Forms.Label();
@@ -53,20 +52,15 @@ namespace UnitTests {
 			this.label11 = new System.Windows.Forms.Label();
 			this.textUserName = new System.Windows.Forms.TextBox();
 			this.groupDatabase = new System.Windows.Forms.GroupBox();
+			this.textResults = new System.Windows.Forms.RichTextBox();
+			this.label12 = new System.Windows.Forms.Label();
+			this.label13 = new System.Windows.Forms.Label();
+			this.textMiddleTierUser = new System.Windows.Forms.TextBox();
+			this.label14 = new System.Windows.Forms.Label();
+			this.textMiddleTierURI = new System.Windows.Forms.TextBox();
+			this.textMiddleTierPassword = new System.Windows.Forms.TextBox();
 			this.groupDatabase.SuspendLayout();
 			this.SuspendLayout();
-			// 
-			// textResults
-			// 
-			this.textResults.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.textResults.Location = new System.Drawing.Point(12, 304);
-			this.textResults.Multiline = true;
-			this.textResults.Name = "textResults";
-			this.textResults.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-			this.textResults.Size = new System.Drawing.Size(733, 491);
-			this.textResults.TabIndex = 1;
 			// 
 			// label1
 			// 
@@ -165,9 +159,8 @@ namespace UnitTests {
 			// 
 			// listType
 			// 
-			this.listType.Anchor = System.Windows.Forms.AnchorStyles.Top;
 			this.listType.FormattingEnabled = true;
-			this.listType.Location = new System.Drawing.Point(501, 50);
+			this.listType.Location = new System.Drawing.Point(337, 33);
 			this.listType.Name = "listType";
 			this.listType.Size = new System.Drawing.Size(99, 30);
 			this.listType.TabIndex = 22;
@@ -175,8 +168,7 @@ namespace UnitTests {
 			// 
 			// label7
 			// 
-			this.label7.Anchor = System.Windows.Forms.AnchorStyles.Top;
-			this.label7.Location = new System.Drawing.Point(498, 29);
+			this.label7.Location = new System.Drawing.Point(334, 12);
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(99, 18);
 			this.label7.TabIndex = 21;
@@ -253,8 +245,7 @@ namespace UnitTests {
 			// 
 			// textAddr
 			// 
-			this.textAddr.Anchor = System.Windows.Forms.AnchorStyles.Top;
-			this.textAddr.Location = new System.Drawing.Point(132, 32);
+			this.textAddr.Location = new System.Drawing.Point(9, 32);
 			this.textAddr.Multiline = true;
 			this.textAddr.Name = "textAddr";
 			this.textAddr.Size = new System.Drawing.Size(150, 20);
@@ -263,9 +254,8 @@ namespace UnitTests {
 			// 
 			// label9
 			// 
-			this.label9.Anchor = System.Windows.Forms.AnchorStyles.Top;
 			this.label9.AutoSize = true;
-			this.label9.Location = new System.Drawing.Point(132, 16);
+			this.label9.Location = new System.Drawing.Point(9, 16);
 			this.label9.Name = "label9";
 			this.label9.Size = new System.Drawing.Size(94, 13);
 			this.label9.TabIndex = 31;
@@ -273,9 +263,8 @@ namespace UnitTests {
 			// 
 			// label10
 			// 
-			this.label10.Anchor = System.Windows.Forms.AnchorStyles.Top;
 			this.label10.AutoSize = true;
-			this.label10.Location = new System.Drawing.Point(133, 57);
+			this.label10.Location = new System.Drawing.Point(10, 57);
 			this.label10.Name = "label10";
 			this.label10.Size = new System.Drawing.Size(66, 13);
 			this.label10.TabIndex = 32;
@@ -283,8 +272,7 @@ namespace UnitTests {
 			// 
 			// textPort
 			// 
-			this.textPort.Anchor = System.Windows.Forms.AnchorStyles.Top;
-			this.textPort.Location = new System.Drawing.Point(133, 74);
+			this.textPort.Location = new System.Drawing.Point(10, 74);
 			this.textPort.Name = "textPort";
 			this.textPort.Size = new System.Drawing.Size(150, 20);
 			this.textPort.TabIndex = 2;
@@ -292,18 +280,16 @@ namespace UnitTests {
 			// 
 			// labelPassword
 			// 
-			this.labelPassword.Anchor = System.Windows.Forms.AnchorStyles.Top;
 			this.labelPassword.AutoSize = true;
-			this.labelPassword.Location = new System.Drawing.Point(302, 57);
+			this.labelPassword.Location = new System.Drawing.Point(179, 57);
 			this.labelPassword.Name = "labelPassword";
-			this.labelPassword.Size = new System.Drawing.Size(53, 13);
+			this.labelPassword.Size = new System.Drawing.Size(91, 13);
 			this.labelPassword.TabIndex = 35;
-			this.labelPassword.Text = "Password";
+			this.labelPassword.Text = "MySQL Password";
 			// 
 			// textPassword
 			// 
-			this.textPassword.Anchor = System.Windows.Forms.AnchorStyles.Top;
-			this.textPassword.Location = new System.Drawing.Point(302, 73);
+			this.textPassword.Location = new System.Drawing.Point(179, 73);
 			this.textPassword.Multiline = true;
 			this.textPassword.Name = "textPassword";
 			this.textPassword.Size = new System.Drawing.Size(150, 20);
@@ -311,18 +297,16 @@ namespace UnitTests {
 			// 
 			// label11
 			// 
-			this.label11.Anchor = System.Windows.Forms.AnchorStyles.Top;
 			this.label11.AutoSize = true;
-			this.label11.Location = new System.Drawing.Point(302, 16);
+			this.label11.Location = new System.Drawing.Point(179, 16);
 			this.label11.Name = "label11";
-			this.label11.Size = new System.Drawing.Size(29, 13);
+			this.label11.Size = new System.Drawing.Size(67, 13);
 			this.label11.TabIndex = 37;
-			this.label11.Text = "User";
+			this.label11.Text = "MySQL User";
 			// 
 			// textUserName
 			// 
-			this.textUserName.Anchor = System.Windows.Forms.AnchorStyles.Top;
-			this.textUserName.Location = new System.Drawing.Point(302, 32);
+			this.textUserName.Location = new System.Drawing.Point(179, 32);
 			this.textUserName.Multiline = true;
 			this.textUserName.Name = "textUserName";
 			this.textUserName.Size = new System.Drawing.Size(150, 20);
@@ -331,7 +315,14 @@ namespace UnitTests {
 			// 
 			// groupDatabase
 			// 
-			this.groupDatabase.Anchor = System.Windows.Forms.AnchorStyles.Top;
+			this.groupDatabase.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupDatabase.Controls.Add(this.label12);
+			this.groupDatabase.Controls.Add(this.label13);
+			this.groupDatabase.Controls.Add(this.textMiddleTierUser);
+			this.groupDatabase.Controls.Add(this.label14);
+			this.groupDatabase.Controls.Add(this.textMiddleTierURI);
+			this.groupDatabase.Controls.Add(this.textMiddleTierPassword);
 			this.groupDatabase.Controls.Add(this.label9);
 			this.groupDatabase.Controls.Add(this.label11);
 			this.groupDatabase.Controls.Add(this.label7);
@@ -344,16 +335,82 @@ namespace UnitTests {
 			this.groupDatabase.Controls.Add(this.textPort);
 			this.groupDatabase.Location = new System.Drawing.Point(12, 0);
 			this.groupDatabase.Name = "groupDatabase";
-			this.groupDatabase.Size = new System.Drawing.Size(733, 100);
+			this.groupDatabase.Size = new System.Drawing.Size(789, 100);
 			this.groupDatabase.TabIndex = 38;
 			this.groupDatabase.TabStop = false;
 			this.groupDatabase.Text = "Connection Settings";
+			// 
+			// textResults
+			// 
+			this.textResults.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.textResults.Location = new System.Drawing.Point(12, 304);
+			this.textResults.Name = "textResults";
+			this.textResults.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+			this.textResults.Size = new System.Drawing.Size(789, 491);
+			this.textResults.TabIndex = 1;
+			this.textResults.Text = "";
+			// 
+			// label12
+			// 
+			this.label12.AutoSize = true;
+			this.label12.Location = new System.Drawing.Point(442, 16);
+			this.label12.Name = "label12";
+			this.label12.Size = new System.Drawing.Size(81, 13);
+			this.label12.TabIndex = 41;
+			this.label12.Text = "Middle Tier URI";
+			// 
+			// label13
+			// 
+			this.label13.AutoSize = true;
+			this.label13.Location = new System.Drawing.Point(442, 57);
+			this.label13.Name = "label13";
+			this.label13.Size = new System.Drawing.Size(92, 13);
+			this.label13.TabIndex = 43;
+			this.label13.Text = "Open Dental User";
+			// 
+			// textMiddleTierUser
+			// 
+			this.textMiddleTierUser.Location = new System.Drawing.Point(442, 73);
+			this.textMiddleTierUser.Multiline = true;
+			this.textMiddleTierUser.Name = "textMiddleTierUser";
+			this.textMiddleTierUser.Size = new System.Drawing.Size(150, 20);
+			this.textMiddleTierUser.TabIndex = 39;
+			this.textMiddleTierUser.Text = "Admin";
+			// 
+			// label14
+			// 
+			this.label14.AutoSize = true;
+			this.label14.Location = new System.Drawing.Point(609, 57);
+			this.label14.Name = "label14";
+			this.label14.Size = new System.Drawing.Size(116, 13);
+			this.label14.TabIndex = 42;
+			this.label14.Text = "Open Dental Password";
+			// 
+			// textMiddleTierURI
+			// 
+			this.textMiddleTierURI.Location = new System.Drawing.Point(442, 32);
+			this.textMiddleTierURI.Multiline = true;
+			this.textMiddleTierURI.Name = "textMiddleTierURI";
+			this.textMiddleTierURI.Size = new System.Drawing.Size(320, 20);
+			this.textMiddleTierURI.TabIndex = 38;
+			this.textMiddleTierURI.Text = "http://localhost:49262/ServiceMain.asmx";
+			// 
+			// textMiddleTierPassword
+			// 
+			this.textMiddleTierPassword.Location = new System.Drawing.Point(609, 73);
+			this.textMiddleTierPassword.Multiline = true;
+			this.textMiddleTierPassword.Name = "textMiddleTierPassword";
+			this.textMiddleTierPassword.Size = new System.Drawing.Size(150, 20);
+			this.textMiddleTierPassword.TabIndex = 40;
+			this.textMiddleTierPassword.Text = "pass";
 			// 
 			// FormUnitTests
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(757, 807);
+			this.ClientSize = new System.Drawing.Size(813, 807);
 			this.Controls.Add(this.groupDatabase);
 			this.Controls.Add(this.label8);
 			this.Controls.Add(this.butHL7);
@@ -386,8 +443,6 @@ namespace UnitTests {
 		}
 
 		#endregion
-
-		private System.Windows.Forms.TextBox textResults;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Button butNewDb;
 		private System.Windows.Forms.Label label2;
@@ -416,6 +471,13 @@ namespace UnitTests {
 		private System.Windows.Forms.Label label11;
 		private System.Windows.Forms.TextBox textUserName;
 		private System.Windows.Forms.GroupBox groupDatabase;
+		private System.Windows.Forms.RichTextBox textResults;
+		private System.Windows.Forms.Label label12;
+		private System.Windows.Forms.Label label13;
+		private System.Windows.Forms.TextBox textMiddleTierUser;
+		private System.Windows.Forms.Label label14;
+		private System.Windows.Forms.TextBox textMiddleTierURI;
+		private System.Windows.Forms.TextBox textMiddleTierPassword;
 	}
 }
 

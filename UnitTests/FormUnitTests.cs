@@ -1,15 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Reflection;
-using System.Text;
 using System.Windows.Forms;
-using OpenDentBusiness;
 using OpenDental;
-using OpenDental.UI;
+using OpenDentBusiness;
 
 namespace UnitTests {
 	public partial class FormUnitTests:Form {
@@ -41,12 +35,13 @@ namespace UnitTests {
 		}
 
 		private void butWebService_Click(object sender,EventArgs e) {
-			RemotingClient.ServerURI="http://localhost:49262/ServiceMain.asmx";
+			RemotingClient.ServerURI=textMiddleTierURI.Text;
 			Cursor=Cursors.WaitCursor;
 			try{
 				if(!isOracle){
-					Userod user=Security.LogInWeb("Admin","pass","",Application.ProductVersion,false);//Userods.EncryptPassword("pass",false)
+					Userod user=Security.LogInWeb(textMiddleTierUser.Text,textMiddleTierPassword.Text,"",Application.ProductVersion,false);
 					Security.CurUser=user;
+					Security.PasswordTyped=textMiddleTierPassword.Text;
 					RemotingClient.RemotingRole=RemotingRole.ClientWeb;
 				}
 				else if(isOracle) {
@@ -62,7 +57,22 @@ namespace UnitTests {
 			}
 			textResults.Text="";
 			Application.DoEvents();
-			textResults.Text+=WebServiceT.RunAll();
+			List<string> result=WebServiceT.RunAll();
+			for(int i=0;i<result.Count;i++) {
+				if(i>0) {
+					textResults.AppendText("\r\n");
+				}
+				textResults.SelectionStart=textResults.TextLength;
+				textResults.SelectionLength=0;
+				if(result[i].Contains("Passed")) {
+					textResults.SelectionColor=Color.Green;
+				}
+				else {
+					textResults.SelectionColor=Color.Red;
+				}
+				textResults.AppendText(result[i]);
+			}
+			textResults.SelectionColor=textResults.ForeColor;
 			Cursor=Cursors.Default;
 		}
 
