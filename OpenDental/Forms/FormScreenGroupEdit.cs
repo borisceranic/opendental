@@ -734,7 +734,20 @@ namespace OpenDental{
 				if(FormSFE.DialogResult!=DialogResult.OK) {
 					break;
 				}
-				Screens.CreateScreenFromSheet(sheet,screen);
+				if(FormSFE.SheetCur!=null) {//It wasn't deleted, create a screen.
+					Screens.CreateScreenFromSheet(sheet,screen);
+					//Now try and process the screening chart for treatment planned sealants.
+					foreach(SheetField field in sheet.SheetFields) {
+						if(field.FieldName=="ChartSealantTreatment") {
+							if(ProcedureCodes.GetCodeNum("D1351")==0) {
+								MsgBox.Show(this,"The required sealant code is not present in the database.  The screening chart will not be processed.");
+								break;
+							}
+							Screens.ProcessScreenChart(sheet,ScreenChartType.TP);
+							break;
+						}
+					}
+				}
 				screen.ScreenGroupOrder++;
 				FillGrid();
 				i=(i+1)%_listScreenPats.Count;//Causes the index to loop around when it gets to the end of the list so we can get to the beginning again.
@@ -766,10 +779,17 @@ namespace OpenDental{
 			}
 			FormSheetFillEdit FormSFE=new FormSheetFillEdit(sheet);
 			if(FormSFE.ShowDialog()==DialogResult.OK) {
-				//Digest the Sealant Chart
+				//Now try and process the screening chart for completed sealants.
+				if(FormSFE.SheetCur==null) {
+					return;
+				}
 				foreach(SheetField field in sheet.SheetFields) {
 					if(field.FieldName=="ChartSealantComplete") {
-						Screens.ProcessScreenChart(sheet,new List<string>() { "ChartSealantComplete" });
+						if(ProcedureCodes.GetCodeNum("D1351")==0) {
+							MsgBox.Show(this,"The required sealant code is not present in the database.  The screening chart will not be processed.");
+							break;
+						}
+						Screens.ProcessScreenChart(sheet,ScreenChartType.C);
 						break;
 					}
 				}

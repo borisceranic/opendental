@@ -195,8 +195,8 @@ namespace OpenDentBusiness{
 			Crud.SheetCrud.Update(sheet);
 		}
 
-		///<summary></summary>
-		public static void DeleteObject(long sheetNum) {
+		///<summary>Deletes all sheetfields related to the sheet passed in and then deletes the sheet itself.</summary>
+		public static void Delete(long sheetNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),sheetNum);
 				return;
