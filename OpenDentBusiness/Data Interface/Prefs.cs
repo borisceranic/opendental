@@ -106,7 +106,7 @@ namespace OpenDentBusiness{
 			if(!dictPrefs.ContainsKey(prefName.ToString())) {
 				throw new ApplicationException(prefName+" is an invalid pref name.");
 			}
-			if(PrefC.GetLong(prefName)==newValue) {
+			if(PIn.Long(dictPrefs[prefName.ToString()].ValueString)==newValue) {
 				return false;//no change needed
 			}
 			string command= "UPDATE preference SET "
@@ -122,7 +122,7 @@ namespace OpenDentBusiness{
 			Pref pref=new Pref();
 			pref.PrefName=prefName.ToString();
 			pref.ValueString=newValue.ToString();
-			Dictionary<string,Pref> dictPrefsUpdated=PrefC.GetDict();
+			Dictionary<string,Pref> dictPrefsUpdated=dictPrefs;
 			dictPrefsUpdated[prefName.ToString()]=pref;//in some cases, we just want to change the pref in local memory instead of doing a refresh afterwards.
 			PrefC.Dict=dictPrefsUpdated;
 			return retVal;
@@ -135,7 +135,7 @@ namespace OpenDentBusiness{
 			if(!dictPrefs.ContainsKey(prefName.ToString())) {
 				throw new ApplicationException(prefName+" is an invalid pref name.");
 			}
-			if(PrefC.GetDouble(prefName)==newValue) {
+			if(PIn.Double(dictPrefs[prefName.ToString()].ValueString)==newValue) {
 				return false;//no change needed
 			}
 			string command = "UPDATE preference SET "
@@ -170,7 +170,7 @@ namespace OpenDentBusiness{
 			if(!dictPrefs.ContainsKey(prefName.ToString())) {
 				throw new ApplicationException(prefName+" is an invalid pref name.");
 			}
-			if(!isForced && PrefC.GetBool(prefName)==newValue) {
+			if(!isForced && PIn.Bool(dictPrefs[prefName.ToString()].ValueString)==newValue) {
 				return false;//no change needed
 			}
 			string command="UPDATE preference SET "
@@ -186,7 +186,7 @@ namespace OpenDentBusiness{
 			Pref pref=new Pref();
 			pref.PrefName=prefName.ToString();
 			pref.ValueString=POut.Bool(newValue);
-			Dictionary<string,Pref> dictPrefsUpdated=PrefC.GetDict();
+			Dictionary<string,Pref> dictPrefsUpdated=dictPrefs;
 			dictPrefsUpdated[prefName.ToString()]=pref;
 			PrefC.Dict=dictPrefsUpdated;
 			return retVal;
@@ -209,7 +209,7 @@ namespace OpenDentBusiness{
 			if(!dictPrefs.ContainsKey(prefName.ToString())) {
 				throw new ApplicationException(prefName+" is an invalid pref name.");
 			}
-			if(PrefC.GetString(prefName)==newValue) {
+			if(dictPrefs[prefName.ToString()].ValueString==newValue) {
 				return false;//no change needed
 			}
 			string command = "UPDATE preference SET "
@@ -225,7 +225,7 @@ namespace OpenDentBusiness{
 			Pref pref=new Pref();
 			pref.PrefName=prefName.ToString();
 			pref.ValueString=newValue;
-			Dictionary<string,Pref> dictPrefsUpdated=PrefC.GetDict();
+			Dictionary<string,Pref> dictPrefsUpdated=dictPrefs;
 			dictPrefsUpdated[prefName.ToString()]=pref;
 			PrefC.Dict=dictPrefsUpdated;
 			return retVal;
@@ -248,7 +248,7 @@ namespace OpenDentBusiness{
 			if(!dictPrefs.ContainsKey(prefName)) {
 				throw new ApplicationException(prefName+" is an invalid pref name.");
 			}
-			if(PrefC.GetRaw(prefName)==newValue) {
+			if(dictPrefs[prefName].ValueString==newValue) {
 				return false;//no change needed
 			}
 			string command = "UPDATE preference SET "
@@ -264,7 +264,7 @@ namespace OpenDentBusiness{
 			Pref pref=new Pref();
 			pref.PrefName=prefName;
 			pref.ValueString=newValue;
-			Dictionary<string,Pref> dictPrefsUpdated=PrefC.GetDict();
+			Dictionary<string,Pref> dictPrefsUpdated=dictPrefs;
 			dictPrefsUpdated[prefName.ToString()]=pref;
 			PrefC.Dict=dictPrefsUpdated;
 			return retVal;
@@ -277,7 +277,7 @@ namespace OpenDentBusiness{
 			if(!dictPrefs.ContainsKey(prefName.ToString())) {
 				throw new ApplicationException(prefName+" is an invalid pref name.");
 			}
-			if(PrefC.GetDateT(prefName)==newValue) {
+			if(PIn.DateT(dictPrefs[prefName.ToString()].ValueString)==newValue) {
 				return false;//no change needed
 			}
 			string command = "UPDATE preference SET "
@@ -293,7 +293,7 @@ namespace OpenDentBusiness{
 			Pref pref=new Pref();
 			pref.PrefName=prefName.ToString();
 			pref.ValueString=POut.DateT(newValue,false);
-			Dictionary<string,Pref> dictPrefsUpdated=PrefC.GetDict();
+			Dictionary<string,Pref> dictPrefsUpdated=dictPrefs;
 			dictPrefsUpdated[prefName.ToString()]=pref;//in some cases, we just want to change the pref in local memory instead of doing a refresh afterwards.
 			PrefC.Dict=dictPrefsUpdated;
 			return retVal;
