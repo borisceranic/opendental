@@ -84,6 +84,7 @@ namespace OpenDentBusiness{
 		///<summary>For Canadian customers, tracks scaling insurance and periodontal scaling units for patients depending on coverage.</summary>
 		public double CanadaTimeUnits;
 		///<summary>Not a database column.  Only used for xml import function.</summary>
+		[CrudColumn(IsNotDbColumn=true)]
 		private string procCatDescript;
 		///<summary>Set to true for radiology procedures.  An EHR core measure uses this flag to help determine the denominator for rad orders.</summary>
 		public bool IsRadiology;
@@ -106,6 +107,7 @@ namespace OpenDentBusiness{
 		}
 
 		//[XmlElement(DataType="string",ElementName="ProcCatDescript")]
+		[XmlIgnore]
 		public string ProcCatDescript{
 			get{
 				if(ProcCat==0){//only used in xml import. We have an incomplete object.
