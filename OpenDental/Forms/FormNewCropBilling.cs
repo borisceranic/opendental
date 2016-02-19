@@ -1,4 +1,7 @@
-﻿using System;
+﻿using CodeBase;
+using OpenDental.UI;
+using OpenDentBusiness;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,10 +10,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Xml;
 using System.Windows.Forms;
-using OpenDental.UI;
-using OpenDentBusiness;
+using System.Xml;
 
 namespace OpenDental {
 	public partial class FormNewCropBilling:Form {
@@ -200,6 +201,7 @@ namespace OpenDental {
 			Cursor=Cursors.WaitCursor;
 			int numChargesAdded=0;
 			int numSkipped=0;
+			StringBuilder strBldArchivedPats=new StringBuilder();
 			for(int i=0;i<gridBillingList.Rows.Count;i++) {
 				long patNum=PIn.Long(gridBillingList.Rows[i].Cells[0].Text);
 				string npi=PIn.String(gridBillingList.Rows[i].Cells[1].Text);
@@ -242,6 +244,14 @@ namespace OpenDental {
 						//Set the patient's billing day to the start day on the repeat charge
 						Patient patOld=Patients.GetPat(repeatCur.PatNum);
 						Patient patNew=patOld.Copy();
+						//Check the patients status and move them to Archived if they are currently deleted.
+						if(patOld.PatStatus==PatientStatus.Deleted) {
+							patNew.PatStatus=PatientStatus.Archived;
+						}
+						//Notify the user about any deleted or archived patients that were just given a new repeating charge.
+						if(patOld.PatStatus==PatientStatus.Archived || patOld.PatStatus==PatientStatus.Deleted) {
+							strBldArchivedPats.AppendLine("#"+patOld.PatNum+" - "+patOld.GetNameLF());
+						}
 						patNew.BillingCycleDay=repeatCur.DateStart.Day;
 						Patients.Update(patNew,patOld);
 					}
@@ -272,7 +282,12 @@ namespace OpenDental {
 			if(numSkipped>0) {
 				msg+=Environment.NewLine+"Number skipped due to old DateBilling (over 3 months ago): "+numSkipped;
 			}
-			MessageBox.Show(msg);
+			if(strBldArchivedPats.Length > 0) {
+				msg+=Environment.NewLine+"Archived patients that had a repeating charge created:"
+					+Environment.NewLine+strBldArchivedPats.ToString();
+			}
+			MsgBoxCopyPaste msgBoxCP=new MsgBoxCopyPaste(msg);
+			msgBoxCP.Show();
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {
