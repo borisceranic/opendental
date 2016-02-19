@@ -1196,7 +1196,7 @@ namespace OpenDental{
 				message=message.Replace("[NameFL]",Table.Rows[gridMain.SelectedIndices[i]]["nameFL"].ToString());
 				message=message.Replace("[date]",((DateTime)Table.Rows[gridMain.SelectedIndices[i]]["AptDateTime"]).ToShortDateString());
 				message=message.Replace("[time]",((DateTime)Table.Rows[gridMain.SelectedIndices[i]]["AptDateTime"]).ToShortTimeString());
-				if(FormTME.SendText(patNum,wirelessPhone,message,txtMsgOk,clinicNum)) {
+				if(FormTME.SendText(patNum,wirelessPhone,message,txtMsgOk,clinicNum,SmsMessageSource.Confirmation)) {
 					Appointments.SetConfirmed(PIn.Long(Table.Rows[gridMain.SelectedIndices[i]]["AptNum"].ToString()),PrefC.GetLong(PrefName.ConfirmStatusTextMessaged));
 				}
 				else {//There was an exception thrown in FormTME.SendText() meaning something went wrong.  Give the user an option to stop sending messages.

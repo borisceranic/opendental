@@ -387,6 +387,18 @@ namespace OpenDentBusiness{
 			return Clinics.List[0].ClinicNum;
 		}
 
+		///<summary>Returns true if there is an active phone for the country code.</summary>
+		public static bool IsTextingForCountry(params string[] countryCodes) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),countryCodes);
+			}
+			if(countryCodes==null || countryCodes.Length==0) {
+				return false;
+			}
+			string command = "SELECT COUNT(*) FROM smsphone WHERE CountryCode IN ("+string.Join(",",countryCodes.Select(x=>"'"+POut.String(x)+"'"))+") AND "+DbHelper.Year("DateTimeInactive")+"<1880";
+			return Db.GetScalar(command)!="0";
+		}
+
 
 	}
 }
