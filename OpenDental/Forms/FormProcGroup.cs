@@ -84,7 +84,9 @@ namespace OpenDental{
 		private UI.Button butChangeUser;
 		private DataTable TablePlanned;
 		///<summary>Users can temporarily log in on this form.  Defaults to Security.CurUser.</summary>
-		private Userod _curUser;
+		private Userod _curUser=Security.CurUser;
+		///<summary>True if the user clicked the Change User button.</summary>
+		private bool _hasUserChanged;
 
 		public FormProcGroup() {
 			InitializeComponent();
@@ -736,7 +738,6 @@ namespace OpenDental{
 		#endregion
 
 		private void FormProcGroup_Load(object sender, System.EventArgs e){
-			_curUser=Security.CurUser;
 			IsOpen=true;
 			IsStartingUp=true;
 			//ProcList gets set in ContrChart where this form is created.
@@ -1284,7 +1285,11 @@ namespace OpenDental{
 			FormChangeUser.IsSimpleSwitch=true;
 			FormChangeUser.ShowDialog();
 			if(FormChangeUser.DialogResult==DialogResult.OK) {
-				_curUser=FormChangeUser.CurUserSimpleSwitch;
+				_curUser=FormChangeUser.CurUserSimpleSwitch; //assign temp user
+				signatureBoxWrapper.ClearSignature(); //clear sig
+				textUser.Text=_curUser.UserName; //update user textbox.
+				SigChanged=true;
+				_hasUserChanged=true;
 			}
 		}
 
@@ -1298,7 +1303,7 @@ namespace OpenDental{
 
 		private void signatureBoxWrapper_SignatureChanged(object sender,EventArgs e) {
 			GroupCur.UserNum=_curUser.UserNum;
-			textUser.Text=Userods.GetName(GroupCur.UserNum);
+			textUser.Text=_curUser.UserName;
 			SigChanged=true;
 		}
 
@@ -1499,6 +1504,12 @@ namespace OpenDental{
 
 		private void butOK_Click(object sender,System.EventArgs e) {
 			if(!EntriesAreValid()){
+				return;
+			}
+			if(_hasUserChanged && signatureBoxWrapper.SigIsBlank 
+				&& !MsgBox.Show(this,MsgBoxButtons.OKCancel,
+					"The signature box has not been re-signed.  Continuing will remove the previous signature from this procedure.  Exit anyway?")) 
+			{
 				return;
 			}
 			SaveAndClose();
