@@ -1340,15 +1340,14 @@ namespace OpenDentBusiness{
 			return table;
 		}
 
-		///<summary>Gets the provider for this patient.  If provNum==0, then it gets the practice default prov.</summary>
+		///<summary>Gets the provider for this patient.  If provNum==0, then it gets the practice default prov.
+		///If no practice default set, returns the first non-hidden ProvNum from the provider cache.</summary>
 		public static long GetProvNum(Patient pat) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetLong(MethodBase.GetCurrentMethod(),pat);
-			}
-			if(pat.PriProv!=0)
+			//No need to check RemotingRole; no call to db.
+			if(pat.PriProv!=0) {
 				return pat.PriProv;
+			}
 			if(PrefC.GetLong(PrefName.PracticeDefaultProv)==0) {
-				MessageBox.Show(Lans.g("Patients","Please set a default provider in the practice setup window."));
 				List<Provider> listProvs=ProviderC.GetListShort();
 				return listProvs[0].ProvNum;
 			}
