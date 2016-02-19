@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
@@ -9,6 +10,8 @@ namespace OpenDentBusiness
 {
 	///<summary>Encapsulates one entire X12 Interchange object, including multiple functional groups and transaction sets. It does not care what type of transactions are contained.  It just stores them.  It does not inherit either.  It is up to other classes to use this as needed.</summary>
 	public class X12object{
+		///<summary>The date and time this X12 object was created by the sender.  Relative to sender's time zone.</summary>
+		public DateTime DateInterchange;
 		///<summary>usually *,:,and ~</summary>
 		public X12Separators Separators;
 		///<summary>A collection of X12FunctionalGroups.</summary>
@@ -49,19 +52,27 @@ namespace OpenDentBusiness
 			Separators.Element=messageText.Substring(3,1);
 			Separators.Subelement=messageText.Substring(104,1);
 			Separators.Segment=messageText.Substring(105,1);
-			string[] messageRows=messageText.Split(new string[] {Separators.Segment},StringSplitOptions.None);
+			string[] arrayRawSegments=messageText.Split(new string[] {Separators.Segment},StringSplitOptions.None);
 			FunctGroups=new List<X12FunctionalGroup>();
 			Segments=new List<X12Segment>();
-			string row;
 			X12Segment segment;
-			for(int i=1;i<messageRows.Length;i++){
-				row=messageRows[i];
-				segment=new X12Segment(row,Separators);
+			for(int i=0;i<arrayRawSegments.Length;i++) {
+				segment=new X12Segment(arrayRawSegments[i],Separators);
+				segment.SegmentIndex=i;
 				Segments.Add(segment);
-				if(messageRows[i]=="") {
+				if(arrayRawSegments[i]=="") {
 					//do nothing
 				}
-				else if(segment.SegmentID=="IEA") {//if end of interchange
+				else if(segment.SegmentID=="ISA") {//interchange control header begin
+					//do not add to list of segments
+					try {
+						DateInterchange=DateTime.ParseExact(segment.Get(9)+segment.Get(10),"yyMMddHHmm",CultureInfo.CurrentCulture.DateTimeFormat);
+					}
+					catch(Exception ex) {
+						DateInterchange=DateTime.MinValue;
+					}
+				}
+				else if(segment.SegmentID=="IEA") {//interchange control header end
 					//do nothing
 				}
 				else if(segment.SegmentID=="GS") {//if new functional group
@@ -188,6 +199,57 @@ namespace OpenDentBusiness
 			return retVal;
 		}
 
+		///<summary>The startIndex is zero-based.  The segmentId is case sensitive.
+		///If arrayElement01Values is specified, then will only return segments where the segment.Get(1) returns one of the specified values.
+		///Returns null if no segment is found.</summary>
+		public X12Segment GetNextSegmentById(int startIndex,string segmentId,params string[] arrayElement01Values) {
+			for(int i=startIndex;i<Segments.Count;i++) {
+				X12Segment seg=Segments[i];
+				if(seg.SegmentID!=segmentId) {
+					continue;
+				}
+				if(arrayElement01Values.Length > 0) {
+					bool isMatchingElement01=false;
+					for(int j=0;j<arrayElement01Values.Length;j++) {
+						if(arrayElement01Values[j]==seg.Get(1)) {
+							isMatchingElement01=true;
+							break;
+						}
+					}
+					if(!isMatchingElement01) {
+						continue;
+					}
+				}
+				return seg;
+			}
+			return null;
+		}
+
+		///<summary>Removes the specified segments and recreates the raw X12 from the remaining segments.
+		///Useful for modifying X12 reports which have been partially processed in order to keep track of which parts have not been processed.
+		///Certain X12 documents also require the segment count as part of the message (ex 5010 SE segment).
+		///This function does not modify total segment count within the message.</summary>
+		public string ReconstructRaw(List <int> listSegmentIndiciesToRemove) {
+			bool[] arrayIndiciesToKeep=new bool[Segments.Count];
+			for(int i=0;i<arrayIndiciesToKeep.Length;i++) {
+				arrayIndiciesToKeep[i]=true;
+			}
+			for(int i=0;i<listSegmentIndiciesToRemove.Count;i++) {
+				int index=listSegmentIndiciesToRemove[i];
+				arrayIndiciesToKeep[index]=false;
+			}
+			StringBuilder sb=new StringBuilder();
+			for(int i=0;i<arrayIndiciesToKeep.Length;i++) {
+				if(!arrayIndiciesToKeep[i]) {
+					continue;
+				}
+				sb.Append(Segments[i].ToString());//This gets the raw text of the segment.
+				sb.Append(Separators.Segment);
+				sb.Append("\r\n");
+			}
+			return sb.ToString();
+		}
+
 	}
 
 
@@ -234,6 +296,8 @@ namespace OpenDentBusiness
 		public string SegmentID;
 		///<summary></summary>
 		public string[] Elements;
+		///<summary>The zero-based segment index within the X12 document.</summary>
+		public int SegmentIndex;
 		///<summary></summary>
 		private X12Separators Separators;
 		private string rawText;
@@ -249,6 +313,14 @@ namespace OpenDentBusiness
 			SegmentID=Elements[0];
 		}
 
+		public X12Segment(X12Segment seg) {
+			SegmentID=seg.SegmentID;
+			Elements=(string[])seg.Elements.Clone();//shallow copy is fine since just strings.
+			SegmentIndex=seg.SegmentIndex;
+			Separators=seg.Separators;
+			rawText=seg.rawText;
+		}
+
 		private X12Segment(){
 
 		}
@@ -259,10 +331,7 @@ namespace OpenDentBusiness
 
 		///<summary>Returns a copy of this segement</summary>
 		public X12Segment Copy(){
-			X12Segment retVal=new X12Segment();
-			retVal.SegmentID=SegmentID;
-			retVal.Elements=(string[])Elements.Clone();//shallow copy is fine since just strings.
-			return retVal;
+			return new X12Segment(this);
 		}
 
 		///<summary>Returns the string representation of the given element within this segment. If the element does not exist, as can happen with optional elements, then "" is returned.</summary>
@@ -338,33 +407,33 @@ namespace OpenDentBusiness
 
 	#region Segments
 
-	public class X12_ACT {
+	public class X12_ACT : X12Segment {
 		///<summary>ACT01</summary>
 		public string AccountNumber1;
 		///<summary>ACT06</summary>
 		public string AccountNumber2;
 
-		public X12_ACT(X12Segment seg) {
+		public X12_ACT(X12Segment seg) : base(seg) {
 			seg.AssertType("ACT");
 			AccountNumber1=seg.Get(1);
 			AccountNumber2=seg.Get(6);
 		}
 	}
 
-	public class X12_AMT {
+	public class X12_AMT : X12Segment {
 		///<summary>AMT01</summary>
 		public string AmountQualifierCode;
 		///<summary>AMT02</summary>
 		public string MonetaryAmount;
 
-		public X12_AMT(X12Segment seg) {
+		public X12_AMT(X12Segment seg) : base(seg) {
 			seg.AssertType("AMT");
 			AmountQualifierCode=seg.Get(1);
 			MonetaryAmount=seg.Get(2);
 		}
 	}
 
-	public class X12_BGN {
+	public class X12_BGN : X12Segment {
 		///<summary>BGN01</summary>
 		public string TransactionSetPurposeCode;
 		///<summary>BGN02</summary>
@@ -380,7 +449,7 @@ namespace OpenDentBusiness
 		///<summary>BGN08</summary>
 		public string ActionCode;
 
-		public X12_BGN(X12Segment seg) {
+		public X12_BGN(X12Segment seg) : base(seg) {
 			seg.AssertType("BGN");
 			TransactionSetPurposeCode=seg.Get(1);
 			ReferenceIdentification1=seg.Get(2);
@@ -392,7 +461,7 @@ namespace OpenDentBusiness
 		}
 	}
 
-	public class X12_COB {
+	public class X12_COB : X12Segment {
 		///<summary>COB01</summary>
 		public string PayerResponsibilitySequenceNumberCode;
 		///<summary>COB02</summary>
@@ -402,7 +471,7 @@ namespace OpenDentBusiness
 		///<summary>COB04</summary>
 		public string ServiceTypeCode;
 
-		public X12_COB(X12Segment seg) {
+		public X12_COB(X12Segment seg) : base(seg) {
 			seg.AssertType("COB");
 			PayerResponsibilitySequenceNumberCode=seg.Get(1);
 			ReferenceIdentification=seg.Get(2);
@@ -411,7 +480,7 @@ namespace OpenDentBusiness
 		}
 	}
 
-	public class X12_DMG {
+	public class X12_DMG : X12Segment {
 		///<summary>DMG01</summary>
 		public string DateTimePeriodFormatQualifier;
 		///<summary>DMG02</summary>
@@ -429,7 +498,7 @@ namespace OpenDentBusiness
 		///<summary>DMG11</summary>
 		public string IndustryCode;
 
-		public X12_DMG(X12Segment seg) {
+		public X12_DMG(X12Segment seg) : base(seg) {
 			seg.AssertType("DMG");
 			DateTimePeriodFormatQualifier=seg.Get(1);
 			DateTimePeriod=seg.Get(2);
@@ -442,7 +511,7 @@ namespace OpenDentBusiness
 		}
 	}
 
-	public class X12_DSB {
+	public class X12_DSB : X12Segment {
 		///<summary>DSP01</summary>
 		public string DisabilityTypeCode;
 		///<summary>DSP07</summary>
@@ -450,7 +519,7 @@ namespace OpenDentBusiness
 		///<summary>DSP08</summary>
 		public string MedicalCodeValue;
 
-		public X12_DSB(X12Segment seg) {
+		public X12_DSB(X12Segment seg) : base(seg) {
 			seg.AssertType("DSB");
 			DisabilityTypeCode=seg.Get(1);
 			ProductServiceIdQualifier=seg.Get(7);
@@ -458,7 +527,7 @@ namespace OpenDentBusiness
 		}
 	}
 
-	public class X12_DTP {
+	public class X12_DTP : X12Segment {
 		///<summary>DTP01</summary>
 		public string DateTimeQualifier;
 		///<summary>DTP02</summary>
@@ -466,7 +535,7 @@ namespace OpenDentBusiness
 		///<summary>DTP03</summary>
 		public string DateTimePeriod;
 
-		public X12_DTP(X12Segment seg) {
+		public X12_DTP(X12Segment seg) : base(seg) {
 			seg.AssertType("DTP");
 			DateTimeQualifier=seg.Get(1);
 			DateTimePeriodFormatQualifier=seg.Get(2);
@@ -481,7 +550,7 @@ namespace OpenDentBusiness
 		}
 	}
 
-	public class X12_EC {
+	public class X12_EC : X12Segment {
 		///<summary>EC01</summary>
 		public string EmploymentClassCode1;
 		///<summary>EC02</summary>
@@ -489,7 +558,7 @@ namespace OpenDentBusiness
 		///<summary>EC03</summary>
 		public string EmploymentClassCode3;
 
-		public X12_EC(X12Segment seg) {
+		public X12_EC(X12Segment seg) : base(seg) {
 			seg.AssertType("EC");
 			EmploymentClassCode1=seg.Get(1);
 			EmploymentClassCode2=seg.Get(2);
@@ -497,7 +566,7 @@ namespace OpenDentBusiness
 		}
 	}
 
-	public class X12_HD {
+	public class X12_HD : X12Segment {
 		///<summary>HD01</summary>
 		public string MaintenanceTypeCode;
 		///<summary>HD03</summary>
@@ -509,7 +578,7 @@ namespace OpenDentBusiness
 		///<summary>HD09</summary>
 		public string YesNoConditionOrResponseCode;
 
-		public X12_HD(X12Segment seg) {
+		public X12_HD(X12Segment seg) : base(seg) {
 			seg.AssertType("HD");
 			MaintenanceTypeCode=seg.Get(1);
 			InsuranceLineCode=seg.Get(3);
@@ -519,7 +588,7 @@ namespace OpenDentBusiness
 		}
 	}
 
-	public class X12_HLH {
+	public class X12_HLH : X12Segment {
 		///<summary>HLH01</summary>
 		public string HealthRelatedCode;
 		///<summary>HLH02</summary>
@@ -527,7 +596,7 @@ namespace OpenDentBusiness
 		///<summary>HLH03</summary>
 		public string Weight;
 
-		public X12_HLH(X12Segment seg) {
+		public X12_HLH(X12Segment seg) : base(seg) {
 			seg.AssertType("HLH");
 			HealthRelatedCode=seg.Get(1);
 			Height=seg.Get(2);
@@ -535,7 +604,7 @@ namespace OpenDentBusiness
 		}
 	}
 
-	public class X12_ICM {
+	public class X12_ICM : X12Segment {
 		///<summary>ICM01</summary>
 		public string FrequencyCode;
 		///<summary>ICM02</summary>
@@ -547,7 +616,7 @@ namespace OpenDentBusiness
 		///<summary>ICM05</summary>
 		public string SalaryGrade;
 
-		public X12_ICM(X12Segment seg) {
+		public X12_ICM(X12Segment seg) : base(seg) {
 			seg.AssertType("ICM");
 			FrequencyCode=seg.Get(1);
 			MonetaryAmount=seg.Get(2);
@@ -557,7 +626,7 @@ namespace OpenDentBusiness
 		}
 	}
 
-	public class X12_IDC {
+	public class X12_IDC : X12Segment {
 		///<summary>IDC01</summary>
 		public string PlanCoverageDescription;
 		///<summary>IDC02</summary>
@@ -567,7 +636,7 @@ namespace OpenDentBusiness
 		///<summary>IDC04</summary>
 		public string ActionCode;
 
-		public X12_IDC(X12Segment seg) {
+		public X12_IDC(X12Segment seg) : base(seg) {
 			seg.AssertType("IDC");
 			PlanCoverageDescription=seg.Get(1);
 			IdentificationCardTypeCode=seg.Get(2);
@@ -576,7 +645,7 @@ namespace OpenDentBusiness
 		}
 	}
 
-	public class X12_INS {
+	public class X12_INS : X12Segment {
 		///<summary>INS01</summary>
 		public string YesNoConditionOrResponseCode1;
 		///<summary>INS02</summary>
@@ -606,7 +675,7 @@ namespace OpenDentBusiness
 		///<summary>INS17</summary>
 		public string Number;
 
-		public X12_INS(X12Segment seg) {
+		public X12_INS(X12Segment seg) : base(seg) {
 			seg.AssertType("INS");
 			YesNoConditionOrResponseCode1=seg.Get(1);
 			IndividualRelationshipCode=seg.Get(2);
@@ -625,27 +694,27 @@ namespace OpenDentBusiness
 		}
 	}
 
-	public class X12_LE {
+	public class X12_LE : X12Segment {
 		///<summary>LE01</summary>
 		public string LoopIdentifierCode;
 
-		public X12_LE(X12Segment seg) {
+		public X12_LE(X12Segment seg) : base(seg) {
 			seg.AssertType("LE");
 			LoopIdentifierCode=seg.Get(1);
 		}
 	}
 
-	public class X12_LS {
+	public class X12_LS : X12Segment {
 		///<summary>LS01</summary>
 		public string LoopIdentifierCode;
 
-		public X12_LS(X12Segment seg) {
+		public X12_LS(X12Segment seg) : base(seg) {
 			seg.AssertType("LS");
 			LoopIdentifierCode=seg.Get(1);
 		}
 	}
 
-	public class X12_LUI {
+	public class X12_LUI : X12Segment {
 		///<summary>LUI01</summary>
 		public string IdentificationCodeQualifier;
 		///<summary>LUI02</summary>
@@ -655,7 +724,7 @@ namespace OpenDentBusiness
 		///<summary>LUI04</summary>
 		public string UseOfLanguageIndicator;
 
-		public X12_LUI(X12Segment seg) {
+		public X12_LUI(X12Segment seg) : base(seg) {
 			seg.AssertType("LUI");
 			IdentificationCodeQualifier=seg.Get(1);
 			IdentificationCode=seg.Get(2);
@@ -664,17 +733,17 @@ namespace OpenDentBusiness
 		}
 	}
 
-	public class X12_LX {
+	public class X12_LX : X12Segment {
 		///<summary>LX01</summary>
 		public string AssignedNumber;
 
-		public X12_LX(X12Segment seg) {
+		public X12_LX(X12Segment seg) : base(seg) {
 			seg.AssertType("LX");
 			AssignedNumber=seg.Get(1);
 		}
 	}
 
-	public class X12_N1 {
+	public class X12_N1 : X12Segment {
 		///<summary>N101</summary>
 		public string EntityIdentifierCode;
 		///<summary>N102</summary>
@@ -684,7 +753,7 @@ namespace OpenDentBusiness
 		///<summary>N104</summary>
 		public string IdentificationCode;
 
-		public X12_N1(X12Segment seg,params string[] arrayElement01Values) {
+		public X12_N1(X12Segment seg,params string[] arrayElement01Values) : base(seg) {
 			seg.AssertType("N1",arrayElement01Values);
 			EntityIdentifierCode=seg.Get(1);
 			Name=seg.Get(2);
@@ -693,20 +762,20 @@ namespace OpenDentBusiness
 		}
 	}
 
-	public class X12_N3 {
+	public class X12_N3 : X12Segment {
 		///<summary>N301</summary>
 		public string AddressInformation1;
 		///<summary>N302</summary>
 		public string AddressInformation2;
 
-		public X12_N3(X12Segment seg) {
+		public X12_N3(X12Segment seg) : base(seg) {
 			seg.AssertType("N3");
 			AddressInformation1=seg.Get(1);
 			AddressInformation2=seg.Get(2);
 		}
 	}
 
-	public class X12_N4 {
+	public class X12_N4 : X12Segment {
 		///<summary>N401</summary>
 		public string CityName;
 		///<summary>N402</summary>
@@ -722,7 +791,7 @@ namespace OpenDentBusiness
 		///<summary>N407</summary>
 		public string CountrySubdivisionCode;
 
-		public X12_N4(X12Segment seg) {
+		public X12_N4(X12Segment seg) : base(seg) {
 			seg.AssertType("N4");
 			CityName=seg.Get(1);
 			StateOrProvinceCode=seg.Get(2);
@@ -734,7 +803,7 @@ namespace OpenDentBusiness
 		}
 	}
 
-	public class X12_NM1 {
+	public class X12_NM1 : X12Segment {
 		///<summary>NM101</summary>
 		public string EntityIdentifierCode;
 		///<summary>NM102</summary>
@@ -754,7 +823,7 @@ namespace OpenDentBusiness
 		///<summary>NM109</summary>
 		public string IdentificationCode;
 
-		public X12_NM1(X12Segment seg,params string[] arrayElement01Values) {
+		public X12_NM1(X12Segment seg,params string[] arrayElement01Values) : base(seg) {
 			seg.AssertType("NM1",arrayElement01Values);
 			EntityIdentifierCode=seg.Get(1);
 			EntityTypeQualifier=seg.Get(2);
@@ -768,7 +837,7 @@ namespace OpenDentBusiness
 		}
 	}
 
-	public class X12_PER {
+	public class X12_PER : X12Segment {
 		///<summary>PER01</summary>
 		public string ContactFunctionCode;
 		///<summary>PER03</summary>
@@ -784,7 +853,7 @@ namespace OpenDentBusiness
 		///<summary>PER08</summary>
 		public string CommunicationNumber3;
 
-		public X12_PER(X12Segment seg,params string[] arrayElement01Values) {
+		public X12_PER(X12Segment seg,params string[] arrayElement01Values) : base(seg) {
 			seg.AssertType("PER",arrayElement01Values);
 			ContactFunctionCode=seg.Get(1);
 			CommunicationNumberQualifier1=seg.Get(3);
@@ -796,7 +865,7 @@ namespace OpenDentBusiness
 		}
 	}
 
-	public class X12_PLA {
+	public class X12_PLA : X12Segment {
 		///<summary>PLA01</summary>
 		public string ActionCode;
 		///<summary>PLA02</summary>
@@ -808,7 +877,7 @@ namespace OpenDentBusiness
 		///<summary>PLA05</summary>
 		public string MaintenanceReasonCode;
 
-		public X12_PLA(X12Segment seg) {
+		public X12_PLA(X12Segment seg) : base(seg) {
 			seg.AssertType("PLA");
 			ActionCode=seg.Get(1);
 			EntityIdentifierCode=seg.Get(2);
@@ -818,26 +887,26 @@ namespace OpenDentBusiness
 		}
 	}
 
-	public class X12_REF {
+	public class X12_REF : X12Segment {
 		///<summary>REF01</summary>
 		public string ReferenceIdQualifier;
 		///<summary>REF02</summary>
 		public string ReferenceId;
 
-		public X12_REF(X12Segment seg,params string[] arrayElement01Values) {
+		public X12_REF(X12Segment seg,params string[] arrayElement01Values) : base(seg) {
 			seg.AssertType("REF",arrayElement01Values);
 			ReferenceIdQualifier=seg.Get(1);
 			ReferenceId=seg.Get(2);
 		}
 	}
 
-	public class X12_QTY {
+	public class X12_QTY : X12Segment {
 		///<summary>QTY01</summary>
 		public string QuantityQualifier;
 		///<summary>QTY02</summary>
 		public string Quantity;
 
-		public X12_QTY(X12Segment seg) {
+		public X12_QTY(X12Segment seg) : base(seg) {
 			seg.AssertType("QTY");
 			QuantityQualifier=seg.Get(1);
 			Quantity=seg.Get(2);

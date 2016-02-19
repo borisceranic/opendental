@@ -52,11 +52,11 @@ namespace OpenDental{
 			this.gridInsPlans.Location = new System.Drawing.Point(12, 28);
 			this.gridInsPlans.Name = "gridInsPlans";
 			this.gridInsPlans.ScrollValue = 0;
-			this.gridInsPlans.SelectionMode = OpenDental.UI.GridSelectionMode.None;
 			this.gridInsPlans.Size = new System.Drawing.Size(950, 626);
 			this.gridInsPlans.TabIndex = 4;
 			this.gridInsPlans.Title = "Ins Plans";
 			this.gridInsPlans.TranslationName = null;
+			this.gridInsPlans.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridInsPlans_CellDoubleClick);
 			// 
 			// butOK
 			// 
