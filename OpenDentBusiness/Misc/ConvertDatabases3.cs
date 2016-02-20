@@ -11629,10 +11629,10 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '"+POut.String(reminderText)+"' WHERE PrefName = 'ApptReminderHourMessage'";
 				Db.NonQ(command);
 				//This pref was also added to the 16.1.1 conversion.
-				reminderText = @"Dental appointment reminder from [clinicName]:
-[nameF] is scheduled for an appointment at [apptTime] on [apptDate]. 
-There is no need to reply if you are going to make this appointment, but if there is any issue please call [clinicPhone] as soon as possible.
-Thanks!";
+				reminderText = "Dental appointment reminder from [clinicName]:\n"
+					+"[nameF] is scheduled for an appointment at [apptTime] on [apptDate].\n"
+					+"There is no need to reply if you are going to make this appointment, but if there is any issue please call [clinicPhone] as soon as possible.\n"
+					+"Thanks!";
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference(PrefName,ValueString) VALUES('ApptReminderEmailMessage','"+reminderText+"')";
 					Db.NonQ(command);

@@ -370,7 +370,7 @@ namespace OpenDentBusiness{
 				return pat.LName+", "+pat.FName+" "+Lans.g("ApptComms","cannot be sent texts")+".  ";
 			}
 			string message;
-			if(SmsPhones.IsIntegratedTextingEnabled() && SmsPhones.IsTextingForCountry("US","CA")) {
+			if(SmsPhones.IsIntegratedTextingEnabled() && SmsPhones.IsTextingForCountry("US")) {
 				message=ApptComms.ApptReminderMsgUS;
 			}
 			else {
