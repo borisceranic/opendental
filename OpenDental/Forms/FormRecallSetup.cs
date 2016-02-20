@@ -1630,8 +1630,8 @@ namespace OpenDental{
 		#region Appt Reminder Setup
 
 		private void FillPriorityTab() {
-			if(SmsPhones.IsIntegratedTextingEnabled() && SmsPhones.IsTextingForCountry("US","CA")) {
-				labelTextMessage.Text+=" (Not editable for US or CA)";
+			if(SmsPhones.IsIntegratedTextingEnabled() && SmsPhones.IsTextingForCountry("US")) {
+				labelTextMessage.Text+=" (Not editable for US)";
 				textMessageText.ReadOnly=true;
 				textMessageText.Text=ApptComms.ApptReminderMsgUS;
 			}
@@ -2073,7 +2073,7 @@ namespace OpenDental{
 				//Update ApptComms with new reminder entries.
 				ApptComms.InsertForFutureAppts();
 			}
-			if(!SmsPhones.IsIntegratedTextingEnabled() || !SmsPhones.IsTextingForCountry("US","CA")) {
+			if(!SmsPhones.IsIntegratedTextingEnabled() || !SmsPhones.IsTextingForCountry("US")) {
 				Prefs.UpdateString(PrefName.ApptReminderDayMessage,PIn.String(textMessageText.Text));
 				textMessageText.Text=PrefC.GetString(PrefName.ApptReminderDayMessage);
 			}
