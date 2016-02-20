@@ -490,7 +490,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Used from insplan window when requesting benefits.  Gets carrier based on electID.</summary>
-		public static Carrier GetCanadian(string electID){
+		public static Carrier GetByElectId(string electID){
 			//No need to check RemotingRole; no call to db.
 			for(int i=0;i<Listt.Length;i++){
 				if(Listt[i].ElectID==electID){
@@ -566,7 +566,17 @@ namespace OpenDentBusiness{
 			return retVal;
 		}*/
 
-
+		///<summary>The carrierName is case insensitive.</summary>
+		public static List<Carrier> GetByNameAndElectId(string carrierName,string electId){
+			//No need to check RemotingRole; no call to db.
+			List <Carrier> listCarriers=new List<Carrier>();
+			for(int i=0;i<Listt.Length;i++){
+				if(Listt[i].CarrierName.Trim().ToLower()==carrierName.Trim().ToLower() && Listt[i].ElectID==electId) {
+					listCarriers.Add(Listt[i]);
+				}
+			}
+			return listCarriers;
+		}
 
 	}
 

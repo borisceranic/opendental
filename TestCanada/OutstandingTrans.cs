@@ -21,7 +21,7 @@ namespace TestCanada {
 		public static string RunOne() {
 			List<Etrans> etransRequests;
 			//Claim claim=Claims.GetClaim(ClaimTC.ClaimNums[0]);
-			Carrier carrier=Carriers.GetCanadian("666666");
+			Carrier carrier=Carriers.GetByElectId("666666");
 			carrier.CanadianEncryptionMethod=1;
 			string retval=Run(1,false,false,carrier,out etransRequests);
 			////EOB
@@ -44,7 +44,7 @@ namespace TestCanada {
 		public static string RunTwo() {
 			List<Etrans> etransRequests;
 			//Claim claim=Claims.GetClaim(ClaimTC.ClaimNums[6]);
-			Carrier carrier=Carriers.GetCanadian("888888");
+			Carrier carrier=Carriers.GetByElectId("888888");
 			string retval=Run(2,false,false,carrier,out etransRequests);
 			////EOB
 			//etransRequests[0].PatNum=claim.PatNum;
@@ -59,7 +59,7 @@ namespace TestCanada {
 		public static string RunThree() {
 			List<Etrans> etransRequests;
 			//Claim claim=Claims.GetClaim(ClaimTC.ClaimNums[]);
-			Carrier carrier=Carriers.GetCanadian("777777");
+			Carrier carrier=Carriers.GetByElectId("777777");
 			string retval=Run(3,false,false,carrier,out etransRequests);
 			////EOB
 			//etransRequests[0].PatNum=claim.PatNum;

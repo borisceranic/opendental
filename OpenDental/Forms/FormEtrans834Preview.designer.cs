@@ -26,18 +26,19 @@ namespace OpenDental{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEtrans834Preview));
 			this.checkIsPatientCreate = new System.Windows.Forms.CheckBox();
 			this.gridInsPlans = new OpenDental.UI.ODGrid();
+			this.label1 = new System.Windows.Forms.Label();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// checkIsPatientCreate
 			// 
-			this.checkIsPatientCreate.Location = new System.Drawing.Point(12, 7);
+			this.checkIsPatientCreate.Location = new System.Drawing.Point(12, 96);
 			this.checkIsPatientCreate.Name = "checkIsPatientCreate";
 			this.checkIsPatientCreate.Size = new System.Drawing.Size(950, 20);
 			this.checkIsPatientCreate.TabIndex = 8;
-			this.checkIsPatientCreate.Text = "Automatically create new patients when importing plans unknown patients.  If unch" +
-    "ecked, you can still add patients manually.";
+			this.checkIsPatientCreate.Text = "Automatically create new patients when importing plans for unknown patients.  If " +
+    "unchecked, you can still add patients by selecting manually.";
 			this.checkIsPatientCreate.UseVisualStyleBackColor = true;
 			// 
 			// gridInsPlans
@@ -49,14 +50,22 @@ namespace OpenDental{
 			this.gridInsPlans.HasAddButton = false;
 			this.gridInsPlans.HasMultilineHeaders = false;
 			this.gridInsPlans.HScrollVisible = false;
-			this.gridInsPlans.Location = new System.Drawing.Point(12, 28);
+			this.gridInsPlans.Location = new System.Drawing.Point(12, 122);
 			this.gridInsPlans.Name = "gridInsPlans";
 			this.gridInsPlans.ScrollValue = 0;
-			this.gridInsPlans.Size = new System.Drawing.Size(950, 626);
+			this.gridInsPlans.Size = new System.Drawing.Size(950, 532);
 			this.gridInsPlans.TabIndex = 4;
 			this.gridInsPlans.Title = "Ins Plans";
 			this.gridInsPlans.TranslationName = null;
 			this.gridInsPlans.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridInsPlans_CellDoubleClick);
+			// 
+			// label1
+			// 
+			this.label1.Location = new System.Drawing.Point(12, 9);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(950, 84);
+			this.label1.TabIndex = 9;
+			this.label1.Text = resources.GetString("label1.Text");
 			// 
 			// butOK
 			// 
@@ -92,6 +101,7 @@ namespace OpenDental{
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 696);
+			this.Controls.Add(this.label1);
 			this.Controls.Add(this.checkIsPatientCreate);
 			this.Controls.Add(this.gridInsPlans);
 			this.Controls.Add(this.butOK);
@@ -101,7 +111,6 @@ namespace OpenDental{
 			this.Name = "FormEtrans834Preview";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Import Ins Plans 834 Preview";
-			this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
 			this.Load += new System.EventHandler(this.FormEtrans834Preview_Load);
 			this.ResumeLayout(false);
 
@@ -113,5 +122,6 @@ namespace OpenDental{
 		private OpenDental.UI.Button butCancel;
 		private UI.ODGrid gridInsPlans;
 		private System.Windows.Forms.CheckBox checkIsPatientCreate;
+		private System.Windows.Forms.Label label1;
 	}
 }
