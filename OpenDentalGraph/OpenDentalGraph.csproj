@@ -237,10 +237,6 @@
       <Project>{18f7bc78-4b99-48d3-a1f1-0d13a63e3cf9}</Project>
       <Name>xCodeBase</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ODR\xODR.csproj">
-      <Project>{84688345-BB6A-4F2F-8672-A82B52FD433B}</Project>
-      <Name>xODR</Name>
-    </ProjectReference>
     <ProjectReference Include="..\OpenDentBusiness\OpenDentBusiness.csproj">
       <Project>{3d0fc76e-803c-4de2-bdb1-47d63a4e2357}</Project>
       <Name>OpenDentBusiness</Name>
