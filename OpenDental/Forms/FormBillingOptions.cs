@@ -1098,6 +1098,9 @@ namespace OpenDental{
 				if(agingList[i].HasSuperBilling && agingList[i].PatNum==agingList[i].SuperFamily && checkSuperFam.Checked) {
 					stmt.SuperFamily=agingList[i].SuperFamily;
 				}
+				stmt.IsBalValid=true;
+				stmt.BalTotal=agingList[i].BalTotal;
+				stmt.InsEst=agingList[i].InsEst;
 				Statements.Insert(stmt);
 			}
 			DialogResult=DialogResult.OK;

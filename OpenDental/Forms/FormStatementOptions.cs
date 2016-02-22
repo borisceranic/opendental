@@ -985,13 +985,13 @@ namespace OpenDental{
 		}
 
 		private void butPrintClassic() {
+			Patient patCur = Patients.GetPat(StmtCur.PatNum);
 			if(StmtCur.DocNum!=0 && checkIsSent.Checked 
 				&& !StmtCur.IsInvoice)//Invoices are always recreated on the fly in order to show "Copy" when needed.
 			{
 				//launch existing archive pdf. User can click print from within Acrobat.
 				Cursor=Cursors.WaitCursor;
-				Patient pat=Patients.GetPat(StmtCur.PatNum);
-				string patFolder=ImageStore.GetPatientFolder(pat,ImageStore.GetPreferredAtoZpath());
+				string patFolder=ImageStore.GetPatientFolder(patCur,ImageStore.GetPreferredAtoZpath());
 				Process.Start(ImageStore.GetFilePath(Documents.GetByNum(StmtCur.DocNum),patFolder));
 				Cursor=Cursors.Default;
 			}
@@ -1007,6 +1007,15 @@ namespace OpenDental{
 				}
 				checkIsSent.Checked=true;
 				Cursor=Cursors.WaitCursor;
+				Patient guarantor = null;
+				if(patCur!=null) {
+					guarantor = Patients.GetPat(patCur.Guarantor);
+				}
+				if(guarantor!=null) {
+					StmtCur.IsBalValid=true;
+					StmtCur.BalTotal=guarantor.BalTotal;
+					StmtCur.InsEst=guarantor.InsEst;
+				}
 				if(!SaveToDb()) {
 					Cursor=Cursors.Default;
 					return;
@@ -1032,13 +1041,13 @@ namespace OpenDental{
 		}
 
 		private void butPrintSheets() {
+			Patient patCur = Patients.GetPat(StmtCur.PatNum);
 			if(StmtCur.DocNum!=0 && checkIsSent.Checked 
 				&& !StmtCur.IsInvoice)//Invoices are always recreated on the fly in order to show "Copy" when needed.
 			{
 				//launch existing archive pdf. User can click print from within Acrobat.
 				Cursor=Cursors.WaitCursor;
-				Patient pat=Patients.GetPat(StmtCur.PatNum);
-				string patFolder=ImageStore.GetPatientFolder(pat,ImageStore.GetPreferredAtoZpath());
+				string patFolder=ImageStore.GetPatientFolder(patCur,ImageStore.GetPreferredAtoZpath());
 				Process.Start(ImageStore.GetFilePath(Documents.GetByNum(StmtCur.DocNum),patFolder));
 				Cursor=Cursors.Default;
 			}
@@ -1054,6 +1063,15 @@ namespace OpenDental{
 				}
 				checkIsSent.Checked=true;
 				Cursor=Cursors.WaitCursor;
+				Patient guarantor = null;
+				if(patCur!=null) {
+					guarantor = Patients.GetPat(patCur.Guarantor);
+				}
+				if(guarantor!=null) {
+					StmtCur.IsBalValid=true;
+					StmtCur.BalTotal=guarantor.BalTotal;
+					StmtCur.InsEst=guarantor.InsEst;
+				}
 				if(!SaveToDb()) {
 					Cursor=Cursors.Default;
 					return;
@@ -1162,6 +1180,16 @@ namespace OpenDental{
 				}
 				checkIsSent.Checked=true;
 				Cursor=Cursors.WaitCursor;
+				Patient patCur = Patients.GetPat(StmtCur.PatNum);
+				Patient guarantor = null;
+				if(patCur!=null) {
+					guarantor = Patients.GetPat(patCur.Guarantor);
+				}
+				if(guarantor!=null) {
+					StmtCur.IsBalValid=true;
+					StmtCur.BalTotal=guarantor.BalTotal;
+					StmtCur.InsEst=guarantor.InsEst;
+				}
 				if(!SaveToDb()) {
 					return;
 				}
@@ -1197,6 +1225,16 @@ namespace OpenDental{
 				}
 				checkIsSent.Checked=true;
 				Cursor=Cursors.WaitCursor;
+				Patient patCur = Patients.GetPat(StmtCur.PatNum);
+				Patient guarantor = null;
+				if(patCur!=null) {
+					guarantor = Patients.GetPat(patCur.Guarantor);
+				}
+				if(guarantor!=null) {
+					StmtCur.IsBalValid=true;
+					StmtCur.BalTotal=guarantor.BalTotal;
+					StmtCur.InsEst=guarantor.InsEst;
+				}
 				if(!SaveToDb()) {
 					return;
 				}
@@ -1306,11 +1344,11 @@ namespace OpenDental{
 		}
 
 		private void butPreviewClassic() {
+			Patient patCur = Patients.GetPat(StmtCur.PatNum);
 			if(StmtCur.DocNum!=0 && checkIsSent.Checked) {//initiallySent && checkIsSent.Checked){
 				//launch existing archive pdf
 				Cursor=Cursors.WaitCursor;
-				Patient pat=Patients.GetPat(StmtCur.PatNum);
-				string patFolder=ImageStore.GetPatientFolder(pat,ImageStore.GetPreferredAtoZpath());
+				string patFolder=ImageStore.GetPatientFolder(patCur,ImageStore.GetPreferredAtoZpath());
 				//Currently unable to load Statements stored in database even though they get saved into the database.
 				if(!File.Exists(ImageStore.GetFilePath(Documents.GetByNum(StmtCur.DocNum),patFolder))) {
 					Cursor=Cursors.Default;
@@ -1326,6 +1364,15 @@ namespace OpenDental{
 					MsgBox.Show(this,"There was no archived image of this statement.  The preview will be based on current data.");
 				}
 				Cursor=Cursors.WaitCursor;
+				Patient guarantor = null;
+				if(patCur!=null) {
+					guarantor = Patients.GetPat(patCur.Guarantor);
+				}
+				if(guarantor!=null) {
+					StmtCur.IsBalValid=true;
+					StmtCur.BalTotal=guarantor.BalTotal;
+					StmtCur.InsEst=guarantor.InsEst;
+				}
 				if(!SaveToDb()){
 					Cursor=Cursors.Default;
 					return;
@@ -1349,11 +1396,11 @@ namespace OpenDental{
 		}
 
 		private void butPreviewSheets() {
+			Patient patCur = Patients.GetPat(StmtCur.PatNum);
 			if(StmtCur.DocNum!=0 && checkIsSent.Checked) {//initiallySent && checkIsSent.Checked){
 				//launch existing archive pdf
 				Cursor=Cursors.WaitCursor;
-				Patient pat=Patients.GetPat(StmtCur.PatNum);
-				string patFolder=ImageStore.GetPatientFolder(pat,ImageStore.GetPreferredAtoZpath());
+				string patFolder=ImageStore.GetPatientFolder(patCur,ImageStore.GetPreferredAtoZpath());
 				if(!File.Exists(ImageStore.GetFilePath(Documents.GetByNum(StmtCur.DocNum),patFolder))) {
 					Cursor=Cursors.Default;
 					MsgBox.Show(this,"File not found: " + Documents.GetByNum(StmtCur.DocNum).FileName);
@@ -1363,6 +1410,15 @@ namespace OpenDental{
 				Cursor=Cursors.Default;
 			}
 			else {//was not initially sent, or else user has unchecked the sent box
+				Patient guarantor = null;
+				if(patCur!=null) {
+					guarantor = Patients.GetPat(patCur.Guarantor);
+				}
+				if(guarantor!=null) {
+					StmtCur.IsBalValid=true;
+					StmtCur.BalTotal=guarantor.BalTotal;
+					StmtCur.InsEst=guarantor.InsEst;
+				}
 				if(!SaveToDb()) { 
 					return;
 				}
@@ -1711,6 +1767,7 @@ namespace OpenDental{
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
+			//Do not set IsBalValid, BalTotal, or InsEst here. This would edit old statments.
 			if(!SaveToDb()){
 				return;
 			}

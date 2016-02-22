@@ -51,6 +51,14 @@ namespace OpenDentBusiness{
 //TODO: This column may need to be changed to the TextIsClobNote attribute to remove more than 50 consecutive new line characters.
 		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
 		public string EmailBody;
+		///<summary>True for statements generated in version 16.1 or greater. Older statements did not store InsEst or BalTotal. </summary>
+		public bool IsBalValid;
+		/// <summary>Insurance Estimate for entire family, taken from garantor at time of statement being sent/saved.</summary>
+		public double InsEst;
+		/// <summary>Total balance for entire family before insurance estimate.  
+		/// Not the same as the sum of the 4 aging balances because this can be negative.</summary>
+		public double BalTotal;
+
 
 		public Statement Copy(){
 			return (Statement)this.MemberwiseClone();

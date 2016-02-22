@@ -66,6 +66,9 @@ namespace OpenDentBusiness.Crud{
 				statement.IsInvoiceCopy= PIn.Bool  (row["IsInvoiceCopy"].ToString());
 				statement.EmailSubject = PIn.String(row["EmailSubject"].ToString());
 				statement.EmailBody    = PIn.String(row["EmailBody"].ToString());
+				statement.IsBalValid   = PIn.Bool  (row["IsBalValid"].ToString());
+				statement.InsEst       = PIn.Double(row["InsEst"].ToString());
+				statement.BalTotal     = PIn.Double(row["BalTotal"].ToString());
 				retVal.Add(statement);
 			}
 			return retVal;
@@ -97,6 +100,9 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("IsInvoiceCopy");
 			table.Columns.Add("EmailSubject");
 			table.Columns.Add("EmailBody");
+			table.Columns.Add("IsBalValid");
+			table.Columns.Add("InsEst");
+			table.Columns.Add("BalTotal");
 			foreach(Statement statement in listStatements) {
 				table.Rows.Add(new object[] {
 					POut.Long  (statement.StatementNum),
@@ -119,6 +125,9 @@ namespace OpenDentBusiness.Crud{
 					POut.Bool  (statement.IsInvoiceCopy),
 					POut.String(statement.EmailSubject),
 					POut.String(statement.EmailBody),
+					POut.Bool  (statement.IsBalValid),
+					POut.Double(statement.InsEst),
+					POut.Double(statement.BalTotal),
 				});
 			}
 			return table;
@@ -159,7 +168,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="StatementNum,";
 			}
-			command+="PatNum,SuperFamily,DateSent,DateRangeFrom,DateRangeTo,Note,NoteBold,Mode_,HidePayment,SinglePatient,Intermingled,IsSent,DocNum,IsReceipt,IsInvoice,IsInvoiceCopy,EmailSubject,EmailBody) VALUES(";
+			command+="PatNum,SuperFamily,DateSent,DateRangeFrom,DateRangeTo,Note,NoteBold,Mode_,HidePayment,SinglePatient,Intermingled,IsSent,DocNum,IsReceipt,IsInvoice,IsInvoiceCopy,EmailSubject,EmailBody,IsBalValid,InsEst,BalTotal) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(statement.StatementNum)+",";
 			}
@@ -182,7 +191,10 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (statement.IsInvoice)+","
 				+    POut.Bool  (statement.IsInvoiceCopy)+","
 				+"'"+POut.String(statement.EmailSubject)+"',"
-				+    DbHelper.ParamChar+"paramEmailBody)";
+				+    DbHelper.ParamChar+"paramEmailBody,"
+				+    POut.Bool  (statement.IsBalValid)+","
+				+"'"+POut.Double(statement.InsEst)+"',"
+				+"'"+POut.Double(statement.BalTotal)+"')";
 			if(statement.EmailBody==null) {
 				statement.EmailBody="";
 			}
@@ -219,7 +231,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="StatementNum,";
 			}
-			command+="PatNum,SuperFamily,DateSent,DateRangeFrom,DateRangeTo,Note,NoteBold,Mode_,HidePayment,SinglePatient,Intermingled,IsSent,DocNum,IsReceipt,IsInvoice,IsInvoiceCopy,EmailSubject,EmailBody) VALUES(";
+			command+="PatNum,SuperFamily,DateSent,DateRangeFrom,DateRangeTo,Note,NoteBold,Mode_,HidePayment,SinglePatient,Intermingled,IsSent,DocNum,IsReceipt,IsInvoice,IsInvoiceCopy,EmailSubject,EmailBody,IsBalValid,InsEst,BalTotal) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(statement.StatementNum)+",";
 			}
@@ -242,7 +254,10 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (statement.IsInvoice)+","
 				+    POut.Bool  (statement.IsInvoiceCopy)+","
 				+"'"+POut.String(statement.EmailSubject)+"',"
-				+    DbHelper.ParamChar+"paramEmailBody)";
+				+    DbHelper.ParamChar+"paramEmailBody,"
+				+    POut.Bool  (statement.IsBalValid)+","
+				+"'"+POut.Double(statement.InsEst)+"',"
+				+"'"+POut.Double(statement.BalTotal)+"')";
 			if(statement.EmailBody==null) {
 				statement.EmailBody="";
 			}
@@ -277,7 +292,10 @@ namespace OpenDentBusiness.Crud{
 				+"IsInvoice    =  "+POut.Bool  (statement.IsInvoice)+", "
 				+"IsInvoiceCopy=  "+POut.Bool  (statement.IsInvoiceCopy)+", "
 				+"EmailSubject = '"+POut.String(statement.EmailSubject)+"', "
-				+"EmailBody    =  "+DbHelper.ParamChar+"paramEmailBody "
+				+"EmailBody    =  "+DbHelper.ParamChar+"paramEmailBody, "
+				+"IsBalValid   =  "+POut.Bool  (statement.IsBalValid)+", "
+				+"InsEst       = '"+POut.Double(statement.InsEst)+"', "
+				+"BalTotal     = '"+POut.Double(statement.BalTotal)+"' "
 				+"WHERE StatementNum = "+POut.Long(statement.StatementNum);
 			if(statement.EmailBody==null) {
 				statement.EmailBody="";
@@ -362,6 +380,18 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="EmailBody = "+DbHelper.ParamChar+"paramEmailBody";
 			}
+			if(statement.IsBalValid != oldStatement.IsBalValid) {
+				if(command!=""){ command+=",";}
+				command+="IsBalValid = "+POut.Bool(statement.IsBalValid)+"";
+			}
+			if(statement.InsEst != oldStatement.InsEst) {
+				if(command!=""){ command+=",";}
+				command+="InsEst = '"+POut.Double(statement.InsEst)+"'";
+			}
+			if(statement.BalTotal != oldStatement.BalTotal) {
+				if(command!=""){ command+=",";}
+				command+="BalTotal = '"+POut.Double(statement.BalTotal)+"'";
+			}
 			if(command==""){
 				return false;
 			}
@@ -431,6 +461,15 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			if(statement.EmailBody != oldStatement.EmailBody) {
+				return true;
+			}
+			if(statement.IsBalValid != oldStatement.IsBalValid) {
+				return true;
+			}
+			if(statement.InsEst != oldStatement.InsEst) {
+				return true;
+			}
+			if(statement.BalTotal != oldStatement.BalTotal) {
 				return true;
 			}
 			return false;
