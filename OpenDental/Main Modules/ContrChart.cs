@@ -5603,10 +5603,9 @@ namespace OpenDental {
 						int count=0;
 						DataTable table=DataSetMain.Tables["ProgNotes"];
 						if(ProcedureCodes.IsValidCode("D9986")) {
-							for(int i=0;i<table.Rows.Count;i++) {
-								Procedure proc=Procedures.GetOneProc(PIn.Long(table.Rows[i]["ProcNum"].ToString()),false);
-								ProcedureCode procCode=ProcedureCodes.GetProcCode(proc.CodeNum);
-								if(procCode.ProcCode=="D9986") {
+							foreach(DataRow rowCur in table.Rows.OfType<DataRow>().Where(x => x["ProcNum"].ToString()!="0")) {
+								Procedure proc=Procedures.GetOneProc(PIn.Long(rowCur["ProcNum"].ToString()),false);
+								if(ProcedureCodes.GetStringProcCode(proc.CodeNum)=="D9986") {
 									count++;
 								}
 							}
@@ -9672,6 +9671,9 @@ namespace OpenDental {
 						FillPtInfo();
 					}
 					return;
+				}
+				if(gridPtInfo.Rows[e.Row].Tag.ToString()=="Broken Appts") {					
+					return;//This row is just for display; it can't be edited.
 				}
 				if(gridPtInfo.Rows[e.Row].Tag.GetType()==typeof(CustRefEntry)) {
 					FormReferenceEntryEdit FormRE=new FormReferenceEntryEdit((CustRefEntry)gridPtInfo.Rows[e.Row].Tag);
