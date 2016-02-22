@@ -5075,7 +5075,12 @@ namespace OpenDental {
 			hl7Msg.HL7Status=HL7MessageStatus.OutPending;//it will be marked outSent by the HL7 service.
 			hl7Msg.MsgText=messageHL7.ToString();
 			hl7Msg.PatNum=PatCur.PatNum;
-			HL7Msgs.Insert(hl7Msg);
+			HL7ProcAttach hl7ProcAttach=new HL7ProcAttach();
+			hl7ProcAttach.HL7MsgNum=HL7Msgs.Insert(hl7Msg);
+			foreach(Procedure proc in procs) {
+				hl7ProcAttach.ProcNum=proc.ProcNum;
+				HL7ProcAttaches.Insert(hl7ProcAttach);
+			}
 #if DEBUG
 			MsgBox.Show(this,messageHL7.ToString());
 #else
@@ -5997,7 +6002,8 @@ namespace OpenDental {
 				if(fields[i].InternalName=="ADA Code"
 					|| fields[i].InternalName=="User"
 					|| fields[i].InternalName=="Signed"
-					|| fields[i].InternalName=="Locked")
+					|| fields[i].InternalName=="Locked"
+					|| fields[i].InternalName=="HL7 Sent")
 				{
 					col.TextAlign=HorizontalAlignment.Center;
 				}
@@ -6219,6 +6225,9 @@ namespace OpenDental {
 							break;
 						case "Locked":
 							row.Cells.Add(rowCur["isLocked"].ToString());
+							break;
+						case "HL7 Sent":
+							row.Cells.Add(rowCur["hl7Sent"].ToString());
 							break;
 						default:
 							row.Cells.Add("");

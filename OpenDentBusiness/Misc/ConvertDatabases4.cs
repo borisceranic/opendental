@@ -32,6 +32,33 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE hl7def MODIFY IsProcApptEnforced NOT NULL";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS hl7procattach";
+					Db.NonQ(command);
+					command=@"CREATE TABLE hl7procattach (
+						HL7ProcAttachNum bigint NOT NULL auto_increment PRIMARY KEY,
+						HL7MsgNum bigint NOT NULL,
+						ProcNum bigint NOT NULL,
+						INDEX(HL7MsgNum),
+						INDEX(ProcNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE hl7procattach'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE hl7procattach (
+						HL7ProcAttachNum number(20) NOT NULL,
+						HL7MsgNum number(20) NOT NULL,
+						ProcNum number(20) NOT NULL,
+						CONSTRAINT hl7procattach_HL7ProcAttachNum PRIMARY KEY (HL7ProcAttachNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX hl7procattach_HL7MsgNum ON hl7procattach (HL7MsgNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX hl7procattach_ProcNum ON hl7procattach (ProcNum)";
+					Db.NonQ(command);
+				}
 
 
 

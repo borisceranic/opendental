@@ -52,6 +52,7 @@ namespace OpenDentBusiness {
 			table.Columns.Add("EmailMessageNum");
 			table.Columns.Add("FormPatNum");
 			table.Columns.Add("HideGraphics");
+			table.Columns.Add("hl7Sent");
 			table.Columns.Add("isLocked");
 			table.Columns.Add("length");
 			table.Columns.Add("LabCaseNum");
@@ -109,13 +110,18 @@ namespace OpenDentBusiness {
 				#region Procedures
 				command="SELECT provider.Abbr,procedurecode.AbbrDesc,appointment.AptDateTime,procedurelog.BaseUnits,procedurelog.ClinicNum,"
 				+"procedurelog.CodeNum,procedurelog.DateEntryC,orionproc.DateScheduleBy,orionproc.DateStopClock,procedurelog.DateTP,"
-				+"procedurecode.Descript,orionproc.DPC,orionproc.DPCpost,Dx,HideGraphics,orionproc.IsEffectiveComm,IsLocked,orionproc.IsOnCall,"
-				+"LaymanTerm,Priority,procedurecode.ProcCode,ProcDate,ProcFee,procedurelog.ProcNum,ProcNumLab,procedurelog.ProcTime,"
+				+"procedurecode.Descript,orionproc.DPC,orionproc.DPCpost,Dx,HideGraphics,HL7ProcAttachNum,orionproc.IsEffectiveComm,IsLocked,"
+				+"orionproc.IsOnCall,LaymanTerm,Priority,procedurecode.ProcCode,ProcDate,ProcFee,procedurelog.ProcNum,ProcNumLab,procedurelog.ProcTime,"
 				+"procedurelog.ProcTimeEnd,procedurelog.Prognosis,provider.ProvNum,ProcStatus,orionproc.Status2,Surf,ToothNum,ToothRange,UnitQty "
 				+"FROM procedurelog "
 				+"LEFT JOIN procedurecode ON procedurecode.CodeNum=procedurelog.CodeNum "
 				+"LEFT JOIN provider ON provider.ProvNum=procedurelog.ProvNum "
 				+"LEFT JOIN orionproc ON procedurelog.ProcNum=orionproc.ProcNum "
+				+"LEFT JOIN ( "
+					+"SELECT MAX(HL7ProcAttachNum) AS HL7ProcAttachNum,ProcNum "
+					+"FROM hl7procattach "
+					+"GROUP BY ProcNum "
+				+") hl7pa ON hl7pa.ProcNum=procedurelog.ProcNum "
 				+"LEFT JOIN appointment ON appointment.AptNum=procedurelog.AptNum "
 				+"AND (appointment.AptStatus="+POut.Long((int)ApptStatus.Scheduled)
 				+" OR appointment.AptStatus="+POut.Long((int)ApptStatus.ASAP)
@@ -197,6 +203,12 @@ namespace OpenDentBusiness {
 					row["EmailMessageNum"]=0;
 					row["FormPatNum"]=0;
 					row["HideGraphics"]=rawProcs.Rows[i]["HideGraphics"].ToString();
+					if(rawProcs.Rows[i]["HL7ProcAttachNum"].ToString()=="") {
+						row["hl7Sent"]="";
+					}
+					else {
+						row["hl7Sent"]="X";
+					}
 					row["isLocked"]=PIn.Bool(rawProcs.Rows[i]["isLocked"].ToString())?"X":"";
 					row["LabCaseNum"]=0;
 					row["length"]="";

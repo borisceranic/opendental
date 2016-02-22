@@ -292,6 +292,7 @@
     <Compile Include="Crud\HL7DefMessageCrud.cs" />
     <Compile Include="Crud\HL7DefSegmentCrud.cs" />
     <Compile Include="Crud\HL7MsgCrud.cs" />
+    <Compile Include="Crud\HL7ProcAttachCrud.cs" />
     <Compile Include="Crud\Icd10Crud.cs" />
     <Compile Include="Crud\ICD9Crud.cs" />
     <Compile Include="Crud\InsFilingCodeCrud.cs" />
@@ -435,6 +436,7 @@
     <Compile Include="Data Interface\DashboardLayouts.cs" />
     <Compile Include="Data Interface\Ebills.cs" />
     <Compile Include="Data Interface\EmailAutographs.cs" />
+    <Compile Include="Data Interface\HL7ProcAttaches.cs" />
     <Compile Include="Data Interface\InsVerifies.cs" />
     <Compile Include="Data Interface\InsVerifyHists.cs" />
     <Compile Include="Data Interface\TreatPlanAttaches.cs" />
@@ -1012,6 +1014,7 @@
     <Compile Include="TableTypes\ClaimSnapshot.cs" />
     <Compile Include="TableTypes\DashboardCell.cs" />
     <Compile Include="TableTypes\DashboardLayout.cs" />
+    <Compile Include="TableTypes\HL7ProcAttach.cs" />
     <Compile Include="TableTypes\InsVerify.cs" />
     <Compile Include="TableTypes\InsVerifyHist.cs" />
     <Compile Include="TableTypes\TreatPlanAttach.cs" />
