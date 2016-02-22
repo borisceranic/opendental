@@ -89,6 +89,7 @@ namespace OpenDental{
 			this.butDelete = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.checkLongDCodes = new System.Windows.Forms.CheckBox();
+			this.checkProcsAppt = new System.Windows.Forms.CheckBox();
 			this.groupShowDemographics.SuspendLayout();
 			this.groupDelimeters.SuspendLayout();
 			this.groupHL7Comm.SuspendLayout();
@@ -575,7 +576,7 @@ namespace OpenDental{
 			// checkShowAccount
 			// 
 			this.checkShowAccount.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkShowAccount.Location = new System.Drawing.Point(6, 270);
+			this.checkShowAccount.Location = new System.Drawing.Point(63, 272);
 			this.checkShowAccount.Name = "checkShowAccount";
 			this.checkShowAccount.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
 			this.checkShowAccount.Size = new System.Drawing.Size(162, 18);
@@ -585,7 +586,7 @@ namespace OpenDental{
 			// checkShowAppts
 			// 
 			this.checkShowAppts.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkShowAppts.Location = new System.Drawing.Point(6, 252);
+			this.checkShowAppts.Location = new System.Drawing.Point(63, 255);
 			this.checkShowAppts.Name = "checkShowAppts";
 			this.checkShowAppts.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
 			this.checkShowAppts.Size = new System.Drawing.Size(162, 18);
@@ -595,7 +596,7 @@ namespace OpenDental{
 			// checkQuadAsToothNum
 			// 
 			this.checkQuadAsToothNum.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkQuadAsToothNum.Location = new System.Drawing.Point(6, 288);
+			this.checkQuadAsToothNum.Location = new System.Drawing.Point(63, 289);
 			this.checkQuadAsToothNum.Name = "checkQuadAsToothNum";
 			this.checkQuadAsToothNum.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
 			this.checkQuadAsToothNum.Size = new System.Drawing.Size(162, 18);
@@ -764,11 +765,13 @@ namespace OpenDental{
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasAddButton = false;
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(17, 332);
+			this.gridMain.Location = new System.Drawing.Point(17, 347);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(796, 318);
+			this.gridMain.Size = new System.Drawing.Size(796, 303);
 			this.gridMain.TabIndex = 0;
 			this.gridMain.Title = "Messages / Segments";
 			this.gridMain.TranslationName = null;
@@ -778,17 +781,28 @@ namespace OpenDental{
 			// checkLongDCodes
 			// 
 			this.checkLongDCodes.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkLongDCodes.Location = new System.Drawing.Point(6, 306);
+			this.checkLongDCodes.Location = new System.Drawing.Point(63, 306);
 			this.checkLongDCodes.Name = "checkLongDCodes";
 			this.checkLongDCodes.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
 			this.checkLongDCodes.Size = new System.Drawing.Size(162, 18);
 			this.checkLongDCodes.TabIndex = 71;
 			this.checkLongDCodes.Text = "Send Long D Codes";
 			// 
+			// checkProcsAppt
+			// 
+			this.checkProcsAppt.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkProcsAppt.Location = new System.Drawing.Point(6, 323);
+			this.checkProcsAppt.Name = "checkProcsAppt";
+			this.checkProcsAppt.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+			this.checkProcsAppt.Size = new System.Drawing.Size(219, 18);
+			this.checkProcsAppt.TabIndex = 72;
+			this.checkProcsAppt.Text = "Warn if Procs not attached to Appt";
+			// 
 			// FormHL7DefEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
 			this.ClientSize = new System.Drawing.Size(823, 696);
+			this.Controls.Add(this.checkProcsAppt);
 			this.Controls.Add(this.checkLongDCodes);
 			this.Controls.Add(this.groupHL7Comm);
 			this.Controls.Add(this.groupDelimeters);
@@ -905,5 +919,6 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textFieldSep;
 		private System.Windows.Forms.GroupBox groupHL7Comm;
 		private System.Windows.Forms.CheckBox checkLongDCodes;
+		private System.Windows.Forms.CheckBox checkProcsAppt;
 	}
 }

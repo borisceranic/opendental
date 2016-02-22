@@ -70,6 +70,9 @@ namespace OpenDentBusiness{
 		///<summary>For eCW HL7 interfaces only.  False by default.  When false, D codes sent in outbound DFT messages will be limited to 5 characters.
 		///Any additional characters will be stripped off when generating the HL7 message.  When true, D codes will not be truncated.</summary>
 		public bool HasLongDCodes;
+		///<summary>If true a message box will warn users if they try to send procedures from the chart module that are not attached to an 
+		///appointment.</summary>
+		public bool IsProcApptEnforced;
 
 
 		///<Summary>List of messages associated with this hierarchical definition.  Use items in this list to get to items lower in the hierarchy.</Summary>

@@ -38,6 +38,7 @@ namespace OpenDental {
 			checkShowAppts.Checked=HL7DefCur.ShowAppts;
 			checkQuadAsToothNum.Checked=HL7DefCur.IsQuadAsToothNum;
 			checkLongDCodes.Checked=HL7DefCur.HasLongDCodes;
+			checkProcsAppt.Checked=HL7DefCur.IsProcApptEnforced;
 			textSftpUsername.Text=HL7DefCur.SftpUsername;
 			textSftpPassword.Text=HL7DefCur.SftpPassword;
 			for(int i=0;i<Enum.GetNames(typeof(ModeTxHL7)).Length;i++) {
@@ -67,6 +68,7 @@ namespace OpenDental {
 			checkQuadAsToothNum.Enabled=false;
 			checkShowAccount.Enabled=false;
 			checkShowAppts.Enabled=false;
+			checkProcsAppt.Enabled=false;
 			comboLabImageCat.Enabled=false;
 			//comboModeTx.Enabled=false;//also part of the internal type controls, must be type other than MedLabv2_3 and enabled for comboModeTx to be enabled
 			groupDelimeters.Enabled=false;
@@ -85,6 +87,7 @@ namespace OpenDental {
 			checkQuadAsToothNum.Visible=false;
 			checkShowAccount.Visible=false;
 			checkShowAppts.Visible=false;
+			checkProcsAppt.Visible=false;
 			comboModeTx.Enabled=false;
 			groupShowDemographics.Visible=false;
 			#endregion Internal Type Affected Controls
@@ -113,6 +116,7 @@ namespace OpenDental {
 				checkQuadAsToothNum.Enabled=true;
 				checkShowAccount.Enabled=true;
 				checkShowAppts.Enabled=true;
+				checkProcsAppt.Enabled=true;
 				comboLabImageCat.Enabled=true;
 				groupShowDemographics.Enabled=true;
 				groupDelimeters.Enabled=true;
@@ -138,6 +142,7 @@ namespace OpenDental {
 				checkQuadAsToothNum.Visible=true;
 				checkShowAccount.Visible=true;
 				checkShowAppts.Visible=true;
+				checkProcsAppt.Visible=true;
 				groupShowDemographics.Visible=true;
 			}
 			if(HL7DefCur.InternalType==HL7InternalType.eCWFull
@@ -518,6 +523,7 @@ namespace OpenDental {
 			HL7DefCur.ShowAppts=checkShowAppts.Checked;
 			HL7DefCur.IsQuadAsToothNum=checkQuadAsToothNum.Checked;
 			HL7DefCur.HasLongDCodes=checkLongDCodes.Checked;
+			HL7DefCur.IsProcApptEnforced=checkProcsAppt.Checked;
 			//clear all fields in order to save the relevant data in the proper fields and clear out data that may not be relevant for the Tx mode
 			HL7DefCur.IncomingFolder="";
 			HL7DefCur.OutgoingFolder="";

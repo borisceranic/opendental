@@ -5059,6 +5059,11 @@ namespace OpenDental {
 				aptNum=procs[i].AptNum;
 				break;
 			}
+			if(HL7Defs.GetOneDeepEnabled().IsProcApptEnforced && procs.Any(x => x.AptNum==0)) {
+				if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"At least one of these procedures is not attached to an appointment. Send anyway?")) {
+					return;
+				}
+			}
 //todo: compare with: Bridges.ECW.AptNum, no need to generate PDF segment, pdfs only with eCW and this button not available with eCW integration
 			MessageHL7 messageHL7=MessageConstructor.GenerateDFT(procs,EventTypeHL7.P03,PatCur,FamCur.ListPats[0],aptNum,"treatment","PDF Segment");
 			if(messageHL7==null) {
@@ -5073,6 +5078,9 @@ namespace OpenDental {
 			HL7Msgs.Insert(hl7Msg);
 #if DEBUG
 			MsgBox.Show(this,messageHL7.ToString());
+#else
+			MessageBox.Show(procs.Count+" "+(procs.Count==1?Lan.g(this,"procedure"):Lan.g(this,"procedures"))
+				+" "+Lan.g(this,"queued to be sent by the HL7 service."));
 #endif
 		}
 

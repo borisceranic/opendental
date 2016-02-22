@@ -20,6 +20,18 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference (PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'PatientAllSuperFamilySync','0')";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE hl7def ADD IsProcApptEnforced tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE hl7def ADD IsProcApptEnforced number(3)";
+					Db.NonQ(command);
+					command="UPDATE hl7def SET IsProcApptEnforced = 0 WHERE IsProcApptEnforced IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE hl7def MODIFY IsProcApptEnforced NOT NULL";
+					Db.NonQ(command);
+				}
 
 
 
