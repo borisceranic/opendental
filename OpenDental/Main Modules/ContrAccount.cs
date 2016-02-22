@@ -3779,6 +3779,15 @@ namespace OpenDental {
 			}
 			stmt.Note = "";
 			stmt.NoteBold = "";
+			Patient guarantor = null;
+			if(PatCur!=null) {
+				guarantor = Patients.GetPat(PatCur.Guarantor);
+			}
+			if(guarantor!=null) {
+				stmt.IsBalValid=true;
+				stmt.BalTotal=guarantor.BalTotal;
+				stmt.InsEst=guarantor.InsEst;
+			}
 			PrintStatement(stmt);
 			ModuleSelected(PatCur.PatNum);
 		}
@@ -3801,6 +3810,15 @@ namespace OpenDental {
 			stmt.DateRangeTo=DateTimeOD.Today;
 			stmt.Note="";
 			stmt.NoteBold="";
+			Patient guarantor = null;
+			if(PatCur!=null) {
+				guarantor = Patients.GetPat(PatCur.Guarantor);
+			}
+			if(guarantor!=null) {
+				stmt.IsBalValid=true;
+				stmt.BalTotal=guarantor.BalTotal;
+				stmt.InsEst=guarantor.InsEst;
+			}
 			PrintStatement(stmt);
 			ModuleSelected(PatCur.PatNum);
 		}
@@ -3836,6 +3854,15 @@ namespace OpenDental {
 			}
 			stmt.Note="";
 			stmt.NoteBold="";
+			Patient guarantor = null;
+			if(PatCur!=null) {
+				guarantor = Patients.GetPat(PatCur.Guarantor);
+			}
+			if(guarantor!=null) {
+				stmt.IsBalValid=true;
+				stmt.BalTotal=guarantor.BalTotal;
+				stmt.InsEst=guarantor.InsEst;
+			}
 			//It's pointless to give the user the window to select statement options, because they could just as easily have hit the More Options dropdown, then Email from there.
 			PrintStatement(stmt);
 			ModuleSelected(PatCur.PatNum);
@@ -3859,6 +3886,15 @@ namespace OpenDental {
 			stmt.DateRangeTo=DateTimeOD.Today;
 			stmt.Note="";
 			stmt.NoteBold="";
+			Patient guarantor = null;
+			if(PatCur!=null) {
+				guarantor = Patients.GetPat(PatCur.Guarantor);
+			}
+			if(guarantor!=null) {
+				stmt.IsBalValid=true;
+				stmt.BalTotal=guarantor.BalTotal;
+				stmt.InsEst=guarantor.InsEst;
+			}
 			PrintStatement(stmt);
 			ModuleSelected(PatCur.PatNum);
 		}
@@ -3949,6 +3985,15 @@ namespace OpenDental {
 			stmt.DateRangeTo=DateTimeOD.Today;
 			stmt.Note=PrefC.GetString(PrefName.BillingDefaultsInvoiceNote);
 			stmt.NoteBold="";
+			Patient guarantor = null;
+			if(PatCur!=null) {
+				guarantor = Patients.GetPat(PatCur.Guarantor);
+			}
+			if(guarantor!=null) {
+				stmt.IsBalValid=true;
+				stmt.BalTotal=guarantor.BalTotal;
+				stmt.InsEst=guarantor.InsEst;
+			}
 			Statements.Insert(stmt);
 			stmt.IsNew=true;
 			List<Procedure> procsForPat=Procedures.Refresh(PatCur.PatNum);
@@ -4011,6 +4056,15 @@ namespace OpenDental {
 			}
 			stmt.Note="";
 			stmt.NoteBold="";
+			Patient guarantor = null;
+			if(PatCur!=null) {
+				guarantor = Patients.GetPat(PatCur.Guarantor);
+			}
+			if(guarantor!=null) {
+				stmt.IsBalValid=true;
+				stmt.BalTotal=guarantor.BalTotal;
+				stmt.InsEst=guarantor.InsEst;
+			}
 			//All printing and emailing will be done from within the form:
 			FormStatementOptions FormSO=new FormStatementOptions();
 			stmt.IsNew=true;

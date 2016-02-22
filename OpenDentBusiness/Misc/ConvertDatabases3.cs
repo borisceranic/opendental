@@ -13163,6 +13163,43 @@ namespace OpenDentBusiness {
 						Db.NonQ(command);
 					}
 				}
+				//New Statement Columns
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE statement ADD IsBalValid tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE statement ADD IsBalValid number(3)";
+					Db.NonQ(command);
+					command="UPDATE statement SET IsBalValid = 0 WHERE IsBalValid IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE statement MODIFY IsBalValid NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE statement ADD InsEst double NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE statement ADD InsEst number(38,8)";
+					Db.NonQ(command);
+					command="UPDATE statement SET InsEst = 0 WHERE InsEst IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE statement MODIFY InsEst NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE statement ADD BalTotal double NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE statement ADD BalTotal number(38,8)";
+					Db.NonQ(command);
+					command="UPDATE statement SET BalTotal = 0 WHERE BalTotal IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE statement MODIFY BalTotal NOT NULL";
+					Db.NonQ(command);
+				}
 				command="UPDATE preference SET ValueString = '16.1.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
@@ -13173,5 +13210,3 @@ namespace OpenDentBusiness {
 	}
 }
 
-				
-				
