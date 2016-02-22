@@ -1070,8 +1070,8 @@ namespace OpenDentBusiness{
 					AND procedurelog.ProcDate > "+DbHelper.DateAddMonth(DbHelper.Curdate(),"-6")+" "
 					+"GROUP BY patient.Guarantor;";
 			}
-			command+="SELECT patient.PatNum,Bal_0_30,Bal_31_60,Bal_61_90,BalOver90,BalTotal,BillingType,"
-				+"InsEst,LName,FName,MiddleI,PayPlanDue,Preferred,patient.SuperFamily,patient.HasSuperBilling, "
+			command+="SELECT patient.PatNum,Bal_0_30,Bal_31_60,Bal_61_90,BalOver90,patient.BalTotal,BillingType,"
+				+"patient.InsEst,LName,FName,MiddleI,PayPlanDue,Preferred,patient.SuperFamily,patient.HasSuperBilling, "
 				+"IFNULL(MAX(statement.DateSent),'0001-01-01') AS LastStatement ";
 			if(includeChanged){
 				command+=",IFNULL(templastproc"+rndStr+@".LastProc,'0001-01-01') AS LastChange,"
@@ -1104,19 +1104,19 @@ namespace OpenDentBusiness{
 				command+="EXISTS (SELECT * FROM patient p2 WHERE p2.Guarantor=patient.Guarantor AND p2.PatStatus != "+POut.Int((int)PatientStatus.Inactive)+") AND ";
 			}
 			if(PrefC.GetBool(PrefName.BalancesDontSubtractIns)) {
-				command+="(BalTotal";
+				command+="(patient.BalTotal";
 			}
 			else {
-				command+="(BalTotal - InsEst";
+				command+="(patient.BalTotal-patient.InsEst";
 			}
 			command+=" > '"+POut.Double(excludeLessThan+.005)+"'"//add half a penny for rounding error
 				+" OR PayPlanDue > 0";
 			if(!excludeNeg){
 				if(PrefC.GetBool(PrefName.BalancesDontSubtractIns)) {
-					command+=" OR BalTotal < '-.005')";
+					command+=" OR patient.BalTotal < '-.005')";
 				}
 				else {
-					command+=" OR BalTotal - InsEst < '-.005')";
+					command+=" OR patient.BalTotal-patient.InsEst < '-.005')";
 				}
 			}
 			else{

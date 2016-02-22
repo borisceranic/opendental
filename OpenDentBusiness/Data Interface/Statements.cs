@@ -138,7 +138,7 @@ namespace OpenDentBusiness{
 			table.Columns.Add("StatementNum");
 			table.Columns.Add("SuperFamily");
 			List<DataRow> rows=new List<DataRow>();
-			string command="SELECT BalTotal,BillingType,FName,InsEst,statement.IsSent,"
+			string command="SELECT patient.BalTotal,BillingType,FName,patient.InsEst,statement.IsSent,"
 				+"IFNULL(MAX(s2.DateSent),"+POut.Date(DateTime.MinValue)+") LastStatement,"
 				+"LName,MiddleI,statement.Mode_,PayPlanDue,Preferred,"
 				+"statement.PatNum,statement.StatementNum,statement.SuperFamily "
@@ -162,7 +162,7 @@ namespace OpenDentBusiness{
 			if(clinicNums.Count>0) {
 				command+="AND patient.ClinicNum IN ("+string.Join(",",clinicNums)+") ";
 			}
-			command+="GROUP BY BalTotal,BillingType,FName,InsEst,statement.IsSent,"
+			command+="GROUP BY patient.BalTotal,BillingType,FName,patient.InsEst,statement.IsSent,"
 				+"LName,MiddleI,statement.Mode_,PayPlanDue,Preferred,"
 				+"statement.PatNum,statement.StatementNum,statement.SuperFamily "; 
 			if(orderBy==0){//BillingType
