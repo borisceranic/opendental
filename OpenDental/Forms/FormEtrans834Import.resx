@@ -120,6 +120,13 @@
   <metadata name="folderBrowserImportPath.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
+  <data name="label2.Text" xml:space="preserve">
+    <value>All files in the selected directory are shown below.
+If a file is not an X12 file or is an X12 file but is not an 834, then an error will display in the Errors column.
+Each 834 contains a date and time.  The oldest 834 must be imported before newer 834s are imported to preserve the order of insurance plan changes.
+The oldest 834 will be automatically selected.  When you click OK, only the selected 834 will be imported.
+If there are multiple 834s displayed below, then run this tool multiple times to import all 834s.</value>
+  </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>

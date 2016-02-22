@@ -32,11 +32,12 @@ namespace OpenDental{
 			this.textImportPath = new OpenDental.ODtextBox();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.label2 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(12, 9);
+			this.label1.Location = new System.Drawing.Point(12, 93);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(100, 20);
 			this.label1.TabIndex = 5;
@@ -52,11 +53,11 @@ namespace OpenDental{
 			this.gridInsPlanFiles.HasAddButton = false;
 			this.gridInsPlanFiles.HasMultilineHeaders = false;
 			this.gridInsPlanFiles.HScrollVisible = false;
-			this.gridInsPlanFiles.Location = new System.Drawing.Point(12, 58);
+			this.gridInsPlanFiles.Location = new System.Drawing.Point(12, 142);
 			this.gridInsPlanFiles.Name = "gridInsPlanFiles";
 			this.gridInsPlanFiles.ScrollValue = 0;
 			this.gridInsPlanFiles.SelectionMode = OpenDental.UI.GridSelectionMode.None;
-			this.gridInsPlanFiles.Size = new System.Drawing.Size(950, 596);
+			this.gridInsPlanFiles.Size = new System.Drawing.Size(950, 512);
 			this.gridInsPlanFiles.TabIndex = 8;
 			this.gridInsPlanFiles.Title = "Ins Plan Files To Import";
 			this.gridInsPlanFiles.TranslationName = null;
@@ -69,7 +70,7 @@ namespace OpenDental{
 			this.butRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butRefresh.CornerRadius = 4F;
-			this.butRefresh.Location = new System.Drawing.Point(887, 32);
+			this.butRefresh.Location = new System.Drawing.Point(887, 116);
 			this.butRefresh.Name = "butRefresh";
 			this.butRefresh.Size = new System.Drawing.Size(75, 20);
 			this.butRefresh.TabIndex = 9;
@@ -84,7 +85,7 @@ namespace OpenDental{
 			this.butImportPathPick.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butImportPathPick.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butImportPathPick.CornerRadius = 4F;
-			this.butImportPathPick.Location = new System.Drawing.Point(854, 32);
+			this.butImportPathPick.Location = new System.Drawing.Point(854, 116);
 			this.butImportPathPick.Name = "butImportPathPick";
 			this.butImportPathPick.Size = new System.Drawing.Size(30, 20);
 			this.butImportPathPick.TabIndex = 6;
@@ -98,7 +99,7 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textImportPath.BackColor = System.Drawing.SystemColors.Window;
 			this.textImportPath.DetectUrls = false;
-			this.textImportPath.Location = new System.Drawing.Point(12, 32);
+			this.textImportPath.Location = new System.Drawing.Point(12, 116);
 			this.textImportPath.Multiline = false;
 			this.textImportPath.Name = "textImportPath";
 			this.textImportPath.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
@@ -137,10 +138,19 @@ namespace OpenDental{
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
+			// label2
+			// 
+			this.label2.Location = new System.Drawing.Point(12, 9);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(950, 84);
+			this.label2.TabIndex = 10;
+			this.label2.Text = resources.GetString("label2.Text");
+			// 
 			// FormEtrans834Import
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 696);
+			this.Controls.Add(this.label2);
 			this.Controls.Add(this.butRefresh);
 			this.Controls.Add(this.gridInsPlanFiles);
 			this.Controls.Add(this.butImportPathPick);
@@ -149,11 +159,10 @@ namespace OpenDental{
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(700, 600);
+			this.MinimumSize = new System.Drawing.Size(990, 600);
 			this.Name = "FormEtrans834Import";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Import Ins Plans 834";
-			this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
 			this.Load += new System.EventHandler(this.FormEtrans834Import_Load);
 			this.ResumeLayout(false);
 
@@ -169,5 +178,6 @@ namespace OpenDental{
 		private System.Windows.Forms.FolderBrowserDialog folderBrowserImportPath;
 		private UI.ODGrid gridInsPlanFiles;
 		private UI.Button butRefresh;
+		private System.Windows.Forms.Label label2;
 	}
 }

@@ -1164,12 +1164,12 @@ namespace OpenDentBusiness {
 				}
 				else if(dtp.DateTimeQualifier=="348") {//Benefit Begin
 					//This is the effective date of coverage.  This code must always be sent when adding or reinstating coverage.
-					healthCoverage.Sub.DateEffective=X12Parse.ToDate(dtp.DateTimePeriod);
+					healthCoverage.DateEffective=X12Parse.ToDate(dtp.DateTimePeriod);
 				}
 				else if(dtp.DateTimeQualifier=="349") {//Benefit End
 					//The termination date represents the last date of coverage in which claims will be paid for the individual being terminated.
 					//For example, if a date of 02/28/2001 is passed then claims for this individual will be paid through 11:50 p.m. on 02/28/2001.
-					healthCoverage.Sub.DateTerm=X12Parse.ToDate(dtp.DateTimePeriod);
+					healthCoverage.DateTerm=X12Parse.ToDate(dtp.DateTimePeriod);
 				}
 				else if(dtp.DateTimeQualifier=="543") {//Last Premium Paid Date
 				}
@@ -1563,7 +1563,10 @@ namespace OpenDentBusiness {
 		public List<Hx834_Provider> ListProviderInformation=new List<Hx834_Provider>();
 		///<summary>Loop 2320.  Repeat 5.</summary>
 		public List<Hx834_Cob> ListCoordinationOfBeneifts=new List<Hx834_Cob>();
-		public InsSub Sub=new InsSub();
+		///<summary>The date in which insurance coverage begins.</summary>
+		public DateTime DateEffective;
+		///<summary>The date in which insurance coverage ends.</summary>
+		public DateTime DateTerm;
 
 		public string GetCoverageMaintTypeDescript() {
 			if(HealthCoverage==null) {

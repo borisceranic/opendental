@@ -141,14 +141,14 @@ namespace OpenDental {
 			else {//Either the patient was matched perfectly or the user chose the correct patient already.
 				row.Cells.Add(member.Pat.PatNum.ToString());//PatNum
 			}
-			if(healthCoverage!=null && healthCoverage.Sub.DateEffective.Year > 1880) {
-				row.Cells.Add(healthCoverage.Sub.DateEffective.ToShortDateString());//Date Begin
+			if(healthCoverage!=null && healthCoverage.DateEffective.Year > 1880) {
+				row.Cells.Add(healthCoverage.DateEffective.ToShortDateString());//Date Begin
 			}
 			else {
 				row.Cells.Add("");//Date Begin
 			}
-			if(healthCoverage!=null && healthCoverage.Sub.DateTerm.Year > 1880) {
-				row.Cells.Add(healthCoverage.Sub.DateTerm.ToShortDateString());//Date Term
+			if(healthCoverage!=null && healthCoverage.DateTerm.Year > 1880) {
+				row.Cells.Add(healthCoverage.DateTerm.ToShortDateString());//Date Term
 			}
 			else {
 				row.Cells.Add("");//Date Term
@@ -218,12 +218,22 @@ namespace OpenDental {
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
+			if(!MsgBox.Show(this,true,"Importing insurance plans is a database intensive operation and can take 10 minutes or more to run.  "
+				+"It is best to import insurance plans after hours or during another time period when database usage is otherwise low.\r\n"
+				+"Click OK to import insurance plans now, or click Cancel."))
+			{
+				return;
+			}
 			Cursor=Cursors.WaitCursor;
 			Prefs.UpdateBool(PrefName.Ins834IsPatientCreate,checkIsPatientCreate.Checked);
 			int rowIndex=1;
 			int createdPatsCount=0;
 			int updatedPatsCount=0;
 			int skippedPatsCount=0;
+			int createdCarrierCount=0;
+			int createdPlanCount=0;
+			int droppedPlanCount=0;
+			int updatedPlanCount=0;
 			StringBuilder sbErrorMessages=new StringBuilder();
 			List <int> listImportedSegments=new List<int> ();//Used to reconstruct the 834 with imported patients removed.
 			for(int i=0;i<_x834.ListTransactions.Count;i++) {
@@ -256,9 +266,20 @@ namespace OpenDental {
 						skippedPatsCount++;
 					}
 					else if(member.Pat.PatNum==0 && checkIsPatientCreate.Checked) {
+						//The code here mimcs the behavior of FormPatientSelect.butAddPt_Click().
 						Patients.Insert(member.Pat,false);
+						Patient memberPatOld=member.Pat.Copy();
+						member.Pat.PatStatus=PatientStatus.Patient;
+						member.Pat.BillingType=PrefC.GetLong(PrefName.PracticeDefaultBillType);
+						if(!PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
+							//Set the patients primary provider to the practice default provider.
+							member.Pat.PriProv=Providers.GetDefaultProvider().ProvNum;
+						}
+						member.Pat.ClinicNum=Clinics.ClinicNum;
+						member.Pat.Guarantor=member.Pat.PatNum;
+						Patients.Update(member.Pat,memberPatOld);
 						int patIdx=_listPatients.BinarySearch(member.Pat);//Preserve sort order by locating the index in which to insert the newly added patient.
-						int insertIdx=~patIdx;//According to MSDN, the index returned by BinarySearch() is a "bitwise compliment"
+						int insertIdx=~patIdx;//According to MSDN, the index returned by BinarySearch() is a "bitwise compliment", since not currently in list.
 						_listPatients.Insert(insertIdx,member.Pat);
 						SecurityLogs.MakeLogEntry(Permissions.PatientCreate,member.Pat.PatNum,"Created from Import Ins Plans 834.",LogSources.InsPlanImport834);
 						isMemberImported=true;
@@ -286,7 +307,130 @@ namespace OpenDental {
 							if(k > 0) {
 								rowIndex++;
 							}
-							//TODO: Import insurance plans.
+							List <Carrier> listCarriers=Carriers.GetByNameAndElectId(tran.Payer.Name,tran.Payer.IdentificationCode);							
+							if(listCarriers.Count==0) {
+								Carrier carrier=new Carrier();
+								carrier.CarrierName=tran.Payer.Name;
+								carrier.ElectID=tran.Payer.IdentificationCode;
+								Carriers.Insert(carrier);
+								DataValid.SetInvalid(InvalidType.Carriers);
+								listCarriers.Add(carrier);
+								createdCarrierCount++;
+							}
+							//Update insurance plans.  Match based on carrier and SubscriberId.
+							bool isDropping=false;
+							if(healthCoverage.HealthCoverage.MaintenanceTypeCode=="002") {
+								isDropping=true;
+							}
+							Family fam=Patients.GetFamily(member.Pat.PatNum);
+							List<InsSub> listInsSubs=InsSubs.RefreshForFam(fam);
+							List <InsPlan> listInsPlans=InsPlans.RefreshForSubList(listInsSubs);
+							List <PatPlan> listPatPlans=PatPlans.Refresh(member.Pat.PatNum);
+							InsSub insSubMatch=null;
+							InsPlan insPlanMatch=null;
+							PatPlan patPlanMatch=null;
+							for(int p=0;p<listInsSubs.Count;p++) {
+								InsSub insSub=listInsSubs[p];
+								//According to section 1.4.3 of the standard, the preferred method of matching a dependent to a subscriber is to use the subscriberId.
+								if(insSub.SubscriberID.Trim()!=member.SubscriberId.Trim()) {
+									continue;
+								}
+								InsPlan insPlan=InsPlans.GetPlan(insSub.PlanNum,listInsPlans);
+								//We also require a carrier match, because we expect the sender to give us
+								//the same carrier information for the insurance plans of both the subscriber and dependent.
+								Carrier carrier=listCarriers.FirstOrDefault(x => x.CarrierNum==insPlan.CarrierNum);
+								if(carrier==null) {
+									continue;
+								}
+								insSubMatch=insSub;
+								insPlanMatch=insPlan;
+								patPlanMatch=PatPlans.GetFromList(listPatPlans,insSub.InsSubNum);
+								break;
+							}							
+							if(patPlanMatch==null && isDropping) {//No plan match and dropping plan.
+								//Nothing to do.  The plan either never existed or is already dropped.
+							}
+							else if(patPlanMatch==null && !isDropping) {//No plan match and not dropping plan.  Create the plan.
+								//The code below mimics how insurance plans are created in ContrFamily.ToolButIns_Click().
+								if(insPlanMatch==null) {
+									insPlanMatch=new InsPlan();
+									if(member.InsFiling!=null) {
+										insPlanMatch.FilingCode=member.InsFiling.InsFilingCodeNum;
+									}
+									insPlanMatch.GroupNum=member.GroupNum;
+									insPlanMatch.CarrierNum=listCarriers[0].CarrierNum;
+									insPlanMatch.ClaimFormNum=PrefC.GetLong(PrefName.DefaultClaimForm);
+									InsPlans.Insert(insPlanMatch);
+								}
+								else {
+									if(member.InsFiling!=null) {
+										insPlanMatch.FilingCode=member.InsFiling.InsFilingCodeNum;
+									}
+									insPlanMatch.GroupNum=member.GroupNum;
+									InsPlans.Update(insPlanMatch);
+								}
+								if(insSubMatch==null) {
+									insSubMatch=new InsSub();
+									insSubMatch.PlanNum=insPlanMatch.PlanNum;
+									//According to section 1.4.3 of the 834 standard, subscribers must be sent in the 834 before dependents.
+									//This requirement facilitates easier linking of dependents to their subscribers.
+									//Since we were not able to locate a subscriber within the family above, we can safely assume that the insurance plan in the 834
+									//is for the subscriber.  Thus we can set the Subscriber PatNum to the same PatNum as the patient.
+									insSubMatch.Subscriber=member.Pat.PatNum;
+									insSubMatch.SubscriberID=member.SubscriberId;
+									insSubMatch.ReleaseInfo=member.IsReleaseInfo;
+									insSubMatch.AssignBen=true;
+									insSubMatch.DateEffective=healthCoverage.DateEffective;
+									insSubMatch.DateTerm=healthCoverage.DateTerm;
+									InsSubs.Insert(insSubMatch);
+								}
+								else {
+									insSubMatch.DateEffective=healthCoverage.DateEffective;
+									insSubMatch.DateTerm=healthCoverage.DateTerm;
+									insSubMatch.ReleaseInfo=member.IsReleaseInfo;
+									InsSubs.Update(insSubMatch);
+								}
+								patPlanMatch=new PatPlan();
+								patPlanMatch.Ordinal=0;
+								for(int p=0;p<listPatPlans.Count;p++) {
+									if(listPatPlans[p].Ordinal > patPlanMatch.Ordinal) {
+										patPlanMatch.Ordinal=listPatPlans[p].Ordinal;
+									}
+								}
+								patPlanMatch.Ordinal++;//Greatest ordinal for patient.
+								patPlanMatch.PatNum=member.Pat.PatNum;
+								patPlanMatch.InsSubNum=insSubMatch.InsSubNum;
+								patPlanMatch.Relationship=member.PlanRelat;
+								if(member.PlanRelat!=Relat.Self) {
+									member.Pat.Guarantor=insSubMatch.Subscriber;
+									Patient memberPatOld=member.Pat.Copy();
+									Patients.Update(member.Pat,memberPatOld);
+								}
+								PatPlans.Insert(patPlanMatch);
+								createdPlanCount++;
+							}
+							else if(patPlanMatch!=null && isDropping) {//Plan matched and dropping plan.  Drop the plan.
+								//This code mimics the behavior of FormInsPlan.butDrop_Click(), except here we do not care if there are claims for this plan today.
+								//We need this feature to be as streamlined as possible so that it might become an automated process later.
+								//Testing for claims on today's date does not seem that useful anyway, or at least not as useful as checking for any claims
+								//associated to the plan, instead of just today's date.
+								PatPlans.Delete(patPlanMatch.PatPlanNum);//Estimates recomputed within Delete()
+								droppedPlanCount++;
+							}
+							else if(patPlanMatch!=null && !isDropping)  {//Plan matched and not dropping plan.  Update the plan.
+								patPlanMatch.Relationship=member.PlanRelat;
+								PatPlans.Update(patPlanMatch);
+								insSubMatch.DateEffective=healthCoverage.DateEffective;
+								insSubMatch.DateTerm=healthCoverage.DateTerm;
+								insSubMatch.ReleaseInfo=member.IsReleaseInfo;
+								InsSubs.Update(insSubMatch);
+								if(member.InsFiling!=null) {
+									insPlanMatch.FilingCode=member.InsFiling.InsFilingCodeNum;
+								}
+								insPlanMatch.GroupNum=member.GroupNum;
+								InsPlans.Update(insPlanMatch);
+								updatedPlanCount++;
+							}
 						}//end loop k
 						//Remove the member from the X834.
 						int endSegIndex=0;
@@ -300,7 +444,6 @@ namespace OpenDental {
 						for(int s=member.MemberLevelDetail.SegmentIndex;s<=endSegIndex;s++) {
 							listImportedSegments.Add(s);
 						}
-
 					}
 					rowIndex++;
 				}//end loop j
@@ -327,6 +470,22 @@ namespace OpenDental {
 			}
 			if(skippedPatsCount > 0) {
 				msg+="\r\n"+Lan.g(this,"Number of patients skipped:")+" "+skippedPatsCount;
+				msg+=sbErrorMessages.ToString();
+			}
+			if(createdCarrierCount > 0) {
+				msg+="\r\n"+Lan.g(this,"Number of carriers created:")+" "+createdCarrierCount;
+				msg+=sbErrorMessages.ToString();
+			}
+			if(createdPlanCount > 0) {
+				msg+="\r\n"+Lan.g(this,"Number of plans created:")+" "+createdPlanCount;
+				msg+=sbErrorMessages.ToString();
+			}
+			if(droppedPlanCount > 0) {
+				msg+="\r\n"+Lan.g(this,"Number of plans dropped:")+" "+droppedPlanCount;
+				msg+=sbErrorMessages.ToString();
+			}
+			if(updatedPlanCount > 0) {
+				msg+="\r\n"+Lan.g(this,"Number of plans updated:")+" "+updatedPlanCount;
 				msg+=sbErrorMessages.ToString();
 			}
 			MsgBoxCopyPaste msgBox=new MsgBoxCopyPaste(msg);
