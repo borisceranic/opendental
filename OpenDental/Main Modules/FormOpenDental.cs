@@ -7461,10 +7461,12 @@ namespace OpenDental{
 			if(e.Reason!=SessionSwitchReason.SessionLock) {
 				return;
 			}
-			if(!PrefC.GetBool(PrefName.SecurityLogOffWithWindows)) {
+			//CurUser will be null if Open Dental is already in a 'logged off' state.
+			//Also catches the case where Open Dental has NEVER connected to a database yet and checking PrefC would throw an exception (no db conn).
+			if(Security.CurUser==null) {
 				return;
 			}
-			if(Security.CurUser==null) {//not sure if this is a good test.
+			if(!PrefC.GetBool(PrefName.SecurityLogOffWithWindows)) {
 				return;
 			}
 			LogOffNow(true);
