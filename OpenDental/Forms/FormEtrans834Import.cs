@@ -15,6 +15,7 @@ namespace OpenDental {
 		private int _colPatCountIndex;
 		private int _colPlanCountIndex;
 		private int _colErrorIndex;
+		public FormEtrans834Preview FormE834P=null;
 
 		public FormEtrans834Import() {
 			InitializeComponent();
@@ -204,14 +205,16 @@ namespace OpenDental {
 				return;
 			}
 			X834 x834=(X834)gridInsPlanFiles.Rows[x834Index].Tag;
-			FormEtrans834Preview FormEP=new FormEtrans834Preview(x834);
-			FormEP.ShowDialog();
+			FormE834P=new FormEtrans834Preview(x834);
+			FormE834P.Show();
 			DialogResult=DialogResult.OK;
+			Close();
 		}
 
 		private void butCancel_Click(object sender,EventArgs e) {
 			_odThread.QuitAsync();
 			DialogResult=DialogResult.Cancel;
+			Close();
 		}
 
 	}

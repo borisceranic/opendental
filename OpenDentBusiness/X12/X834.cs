@@ -1787,7 +1787,10 @@ namespace OpenDentBusiness {
 			if(ListMemberSchools.Count > 0) {//The patient school is situational information.  Only overwrite if specified.
 				patDb.SchoolName=Pat.SchoolName;
 			}
-			Patients.Update(patDb,patDbOld);
+			if(Crud.PatientCrud.UpdateComparison(patDb,patDbOld)) {
+				Patients.Update(patDb,patDbOld);
+				SecurityLogs.MakeLogEntry(Permissions.PatientEdit,patDb.PatNum,"Demographics edited from Import Ins Plans 834.",LogSources.InsPlanImport834);
+			}
 			return patDb;
 		}
 
