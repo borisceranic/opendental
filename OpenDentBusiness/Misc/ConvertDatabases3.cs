@@ -13209,6 +13209,14 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE carrier ADD TIN varchar2(255)";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE procedurecode ADD DefaultClaimNote TEXT NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE procedurecode ADD DefaultClaimNote clob";
+					Db.NonQ(command);
+				}
 				command="UPDATE preference SET ValueString = '16.1.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}

@@ -76,6 +76,7 @@ namespace OpenDentBusiness.Crud{
 				procedureCode.ProvNumDefault    = PIn.Long  (row["ProvNumDefault"].ToString());
 				procedureCode.CanadaTimeUnits   = PIn.Double(row["CanadaTimeUnits"].ToString());
 				procedureCode.IsRadiology       = PIn.Bool  (row["IsRadiology"].ToString());
+				procedureCode.DefaultClaimNote  = PIn.String(row["DefaultClaimNote"].ToString());
 				retVal.Add(procedureCode);
 			}
 			return retVal;
@@ -117,6 +118,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("ProvNumDefault");
 			table.Columns.Add("CanadaTimeUnits");
 			table.Columns.Add("IsRadiology");
+			table.Columns.Add("DefaultClaimNote");
 			foreach(ProcedureCode procedureCode in listProcedureCodes) {
 				table.Rows.Add(new object[] {
 					POut.Long  (procedureCode.CodeNum),
@@ -149,6 +151,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (procedureCode.ProvNumDefault),
 					POut.Double(procedureCode.CanadaTimeUnits),
 					POut.Bool  (procedureCode.IsRadiology),
+					POut.String(procedureCode.DefaultClaimNote),
 				});
 			}
 			return table;
@@ -189,7 +192,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="CodeNum,";
 			}
-			command+="ProcCode,Descript,AbbrDesc,ProcTime,ProcCat,TreatArea,NoBillIns,IsProsth,DefaultNote,IsHygiene,GTypeNum,AlternateCode1,MedicalCode,IsTaxed,PaintType,GraphicColor,LaymanTerm,IsCanadianLab,PreExisting,BaseUnits,SubstitutionCode,SubstOnlyIf,IsMultiVisit,DrugNDC,RevenueCodeDefault,ProvNumDefault,CanadaTimeUnits,IsRadiology) VALUES(";
+			command+="ProcCode,Descript,AbbrDesc,ProcTime,ProcCat,TreatArea,NoBillIns,IsProsth,DefaultNote,IsHygiene,GTypeNum,AlternateCode1,MedicalCode,IsTaxed,PaintType,GraphicColor,LaymanTerm,IsCanadianLab,PreExisting,BaseUnits,SubstitutionCode,SubstOnlyIf,IsMultiVisit,DrugNDC,RevenueCodeDefault,ProvNumDefault,CanadaTimeUnits,IsRadiology,DefaultClaimNote) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(procedureCode.CodeNum)+",";
 			}
@@ -222,7 +225,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(procedureCode.RevenueCodeDefault)+"',"
 				+    POut.Long  (procedureCode.ProvNumDefault)+","
 				+"'"+POut.Double(procedureCode.CanadaTimeUnits)+"',"
-				+    POut.Bool  (procedureCode.IsRadiology)+")";
+				+    POut.Bool  (procedureCode.IsRadiology)+","
+				+"'"+POut.String(procedureCode.DefaultClaimNote)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -255,7 +259,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="CodeNum,";
 			}
-			command+="ProcCode,Descript,AbbrDesc,ProcTime,ProcCat,TreatArea,NoBillIns,IsProsth,DefaultNote,IsHygiene,GTypeNum,AlternateCode1,MedicalCode,IsTaxed,PaintType,GraphicColor,LaymanTerm,IsCanadianLab,PreExisting,BaseUnits,SubstitutionCode,SubstOnlyIf,IsMultiVisit,DrugNDC,RevenueCodeDefault,ProvNumDefault,CanadaTimeUnits,IsRadiology) VALUES(";
+			command+="ProcCode,Descript,AbbrDesc,ProcTime,ProcCat,TreatArea,NoBillIns,IsProsth,DefaultNote,IsHygiene,GTypeNum,AlternateCode1,MedicalCode,IsTaxed,PaintType,GraphicColor,LaymanTerm,IsCanadianLab,PreExisting,BaseUnits,SubstitutionCode,SubstOnlyIf,IsMultiVisit,DrugNDC,RevenueCodeDefault,ProvNumDefault,CanadaTimeUnits,IsRadiology,DefaultClaimNote) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(procedureCode.CodeNum)+",";
 			}
@@ -288,7 +292,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(procedureCode.RevenueCodeDefault)+"',"
 				+    POut.Long  (procedureCode.ProvNumDefault)+","
 				+"'"+POut.Double(procedureCode.CanadaTimeUnits)+"',"
-				+    POut.Bool  (procedureCode.IsRadiology)+")";
+				+    POut.Bool  (procedureCode.IsRadiology)+","
+				+"'"+POut.String(procedureCode.DefaultClaimNote)+"')";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -329,7 +334,8 @@ namespace OpenDentBusiness.Crud{
 				+"RevenueCodeDefault= '"+POut.String(procedureCode.RevenueCodeDefault)+"', "
 				+"ProvNumDefault    =  "+POut.Long  (procedureCode.ProvNumDefault)+", "
 				+"CanadaTimeUnits   = '"+POut.Double(procedureCode.CanadaTimeUnits)+"', "
-				+"IsRadiology       =  "+POut.Bool  (procedureCode.IsRadiology)+" "
+				+"IsRadiology       =  "+POut.Bool  (procedureCode.IsRadiology)+", "
+				+"DefaultClaimNote  = '"+POut.String(procedureCode.DefaultClaimNote)+"' "
 				+"WHERE CodeNum = "+POut.Long(procedureCode.CodeNum);
 			Db.NonQ(command);
 		}
@@ -447,6 +453,10 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="IsRadiology = "+POut.Bool(procedureCode.IsRadiology)+"";
 			}
+			if(procedureCode.DefaultClaimNote != oldProcedureCode.DefaultClaimNote) {
+				if(command!=""){ command+=",";}
+				command+="DefaultClaimNote = '"+POut.String(procedureCode.DefaultClaimNote)+"'";
+			}
 			if(command==""){
 				return false;
 			}
@@ -540,6 +550,9 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			if(procedureCode.IsRadiology != oldProcedureCode.IsRadiology) {
+				return true;
+			}
+			if(procedureCode.DefaultClaimNote != oldProcedureCode.DefaultClaimNote) {
 				return true;
 			}
 			return false;

@@ -86,6 +86,8 @@ namespace OpenDental{
 		private TextBox textTimeUnits;
 		private CheckBox checkIsRadiology;
 		private Label label24;
+		private Label labelDefaultClaimNote;
+		private ODtextBox textDefaultClaimNote;
 		private List<ProcCodeNote> NoteList;
 
 		///<summary>The procedure code must have already been insterted into the database.</summary>
@@ -168,6 +170,8 @@ namespace OpenDental{
 			this.textTimeUnits = new System.Windows.Forms.TextBox();
 			this.checkIsRadiology = new System.Windows.Forms.CheckBox();
 			this.label24 = new System.Windows.Forms.Label();
+			this.labelDefaultClaimNote = new System.Windows.Forms.Label();
+			this.textDefaultClaimNote = new OpenDental.ODtextBox();
 			this.butMore = new OpenDental.UI.Button();
 			this.butAddNote = new OpenDental.UI.Button();
 			this.tbTime = new OpenDental.TableTimeBar();
@@ -189,7 +193,7 @@ namespace OpenDental{
 			// 
 			// labelTreatArea
 			// 
-			this.labelTreatArea.Location = new System.Drawing.Point(493, 247);
+			this.labelTreatArea.Location = new System.Drawing.Point(493, 236);
 			this.labelTreatArea.Name = "labelTreatArea";
 			this.labelTreatArea.Size = new System.Drawing.Size(100, 14);
 			this.labelTreatArea.TabIndex = 0;
@@ -198,7 +202,7 @@ namespace OpenDental{
 			// 
 			// label5
 			// 
-			this.label5.Location = new System.Drawing.Point(616, 13);
+			this.label5.Location = new System.Drawing.Point(616, 2);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(100, 14);
 			this.label5.TabIndex = 0;
@@ -239,7 +243,7 @@ namespace OpenDental{
 			this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.label10.Location = new System.Drawing.Point(43, 365);
 			this.label10.Name = "label10";
-			this.label10.Size = new System.Drawing.Size(148, 14);
+			this.label10.Size = new System.Drawing.Size(106, 14);
 			this.label10.TabIndex = 0;
 			this.label10.Text = "Default Note";
 			this.label10.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
@@ -279,7 +283,7 @@ namespace OpenDental{
             "Sextant",
             "Arch",
             "Tooth Range"});
-			this.listTreatArea.Location = new System.Drawing.Point(495, 265);
+			this.listTreatArea.Location = new System.Drawing.Point(495, 251);
 			this.listTreatArea.Name = "listTreatArea";
 			this.listTreatArea.Size = new System.Drawing.Size(118, 95);
 			this.listTreatArea.TabIndex = 24;
@@ -298,9 +302,9 @@ namespace OpenDental{
 			// 
 			// listCategory
 			// 
-			this.listCategory.Location = new System.Drawing.Point(616, 31);
+			this.listCategory.Location = new System.Drawing.Point(616, 17);
 			this.listCategory.Name = "listCategory";
-			this.listCategory.Size = new System.Drawing.Size(120, 238);
+			this.listCategory.Size = new System.Drawing.Size(120, 329);
 			this.listCategory.TabIndex = 23;
 			// 
 			// label3
@@ -416,16 +420,16 @@ namespace OpenDental{
 			// 
 			// label15
 			// 
-			this.label15.Location = new System.Drawing.Point(493, 10);
+			this.label15.Location = new System.Drawing.Point(493, 2);
 			this.label15.Name = "label15";
-			this.label15.Size = new System.Drawing.Size(100, 18);
+			this.label15.Size = new System.Drawing.Size(100, 14);
 			this.label15.TabIndex = 0;
 			this.label15.Text = "Paint Type";
 			this.label15.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// listPaintType
 			// 
-			this.listPaintType.Location = new System.Drawing.Point(495, 31);
+			this.listPaintType.Location = new System.Drawing.Point(495, 17);
 			this.listPaintType.Name = "listPaintType";
 			this.listPaintType.Size = new System.Drawing.Size(118, 212);
 			this.listPaintType.TabIndex = 22;
@@ -551,6 +555,7 @@ namespace OpenDental{
 			// 
 			// gridNotes
 			// 
+			this.gridNotes.HasAddButton = false;
 			this.gridNotes.HasMultilineHeaders = false;
 			this.gridNotes.HScrollVisible = false;
 			this.gridNotes.Location = new System.Drawing.Point(44, 489);
@@ -565,12 +570,13 @@ namespace OpenDental{
 			// 
 			// gridFees
 			// 
+			this.gridFees.HasAddButton = false;
 			this.gridFees.HasMultilineHeaders = false;
 			this.gridFees.HScrollVisible = false;
-			this.gridFees.Location = new System.Drawing.Point(739, 31);
+			this.gridFees.Location = new System.Drawing.Point(739, 17);
 			this.gridFees.Name = "gridFees";
 			this.gridFees.ScrollValue = 0;
-			this.gridFees.Size = new System.Drawing.Size(199, 445);
+			this.gridFees.Size = new System.Drawing.Size(199, 329);
 			this.gridFees.TabIndex = 0;
 			this.gridFees.TabStop = false;
 			this.gridFees.Title = "Default Fees";
@@ -646,7 +652,7 @@ namespace OpenDental{
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(726, 482);
+			this.label4.Location = new System.Drawing.Point(726, 491);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(122, 28);
 			this.label4.TabIndex = 0;
@@ -655,7 +661,7 @@ namespace OpenDental{
 			// 
 			// label23
 			// 
-			this.label23.Location = new System.Drawing.Point(726, 518);
+			this.label23.Location = new System.Drawing.Point(726, 527);
 			this.label23.Name = "label23";
 			this.label23.Size = new System.Drawing.Size(122, 17);
 			this.label23.TabIndex = 0;
@@ -664,9 +670,9 @@ namespace OpenDental{
 			// 
 			// labelTimeUnits
 			// 
-			this.labelTimeUnits.Location = new System.Drawing.Point(100, 358);
+			this.labelTimeUnits.Location = new System.Drawing.Point(126, 358);
 			this.labelTimeUnits.Name = "labelTimeUnits";
-			this.labelTimeUnits.Size = new System.Drawing.Size(103, 13);
+			this.labelTimeUnits.Size = new System.Drawing.Size(77, 13);
 			this.labelTimeUnits.TabIndex = 0;
 			this.labelTimeUnits.Text = "Time Units";
 			this.labelTimeUnits.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -701,6 +707,29 @@ namespace OpenDental{
 			this.label24.Text = "(bitewing, panoramic, FMX)";
 			this.label24.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
+			// labelDefaultClaimNote
+			// 
+			this.labelDefaultClaimNote.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.labelDefaultClaimNote.Location = new System.Drawing.Point(596, 364);
+			this.labelDefaultClaimNote.Name = "labelDefaultClaimNote";
+			this.labelDefaultClaimNote.Size = new System.Drawing.Size(148, 14);
+			this.labelDefaultClaimNote.TabIndex = 34;
+			this.labelDefaultClaimNote.Text = "Default Claim Note";
+			this.labelDefaultClaimNote.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
+			// textDefaultClaimNote
+			// 
+			this.textDefaultClaimNote.AcceptsTab = true;
+			this.textDefaultClaimNote.BackColor = System.Drawing.SystemColors.Window;
+			this.textDefaultClaimNote.DetectUrls = false;
+			this.textDefaultClaimNote.Location = new System.Drawing.Point(599, 381);
+			this.textDefaultClaimNote.Name = "textDefaultClaimNote";
+			this.textDefaultClaimNote.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
+			this.textDefaultClaimNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+			this.textDefaultClaimNote.Size = new System.Drawing.Size(339, 105);
+			this.textDefaultClaimNote.TabIndex = 35;
+			this.textDefaultClaimNote.Text = "";
+			// 
 			// butMore
 			// 
 			this.butMore.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -709,7 +738,7 @@ namespace OpenDental{
 			this.butMore.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butMore.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butMore.CornerRadius = 4F;
-			this.butMore.Location = new System.Drawing.Point(854, 482);
+			this.butMore.Location = new System.Drawing.Point(854, 491);
 			this.butMore.Name = "butMore";
 			this.butMore.Size = new System.Drawing.Size(75, 26);
 			this.butMore.TabIndex = 25;
@@ -725,7 +754,7 @@ namespace OpenDental{
 			this.butAddNote.CornerRadius = 4F;
 			this.butAddNote.Image = global::OpenDental.Properties.Resources.Add;
 			this.butAddNote.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butAddNote.Location = new System.Drawing.Point(600, 457);
+			this.butAddNote.Location = new System.Drawing.Point(505, 355);
 			this.butAddNote.Name = "butAddNote";
 			this.butAddNote.Size = new System.Drawing.Size(88, 26);
 			this.butAddNote.TabIndex = 20;
@@ -762,6 +791,7 @@ namespace OpenDental{
 			// textNote
 			// 
 			this.textNote.AcceptsTab = true;
+			this.textNote.BackColor = System.Drawing.SystemColors.Window;
 			this.textNote.DetectUrls = false;
 			this.textNote.Location = new System.Drawing.Point(44, 382);
 			this.textNote.Name = "textNote";
@@ -795,7 +825,7 @@ namespace OpenDental{
 			this.butAuditTrail.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAuditTrail.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAuditTrail.CornerRadius = 4F;
-			this.butAuditTrail.Location = new System.Drawing.Point(854, 514);
+			this.butAuditTrail.Location = new System.Drawing.Point(854, 523);
 			this.butAuditTrail.Name = "butAuditTrail";
 			this.butAuditTrail.Size = new System.Drawing.Size(75, 26);
 			this.butAuditTrail.TabIndex = 26;
@@ -821,6 +851,8 @@ namespace OpenDental{
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(941, 707);
+			this.Controls.Add(this.textDefaultClaimNote);
+			this.Controls.Add(this.labelDefaultClaimNote);
 			this.Controls.Add(this.label24);
 			this.Controls.Add(this.checkIsRadiology);
 			this.Controls.Add(this.textTimeUnits);
@@ -938,6 +970,7 @@ namespace OpenDental{
 			//}
 			checkIsCanadianLab.Checked=ProcCode.IsCanadianLab;
 			textNote.Text=ProcCode.DefaultNote;
+			textDefaultClaimNote.Text=ProcCode.DefaultClaimNote;
 			listTreatArea.Items.Clear();
 			for(int i=1;i<Enum.GetNames(typeof(TreatmentArea)).Length;i++){
 				listTreatArea.Items.Add(Lan.g("enumTreatmentArea",Enum.GetNames(typeof(TreatmentArea))[i]));
@@ -1184,6 +1217,7 @@ namespace OpenDental{
 			ProcCode.IsRadiology=checkIsRadiology.Checked;
 			ProcCode.IsCanadianLab=checkIsCanadianLab.Checked;
 			ProcCode.DefaultNote=textNote.Text;
+			ProcCode.DefaultClaimNote=textDefaultClaimNote.Text;
 			ProcCode.PaintType=(ToothPaintingType)listPaintType.SelectedIndex;
 			ProcCode.TreatArea=(TreatmentArea)listTreatArea.SelectedIndex+1;
 			ProcCode.BaseUnits=PIn.Int(textBaseUnits.Text.ToString());

@@ -87,7 +87,8 @@ namespace OpenDentBusiness{
 		private string procCatDescript;
 		///<summary>Set to true for radiology procedures.  An EHR core measure uses this flag to help determine the denominator for rad orders.</summary>
 		public bool IsRadiology;
-
+		///<summary>Default note inserted to claim note when claim is created.</summary>
+		public string DefaultClaimNote;
 		public ProcedureCode(){
 			ProcTime="/X/";
 			//procCode.ProcCat=DefC.Short[(long)DefCat.ProcCodeCats][0].DefNum;
