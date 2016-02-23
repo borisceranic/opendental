@@ -146,6 +146,9 @@ namespace CodeBase {
 
 		///<summary>Forces the calling thread to synchronously wait for the current thread to finish doing work.  Pass Timeout.Infinite into timeoutMS if you wish to wait as long as necessary for the thread to join.  The thread will be aborted if the timeout was reached and then will return false.</summary>
 		public bool Join(int timeoutMS) {
+			if(_thread.ThreadState==ThreadState.Unstarted) {
+				return true;//Thread has not even started yet to we cannot join.
+			}
 			bool hasJoined=_thread.Join(timeoutMS);
 			if(!hasJoined) {
 				//The timeout expired and the thread is still alive so we want to abort it manually.
