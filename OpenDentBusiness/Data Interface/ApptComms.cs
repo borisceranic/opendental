@@ -371,10 +371,10 @@ namespace OpenDentBusiness{
 			}
 			string message;
 			if(SmsPhones.IsIntegratedTextingEnabled() && SmsPhones.IsTextingForCountry("US")) {
-				message=ApptComms.ApptReminderMsgUS;
+				message=FillMessage(ApptComms.ApptReminderMsgUS,pat,appt);
 			}
 			else {
-				message=PrefC.GetString(PrefName.ApptReminderDayMessage);
+				message=FillMessage(PrefC.GetString(PrefName.ApptReminderDayMessage),pat,appt);
 			}
 			try {
 				SmsToMobiles.SendSmsSingle(pat.PatNum,patPhone,message,pat.ClinicNum,SmsMessageSource.Reminder);
