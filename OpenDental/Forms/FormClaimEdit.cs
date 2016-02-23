@@ -4602,6 +4602,7 @@ namespace OpenDental{
 			gridProc.Rows.Clear();
 			ODGridRow row;
 			Procedure ProcCur;
+			List<ProcedureCode> listProcCodes=ProcedureCodeC.GetListLong();
 			ClaimProcsForClaim=ClaimProcs.RefreshForClaim(ClaimCur.ClaimNum);
 			for(int i=0;i<ClaimProcsForClaim.Count;i++){
 				row=new ODGridRow();
@@ -4643,6 +4644,17 @@ namespace OpenDental{
 					}
 					ProcedureCode procCodeSent=ProcedureCodes.GetProcCode(ClaimProcsForClaim[i].CodeSent);
 					row.Cells.Add(procCodeSent.Descript);
+					if(IsNew) {
+						ProcedureCode procCodeCur=ProcedureCodes.GetProcCode(ProcCur.CodeNum,listProcCodes);
+						if(ClaimCur.ClaimNote==null) {
+							ClaimCur.ClaimNote="";
+						}
+						if(ClaimCur.ClaimNote.Length > 0) {
+							ClaimCur.ClaimNote+="\n";
+						}
+						ClaimCur.ClaimNote+=procCodeCur.DefaultClaimNote;
+						textNote.Text=ClaimCur.ClaimNote;
+					}
 				}
 				row.Cells.Add(ClaimProcsForClaim[i].FeeBilled.ToString("F"));
 				decimal claimProcInsEst=(decimal)ClaimProcsForClaim[i].InsPayEst;
