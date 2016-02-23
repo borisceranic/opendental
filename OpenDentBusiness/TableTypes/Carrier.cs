@@ -51,7 +51,9 @@ namespace OpenDentBusiness{
 		///updates.  Not user editable with the UI.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.TimeStamp)]
 		public DateTime SecDateTEdit;
-
+		///<summary>Tax ID Number.  Not user editable.  No UI for this field.
+		///Used in when importing insurance plans from 834s to uniquely identify carriers.</summary>
+		public string TIN;
 
 		public Carrier Copy(){
 			return (Carrier)this.MemberwiseClone();

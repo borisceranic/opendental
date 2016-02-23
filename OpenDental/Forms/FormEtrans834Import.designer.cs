@@ -27,12 +27,12 @@ namespace OpenDental{
 			this.label1 = new System.Windows.Forms.Label();
 			this.folderBrowserImportPath = new System.Windows.Forms.FolderBrowserDialog();
 			this.gridInsPlanFiles = new OpenDental.UI.ODGrid();
+			this.label2 = new System.Windows.Forms.Label();
 			this.butRefresh = new OpenDental.UI.Button();
 			this.butImportPathPick = new OpenDental.UI.Button();
 			this.textImportPath = new OpenDental.ODtextBox();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
-			this.label2 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -61,6 +61,14 @@ namespace OpenDental{
 			this.gridInsPlanFiles.TabIndex = 8;
 			this.gridInsPlanFiles.Title = "Ins Plan Files To Import";
 			this.gridInsPlanFiles.TranslationName = null;
+			// 
+			// label2
+			// 
+			this.label2.Location = new System.Drawing.Point(12, 9);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(950, 84);
+			this.label2.TabIndex = 10;
+			this.label2.Text = resources.GetString("label2.Text");
 			// 
 			// butRefresh
 			// 
@@ -137,14 +145,6 @@ namespace OpenDental{
 			this.butCancel.TabIndex = 2;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
-			// 
-			// label2
-			// 
-			this.label2.Location = new System.Drawing.Point(12, 9);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(950, 84);
-			this.label2.TabIndex = 10;
-			this.label2.Text = resources.GetString("label2.Text");
 			// 
 			// FormEtrans834Import
 			// 

@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,9 +10,13 @@ using CodeBase;
 namespace OpenDental {
 	public partial class FormEtrans834Preview:Form {
 
-		X834 _x834;
-		List<Patient> _listPatients;
+		private ODThread _odThread=null;
+		private delegate void Preview834Delegate();
+		private X834 _x834;
+		private List<Patient> _listPatients=null;
 		private int _patNumCol;
+		private int _sortedByColumnIdx;
+		private bool _isSortAscending;
 
 		public FormEtrans834Preview(X834 x834) {
 			InitializeComponent();
@@ -22,15 +24,9 @@ namespace OpenDental {
 			_x834=x834;
 		}
 
-		private void FormEtrans834Preview_Load(object sender,EventArgs e) {
-			Cursor=Cursors.WaitCursor;
-			ShowStatus("Loading patient information");
+		private void FormEtrans834Preview_Load(object sender,EventArgs e) {			
 			checkIsPatientCreate.Checked=PrefC.GetBool(PrefName.Ins834IsPatientCreate);
-			_listPatients=Patients.GetAllPatients();//Testing this on an average sized database took about 1 second to run on a dev machine.
-			_listPatients.Sort();
 			FillGridInsPlans();
-			ShowStatus("");
-			Cursor=Cursors.Default;
 		}
 
 		///<summary>Shows current status to user in title bar.  Useful for when processing for a few seconds or more.</summary>
@@ -54,8 +50,8 @@ namespace OpenDental {
 		}
 
 		void FillGridInsPlans() {
-			int sortedByColumnIdx=gridInsPlans.SortedByColumnIdx;
-			bool isSortAscending=gridInsPlans.SortedIsAscending;
+			_sortedByColumnIdx=gridInsPlans.SortedByColumnIdx;
+			_isSortAscending=gridInsPlans.SortedIsAscending;
 			gridInsPlans.BeginUpdate();
 			if(gridInsPlans.Columns.Count==0) {
 				gridInsPlans.Columns.Clear();
@@ -70,13 +66,44 @@ namespace OpenDental {
 				gridInsPlans.Columns.Add(new UI.ODGridColumn("SubscriberID",96,HorizontalAlignment.Left,UI.GridSortingStrategy.StringCompare));
 				gridInsPlans.Columns.Add(new UI.ODGridColumn("GroupNum",100,HorizontalAlignment.Left,UI.GridSortingStrategy.StringCompare));
 				gridInsPlans.Columns.Add(new UI.ODGridColumn("Payer",0,HorizontalAlignment.Left,UI.GridSortingStrategy.StringCompare));
-				sortedByColumnIdx=0;//Sort by Patient Last Name by default.
-				isSortAscending=true;//Start with A and progress to Z.
+				_sortedByColumnIdx=0;//Sort by Patient Last Name by default.
+				_isSortAscending=true;//Start with A and progress to Z.
 			}
 			gridInsPlans.EndUpdate();
 			Application.DoEvents();//To show empty grid while the window is loading.
+			if(_odThread!=null) {
+				_odThread.QuitSync(0);
+			}
+			_odThread=new ODThread(WorkerPreview834);
+			_odThread.Start();
+		}
+
+		private void WorkerPreview834(ODThread odThread) {
+			Load834_Safe();
+			odThread.QuitAsync();
+		}
+
+		///<summary>Call this from external thread. Invokes to main thread to avoid cross-thread collision.</summary>
+		private void Load834_Safe() {
+			try {
+				this.BeginInvoke(new Preview834Delegate(Load834_Unsafe),new object[] { });
+			}
+			//most likely because form is no longer available to invoke to
+			catch { }
+		}
+
+		private void Load834_Unsafe() {
+			Cursor=Cursors.WaitCursor;
+			ShowStatus("Loading patient information");
+			const int previewLimitCount=40;
 			gridInsPlans.BeginUpdate();
 			gridInsPlans.Rows.Clear();
+			gridInsPlans.EndUpdate();
+			Application.DoEvents();
+			if(_listPatients==null) {
+				_listPatients=Patients.GetAllPatients();//Testing this on an average sized database took about 1 second to run on a dev machine.
+				_listPatients.Sort();
+			}
 			int rowCount=0;
 			for(int i=0;i<_x834.ListTransactions.Count;i++) {
 				Hx834_Tran tran=_x834.ListTransactions[i];
@@ -90,6 +117,9 @@ namespace OpenDental {
 					Hx834_Member member=tran.ListMembers[j];
 					ShowStatus("Loading "+(gridInsPlans.Rows.Count+1).ToString().PadLeft(6)+"/"+rowCount.ToString().PadLeft(6)
 						+"  Patient "+member.Pat.GetNameLF());
+					if(gridInsPlans.Rows.Count < previewLimitCount) {
+						gridInsPlans.BeginUpdate();
+					}
 					if(member.ListHealthCoverage.Count==0) {
 						UI.ODGridRow row=new UI.ODGridRow();
 						gridInsPlans.Rows.Add(row);
@@ -103,11 +133,18 @@ namespace OpenDental {
 							FillGridRow(row,null,healthCoverage);
 						}
 					}
+					if(gridInsPlans.Rows.Count < previewLimitCount) {
+						gridInsPlans.EndUpdate();//Also invalidates grid.
+						Application.DoEvents();
+					}
 				}
 			}
-			gridInsPlans.SortForced(sortedByColumnIdx,isSortAscending);
-			gridInsPlans.EndUpdate();
+			gridInsPlans.BeginUpdate();
+			gridInsPlans.SortForced(_sortedByColumnIdx,_isSortAscending);
+			gridInsPlans.EndUpdate();//Also invalidates grid.
 			ShowStatus("");
+			Cursor=Cursors.Default;
+			Application.DoEvents();
 		}
 
 		///<summary>The healthCoverage variable can be null.</summary>
@@ -307,11 +344,11 @@ namespace OpenDental {
 							if(k > 0) {
 								rowIndex++;
 							}
-							List <Carrier> listCarriers=Carriers.GetByNameAndElectId(tran.Payer.Name,tran.Payer.IdentificationCode);							
+							List <Carrier> listCarriers=Carriers.GetByNameAndTin(tran.Payer.Name,tran.Payer.IdentificationCode);							
 							if(listCarriers.Count==0) {
 								Carrier carrier=new Carrier();
 								carrier.CarrierName=tran.Payer.Name;
-								carrier.ElectID=tran.Payer.IdentificationCode;
+								carrier.TIN=tran.Payer.IdentificationCode;
 								Carriers.Insert(carrier);
 								DataValid.SetInvalid(InvalidType.Carriers);
 								listCarriers.Add(carrier);

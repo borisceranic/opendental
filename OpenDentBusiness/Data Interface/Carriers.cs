@@ -567,11 +567,11 @@ namespace OpenDentBusiness{
 		}*/
 
 		///<summary>The carrierName is case insensitive.</summary>
-		public static List<Carrier> GetByNameAndElectId(string carrierName,string electId){
+		public static List<Carrier> GetByNameAndTin(string carrierName,string tin){
 			//No need to check RemotingRole; no call to db.
 			List <Carrier> listCarriers=new List<Carrier>();
 			for(int i=0;i<Listt.Length;i++){
-				if(Listt[i].CarrierName.Trim().ToLower()==carrierName.Trim().ToLower() && Listt[i].ElectID==electId) {
+				if(Listt[i].CarrierName.Trim().ToLower()==carrierName.Trim().ToLower() && Listt[i].TIN==tin) {
 					listCarriers.Add(Listt[i]);
 				}
 			}
