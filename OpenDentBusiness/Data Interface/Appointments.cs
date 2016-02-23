@@ -608,7 +608,7 @@ namespace OpenDentBusiness{
 			}
 			string command="UPDATE appointment SET AptStatus="+POut.Long((int)newStatus)
 				+" WHERE AptNum="+POut.Long(aptNum);
-			if(newStatus!=ApptStatus.Scheduled) {
+			if(newStatus!=ApptStatus.Scheduled && newStatus!=ApptStatus.ASAP) {
 				ApptComms.DeleteForAppt(aptNum);//Delete the automated reminder if it was unscheduled.
 			}
 			Db.NonQ(command);
