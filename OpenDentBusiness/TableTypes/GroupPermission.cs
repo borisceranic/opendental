@@ -247,6 +247,28 @@ namespace OpenDentBusiness{
 		PatientCreate,
 		///<summary>107- Allows changing the settings for graphical repots.</summary>
 		GraphicalReportSetup,
+		///<summary>108 - Audit when a patient is edited.  Currently only used in X12 834 insurance plan import.</summary>
+		PatientEdit,
+		///<summary>109 - Audit when an insurance plan is created.  Currently only used in X12 834 insurance plan import.</summary>
+		InsPlanCreate,
+		///<summary>110 - Audit when an insurance plan is edited.  Currently only used in X12 834 insurance plan import.</summary>
+		InsPlanEdit,
+		///<summary>111 - Audit when an insurance subscriber is created.  The naming convention of this permission was decided upon by Nathan and Derek
+		///based on the following existing permissions: InsPlanChangeSubsc, InsPlanChangeCarrierName, InsPlanChangeAssign.
+		///Currently only used in X12 834 insurance plan import.<summary>
+		InsPlanCreateSub,
+		///<summary>112 - Audit when an insurance subscriber is edited.  The naming convention of this permission was decided upon by Nathan and Derek
+		///based on the following existing permissions: InsPlanChangeSubsc, InsPlanChangeCarrierName, InsPlanChangeAssign.
+		///Currently only used in X12 834 insurance plan import.</summary>
+		InsPlanEditSub,
+		///<summary>113 - Audit when a patient is added to an insurance plan.  The naming convention of this permission was decided upon by Nathan and
+		///Derek based on the following existing permissions: InsPlanChangeSubsc, InsPlanChangeCarrierName, InsPlanChangeAssign.
+		///Currently only used in X12 834 insurance plan import.</summary>
+		InsPlanAddPat,
+		///<summary>114 - Audit when a patient is dropped from an insurance plan.  The naming convention of this permission was decided upon by Nathan and
+		///Derek based on the following existing permissions: InsPlanChangeSubsc, InsPlanChangeCarrierName, InsPlanChangeAssign.
+		///Currently only used in X12 834 insurance plan import.</summary>
+		InsPlanDropPat,
 	}
 
 	

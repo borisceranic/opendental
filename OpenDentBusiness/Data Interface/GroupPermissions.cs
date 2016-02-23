@@ -298,6 +298,13 @@ namespace OpenDentBusiness{
 				//case Permissions.TaskListCreate:
 				//case Permissions.PatientCreate:
 				//case Permissions.GraphicalReportSetup:
+				//case Permissions.PatientEdit:
+				//case Permissions.InsPlanCreate:
+				//case Permissions.InsPlanEdit:
+				//case Permissions.InsPlanCreateSub:
+				//case Permissions.InsPlanEditSub:
+				//case Permissions.InsPlanAddPat:
+				//case Permissions.InsPlanDropPat:
 				return false;//Does not have audit Trail if uncommented.
 			}
 			return true;
@@ -397,10 +404,22 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Insurance Payment Create");
 				case Permissions.InsPayEdit:
 					return Lans.g("enumPermissions","Insurance Payment Edit");
+				case Permissions.InsPlanAddPat:
+					return Lans.g("enumPermissions","Insurance Plan Add Patient");
 				case Permissions.InsPlanChangeAssign:
 					return Lans.g("enumPermissions","Insurance Plan Change Assignment of Benefits");
 				case Permissions.InsPlanChangeSubsc:
 					return Lans.g("enumPermissions","Insurance Plan Change Subscriber");
+				case Permissions.InsPlanCreate:
+					return Lans.g("enumPermissions","Insurance Plan Create");
+				case Permissions.InsPlanCreateSub:
+					return Lans.g("enumPermissions","Insurance Plan Create Subscriber");
+				case Permissions.InsPlanDropPat:
+					return Lans.g("enumPermissions","Insurance Plan Drop Patient");
+				case Permissions.InsPlanEdit:
+					return Lans.g("enumPermissions","Insurance Plan Edit");
+				case Permissions.InsPlanEditSub:
+					return Lans.g("enumPermissions","Insurance Plan Edit Subscriber");
 				case Permissions.ManageModule:
 					return Lans.g("enumPermissions","Manage Module");
 				case Permissions.MedicationMerge:
@@ -411,6 +430,8 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Ortho Chart Edit");
 				case Permissions.PatientCreate:
 					return Lans.g("enumPermissions","Patient Create");
+				case Permissions.PatientEdit:
+					return Lans.g("enumPermissions","Patient Edit");
 				case Permissions.PatientMerge:
 					return Lans.g("enumPermissions","Patient Merge");
 				case Permissions.PaymentCreate:

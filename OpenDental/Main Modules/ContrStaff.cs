@@ -78,6 +78,7 @@ namespace OpenDental{
 		public FormAccounting FormA;
 		private UI.Button butImportInsPlans;
 		private List<Employee> _listEmployees=new List<Employee>();
+		private FormEtrans834Import FormE834I=null;
 
 		///<summary></summary>
 		public ContrStaff(){
@@ -1063,8 +1064,16 @@ namespace OpenDental{
 		}
 
 		private void butImportInsPlans_Click(object sender,EventArgs e) {
-			FormEtrans834Import Form=new FormEtrans834Import();
-			Form.ShowDialog();
+			if(FormE834I!=null && FormE834I.FormE834P!=null && !FormE834I.FormE834P.IsDisposed) {
+				FormE834I.FormE834P.Show();
+				FormE834I.FormE834P.BringToFront();
+				return;
+			}
+			if(FormE834I==null || FormE834I.IsDisposed) {
+				FormE834I=new FormEtrans834Import();
+			}
+			FormE834I.Show();
+			FormE834I.BringToFront();
 		}
 
 		//private void butClear_Click(object sender, System.EventArgs e) {

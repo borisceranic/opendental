@@ -254,13 +254,25 @@ namespace OpenDental {
 			return true;
 		}
 
-		private void butOK_Click(object sender,EventArgs e) {
+		///<summary>Call this from external thread. Invokes to main thread to avoid cross-thread collision.</summary>
+		private void Import834_Safe() {
+			try {
+				this.BeginInvoke(new Preview834Delegate(Import834_Unsafe),new object[] { });
+			}
+			//most likely because form is no longer available to invoke to
+			catch { }
+		}
+
+		private void Import834_Unsafe() {
 			if(!MsgBox.Show(this,true,"Importing insurance plans is a database intensive operation and can take 10 minutes or more to run.  "
 				+"It is best to import insurance plans after hours or during another time period when database usage is otherwise low.\r\n"
 				+"Click OK to import insurance plans now, or click Cancel."))
 			{
 				return;
 			}
+			checkIsPatientCreate.Enabled=false;
+			gridInsPlans.Enabled=false;
+			butOK.Enabled=false;
 			Cursor=Cursors.WaitCursor;
 			Prefs.UpdateBool(PrefName.Ins834IsPatientCreate,checkIsPatientCreate.Checked);
 			int rowIndex=1;
@@ -327,7 +339,7 @@ namespace OpenDental {
 					}
 					else {//member.Pat.PatNum!=0
 						Patient patDb=_listPatients.FirstOrDefault(x => x.PatNum==member.Pat.PatNum);//Locate by PatNum, in case user selected manually.
-						member.MergePatientIntoDbPatient(patDb);
+						member.MergePatientIntoDbPatient(patDb);//Also updates the patient to the database and makes log entry.
 						_listPatients.Remove(patDb);//Remove patient from list so we can add it back in the correct location (in case name or bday changed).
 						int patIdx=_listPatients.BinarySearch(patDb);//Preserve sort order by locating the index in which to insert the newly added patient.
 						//patIdx could be positive if the user manually selected a patient when there were multiple matches found.
@@ -352,6 +364,8 @@ namespace OpenDental {
 								Carriers.Insert(carrier);
 								DataValid.SetInvalid(InvalidType.Carriers);
 								listCarriers.Add(carrier);
+								SecurityLogs.MakeLogEntry(Permissions.CarrierCreate,0,"Carrier '"+carrier.CarrierName
+									+"' created from Import Ins Plans 834.",LogSources.InsPlanImport834);
 								createdCarrierCount++;
 							}
 							//Update insurance plans.  Match based on carrier and SubscriberId.
@@ -398,6 +412,8 @@ namespace OpenDental {
 									insPlanMatch.CarrierNum=listCarriers[0].CarrierNum;
 									insPlanMatch.ClaimFormNum=PrefC.GetLong(PrefName.DefaultClaimForm);
 									InsPlans.Insert(insPlanMatch);
+									SecurityLogs.MakeLogEntry(Permissions.InsPlanCreate,0,"Insurance plan for carrier '"+listCarriers[0].CarrierName+"' and groupnum "
+										+"'"+insPlanMatch.GroupNum+"' created from Import Ins Plans 834.",LogSources.InsPlanImport834);
 								}
 								else {
 									if(member.InsFiling!=null) {
@@ -405,6 +421,8 @@ namespace OpenDental {
 									}
 									insPlanMatch.GroupNum=member.GroupNum;
 									InsPlans.Update(insPlanMatch);
+									SecurityLogs.MakeLogEntry(Permissions.InsPlanEdit,0,"Insurance plan for carrier '"+listCarriers[0].CarrierName+"' and groupnum "
+										+"'"+insPlanMatch.GroupNum+"' edited from Import Ins Plans 834.",LogSources.InsPlanImport834);
 								}
 								if(insSubMatch==null) {
 									insSubMatch=new InsSub();
@@ -420,12 +438,20 @@ namespace OpenDental {
 									insSubMatch.DateEffective=healthCoverage.DateEffective;
 									insSubMatch.DateTerm=healthCoverage.DateTerm;
 									InsSubs.Insert(insSubMatch);
+									SecurityLogs.MakeLogEntry(Permissions.InsPlanCreateSub,insSubMatch.Subscriber,
+										"Insurance subscriber created for carrier '"+listCarriers[0].CarrierName+"' and groupnum "
+										+"'"+insPlanMatch.GroupNum+"' and subscriber ID '"+insSubMatch.SubscriberID+"' "
+										+"from Import Ins Plans 834.",LogSources.InsPlanImport834);
 								}
 								else {
 									insSubMatch.DateEffective=healthCoverage.DateEffective;
 									insSubMatch.DateTerm=healthCoverage.DateTerm;
 									insSubMatch.ReleaseInfo=member.IsReleaseInfo;
 									InsSubs.Update(insSubMatch);
+									SecurityLogs.MakeLogEntry(Permissions.InsPlanEditSub,insSubMatch.Subscriber,
+										"Insurance subscriber edited for carrier '"+listCarriers[0].CarrierName+"' and groupnum "
+										+"'"+insPlanMatch.GroupNum+"' and subscriber ID '"+insSubMatch.SubscriberID+"' "
+										+"from Import Ins Plans 834.",LogSources.InsPlanImport834);
 								}
 								patPlanMatch=new PatPlan();
 								patPlanMatch.Ordinal=0;
@@ -439,11 +465,16 @@ namespace OpenDental {
 								patPlanMatch.InsSubNum=insSubMatch.InsSubNum;
 								patPlanMatch.Relationship=member.PlanRelat;
 								if(member.PlanRelat!=Relat.Self) {
-									member.Pat.Guarantor=insSubMatch.Subscriber;
-									Patient memberPatOld=member.Pat.Copy();
-									Patients.Update(member.Pat,memberPatOld);
+									//This is not needed yet.  If we do this in the future, then we need to mimic the Move tool in the Family module.
+									//member.Pat.Guarantor=insSubMatch.Subscriber;
+									//Patient memberPatOld=member.Pat.Copy();
+									//Patients.Update(member.Pat,memberPatOld);
 								}
 								PatPlans.Insert(patPlanMatch);
+								SecurityLogs.MakeLogEntry(Permissions.InsPlanAddPat,patPlanMatch.PatNum,
+									"Insurance plan added to patient for carrier '"+listCarriers[0].CarrierName+"' and groupnum "
+									+"'"+insPlanMatch.GroupNum+"' and subscriber ID '"+insSubMatch.SubscriberID+"' "
+									+"from Import Ins Plans 834.",LogSources.InsPlanImport834);
 								createdPlanCount++;
 							}
 							else if(patPlanMatch!=null && isDropping) {//Plan matched and dropping plan.  Drop the plan.
@@ -452,20 +483,35 @@ namespace OpenDental {
 								//Testing for claims on today's date does not seem that useful anyway, or at least not as useful as checking for any claims
 								//associated to the plan, instead of just today's date.
 								PatPlans.Delete(patPlanMatch.PatPlanNum);//Estimates recomputed within Delete()
+								SecurityLogs.MakeLogEntry(Permissions.InsPlanDropPat,patPlanMatch.PatNum,
+									"Insurance plan dropped from patient for carrier '"+listCarriers[0].CarrierName+"' and groupnum "
+									+"'"+insPlanMatch.GroupNum+"' and subscriber ID '"+insSubMatch.SubscriberID+"' "
+									+"from Import Ins Plans 834.",LogSources.InsPlanImport834);
 								droppedPlanCount++;
 							}
 							else if(patPlanMatch!=null && !isDropping)  {//Plan matched and not dropping plan.  Update the plan.
+								if(patPlanMatch.Relationship!=member.PlanRelat) {
+									SecurityLogs.MakeLogEntry(Permissions.InsPlanEdit,patPlanMatch.PatNum,"Insurance plan relationship changed from "
+										+member.PlanRelat+" to "+patPlanMatch.Relationship+" for carrier '"+listCarriers[0].CarrierName+"' and groupnum "
+										+"'"+insPlanMatch.GroupNum+"' from Import Ins Plans 834.",LogSources.InsPlanImport834);
+								}
 								patPlanMatch.Relationship=member.PlanRelat;
 								PatPlans.Update(patPlanMatch);
 								insSubMatch.DateEffective=healthCoverage.DateEffective;
 								insSubMatch.DateTerm=healthCoverage.DateTerm;
 								insSubMatch.ReleaseInfo=member.IsReleaseInfo;
 								InsSubs.Update(insSubMatch);
+								SecurityLogs.MakeLogEntry(Permissions.InsPlanEditSub,insSubMatch.Subscriber,
+									"Insurance subscriber edited for carrier '"+listCarriers[0].CarrierName+"' and groupnum "
+									+"'"+insPlanMatch.GroupNum+"' and subscriber ID '"+insSubMatch.SubscriberID+"' "
+									+"from Import Ins Plans 834.",LogSources.InsPlanImport834);
 								if(member.InsFiling!=null) {
 									insPlanMatch.FilingCode=member.InsFiling.InsFilingCodeNum;
 								}
 								insPlanMatch.GroupNum=member.GroupNum;
 								InsPlans.Update(insPlanMatch);
+								SecurityLogs.MakeLogEntry(Permissions.InsPlanEdit,0,"Insurance plan for carrier '"+listCarriers[0].CarrierName+"' and groupnum "
+									+"'"+insPlanMatch.GroupNum+"' edited from Import Ins Plans 834.",LogSources.InsPlanImport834);
 								updatedPlanCount++;
 							}
 						}//end loop k
@@ -527,11 +573,17 @@ namespace OpenDental {
 			}
 			MsgBoxCopyPaste msgBox=new MsgBoxCopyPaste(msg);
 			msgBox.ShowDialog();
+		}
+
+		private void butOK_Click(object sender,EventArgs e) {
+			Import834_Unsafe();//TODO: threading.
 			DialogResult=DialogResult.OK;
+			Close();
 		}
 
 		private void butCancel_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
+			Close();
 		}
 
 	}
