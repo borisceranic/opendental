@@ -394,7 +394,7 @@ namespace OpenDental{
 			// label2
 			// 
 			this.label2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label2.Location = new System.Drawing.Point(4, 325);
+			this.label2.Location = new System.Drawing.Point(4, 347);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(279, 17);
 			this.label2.TabIndex = 198;
