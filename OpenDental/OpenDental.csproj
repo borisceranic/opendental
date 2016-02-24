@@ -252,7 +252,6 @@
     <Compile Include="Bridges\CleaRay.cs" />
     <Compile Include="Bridges\DentalIntel.cs" />
     <Compile Include="Bridges\Romexis.cs" />
-    <Compile Include="Bridges\Podium.cs" />
     <Compile Include="Bridges\DentalTek.cs" />
     <Compile Include="Bridges\DemandForce.cs">
       <SubType>Code</SubType>
@@ -424,6 +423,12 @@
     </Compile>
     <Compile Include="Forms\FormCdsTriggers.designer.cs">
       <DependentUpon>FormCdsTriggers.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FormPodiumSetup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormPodiumSetup.designer.cs">
+      <DependentUpon>FormPodiumSetup.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\FormPreviousVersions.cs">
       <SubType>Form</SubType>
@@ -4039,6 +4044,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormCdsTriggers.resx">
       <DependentUpon>FormCdsTriggers.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormPodiumSetup.resx">
+      <DependentUpon>FormPodiumSetup.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormPreviousVersions.resx">
       <DependentUpon>FormPreviousVersions.cs</DependentUpon>

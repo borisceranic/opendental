@@ -1177,6 +1177,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
+    <Compile Include="WebBridges\Podium.cs" />
     <Compile Include="WebServiceTests.cs" />
     <Compile Include="X12\X834.cs" />
     <Compile Include="X12\X835.cs" />

@@ -13216,6 +13216,112 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE procedurecode ADD DefaultClaimNote clob";
 					Db.NonQ(command);
 				}
+                command="SELECT ProgramNum FROM program WHERE ProgName='Podium'";
+                string podiumProgramNum=Db.GetScalar(command);
+				//Create a new program property for having Podium run via the eConnector instead of on the workstation(s).
+				//Users may call in and complain about "multiple commlogs" being created in which case they need to upgrade to using the eConnector.
+                if(DataConnection.DBtype==DatabaseType.MySql) {
+                    command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+                        +") VALUES("
+                        +"'"+POut.String(podiumProgramNum)+"', "
+                        +"'Enter 0 to use Open Dental for sending review invitations, or 1 to use eConnector', "
+                        +"'0')";
+                    Db.NonQ(command);
+                }
+                else {//oracle
+                    command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+                        +") VALUES("
+                        +"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+                        +"'"+POut.String(podiumProgramNum)+"', "
+                        +"'Enter 0 to use Open Dental for sending review invitations, or 1 to use eConnector', "
+                        +"'0')";
+                    Db.NonQ(command);
+                }
+                if(DataConnection.DBtype==DatabaseType.MySql) {
+                    command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+                        +") VALUES("
+                        +"'"+POut.String(podiumProgramNum)+"', "
+                        +"'Send after appointment completed (minutes)', "
+                        +"'5')";
+                    Db.NonQ(command);
+                }
+                else {//oracle
+                    command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+                        +") VALUES("
+                        +"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+                        +"'"+POut.String(podiumProgramNum)+"', "
+                        +"'Send after appointment completed (minutes)', "
+                        +"'5')";
+                    Db.NonQ(command);
+                }
+                if(DataConnection.DBtype==DatabaseType.MySql) {
+                    command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+                        +") VALUES("
+                        +"'"+POut.String(podiumProgramNum)+"', "
+                        +"'Send after appointment time arrived (minutes)', "
+                        +"'5')";
+                    Db.NonQ(command);
+                }
+                else {//oracle
+                    command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+                        +") VALUES("
+                        +"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+                        +"'"+POut.String(podiumProgramNum)+"', "
+                        +"'Send after appointment time arrived (minutes)', "
+                        +"'5')";
+                    Db.NonQ(command);
+                }
+                if(DataConnection.DBtype==DatabaseType.MySql) {
+                    command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+                        +") VALUES("
+                        +"'"+POut.String(podiumProgramNum)+"', "
+                        +"'Send after appointment time dismissed (minutes)', "
+                        +"'5')";
+                    Db.NonQ(command);
+                }
+                else {//oracle
+                    command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+                        +") VALUES("
+                        +"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+                        +"'"+POut.String(podiumProgramNum)+"', "
+                        +"'Send after appointment time dismissed (minutes)', "
+                        +"'5')";
+                    Db.NonQ(command);
+                }
+                if(DataConnection.DBtype==DatabaseType.MySql) {
+                    command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+                        +") VALUES("
+                        +"'"+POut.String(podiumProgramNum)+"', "
+                        +"'New patient trigger type', "
+                        +"'0')";//ReviewInvitationTrigger.AppointmentCompleted
+                    Db.NonQ(command);
+                }
+                else {//oracle
+                    command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+                        +") VALUES("
+                        +"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+                        +"'"+POut.String(podiumProgramNum)+"', "
+                        +"'New patient trigger type', "
+                        +"'0')";//ReviewInvitationTrigger.AppointmentCompleted
+                    Db.NonQ(command);
+                }
+                if(DataConnection.DBtype==DatabaseType.MySql) {
+                    command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+                        +") VALUES("
+                        +"'"+POut.String(podiumProgramNum)+"', "
+                        +"'Existing patient trigger type', "
+                        +"'1')";//ReviewInvitationTrigger.AppointmentTimeArrived
+                    Db.NonQ(command);
+                }
+                else {//oracle
+                    command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+                        +") VALUES("
+                        +"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+                        +"'"+POut.String(podiumProgramNum)+"', "
+                        +"'Existing patient trigger type', "
+                        +"'1')";//ReviewInvitationTrigger.AppointmentTimeArrived
+                    Db.NonQ(command);
+                }
 				command="UPDATE preference SET ValueString = '16.1.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}

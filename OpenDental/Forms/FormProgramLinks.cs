@@ -207,6 +207,15 @@ namespace OpenDental{
 				}
 				return;
 			}
+			if(program.ProgName=="Podium") {
+				FormPodiumSetup FormPS=new FormPodiumSetup();
+				FormPS.ShowDialog();
+				if(FormPS.DialogResult==DialogResult.OK) {
+					changed=true;
+					FillList();
+				}
+				return;
+			}
 			if(program.ProgName=="Xcharge") {
 				FormXchargeSetup fxcs=new FormXchargeSetup();
 				fxcs.ShowDialog();

@@ -5,6 +5,7 @@ using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Globalization;
+using System.ComponentModel;
 //using System.Windows.Forms;
 
 namespace OpenDentBusiness{
@@ -164,6 +165,31 @@ namespace OpenDentBusiness{
 			else {
 				return System.Convert.ToInt16(myString);
 			}
+		}
+		
+		///<summary>Strongly types the value provided to the enumeration value of declared enum type (T).
+		///When isEnumAsString is false, value should be the integer value of the desired enum item.  E.g. T = ApptStatus, value = "5", retVal = ApptStatus.Broken
+		///When isEnumAsString is true, value must be the enum item name.  E.g. T = ProgramName, value = programCur.ProgName, retVal = ProgramName.Podium
+		///This will mainly get called to circumvent double casting.  E.g. ApptStatus stat=(ApptStatus)PIn(table["ApptStatus"].ToString());</summary>
+		public static T Enum<T>(string value,bool isEnumAsString=false) where T : struct, IConvertible {
+			if(!typeof(T).IsEnum) {
+				throw new Exception("T must be an enumeration.");
+			}
+			T retVal=default(T);
+			if(isEnumAsString) {
+				System.Enum.TryParse(value,out retVal);
+			}
+			else {
+				int valueAsInt=Int(value);//value should be an integer at this point.
+				Array enums=System.Enum.GetValues(typeof(T));
+				foreach(int enumValue in enums) {
+					if(enumValue==valueAsInt) {
+						retVal=(T)enums.GetValue(valueAsInt);
+						break;
+					}
+				}
+			}
+			return retVal;
 		}
 
 		///<summary>Saves the string representation of a sound into a .wav file.  The timing of this is different than with the other "P" functions, and is only used by the export button in FormSigElementDefEdit</summary>
