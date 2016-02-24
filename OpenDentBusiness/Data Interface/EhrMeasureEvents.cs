@@ -117,21 +117,18 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
-		public static Dictionary<string,int> GetByTypeFromDb(EhrMeasureEventType eventType) {
+		///<summary>Gets codes (SNOMEDCT) from CodeValueResult for EhrMeasureEvents with DateTEvent within the last year for the given EhrMeasureEventType.
+		///Result list is grouped by code.</summary>
+		public static List<string> GetListCodesUsedForType(EhrMeasureEventType eventType) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<Dictionary<string,int>>(MethodBase.GetCurrentMethod(),eventType);
+				return Meth.GetObject<List<string>>(MethodBase.GetCurrentMethod(),eventType);
 			}
-			string command="SELECT CodeValueResult, COUNT(*) numUsed FROM ehrmeasureevent "
+			string command="SELECT CodeValueResult FROM ehrmeasureevent "
 				+"WHERE EventType="+POut.Int((int)eventType)+" "
 				+"AND CodeValueResult!='' "
-				+"AND "+DbHelper.DtimeToDate("DateTEvent")+" >="+POut.Date(MiscData.GetNowDateTime().AddYears(-1))+" "
+				+"AND "+DbHelper.DtimeToDate("DateTEvent")+">="+POut.Date(MiscData.GetNowDateTime().AddYears(-1))+" "
 				+"GROUP BY CodeValueResult";
-			DataTable table =Db.GetTable(command);
-			Dictionary<string,int> retVal=new Dictionary<string, int>();
-			foreach(DataRow row in table.Rows) {
-				retVal[row[0].ToString()]=PIn.Int(row[1].ToString());
-			}
-			return retVal;
+			return Db.GetListString(command);
 		}
 
 		/*
