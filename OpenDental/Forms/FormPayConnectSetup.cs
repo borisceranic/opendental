@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
+using CodeBase;
 using OpenDentBusiness;
 
 namespace OpenDental{
@@ -394,6 +395,41 @@ namespace OpenDental{
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
+			#region Check Credit Card Processor Mismatch
+			if(_progCur.Enabled && !checkEnabled.Checked) {
+				MsgBox.Show(this,"Warning: Changing credit card processing companies will require you to delete all cards stored with tokens."
+					+"  When you enable another processor you will be prompted to delete these credit cards.");
+			}
+			if(checkEnabled.Checked && Programs.IsEnabled(ProgramName.Xcharge)) {
+				MsgBox.Show(this,"X-Charge is currently enabled.  You cannot enable both PayConnect and X-Charge at the same time.");
+				return;
+			}
+			if(checkEnabled.Checked) {
+				List<CreditCard> xChargeCreditCards = CreditCards.GetCardsWithXChargeTokens();
+				if(xChargeCreditCards.Count>0) {
+					if(MessageBox.Show(Lan.g(this,"There are")+" "+xChargeCreditCards.Count.ToString()+" "+Lan.g(this,"credit cards using X-Charge tokens.  Enabling PayConnect will delete all of these credit cards and their authorized repeating charge information.  Continue?"),"",MessageBoxButtons.OKCancel)!=DialogResult.OK) {
+						return;
+					}
+					SecurityLogs.MakeLogEntry(Permissions.Setup,0,Lan.g(this,"Deleted all credit cards with X-Charge tokens"));
+					List<Patient> listPats = new List<Patient>();
+					foreach(CreditCard creditC in xChargeCreditCards) {
+						//Delete the card
+						CreditCards.Delete(creditC.CreditCardNum);
+						//Add patient to list to display for reference
+						if(listPats.Select(x => x.PatNum).Contains(creditC.PatNum)) {
+							continue;
+						}
+						listPats.Add(Patients.GetPat(creditC.PatNum));
+					}
+					string msg = Lan.g(this,"Credit Cards deleted for the following patients:");
+					listPats.OrderBy(x => x.LName)
+						.ThenBy(x => x.FName).ToList()
+						.ForEach(x => msg+="\r\n"+x.PatNum+" "+Patients.GetNameFL(x.LName,x.FName,x.Preferred,x.MiddleI));
+					MsgBoxCopyPaste msgBox = new MsgBoxCopyPaste(msg);
+					msgBox.ShowDialog();
+				}
+			}
+			#endregion Check Credit Card Processor Mismatch
 			#region Validation
 			//if clinics are not enabled and the PayConnect program link is enabled, make sure there is a username and password set
 			//if clinics are enabled, the program link can be enabled with blank username and/or password fields for some clinics
