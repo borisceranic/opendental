@@ -78,6 +78,28 @@ namespace OpenDentBusiness {
 				.FindAll(x => x.ClinicNum==clinicNum)
 				.FindAll(x => x.PropertyDesc!="");
 		}
+		
+		///<summary>Returns a List of ProgramProperties attached to the specified programNum with the given clinicnum.  
+		///Includes the default program properties as well (ClinicNum==0).</summary>
+		public static List<ProgramProperty> GetListForProgramAndClinicWithDefault(long programNum,long clinicNum) {
+			//No need to check RemotingRole; no call to db.
+			List<ProgramProperty> listProperties=ProgramPropertyC.GetListt();
+			List<ProgramProperty> listClinicProperties=listProperties.FindAll(x => x.ProgramNum==programNum && x.ClinicNum==clinicNum);
+			if(clinicNum==0) {
+				return listClinicProperties;//return the defaults cause ClinicNum of 0 is default.
+			}
+			//Get all the defaults and return a list of defaults mixed with overrides.
+			List<ProgramProperty> listClinicAndDefaultProperties=listProperties.FindAll(x => x.ProgramNum==programNum 
+				&& !listClinicProperties.Any(y => y.PropertyDesc==x.PropertyDesc));
+			listClinicAndDefaultProperties.AddRange(listClinicProperties);
+			return listClinicAndDefaultProperties;//Clinic users need to have all properties, defaults with the clinic overrides.
+		}
+
+		///<summary>Returns the property value of the clinic override or default program property if no clinic override is found.</summary>
+		public static string GetPropValForClinicOrDefault(long programNum,string desc,long clinicNum) {
+			//No need to check RemotingRole; no call to db.
+			return GetListForProgramAndClinicWithDefault(programNum,clinicNum).FirstOrDefault(x => x.PropertyDesc==desc).PropertyValue;
+		}
 
 		///<summary>Returns an ArrayList of ProgramProperties attached to the specified programNum.  Does not include path overrides.
 		///Uses thread-safe caching pattern.  Each call to this method creates an copy of the entire ProgramProperty cache.</summary>

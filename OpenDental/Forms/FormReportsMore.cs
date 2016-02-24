@@ -1,14 +1,9 @@
 using System;
 using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Windows;
 using System.Windows.Forms;
 using OpenDentBusiness;
-using OpenDentalWpf;
+using OpenDentBusiness.WebBridges;
 using OpenDental.Bridges;
 
 namespace OpenDental {
@@ -914,7 +909,12 @@ namespace OpenDental {
 		}
 
 		private void picturePodium_Click(object sender,EventArgs e) {
-			Podium.ShowPage();
+			try {
+				Podium.ShowPage();
+			}
+			catch(Exception ex) {
+				System.Windows.Forms.MessageBox.Show(ex.Message);
+			}
 		}
 
 		private void butClose_Click(object sender,System.EventArgs e) {

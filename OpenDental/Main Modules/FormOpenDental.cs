@@ -53,6 +53,7 @@ using System.ServiceProcess;
 using System.Linq;
 using OpenDental.Bridges;
 using OpenDentBusiness.WebServiceMainHQ;
+using OpenDentBusiness.WebBridges;
 #if EHRTEST
 using EHR;
 #endif
@@ -264,7 +265,6 @@ namespace OpenDental{
 		///appointments that started 10-40 minutes ago (depending on in the patient is a new patient) at 10 minute intervals.  No preferences.
 		///In the future, some sort of identification should be made to tell if this thread is running on any computer.</summary>
 		private ODThread _threadPodium;
-		private int _podiumIntervalMS=(int)TimeSpan.FromMinutes(5).TotalMilliseconds;
 		///<summary>If the local computer is the computer where claim reports are retrieved then this thread runs in the background and will retrieve
 		///and import reports for the default clearinghouse or for clearinghouses where both the Payors field is not empty plus the Eformat matches the
 		///region the user is in.  If an error is returned from the importation, this thread will silently fail.</summary>
@@ -2593,7 +2593,7 @@ namespace OpenDental{
 			_threadClaimReportRetrieve=new ODThread(_claimReportRetrieveIntervalMS,ThreadClaimReportRetrieve);
 			_threadClaimReportRetrieve.Name="Claim Report Thread";
 			_threadClaimReportRetrieve.Start();
-			_threadPodium=new ODThread(_podiumIntervalMS,ThreadPodiumSendInvitations);
+			_threadPodium=new ODThread(Podium.PodiumThreadIntervalMS,((ODThread o) => { Podium.ThreadPodiumSendInvitations(false); }));
 			_threadPodium.AddExceptionHandler(PodiumMonitoringException);
 			_threadPodium.Name="Podium Thread";
 			_threadPodium.Start();
@@ -4977,42 +4977,6 @@ namespace OpenDental{
 					FormClaimReports.RetrieveAndImport(clearinghouseClin,true);
 				}
 			}
-		}
-
-		private void ThreadPodiumSendInvitations(ODThread worker) {
-			//consider blocking re-entrance if this hasn't finished.
-			//Only send invitations if the program link is enabled, the computer name is set to this computer, and eConnector is not set to send invitations
-			if(!Programs.IsEnabled(ProgramName.Podium)
-				|| !ODEnvironment.IdIsThisComputer(ProgramProperties.GetPropVal(Programs.GetProgramNum(ProgramName.Podium),"Enter your computer name or IP (required)"))
-				|| ProgramProperties.GetPropVal(Programs.GetProgramNum(ProgramName.Podium),"Enter 0 to use Open Dental for sending review invitations, or 1 to use eConnector")!="0")
-			{
-				return;
-			}
-			//Keep a consistant "Now" timestamp throughout this method.
-			DateTime nowDT=MiscData.GetNowDateTime();
-			if(Podium.DateTimeLastRan==DateTime.MinValue) {
-				Podium.DateTimeLastRan=nowDT.AddMilliseconds(-_podiumIntervalMS);
-			}
-			List<Appointment> listApptsCur=Appointments.GetAppointmentsStartingWithinPeriod(Podium.DateTimeLastRan.AddMinutes(-40).AddMilliseconds(_podiumIntervalMS),nowDT.AddMilliseconds(-_podiumIntervalMS));
-			for(int i=0;i<listApptsCur.Count;i++) {
-				Appointment apptCur=listApptsCur[i];
-				if(apptCur.AptStatus!=ApptStatus.Scheduled
-					&& apptCur.AptStatus!=ApptStatus.Complete
-					&& apptCur.AptStatus!=ApptStatus.ASAP)
-				{
-					continue;
-				}
-				Patient patCur=Patients.GetPat(apptCur.PatNum);
-				int podiumMinutes=(apptCur.IsNewPatient?40:10);
-				if(apptCur.AptDateTime>=Podium.DateTimeLastRan.AddMinutes(-podiumMinutes).AddMilliseconds(_podiumIntervalMS)//Appointment between tick interval of last run and now
-					&& apptCur.AptDateTime<nowDT.AddMinutes(-podiumMinutes).AddMilliseconds(_podiumIntervalMS)) 
-				{
-					//appointments should be newer than DateTimeLastRan-(40 or 10)+lag minutes
-					//appointments should be older than Now-(35 or 5) minutes.
-					Podium.SendInvitation(patCur,apptCur.IsNewPatient);
-				}
-			}
-			Podium.DateTimeLastRan=nowDT;
 		}
 
 		///<summary>If the local computer is the computer where incoming email is fetched, then this thread runs in the background and checks for new
