@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.IO;
+using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using CodeBase;
@@ -38,24 +39,10 @@ namespace OpenDental {
 			FillGridInsPlanFiles();
 		}
 
-		///<summary>Shows current status to user in title bar.  Useful for when processing for a few seconds or more.</summary>
+		///<summary>Shows current status to user in the progress label.  Useful for when processing for a few seconds or more.</summary>
 		private void ShowStatus(string message) {
-			int index=Text.IndexOf(" - ");
-			if(index >= 0) {
-				Text=Text.Substring(0,index+3);//Remove old status, but keep the dash and spaces.
-			}
-			else {
-				Text+=" - ";//Ensure there is a separating dash with spaces.
-			}
-			if(message.Trim()=="") {
-				index=Text.IndexOf(" - ");
-				if(index >= 0) {
-					Text=Text.Substring(0,index);//Remove dash a separating spaces if message is empty.
-				}
-			}
-			else {
-				Text+=message;
-			}
+			labelProgress.Text=message;
+			Application.DoEvents();
 		}
 
 		private void FillGridInsPlanFiles() {
