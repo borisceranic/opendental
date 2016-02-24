@@ -12,6 +12,7 @@ using CodeBase;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
+		public static System.Version LatestVersion=new Version("16.1.1.0");//This value must be changed when a new conversion is to be triggered.
 
 		#region Helper Functions
 
@@ -13346,7 +13347,7 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '16.1.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
-			To16_2_0();
+			//To16_2_0();
 		}
 
 
