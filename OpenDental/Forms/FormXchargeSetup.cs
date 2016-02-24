@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using CodeBase;
 using OpenDentBusiness;
 
 namespace OpenDental{
@@ -770,7 +771,42 @@ namespace OpenDental{
 			if(_progCur==null) {//should never happen
 				MsgBox.Show(this,"X-Charge entry is missing from the database.");
 				return;
-			}			
+			}
+			#region Check Credit Card Processor Mismatch
+			if(_progCur.Enabled && !checkEnabled.Checked) {
+				MsgBox.Show(this,"Warning: Changing credit card processing companies will require you to delete all cards stored with tokens."
+					+"  When you enable another processor you will be prompted to delete these credit cards.");
+			}
+			if(checkEnabled.Checked && Programs.IsEnabled(ProgramName.PayConnect)) {
+				MsgBox.Show(this,"PayConnect is currently enabled.  You cannot enable both X-Charge and PayConnect at the same time.");
+				return;
+			}
+			if(checkEnabled.Checked) {
+				List<CreditCard> payConnectCreditCards = CreditCards.GetCardsWithPayConnectTokens();
+				if(payConnectCreditCards.Count>0) {
+					if(MessageBox.Show(Lan.g(this,"There are")+" "+payConnectCreditCards.Count.ToString()+" "+Lan.g(this,"credit cards using PayConnect tokens.  Enabling X-Charge will delete all of these credit cards and their authorized repeating charge information.  Continue?"),"",MessageBoxButtons.OKCancel)!=DialogResult.OK) {
+						return;
+					}
+					SecurityLogs.MakeLogEntry(Permissions.Setup,0,Lan.g(this,"Deleted all credit cards with PayConnect tokens"));
+					List<Patient> listPats = new List<Patient>();
+					foreach(CreditCard creditC in payConnectCreditCards) {
+						//Delete the card
+						CreditCards.Delete(creditC.CreditCardNum);
+						//Add patient to list to display for reference
+						if(listPats.Select(x => x.PatNum).Contains(creditC.PatNum)) {
+							continue;
+						}
+						listPats.Add(Patients.GetPat(creditC.PatNum));
+					}
+					string msg = Lan.g(this,"Credit Cards deleted for the following patients:");
+					listPats.OrderBy(x => x.LName)
+						.ThenBy(x => x.FName).ToList()
+						.ForEach(x => msg+="\r\n"+x.PatNum+" "+Patients.GetNameFL(x.LName,x.FName,x.Preferred,x.MiddleI));
+					MsgBoxCopyPaste msgBox = new MsgBoxCopyPaste(msg);
+					msgBox.ShowDialog();
+				}
+			}
+			#endregion Check Credit Card Processor Mismatch
 			#region Validate Path and Local Path Override
 			if(checkEnabled.Checked && textOverride.Text.Trim().Length>0 && !File.Exists(textOverride.Text.Trim())) {
 				MsgBox.Show(this,"Local Path Override is not valid.");

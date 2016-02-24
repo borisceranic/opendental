@@ -310,5 +310,13 @@ namespace OpenDentBusiness{
 			return Crud.CreditCardCrud.SelectMany(command);
 		}
 
+		///<summary>Gets every credit card in the db with a PayConnect token.</summary>
+		public static List<CreditCard> GetCardsWithPayConnectTokens() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<CreditCard>>(MethodBase.GetCurrentMethod());
+			}
+			string command = "SELECT * FROM creditcard WHERE PayConnectToken!=\"\"";
+			return Crud.CreditCardCrud.SelectMany(command);
+		}
 	}
 }
