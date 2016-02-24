@@ -213,6 +213,7 @@ namespace OpenDental{
 			this.gridMeds.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMeds.HasAddButton = false;
 			this.gridMeds.HasMultilineHeaders = false;
 			this.gridMeds.HScrollVisible = false;
 			this.gridMeds.Location = new System.Drawing.Point(6, 35);
@@ -230,6 +231,7 @@ namespace OpenDental{
 			this.gridDiseases.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridDiseases.HasAddButton = false;
 			this.gridDiseases.HasMultilineHeaders = false;
 			this.gridDiseases.HScrollVisible = false;
 			this.gridDiseases.Location = new System.Drawing.Point(6, 35);
@@ -259,6 +261,7 @@ namespace OpenDental{
 			this.gridAllergies.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridAllergies.HasAddButton = false;
 			this.gridAllergies.HasMultilineHeaders = false;
 			this.gridAllergies.HScrollVisible = false;
 			this.gridAllergies.Location = new System.Drawing.Point(6, 35);
@@ -336,6 +339,7 @@ namespace OpenDental{
 			this.gridFamilyHealth.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridFamilyHealth.HasAddButton = false;
 			this.gridFamilyHealth.HasMultilineHeaders = false;
 			this.gridFamilyHealth.HScrollVisible = false;
 			this.gridFamilyHealth.Location = new System.Drawing.Point(6, 35);
@@ -441,6 +445,7 @@ namespace OpenDental{
 			// textMedical
 			// 
 			this.textMedical.AcceptsTab = true;
+			this.textMedical.BackColor = System.Drawing.SystemColors.Window;
 			this.textMedical.DetectUrls = false;
 			this.textMedical.Location = new System.Drawing.Point(6, 139);
 			this.textMedical.Name = "textMedical";
@@ -464,12 +469,14 @@ namespace OpenDental{
 			this.butPrintMedical.Size = new System.Drawing.Size(112, 24);
 			this.butPrintMedical.TabIndex = 92;
 			this.butPrintMedical.Text = "Print Medical";
+			this.butPrintMedical.Click += new System.EventHandler(this.butPrintMedical_Click);
 			// 
 			// textService
 			// 
 			this.textService.AcceptsTab = true;
 			this.textService.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.textService.BackColor = System.Drawing.SystemColors.Window;
 			this.textService.DetectUrls = false;
 			this.textService.Location = new System.Drawing.Point(233, 53);
 			this.textService.Name = "textService";
@@ -482,6 +489,7 @@ namespace OpenDental{
 			// textMedUrgNote
 			// 
 			this.textMedUrgNote.AcceptsTab = true;
+			this.textMedUrgNote.BackColor = System.Drawing.SystemColors.Window;
 			this.textMedUrgNote.DetectUrls = false;
 			this.textMedUrgNote.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.textMedUrgNote.ForeColor = System.Drawing.Color.Red;
@@ -550,6 +558,7 @@ namespace OpenDental{
 			this.textMedicalComp.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.textMedicalComp.BackColor = System.Drawing.SystemColors.Window;
 			this.textMedicalComp.DetectUrls = false;
 			this.textMedicalComp.Location = new System.Drawing.Point(9, 230);
 			this.textMedicalComp.Name = "textMedicalComp";
@@ -660,6 +669,7 @@ namespace OpenDental{
 			this.gridVitalSigns.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridVitalSigns.HasAddButton = false;
 			this.gridVitalSigns.HasMultilineHeaders = false;
 			this.gridVitalSigns.HScrollVisible = false;
 			this.gridVitalSigns.Location = new System.Drawing.Point(6, 35);
