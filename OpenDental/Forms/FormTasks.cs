@@ -5,10 +5,12 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace OpenDental{
 	/// <summary></summary>
-	public class FormTasks:System.Windows.Forms.Form {
+	public class FormTasks:System.Windows.Forms.Form, ISignalProcessor {
 		//private System.ComponentModel.IContainer components;
 		/////<summary>After closing, if this is not zero, then it will jump to the object specified in GotoKeyNum.</summary>
 		//public TaskObjectType GotoType;
@@ -83,6 +85,15 @@ namespace OpenDental{
 		private void FormTasks_Load(object sender,EventArgs e) {
 			windowStateOld=WindowState;
 			userControlTasks1.InitializeOnStartup();
+			Signalods.Subscribe(this);
+		}
+
+		public void ProcessSignals(List<Signalod> listSignals) {
+			if(listSignals.All(x => !x.ITypes.Contains(((int)InvalidType.Task).ToString()) && !x.ITypes.Contains(((int)InvalidType.TaskPopup).ToString()))) {
+				//no task signals;
+				return;
+			}
+			RefreshUserControlTasks();
 		}
 		
 		private void userControlTasks1_GoToChanged(object sender,EventArgs e) {

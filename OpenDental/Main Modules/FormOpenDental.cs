@@ -2657,6 +2657,7 @@ namespace OpenDental{
 					//The tooth chart will default to Simple2D mode if the above code fails for any reason.  This will at least get the user into the program.
 				}
 			}
+			Signalods.Subscribe(this);
 			Plugins.HookAddCode(this,"FormOpenDental.Load_end");
 		}
 
@@ -4504,10 +4505,6 @@ namespace OpenDental{
 			if(areAnySignalsTasks || tasksPopup.Count>0) {
 				if(userControlTasks1.Visible) {
 					userControlTasks1.RefreshTasks();
-				}
-				//See if FormTasks is currently open.
-				if(ContrManage2!=null && ContrManage2.FormT!=null && !ContrManage2.FormT.IsDisposed) {
-					ContrManage2.FormT.RefreshUserControlTasks();
 				}
 			}
 			//This can be enhanced.
