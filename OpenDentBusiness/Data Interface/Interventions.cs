@@ -93,19 +93,17 @@ namespace OpenDentBusiness{
 			return Crud.InterventionCrud.SelectMany(command);
 		}
 
-		public static Dictionary<string,int> GetAllForCodeSet(InterventionCodeSet codeSet) {
+		///<summary>Gets list of CodeValue strings from interventions with DateEntry in the last year and CodeSet equal to the supplied codeSet.
+		///Result list is grouped by CodeValue, CodeSystem even though we only return the list of CodeValues.  However, there are no codes in the
+		///EHR intervention code list that conflict between code systems, so we should never have a duplicate code in the returned list.</summary>
+		public static List<string> GetAllForCodeSet(InterventionCodeSet codeSet) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<Dictionary<string,int>>(MethodBase.GetCurrentMethod(),codeSet);
+				return Meth.GetObject<List<string>>(MethodBase.GetCurrentMethod(),codeSet);
 			}
-			string command="SELECT CodeValue, Count(*) FROM intervention WHERE CodeSet = "+POut.Int((int)codeSet)+" "
-				+"AND "+DbHelper.DtimeToDate("DateEntry")+" >="+POut.Date(MiscData.GetNowDateTime().AddYears(-1))+" "
-				+"GROUP BY CodeValue, CodeSystem";
-			DataTable table =Db.GetTable(command);
-			Dictionary<string,int> retVal=new Dictionary<string, int>();
-			foreach(DataRow row in table.Rows) {
-				retVal[row[0].ToString()]=PIn.Int(row[1].ToString());
-			}
-			return retVal;
+			string command="SELECT CodeValue FROM intervention WHERE CodeSet="+POut.Int((int)codeSet)+" "
+				+"AND "+DbHelper.DtimeToDate("DateEntry")+">="+POut.Date(MiscData.GetNowDateTime().AddYears(-1))+" "
+				+"GROUP BY CodeValue,CodeSystem";
+			return Db.GetListString(command);
 		}
 
 		///<summary>Gets one Intervention from the db.</summary>
