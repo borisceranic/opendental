@@ -598,6 +598,7 @@ namespace OpenDental{
 				Patient pat=Patients.GetPat(RepeatCur.PatNum);
 				proc.SiteNum=pat.SiteNum;
 			}
+			Procedures.Insert(proc);
 			Recalls.Synch(RepeatCur.PatNum);
 			MsgBox.Show(this,"Procedure added.");
 		}
