@@ -49,6 +49,7 @@
 			this.butRetry.TabIndex = 1;
 			this.butRetry.Text = "Retry";
 			this.butRetry.UseVisualStyleBackColor = true;
+			this.butRetry.Visible = false;
 			this.butRetry.Click += new System.EventHandler(this.butRetry_Click);
 			// 
 			// FormMain
