@@ -2637,7 +2637,8 @@ namespace OpenDentBusiness {
 						command+="AND intervention.PatNum IN("+string.Join(",",listEhrPatNums)+") ";
 					}
 					command+="ORDER BY PatNum,DateEntry DESC";
-					listValueSetOIDs=new List<string>() { "2.16.840.1.113883.3.526.3.509" };//Tobacco Use Cessation Counseling Grouping Value Set
+					//Tobacco Use Cessation Counseling Grouping and Tobacco Use Cessation Pharmacotherapy Grouping Value Sets
+					listValueSetOIDs=new List<string>() { "2.16.840.1.113883.3.526.3.509","2.16.840.1.113883.3.526.3.1190" };
 					measureCur.DictPatNumListInterventions=GetInterventions(command,listValueSetOIDs);
 					#endregion
 					#region Get Tobacco Cessation Meds
@@ -3311,8 +3312,20 @@ namespace OpenDentBusiness {
 			for(int i=listInterventions.Count-1;i>-1;i--) {
 				bool isValidIntervention=false;
 				for(int j=0;j<listAllInterventionCodes.Count;j++) {
-					if(listInterventions[i].CodeValue==listAllInterventionCodes[j].CodeValue
-								&& listInterventions[i].CodeSystem==listAllInterventionCodes[j].CodeSystem) {
+					if(listAllInterventionCodes[j].ValueSetOID!="2.16.840.1.113883.3.526.3.1190"//Tobacco Use Cessation Pharmacotherapy Grouping Value Set
+						&& listInterventions[i].CodeValue==listAllInterventionCodes[j].CodeValue
+						&& listInterventions[i].CodeSystem==listAllInterventionCodes[j].CodeSystem)
+					{
+						isValidIntervention=true;
+						dictInterventionNumEhrCode.Add(listInterventions[i].InterventionNum,listAllInterventionCodes[j]);
+						break;
+					}
+					else if(listAllInterventionCodes[j].ValueSetOID=="2.16.840.1.113883.3.526.3.1190"//Tobacco Use Cessation Pharmacotherapy Grouping Value Set
+						&& listInterventions[i].CodeValue==listAllInterventionCodes[j].CodeValue
+						&& listInterventions[i].CodeSystem==listAllInterventionCodes[j].CodeSystem
+						&& listInterventions[i].IsPatDeclined)
+					{
+						//include any medication interventions if they are declined medications inserted as interventions
 						isValidIntervention=true;
 						dictInterventionNumEhrCode.Add(listInterventions[i].InterventionNum,listAllInterventionCodes[j]);
 						break;

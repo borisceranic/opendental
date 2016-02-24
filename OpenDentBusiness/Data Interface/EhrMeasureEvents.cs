@@ -117,6 +117,23 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
+		public static Dictionary<string,int> GetByTypeFromDb(EhrMeasureEventType eventType) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<Dictionary<string,int>>(MethodBase.GetCurrentMethod(),eventType);
+			}
+			string command="SELECT CodeValueResult, COUNT(*) numUsed FROM ehrmeasureevent "
+				+"WHERE EventType="+POut.Int((int)eventType)+" "
+				+"AND CodeValueResult!='' "
+				+"AND "+DbHelper.DtimeToDate("DateTEvent")+" >="+POut.Date(MiscData.GetNowDateTime().AddYears(-1))+" "
+				+"GROUP BY CodeValueResult";
+			DataTable table =Db.GetTable(command);
+			Dictionary<string,int> retVal=new Dictionary<string, int>();
+			foreach(DataRow row in table.Rows) {
+				retVal[row[0].ToString()]=PIn.Int(row[1].ToString());
+			}
+			return retVal;
+		}
+
 		/*
 		
 		///<summary>Gets one EhrMeasureEvent from the db.</summary>

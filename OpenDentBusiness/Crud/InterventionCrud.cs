@@ -54,6 +54,7 @@ namespace OpenDentBusiness.Crud{
 				intervention.Note           = PIn.String(row["Note"].ToString());
 				intervention.DateEntry      = PIn.Date  (row["DateEntry"].ToString());
 				intervention.CodeSet        = (OpenDentBusiness.InterventionCodeSet)PIn.Int(row["CodeSet"].ToString());
+				intervention.IsPatDeclined  = PIn.Bool  (row["IsPatDeclined"].ToString());
 				retVal.Add(intervention);
 			}
 			return retVal;
@@ -73,6 +74,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("Note");
 			table.Columns.Add("DateEntry");
 			table.Columns.Add("CodeSet");
+			table.Columns.Add("IsPatDeclined");
 			foreach(Intervention intervention in listInterventions) {
 				table.Rows.Add(new object[] {
 					POut.Long  (intervention.InterventionNum),
@@ -83,6 +85,7 @@ namespace OpenDentBusiness.Crud{
 					POut.String(intervention.Note),
 					POut.Date  (intervention.DateEntry),
 					POut.Int   ((int)intervention.CodeSet),
+					POut.Bool  (intervention.IsPatDeclined),
 				});
 			}
 			return table;
@@ -123,7 +126,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="InterventionNum,";
 			}
-			command+="PatNum,ProvNum,CodeValue,CodeSystem,Note,DateEntry,CodeSet) VALUES(";
+			command+="PatNum,ProvNum,CodeValue,CodeSystem,Note,DateEntry,CodeSet,IsPatDeclined) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(intervention.InterventionNum)+",";
 			}
@@ -134,7 +137,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(intervention.CodeSystem)+"',"
 				+"'"+POut.String(intervention.Note)+"',"
 				+    POut.Date  (intervention.DateEntry)+","
-				+    POut.Int   ((int)intervention.CodeSet)+")";
+				+    POut.Int   ((int)intervention.CodeSet)+","
+				+    POut.Bool  (intervention.IsPatDeclined)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -167,7 +171,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="InterventionNum,";
 			}
-			command+="PatNum,ProvNum,CodeValue,CodeSystem,Note,DateEntry,CodeSet) VALUES(";
+			command+="PatNum,ProvNum,CodeValue,CodeSystem,Note,DateEntry,CodeSet,IsPatDeclined) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(intervention.InterventionNum)+",";
 			}
@@ -178,7 +182,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(intervention.CodeSystem)+"',"
 				+"'"+POut.String(intervention.Note)+"',"
 				+    POut.Date  (intervention.DateEntry)+","
-				+    POut.Int   ((int)intervention.CodeSet)+")";
+				+    POut.Int   ((int)intervention.CodeSet)+","
+				+    POut.Bool  (intervention.IsPatDeclined)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -197,7 +202,8 @@ namespace OpenDentBusiness.Crud{
 				+"CodeSystem     = '"+POut.String(intervention.CodeSystem)+"', "
 				+"Note           = '"+POut.String(intervention.Note)+"', "
 				+"DateEntry      =  "+POut.Date  (intervention.DateEntry)+", "
-				+"CodeSet        =  "+POut.Int   ((int)intervention.CodeSet)+" "
+				+"CodeSet        =  "+POut.Int   ((int)intervention.CodeSet)+", "
+				+"IsPatDeclined  =  "+POut.Bool  (intervention.IsPatDeclined)+" "
 				+"WHERE InterventionNum = "+POut.Long(intervention.InterventionNum);
 			Db.NonQ(command);
 		}
@@ -233,6 +239,10 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="CodeSet = "+POut.Int   ((int)intervention.CodeSet)+"";
 			}
+			if(intervention.IsPatDeclined != oldIntervention.IsPatDeclined) {
+				if(command!=""){ command+=",";}
+				command+="IsPatDeclined = "+POut.Bool(intervention.IsPatDeclined)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -264,6 +274,9 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			if(intervention.CodeSet != oldIntervention.CodeSet) {
+				return true;
+			}
+			if(intervention.IsPatDeclined != oldIntervention.IsPatDeclined) {
 				return true;
 			}
 			return false;

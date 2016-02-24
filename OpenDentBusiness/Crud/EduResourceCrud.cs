@@ -53,6 +53,7 @@ namespace OpenDentBusiness.Crud{
 				eduResource.LabResultName   = PIn.String(row["LabResultName"].ToString());
 				eduResource.LabResultCompare= PIn.String(row["LabResultCompare"].ToString());
 				eduResource.ResourceUrl     = PIn.String(row["ResourceUrl"].ToString());
+				eduResource.SmokingSnoMed   = PIn.String(row["SmokingSnoMed"].ToString());
 				retVal.Add(eduResource);
 			}
 			return retVal;
@@ -71,6 +72,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("LabResultName");
 			table.Columns.Add("LabResultCompare");
 			table.Columns.Add("ResourceUrl");
+			table.Columns.Add("SmokingSnoMed");
 			foreach(EduResource eduResource in listEduResources) {
 				table.Rows.Add(new object[] {
 					POut.Long  (eduResource.EduResourceNum),
@@ -80,6 +82,7 @@ namespace OpenDentBusiness.Crud{
 					POut.String(eduResource.LabResultName),
 					POut.String(eduResource.LabResultCompare),
 					POut.String(eduResource.ResourceUrl),
+					POut.String(eduResource.SmokingSnoMed),
 				});
 			}
 			return table;
@@ -120,7 +123,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="EduResourceNum,";
 			}
-			command+="DiseaseDefNum,MedicationNum,LabResultID,LabResultName,LabResultCompare,ResourceUrl) VALUES(";
+			command+="DiseaseDefNum,MedicationNum,LabResultID,LabResultName,LabResultCompare,ResourceUrl,SmokingSnoMed) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(eduResource.EduResourceNum)+",";
 			}
@@ -130,7 +133,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(eduResource.LabResultID)+"',"
 				+"'"+POut.String(eduResource.LabResultName)+"',"
 				+"'"+POut.String(eduResource.LabResultCompare)+"',"
-				+"'"+POut.String(eduResource.ResourceUrl)+"')";
+				+"'"+POut.String(eduResource.ResourceUrl)+"',"
+				+"'"+POut.String(eduResource.SmokingSnoMed)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -163,7 +167,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="EduResourceNum,";
 			}
-			command+="DiseaseDefNum,MedicationNum,LabResultID,LabResultName,LabResultCompare,ResourceUrl) VALUES(";
+			command+="DiseaseDefNum,MedicationNum,LabResultID,LabResultName,LabResultCompare,ResourceUrl,SmokingSnoMed) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(eduResource.EduResourceNum)+",";
 			}
@@ -173,7 +177,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(eduResource.LabResultID)+"',"
 				+"'"+POut.String(eduResource.LabResultName)+"',"
 				+"'"+POut.String(eduResource.LabResultCompare)+"',"
-				+"'"+POut.String(eduResource.ResourceUrl)+"')";
+				+"'"+POut.String(eduResource.ResourceUrl)+"',"
+				+"'"+POut.String(eduResource.SmokingSnoMed)+"')";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -191,7 +196,8 @@ namespace OpenDentBusiness.Crud{
 				+"LabResultID     = '"+POut.String(eduResource.LabResultID)+"', "
 				+"LabResultName   = '"+POut.String(eduResource.LabResultName)+"', "
 				+"LabResultCompare= '"+POut.String(eduResource.LabResultCompare)+"', "
-				+"ResourceUrl     = '"+POut.String(eduResource.ResourceUrl)+"' "
+				+"ResourceUrl     = '"+POut.String(eduResource.ResourceUrl)+"', "
+				+"SmokingSnoMed   = '"+POut.String(eduResource.SmokingSnoMed)+"' "
 				+"WHERE EduResourceNum = "+POut.Long(eduResource.EduResourceNum);
 			Db.NonQ(command);
 		}
@@ -223,6 +229,10 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="ResourceUrl = '"+POut.String(eduResource.ResourceUrl)+"'";
 			}
+			if(eduResource.SmokingSnoMed != oldEduResource.SmokingSnoMed) {
+				if(command!=""){ command+=",";}
+				command+="SmokingSnoMed = '"+POut.String(eduResource.SmokingSnoMed)+"'";
+			}
 			if(command==""){
 				return false;
 			}
@@ -251,6 +261,9 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			if(eduResource.ResourceUrl != oldEduResource.ResourceUrl) {
+				return true;
+			}
+			if(eduResource.SmokingSnoMed != oldEduResource.SmokingSnoMed) {
 				return true;
 			}
 			return false;

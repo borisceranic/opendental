@@ -93,6 +93,21 @@ namespace OpenDentBusiness{
 			return Crud.InterventionCrud.SelectMany(command);
 		}
 
+		public static Dictionary<string,int> GetAllForCodeSet(InterventionCodeSet codeSet) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<Dictionary<string,int>>(MethodBase.GetCurrentMethod(),codeSet);
+			}
+			string command="SELECT CodeValue, Count(*) FROM intervention WHERE CodeSet = "+POut.Int((int)codeSet)+" "
+				+"AND "+DbHelper.DtimeToDate("DateEntry")+" >="+POut.Date(MiscData.GetNowDateTime().AddYears(-1))+" "
+				+"GROUP BY CodeValue, CodeSystem";
+			DataTable table =Db.GetTable(command);
+			Dictionary<string,int> retVal=new Dictionary<string, int>();
+			foreach(DataRow row in table.Rows) {
+				retVal[row[0].ToString()]=PIn.Int(row[1].ToString());
+			}
+			return retVal;
+		}
+
 		///<summary>Gets one Intervention from the db.</summary>
 		public static Intervention GetOne(long interventionNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
 using System.Text;
+using System.Linq;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
@@ -17,67 +18,45 @@ namespace OpenDentBusiness{
 			List<LabResult> labResultList = LabResults.GetAllForPatient(patNum);
 			List<EhrLabResult> listEhrLabResults= EhrLabResults.GetAllForPatient(patNum);
 			List<EduResource> eduResourceListAll = Crud.EduResourceCrud.SelectMany("SELECT * FROM eduresource");
+			List<EhrMeasureEvent> listTobaccoEvents=EhrMeasureEvents.RefreshByType(patNum,EhrMeasureEventType.TobaccoUseAssessed)
+				.FindAll(x => x.CodeSystemResult=="SNOMEDCT");
 			List<EduResource> retVal = new List<EduResource>();
-			for(int i=0;i<eduResourceListAll.Count;i++) {
-				if(eduResourceListAll[i].DiseaseDefNum!=0) {
-					for(int j=0;j<diseaseList.Count;j++) {
-						if(eduResourceListAll[i].DiseaseDefNum==diseaseList[j].DiseaseDefNum) {
-							retVal.Add(eduResourceListAll[i]);
+			eduResourceListAll.FindAll(x => x.DiseaseDefNum!=0 && diseaseList.Any(y => y.DiseaseDefNum==x.DiseaseDefNum)).ForEach(x => retVal.Add(x));
+			eduResourceListAll.FindAll(x => x.MedicationNum!=0
+					&& medicationPatList.Any(y => y.MedicationNum==x.MedicationNum 
+						|| (y.MedicationNum==0 && Medications.GetMedication(x.MedicationNum).RxCui==y.RxCui)))
+				.ForEach(x => retVal.Add(x));
+			eduResourceListAll.FindAll(x => x.SmokingSnoMed!="" && listTobaccoEvents.Any(y => y.CodeValueResult==x.SmokingSnoMed)).ForEach(x => retVal.Add(x));
+			foreach(EduResource resourceCur in eduResourceListAll.Where(x => x.LabResultID!="")) {
+				foreach(LabResult labResult in labResultList.Where(x => x.TestID==resourceCur.LabResultID)) {
+					if(resourceCur.LabResultCompare.StartsWith("<")){
+						//PIn.Int not used because blank not allowed.
+						try{
+							if(int.Parse(labResult.ObsValue) < int.Parse(resourceCur.LabResultCompare.Substring(1))){
+								retVal.Add(resourceCur);
+							}
+						}
+						catch{
+							//This could only happen if the validation in either input didn't work.
 						}
 					}
-				}
-				else if(eduResourceListAll[i].DiseaseDefNum!=0) {//checks against same list as Diseases/Problems
-					for(int j=0;j<diseaseList.Count;j++) {
-						if(eduResourceListAll[i].DiseaseDefNum==diseaseList[j].DiseaseDefNum) {
-							retVal.Add(eduResourceListAll[i]);
+					else if(resourceCur.LabResultCompare.StartsWith(">")){
+						try {
+							if(int.Parse(labResult.ObsValue) > int.Parse(resourceCur.LabResultCompare.Substring(1))) {
+								retVal.Add(resourceCur);
+							}
+						}
+						catch {
+							//This could only happen if the validation in either input didn't work.
 						}
 					}
-				}
-				else if(eduResourceListAll[i].MedicationNum!=0) {
-					Medication med=Medications.GetMedication(eduResourceListAll[i].MedicationNum);
-					for(int j=0;j<medicationPatList.Count;j++) {
-						if(eduResourceListAll[i].MedicationNum==medicationPatList[j].MedicationNum || (medicationPatList[j].MedicationNum==0 && medicationPatList[j].RxCui==med.RxCui)) {
-							retVal.Add(eduResourceListAll[i]);
-						}
+				}//end LabResultList
+				foreach(EhrLabResult ehrLabResult in listEhrLabResults.Where(x => x.ObservationIdentifierID==resourceCur.LabResultID)) {//matches loinc only.
+					if(retVal.Contains(resourceCur)){
+						continue;//already added from loop above.
 					}
-				}
-				else if(eduResourceListAll[i].LabResultID!="") {
-					for(int j=0;j<labResultList.Count;j++) {
-						if(eduResourceListAll[i].LabResultID != labResultList[j].TestID) {
-							continue;
-						}
-						if(eduResourceListAll[i].LabResultCompare.StartsWith("<")){
-							//PIn.Int not used because blank not allowed.
-							try{
-								if(int.Parse(labResultList[j].ObsValue) < int.Parse(eduResourceListAll[i].LabResultCompare.Substring(1))){
-									retVal.Add(eduResourceListAll[i]);
-								}
-							}
-							catch{
-								//This could only happen if the validation in either input didn't work.
-							}
-						}
-						else if(eduResourceListAll[i].LabResultCompare.StartsWith(">")){
-							try {
-								if(int.Parse(labResultList[j].ObsValue) > int.Parse(eduResourceListAll[i].LabResultCompare.Substring(1))) {
-									retVal.Add(eduResourceListAll[i]);
-								}
-							}
-							catch {
-								//This could only happen if the validation in either input didn't work.
-							}
-						}
-					}//end LabResultList
-					for(int j=0;j<listEhrLabResults.Count;j++) {//matches loinc only.
-						if(listEhrLabResults[j].ObservationIdentifierID!=eduResourceListAll[i].LabResultID) {
-							continue;
-						}
-						if(retVal.Contains(eduResourceListAll[i])){
-							continue;//already added from loop above.
-						}
-						retVal.Add(eduResourceListAll[i]);
-					}//end EhrLabResults
-				}
+					retVal.Add(resourceCur);
+				}//end EhrLabResults
 			}
 			return retVal;
 		}

@@ -31,19 +31,27 @@ namespace OpenDental {
 			eduResourceList=EduResources.SelectAll();
 			gridEdu.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<eduResourceList.Count;i++) {
+			foreach(EduResource eduResCur in eduResourceList) {
 				row=new ODGridRow();
-				if(eduResourceList[i].DiseaseDefNum!=0) {
-					row.Cells.Add("Problem: "+DiseaseDefs.GetItem(eduResourceList[i].DiseaseDefNum).DiseaseName);
-					//row.Cells.Add("ICD9: "+DiseaseDefs.GetItem(eduResourceList[i].DiseaseDefNum).ICD9Code);
+				if(eduResCur.DiseaseDefNum!=0) {
+					row.Cells.Add("Problem: "+DiseaseDefs.GetItem(eduResCur.DiseaseDefNum).DiseaseName);
+					//row.Cells.Add("ICD9: "+DiseaseDefs.GetItem(eduResCur.DiseaseDefNum).ICD9Code);
 				}
-				else if(eduResourceList[i].MedicationNum!=0) {
-					row.Cells.Add("Medication: "+Medications.GetDescription(eduResourceList[i].MedicationNum));
+				else if(eduResCur.MedicationNum!=0) {
+					row.Cells.Add("Medication: "+Medications.GetDescription(eduResCur.MedicationNum));
+				}
+				else if(eduResCur.SmokingSnoMed!="") {
+					Snomed sCur=Snomeds.GetByCode(eduResCur.SmokingSnoMed);
+					string criteriaCur="Tobacco Use Assessment: ";
+					if(sCur!=null) {
+						criteriaCur+=sCur.Description;
+					}
+					row.Cells.Add(criteriaCur);
 				}
 				else {
-					row.Cells.Add("Lab Results: "+eduResourceList[i].LabResultName+" "+eduResourceList[i].LabResultCompare);
+					row.Cells.Add("Lab Results: "+eduResCur.LabResultName+" "+eduResCur.LabResultCompare);
 				}
-				row.Cells.Add(eduResourceList[i].ResourceUrl);
+				row.Cells.Add(eduResCur.ResourceUrl);
 				gridEdu.Rows.Add(row);
 			}
 			gridEdu.EndUpdate();

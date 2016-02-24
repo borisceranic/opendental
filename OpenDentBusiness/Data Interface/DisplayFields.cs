@@ -256,6 +256,9 @@ namespace OpenDentBusiness {
 				//list.Add(new DisplayField("Super Head",0,category));
 				//list.Add(new DisplayField("Patient Portal",0,category));
 				//list.Add(new DisplayField("Broken Appts",0,category));
+				//if(PrefC.GetBool(PrefName.ShowFeatureEhr)) {
+				//	list.Add(new DisplayField("Tobacco Use",0,category));
+				//}
 			}
 			else if(category==DisplayFieldCategory.ProcedureGroupNote) {
 				list.Add(new DisplayField("Date",67,category));
@@ -556,6 +559,9 @@ namespace OpenDentBusiness {
 				list.Add(new DisplayField("Super Head",0,category));
 				list.Add(new DisplayField("Patient Portal",0,category));
 			  list.Add(new DisplayField("Broken Appts",0,category));
+				if(PrefC.GetBool(PrefName.ShowFeatureEhr)) {
+					list.Add(new DisplayField("Tobacco Use",0,category));
+				}
 			}
 			else if(category==DisplayFieldCategory.ProcedureGroupNote) {
 				list.Add(new DisplayField("Date",67,category));

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
 using System.Text;
+using System.Linq;
 
 namespace OpenDentBusiness {
 	///<summary>Never insert or update, use cache pattern only.  This is not referencing a real table in the database, it is a static object filled by the contents of the EHR.dll.</summary>
@@ -303,6 +304,50 @@ namespace OpenDentBusiness {
 				}
 			}
 			return retval;
+		}
+
+		///<summary>Returns EhrCodes for the specified EhrMeasureEventType ordered by how often and how recently they have been used.  Results are
+		///ordered by applying a weight based on the date diff from current date to DateTEvent of the EhrMeasureEvents.  EhrCodes used most
+		///recently will have the largest weight and help move the EhrCode to the top of the list.  Specify a limit amount if the result set should only
+		///be a certain number of EhrCodes at most.</summary>
+		public static List<EhrCode> GetForEventTypeByUse(EhrMeasureEventType ehrMeasureEventTypes) {
+			List<EhrCode> retVal=new List<EhrCode>();
+			//list of CodeValueResults of the specified type ordered by a weight calculated by summing values based on how recently the codes were used
+			Dictionary<string,int> listCodesOrdered=EhrMeasureEvents.GetByTypeFromDb(ehrMeasureEventTypes);
+			foreach(KeyValuePair<string,int> kvp in listCodesOrdered) {
+				EhrCode codeCur=Listt.FirstOrDefault(x => x.CodeValue==kvp.Key);
+				Snomed sCur=null;
+				if(codeCur==null) {
+					sCur=Snomeds.GetByCode(kvp.Key);
+					if(sCur==null) {
+						continue;
+					}
+					codeCur=new EhrCode { CodeValue=sCur.SnomedCode,Description=sCur.Description };
+				}
+				retVal.Add(codeCur);
+			}
+			return retVal.OrderBy(x=>x.Description).ToList();
+		}
+
+		///<summary>Returns a list of EhrCodes for the specified InterventionCodeSet and ValueSetOID for any medication interventions.  Results will
+		///contain both intervention codes and medication codes ordered by applying a weight based on the date diff from the current date to the DateStart
+		///of the medications or the DateEntry of the interventions.  More recently used interentions/medications will have a heavier weight and help move
+		///the code to the top of the list.  Specifying a limit will restrict the result set to a max length.</summary>
+		public static List<EhrCode> GetForIntervAndMedByUse(InterventionCodeSet codeSet,List<string> listMedValueSetOIDs) {
+			//get all MedicationPats where the RxCui is one of the RxCui strings for list of ValueSetOIDs provided
+			Dictionary<string,int> listMedPats=MedicationPats.GetAllForRxCuis(GetForValueSetOIDs(listMedValueSetOIDs,true).Select(x=>x.CodeValue).ToList());
+			Dictionary<string,int> listInterventions=Interventions.GetAllForCodeSet(codeSet);
+			List<EhrCode> retVal=new List<EhrCode>();
+			List<string> listCodes=listMedPats.Union(listInterventions).OrderByDescending(x=>x.Value).Select(x=>x.Key).ToList();
+			foreach(string code in listCodes) {
+				EhrCode codeCur=Listt.FirstOrDefault(x => x.CodeValue==code);
+				if(codeCur==null) {
+					continue;
+				}
+				retVal.Add(codeCur);
+			}
+			//we might find the "wrong" ehr code, because a single code may be in multiple code sets. This is still a valid code.
+			return retVal.OrderBy(x=>x.Description).ToList();
 		}
 
 

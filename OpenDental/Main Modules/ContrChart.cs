@@ -5203,30 +5203,103 @@ namespace OpenDental {
 				}
 				int ordinal=0;
 				switch(fields[f].InternalName) {
-					case "Age":
-						row.Cells.Add(PatientLogic.DateToAgeString(PatCur.Birthdate,PatCur.DateTimeDeceased));
-						break;
+					#region ABC0
 					case "ABC0":
 						row.Cells.Add(PatCur.CreditType);
 						break;
+					#endregion ABC0
+					#region Age
+					case "Age":
+						row.Cells.Add(PatientLogic.DateToAgeString(PatCur.Birthdate,PatCur.DateTimeDeceased));
+						break;
+					#endregion Age
+					#region Allergies
+					case "Allergies":
+						List<Allergy> allergyList=Allergies.GetAll(PatCur.PatNum,false);
+						row=new ODGridRow();
+						cell=new ODGridCell();
+						if(fields[f].Description=="") {
+							cell.Text=fields[f].InternalName;
+						}
+						else {
+							cell.Text=fields[f].Description;
+						}
+						cell.Bold=YN.Yes;
+						row.Cells.Add(cell);
+						row.ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor;
+						row.Tag="med";
+						if(allergyList.Count>0) {
+							row.Cells.Add("");
+							gridPtInfo.Rows.Add(row);
+						}
+						else {
+							row.Cells.Add(Lan.g("TableChartPtInfo","none"));
+						}
+						for(int i=0;allergyList.Count>i;i++) {
+							row=new ODGridRow();
+							cell=new ODGridCell(AllergyDefs.GetOne(allergyList[i].AllergyDefNum).Description);
+							cell.Bold=YN.Yes;
+							cell.ColorText=Color.Red;
+							row.Cells.Add(cell);
+							row.Cells.Add(allergyList[i].Reaction);
+							row.ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor;
+							row.Tag="med";
+							if(i!=allergyList.Count-1) {
+								gridPtInfo.Rows.Add(row);
+							}
+						}
+						break;
+					#endregion Allergies
+					#region AskToArriveEarly
+					case "AskToArriveEarly":
+						if(PatCur.AskToArriveEarly==0) {
+							row.Cells.Add("");
+						}
+						else {
+							row.Cells.Add(PatCur.AskToArriveEarly.ToString()+" minute(s)");
+						}
+						break;
+					#endregion AskToArriveEarly
+					#region Billing Type
 					case "Billing Type":
 						row.Cells.Add(DefC.GetName(DefCat.BillingTypes,PatCur.BillingType));
 						break;
-					case "Referred From":
-						List<RefAttach> RefAttachList=RefAttaches.Refresh(PatCur.PatNum);
-						string referral="";
-						for(int i=0;i<RefAttachList.Count;i++) {
-							if(RefAttachList[i].IsFrom) {
-								referral=Referrals.GetNameLF(RefAttachList[i].ReferralNum);
-								break;
+					#endregion Billing Type
+					#region Birthdate
+					case "Birthdate":
+						if(PatCur.Birthdate.Year<1880) {
+							row.Cells.Add("");
+						}
+						else {
+							row.Cells.Add(PatCur.Birthdate.ToShortDateString());
+						}
+						break;
+					#endregion Birthdate
+					#region Broken Appts
+					case "Broken Appts":
+						row.Tag="Broken Appts";
+						int count=0;
+						DataTable table=DataSetMain.Tables["ProgNotes"];
+						if(ProcedureCodes.IsValidCode("D9986")) {
+							foreach(DataRow rowCur in table.Rows.OfType<DataRow>().Where(x => x["ProcNum"].ToString()!="0")) {
+								Procedure proc=Procedures.GetOneProc(PIn.Long(rowCur["ProcNum"].ToString()),false);
+								if(ProcedureCodes.GetStringProcCode(proc.CodeNum)=="D9986") {
+									count++;
+								}
 							}
 						}
-						if(referral=="") {
-							referral="??";
+						else {
+							count=Adjustments.GetAdjustForPatByType(PatCur.PatNum,PrefC.GetLong(PrefName.BrokenAppointmentAdjustmentType)).Count;
 						}
-						row.Cells.Add(referral);
-						row.Tag="Referral";
+						row.Cells.Add(count.ToString());
 						break;
+					#endregion Broken Appts
+					#region City
+					case "City":
+						row.Cells.Add(PatCur.City);
+						break;
+					#endregion City
+					#region Date First Visit
 					case "Date First Visit":
 						if(PatCur.DateFirstVisit.Year<1880) {
 							row.Cells.Add("??");
@@ -5239,96 +5312,8 @@ namespace OpenDental {
 						}
 						row.Tag=null;
 						break;
-					case "Prov. (Pri, Sec)":
-						string provText="";
-						if(PatCur.PriProv!=0) {
-							provText+=Providers.GetAbbr(PatCur.PriProv)+", ";							
-						}
-						else {
-							provText+=Lan.g("TableChartPtInfo","None")+", ";
-						}
-						if(PatCur.SecProv != 0) {
-							provText+=Providers.GetAbbr(PatCur.SecProv);
-						}
-						else {
-							provText+=Lan.g("TableChartPtInfo","None");
-						}
-						row.Cells.Add(provText);
-						row.Tag = null;
-						break;
-					case "Pri Ins":
-						string name;
-						ordinal=PatPlans.GetOrdinal(PriSecMed.Primary,PatPlanList,PlanList,SubList);
-						if(ordinal>0) {
-							InsSub sub=InsSubs.GetSub(PatPlans.GetInsSubNum(PatPlanList,ordinal),SubList);
-							name=InsPlans.GetCarrierName(sub.PlanNum,PlanList);
-							if(PatPlanList[0].IsPending) {
-								name+=Lan.g("TableChartPtInfo"," (pending)");
-							}
-							row.Cells.Add(name);
-						}
-						else {
-							row.Cells.Add("");
-						}
-						row.Tag=null;
-						break;
-					case "Sec Ins":
-						ordinal=PatPlans.GetOrdinal(PriSecMed.Secondary,PatPlanList,PlanList,SubList);
-						if(ordinal>0) {
-							InsSub sub=InsSubs.GetSub(PatPlans.GetInsSubNum(PatPlanList,ordinal),SubList);
-							name=InsPlans.GetCarrierName(sub.PlanNum,PlanList);
-							if(PatPlanList[1].IsPending) {
-								name+=Lan.g("TableChartPtInfo"," (pending)");
-							}
-							row.Cells.Add(name);
-						}
-						else {
-							row.Cells.Add("");
-						}
-						row.Tag=null;
-						break;
-					case "Payor Types":
-						row.Tag="Payor Types";
-						row.Cells.Add(PayorTypes.GetCurrentDescription(PatCur.PatNum));
-						break;
-					case "Registration Keys":
-						//Not even available to most users.
-						RegistrationKey[] keys=RegistrationKeys.GetForPatient(PatCur.PatNum);
-						for(int i=0;i<keys.Length;i++) {
-							//For non-guarantors with reseller keys, we do not want to show other family member reseller keys (there will be a lot of them).
-							if(PatCur.PatNum!=PatCur.Guarantor
-								&& keys[i].IsResellerCustomer 
-								&& keys[i].PatNum!=PatCur.PatNum) 
-							{
-								//The current patient selected is not the guarantor and this is a reseller key for another family member.  Do not show it in this patient's chart module.
-								continue;
-							}
-							row=new ODGridRow();
-							row.Cells.Add(Lan.g("TableChartPtInfo","Registration Key"));
-							string str=keys[i].RegKey.Substring(0,4)+"-"+keys[i].RegKey.Substring(4,4)+"-"
-								+keys[i].RegKey.Substring(8,4)+"-"+keys[i].RegKey.Substring(12,4);
-							str+="  |  PatNum: "+keys[i].PatNum.ToString();//Always show the PatNum
-							if(keys[i].IsForeign) {
-								str+="\r\nForeign";
-							}
-							else {
-								str+="\r\nUSA";
-							}
-							str+="\r\nStarted: "+keys[i].DateStarted.ToShortDateString();
-							if(keys[i].DateDisabled.Year>1880) {
-								str+="\r\nDisabled: "+keys[i].DateDisabled.ToShortDateString();
-							}
-							if(keys[i].DateEnded.Year>1880) {
-								str+="\r\nEnded: "+keys[i].DateEnded.ToShortDateString();
-							}
-							if(keys[i].Note!="") {
-								str+=keys[i].Note;
-							}
-							row.Cells.Add(str);
-							row.Tag=keys[i].Copy();
-							gridPtInfo.Rows.Add(row);
-						}
-						break;
+					#endregion Date First Visit
+					#region Ehr Provider Keys
 					case "Ehr Provider Keys":
 						//Not even available to most users.
 						List<EhrProvKey> listProvKeys=EhrProvKeys.RefreshForFam(PatCur.Guarantor);
@@ -5344,71 +5329,8 @@ namespace OpenDental {
 						row.ColorBackG=Color.PowderBlue;
 						row.Tag="EhrProvKeys";
 						break;
-					case "Premedicate":
-						if(PatCur.Premed) {
-							row=new ODGridRow();
-							row.Cells.Add("");
-							cell=new ODGridCell();
-							if(fields[f].Description=="") {
-								cell.Text=fields[f].InternalName;
-							}
-							else {
-								cell.Text=fields[f].Description;
-							}
-							cell.ColorText=Color.Red;
-							cell.Bold=YN.Yes;
-							row.Cells.Add(cell);
-							row.ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor;
-							row.Tag="med";
-							gridPtInfo.Rows.Add(row);
-						}
-						break;
-					case "Problems":
-						List<Disease> DiseaseList=Diseases.Refresh(PatCur.PatNum,true);
-						row=new ODGridRow();
-						cell=new ODGridCell();
-						if(fields[f].Description=="") {
-							cell.Text=fields[f].InternalName;
-						}
-						else {
-							cell.Text=fields[f].Description;
-						}
-						cell.Bold=YN.Yes;
-						row.Cells.Add(cell);
-						row.ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor;
-						row.Tag="med";
-						if(DiseaseList.Count>0) {
-							row.Cells.Add("");
-							gridPtInfo.Rows.Add(row);
-						}
-						else {
-							row.Cells.Add(Lan.g("TableChartPtInfo","none"));
-						}
-						//Add a new row for each med.
-						for(int i=0;i<DiseaseList.Count;i++) {
-							row=new ODGridRow(); 
-							if(DiseaseList[i].DiseaseDefNum!=0) {
-								cell=new ODGridCell(DiseaseDefs.GetName(DiseaseList[i].DiseaseDefNum));
-								cell.ColorText=Color.Red;
-								cell.Bold=YN.Yes;
-								row.Cells.Add(cell);
-								row.Cells.Add(DiseaseList[i].PatNote);
-							}
-							else {
-								row.Cells.Add("");
-								cell=new ODGridCell(DiseaseDefs.GetItem(DiseaseList[i].DiseaseDefNum).DiseaseName);
-								cell.ColorText=Color.Red;
-								cell.Bold=YN.Yes;
-								row.Cells.Add(cell);
-								//row.Cells.Add(DiseaseList[i].PatNote);//no place to show a pat note
-							}
-							row.ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor;
-							row.Tag="med";
-							if(i!=DiseaseList.Count-1) {
-								gridPtInfo.Rows.Add(row);
-							}
-						}
-						break;
+					#endregion Ehr Provider Keys
+					#region Med Urgent
 					case "Med Urgent":
 						cell=new ODGridCell();
 						cell.Text=PatCur.MedUrgNote;
@@ -5418,16 +5340,15 @@ namespace OpenDental {
 						row.ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor;
 						row.Tag="med";
 						break;
+					#endregion Med Urgent
+					#region Medical Summary
 					case "Medical Summary":
 						row.Cells.Add(PatientNoteCur.Medical);
 						row.ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor;
 						row.Tag="med";
 						break;
-					case "Service Notes":
-						row.Cells.Add(PatientNoteCur.Service);
-						row.ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor;
-						row.Tag="med";
-						break;
+					#endregion Medical Summary
+					#region Medications
 					case "Medications":
 						Medications.Refresh();
 						List<MedicationPat> medList=MedicationPats.Refresh(PatCur.PatNum,false);
@@ -5481,41 +5402,8 @@ namespace OpenDental {
 							}
 						}
 						break;
-					case "Allergies":
-						List<Allergy> allergyList=Allergies.GetAll(PatCur.PatNum,false);
-						row=new ODGridRow();
-						cell=new ODGridCell();
-						if(fields[f].Description=="") {
-							cell.Text=fields[f].InternalName;
-						}
-						else {
-							cell.Text=fields[f].Description;
-						}
-						cell.Bold=YN.Yes;
-						row.Cells.Add(cell);
-						row.ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor;
-						row.Tag="med";
-						if(allergyList.Count>0) {
-							row.Cells.Add("");
-							gridPtInfo.Rows.Add(row);
-						}
-						else {
-							row.Cells.Add(Lan.g("TableChartPtInfo","none"));
-						}
-						for(int i=0;allergyList.Count>i;i++) {
-							row=new ODGridRow();
-							cell=new ODGridCell(AllergyDefs.GetOne(allergyList[i].AllergyDefNum).Description);
-							cell.Bold=YN.Yes;
-							cell.ColorText=Color.Red;
-							row.Cells.Add(cell);
-							row.Cells.Add(allergyList[i].Reaction);
-							row.ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor;
-							row.Tag="med";
-							if(i!=allergyList.Count-1) {
-								gridPtInfo.Rows.Add(row);
-							}
-						}
-						break;
+					#endregion Medications
+					#region PatFields
 					case "PatFields":
 						PatField field;
 						for(int i=0;i<PatFieldDefs.ListShort.Count;i++) {
@@ -5537,34 +5425,8 @@ namespace OpenDental {
 							gridPtInfo.Rows.Add(row);
 						}
 						break;
-					case "Birthdate":
-						if(PatCur.Birthdate.Year<1880) {
-							row.Cells.Add("");
-						}
-						else {
-							row.Cells.Add(PatCur.Birthdate.ToShortDateString());
-						}
-						break;
-					case "City":
-						row.Cells.Add(PatCur.City);
-						break;
-					case "AskToArriveEarly":
-						if(PatCur.AskToArriveEarly==0) {
-							row.Cells.Add("");
-						}
-						else {
-							row.Cells.Add(PatCur.AskToArriveEarly.ToString()+" minute(s)");
-						}
-						break;
-					case "Super Head":
-						if(PatCur.SuperFamily!=0) {
-							Patient tempSuper = Patients.GetPat(PatCur.SuperFamily);
-							row.Cells.Add(tempSuper.GetNameLF()+" ("+tempSuper.PatNum+")");
-						}
-						else {
-							continue;//do not allow this row to be added if there is no data to in the row.
-						}
-						break;
+					#endregion PatFields
+					#region Patient Portal
 					case "Patient Portal":
 						row.Tag="Patient Portal";
 						if(PatCur.OnlinePassword=="") {
@@ -5574,6 +5436,120 @@ namespace OpenDental {
 							row.Cells.Add(Lan.g(this,"Online"));
 						}
 						break;
+					#endregion Patient Portal
+					#region Payor Types
+					case "Payor Types":
+						row.Tag="Payor Types";
+						row.Cells.Add(PayorTypes.GetCurrentDescription(PatCur.PatNum));
+						break;
+					#endregion Payor Types
+					#region Premedicate
+					case "Premedicate":
+						if(PatCur.Premed) {
+							row=new ODGridRow();
+							row.Cells.Add("");
+							cell=new ODGridCell();
+							if(fields[f].Description=="") {
+								cell.Text=fields[f].InternalName;
+							}
+							else {
+								cell.Text=fields[f].Description;
+							}
+							cell.ColorText=Color.Red;
+							cell.Bold=YN.Yes;
+							row.Cells.Add(cell);
+							row.ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor;
+							row.Tag="med";
+							gridPtInfo.Rows.Add(row);
+						}
+						break;
+					#endregion Premedicate
+					#region Pri Ins
+					case "Pri Ins":
+						string name;
+						ordinal=PatPlans.GetOrdinal(PriSecMed.Primary,PatPlanList,PlanList,SubList);
+						if(ordinal>0) {
+							InsSub sub=InsSubs.GetSub(PatPlans.GetInsSubNum(PatPlanList,ordinal),SubList);
+							name=InsPlans.GetCarrierName(sub.PlanNum,PlanList);
+							if(PatPlanList[0].IsPending) {
+								name+=Lan.g("TableChartPtInfo"," (pending)");
+							}
+							row.Cells.Add(name);
+						}
+						else {
+							row.Cells.Add("");
+						}
+						row.Tag=null;
+						break;
+					#endregion Pri Ins
+					#region Problems
+					case "Problems":
+						List<Disease> DiseaseList=Diseases.Refresh(PatCur.PatNum,true);
+						row=new ODGridRow();
+						cell=new ODGridCell();
+						if(fields[f].Description=="") {
+							cell.Text=fields[f].InternalName;
+						}
+						else {
+							cell.Text=fields[f].Description;
+						}
+						cell.Bold=YN.Yes;
+						row.Cells.Add(cell);
+						row.ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor;
+						row.Tag="med";
+						if(DiseaseList.Count>0) {
+							row.Cells.Add("");
+							gridPtInfo.Rows.Add(row);
+						}
+						else {
+							row.Cells.Add(Lan.g("TableChartPtInfo","none"));
+						}
+						//Add a new row for each med.
+						for(int i=0;i<DiseaseList.Count;i++) {
+							row=new ODGridRow(); 
+							if(DiseaseList[i].DiseaseDefNum!=0) {
+								cell=new ODGridCell(DiseaseDefs.GetName(DiseaseList[i].DiseaseDefNum));
+								cell.ColorText=Color.Red;
+								cell.Bold=YN.Yes;
+								row.Cells.Add(cell);
+								row.Cells.Add(DiseaseList[i].PatNote);
+							}
+							else {
+								row.Cells.Add("");
+								cell=new ODGridCell(DiseaseDefs.GetItem(DiseaseList[i].DiseaseDefNum).DiseaseName);
+								cell.ColorText=Color.Red;
+								cell.Bold=YN.Yes;
+								row.Cells.Add(cell);
+								//row.Cells.Add(DiseaseList[i].PatNote);//no place to show a pat note
+							}
+							row.ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor;
+							row.Tag="med";
+							if(i!=DiseaseList.Count-1) {
+								gridPtInfo.Rows.Add(row);
+							}
+						}
+						break;
+					#endregion Problems
+					#region Prov. (Pri, Sec)
+					case "Prov. (Pri, Sec)":
+						string provText="";
+						if(PatCur.PriProv!=0) {
+							provText+=Providers.GetAbbr(PatCur.PriProv)+", ";							
+						}
+						else {
+							provText+=Lan.g("TableChartPtInfo","None")+", ";
+						}
+						if(PatCur.SecProv != 0) {
+							provText+=Providers.GetAbbr(PatCur.SecProv);
+						}
+						else {
+							provText+=Lan.g("TableChartPtInfo","None");
+						}
+						row.Cells.Add(provText);
+						row.Tag = null;
+						break;
+					#endregion Prov. (Pri, Sec)
+					#region References
 					case "References":
 						List<CustRefEntry> custREList=CustRefEntries.GetEntryListForCustomer(PatCur.PatNum);
 						if(custREList.Count==0) {
@@ -5598,23 +5574,121 @@ namespace OpenDental {
 							}
 						}
 						break;
-					case "Broken Appts":
-						row.Tag="Broken Appts";
-						int count=0;
-						DataTable table=DataSetMain.Tables["ProgNotes"];
-						if(ProcedureCodes.IsValidCode("D9986")) {
-							foreach(DataRow rowCur in table.Rows.OfType<DataRow>().Where(x => x["ProcNum"].ToString()!="0")) {
-								Procedure proc=Procedures.GetOneProc(PIn.Long(rowCur["ProcNum"].ToString()),false);
-								if(ProcedureCodes.GetStringProcCode(proc.CodeNum)=="D9986") {
-									count++;
-								}
+					case "Referred From":
+						List<RefAttach> RefAttachList=RefAttaches.Refresh(PatCur.PatNum);
+						string referral="";
+						for(int i=0;i<RefAttachList.Count;i++) {
+							if(RefAttachList[i].IsFrom) {
+								referral=Referrals.GetNameLF(RefAttachList[i].ReferralNum);
+								break;
 							}
 						}
-						else {
-							count=Adjustments.GetAdjustForPatByType(PatCur.PatNum,PrefC.GetLong(PrefName.BrokenAppointmentAdjustmentType)).Count;
+						if(referral=="") {
+							referral="??";
 						}
-						row.Cells.Add(count.ToString());
+						row.Cells.Add(referral);
+						row.Tag="Referral";
 						break;
+					#endregion Referred From
+					#region Registration Keys
+					case "Registration Keys":
+						//Not even available to most users.
+						RegistrationKey[] keys=RegistrationKeys.GetForPatient(PatCur.PatNum);
+						for(int i=0;i<keys.Length;i++) {
+							//For non-guarantors with reseller keys, we do not want to show other family member reseller keys (there will be a lot of them).
+							if(PatCur.PatNum!=PatCur.Guarantor
+								&& keys[i].IsResellerCustomer 
+								&& keys[i].PatNum!=PatCur.PatNum) 
+							{
+								//The current patient selected is not the guarantor and this is a reseller key for another family member.  Do not show it in this patient's chart module.
+								continue;
+							}
+							row=new ODGridRow();
+							row.Cells.Add(Lan.g("TableChartPtInfo","Registration Key"));
+							string str=keys[i].RegKey.Substring(0,4)+"-"+keys[i].RegKey.Substring(4,4)+"-"
+								+keys[i].RegKey.Substring(8,4)+"-"+keys[i].RegKey.Substring(12,4);
+							str+="  |  PatNum: "+keys[i].PatNum.ToString();//Always show the PatNum
+							if(keys[i].IsForeign) {
+								str+="\r\nForeign";
+							}
+							else {
+								str+="\r\nUSA";
+							}
+							str+="\r\nStarted: "+keys[i].DateStarted.ToShortDateString();
+							if(keys[i].DateDisabled.Year>1880) {
+								str+="\r\nDisabled: "+keys[i].DateDisabled.ToShortDateString();
+							}
+							if(keys[i].DateEnded.Year>1880) {
+								str+="\r\nEnded: "+keys[i].DateEnded.ToShortDateString();
+							}
+							if(keys[i].Note!="") {
+								str+=keys[i].Note;
+							}
+							row.Cells.Add(str);
+							row.Tag=keys[i].Copy();
+							gridPtInfo.Rows.Add(row);
+						}
+						break;
+					#endregion Registration Keys
+					#region Sec Ins
+					case "Sec Ins":
+						ordinal=PatPlans.GetOrdinal(PriSecMed.Secondary,PatPlanList,PlanList,SubList);
+						if(ordinal>0) {
+							InsSub sub=InsSubs.GetSub(PatPlans.GetInsSubNum(PatPlanList,ordinal),SubList);
+							name=InsPlans.GetCarrierName(sub.PlanNum,PlanList);
+							if(PatPlanList[1].IsPending) {
+								name+=Lan.g("TableChartPtInfo"," (pending)");
+							}
+							row.Cells.Add(name);
+						}
+						else {
+							row.Cells.Add("");
+						}
+						row.Tag=null;
+						break;
+					#endregion Sec Ins
+					#region Service Notes
+					case "Service Notes":
+						row.Cells.Add(PatientNoteCur.Service);
+						row.ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor;
+						row.Tag="med";
+						break;
+					#endregion Service Notes
+					#region Super Head
+					case "Super Head":
+						if(PatCur.SuperFamily!=0) {
+							Patient tempSuper = Patients.GetPat(PatCur.SuperFamily);
+							row.Cells.Add(tempSuper.GetNameLF()+" ("+tempSuper.PatNum+")");
+						}
+						else {
+							continue;//do not allow this row to be added if there is no data to in the row.
+						}
+						break;
+					#endregion Super Head
+					#region Tobacco Use (Patient Smoking Status)
+					case "Tobacco Use":
+						List<EhrMeasureEvent> listTobaccoStatuses=EhrMeasureEvents.RefreshByType(PatCur.PatNum,EhrMeasureEventType.TobaccoUseAssessed)
+							.OrderByDescending(x => x.DateTEvent).Take(3).ToList();//only display the last three assessments at most
+						row=new ODGridRow() { ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor,Tag="TobaccoUse" };
+						row.Cells.Add(new ODGridCell(Text=fields[f].Description==""?fields[f].InternalName:fields[f].Description) { Bold=YN.Yes });
+						row.Cells.Add(listTobaccoStatuses.Count>0 ? "" : Lan.g("TableChartPtInfo","none"));
+						if(listTobaccoStatuses.Count>0) {
+							gridPtInfo.Rows.Add(row);
+						}
+						Snomed snmCur;
+						for(int i = 0;i<listTobaccoStatuses.Count;i++) {//show the last three tobacco use assessments at most
+							EhrMeasureEvent eCur=listTobaccoStatuses[i];
+							row=new ODGridRow() { ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor,Tag="TobaccoUse" };
+							snmCur=Snomeds.GetByCode(eCur.CodeValueResult);
+							row.Cells.Add(snmCur!=null ? snmCur.Description : "");
+							row.Cells.Add(eCur.DateTEvent.ToShortDateString()+(eCur.MoreInfo=="" ? "" : (" - "+eCur.MoreInfo)));
+							if(i==listTobaccoStatuses.Count-1) {
+								break;//don't add last row here, handled outside of switch statement
+							}
+							gridPtInfo.Rows.Add(row);
+						}
+						break;
+						#endregion Tobacco Use (Patient Smoking Status)
 				}
 				if(fields[f].InternalName=="PatFields"
 					|| fields[f].InternalName=="Premedicate"
@@ -9674,6 +9748,17 @@ namespace OpenDental {
 				}
 				if(gridPtInfo.Rows[e.Row].Tag.ToString()=="Broken Appts") {					
 					return;//This row is just for display; it can't be edited.
+				}
+				if(gridPtInfo.Rows[e.Row].Tag.ToString()=="TobaccoUse") {
+					FormEhrPatientSmoking FormPS=new FormEhrPatientSmoking();
+					FormPS.PatCur=PatCur;
+					FormPS.ShowDialog();
+					if(FormPS.DialogResult==DialogResult.OK) {
+						PatCur=Patients.GetPat(PatCur.PatNum);//patient's smoke status may have been updated, refresh from db
+					}
+					//fill patient info whether DialogResult.OK or Cancel, since assessments may have been inserted/updated even if the user presses cancel
+					FillPtInfo();
+					return;
 				}
 				if(gridPtInfo.Rows[e.Row].Tag.GetType()==typeof(CustRefEntry)) {
 					FormReferenceEntryEdit FormRE=new FormReferenceEntryEdit((CustRefEntry)gridPtInfo.Rows[e.Row].Tag);

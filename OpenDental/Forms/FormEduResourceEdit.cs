@@ -28,6 +28,9 @@ namespace OpenDental {
 			else if(EduResourceCur.MedicationNum!=0) {
 				textMedication.Text=Medications.GetDescription(EduResourceCur.MedicationNum);
 			}
+			else if(EduResourceCur.SmokingSnoMed!="") {
+				textTobaccoAssessment.Text=Snomeds.GetCodeAndDescription(EduResourceCur.SmokingSnoMed);
+			}
 			textLabResultsID.Text=EduResourceCur.LabResultID;
 			textLabTestName.Text=EduResourceCur.LabResultName;
 			textCompareValue.Text=EduResourceCur.LabResultCompare;
@@ -46,10 +49,16 @@ namespace OpenDental {
 				return;
 			}
 			EduResourceCur.DiseaseDefNum=FormDD.SelectedDiseaseDefNum;
+			EduResourceCur.MedicationNum=0;
+			EduResourceCur.SmokingSnoMed="";
+			EduResourceCur.LabResultID="";
+			EduResourceCur.LabResultName="";
+			EduResourceCur.LabResultCompare="";
 			textProblem.Text=disCur.DiseaseName;
 			textICD9.Text=ICD9s.GetCodeAndDescription(disCur.ICD9Code);
 			textSnomed.Text=Snomeds.GetCodeAndDescription(disCur.SnomedCode);
-			EduResourceCur.MedicationNum=0;
+			textMedication.Text="";
+			textTobaccoAssessment.Text="";
 			textLabResultsID.Text="";
 			textLabTestName.Text="";
 			textCompareValue.Text="";
@@ -62,12 +71,40 @@ namespace OpenDental {
 			if(FormM.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			textProblem.Text="";
 			EduResourceCur.DiseaseDefNum=0;
+			EduResourceCur.MedicationNum=FormM.SelectedMedicationNum;
+			EduResourceCur.SmokingSnoMed="";
+			EduResourceCur.LabResultID="";
+			EduResourceCur.LabResultName="";
+			EduResourceCur.LabResultCompare="";
+			textProblem.Text="";
 			textICD9.Text="";
 			textSnomed.Text="";
 			textMedication.Text=Medications.GetDescription(FormM.SelectedMedicationNum);
-			EduResourceCur.MedicationNum=FormM.SelectedMedicationNum;
+			textTobaccoAssessment.Text="";
+			textLabResultsID.Text="";
+			textLabTestName.Text="";
+			textCompareValue.Text="";
+		}
+
+		private void butTobaccoCodeSelect_Click(object sender,EventArgs e) {
+			FormSnomeds FormS=new FormSnomeds();
+			FormS.IsSelectionMode=true;
+			FormS.ShowDialog();
+			if(FormS.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			EduResourceCur.DiseaseDefNum=0;
+			EduResourceCur.MedicationNum=0;
+			EduResourceCur.SmokingSnoMed=FormS.SelectedSnomed.SnomedCode;
+			EduResourceCur.LabResultID="";
+			EduResourceCur.LabResultName="";
+			EduResourceCur.LabResultCompare="";
+			textProblem.Text="";
+			textICD9.Text="";
+			textSnomed.Text="";
+			textMedication.Text="";
+			textTobaccoAssessment.Text=FormS.SelectedSnomed.SnomedCode+" - "+FormS.SelectedSnomed.Description;
 			textLabResultsID.Text="";
 			textLabTestName.Text="";
 			textCompareValue.Text="";
@@ -75,12 +112,14 @@ namespace OpenDental {
 
 		private void textLabResults_Click(object sender,EventArgs e) {
 			//attached to click for 3 different text boxes.
-			textProblem.Text="";
 			EduResourceCur.DiseaseDefNum=0;
+			EduResourceCur.MedicationNum=0;
+			EduResourceCur.SmokingSnoMed="";
+			textProblem.Text="";
 			textICD9.Text="";
 			textSnomed.Text="";
 			textMedication.Text="";
-			EduResourceCur.MedicationNum=0;
+			textTobaccoAssessment.Text="";
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {
@@ -97,11 +136,13 @@ namespace OpenDental {
 
 		private void butOk_Click(object sender,EventArgs e) {
 			//validation
-			if(EduResourceCur.DiseaseDefNum==0 && EduResourceCur.MedicationNum==0 && textLabResultsID.Text=="" && textLabTestName.Text=="" && textCompareValue.Text=="") {
+			if(EduResourceCur.DiseaseDefNum==0 && EduResourceCur.MedicationNum==0 && EduResourceCur.SmokingSnoMed==""
+				&& textLabResultsID.Text=="" && textLabTestName.Text=="" && textCompareValue.Text=="")
+			{
 				MessageBox.Show("Please Select a valid problem, medication, or lab result.");
 				return;
 			}
-			if(EduResourceCur.DiseaseDefNum==0 && EduResourceCur.MedicationNum==0) {
+			if(EduResourceCur.DiseaseDefNum==0 && EduResourceCur.MedicationNum==0 && EduResourceCur.SmokingSnoMed=="") {
 				if(textLabTestName.Text=="") {
 					MessageBox.Show("Invalid test name for lab result.");
 					return;
@@ -143,10 +184,6 @@ namespace OpenDental {
 		private void butCancel_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
-
-
-
-
 
 	}
 }
