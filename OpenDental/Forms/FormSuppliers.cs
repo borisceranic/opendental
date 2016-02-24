@@ -10,7 +10,7 @@ using OpenDentBusiness;
 
 namespace OpenDental {
 	public partial class FormSuppliers:Form {
-		private List<Supplier> listSuppliers;
+		private List<Supplier> _listSuppliers;
 
 		public FormSuppliers() {
 			InitializeComponent();
@@ -22,7 +22,7 @@ namespace OpenDental {
 		}
 
 		private void FillGrid(){
-			listSuppliers=Suppliers.CreateObjects();
+			_listSuppliers=Suppliers.GetAll();
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g(this,"Name"),110);
@@ -41,15 +41,15 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<listSuppliers.Count;i++){
+			for(int i=0;i<_listSuppliers.Count;i++){
 				row=new ODGridRow();
-				row.Cells.Add(listSuppliers[i].Name);
-				row.Cells.Add(listSuppliers[i].Phone);
-				row.Cells.Add(listSuppliers[i].CustomerId);
-				row.Cells.Add(listSuppliers[i].Website);
-				row.Cells.Add(listSuppliers[i].UserName);
-				row.Cells.Add(listSuppliers[i].Password);
-				row.Cells.Add(listSuppliers[i].Note);
+				row.Cells.Add(_listSuppliers[i].Name);
+				row.Cells.Add(_listSuppliers[i].Phone);
+				row.Cells.Add(_listSuppliers[i].CustomerId);
+				row.Cells.Add(_listSuppliers[i].Website);
+				row.Cells.Add(_listSuppliers[i].UserName);
+				row.Cells.Add(_listSuppliers[i].Password);
+				row.Cells.Add(_listSuppliers[i].Note);
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
@@ -68,7 +68,7 @@ namespace OpenDental {
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			FormSupplierEdit FormS=new FormSupplierEdit();
-			FormS.Supp=listSuppliers[e.Row];
+			FormS.Supp=_listSuppliers[e.Row];
 			FormS.ShowDialog();
 			if(FormS.DialogResult==DialogResult.OK) {
 				FillGrid();

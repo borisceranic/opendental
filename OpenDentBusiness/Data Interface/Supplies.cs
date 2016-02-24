@@ -218,6 +218,14 @@ namespace OpenDentBusiness{
 			}
 		}
 
+		///<summary>Syncs supplies to the database.  Sync(list,list) uses more bandwidth for middle tier than Sync(List,long).</summary>
+		public static bool Sync(List<Supply> listNew,List<Supply> listOld) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),listNew,listOld);
+			}
+			return Crud.SupplyCrud.Sync(listNew,listOld);
+		}
+
 		/////<Summary>Deprecated.  Gets from the database the last itemOrder for the specified category.  Used to send un unhidden supply to the end of the list.</Summary>
 		//public static int GetLastItemOrder(long supplierNum,long catNum) {
 		//	if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

@@ -4,6 +4,7 @@ using System.Collections;
 namespace OpenDentBusiness{
 	///<summary>A dental supply or office supply item.</summary>
 	[Serializable()]
+	[CrudTable(IsSynchable=true)]
 	public class Supply : TableBase {
 		/// <summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]

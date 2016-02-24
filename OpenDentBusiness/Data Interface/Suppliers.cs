@@ -10,7 +10,7 @@ namespace OpenDentBusiness{
 	public class Suppliers {
 
 		///<summary>Gets all Suppliers.</summary>
-		public static List<Supplier> CreateObjects() {
+		public static List<Supplier> GetAll() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Supplier>>(MethodBase.GetCurrentMethod());
 			}

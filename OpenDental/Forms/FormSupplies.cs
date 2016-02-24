@@ -9,27 +9,27 @@ using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
 using System.Drawing.Printing;
+using System.Linq;
 
 namespace OpenDental {
 	public partial class FormSupplies:Form {
-		/////<summary>Used to cache all supply items from DB, this list is compaired to ListSupplyAll to determine which elements have changed and need to be updated.</summary>
-		//private List<Supply> ListSupplyAllCache = new List<Supply>();
-		///<summary>Used to cache all supply items from DB and then altered.</summary>
-		private List<Supply> ListSupplyAll = new List<Supply>();
-		///<summary>Used to populate the grid. Filtered version of ListSupplyAll.</summary>
-		private List<Supply> ListSupply = new List<Supply>();
-		///<summary>Used to cach list of all suppliers.</summary>
-		public List<Supplier> ListSupplier;
-		///<Summary>Sets the supplier that will first show when opening this window.</Summary>
+		///<summary>A cached copy of supplies obtained on window load.</summary>
+		private List<Supply> _listSupplies;
+		///<summary>Used to sync at the close of the window.</summary>
+		private List<Supply> _listSuppliesOld;
+		///<summary>A cached copy of all suppliers obtaine don window load.</summary>
+		private List<Supplier> _listSuppliers;
+		///<Summary>Sets the supplier that will first show when opening this window.  Used when IsSelectMode is true.</Summary>
 		public long SelectedSupplierNum;
-		///<summary>Used for selecting supply items to add to orders.</summary>
+		///<summary>Used for selecting supply items to add to orders in FormSupplyOrders.</summary>
 		public bool IsSelectMode;
-		///<summary>Possible deprecated with the addition of ListSelectedSupplies.  Selected supply item. Intended to be used to add to an order.</summary>
-		public Supply SelectedSupply;
-		///<summary>Selected supply items. Intended to be used to add to an order.</summary>
-		public List<Supply> ListSelectedSupplies = new List<Supply>();
-		///<summary>Used to cache the selected SupplyNums of the items in the main grid, to reselect them after a refresh.</summary>
-		private List<long> SelectedGridItems=new List<long>();
+		///<summary>Selected supply items.  Used outside this window for selecting supplies to order in FormSupplyOrders.</summary>
+		public List<Supply> ListSelectedSupplies;
+		///<summary>Used to re-select supplies after filters are applied.</summary>
+		private List<long> _listSelectedSupplyNums;
+		///<summary>Used to re-select supplies after filters are applied.</summary>
+		private List<Supply> _listSelectedSupplies;
+
 		//Variables used for printing are copied and pasted here
 		PrintDocument pd2;
 		private int pagesPrinted;
@@ -42,34 +42,37 @@ namespace OpenDental {
 		}
 
 		private void FormSupplies_Load(object sender,EventArgs e) {
-			Height=SystemInformation.WorkingArea.Height;//max height
-			Location=new Point(Location.X,0);//move to top of screen
-			ListSupplier=Suppliers.CreateObjects();
-			ListSupplyAll=Supplies.GetAll();//Seperate GetAll() function call so that we do not copy by reference.
-			fillComboSupplier();
+			this.Height=SystemInformation.WorkingArea.Height;//Resize height
+			this.Location=new Point(Location.X,0);//Move window to compensate for changed height
+			ListSelectedSupplies=new List<Supply>();
+			_listSuppliers=Suppliers.GetAll();
+			_listSupplies=Supplies.GetAll();
+			_listSelectedSupplyNums=new List<long>();
+			_listSelectedSupplies=new List<Supply>();
+			_listSuppliesOld=new List<Supply>();
+			foreach(Supply supply in _listSupplies) {//Make deep copy of the list so we can sync later.
+				_listSuppliesOld.Add(supply.Copy());
+			}
+			FillComboSupplier();
 			FillGrid();
 			if(IsSelectMode) {
 				comboSupplier.Enabled=false;
-				//gridMain.SelectionMode=GridSelectionMode.One;//we now support multi select to add
 			}
 		}
 
-		private void fillComboSupplier() {
+		private void FillComboSupplier() {
 			comboSupplier.Items.Clear();
 			comboSupplier.Items.Add(Lan.g(this,"All"));
 			comboSupplier.SelectedIndex=0;//default to "All" otherwise selected index will be selected below.
-			for(int i=0;i<ListSupplier.Count;i++) {
-				comboSupplier.Items.Add(ListSupplier[i].Name);
-				if(ListSupplier[i].SupplierNum==SelectedSupplierNum) {
+			for(int i = 0;i<_listSuppliers.Count;i++) {
+				comboSupplier.Items.Add(_listSuppliers[i].Name);
+				if(_listSuppliers[i].SupplierNum==SelectedSupplierNum) {
 					comboSupplier.SelectedIndex=i+1;//+1 to account for the ALL item.
 				}
 			}
 		}
 
 		private void FillGrid(){
-			//We don't refresh ListSupplyAll here because we are frequently using FillGrid with a search filter.
-			filterListSupply();
-			ListSupply.Sort(sortSupplyListByCategoryOrderThenItemOrder);
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g(this,"Category"),130);
@@ -90,43 +93,65 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<ListSupply.Count;i++) {
+			for(int i=0;i<_listSupplies.Count;i++) {
+				Supply supply=_listSupplies[i];
+				if(!checkShowHidden.Checked && supply.IsHidden) {
+					continue;//If we're filtering out hidden supplies and this one is hidden, skip it.
+				}
+				if(SelectedSupplierNum!=0 && supply.SupplierNum!=SelectedSupplierNum) {
+					continue;//If we specified a suppliernum outside this form and this supply doesn't have that suppliernum, skip it.
+				}
+				else if(comboSupplier.SelectedIndex!=0 && _listSuppliers[comboSupplier.SelectedIndex-1].SupplierNum!=supply.SupplierNum) {
+					continue;//If a supplier is selected in the combo box and this supply doesn't have it, skip it.
+				}
+				if(checkShowShoppingList.Checked && supply.LevelOnHand >= supply.LevelDesired) {
+					continue;//If we are only showing those that require restocking and this one has the number desired, skip it.
+				}
+				if(!string.IsNullOrEmpty(textFind.Text)
+					&& !supply.Descript.ToUpper().Contains(textFind.Text.ToUpper())
+					&& !supply.CatalogNumber.ToString().ToUpper().Contains(textFind.Text.ToUpper())
+					&& !DefC.GetName(DefCat.SupplyCats,supply.Category).ToUpper().Contains(textFind.Text.ToUpper())
+					&& !supply.LevelDesired.ToString().Contains(textFind.Text)
+					&& !supply.Price.ToString().ToUpper().Contains(textFind.Text.ToUpper())
+					&& !supply.SupplierNum.ToString().Contains(textFind.Text))
+				{//If nothing about the supply matches the text entered in the field, skip it.
+					continue;
+				}
 				row=new ODGridRow();
-				if(i==0 || ListSupply[i].Category!=ListSupply[i-1].Category) {
-					row.Cells.Add(DefC.GetName(DefCat.SupplyCats,ListSupply[i].Category));
+				if(i==0 || (gridMain.Rows.Count>1 && supply.Category!=((Supply)gridMain.Rows[gridMain.Rows.Count-1].Tag).Category)) {
+					row.Cells.Add(DefC.GetName(DefCat.SupplyCats,supply.Category));//Add the new category header in this row if it doesn't match the previous row's category.
 				}
 				else {
 					row.Cells.Add("");
 				}
-				row.Cells.Add(ListSupply[i].CatalogNumber);
-				row.Cells.Add(Suppliers.GetName(ListSupplier,ListSupply[i].SupplierNum));
-				row.Cells.Add(ListSupply[i].Descript);
-				if(ListSupply[i].Price==0) {
+				row.Cells.Add(supply.CatalogNumber);
+				row.Cells.Add(Suppliers.GetName(_listSuppliers,supply.SupplierNum));
+				row.Cells.Add(supply.Descript);
+				if(supply.Price==0) {
 					row.Cells.Add("");
 				}
 				else {
-					row.Cells.Add(ListSupply[i].Price.ToString("n"));
+					row.Cells.Add(supply.Price.ToString("n"));
 				}
-				if(ListSupply[i].LevelDesired==0) {
+				if(supply.LevelDesired==0) {
 					row.Cells.Add("");
 				}
 				else {
-					row.Cells.Add(ListSupply[i].LevelDesired.ToString());
+					row.Cells.Add(supply.LevelDesired.ToString());
 				}
-				row.Cells.Add(ListSupply[i].LevelOnHand.ToString());
-				if(ListSupply[i].IsHidden) {
+				row.Cells.Add(supply.LevelOnHand.ToString());
+				if(supply.IsHidden) {
 					row.Cells.Add("X");
 				}
 				else {
 					row.Cells.Add("");
 				}
-				row.Tag=ListSupply[i].SupplyNum;
-				//row.Cells.Add(listSupply[i].ItemOrder.ToString());
+				row.Tag=supply;
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
-			for(int i=0;i<ListSupply.Count;i++) {
-				if(SelectedGridItems.Contains(ListSupply[i].SupplyNum)) {
+			for(int i=0;i<gridMain.Rows.Count;i++) {
+				if(_listSelectedSupplies.Contains(((Supply)gridMain.Rows[i].Tag))) {
 					gridMain.SetSelected(i,true);
 				}
 			}
@@ -143,75 +168,83 @@ namespace OpenDental {
 			}
 			Supply supp=new Supply();
 			supp.IsNew=true;
-			supp.SupplierNum=ListSupplier[comboSupplier.SelectedIndex-1].SupplierNum;//Selected index -1 to account for ALL being at the top of the list.
-			if(gridMain.GetSelectedIndex()>-1){
-				supp.Category=ListSupply[gridMain.GetSelectedIndex()].Category;
-				supp.ItemOrder=ListSupply[gridMain.GetSelectedIndex()].ItemOrder;
+			supp.SupplierNum=_listSuppliers[comboSupplier.SelectedIndex-1].SupplierNum;//Selected index -1 to account for ALL being at the top of the list.
+			if(gridMain.GetSelectedIndex()>-1) {
+				supp.Category=_listSupplies[gridMain.GetSelectedIndex()].Category;
 			}
 			FormSupplyEdit FormS=new FormSupplyEdit();
 			FormS.Supp=supp;
-			FormS.ListSupplier=ListSupplier;
+			FormS.ListSupplier=_listSuppliers;
 			FormS.ShowDialog();//inserts supply in DB if needed.  Item order will be at selected index or end of category.
 			if(FormS.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			//update listSupplyAll to reflect changes made to DB.
-			ListSupplyAll=Supplies.GetAll();
-			//int scroll=gridMain.ScrollValue;
-			SelectedGridItems.Clear();
-			SelectedGridItems.Add(FormS.Supp.SupplyNum);
+			if(FormS.Supp==null) {//New supply deleted
+				return;
+			}
+			FormS.Supp.ItemOrder=_listSupplies.FindAll(x=>x.Category==FormS.Supp.Category)
+				.Select(x=>x.ItemOrder)
+				.OrderByDescending(x=>x)
+				.FirstOrDefault()+1;//Last item in the category.
+			int idx=_listSupplies.FindLastIndex(x=>x.Category==FormS.Supp.Category);
+			if(idx==-1) {
+				_listSupplies.Add(FormS.Supp);//new category, add to bottom of list
+			}
+			else {
+				_listSupplies.Insert(idx+1,FormS.Supp);//add to bottom of existing category
+			}
 			FillGrid();
-			//gridMain.ScrollValue=scroll;
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			SelectedGridItems.Clear();
+			_listSelectedSupplies.Clear();
 			foreach(int index in gridMain.SelectedIndices) {
-				SelectedGridItems.Add(ListSupply[index].SupplyNum);
+				_listSelectedSupplies.Add((Supply)gridMain.Rows[index].Tag);
 			}
 			if(IsSelectMode) {
-				SelectedSupply = Supplies.GetSupply((long)gridMain.Rows[e.Row].Tag);
 				ListSelectedSupplies.Clear();//just in case
 				for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
-					ListSelectedSupplies.Add(ListSupply[gridMain.SelectedIndices[i]]);
+					ListSelectedSupplies.Add((Supply)gridMain.Rows[gridMain.SelectedIndices[i]].Tag);
 				}				
-				DialogResult = DialogResult.OK;
+				DialogResult=DialogResult.OK;
 				return;
 			}
-			//Supply supplyCached=Supplies.GetSupply((long)gridMain.Rows[e.Row].Tag);
+			Supply selectedSupply=(Supply)gridMain.Rows[e.Row].Tag;
 			FormSupplyEdit FormS=new FormSupplyEdit();
-			FormS.Supp=Supplies.GetSupply((long)gridMain.Rows[e.Row].Tag);//works with sorting
-			FormS.ListSupplier=ListSupplier;
+			FormS.Supp=selectedSupply;
+			FormS.ListSupplier=_listSuppliers;
 			FormS.ShowDialog();
 			if(FormS.DialogResult!=DialogResult.OK) {
 				return;	
 			}
-			ListSupplyAll=Supplies.GetAll();
+			if(FormS.Supp==null) {
+				_listSupplies.Remove(selectedSupply);
+			}
 			int scroll=gridMain.ScrollValue;
 			FillGrid();
 			gridMain.ScrollValue=scroll;
 		}
 
 		private void comboSupplier_SelectionChangeCommitted(object sender,EventArgs e) {
-			SelectedGridItems.Clear();
+			_listSelectedSupplies.Clear();
 			foreach(int index in gridMain.SelectedIndices) {
-				SelectedGridItems.Add(ListSupply[index].SupplyNum);
+				_listSelectedSupplies.Add((Supply)gridMain.Rows[index].Tag);
 			}
 			FillGrid();
 		}
 
 		private void checkShowHidden_Click(object sender,EventArgs e) {
-			SelectedGridItems.Clear();
+			_listSelectedSupplies.Clear();
 			foreach(int index in gridMain.SelectedIndices) {
-				SelectedGridItems.Add(ListSupply[index].SupplyNum);
+				_listSelectedSupplies.Add((Supply)gridMain.Rows[index].Tag);
 			}
 			FillGrid();
 		}
 
 		private void checkShowShoppingList_Click(object sender,EventArgs e) {
-			SelectedGridItems.Clear();
+			_listSelectedSupplies.Clear();
 			foreach(int index in gridMain.SelectedIndices) {
-				SelectedGridItems.Add(ListSupply[index].SupplyNum);
+				_listSelectedSupplies.Add((Supply)gridMain.Rows[index].Tag);
 			}
 			FillGrid();
 		}
@@ -221,42 +254,33 @@ namespace OpenDental {
 			if(gridMain.SelectedIndices.Length==0) {
 				return;
 			}
-			//remember selected SupplyNums for later
-			SelectedGridItems.Clear();
+			_listSelectedSupplies.Clear();
 			foreach(int index in gridMain.SelectedIndices) {
-				SelectedGridItems.Add(ListSupply[index].SupplyNum);
+				_listSelectedSupplies.Add((Supply)gridMain.Rows[index].Tag);
 			}
-			if(Supplies.CleanupItemOrders(ListSupplyAll)) {//should only have to run once more... after code updates to supply window.
-				MsgBox.Show(this,"There was a problem with sorting, but it has been fixed.  You may now try again.");
-				FillGrid();
-				return;
-			}
-			//loop through selected indicies, moving each one as needed, no saves to the database until after all items are moved.
+			//Loop through selected indices, moving each one as needed.
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
-				int index=gridMain.SelectedIndices[i];//to reduce confusion
-				int itemOrder=ListSupply[index].ItemOrder;//to reduce confusion
+				int indexSource=gridMain.SelectedIndices[i];
+				int indexDest=indexSource-1;
+				//Top of visible category-------------------------------------------------------------------------------
+				if(indexSource==0) {
+					continue;
+				}
+				Supply supplySource=(Supply)gridMain.Rows[indexSource].Tag;
+				Supply supplyDest=(Supply)gridMain.Rows[indexDest].Tag;//Incorrect. 
 				//Top of category---------------------------------------------------------------------------------------
-				if(itemOrder==0) {
+				if(supplySource.Category!=supplyDest.Category) {
 					continue;//already top of category
 				}
-				//Top of visible category but not actually top of category----------------------------------------------
-				if(index==0 //topmost item in visible list
-					|| ListSupply[index].Category!=ListSupply[index-1].Category) //topmost item in category in visible list
-				{
-					moveItemOrderHelper(ListSupply[index],0);//move item to top of respective category.
-					continue;
-				}
-				//Item is directly below a selected item in same category-----------------------------------------------
-				if(indexIsSelectedHelper(index-1)) {//check for same category is performed above
-					moveItemOrderHelper(ListSupply[index],ListSupply[index-1].ItemOrder+1);//move this item after the item above it, because both are selected.
-					continue;
-				}
-				//Item is directly below a non-selected item in same category-------------------------------------------
-				//check for same category is performed above.
-				moveItemOrderHelper(ListSupply[index],ListSupply[index-1].ItemOrder);
+				//Move the item up.  Change all item's item orders that it moved past (can be a filtered out result) and change its position in the global list.
+				int sourceIdx=_listSupplies.IndexOf(supplySource);//sourceIdx = higher entry
+				int destIdx=_listSupplies.IndexOf(supplyDest);//destIdx = lower entry
+				_listSupplies[sourceIdx]=supplyDest;
+				_listSupplies[destIdx]=supplySource;
+				gridMain.Rows[indexSource].Tag=supplyDest;//Fix up the tags for future movement.
+				gridMain.Rows[indexDest].Tag=supplySource;
+				//Item orders are not set here, they are reconciled on OK click.
 			}
-			saveChangesToDBHelper();
-			ListSupplyAll.Sort(sortSupplyListByCategoryOrderThenItemOrder);
 			int scrollVal=gridMain.ScrollValue;
 			FillGrid();
 			gridMain.ScrollValue=scrollVal;
@@ -267,211 +291,48 @@ namespace OpenDental {
 			if(gridMain.SelectedIndices.Length==0) {
 				return;
 			}
-			//remember selected SupplyNums for later
-			SelectedGridItems.Clear();
+			_listSelectedSupplies.Clear();
 			foreach(int index in gridMain.SelectedIndices) {
-				SelectedGridItems.Add(ListSupply[index].SupplyNum);
+				_listSelectedSupplies.Add((Supply)gridMain.Rows[index].Tag);
 			}
-			if(Supplies.CleanupItemOrders(ListSupplyAll)) {//should only have to run once more... after code updates to supply window.
-				MsgBox.Show(this,"There was a problem with sorting, but it has been fixed.  You may now try again.");
-				FillGrid();
-				return;
-			}
+			//Loop through selected indices, moving each one as needed.
 			for(int i=gridMain.SelectedIndices.Length-1;i>=0;i--) {
-				int index=gridMain.SelectedIndices[i];//to reduce confusion
-				int itemOrder=ListSupply[index].ItemOrder;//to reduce confusion
-				//Bottom----------------------------------------------
-				if(index==ListSupply.Count-1 //bottommost item in visible list
-					|| ListSupply[index].Category!=ListSupply[index+1].Category) //bottommost item in category in visible list
-				{
-					//end of list or category already.
+				int indexSource=gridMain.SelectedIndices[i];//to reduce confusion
+				int indexDest=indexSource+1;
+				//Bottom of visible category-------------------------------------------------------------------------------
+				if(indexSource==gridMain.Rows.Count-1) {
 					continue;
 				}
-				//Item is directly above a selected item in same category-----------------------------------------------
-				if(indexIsSelectedHelper(index+1)) {//check for same category is performed above
-					moveItemOrderHelper(ListSupply[index],ListSupply[index+1].ItemOrder-1);//move this item after the item above it, because both are selected.
-					continue;
+				Supply supplySource=(Supply)gridMain.Rows[indexSource].Tag;
+				Supply supplyDest=(Supply)gridMain.Rows[indexDest].Tag;
+				//Bottom of category---------------------------------------------------------------------------------------
+				if(supplySource.Category!=supplyDest.Category) {
+					continue;//already bottom of category
 				}
-				//Item is directly below a non-selected item in same category-------------------------------------------
-				//check for same category is performed above.
-				moveItemOrderHelper(ListSupply[index],ListSupply[index+1].ItemOrder);
+				//Move the item down.  Change all item's item orders that it moved past (can be a filtered out result) and change its position in the global list.
+				int sourceIdx=_listSupplies.IndexOf(supplySource);//Grid Tags are references to this in-memory list, so this will work.
+				int destIdx=_listSupplies.IndexOf(supplyDest);
+				_listSupplies[sourceIdx]=supplyDest;
+				_listSupplies[destIdx]=supplySource;
+				gridMain.Rows[indexSource].Tag=supplyDest;//Fix up the tags for future movement.
+				gridMain.Rows[indexDest].Tag=supplySource;
+				//Item orders are not set here, they are reconciled on OK click.
 			}
-			saveChangesToDBHelper();
-			ListSupplyAll.Sort(sortSupplyListByCategoryOrderThenItemOrder);
 			int scrollVal=gridMain.ScrollValue;
 			FillGrid();
 			gridMain.ScrollValue=scrollVal;
 		}
-
-		///<summary>Updates database based on the values in ListSupplyAll.</summary>
-		private void saveChangesToDBHelper() {
-			//Get all supplies from DB to check for changes.-----------------------------------------------------------------
-			List<Supply> ListSupplyAllDB=Supplies.GetAll();
-			//Itterate through current supply list in memory-----------------------------------------------------------------
-			for(int i=0;i<ListSupplyAll.Count;i++) {
-				//find DB version of supply to pass to UpdateOrInsertIfNeeded
-				Supply supplyOriginal=null;
-				for(int j=0;j<ListSupplyAllDB.Count;j++) {
-					if(ListSupplyAll[i].SupplyNum!=ListSupplyAllDB[j].SupplyNum) {
-						continue;//not the correct supply
-					}
-					supplyOriginal=ListSupplyAllDB[j];
-					break;//found match
-				}
-				Supplies.UpdateOrInsertIfNeeded(supplyOriginal,ListSupplyAll[i]);//accepts null for original.
-			}
-			//Update inmemory list to reflect changes.
-			ListSupplyAll=Supplies.GetAll();
-		}
-
-		private bool indexIsSelectedHelper(int index) {
-			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
-				if(gridMain.SelectedIndices[i]==index) {
-					return true;
-				}
-			}
-			return false;
-		}
-
-		///<summary>Sets item orders appropriately. Does not reorder list, and does not repaint/refill grid.</summary>
-		private void moveItemOrderHelper(Supply supply,int newItemOrder) {
-			if(supply.ItemOrder>newItemOrder) {//moving item up, itterate down through list
-				for(int i=0;i<ListSupplyAll.Count;i++) {
-					if(ListSupplyAll[i].Category!=supply.Category) {
-						continue;//wrong category
-					}
-					if(ListSupplyAll[i].SupplyNum==supply.SupplyNum) {
-						ListSupplyAll[i].ItemOrder=newItemOrder;//set item order of this supply.
-						continue;
-					}
-					if(ListSupplyAll[i].ItemOrder>=newItemOrder && ListSupplyAll[i].ItemOrder<supply.ItemOrder) {//all items between newItemOrder and oldItemOrder
-						ListSupplyAll[i].ItemOrder++;
-					}
-				}
-			}
-			else {//moving item down, itterate up through list
-				for(int i=ListSupplyAll.Count-1;i>=0;i--) {
-					if(ListSupplyAll[i].Category!=supply.Category) {
-						continue;//wrong category
-					}
-					if(ListSupplyAll[i].SupplyNum==supply.SupplyNum) {
-						ListSupplyAll[i].ItemOrder=newItemOrder;//set item order of this supply.
-						continue;
-					}
-					if(ListSupplyAll[i].ItemOrder<=newItemOrder && ListSupplyAll[i].ItemOrder>supply.ItemOrder) {//all items between newItemOrder and oldItemOrder
-						ListSupplyAll[i].ItemOrder--;
-					}
-				}
-			}
-			//ListSupplyAll has correct itemOrder values, which we need to copy to listSupply without changing the actual order of ListSupply.
-			for(int i=0;i<ListSupply.Count;i++){
-				for(int j=0;j<ListSupplyAll.Count;j++) {
-					if(ListSupply[i].SupplyNum!=ListSupplyAll[j].SupplyNum) {
-						continue;
-					}
-					ListSupply[i]=ListSupplyAll[j];//update order and category.
-				}
-			}
-		}
 		
 		private void textFind_TextChanged(object sender,EventArgs e) {
-			SelectedGridItems.Clear();
+			_listSelectedSupplies.Clear();
 			foreach(int index in gridMain.SelectedIndices) {
-				SelectedGridItems.Add(ListSupply[index].SupplyNum);
+				_listSelectedSupplies.Add((Supply)gridMain.Rows[index].Tag);
 			}
 			FillGrid();
 		}
 
-		/// <summary> Empties listSupply and adds to it all elements that contain items in the search field. Matches on all columns simultaneously.</summary>
-		private void filterListSupply() {
-			ListSupply.Clear();
-			ListSupplyAll.Sort(sortSupplyListByCategoryOrderThenItemOrder);
-			long supplier=0;
-			if(SelectedSupplierNum!=0) {//Use supplier num if it is provided, usually when IsSelectMode is also true
-				supplier = SelectedSupplierNum;
-			}
-			else if(comboSupplier.SelectedIndex < 1) {//this includes selecting All or not having anything selected.
-				supplier = 0;
-			}
-			else {
-				supplier=ListSupplier[comboSupplier.SelectedIndex-1].SupplierNum;//SelectedIndex-1 because All is added before all the other items in the list.
-			}
-			foreach(Supply supply in ListSupplyAll) {
-				if(!checkShowHidden.Checked && supply.IsHidden) {
-					continue;//skip hidden supplies if show hidden is not checked
-				}
-				if(supplier!=0 && supply.SupplierNum!=supplier) {
-					continue;//skip supplies that do not match selected supplier
-				}
-				if(checkShowShoppingList.Checked && supply.LevelOnHand >= supply.LevelDesired) {
-					continue;
-				}
-				if(textFind.Text=="") {//Start filtering based on findText
-					ListSupply.Add(supply);
-					continue;
-				}
-				else if(supply.CatalogNumber.ToString().ToUpper().Contains(textFind.Text.ToUpper())) {//Check each field to see if it matches the search text field. If it does then add it and move on.
-					ListSupply.Add(supply);
-					continue;
-				}
-				else if(DefC.GetName(DefCat.SupplyCats,supply.Category).ToUpper().Contains(textFind.Text.ToUpper())) {
-					ListSupply.Add(supply);
-					continue;
-				}
-				else if(supply.Descript.ToString().ToUpper().Contains(textFind.Text.ToUpper())) {
-					ListSupply.Add(supply);
-					continue;
-				}
-				//else if(supply.ItemOrder.ToString().Contains(textFind.Text)) {
-				//  listSupply.Add(supply);
-				//  continue;
-				//}
-				else if(supply.LevelDesired.ToString().Contains(textFind.Text)) {
-					ListSupply.Add(supply);
-					continue;
-				}
-				else if(supply.Price.ToString().ToUpper().Contains(textFind.Text.ToUpper())) {
-					ListSupply.Add(supply);
-					continue;
-				}
-				else if(supply.SupplierNum.ToString().Contains(textFind.Text)) {
-					ListSupply.Add(supply);
-					continue;
-				}
-				//else if(supply.SupplyNum.ToString().Contains(textFind.Text)) {
-				//  listSupply.Add(supply);
-				//  continue;
-				//}
-				//end of filter, item not added, move to next supply item.
-			}
-			return;
-		}
-
-		///<summary>Used to sort supply list. Returns -1 if sup1 should come before sup2, 0 is they are the same, and 1 is sup2 should come before sup1.</summary>
-		private int sortSupplyListByCategoryOrderThenItemOrder(Supply sup1,Supply sup2) {
-			int sup1Cat=DefC.GetOrder(DefCat.SupplyCats,sup1.Category);
-			int sup2Cat=DefC.GetOrder(DefCat.SupplyCats,sup2.Category);
-			if(sup1Cat==sup2Cat) {//Items in same category
-				if(sup1.ItemOrder==sup2.ItemOrder) {//same item
-					return 0;
-				}
-				else if(sup1.ItemOrder<sup2.ItemOrder) {
-					return -1;
-				}
-				else {
-					return 1;
-				}
-			}
-			else if(sup1Cat<sup2Cat) {
-				return -1;
-			}
-			else {
-				return 1;
-			}
-		}
-
 		private void butPrint_Click(object sender,EventArgs e) {
-			if(ListSupply.Count<1) {
+			if(_listSuppliesOld.Count<1) {
 				MsgBox.Show(this,"Supply list is Empty.");
 				return;
 			}
@@ -544,16 +405,16 @@ namespace OpenDental {
 					yPos+=(int)g.MeasureString(text,subHeadingFont).Height;
 				}
 				else {
-					text=Lan.g(this,"Supplier")+": "+ListSupplier[comboSupplier.SelectedIndex-1].Name;
+					text=Lan.g(this,"Supplier")+": "+_listSuppliers[comboSupplier.SelectedIndex-1].Name;
 					g.DrawString(text,subHeadingFont,Brushes.Black,425-g.MeasureString(text,subHeadingFont).Width/2,yPos);
 					yPos+=(int)g.MeasureString(text,subHeadingFont).Height;
-					if(ListSupplier[comboSupplier.SelectedIndex-1].Phone!="") {
-						text=Lan.g(this,"Phone")+": "+ListSupplier[comboSupplier.SelectedIndex-1].Phone;
+					if(_listSuppliers[comboSupplier.SelectedIndex-1].Phone!="") {
+						text=Lan.g(this,"Phone")+": "+_listSuppliers[comboSupplier.SelectedIndex-1].Phone;
 						g.DrawString(text,subHeadingFont,Brushes.Black,425-g.MeasureString(text,subHeadingFont).Width/2,yPos);
 						yPos+=(int)g.MeasureString(text,subHeadingFont).Height;
 					}
-					if(ListSupplier[comboSupplier.SelectedIndex-1].Name!="") {
-						text=Lan.g(this,"Note")+": "+ListSupplier[comboSupplier.SelectedIndex-1].Name;
+					if(_listSuppliers[comboSupplier.SelectedIndex-1].Name!="") {
+						text=Lan.g(this,"Note")+": "+_listSuppliers[comboSupplier.SelectedIndex-1].Name;
 						g.DrawString(text,subHeadingFont,Brushes.Black,425-g.MeasureString(text,subHeadingFont).Width/2,yPos);
 						yPos+=(int)g.MeasureString(text,subHeadingFont).Height;
 					}
@@ -582,12 +443,23 @@ namespace OpenDental {
 				}
 				ListSelectedSupplies.Clear();//just in case
 				for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
-					ListSelectedSupplies.Add(ListSupply[gridMain.SelectedIndices[i]]);
+					ListSelectedSupplies.Add((Supply)gridMain.Rows[gridMain.SelectedIndices[i]].Tag);
 				}
-				SelectedSupply = Supplies.GetSupply((long)gridMain.Rows[gridMain.SelectedIndices[0]].Tag);
 				DialogResult=DialogResult.OK;
 			}
-			//saveChangesToDBHelper();//All changes should already be saved to the database
+			int itemOrder=0;
+			for(int i=0;i<_listSupplies.Count;i++) {
+				if(i>0 && _listSupplies[i-1].Category!=_listSupplies[i].Category) {
+					itemOrder=0;
+				}
+				_listSupplies[i].ItemOrder=itemOrder;
+				itemOrder++;
+			}
+			//Nuances of concurency using this sync are, 
+			//Deletes always win,
+			//last in edits win,
+			//Added supplies are unaffected by concurency
+			Supplies.Sync(_listSupplies,_listSuppliesOld);
 			DialogResult=DialogResult.OK;
 		}
 

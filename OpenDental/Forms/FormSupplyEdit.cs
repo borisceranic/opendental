@@ -87,12 +87,7 @@ namespace OpenDental {
 			if(Supp.Category!=categoryInitialVal) {
 				Supp.ItemOrder=int.MaxValue;//changed categories, new or existing, move to bottom of new category.
 			}
-			if(Supp.IsNew) {
-				Supp=Supplies.GetSupply(Supplies.Insert(Supp,Supp.ItemOrder));//insert Supp and update with PK and item order from DB.
-			}
-			else {
-				Supplies.Update(SuppOriginal,Supp);
-			}
+			//No longer saving changes from this form.
 			DialogResult=DialogResult.OK;
 		}
 
