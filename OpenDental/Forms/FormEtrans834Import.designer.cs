@@ -33,6 +33,7 @@ namespace OpenDental{
 			this.textImportPath = new OpenDental.ODtextBox();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.labelProgress = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -146,10 +147,20 @@ namespace OpenDental{
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
+			// labelProgress
+			// 
+			this.labelProgress.Location = new System.Drawing.Point(12, 662);
+			this.labelProgress.Name = "labelProgress";
+			this.labelProgress.Size = new System.Drawing.Size(788, 20);
+			this.labelProgress.TabIndex = 11;
+			this.labelProgress.Text = " ";
+			this.labelProgress.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
 			// FormEtrans834Import
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 696);
+			this.Controls.Add(this.labelProgress);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.butRefresh);
 			this.Controls.Add(this.gridInsPlanFiles);
@@ -179,5 +190,6 @@ namespace OpenDental{
 		private UI.ODGrid gridInsPlanFiles;
 		private UI.Button butRefresh;
 		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.Label labelProgress;
 	}
 }

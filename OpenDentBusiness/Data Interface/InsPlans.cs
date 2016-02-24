@@ -1115,6 +1115,14 @@ namespace OpenDentBusiness {
 			return planNums;
 		}
 
+		public static List<InsPlan> GetAllByCarrierNum(long carrierNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<InsPlan>>(MethodBase.GetCurrentMethod(),carrierNum);
+			}
+			string command="SELECT * FROM insplan WHERE CarrierNum="+POut.Long(carrierNum);
+			return Crud.InsPlanCrud.SelectMany(command);
+		}
+
 		public static void UpdateCobRuleForAll(EnumCobRule cobRule) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),cobRule);

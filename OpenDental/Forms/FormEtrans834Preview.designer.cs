@@ -29,6 +29,7 @@ namespace OpenDental{
 			this.label1 = new System.Windows.Forms.Label();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.labelProgress = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// checkIsPatientCreate
@@ -97,10 +98,20 @@ namespace OpenDental{
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
+			// labelProgress
+			// 
+			this.labelProgress.Location = new System.Drawing.Point(12, 662);
+			this.labelProgress.Name = "labelProgress";
+			this.labelProgress.Size = new System.Drawing.Size(788, 20);
+			this.labelProgress.TabIndex = 10;
+			this.labelProgress.Text = " ";
+			this.labelProgress.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
 			// FormEtrans834Preview
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 696);
+			this.Controls.Add(this.labelProgress);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.checkIsPatientCreate);
 			this.Controls.Add(this.gridInsPlans);
@@ -123,5 +134,6 @@ namespace OpenDental{
 		private UI.ODGrid gridInsPlans;
 		private System.Windows.Forms.CheckBox checkIsPatientCreate;
 		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.Label labelProgress;
 	}
 }
