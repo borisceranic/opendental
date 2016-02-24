@@ -792,7 +792,7 @@ namespace OpenDental {
 		}
 
 		public void GoToJob(long jobNum) {
-			Job job=_listJobsAll.FirstOrDefault(x => x.JobNum==jobNum)??Jobs.GetOneFilled(jobNum);
+			Job job=Jobs.GetOneFilled(jobNum);
 			if(job==null) {
 				MessageBox.Show("Job not found.");
 				return;
