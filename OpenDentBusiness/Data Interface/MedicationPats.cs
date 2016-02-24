@@ -224,6 +224,24 @@ namespace OpenDentBusiness{
 			}
 			return false;
 		}
+
+		public static Dictionary<string,int> GetAllForRxCuis(List<string> listRxCuis) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<Dictionary<string,int>>(MethodBase.GetCurrentMethod(),listRxCuis);
+			}
+			if(listRxCuis==null || listRxCuis.Count==0) {
+				return new Dictionary<string, int>();
+			}
+			string command="SELECT Rxcui, Count(*) numUsed FROM medicationpat WHERE RxCui IN("+string.Join(",",listRxCuis)+") "
+				+"AND "+DbHelper.DtimeToDate("DateStart")+" >="+POut.Date(MiscData.GetNowDateTime().AddYears(-1))+" "
+				+"GROUP BY Rxcui";
+			DataTable table =Db.GetTable(command);
+			Dictionary<string,int> retVal=new Dictionary<string, int>();
+			foreach(DataRow row in table.Rows) {
+				retVal[row[0].ToString()]=PIn.Int(row[1].ToString());
+			}
+			return retVal;
+		}
 	
 	
 	

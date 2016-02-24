@@ -21,6 +21,8 @@ namespace OpenDentBusiness {
 		public DateTime DateEntry;
 		///<summary>Enum:InterventionCodeSet AboveNormalWeight, BelowNormalWeight, TobaccoCessation, Nutrition, PhysicalActivity, Dialysis.</summary>
 		public InterventionCodeSet CodeSet;
+		///<summary>Indicates whether the intervention was offered/recommended to the patient and the patient declined the treatment/referral.</summary>
+		public bool IsPatDeclined;
 
 		///<summary></summary>
 		public Intervention Copy() {

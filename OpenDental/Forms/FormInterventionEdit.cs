@@ -1,12 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
-using OpenDentBusiness;
 using OpenDental.UI;
+using OpenDentBusiness;
 
 namespace OpenDental {
 	public partial class FormInterventionEdit:Form {
@@ -16,7 +12,6 @@ namespace OpenDental {
 		///<summary>Do not let them edit historical interventions, the OK button will be disabled if this is false.</summary>
 		public bool IsSelectionMode;
 		private List<EhrCode> listCodes;
-		private string Description;
 		private Dictionary<string,string> dictValueCodeSets;
 
 		public FormInterventionEdit() {
@@ -26,7 +21,8 @@ namespace OpenDental {
 
 		///<summary></summary>
 		private void FormInterventionEdit_Load(object sender,EventArgs e) {
-			butOK.Enabled=IsSelectionMode;//OK button only enabled in selection mode
+			comboCodeSet.Enabled=IsSelectionMode;//only allow changing code set if IsSelectionMode
+			gridMain.AllowSelection=IsSelectionMode;//only allow changing the selected intervention code if IsSelectionMode
 			dictValueCodeSets=new Dictionary<string,string>();
 			comboCodeSet.Items.Add("All");
 			if(IsAllTypes || InterventionCur.CodeSet==InterventionCodeSet.AboveNormalWeight) {
@@ -78,7 +74,7 @@ namespace OpenDental {
 			}
 			textDate.Text=InterventionCur.DateEntry.ToShortDateString();
 			textNote.Text=InterventionCur.Note;
-			Description="";
+			checkPatientDeclined.Checked=InterventionCur.IsPatDeclined;
 			FillGrid();
 		}
 
@@ -196,11 +192,10 @@ namespace OpenDental {
 			else {
 				codeVal=listCodes[gridMain.GetSelectedIndex()].CodeValue;
 				codeSys=listCodes[gridMain.GetSelectedIndex()].CodeSystem;
-				Description=gridMain.Rows[gridMain.GetSelectedIndex()].Cells[2].Text;
 			}
 			//save--------------------------------------
 			//Intervention grid may contain medications, have to insert a new med if necessary and load FormMedPat for user to input data
-			if(codeSys=="RXNORM") {
+			if(codeSys=="RXNORM" && !checkPatientDeclined.Checked) {
 				//codeVal will be RxCui of medication, see if it already exists in Medication table
 				Medication medCur=Medications.GetMedicationFromDbByRxCui(PIn.Long(codeVal));
 				if(medCur==null) {//no med with this RxCui, create one
@@ -235,6 +230,7 @@ namespace OpenDental {
 			InterventionCur.CodeValue=codeVal;
 			InterventionCur.CodeSystem=codeSys;
 			InterventionCur.Note=textNote.Text;
+			InterventionCur.IsPatDeclined=checkPatientDeclined.Checked;
 			string selectedCodeSet=comboCodeSet.SelectedItem.ToString().Split(new char[]{' '},StringSplitOptions.RemoveEmptyEntries)[0];
 			if(IsAllTypes) {//CodeSet will be set by calling function unless showing all types, in which case we need to determine which InterventionCodeSet to assign
 				if(selectedCodeSet=="All") {//All types showing and set to All, have to determine which InterventionCodeSet this code belongs to
