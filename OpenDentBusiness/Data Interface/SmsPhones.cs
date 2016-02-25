@@ -364,6 +364,10 @@ namespace OpenDentBusiness{
 
 		///<summary>Returns true if texting is enabled for any of the clinics, or if not using clinics, if it is enabled for the practice.</summary>
 		public static bool IsIntegratedTextingEnabled() {
+			//No need to check RemotingRole; no call to db.
+			if(Plugins.HookMethod(null,"SmsPhones.IsIntegratedTextingEnabled_start")) {
+				return true;
+			}
 			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
 				return PrefC.GetDateT(PrefName.SmsContractDate).Year>1880;
 			}

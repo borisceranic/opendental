@@ -480,6 +480,10 @@ namespace OpenDentBusiness{
 		}
 
 		public static bool IsTextingEnabled(long clinicNum) {
+			//No need to check RemotingRole; no call to db.
+			if(Plugins.HookMethod(null,"Clinics.IsTextingEnabled_start",clinicNum)) {
+				return true;
+			}
 			Clinic clinic=GetClinic(clinicNum);
 			if(clinic==null) {
 				return false;
