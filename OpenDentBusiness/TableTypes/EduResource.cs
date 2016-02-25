@@ -21,7 +21,7 @@ namespace OpenDentBusiness {
 		public string LabResultCompare;
 		///<summary>.</summary>
 		public string ResourceUrl;
-		///<summary>Used as a FK to ehrmeasureevent.CodeValueResult where ehrmeasureevent.EventType=EhrMeasureEventType.TobaccoUseAssessed (8).</summary>
+		///<summary>FK to ehrmeasureevent.CodeValueResult when ehrmeasureevent.EventType=EhrMeasureEventType.TobaccoUseAssessed (8).</summary>
 		public string SmokingSnoMed;
 		/////<summary>FK to icd9.ICD9Num.</summary>//this is now obtained by pointing to a DiseaseDef which has an ICD9
 		//public long Icd9Num;

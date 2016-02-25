@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace OpenDentBusiness {
-	///<summary></summary>
+	///<summary>Inherits from insverify. A historical copy of an insurance verification record.</summary>
 	[Serializable]
 	public class InsVerifyHist:InsVerify {
 		///<summary>Primary key.</summary>
