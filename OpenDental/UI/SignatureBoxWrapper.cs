@@ -23,7 +23,7 @@ namespace OpenDental.UI {
 		[Category("Action"),Description("Event raised when the Sign Topaz button is clicked.")]
 		public event EventHandler SignTopazClicked=null;
 		///<summary>Used for special cases where signature logic varies from our default.</summary>
-		public SigMode SignatureMode=SigMode.Default;
+		private SigMode _signatureMode=SigMode.Default;
 
 		[Category("Property"),Description("Set the text that shows in the invalid signature label"),DefaultValue("Invalid Signature")]
 		///<summary>Usually "Invalid Signature", but this can be changed for different situations.</summary>
@@ -65,6 +65,16 @@ namespace OpenDental.UI {
 				if(sigBoxTopaz!=null && sigBox!=null) {
 					sigBoxTopaz.Height=sigBox.Height;
 				}
+			}
+		}
+
+		///<summary>Used for special cases where signature logic varies from our default.</summary>
+		public SigMode SignatureMode {
+			get {
+				return _signatureMode;
+			}
+			set {
+				_signatureMode=value;
 			}
 		}
 
@@ -139,8 +149,9 @@ namespace OpenDental.UI {
 			CodeBase.TopazWrapper.ClearTopaz(sigBoxTopaz);
 			CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,0);
 			CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,0);
+			string hashedKeyData;
 			//Some places used different logic for keystring and autokeydata in the past.  This must be maintained to keep signatures valid.
-			switch(SignatureMode) {
+			switch(_signatureMode) {
 				case SigMode.Document:
 					CodeBase.TopazWrapper.SetTopazKeyString(sigBoxTopaz,keyData);
 					CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,2);//high encryption
@@ -148,12 +159,30 @@ namespace OpenDental.UI {
 					CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,signature);
 					break;
 				case SigMode.TreatPlan:
-					string hashedKeyData= OpenDentBusiness.TreatPlans.GetHashStringForSignature(keyData);//Passed in KeyData still needs to be hashed.
+					hashedKeyData=OpenDentBusiness.TreatPlans.GetHashStringForSignature(keyData);//Passed in KeyData still needs to be hashed.
 					CodeBase.TopazWrapper.SetTopazKeyString(sigBoxTopaz,hashedKeyData);
 					CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,2);//high encryption
 					CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,2);//high encryption
 					CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,signature);
 					sigBoxTopaz.Refresh();
+					//If sig is not showing, then try encryption mode 3 for signatures signed with old SigPlusNet.dll.
+					if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
+						CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,3);//Unknown mode (told to use via TopazSystems)
+						CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,signature);
+					}
+					break;
+				case SigMode.OrthoChart:
+					hashedKeyData=OpenDentBusiness.OrthoCharts.GetHashStringForSignature(keyData);//Passed in KeyData still needs to be hashed.
+					CodeBase.TopazWrapper.SetTopazKeyString(sigBoxTopaz,hashedKeyData);
+					CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,2);//high encryption
+					CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,2);//high compression
+					CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,signature);
+					//older items may have been signed with zeros due to a bug.  We still want to show the sig in that case.
+					//but if a sig is not showing, then set the key string to try to get it to show.
+					if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
+						CodeBase.TopazWrapper.SetTopazAutoKeyData(sigBoxTopaz,hashedKeyData);
+						CodeBase.TopazWrapper.SetTopazSigString(sigBoxTopaz,signature);
+					}
 					//If sig is not showing, then try encryption mode 3 for signatures signed with old SigPlusNet.dll.
 					if(CodeBase.TopazWrapper.GetTopazNumberOfTabletPoints(sigBoxTopaz)==0) {
 						CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,3);//Unknown mode (told to use via TopazSystems)
@@ -193,13 +222,18 @@ namespace OpenDental.UI {
 			//sigBox.SetSigCompressionMode(0);
 			//sigBox.SetEncryptionMode(0);
 			//Some places used different logic for keystring and autokeydata in the past.  This must be maintained to keep signatures valid.
-			switch(SignatureMode) {
+			switch(_signatureMode) {
 				case SigMode.Document:
 					//No auto key data set, only key string.
 					sigBox.SetKeyString(keyData);
 					break;
 				case SigMode.TreatPlan:
-					string hashedKeyData = OpenDentBusiness.TreatPlans.GetHashStringForSignature(keyData);//Passed in KeyData still needs to be hashed.
+					string hashedKeyData=OpenDentBusiness.TreatPlans.GetHashStringForSignature(keyData);//Passed in KeyData still needs to be hashed.
+					//No auto key data set, only key string.
+					sigBox.SetKeyString(hashedKeyData);
+					break;
+				case SigMode.OrthoChart:
+					hashedKeyData=OpenDentBusiness.OrthoCharts.GetHashStringForSignature(keyData);//Passed in KeyData still needs to be hashed.
 					//No auto key data set, only key string.
 					sigBox.SetKeyString(hashedKeyData);
 					break;
@@ -296,9 +330,10 @@ namespace OpenDental.UI {
 				CodeBase.TopazWrapper.SetTopazCompressionMode(sigBoxTopaz,0);
 				CodeBase.TopazWrapper.SetTopazEncryptionMode(sigBoxTopaz,0);
 				//Some places used different logic for keystring and autokeydata in the past.  This must be maintained to keep signatures valid.
-				switch(SignatureMode) {
+				switch(_signatureMode) {
 					case SigMode.Document:
 					case SigMode.TreatPlan:
+					case SigMode.OrthoChart:
 						//No auto key data set, only key string.
 						CodeBase.TopazWrapper.SetTopazKeyString(sigBoxTopaz,keyData);
 						break;
@@ -319,9 +354,10 @@ namespace OpenDental.UI {
 				//sigBox.SetSigCompressionMode(0);
 				//sigBox.SetEncryptionMode(0);
 				//Some places used different logic for keystring and autokeydata in the past.  This must be maintained to keep signatures valid.
-				switch(SignatureMode) {
+				switch(_signatureMode) {
 					case SigMode.Document:
 					case SigMode.TreatPlan:
+					case SigMode.OrthoChart:
 						//No auto key data set, only key string.
 						sigBox.SetKeyString(keyData);
 						break;
@@ -424,7 +460,9 @@ namespace OpenDental.UI {
 			///<summary>Signatures used for documents in the Images module.</summary>
 			Document,
 			///<summary>Signatures used for treatment plans.</summary>
-			TreatPlan
+			TreatPlan,
+			///<summary>Signatures used for ortho charts.</summary>
+			OrthoChart
 		}
 	}
 }

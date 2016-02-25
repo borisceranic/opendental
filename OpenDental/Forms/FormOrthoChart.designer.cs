@@ -76,6 +76,7 @@ namespace OpenDental{
 			this.signatureBoxWrapper.BackColor = System.Drawing.SystemColors.ControlDark;
 			this.signatureBoxWrapper.Location = new System.Drawing.Point(562, 427);
 			this.signatureBoxWrapper.Name = "signatureBoxWrapper";
+			this.signatureBoxWrapper.SignatureMode = OpenDental.UI.SignatureBoxWrapper.SigMode.OrthoChart;
 			this.signatureBoxWrapper.Size = new System.Drawing.Size(364, 81);
 			this.signatureBoxWrapper.TabIndex = 110;
 			this.signatureBoxWrapper.ClearSignatureClicked += new System.EventHandler(this.signatureBoxWrapper_ClearSignatureClicked);

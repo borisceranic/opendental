@@ -325,7 +325,7 @@ namespace OpenDental {
 			}
 			//Get the "translated" name for the signature column.
 			string sigColumnName=_listOrthDisplayFields.FirstOrDefault(x => x.InternalName=="Signature").Description;
-			string keyData=OrthoCharts.GetKeyDataForSignatureSaving(_patCur,_listOrthoCharts
+			string keyData=OrthoCharts.GetKeyDataForSignatureHash(_patCur,_listOrthoCharts
 				.FindAll(x => x.DateService==orthoDate && x.FieldName!=sigColumnName),orthoDate);
 			signatureBoxWrapper.FillSignature(sig.IsTopaz,keyData,sig.SigString);
 			if(signatureBoxWrapper.IsValid) {
