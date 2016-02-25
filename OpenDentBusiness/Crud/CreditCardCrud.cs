@@ -62,6 +62,7 @@ namespace OpenDentBusiness.Crud{
 				creditCard.PayConnectToken   = PIn.String(row["PayConnectToken"].ToString());
 				creditCard.PayConnectTokenExp= PIn.Date  (row["PayConnectTokenExp"].ToString());
 				creditCard.Procedures        = PIn.String(row["Procedures"].ToString());
+				creditCard.CCSource          = (OpenDentBusiness.CreditCardSource)PIn.Int(row["CCSource"].ToString());
 				retVal.Add(creditCard);
 			}
 			return retVal;
@@ -89,6 +90,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("PayConnectToken");
 			table.Columns.Add("PayConnectTokenExp");
 			table.Columns.Add("Procedures");
+			table.Columns.Add("CCSource");
 			foreach(CreditCard creditCard in listCreditCards) {
 				table.Rows.Add(new object[] {
 					POut.Long  (creditCard.CreditCardNum),
@@ -107,6 +109,7 @@ namespace OpenDentBusiness.Crud{
 					POut.String(creditCard.PayConnectToken),
 					POut.Date  (creditCard.PayConnectTokenExp),
 					POut.String(creditCard.Procedures),
+					POut.Int   ((int)creditCard.CCSource),
 				});
 			}
 			return table;
@@ -147,7 +150,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="CreditCardNum,";
 			}
-			command+="PatNum,Address,Zip,XChargeToken,CCNumberMasked,CCExpiration,ItemOrder,ChargeAmt,DateStart,DateStop,Note,PayPlanNum,PayConnectToken,PayConnectTokenExp,Procedures) VALUES(";
+			command+="PatNum,Address,Zip,XChargeToken,CCNumberMasked,CCExpiration,ItemOrder,ChargeAmt,DateStart,DateStop,Note,PayPlanNum,PayConnectToken,PayConnectTokenExp,Procedures,CCSource) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(creditCard.CreditCardNum)+",";
 			}
@@ -166,7 +169,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (creditCard.PayPlanNum)+","
 				+"'"+POut.String(creditCard.PayConnectToken)+"',"
 				+    POut.Date  (creditCard.PayConnectTokenExp)+","
-				+"'"+POut.String(creditCard.Procedures)+"')";
+				+"'"+POut.String(creditCard.Procedures)+"',"
+				+    POut.Int   ((int)creditCard.CCSource)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -199,7 +203,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="CreditCardNum,";
 			}
-			command+="PatNum,Address,Zip,XChargeToken,CCNumberMasked,CCExpiration,ItemOrder,ChargeAmt,DateStart,DateStop,Note,PayPlanNum,PayConnectToken,PayConnectTokenExp,Procedures) VALUES(";
+			command+="PatNum,Address,Zip,XChargeToken,CCNumberMasked,CCExpiration,ItemOrder,ChargeAmt,DateStart,DateStop,Note,PayPlanNum,PayConnectToken,PayConnectTokenExp,Procedures,CCSource) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(creditCard.CreditCardNum)+",";
 			}
@@ -218,7 +222,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (creditCard.PayPlanNum)+","
 				+"'"+POut.String(creditCard.PayConnectToken)+"',"
 				+    POut.Date  (creditCard.PayConnectTokenExp)+","
-				+"'"+POut.String(creditCard.Procedures)+"')";
+				+"'"+POut.String(creditCard.Procedures)+"',"
+				+    POut.Int   ((int)creditCard.CCSource)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -245,7 +250,8 @@ namespace OpenDentBusiness.Crud{
 				+"PayPlanNum        =  "+POut.Long  (creditCard.PayPlanNum)+", "
 				+"PayConnectToken   = '"+POut.String(creditCard.PayConnectToken)+"', "
 				+"PayConnectTokenExp=  "+POut.Date  (creditCard.PayConnectTokenExp)+", "
-				+"Procedures        = '"+POut.String(creditCard.Procedures)+"' "
+				+"Procedures        = '"+POut.String(creditCard.Procedures)+"', "
+				+"CCSource          =  "+POut.Int   ((int)creditCard.CCSource)+" "
 				+"WHERE CreditCardNum = "+POut.Long(creditCard.CreditCardNum);
 			Db.NonQ(command);
 		}
@@ -313,6 +319,10 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="Procedures = '"+POut.String(creditCard.Procedures)+"'";
 			}
+			if(creditCard.CCSource != oldCreditCard.CCSource) {
+				if(command!=""){ command+=",";}
+				command+="CCSource = "+POut.Int   ((int)creditCard.CCSource)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -368,6 +378,9 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			if(creditCard.Procedures != oldCreditCard.Procedures) {
+				return true;
+			}
+			if(creditCard.CCSource != oldCreditCard.CCSource) {
 				return true;
 			}
 			return false;

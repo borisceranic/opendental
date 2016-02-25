@@ -40,10 +40,21 @@ namespace OpenDentBusiness {
 		public DateTime PayConnectTokenExp;
 		///<summary>What procedures will go on this card as a recurring charge.  Comma delimited list of ProcCodes.</summary>
 		public string Procedures;
+		///<summary>Indicates which application made this credit card and token. PatientPortal will only use PatientPortal sourced rows. Likewise 
+		///OD Proper will only use ODProper rows.</summary>
+		public CreditCardSource CCSource;
+
 
 		///<summary></summary>
 		public CreditCard Clone() {
 			return (CreditCard)this.MemberwiseClone();
 		}
+	}
+
+	public enum CreditCardSource {
+		/// <summary>0</summary>
+		ODProper,
+		/// <summary>1</summary>
+		PatientPortal
 	}
 }

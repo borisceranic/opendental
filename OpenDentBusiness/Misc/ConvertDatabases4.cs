@@ -59,6 +59,18 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX hl7procattach_ProcNum ON hl7procattach (ProcNum)";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE creditcard ADD CCSource tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE creditcard ADD CCSource number(3)";
+					Db.NonQ(command);
+					command="UPDATE creditcard SET CCSource = 0 WHERE CCSource IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE creditcard MODIFY CCSource NOT NULL";
+					Db.NonQ(command);
+				}
 
 
 
