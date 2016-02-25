@@ -24,6 +24,16 @@ namespace OpenDentBusiness {
 			return IsZero(val-val2);
 		}
 
+		public static string Right(this string s,int maxCharacters) {
+			if(s==null || string.IsNullOrEmpty(s)) {
+				return "";
+			}
+			if(s.Length>maxCharacters) {
+				return s.Substring(s.Length-maxCharacters,maxCharacters);
+			}
+			return s;
+		}
+
 		//Example: 1/5+1/5-1/10-1/10-1/10-1/10 does not equal zero.
 	}
 }

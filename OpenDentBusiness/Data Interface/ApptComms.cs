@@ -297,14 +297,20 @@ namespace OpenDentBusiness{
 				}
 			}
 			if(text.Contains("[clinicPhone]")) {
+				string phone = "";
 				if(clinic!=null) {
-					text=text.Replace("[clinicPhone]",clinic.Phone);//Clinics disabled but put clinicName.
+					phone=clinic.Phone;
 				}
 				else {
-					text=text.Replace("[clinicPhone]",PrefC.GetString(PrefName.PracticePhone));//Clinics disabled but put clinicName.
+					phone=PrefC.GetString(PrefName.PracticePhone);
 				}
+				if(PrefC.GetLanguageAndRegion().Name.Right(2)=="US" && clinic.Phone.Length==10) {
+					//Phone format "### ### ####" per Nathan's request
+					phone = string.Format("{0} {1} {2}",phone.Substring(0,3),phone.Substring(3,3),phone.Substring(6));
+				}
+				text=text.Replace("[clinicPhone]",phone);
 			}
-				if(text.Contains("[provName]")) {
+			if(text.Contains("[provName]")) {
 				text=text.Replace("[provName]",Providers.GetFormalName(appt.ProvNum));
 			}
 			return text;
