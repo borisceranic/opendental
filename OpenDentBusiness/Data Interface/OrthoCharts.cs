@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -167,7 +168,7 @@ namespace OpenDentBusiness{
 			strb.Append(pat.FName);
 			strb.Append(pat.LName);
 			strb.Append(dateService.ToString("yyyyMMdd"));
-			foreach(OrthoChart orChart in listOrthoCharts) {
+			foreach(OrthoChart orChart in listOrthoCharts.OrderBy(x=>x.FieldName)) {
 				strb.Append(orChart.FieldName);
 				strb.Append(orChart.FieldValue);
 			}
@@ -176,7 +177,7 @@ namespace OpenDentBusiness{
 
 		///<summary>Gets the hashstring from the provided string that is typically generated from GetStringForSignatureHash().
 		///This is done seperate of building the string so that new line replacements can be done when validating signatures before hashing.</summary>
-		private static string GetHashStringForSignature(string str) {
+		public static string GetHashStringForSignature(string str) {
 			//No need to check RemotingRole; no call to db.
 			byte[] textbytes=Encoding.UTF8.GetBytes(str);
 			HashAlgorithm algorithm=MD5.Create();

@@ -24,51 +24,15 @@ namespace OpenDental{
 		/// </summary>
 		private void InitializeComponent() {
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormOrthoChart));
-			this.gridPat = new OpenDental.UI.ODGrid();
-			this.gridMain = new OpenDental.UI.ODGrid();
 			this.signatureBoxWrapper = new OpenDental.UI.SignatureBoxWrapper();
 			this.butOK = new OpenDental.UI.Button();
 			this.butAudit = new OpenDental.UI.Button();
 			this.butUseAutoNote = new OpenDental.UI.Button();
 			this.butAdd = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.gridPat = new OpenDental.UI.ODGrid();
+			this.gridMain = new OpenDental.UI.ODGrid();
 			this.SuspendLayout();
-			// 
-			// gridPat
-			// 
-			this.gridPat.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-			this.gridPat.HasAddButton = false;
-			this.gridPat.HasMultilineHeaders = false;
-			this.gridPat.HScrollVisible = false;
-			this.gridPat.Location = new System.Drawing.Point(10, 427);
-			this.gridPat.Name = "gridPat";
-			this.gridPat.ScrollValue = 0;
-			this.gridPat.Size = new System.Drawing.Size(371, 230);
-			this.gridPat.TabIndex = 6;
-			this.gridPat.Title = "Patient Fields";
-			this.gridPat.TranslationName = "TablePatientFields";
-			this.gridPat.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridPat_CellDoubleClick);
-			// 
-			// gridMain
-			// 
-			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridMain.HasAddButton = false;
-			this.gridMain.HasMultilineHeaders = false;
-			this.gridMain.HScrollVisible = true;
-			this.gridMain.Location = new System.Drawing.Point(10, 12);
-			this.gridMain.Name = "gridMain";
-			this.gridMain.ScrollValue = 0;
-			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.OneCell;
-			this.gridMain.Size = new System.Drawing.Size(916, 409);
-			this.gridMain.TabIndex = 5;
-			this.gridMain.Title = "Ortho Chart";
-			this.gridMain.TranslationName = "TableOrthoChart";
-			this.gridMain.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellClick);
-			this.gridMain.CellTextChanged += new System.EventHandler(this.gridMain_CellTextChanged);
-			this.gridMain.CellLeave += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellLeave);
-			this.gridMain.CellEnter += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellEnter);
 			// 
 			// signatureBoxWrapper
 			// 
@@ -76,6 +40,7 @@ namespace OpenDental{
 			this.signatureBoxWrapper.BackColor = System.Drawing.SystemColors.ControlDark;
 			this.signatureBoxWrapper.Location = new System.Drawing.Point(562, 427);
 			this.signatureBoxWrapper.Name = "signatureBoxWrapper";
+			this.signatureBoxWrapper.SignatureMode = OpenDental.UI.SignatureBoxWrapper.SigMode.OrthoChart;
 			this.signatureBoxWrapper.Size = new System.Drawing.Size(364, 81);
 			this.signatureBoxWrapper.TabIndex = 110;
 			this.signatureBoxWrapper.ClearSignatureClicked += new System.EventHandler(this.signatureBoxWrapper_ClearSignatureClicked);
@@ -156,6 +121,42 @@ namespace OpenDental{
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.UseVisualStyleBackColor = true;
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
+			// 
+			// gridPat
+			// 
+			this.gridPat.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridPat.HasAddButton = false;
+			this.gridPat.HasMultilineHeaders = false;
+			this.gridPat.HScrollVisible = false;
+			this.gridPat.Location = new System.Drawing.Point(10, 427);
+			this.gridPat.Name = "gridPat";
+			this.gridPat.ScrollValue = 0;
+			this.gridPat.Size = new System.Drawing.Size(371, 230);
+			this.gridPat.TabIndex = 6;
+			this.gridPat.Title = "Patient Fields";
+			this.gridPat.TranslationName = "TablePatientFields";
+			this.gridPat.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridPat_CellDoubleClick);
+			// 
+			// gridMain
+			// 
+			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasAddButton = false;
+			this.gridMain.HasMultilineHeaders = false;
+			this.gridMain.HScrollVisible = true;
+			this.gridMain.Location = new System.Drawing.Point(10, 12);
+			this.gridMain.Name = "gridMain";
+			this.gridMain.ScrollValue = 0;
+			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.OneCell;
+			this.gridMain.Size = new System.Drawing.Size(916, 409);
+			this.gridMain.TabIndex = 5;
+			this.gridMain.Title = "Ortho Chart";
+			this.gridMain.TranslationName = "TableOrthoChart";
+			this.gridMain.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellClick);
+			this.gridMain.CellTextChanged += new System.EventHandler(this.gridMain_CellTextChanged);
+			this.gridMain.CellLeave += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellLeave);
+			this.gridMain.CellEnter += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellEnter);
 			// 
 			// FormOrthoChart
 			// 
