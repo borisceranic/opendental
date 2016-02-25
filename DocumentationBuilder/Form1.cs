@@ -241,6 +241,7 @@ namespace DocumentationBuilder {
 				case "appointmenttype": return "AppointmentType";
 				case "apptfield": return "ApptField";
 				case "apptfielddef": return "ApptFieldDef";
+				case "apptcomm": return "ApptComm";
 				case "apptview": return "ApptView";
 				case "apptviewitem": return "ApptViewItem";
 				case "autocode": return "AutoCode";
@@ -261,6 +262,7 @@ namespace DocumentationBuilder {
 				case "claimformitem": return "ClaimFormItem";
 				case "claimpayment": return "ClaimPayment";
 				case "claimproc": return "ClaimProc";
+				case "claimsnapshot": return "ClaimSnapshot";
 				case "claimvalcodelog": return "ClaimValCodeLog";
 				case "clockevent": return "ClockEvent";
 				case "codesystem": return "CodeSystem";
@@ -273,6 +275,8 @@ namespace DocumentationBuilder {
 				case "custrefentry": return "CustRefEntry";
 				case "custreference": return "CustReference";
 				case "dashboardar": return "DashboardAR";
+				case "dashboardcell": return "DashboardCell";
+				case "dashboardlayout": return "DashboardLayout";
 				case "definition": return "Def";
 				case "deletedobject": return "DeletedObject";
 				case "dictcustom": return "DictCustom";
@@ -340,6 +344,8 @@ namespace DocumentationBuilder {
 				case "insfilingcodesubtype": return "InsFilingCodeSubtype";
 				case "insplan": return "InsPlan";
 				case "inssub": return "InsSub";
+				case "insverify": return "InsVerify";
+				case "insverifyhist": return "InsVerifyHist";
 				case "installmentplan": return "InstallmentPlan";
 				case "journalentry": return "JournalEntry";
 				case "labcase": return "LabCase";
@@ -451,8 +457,12 @@ namespace DocumentationBuilder {
 				case "toothgriddef": return "ToothGridDef";
 				case "toothinitial": return "ToothInitial";
 				case "treatplan": return "TreatPlan";
+				case "treatplanattach": return "TreatPlanAttach";
+				case "updatehistory": return "UpdateHistory";
+				case "userclinic": return "UserClinic";
 				case "usergroup": return "UserGroup";
 				case "userodapptview": return "UserodApptView";
+				case "userodpref": return "UserOdPref";
 				case "userquery": return "UserQuery";
 				case "vaccinedef": return "VaccineDef";
 				case "vaccineobs": return "VaccineObs";
