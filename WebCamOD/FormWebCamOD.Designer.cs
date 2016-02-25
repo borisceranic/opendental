@@ -13,9 +13,6 @@
 			if(disposing && (components != null)) {
 				components.Dispose();
 			}
-			if(vidCapt!=null){
-				vidCapt.Dispose();
-			}
 			base.Dispose(disposing);
 		}
 
@@ -28,63 +25,54 @@
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormWebCamOD));
-			this.pictBoxVideo = new System.Windows.Forms.PictureBox();
-			this.timerPhoneWebCam = new System.Windows.Forms.Timer(this.components);
+			this.timerWebCamSnapshots = new System.Windows.Forms.Timer(this.components);
 			this.label1 = new System.Windows.Forms.Label();
-			this.timerScreenShots = new System.Windows.Forms.Timer(this.components);
-			((System.ComponentModel.ISupportInitialize)(this.pictBoxVideo)).BeginInit();
+			this.videoSourcePlayer = new AForge.Controls.VideoSourcePlayer();
 			this.SuspendLayout();
 			// 
-			// pictBoxVideo
+			// timerWebCamSnapshots
 			// 
-			this.pictBoxVideo.Location = new System.Drawing.Point(153,116);
-			this.pictBoxVideo.Name = "pictBoxVideo";
-			this.pictBoxVideo.Size = new System.Drawing.Size(64,48);
-			this.pictBoxVideo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-			this.pictBoxVideo.TabIndex = 0;
-			this.pictBoxVideo.TabStop = false;
-			// 
-			// timerPhoneWebCam
-			// 
-			this.timerPhoneWebCam.Interval = 1600;
-			this.timerPhoneWebCam.Tick += new System.EventHandler(this.timerPhoneWebCam_Tick);
+			this.timerWebCamSnapshots.Interval = 1600;
+			this.timerWebCamSnapshots.Tick += new System.EventHandler(this.timerWebCamSnapshots_Tick);
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(12,9);
+			this.label1.Location = new System.Drawing.Point(12, 9);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(362,106);
+			this.label1.Size = new System.Drawing.Size(362, 106);
 			this.label1.TabIndex = 2;
 			this.label1.Text = resources.GetString("label1.Text");
 			// 
-			// timerScreenShots
+			// videoSourcePlayer
 			// 
-			this.timerScreenShots.Interval = 300000;
-			this.timerScreenShots.Tick += new System.EventHandler(this.timerScreenShots_Tick);
+			this.videoSourcePlayer.BackColor = System.Drawing.SystemColors.ControlDark;
+			this.videoSourcePlayer.ForeColor = System.Drawing.Color.DarkRed;
+			this.videoSourcePlayer.Location = new System.Drawing.Point(152, 116);
+			this.videoSourcePlayer.Name = "videoSourcePlayer";
+			this.videoSourcePlayer.Size = new System.Drawing.Size(64, 48);
+			this.videoSourcePlayer.TabIndex = 3;
+			this.videoSourcePlayer.VideoSource = null;
 			// 
 			// FormWebCamOD
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F,13F);
+			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(378,177);
-			this.Controls.Add(this.pictBoxVideo);
+			this.ClientSize = new System.Drawing.Size(378, 177);
+			this.Controls.Add(this.videoSourcePlayer);
 			this.Controls.Add(this.label1);
 			this.Name = "FormWebCamOD";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "WebCamOD";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormWebCamOD_FormClosing);
 			this.Load += new System.EventHandler(this.FormWebCamOD_Load);
-			((System.ComponentModel.ISupportInitialize)(this.pictBoxVideo)).EndInit();
 			this.ResumeLayout(false);
-			this.PerformLayout();
 
 		}
 
 		#endregion
-
-		private System.Windows.Forms.PictureBox pictBoxVideo;
-		private System.Windows.Forms.Timer timerPhoneWebCam;
+		private System.Windows.Forms.Timer timerWebCamSnapshots;
 		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.Timer timerScreenShots;
+		private AForge.Controls.VideoSourcePlayer videoSourcePlayer;
 	}
 }
 

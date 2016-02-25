@@ -113,10 +113,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Required dlls\DiffieHellman.dll</HintPath>
     </Reference>
-    <Reference Include="DirectShowLib-2005, Version=2.1.0.0, Culture=neutral, PublicKeyToken=67e7b740cdfc2d3f, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Required dlls\DirectShowLib-2005.dll</HintPath>
-    </Reference>
     <Reference Include="Health.Direct.Common, Version=1.2.0.8, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Required dlls\Health.Direct.Common.dll</HintPath>
@@ -3741,7 +3737,6 @@
     <Compile Include="InternalTools\Phones\FormScreenshotBrowse.designer.cs">
       <DependentUpon>FormScreenshotBrowse.cs</DependentUpon>
     </Compile>
-    <Compile Include="InternalTools\Phones\VideoCapture.cs" />
     <Compile Include="InternalTools\Phones\FormPhoneTiles.cs">
       <SubType>Form</SubType>
     </Compile>
