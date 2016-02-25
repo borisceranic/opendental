@@ -680,6 +680,10 @@ namespace OpenDental{
 				apt.Confirmed=DefC.Short[(int)DefCat.ApptConfirmed][selectedI].DefNum;
 				try{
 					Appointments.Update(apt,aptOld);
+					string logtext=Lan.g(this,"Appointment confirmation status changed to:")+" "
+						+DefC.Short[(int)DefCat.ApptConfirmed][selectedI].ItemName+" "
+						+Lan.g(this,"from the confirmation list.");
+					SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,apt.PatNum,logtext);
 				}
 				catch(ApplicationException ex){
 					Cursor=Cursors.Default;
