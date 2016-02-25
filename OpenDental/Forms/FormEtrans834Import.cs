@@ -199,7 +199,9 @@ namespace OpenDental {
 		}
 
 		private void butCancel_Click(object sender,EventArgs e) {
-			_odThread.QuitAsync();
+			if(_odThread!=null) {
+				_odThread.QuitAsync();
+			}
 			DialogResult=DialogResult.Cancel;
 			Close();
 		}
