@@ -997,6 +997,7 @@ namespace OpenDentBusiness {
 				command="SELECT EmailMessageNum,MsgDateTime,Subject,BodyText,PatNum,SentOrReceived "
 				+"FROM emailmessage "
 				+"LEFT JOIN emailaddress ON emailaddress.UserNum != 0 "//For a user's personal inbox.
+				+"AND emailaddress.EmailUsername != '' "
 				//Recipient address is already scrubbed, so we do not need to do a LIKE %string% comparison.
 				+"AND (emailmessage.RecipientAddress=emailaddress.EmailUsername "
 					//FromAddress could contain a bunch of extra characters, so we do a LIKE %string% comparison.
