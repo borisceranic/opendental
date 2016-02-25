@@ -419,7 +419,14 @@ namespace OpenDentBusiness.UI {
 							text="";
 						}
 						else {
-							text=dataRoww["timeAskedToArrive"].ToString();//could be blank
+							DateTime timeAskedToArrive;
+							if(DateTime.TryParse(dataRoww["timeAskedToArrive"].ToString(),out timeAskedToArrive)) {//timeAskedToArrive value could be blank
+								text=timeAskedToArrive.ToShortTimeString();
+							}
+							else {
+								//probably just a blank string
+								text=dataRoww["timeAskedToArrive"].ToString();
+							}
 						}
 						break;
 					case "WirelessPhone":
