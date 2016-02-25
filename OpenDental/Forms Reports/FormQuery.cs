@@ -1635,6 +1635,7 @@ namespace OpenDental{
 
 		private void butClose_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
+			Close();
 		}
 
 		private void FormQuery_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
