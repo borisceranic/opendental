@@ -72,7 +72,7 @@ namespace OpenDentBusiness{
 			Hashtable hashClearinghouses=new Hashtable();
 			lock(_lockObj) {
 				foreach(DictionaryEntry entry in _hqHList) {
-					hashClearinghouses.Add(entry.Key,((Clearinghouse)entry.Value).Copy());
+					hashClearinghouses.Add(entry.Key,(long)entry.Value);
 				}
 			}
 			return hashClearinghouses;
@@ -101,18 +101,18 @@ namespace OpenDentBusiness{
 		///<summary>Fills the cache, which only contains HQ-level clearinghouses.</summary>
 		public static void FillCacheHq(DataTable table) {
 			//No need to check RemotingRole; no call to db.
-			_hqListt=Crud.ClearinghouseCrud.TableToList(table).ToArray();
-			HqHList=new Hashtable();
-			string[] payors;
-			Clearinghouse[] arrayClearinghouse=GetHqListt();
-			for(int i=0;i<arrayClearinghouse.Length;i++) {
-				payors=arrayClearinghouse[i].Payors.Split(',');
-				for(int j=0;j<payors.Length;j++) {
-					if(!HqHList.ContainsKey(payors[j])) {
-						HqHList.Add(payors[j],arrayClearinghouse[i].ClearinghouseNum);
+			List<Clearinghouse> hqListt=Crud.ClearinghouseCrud.TableToList(table);
+			Hashtable hqHList=new Hashtable();
+			foreach(Clearinghouse cHouse in hqListt) {
+				foreach(string payorID in cHouse.Payors.Split(',')) {
+					if(!hqHList.ContainsKey(payorID)) {
+						hqHList.Add(payorID,cHouse.ClearinghouseNum);
 					}
 				}
 			}
+			//Possible race condition. Mitigated by using local lists and waiting until the last moment to assign them to the private lists.
+			_hqHList=hqHList;
+			_hqListt=hqListt.ToArray();
 		}
 
 		///<summary>Returns a list of clearinghouses that filter out clearinghouses we no longer want to display.
