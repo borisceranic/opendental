@@ -148,6 +148,7 @@ namespace OpenDentBusiness{
 
 		///<summary>Convert a phone number to internation format and remove all punctuation. Validates input number format. Throws exceptions.</summary>
 		public static string ConvertPhoneToInternational(string phoneRaw,string countryCode) {
+			//No need to check RemotingRole; no call to db.
 			if(string.IsNullOrWhiteSpace(phoneRaw)) {
 				throw new Exception("Input phone number must be set");
 			}
@@ -169,6 +170,10 @@ namespace OpenDentBusiness{
 
 		///<summary>Surround with Try/Catch.  Sent as time sensitive message.</summary>
 		public static bool SendSmsSingle(long patNum,string wirelessPhone,string message,long clinicNum,SmsMessageSource smsMessageSource) {
+			//No need to check RemotingRole; no call to db.
+			if(Plugins.HookMethod(null,"SmsToMobiles.SendSmsSingle_start",patNum,wirelessPhone,message,clinicNum)) {
+				return true;
+			}
 			double balance=SmsPhones.GetClinicBalance(clinicNum);
 			if(balance-0.04<0) {
 				throw new Exception("To send this message first increase spending limit for integrated texting from eServices Setup.");
@@ -211,6 +216,10 @@ namespace OpenDentBusiness{
 		///<summary>Surround with try/catch. Returns true if all messages succeded, throws exception if it failed. 
 		///All Integrated Texting should use this method, CallFire texting does not use this method.</summary>
 		public static bool SendSms(List<SmsToMobile> listMessages) {
+			//No need to check RemotingRole; no call to db.
+			if(Plugins.HookMethod(null,"SmsToMobiles.SendSms_start",listMessages)) {
+				return true;
+			}
 			if(listMessages==null || listMessages.Count==0) {
 				throw new Exception("No messages to send.");
 			}

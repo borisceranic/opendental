@@ -124,12 +124,13 @@ namespace OpenDentBusiness{
 
 		///<summary>Gets sms phones when not using clinics.</summary>
 		public static List<SmsPhone> GetForPractice() {
-			//No remoting role check, No call to database.
+			//No need to check RemotingRole; no call to db.
 			//Get for practice is just getting for clinic num 0
 			return GetForClinics(new List<long>() { 0 });//clinic num 0
 		}
 
 		public static List<SmsPhone> GetForClinics(List<long> listClinicNums) {
+			//No need to check RemotingRole; no call to db.
 			if(listClinicNums.Count==0) {
 				return new List<SmsPhone>();
 			}
@@ -364,6 +365,10 @@ namespace OpenDentBusiness{
 
 		///<summary>Returns true if texting is enabled for any of the clinics, or if not using clinics, if it is enabled for the practice.</summary>
 		public static bool IsIntegratedTextingEnabled() {
+			//No need to check RemotingRole; no call to db.
+			if(Plugins.HookMethod(null,"SmsPhones.IsIntegratedTextingEnabled_start")) {
+				return true;
+			}
 			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
 				return PrefC.GetDateT(PrefName.SmsContractDate).Year>1880;
 			}
@@ -377,6 +382,7 @@ namespace OpenDentBusiness{
 
 		///<summary>Returns 0 if clinics not in use, or patient.ClinicNum if assigned to a clinic, or ClinicNum of first clinic.</summary>
 		public static long GetClinicNumForTexting(long patNum) {
+			//No need to check RemotingRole; no call to db.
 			if(PrefC.GetBool(PrefName.EasyNoClinics) || Clinics.List.Length==0) {
 				return 0;//0 used for no clinics
 			}

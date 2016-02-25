@@ -480,6 +480,10 @@ namespace OpenDentBusiness{
 		}
 
 		public static bool IsTextingEnabled(long clinicNum) {
+			//No need to check RemotingRole; no call to db.
+			if(Plugins.HookMethod(null,"Clinics.IsTextingEnabled_start",clinicNum)) {
+				return true;
+			}
 			Clinic clinic=GetClinic(clinicNum);
 			if(clinic==null) {
 				return false;
@@ -492,6 +496,7 @@ namespace OpenDentBusiness{
 		///(FormOpenDental.ClinicNum=0) and the pref PracticeIsMedicalOnly is true OR if the currently selected clinic's IsMedicalOnly flag is true.
 		///Otherwise returns false.</summary>
 		public static bool IsMedicalPracticeOrClinic(long clinicNum) {
+			//No need to check RemotingRole; no call to db.
 			if(clinicNum==0) {//either headquarters is selected or the clinics feature is not enabled, use practice pref
 				return PrefC.GetBool(PrefName.PracticeIsMedicalOnly);
 			}
@@ -505,6 +510,7 @@ namespace OpenDentBusiness{
 		///<summary>Returns a clinic object with ClinicNum=0, and values filled using practice level preferences. 
 		/// Caution: do not attempt to save the clinic back to the DB. This should be used for read only purposes.</summary>
 		public static Clinic GetPracticeAsClinicZero() {
+			//No need to check RemotingRole; no call to db.
 			return new Clinic {
 				ClinicNum=0,
 				Description=PrefC.GetString(PrefName.PracticeTitle),
