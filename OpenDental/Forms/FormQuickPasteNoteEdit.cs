@@ -18,20 +18,18 @@ namespace OpenDental{
 		private System.ComponentModel.Container components = null;
 		private System.Windows.Forms.TextBox textNote;
 		private OpenDental.UI.Button butDelete;
-		private QuickPasteNote QuickNote;
+		public QuickPasteNote QuickNote;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.TextBox textAbbreviation;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.Label label3;
-		///<summary></summary>
-		public bool IsNew;
 
 		///<summary></summary>
 		public FormQuickPasteNoteEdit(QuickPasteNote quickNote){
 			//
 			// Required for Windows Form Designer support
 			//
-			QuickNote=quickNote;
+			QuickNote=quickNote.Copy();
 			InitializeComponent();
 			Lan.F(this);
 		}
@@ -179,7 +177,6 @@ namespace OpenDental{
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Quick Paste Note";
-			this.Closing += new System.ComponentModel.CancelEventHandler(this.FormQuickPasteNoteEdit_Closing);
 			this.Load += new System.EventHandler(this.FormQuickPasteNoteEdit_Load);
 			this.ResumeLayout(false);
 			this.PerformLayout();
@@ -204,8 +201,7 @@ namespace OpenDental{
 			if(MessageBox.Show(Lan.g(this,"Delete note?"),"",MessageBoxButtons.OKCancel)!=DialogResult.OK){
 				return;
 			}
-			QuickPasteNotes.Delete(QuickNote);
-			QuickNote.QuickPasteNoteNum=0;//triggers an action in the calling form
+			QuickNote=null;//triggers an action in the calling form
 			DialogResult=DialogResult.OK;
 		}
 
@@ -222,12 +218,6 @@ namespace OpenDental{
 				}
 			}
 			QuickNote.Note=textNote.Text;
-			if(IsNew){
-				QuickPasteNotes.Insert(QuickNote);
-			}
-			else{
-				QuickPasteNotes.Update(QuickNote);
-			}
 			DialogResult=DialogResult.OK;
 		}
 
@@ -242,22 +232,7 @@ namespace OpenDental{
 		private void butCancel_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
-
-		private void FormQuickPasteNoteEdit_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-			if(DialogResult==DialogResult.OK){
-				return;
-			}
-			if(IsNew){
-				QuickPasteNotes.Delete(QuickNote);
-				DialogResult=DialogResult.Cancel;
-			}
-		}
-
-		
-
-		
-
-
+			
 	}
 }
 

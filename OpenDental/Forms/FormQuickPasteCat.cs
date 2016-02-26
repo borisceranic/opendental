@@ -20,11 +20,11 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.ListBox listType;
 		private System.Windows.Forms.Label label2;
-		private QuickPasteCat QuickCat;
+		public QuickPasteCat QuickCat;
 
-		///<summary></summary>
+		///<summary>The QuickPasteCat passed into this constructor is directly manipulated.</summary>
 		public FormQuickPasteCat(QuickPasteCat quickCat){
-			QuickCat=quickCat;
+			QuickCat=quickCat.Copy();
 			//
 			// Required for Windows Form Designer support
 			//
@@ -181,7 +181,6 @@ namespace OpenDental{
 				}
 				QuickCat.DefaultForTypes+=listType.SelectedIndices[i].ToString();
 			}
-			QuickPasteCats.Update(QuickCat);
 			DialogResult=DialogResult.OK;
 		}
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
 
@@ -7,9 +8,9 @@ namespace OpenDentBusiness{
 	///<summary></summary>
 	public class QuickPasteCats {
 		///<summary></summary>
-		private static QuickPasteCat[] list;
+		private static List<QuickPasteCat> list;
 
-		public static QuickPasteCat[] List {
+		public static List<QuickPasteCat> List {
 			//No need to check RemotingRole; no call to db.
 			get {
 				if(list==null) {
@@ -36,7 +37,7 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		public static void FillCache(DataTable table) {
 			//No need to check RemotingRole; no call to db.
-			list=Crud.QuickPasteCatCrud.TableToList(table).ToArray();
+			list=Crud.QuickPasteCatCrud.TableToList(table);
 		}
 
 		///<summary></summary>
@@ -68,18 +69,22 @@ namespace OpenDentBusiness{
  			Db.NonQ(command);
 		}
 
+		///<summary>Gets all categories.</summary>
+		public static List<QuickPasteCat> GetAll() {
+			return List;
+		}
 
 		///<summary>Called from FormQuickPaste and from QuickPasteNotes.Substitute(). Returns the index of the default category for the specified type. If user has entered more than one, only one is returned.</summary>
 		public static int GetDefaultType(QuickPasteType type){
 			//No need to check RemotingRole; no call to db.
-			if(List.Length==0){
+			if(List.Count==0){
 				return -1;
 			}
 			if(type==QuickPasteType.None){
 				return 0;//default to first line
 			}
 			string[] types;
-			for(int i=0;i<List.Length;i++){
+			for(int i=0;i<List.Count;i++){
 				if(List[i].DefaultForTypes==""){
 					types=new string[0];
 				}
@@ -93,6 +98,14 @@ namespace OpenDentBusiness{
 				}
 			}
 			return 0;
+		}
+		
+
+		public static bool Sync(List<QuickPasteCat> listNew,List<QuickPasteCat> listOld) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),listNew,listOld);
+			}
+			return Crud.QuickPasteCatCrud.Sync(listNew,listOld);
 		}
 
 		

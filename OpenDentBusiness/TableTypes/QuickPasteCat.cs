@@ -4,6 +4,7 @@ namespace OpenDentBusiness{
 
 	///<summary>Quick paste categories are used by the quick paste notes feature.</summary>
 	[Serializable]
+	[CrudTable(IsSynchable=true)]
 	public class QuickPasteCat:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
@@ -17,7 +18,9 @@ namespace OpenDentBusiness{
 
 
 		
-
+		public QuickPasteCat Copy() {
+			return (QuickPasteCat)this.MemberwiseClone();
+		}
 		
 
 

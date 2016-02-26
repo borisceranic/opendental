@@ -4,6 +4,7 @@ namespace OpenDentBusiness{
 	
 	///<summary>Template for quick pasted note feature.</summary>
 	[Serializable]
+	[CrudTable(IsSynchable=true)]
 	public class QuickPasteNote:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]
@@ -17,7 +18,9 @@ namespace OpenDentBusiness{
 		///<summary>The abbreviation which will automatically substitute when preceded by a ?.</summary>
 		public string Abbreviation;
 
-
+		public QuickPasteNote Copy() {
+			return (QuickPasteNote)this.MemberwiseClone();
+		}
 
 	}
 
