@@ -498,8 +498,8 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please enter a username.");
 				return;
 			}
+			List<UserClinic> listUserClinics=new List<UserClinic>();
 			if(PrefC.HasClinicsEnabled && checkClinicIsRestricted.Checked) {//They want to restrict the user to certain clinics or clinics are enabled.  
-				List<UserClinic> listUserClinics=new List<UserClinic>();
 				for(int i=0;i<listClinicMulti.SelectedIndices.Count;i++) {
 					listUserClinics.Add(new UserClinic(_arrayClinics[listClinicMulti.SelectedIndices[i]].ClinicNum,UserCur.UserNum));
 				}
@@ -508,8 +508,9 @@ namespace OpenDental{
 					MsgBox.Show(this,"User cannot have a default clinic that they are not restricted to.");
 					return;
 				}
-				UserClinics.Sync(listUserClinics);
-				DataValid.SetInvalid(InvalidType.UserClinics);//Refresh UserClinic caches
+			}
+			if(UserClinics.Sync(listUserClinics,UserCur.UserNum)) {//Either syncs new list, or clears old list if no longer restricted.
+				DataValid.SetInvalid(InvalidType.UserClinics);
 			}
 			if(!PrefC.HasClinicsEnabled || listClinic.SelectedIndex==0) {
 				UserCur.ClinicNum=0;

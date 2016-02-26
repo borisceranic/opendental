@@ -127,11 +127,12 @@ namespace OpenDentBusiness{
 			Crud.UserClinicCrud.Delete(userClinicNum);
 		}
 
-		public static bool Sync(List<UserClinic> listNew) {
+		public static bool Sync(List<UserClinic> listNew,long userNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetBool(MethodBase.GetCurrentMethod(),listNew);
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),listNew,userNum);
 			}
-			return Crud.UserClinicCrud.Sync(listNew,GetListt());
+			List<UserClinic> listOld=UserClinics.GetForUser(userNum);
+			return Crud.UserClinicCrud.Sync(listNew,listOld);
 		}
 
 		///<summary>Deletes all User to Clinic associations for a specific user.</summary>
