@@ -56,6 +56,7 @@ namespace OpenDental {
 		///<summary>Always contains the text that should be displayed in the rich text box.  
 		///Also used to store the UNICODE representation of the RichTextBox.Text property (which we override) due to a Korean bug.</summary>
 		private string _msgText="";
+		private bool isImeComposition;
 
 		///<summary>Set true to enable spell checking in this control.</summary>
 		[Category("Behavior"),Description("Set true to enable spell checking.")]
@@ -81,6 +82,19 @@ namespace OpenDental {
 
 		///<summary></summary>
 		public ODtextBox() {
+			//We have to try catch this just in case an ODTextBox is shown before upgrading to a version that already has this preference.
+			try {
+				if(System.ComponentModel.LicenseManager.UsageMode == System.ComponentModel.LicenseUsageMode.Designtime || this.DesignMode) {
+					isImeComposition=false;
+					return;
+				}
+				else {
+					isImeComposition=PrefC.GetBool(PrefName.ImeCompositionCompatibility);
+				}
+			}
+			catch(Exception) {
+				//Do nothing.  Just treat the ODTextBox like it always has (no composition support).
+			}
 			InitializeComponent();// Required for Windows.Forms Class Composition Designer support
 			spellCheckIsEnabled=true;
 			this.AcceptsTab=true;//Causes CR to not also trigger OK button on a form when that button is set as AcceptButton on the form.
@@ -176,14 +190,6 @@ namespace OpenDental {
 		}
 
 		protected override void WndProc(ref Message m) {
-			bool isImeComposition=false;
-			//We have to try catch this just in case an ODTextBox is shown before upgrading to a version that already has this preference.
-			try {
-				isImeComposition=PrefC.GetBool(PrefName.ImeCompositionCompatibility);
-			}
-			catch(Exception) {
-				//Do nothing.  Just treat the ODTextBox like it always has (no composition support).
-			}
 			//The following code fixes a bug deep down in RichTextBox for foreign users that have a language that needs to use composition symbols.
 			//See post by Jon Burchel - Microsoft: https://goo.gl/d1ehJb  (an MSDN forum post shortened using google url shortener)
 			if(isImeComposition) {
