@@ -11951,11 +11951,11 @@ namespace OpenDentBusiness {
 					hasBrokenApptProcCode=true;
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO Preference(PrefName,ValueString) VALUES('BrokenApptProcedure','"+POut.Bool(hasBrokenApptProcCode)+"')";
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('BrokenApptProcedure','"+POut.Bool(hasBrokenApptProcCode)+"')";
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO Preference(PrefNum,PrefName,ValueString) "
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) "
 						+"VALUES((SELECT MAX(PrefNum)+1 FROM preference),'BrokenApptProcedure','"+POut.Bool(hasBrokenApptProcCode)+"')";
 					Db.NonQ(command);
 				}
