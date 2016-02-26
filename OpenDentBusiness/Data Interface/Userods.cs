@@ -756,6 +756,15 @@ namespace OpenDentBusiness {
 			if(!containsCap) {
 				return Lans.g("FormUserPassword","Password must contain at least one capital letter when the strong password feature is turned on.");
 			}
+			bool containsLower=false;
+			for(int i=0;i<pass.Length;i++) {
+				if(Char.IsLower(pass[i])) {
+					containsLower=true;
+				}
+			}
+			if(!containsLower) {
+				return Lans.g("FormUserPassword","Password must contain at least one lower case letter when the strong password feature is turned on.");
+			}
 			/*
 			bool containsPunct=false;
 			for(int i=0;i<pass.Length;i++) {
