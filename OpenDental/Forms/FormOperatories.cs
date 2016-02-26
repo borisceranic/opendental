@@ -243,7 +243,7 @@ namespace OpenDental{
 					}
 				}
 			}
-			if(comboClinic.SelectedIndex!=0) {
+			if(PrefC.HasClinicsEnabled && comboClinic.SelectedIndex!=0) {
 				butUp.Enabled=false;
 				butDown.Enabled=false;
 			}
