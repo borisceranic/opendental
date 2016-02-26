@@ -440,7 +440,7 @@ namespace OpenDental {
 			BodyText=FormMessageReplacements.ReplaceOffice(BodyText,clinic);
 			//Misc Information
 			BodyText=FormMessageReplacements.ReplaceMisc(BodyText);
-			_emailMessage.Attachments=attachments;
+			_emailMessage.Attachments.AddRange(attachments);
 			FillAttachments();
 			_hasMessageChanged=false;
 		}

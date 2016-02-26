@@ -629,9 +629,8 @@ namespace OpenDental{
 				return;
 			}
 			if(emailPreview.BodyText!="" || emailPreview.Subject!="" || emailPreview.HasAttachments){
-				if(MessageBox.Show(Lan.g(this,"Replace exising e-mail text and attachments with text "
-					+"and attachments from the template?"),"",MessageBoxButtons.OKCancel)
-					!=DialogResult.OK){
+				if(MessageBox.Show(Lan.g(this,"Replace exising e-mail text with text from the template?  Existing attachments will not be deleted."),
+					"",MessageBoxButtons.OKCancel)!=DialogResult.OK){
 					return;
 				}
 			}
