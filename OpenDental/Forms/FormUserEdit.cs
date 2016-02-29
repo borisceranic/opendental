@@ -162,7 +162,7 @@ namespace OpenDental{
 			// checkIsHidden
 			// 
 			this.checkIsHidden.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkIsHidden.Location = new System.Drawing.Point(4, -22);
+			this.checkIsHidden.Location = new System.Drawing.Point(495, 70);
 			this.checkIsHidden.Name = "checkIsHidden";
 			this.checkIsHidden.Size = new System.Drawing.Size(104, 16);
 			this.checkIsHidden.TabIndex = 163;
@@ -188,7 +188,7 @@ namespace OpenDental{
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(206, 23);
+			this.label4.Location = new System.Drawing.Point(229, 11);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(344, 23);
 			this.label4.TabIndex = 158;
