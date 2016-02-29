@@ -57,7 +57,7 @@ namespace OpenDentBusiness{
 		///<summary>The date and time that the patient was seated in the chair in the operatory.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
 		public DateTime DateTimeSeated;
-		///<summary>The date and time that the patient got up out of the chair</summary>
+		///<summary>The date and time that the patient got up out of the chair.  Date is largely ignored since it should be the same as the appt.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
 		public DateTime DateTimeDismissed;
 		///<summary>FK to insplan.PlanNum for the primary insurance plan at the time the appointment is set complete. May be 0. We can't tell later which subscriber is involved; only the plan.</summary>

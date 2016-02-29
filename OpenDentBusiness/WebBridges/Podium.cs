@@ -15,7 +15,6 @@ namespace OpenDentBusiness.WebBridges {
 		public static DateTime DateTimeLastRan=DateTime.MinValue;
 		///<summary>Amount of time to wait inbetween trying to send Podium review invitations.</summary>
 		public static int PodiumThreadIntervalMS=(int)TimeSpan.FromMinutes(5).TotalMilliseconds;
-		private static long _programNum=0;
 
 		///<summary></summary>
 		public Podium() {
@@ -27,8 +26,8 @@ namespace OpenDentBusiness.WebBridges {
 			//Consider blocking re-entrance if this hasn't finished.
 			//Only send invitations if the program link is enabled, the computer name is set to this computer, and eConnector is not set to send invitations 
 			if(!Programs.IsEnabled(ProgramName.Podium) 
-				|| !ODEnvironment.IdIsThisComputer(ProgramProperties.GetPropVal(programNum,ProgramPropertyDescriptions.ComputerNameOrIP)) 
-				|| ProgramProperties.GetPropVal(programNum,ProgramPropertyDescriptions.UseEConnector)!=POut.Bool(isEConnector)) 
+				|| !ODEnvironment.IdIsThisComputer(ProgramProperties.GetPropVal(programNum,PropertyDescs.ComputerNameOrIP)) 
+				|| ProgramProperties.GetPropVal(programNum,PropertyDescs.UseEConnector)!=POut.Bool(isEConnector)) 
 			{ 
 				return;
 			}
@@ -37,8 +36,8 @@ namespace OpenDentBusiness.WebBridges {
 			if(Podium.DateTimeLastRan==DateTime.MinValue) {//First time running the thread.
 				Podium.DateTimeLastRan=nowDT.AddMilliseconds(-PodiumThreadIntervalMS);
 			}
-			ReviewInvitationTrigger newPatTrigger=PIn.Enum<ReviewInvitationTrigger>(ProgramProperties.GetPropVal(programNum,ProgramPropertyDescriptions.NewPatientTriggerType));
-			ReviewInvitationTrigger existingPatTrigger=PIn.Enum<ReviewInvitationTrigger>(ProgramProperties.GetPropVal(programNum,ProgramPropertyDescriptions.ExistingPatientTriggerType));
+			ReviewInvitationTrigger newPatTrigger=PIn.Enum<ReviewInvitationTrigger>(ProgramProperties.GetPropVal(programNum,PropertyDescs.NewPatientTriggerType));
+			ReviewInvitationTrigger existingPatTrigger=PIn.Enum<ReviewInvitationTrigger>(ProgramProperties.GetPropVal(programNum,PropertyDescs.ExistingPatientTriggerType));
 			List<Appointment> listNewPatAppts=GetAppointmentsToSendReview(newPatTrigger,programNum,true);
 			foreach(Appointment apptCur in listNewPatAppts) {
 				Podium.SendData(Patients.GetPat(apptCur.PatNum),apptCur.ClinicNum);
@@ -54,9 +53,9 @@ namespace OpenDentBusiness.WebBridges {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Appointment>>(MethodBase.GetCurrentMethod(),trigger,programNum,isNewPatient);
 			}
-			string minutesToWaitCompleted=ProgramProperties.GetPropVal(programNum,ProgramPropertyDescriptions.ApptSetCompletedMinutes);
-			string minutesToWaitTimeArrived=ProgramProperties.GetPropVal(programNum,ProgramPropertyDescriptions.ApptTimeArrivedMinutes);
-			string minutesToWaitTimeDismissed=ProgramProperties.GetPropVal(programNum,ProgramPropertyDescriptions.ApptTimeDismissedMinutes);
+			string minutesToWaitCompleted=ProgramProperties.GetPropVal(programNum,PropertyDescs.ApptSetCompletedMinutes);
+			string minutesToWaitTimeArrived=ProgramProperties.GetPropVal(programNum,PropertyDescs.ApptTimeArrivedMinutes);
+			string minutesToWaitTimeDismissed=ProgramProperties.GetPropVal(programNum,PropertyDescs.ApptTimeDismissedMinutes);
 			string command="SELECT * "
 				+"FROM appointment "
 				+"LEFT JOIN securitylog ON securitylog.FKey=appointment.AptNum "
@@ -75,12 +74,12 @@ namespace OpenDentBusiness.WebBridges {
 			else if(trigger==ReviewInvitationTrigger.AppointmentTimeArrived) {
 				command+="AND appointment.AptStatus IN ("+POut.Int((int)ApptStatus.Scheduled)+","+POut.Int((int)ApptStatus.ASAP)+","+POut.Int((int)ApptStatus.Complete)+") "
 					+"AND ((appointment.AptStatus="+POut.Int((int)ApptStatus.Complete)+" AND NOT ISNULL(securitylog.PatNum) AND securitylog.LogDateTime + INTERVAL "+minutesToWaitCompleted+" MINUTE <="+DbHelper.Now()+") "
-					+"OR (appointment.DateTimeArrived>'1880-01-01' AND appointment.DateTimeArrived + INTERVAL "+minutesToWaitTimeArrived+" MINUTE<="+DbHelper.Now()+")) ";
+					+"OR (appointment.DateTimeArrived>"+DbHelper.Curdate()+" AND appointment.DateTimeArrived + INTERVAL "+minutesToWaitTimeArrived+" MINUTE<="+DbHelper.Now()+")) ";
 			}
 			else if(trigger==ReviewInvitationTrigger.AppointmentTimeDismissed) {
 				command+="AND appointment.AptStatus IN ("+POut.Int((int)ApptStatus.Scheduled)+","+POut.Int((int)ApptStatus.ASAP)+","+POut.Int((int)ApptStatus.Complete)+") "
 					+"AND ((appointment.AptStatus="+POut.Int((int)ApptStatus.Complete)+" AND NOT ISNULL(securitylog.PatNum) AND securitylog.LogDateTime + INTERVAL 90 MINUTE <="+DbHelper.Now()+") "
-					+"OR (appointment.DateTimeDismissed>'1880-01-01' AND appointment.DateTimeDismissed + INTERVAL "+minutesToWaitTimeDismissed+" MINUTE<="+DbHelper.Now()+")) ";
+					+"OR (appointment.DateTimeDismissed>"+DbHelper.Curdate()+" AND appointment.DateTimeDismissed + INTERVAL "+minutesToWaitTimeDismissed+" MINUTE<="+DbHelper.Now()+")) ";
 			}
 			return Crud.AppointmentCrud.SelectMany(command);
 		}
@@ -117,8 +116,8 @@ namespace OpenDentBusiness.WebBridges {
 					continue;
 				}
 				string apiUrl="https://podium.co/api/v1/review_invitations";
-				string apiToken=ProgramProperties.GetPropVal(Programs.GetProgramNum(ProgramName.Podium),ProgramPropertyDescriptions.APIToken);//I might be able to use _programNum here if static is per class like I think it is
-				string locationId=ProgramProperties.GetPropValForClinicOrDefault(Programs.GetProgramNum(ProgramName.Podium),ProgramPropertyDescriptions.LocationID,clinicNum);
+				string apiToken=ProgramProperties.GetPropVal(Programs.GetProgramNum(ProgramName.Podium),PropertyDescs.APIToken);//I might be able to use _programNum here if static is per class like I think it is
+				string locationId=ProgramProperties.GetPropValForClinicOrDefault(Programs.GetProgramNum(ProgramName.Podium),PropertyDescs.LocationID,clinicNum);
 				try {
 					using(WebClientEx client=new WebClientEx()) {
 						client.Headers[HttpRequestHeader.Accept]="application/json";
@@ -231,7 +230,7 @@ namespace OpenDentBusiness.WebBridges {
 			}
 		}
 
-		public class ProgramPropertyDescriptions {
+		public class PropertyDescs {
 			public static string ComputerNameOrIP="Enter your computer name or IP (required)";
 			public static string APIToken="Enter your API Token (required)";
 			public static string LocationID="Enter your Location ID (required)";
