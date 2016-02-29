@@ -1919,6 +1919,7 @@ namespace OpenDental{
 			// 
 			// tabAttachments
 			// 
+			this.tabAttachments.AutoScroll = true;
 			this.tabAttachments.Controls.Add(this.groupAttachedImages);
 			this.tabAttachments.Controls.Add(this.groupAttachments);
 			this.tabAttachments.Location = new System.Drawing.Point(4, 22);
@@ -2187,6 +2188,7 @@ namespace OpenDental{
 			// 
 			// tabMisc
 			// 
+			this.tabMisc.AutoScroll = true;
 			this.tabMisc.Controls.Add(this.textShareOfCost);
 			this.tabMisc.Controls.Add(this.label74);
 			this.tabMisc.Controls.Add(this.label94);
@@ -3229,6 +3231,7 @@ namespace OpenDental{
 			// 
 			// tabHistory
 			// 
+			this.tabHistory.AutoScroll = true;
 			this.tabHistory.Controls.Add(this.gridStatusHistory);
 			this.tabHistory.Controls.Add(this.labelCustomTracking);
 			this.tabHistory.Controls.Add(this.comboCustomTracking);
