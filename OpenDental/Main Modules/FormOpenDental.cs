@@ -5372,14 +5372,13 @@ namespace OpenDental{
 
 		private void menuItemEmailSettings_Click(object sender,EventArgs e) {
 			EmailAddress emailAddressCur=EmailAddresses.GetForUser(Security.CurUser.UserNum);
+			FormEmailAddressEdit FormEAE=new FormEmailAddressEdit();
 			if(emailAddressCur==null) {
 				emailAddressCur=new EmailAddress();
 				emailAddressCur.UserNum=Security.CurUser.UserNum;
-				EmailAddresses.Insert(emailAddressCur);
+				FormEAE.IsNew=true;
 			}
-			FormEmailAddressEdit FormEAE=new FormEmailAddressEdit();
 			FormEAE.EmailAddressCur=emailAddressCur;
-			FormEAE.IsNew=false;
 			FormEAE.ShowDialog();
 		}
 
