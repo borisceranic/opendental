@@ -313,9 +313,9 @@ namespace OpenDental {
 			pView.printPreviewControl2.Document=_pd2;
 			pView.ShowDialog();
 #else
-				if(PrinterL.SetPrinter(pd2,PrintSituation.Default,0,"Supplies order from "+ListOrders[gridOrders.GetSelectedIndex()].DatePlaced.ToShortDateString()+" printed")) {
+				if(PrinterL.SetPrinter(_pd2,PrintSituation.Default,0,"Supplies order from "+_listOrders[gridOrders.GetSelectedIndex()].DatePlaced.ToShortDateString()+" printed")) {
 					try{
-						pd2.Print();
+						_pd2.Print();
 					}
 					catch{
 						MsgBox.Show(this,"Printer not available");
