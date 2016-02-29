@@ -205,7 +205,7 @@ namespace OpenDentBusiness{
 		QuickPaste,
 		///<summary>19- Userods, UserGroups, and GroupPermissions</summary>
 		Security,
-		///<summary>20</summary>
+		///<summary>20 - Also includes program properties.</summary>
 		Programs,
 		///<summary>21- Also includes Image Mounts</summary>
 		ToolBut,
