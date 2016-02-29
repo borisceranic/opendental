@@ -10,6 +10,8 @@ using OpenDentBusiness;
 using System.Drawing.Printing;
 using System.Data;
 using System.Linq;
+using System.Drawing.Imaging;
+using System.Xml.Serialization;
 using OpenDental.UI;
 
 namespace OpenDental {
@@ -34,6 +36,8 @@ namespace OpenDental {
 		public MedLab MedLabCur;
 		///<summary>Statements use Sheets needs access to the entire Account data set for measuring grids.  See RefreshPanel()</summary>
 		private DataSet _dataSet;
+		///<summary>Used for determining page breaks. When moving to next page, use this Y value to determine the next field to print.</summary>
+		private static int _yPosPrint;
 
 		///<summary>Use this constructor when displaying a statement.  dataSet should be filled with the data set from AccountModules.GetAccount()</summary>
 		public FormSheetFillEdit(Sheet sheet, DataSet dataSet=null){
@@ -549,10 +553,15 @@ namespace OpenDental {
 			RefreshPanel();
 		}
 
+		///<summary>Draw drawings, rectangles, lines, special, and grids.</summary>
 		private void RefreshPanel(){
 			Image img=(Image)imgDraw.Clone();
-			Graphics g=Graphics.FromImage(img);
+			Graphics g=SheetPrinting.GetGraphics();
+			if(g==null) {
+				g=Graphics.FromImage(img);
+			}
 			g.SmoothingMode=SmoothingMode.HighQuality;
+			g.InterpolationMode=InterpolationMode.HighQualityBicubic;//Necessary for very large images that need to be scaled down.
 			//g.CompositingQuality=CompositingQuality.Default;
 			Pen pen=new Pen(Brushes.Black,2f);
 			Pen pen2=new Pen(Brushes.Black,1f);
@@ -632,6 +641,76 @@ namespace OpenDental {
 			pictDraw.Image.Dispose();
 			pictDraw.Image=img;
 			g.Dispose();
+		}
+
+		private void pd_PrintPage(object sender,System.Drawing.Printing.PrintPageEventArgs e) {
+			Graphics g=e.Graphics;
+			//return;
+			e.HasMorePages=false;
+			g.SmoothingMode=SmoothingMode.HighQuality;
+			g.InterpolationMode=InterpolationMode.HighQualityBicubic;//Necessary for very large images that need to be scaled down.			
+			Sheet sheet=SheetCur;
+			SheetUtil.CalculateHeights(sheet,g,_dataSet,Stmt,false,_printMargin.Top,_printMargin.Bottom,MedLabCur);
+			Sheets.SetPageMargin(sheet,_printMargin);
+			//Begin drawing.
+			foreach(SheetField field in sheet.SheetFields) {
+				if(!SheetPrinting.fieldOnCurPageHelper(field,sheet,_printMargin,_yPosPrint)) {
+					continue;
+				}
+				switch(field.FieldType) {
+					case SheetFieldType.Image:
+					case SheetFieldType.PatImage:
+						try {
+							SheetPrinting.drawFieldImage(field,g,null);
+						}
+						catch(OutOfMemoryException ex) {
+							//Cancel the print job because there is a static image on this sheet which is to big for the printer to handle.
+							MessageBox.Show(ex.Message);//Custom message that is already translated.
+							e.Cancel=true;
+							return;
+						}
+						break;
+					case SheetFieldType.Drawing:
+						SheetPrinting.drawFieldDrawing(field,g,null);
+						break;
+					case SheetFieldType.Rectangle:
+						SheetPrinting.drawFieldRectangle(field,g,null);
+						break;
+					case SheetFieldType.Line:
+						SheetPrinting.drawFieldLine(field,g,null);
+						break;
+					case SheetFieldType.Special:
+						SheetPrinting.drawFieldSpecial(sheet,field,g,null);
+						break;
+					case SheetFieldType.Grid:
+						SheetPrinting.drawFieldGrid(field,sheet,g,null,_dataSet,Stmt,MedLabCur);
+						break;
+					case SheetFieldType.InputField:
+					case SheetFieldType.OutputText:
+					case SheetFieldType.StaticText:
+						SheetPrinting.drawFieldText(field,sheet,g,null);
+						break;
+					case SheetFieldType.CheckBox:
+						SheetPrinting.drawFieldCheckBox(field,g,null);
+						break;
+					case SheetFieldType.ComboBox:
+						SheetPrinting.drawFieldComboBox(field,sheet,g,null);
+						break;
+					case SheetFieldType.ScreenChart:
+						SheetPrinting.drawFieldScreenChart(field,sheet,g,null);
+						break;
+					case SheetFieldType.SigBox:
+						SheetPrinting.drawFieldSigBox(field,sheet,g,null);
+						break;
+					default:
+						//Parameter or possibly new field type.
+						break;
+				}
+			}//end foreach SheetField
+			SheetPrinting.drawHeader(sheet,g,null);
+			SheetPrinting.drawFooter(sheet,g,null);
+			g.Dispose();
+			g=null;
 		}
 
 		private void checkErase_Click(object sender,EventArgs e) {
