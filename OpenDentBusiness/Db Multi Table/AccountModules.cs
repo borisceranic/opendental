@@ -560,7 +560,28 @@ namespace OpenDentBusiness {
 				account.Tables.Add(GetMisc(fam,guarantor.PatNum,payPlanDue,balanceForward));
 				retVal.Merge(account);//This works for the purposes we need it for.  Sheets framework auto-splits entries by patnum.
 			}
+			//Sort rows in table by cloning table, sorting rows, then re-adding table to DataSet.
+			List<DataRow> listRows=retVal.Tables["account"].Rows.Cast<DataRow>().ToList();
+			listRows.Sort(RowComparer);
+			DataTable accountSorted=retVal.Tables["account"].Clone();//Easy way to copy the columns.
+			listRows.ForEach(x=>accountSorted.Rows.Add(x.ItemArray));
+			retVal.Tables.Remove(retVal.Tables["account"]);
+			retVal.Tables.Add(accountSorted);
 			return retVal;
+		}
+
+		///<summary>Sort method for sorting superfamily datatables by PatNum then by DateTime.</summary>
+		public static int RowComparer(DataRow x,DataRow y) {
+			//1) Sort by PatNum
+			long xPatNum=PIn.Long(x["PatNum"].ToString());
+			long yPatNum=PIn.Long(y["PatNum"].ToString());
+			if(xPatNum!=yPatNum) {
+				return xPatNum.CompareTo(yPatNum);
+			}
+			//2) Sort by DateTime
+			DateTime xDateTime=PIn.DateT(x["DateTime"].ToString());
+			DateTime yDateTime=PIn.DateT(y["DateTime"].ToString());
+			return xDateTime.CompareTo(yDateTime);
 		}
 
 		///<summary>Also gets the patient table, which has one row for each family member. Also currently runs aging.  Also gets payplan table.  
