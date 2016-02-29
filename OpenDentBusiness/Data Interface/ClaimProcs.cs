@@ -219,16 +219,6 @@ namespace OpenDentBusiness{
 				if(claimProc.ClaimNum!=0) {
 					writeOff+=claimProc.WriteOff;
 				}
-				else {
-					if(claimProc.WriteOffEstOverride==-1) {
-						if(claimProc.WriteOffEst != -1) {//Make sure that WriteOffEst is set if we're trying to use it.
-							writeOff+=claimProc.WriteOffEst;
-						}
-					}
-					else {
-						writeOff+=claimProc.WriteOffEstOverride;
-					}
-				}
 			}
 			return Math.Round(proc.ProcFee*Math.Max(1,proc.BaseUnits+proc.UnitQty)-capWriteoff-insPayAmt-insPayEst-writeOff,2);
 		}
