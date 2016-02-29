@@ -329,9 +329,10 @@ namespace OpenDentBusiness {
 			//INS10: Nowhere to store this information.  If Handicapped Dependent, then the information was already given to us in INS02.
 			//INS11: All dates are always D8 format.
 			member.Pat.DateTimeDeceased=X12Parse.ToDate(member.MemberLevelDetail.DateOfDeath);//INS12:
-			member.IsReleaseInfo=false;//INS13:
-			if(member.MemberLevelDetail.ConfidentialityCode=="U") {
-				member.IsReleaseInfo=true;
+			//INS13: Confidentiality Code.  Situational.
+			member.IsReleaseInfo=true;
+			if(member.MemberLevelDetail.ConfidentialityCode=="R") {
+				member.IsReleaseInfo=false;//Only restricted if specified as such.  Otherwise assume unrestricted.
 			}
 			//INS14: Not used.
 			//INS15: Not used.

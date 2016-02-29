@@ -149,6 +149,7 @@ namespace OpenDental{
 			// 
 			// labelProgress
 			// 
+			this.labelProgress.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.labelProgress.Location = new System.Drawing.Point(12, 662);
 			this.labelProgress.Name = "labelProgress";
 			this.labelProgress.Size = new System.Drawing.Size(788, 20);
