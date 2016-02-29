@@ -203,10 +203,10 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please input a valid date.");
 				return;
 			}
-			//if(String.IsNullOrWhiteSpace(textCarrier.Text)) {
-			//	MsgBox.Show(this,"Carrier can not be blank. Please input a value for carrier.");
-			//	return;
-			//}
+			if(String.IsNullOrWhiteSpace(textCarrier.Text)) {
+				MsgBox.Show(this,"Carrier can not be blank. Please input a value for carrier.");
+				return;
+			}
 			Font font=new Font("Tahoma",9);
 			Font fontTitle=new Font("Tahoma",17,FontStyle.Bold);
 			Font fontSubTitle=new Font("Tahoma",10,FontStyle.Bold);

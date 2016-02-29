@@ -35,25 +35,6 @@ namespace OpenDental {
 		private static MedLab _medLab;
 		///<summary>Used when printing statements that use the Statements use Sheets feature.  Pdf printing does not use this variable.</summary>
 		private static DataSet _dataSet;
-		private static Graphics _g;
-
-		public static Graphics G {
-			get {
-				if(_g!=null) {
-					return _g;
-				}
-				else {
-					return _g;
-				}
-			}
-			set {
-				_g=value;
-			}
-		}
-
-		public static Graphics GetGraphics() {
-			return _g;
-		}
 
 		///<summary>The treatment finder needs to be able to clear out the pages printed variable before it prints a batch.</summary>
 		public static int PagesPrinted {
@@ -293,17 +274,8 @@ namespace OpenDental {
 		///<summary>This gets called for every page to be printed when sending to a printer.  Will stop printing when e.HasMorePages==false.  See also CreatePdfPage.</summary>
 		private static void pd_PrintPage(object sender,System.Drawing.Printing.PrintPageEventArgs e) {
 			Graphics g=e.Graphics;
-			_g=e.Graphics;
-			//Image bm=new Bitmap(850,1110);
-
-			//bm.SetResolution(96,96);
-			//Graphics g=Graphics.FromImage(bm);
-			//g.VisibleClipBounds=new Rectangle(0,0,850,1100);
 			g.SmoothingMode=SmoothingMode.HighQuality;
 			g.InterpolationMode=InterpolationMode.HighQualityBicubic;//Necessary for very large images that need to be scaled down.
-			//g=Graphics.FromImage(new Bitmap(850,1100));
-			//g.SmoothingMode=SmoothingMode.HighQuality;
-			//g.InterpolationMode=InterpolationMode.HighQualityBicubic;//Necessary for very large images that need to be scaled down.
 			Sheet sheet=_sheetList[_sheetsPrinted];
 			Sheets.SetPageMargin(sheet,_printMargin);
 			//Begin drawing.
@@ -391,7 +363,7 @@ namespace OpenDental {
 			#endregion
 		}
 
-		public static bool fieldOnCurPageHelper(SheetField field,Sheet sheet,Margins _printMargin,int _yPosPrint) {
+		private static bool fieldOnCurPageHelper(SheetField field,Sheet sheet,Margins _printMargin,int _yPosPrint) {
 			//Even though _printMargins and _yPosPrint are available in this context they are passed in so for future compatibility with webforms.
 			if(field.YPos>(_yPosPrint+sheet.HeightPage)){
 				return false;//field is entirely on one of the next pages.
@@ -1577,7 +1549,7 @@ namespace OpenDental {
 			return new Bitmap(field.Width,field.Height);
 		}
 
-		public static void drawHeader(Sheet sheet,Graphics g,XGraphics gx) {
+		private static void drawHeader(Sheet sheet,Graphics g,XGraphics gx) {
 			if(_pagesPrinted==0) {
 				return;//Never draw header on first page
 			}
@@ -1593,7 +1565,7 @@ namespace OpenDental {
 			}
 		}
 
-		public static void drawFooter(Sheet sheet,Graphics g,XGraphics gx) {
+		private static void drawFooter(Sheet sheet,Graphics g,XGraphics gx) {
 			if(Sheets.CalculatePageCount(sheet,_printMargin)==1 && sheet.SheetType!=SheetTypeEnum.MedLabResults) {
 				return;//Never draw footers on single page sheets.
 			}
