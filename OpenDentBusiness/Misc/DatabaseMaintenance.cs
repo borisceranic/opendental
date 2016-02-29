@@ -14,7 +14,7 @@ namespace OpenDentBusiness {
 		private static string command;
 		private static bool success=false;
 		///<summary>List of tables and columns to remove null characters from.
-		///Loop through this list two items at a time because it is designed to have a table first whis is then followed by a relative column.</summary>
+		///Loop through this list two items at a time because it is designed to have a table first which is then followed by a relative column.</summary>
 		private static List<string> _listTableAndColumns=new List<string>() {
 				//Table					//Column
 				"adjustment",   "AdjNote",
@@ -5896,27 +5896,6 @@ HAVING cnt>1";
 				}
 			}
 			return "";
-		}
-
-		///<summary>Gets the names of tables in InnoDB format, comma delimited (excluding the 'phone' table).  Returns empty string if none.</summary>
-		public static string GetInnodbTableNames() {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetString(MethodBase.GetCurrentMethod());
-			}
-			//Using COUNT(*) with INFORMATION_SCHEMA is buggy.  It can return "1" even if no results.
-			string command="SELECT TABLE_NAME FROM INFORMATION_SCHEMA.tables "
-				+"WHERE TABLE_SCHEMA='"+POut.String(DataConnection.GetDatabaseName())+"' "
-				+"AND TABLE_NAME!='phone' "//this table is used internally at OD HQ, and is always innodb.
-				+"AND ENGINE NOT LIKE 'MyISAM'";
-			DataTable table=Db.GetTable(command);
-			string tableNames="";
-			for(int i=0;i<table.Rows.Count;i++) {
-				if(tableNames!="") {
-					tableNames+=",";
-				}
-				tableNames+=PIn.String(table.Rows[i][0].ToString());
-			}
-			return tableNames;
 		}
 
 		///<summary>Gets the number of tables in MyISAM format.</summary>

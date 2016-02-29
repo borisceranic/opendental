@@ -135,7 +135,7 @@ namespace OpenDental{
 			}
 			//If MyISAM and InnoDb mix, then try to fix
 			if(DataConnection.DBtype==DatabaseType.MySql) {//not for Oracle
-				string namesInnodb=DatabaseMaintenance.GetInnodbTableNames();//Or possibly some other format.
+				string namesInnodb=InnoDb.GetInnodbTableNames();//Or possibly some other format.
 				int numMyisam=DatabaseMaintenance.GetMyisamTableCount();
 				if(namesInnodb!="" && numMyisam>0) {
 					if(!isSilent) {

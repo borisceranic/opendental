@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using System.Windows.Forms;
+using System.Reflection;
 
 namespace OpenDentBusiness {
 	public class InnoDb {
@@ -33,6 +34,27 @@ namespace OpenDentBusiness {
 			retval+=Lans.g("FormInnoDb","Number of InnoDB tables: ");
 			retval+=Lans.g("FormInnoDb",results.Rows[0]["innodb"].ToString())+"\r\n";
 			return retval;
+		}
+
+		///<summary>Gets the names of tables in InnoDB format, comma delimited (excluding the 'phone' table).  Returns empty string if none.</summary>
+		public static string GetInnodbTableNames() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod());
+			}
+			//Using COUNT(*) with INFORMATION_SCHEMA is buggy.  It can return "1" even if no results.
+			string command="SELECT TABLE_NAME FROM INFORMATION_SCHEMA.tables "
+				+"WHERE TABLE_SCHEMA='"+POut.String(DataConnection.GetDatabaseName())+"' "
+				+"AND TABLE_NAME!='phone' "//this table is used internally at OD HQ, and is always innodb.
+				+"AND ENGINE NOT LIKE 'MyISAM'";
+			DataTable table=Db.GetTable(command);
+			string tableNames="";
+			for(int i=0;i<table.Rows.Count;i++) {
+				if(tableNames!="") {
+					tableNames+=",";
+				}
+				tableNames+=PIn.String(table.Rows[i][0].ToString());
+			}
+			return tableNames;
 		}
 
 		///<summary>The only allowed parameters are "InnoDB" or "MyISAM".  Converts tables to toEngine type and returns the number of tables converted.</summary>
