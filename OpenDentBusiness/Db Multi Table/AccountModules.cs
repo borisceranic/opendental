@@ -389,20 +389,16 @@ namespace OpenDentBusiness {
 				rows.Add(row);
 			}
 			//emailmessage---------------------------------------------------------------------------------------
-			//For privacy reasons, only show email messages for which the recipient or the From address is not a user inbox.
+			//Get all emails for the entire family.
+			//If a user creates an email that is attached to a patient, it will show up here for everyone.
 			command="SELECT p2.FName,emailmessage.MsgDateTime,emailmessage.SentOrReceived,emailmessage.Subject,emailmessage.EmailMessageNum, "
 				+"emailmessage.PatNum,emailmessage.RecipientAddress "
 				+"FROM emailmessage "
-				+"INNER JOIN patient p1 ON emailmessage.PatNum=p1.PatNum "
+				+"INNER JOIN patient p1 ON p1.PatNum="+POut.Long(patNum)+" "
 				+"INNER JOIN patient p2 ON p1.Guarantor=p2.Guarantor "
-				+"LEFT JOIN emailaddress ON emailaddress.UserNum != 0 "//For a user's personal inbox.
-				//Recipient address is already scrubbed, so we do not need to do a LIKE %string% comparison.
-				+"AND (emailmessage.RecipientAddress=emailaddress.EmailUsername "
-					//FromAddress could contain a bunch of extra characters, so we do a LIKE %string% comparison.
-					+"OR emailmessage.FromAddress LIKE CONCAT(CONCAT('%', emailaddress.EmailUsername),'%')) " 
-				+"WHERE emailmessage.PatNum="+POut.Long(patNum)+" "
-				+"AND emailaddress.EmailUsername IS NULL "//Ignore email messages for user inboxes.
-				+"AND emailmessage.SentOrReceived NOT IN (12,13) "//Do not show Direct message acknowledgements.
+					+"AND emailmessage.PatNum=p2.PatNum "
+				+"WHERE emailmessage.SentOrReceived NOT IN ("+POut.Int((int)EmailSentOrReceived.AckDirectProcessed)+","
+					+POut.Int((int)EmailSentOrReceived.AckDirectNotSent)+") "//Do not show Direct message acknowledgements.
 				+"ORDER BY MsgDateTime";
 			DataTable rawEmail=dcon.GetTable(command);
 			string txt;
