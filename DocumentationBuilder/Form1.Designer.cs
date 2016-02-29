@@ -45,7 +45,7 @@ namespace DocumentationBuilder {
 			// butBuild
 			// 
 			this.butBuild.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butBuild.Location = new System.Drawing.Point(477, 279);
+			this.butBuild.Location = new System.Drawing.Point(476, 264);
 			this.butBuild.Name = "butBuild";
 			this.butBuild.Size = new System.Drawing.Size(75, 24);
 			this.butBuild.TabIndex = 1;
@@ -73,7 +73,7 @@ namespace DocumentationBuilder {
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(23, 224);
+			this.label4.Location = new System.Drawing.Point(23, 222);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(558, 41);
 			this.label4.TabIndex = 4;
@@ -81,7 +81,7 @@ namespace DocumentationBuilder {
 			// 
 			// label6
 			// 
-			this.label6.Location = new System.Drawing.Point(23, 194);
+			this.label6.Location = new System.Drawing.Point(23, 192);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(140, 19);
 			this.label6.TabIndex = 6;
@@ -89,7 +89,7 @@ namespace DocumentationBuilder {
 			// 
 			// textVersion
 			// 
-			this.textVersion.Location = new System.Drawing.Point(160, 191);
+			this.textVersion.Location = new System.Drawing.Point(160, 189);
 			this.textVersion.Name = "textVersion";
 			this.textVersion.Size = new System.Drawing.Size(59, 20);
 			this.textVersion.TabIndex = 7;
@@ -106,7 +106,7 @@ namespace DocumentationBuilder {
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(612, 332);
+			this.ClientSize = new System.Drawing.Size(612, 314);
 			this.Controls.Add(this.textConnStr);
 			this.Controls.Add(this.textVersion);
 			this.Controls.Add(this.label6);
