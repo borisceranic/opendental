@@ -167,7 +167,7 @@ namespace OpenDental{
 			this.butInsertTemplate.Size = new System.Drawing.Size(74, 26);
 			this.butInsertTemplate.TabIndex = 2;
 			this.butInsertTemplate.Text = "Insert";
-			this.butInsertTemplate.Click += new System.EventHandler(this.butInsertTemmplate_Click);
+			this.butInsertTemplate.Click += new System.EventHandler(this.butInsertTemplate_Click);
 			// 
 			// butDeleteTemplate
 			// 
@@ -623,7 +623,7 @@ namespace OpenDental{
 			FillTemplates();
 		}
 
-		private void butInsertTemmplate_Click(object sender, System.EventArgs e) {
+		private void butInsertTemplate_Click(object sender, System.EventArgs e) {
 			if(listTemplates.SelectedIndex==-1){
 				MessageBox.Show(Lan.g(this,"Please select an item first."));
 				return;
@@ -636,6 +636,7 @@ namespace OpenDental{
 			}
 			EmailTemplate[] arrayEmailTemplates=EmailTemplates.List;
 			List<EmailAttach> listAttachments=EmailAttaches.GetForTemplate(arrayEmailTemplates[listTemplates.SelectedIndex].EmailTemplateNum);
+			listAttachments.ForEach(x => x.EmailTemplateNum=0); //Unattach the emailattachments from the email template.
 			emailPreview.LoadTemplate(arrayEmailTemplates[listTemplates.SelectedIndex].Subject,
 				arrayEmailTemplates[listTemplates.SelectedIndex].BodyText,listAttachments);
 		}
