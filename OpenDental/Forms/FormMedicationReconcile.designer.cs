@@ -249,7 +249,7 @@ namespace OpenDental{
 			this.Name = "FormMedicationReconcile";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Medication Reconcile";
-			this.Load += new System.EventHandler(this.BasicTemplate_Load);
+			this.Load += new System.EventHandler(this.FormMedicationReconcile_Load);
 			this.Resize += new System.EventHandler(this.FormMedicationReconcile_Resize);
 			((System.ComponentModel.ISupportInitialize)(this.pictBox)).EndInit();
 			this.splitContainer1.Panel1.ResumeLayout(false);

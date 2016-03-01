@@ -20,7 +20,7 @@ namespace OpenDental {
 			Lan.F(this);
 		}
 
-		private void BasicTemplate_Load(object sender,EventArgs e) {
+		private void FormMedicationReconcile_Load(object sender,EventArgs e) {
 			FillMeds();
 			FillReconcilesGrid();
 		}
