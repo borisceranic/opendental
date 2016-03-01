@@ -122,6 +122,7 @@ namespace OpenDental {
 		///<summary></summary>
 		public ODtextBox() {
 			//We have to try catch this just in case an ODTextBox is shown before upgrading to a version that already has this preference.
+			//This check also happens multiple times on FormOpenDental load before connected to a database, and the exception is caught here.
 			try {
 				if(System.ComponentModel.LicenseManager.UsageMode == System.ComponentModel.LicenseUsageMode.Designtime || this.DesignMode) {
 					isImeComposition=false;
