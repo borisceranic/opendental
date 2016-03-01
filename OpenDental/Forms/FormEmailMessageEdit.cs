@@ -636,6 +636,7 @@ namespace OpenDental{
 			}
 			EmailTemplate[] arrayEmailTemplates=EmailTemplates.List;
 			List<EmailAttach> listAttachments=EmailAttaches.GetForTemplate(arrayEmailTemplates[listTemplates.SelectedIndex].EmailTemplateNum);
+			listAttachments.ForEach(x => x.EmailTemplateNum=0); //Unattach the emailattachments from the email template.
 			emailPreview.LoadTemplate(arrayEmailTemplates[listTemplates.SelectedIndex].Subject,
 				arrayEmailTemplates[listTemplates.SelectedIndex].BodyText,listAttachments);
 		}

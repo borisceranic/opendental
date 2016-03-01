@@ -2379,6 +2379,27 @@ namespace OpenDentBusiness {
 		}
 
 		[DbmMethod]
+		public static string EmailAttachWithTemplateNumAndMessageNum(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log = "";
+			if(isCheck) {
+				command="SELECT COUNT(*) FROM emailattach WHERE emailattach.EmailTemplateNum!=0 AND emailattach.EmailMessageNum!=0";
+				int numFound = PIn.Int(Db.GetCount(command));
+				if(numFound>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Email attachments attached to both an email and a template found")+": "+numFound.ToString()+"\r\n";
+				}
+			}
+			else {
+				command="UPDATE emailattach SET EmailTemplateNum=0 WHERE emailattach.EmailTemplateNum!=0 AND emailattach.EmailMessageNum!=0";
+				long numFixed = Db.NonQ(command);
+				log+=Lans.g("FormDatabaseMaintenance","Email attachments attached to both an email and a template fixed")+": "+numFixed.ToString()+"\r\n";
+			}
+			return log;
+		}
+
+		[DbmMethod]
 		public static string FeeDeleteDuplicates(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
