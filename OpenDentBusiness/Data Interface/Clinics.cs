@@ -50,13 +50,16 @@ namespace OpenDentBusiness{
 			List<Clinic> listClinics = Clinics.GetForUserod(Security.CurUser);
 			switch(PrefC.GetString(PrefName.ClinicTrackLast)) {
 				case "Workstation":
-					if(listClinics.Any(x=>x.ClinicNum==ComputerPrefs.LocalComputer.ClinicNum)) {//user is restricted and does not have access to the computerpref clinic
-						_clinicNum=ComputerPrefs.LocalComputer.ClinicNum;
+					if(listClinics.Any(x => x.ClinicNum==ComputerPrefs.LocalComputer.ClinicNum)) {//user is restricted and does not have access to the computerpref clinic
+						_clinicNum=ComputerPrefs.LocalComputer.ClinicNum;//last used clinic on workstation
 					}
-					else if(Security.CurUser.ClinicIsRestricted && listClinics.Count>0){
-						_clinicNum=listClinics[0].ClinicNum;
+					else if(Security.CurUser.ClinicIsRestricted && listClinics.Any(x => x.ClinicNum==Security.CurUser.ClinicNum)) {
+						_clinicNum=Security.CurUser.ClinicNum;//default clinic num if not available
 					}
-					return;
+					else if(listClinics.Count>0) {
+						_clinicNum=listClinics[0].ClinicNum;//first clinic if default not available
+					}
+					return;//Error
 				case "User":
 					List<UserOdPref> prefs = UserOdPrefs.GetByUserAndFkeyType(Security.CurUser.UserNum,UserOdFkeyType.ClinicLast);//should only be one or none.
 					if(prefs.Count==0) {
@@ -64,7 +67,7 @@ namespace OpenDentBusiness{
 							new UserOdPref() {
 								UserNum=Security.CurUser.UserNum,
 								FkeyType=UserOdFkeyType.ClinicLast,
-								Fkey=Security.CurUser.ClinicNum,
+								Fkey=Security.CurUser.ClinicNum,//default clinic num
 							};
 						UserOdPrefs.Insert(pref);
 						prefs.Add(pref);
