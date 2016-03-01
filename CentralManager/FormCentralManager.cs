@@ -31,21 +31,16 @@ namespace CentralManager {
 		}
 
 		private void FormCentralManager_Load(object sender,EventArgs e) {
-			if(!GetConfigAndConnect()){
+			if(!GetConfigAndConnect()) {
 				return;
 			}
 			Cache.Refresh(InvalidType.Prefs);
 			Version storedVersion=new Version(PrefC.GetString(PrefName.ProgramVersion));
 			Version currentVersion=Assembly.GetAssembly(typeof(Db)).GetName().Version;
-			if(storedVersion.CompareTo(currentVersion)!=0){
+			if(storedVersion.CompareTo(currentVersion)!=0) {
 				MessageBox.Show(Lan.g(this,"Program version")+": "+currentVersion.ToString()+"\r\n"
 					+Lan.g(this,"Database version")+": "+storedVersion.ToString()+"\r\n"
 					+Lan.g(this,"Versions must match.  Please manually connect to the database through the main program in order to update the version."));
-				Application.Exit();
-				return;
-			}
-			FormCentralLogOn FormCLO=new FormCentralLogOn();
-			if(FormCLO.ShowDialog()!=DialogResult.OK) {
 				Application.Exit();
 				return;
 			}
@@ -75,9 +70,9 @@ namespace CentralManager {
 		}
 
 		///<summary>Gets the settings from the config file and attempts to connect.</summary>
-		private bool GetConfigAndConnect(){
+		private bool GetConfigAndConnect() {
 			string xmlPath=Path.Combine(Application.StartupPath,"CentralManagerConfig.xml");
-			if(!File.Exists(xmlPath)){
+			if(!File.Exists(xmlPath)) {
 				MessageBox.Show("Please create CentralManagerConfig.xml according to the manual before using this tool.");
 				Application.Exit();
 				return false;
@@ -87,7 +82,8 @@ namespace CentralManager {
 			string database="";
 			string user="";
 			string password="";
-			try{
+			string middleTier="";
+			try {
 				document.Load(xmlPath);
 				XPathNavigator Navigator=document.CreateNavigator();
 				XPathNavigator nav;
@@ -103,6 +99,7 @@ namespace CentralManager {
 				database=nav.SelectSingleNode("Database").Value;
 				user=nav.SelectSingleNode("User").Value;
 				password=nav.SelectSingleNode("Password").Value;
+				middleTier=nav.SelectSingleNode("MiddleTierAddr").Value;
 			}
 			catch(Exception ex) {
 				//Common error: root element is missing
@@ -113,17 +110,32 @@ namespace CentralManager {
 			DataConnection.DBtype=DatabaseType.MySql;
 			OpenDentBusiness.DataConnection dcon=new OpenDentBusiness.DataConnection();
 			//Try to connect to the database directly
-			try {
-				dcon.SetDb(computerName,database,user,password,"","",DataConnection.DBtype);
-				RemotingClient.RemotingRole=RemotingRole.ClientDirect;
-				Cache.RefreshCache(((int)InvalidType.AllLocal).ToString());
-				return true;
+			if(middleTier!="") {
+				FormCentralChooseDatabase FormCCD=new FormCentralChooseDatabase(middleTier);
+				if(FormCCD.ShowDialog()==DialogResult.Cancel) {
+					Application.Exit();
+					return false;
+				}
 			}
-			catch(Exception ex){
-				MessageBox.Show(ex.Message);
-				Application.Exit();
-				return false;
+			else { 
+				try {
+					dcon.SetDb(computerName,database,user,password,"","",DataConnection.DBtype);
+					RemotingClient.RemotingRole=RemotingRole.ClientDirect;
+					Cache.RefreshCache(((int)InvalidType.AllLocal).ToString());
+					FormCentralLogOn FormCLO=new FormCentralLogOn();
+					if(FormCLO.ShowDialog()!=DialogResult.OK) {
+						Application.Exit();
+						return false;
+					}
+					return true;
+				}
+				catch(Exception ex) {
+					MessageBox.Show(ex.Message);
+					Application.Exit();
+					return false;
+				}
 			}
+			return true;
 		}
 
 		private void FillGrid() {
@@ -131,7 +143,7 @@ namespace CentralManager {
 		}
 
 		///<summary>connNums is a list of CentralConnectionNums which is used primarily for filtering out connections through the Refresh button press.</summary>
-		private void FillGrid(List<long> connNums){
+		private void FillGrid(List<long> connNums) {
 			List<CentralConnection> listConnsFiltered=null;
 			if(comboConnectionGroups.SelectedIndex>0) {
 				listConnsFiltered=CentralConnections.FilterConnections(_listConns,textConnSearch.Text,_listConnectionGroups[comboConnectionGroups.SelectedIndex-1]);
@@ -284,7 +296,6 @@ namespace CentralManager {
 				FormCUS.ListConns.Add((CentralConnection)gridMain.Rows[gridMain.SelectedIndices[i]].Tag);
 			}
 			FormCUS.ShowDialog();
-			GetConfigAndConnect();
 		}
 
 		#endregion
@@ -304,7 +315,6 @@ namespace CentralManager {
 			FormCPI.ConnList=listSelectedConn;
 			FormCPI.EncryptionKey=EncryptionKey;
 			FormCPI.ShowDialog();
-			GetConfigAndConnect();//Set the connection settings back to the central manager db.
 		}
 
 		#endregion

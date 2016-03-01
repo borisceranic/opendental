@@ -65,6 +65,7 @@ namespace OpenDentBusiness{
 		public static void Sync(List<CentralConnection> listNew) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew);
+				return;
       }
       List<CentralConnection> listDB=CentralConnections.GetConnections();
       Crud.CentralConnectionCrud.Sync(listNew,listDB);

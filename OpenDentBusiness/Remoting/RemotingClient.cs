@@ -15,8 +15,10 @@ using CodeBase;
 namespace OpenDentBusiness {
 	public class RemotingClient {
 		///<summary>This dll will be in one of these three roles.  There can be a dll on the client and a dll on the server, both involved in the logic.  This keeps track of which one is which.</summary>
+		[ThreadStatic]
 		public static RemotingRole RemotingRole;
 		///<summary>If ClientWeb, then this is the URL to the server.</summary>
+		[ThreadStatic]
 		public static string ServerURI;
 		///<summary>If ClientWeb (middle tier user), proxy settings can be picked up from MiddleTierProxyConfig.xml.</summary>
 		public static string MidTierProxyAddress;

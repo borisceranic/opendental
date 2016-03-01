@@ -149,6 +149,9 @@
     <Compile Include="FormCentralLogOn.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="FormCentralChooseDatabase.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="FormCentralConnectionGroupEdit.resx">
@@ -201,6 +204,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormCentralLogOn.resx">
       <DependentUpon>FormCentralLogOn.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormCentralChooseDatabase.resx">
+      <DependentUpon>FormCentralChooseDatabase.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
