@@ -13346,6 +13346,34 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '16.1.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To16_1_6();
+		}
+
+		private static void To16_1_6() {
+			if(FromVersion<new Version("16.1.6.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.6.0"));//No translation in convert script.
+				string command = "";
+				//Value for this pref should not be included in the convert script
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference (PrefName,ValueString) VALUES('JobManagerDefaultEmail','')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference (PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'JobManagerDefaultEmail','')";
+					Db.NonQ(command);
+				}
+				//Value for this pref should not be included in the convert script
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference (PrefName,ValueString) VALUES('JobManagerDefaultBillingMsg','')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference (PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'JobManagerDefaultBillingMsg','')";
+					Db.NonQ(command);
+				}
+				command="UPDATE preference SET ValueString='16.1.6.0' WHERE PrefName='DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To16_2_0();
 		}
 

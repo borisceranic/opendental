@@ -273,6 +273,9 @@ namespace OpenDentBusiness {
 					if(JobPermissions.IsAuthorized(JobPerm.Documentation,true,user.UserNum)) {
 						return baseAction;
 					}
+					if(JobPermissions.IsAuthorized(JobPerm.NotifyCustomer,true,user.UserNum) && (UserNumCustContact==0 || UserNumCustContact==user.UserNum) && DateTimeCustContact.Year<1880) {
+						return JobAction.ContactCustomerPreDoc;
+					}
 					return JobAction.Undefined;
 				case JobAction.ContactCustomer:
 					if(JobPermissions.IsAuthorized(JobPerm.NotifyCustomer,true,user.UserNum) && (UserNumCustContact==0 || UserNumCustContact==user.UserNum)) {
@@ -338,6 +341,8 @@ namespace OpenDentBusiness {
 		WaitForApproval,
 		[Description("Wait for Review")]
 		WaitForReview,
+		[Description("Contact Customer Pre-Documentation")]
+		ContactCustomerPreDoc,
 		[Description("Contact Customer")]
 		ContactCustomer,
 		[Description("None")]
@@ -386,7 +391,9 @@ namespace OpenDentBusiness {
 		///<summary>3 -</summary>
 		Query,
 		///<summary>4 -</summary>
-		ProgramBridge
+		ProgramBridge,
+		///<summary>5 -</summary>
+		InternalRequest
 	}
 
 }

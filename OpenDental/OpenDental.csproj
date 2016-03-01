@@ -408,6 +408,12 @@
     <Compile Include="Forms Reports\FormRpBrokenAppointments.Designer.cs">
       <DependentUpon>FormRpBrokenAppointments.cs</DependentUpon>
     </Compile>
+    <Compile Include="InternalTools\Job Manager\FormEmailJobTemplateEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="InternalTools\Job Manager\FormEmailJobTemplateEdit.designer.cs">
+      <DependentUpon>FormEmailJobTemplateEdit.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormCdsTriggerEdit.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -419,6 +425,9 @@
     </Compile>
     <Compile Include="Forms\FormCdsTriggers.designer.cs">
       <DependentUpon>FormCdsTriggers.cs</DependentUpon>
+    </Compile>
+    <Compile Include="InternalTools\Job Manager\FormEmailJobs.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\FormPodiumSetup.cs">
       <SubType>Form</SubType>
@@ -4034,11 +4043,18 @@
     <EmbeddedResource Include="Forms Reports\FormRpBrokenAppointments.resx">
       <DependentUpon>FormRpBrokenAppointments.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="InternalTools\Job Manager\FormEmailJobTemplateEdit.resx">
+      <DependentUpon>FormEmailJobTemplateEdit.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormCdsTriggerEdit.resx">
       <DependentUpon>FormCdsTriggerEdit.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormCdsTriggers.resx">
       <DependentUpon>FormCdsTriggers.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InternalTools\Job Manager\FormEmailJobs.resx">
+      <DependentUpon>FormEmailJobs.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormPodiumSetup.resx">
       <DependentUpon>FormPodiumSetup.cs</DependentUpon>

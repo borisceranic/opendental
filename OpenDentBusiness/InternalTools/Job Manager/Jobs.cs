@@ -157,6 +157,89 @@ namespace OpenDentBusiness {
 			} 
 			return false;//no loop detected
 		}
+
+		public static List<JobEmail> GetCustomerEmails(Job job) {
+			Dictionary<long,JobEmail> retVal = new Dictionary<long,JobEmail>();
+			foreach(JobQuote jobQuote in job.ListJobQuotes) {
+				long patNum = jobQuote.PatNum;
+				if(!retVal.ContainsKey(patNum)) {
+					Patient pat = Patients.GetPat(patNum);
+					if(pat==null) {
+						continue;
+					}
+					string phones = "Hm:"+pat.HmPhone+"\r\nMo:"+pat.WirelessPhone+"\r\nWk:"+pat.WkPhone;
+					retVal[patNum]=new JobEmail() { Pat=pat,EmailAddress=pat.Email,PhoneNums=phones,IsSend=false };
+				}
+				retVal[patNum].IsQuote=true;
+			}
+			foreach(JobLink jobLink in job.ListJobLinks.FindAll(x => x.LinkType==JobLinkType.Task)) {
+				Task task = Tasks.GetOne(jobLink.FKey);
+				if(task==null || task.KeyNum==0 || task.ObjectType!=TaskObjectType.Patient) {
+					continue;
+				}
+				long patNum = task.KeyNum;
+				if(!retVal.ContainsKey(patNum)) {
+					Patient pat = Patients.GetPat(patNum);
+					if(pat==null) {
+						continue;
+					}
+					string phones = "Hm:"+pat.HmPhone+"\r\nMo:"+pat.WirelessPhone+"\r\nWk:"+pat.WkPhone;
+					retVal[patNum]=new JobEmail() { Pat=pat,EmailAddress=pat.Email,PhoneNums=phones,IsSend=true };
+				}
+				retVal[patNum].IsTask=true;
+			}
+			foreach(JobLink jobLink in job.ListJobLinks.FindAll(x => x.LinkType==JobLinkType.Request)) {
+				DataTable tableFR = GetFeatureRequestContact(jobLink.FKey);
+				foreach(DataRow row in tableFR.Rows) {
+					long patNum = PIn.Long(row["ODPatNum"].ToString());
+					Patient pat = Patients.GetPat(patNum);
+					if(!retVal.ContainsKey(patNum)) {
+						string phones = "Hm:"+row["HmPhone"].ToString()+"\r\nMo:"+row["WirelessPhone"].ToString()+"\r\nWk:"+row["WkPhone"].ToString();
+						retVal[patNum]=new JobEmail() { Pat=pat,EmailAddress=row["Email"].ToString(),PhoneNums=phones,IsSend=true };
+					}
+					retVal[patNum].IsFeatureReq=true;
+					retVal[patNum].Votes+=PIn.Int(row["Votes"].ToString());
+					retVal[patNum].PledgeAmount+=PIn.Double(row["AmountPledged_"].ToString());
+				}
+			}
+			return retVal.Select(x=>x.Value).ToList();
+		}
+
+		///<summary>This is the query that wasused prior to the job manager to lookup customer votes, pledges, and contact information for feature requests.</summary>
+		private static DataTable GetFeatureRequestContact(long featureRequestNum) {
+			string command = "SELECT A.RequestID, A.LName, A.FName, A.ODPatNum, A.BillingType, A.Email, A.HmPhone, "
+				+"A.WkPhone, A.WirelessPhone, A.Votes, A.AmountPledged AS AmountPledged_, A.DateVote "
+				+"FROM "
+				+"(SELECT 1 AS ItemOrder,	request.RequestId, p.LName,	p.FName,	p.PatNum AS 'ODPatNum',	'' AS BillingType, "
+				+"  p.Email,	p.HmPhone,	p.WkPhone,	p.WirelessPhone,	'' AS Votes,	'' AS AmountPledged,	request.DateTimeEntry AS 'DateVote' "
+				+"FROM bugs.request	INNER JOIN customers.Patient p ON p.PatNum = request.PatNum "
+				+"WHERE bugs.request.RequestId ="+POut.Long(featureRequestNum)+" "
+				+" UNION ALL "
+				+"SELECT 2 AS ItemOrder, vote.RequestID AS RequestID,	p.LName,	p.FName,	p.PatNum AS 'ODPatNum',	def.ItemName AS BillingType, "
+				+"  p.Email,	p.HmPhone,	p.WkPhone,	p.WirelessPhone,	vote.Points AS Votes,	vote.AmountPledged,	vote.DateTStamp AS 'DateVote' "
+				+"FROM bugs.vote INNER JOIN customers.Patient p ON p.PatNum = vote.PatNum INNER JOIN customers.definition def ON def.DefNum = p.BillingType "
+				+" WHERE vote.RequestId ="+POut.Long(featureRequestNum)+" "
+				+") A "
+				+"ORDER BY CAST(A.RequestID AS UNSIGNED INTEGER), A.ItemOrder";
+			return Db.GetTable(command);
+		}
+
+
+		public class JobEmail {
+			public Patient Pat;
+			public string EmailAddress;
+			public double PledgeAmount;
+			public string PhoneNums;
+			public int Votes;
+			public bool IsQuote;
+			public bool IsTask;
+			public bool IsFeatureReq;
+			public bool IsSend;
+			///<summary>UI field to display send, errors.</summary>
+			public string StatusMsg;
+		}
+
+
 	}
 }
 

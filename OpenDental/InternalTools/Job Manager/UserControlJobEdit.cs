@@ -11,9 +11,6 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental.InternalTools.Job_Manager {
-
-
-	
 	
 	public partial class UserControlJobEdit:UserControl {
 		//FIELDS
@@ -605,7 +602,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 						actionMenu.MenuItems.Add(new MenuItem("Change Request",actionMenu_RequestChangeApprovalClick) { Enabled=isExpert });//delayed save, after user can make edits.
 						bool isEngineer = JobPermissions.IsAuthorized(JobPerm.Engineer,true) && (_jobCur.UserNumEngineer==Security.CurUser.UserNum);
 						perm=(isExpert || isEngineer) && _jobCur.UserNumEngineer>0 && _jobCur.ListJobReviews.Count>0 && _jobCur.ListJobReviews.All(x => x.ReviewStatus==JobReviewStatus.Done);
-						actionMenu.MenuItems.Add(new MenuItem("Mark Implemented",actionMenu_ImplementedClick) { Enabled=perm });//not until the engineer set, and reviews completed
+						actionMenu.MenuItems.Add(new MenuItem("Mark as Implemented",actionMenu_ImplementedClick) { Enabled=perm });//not until the engineer set, and reviews completed
 					}
 					else {
 						perm=JobPermissions.IsAuthorized(JobPerm.Approval,true);
@@ -615,11 +612,14 @@ namespace OpenDental.InternalTools.Job_Manager {
 					}
 					break;
 				case JobPhase.Documentation:
-					perm=JobPermissions.IsAuthorized(JobPerm.Documentation,true) && (_jobCur.UserNumDocumenter==0 || _jobCur.UserNumDocumenter==Security.CurUser.UserNum);
+					if(JobPermissions.IsAuthorized(JobPerm.NotifyCustomer,true) && _jobCur.DateTimeCustContact.Year<1880) {
+						actionMenu.MenuItems.Add(new MenuItem("Email Attached Customers",actionMenu_EmailAttachedClick) { Enabled=true });//x
+					}
 					if(JobPermissions.IsAuthorized(JobPerm.Documentation,true)) {
 						actionMenu.MenuItems.Add(new MenuItem((_jobCur.UserNumDocumenter==0 ? "A" : "Rea")+"ssign Documenter",actionMenu_AssignDocumenterClick) { Enabled=true });//x
 					}
-					actionMenu.MenuItems.Add(new MenuItem("Mark Documented",actionMenu_DocumentedClick) { Enabled=perm });
+					perm=JobPermissions.IsAuthorized(JobPerm.Documentation,true) && (_jobCur.UserNumDocumenter==0 || _jobCur.UserNumDocumenter==Security.CurUser.UserNum);
+					actionMenu.MenuItems.Add(new MenuItem("Mark as Documented",actionMenu_DocumentedClick) { Enabled=perm });
 					break;
 				case JobPhase.Complete:
 					if(_jobCur.DateTimeCustContact.Year>1880) {
@@ -629,7 +629,8 @@ namespace OpenDental.InternalTools.Job_Manager {
 					if(JobPermissions.IsAuthorized(JobPerm.NotifyCustomer,true)) {
 						actionMenu.MenuItems.Add(new MenuItem((_jobCur.UserNumCustContact==0 ? "A" : "Rea")+"ssign Contacter",actionMenu_AssignContacterClick) { Enabled=true });//x
 					}
-					actionMenu.MenuItems.Add(new MenuItem("Mark Contacted",actionMenu_ContactClick) { Enabled=perm });
+					actionMenu.MenuItems.Add(new MenuItem("Email Attached Customers",actionMenu_EmailAttachedClick) { Enabled=perm });//x
+					actionMenu.MenuItems.Add(new MenuItem("Mark as Contacted",actionMenu_ContactClick) { Enabled=perm });
 					//Nothing to do really, except override to change something.
 					break;
 				case JobPhase.Cancelled:
@@ -655,6 +656,9 @@ namespace OpenDental.InternalTools.Job_Manager {
 			butActions.ContextMenu.Show(butActions,new Point(0,butActions.Height));
 		}
 
+		///<summary>This should not implement any permissions, this should only check that the fields of the job are valid.</summary>
+		/// <param name="_jobCur"></param>
+		/// <returns></returns>
 		private bool ValidateJob(Job _jobCur) {
 			if(string.IsNullOrWhiteSpace(_jobCur.Title)) {
 				MessageBox.Show("Invalid Title.");
@@ -663,7 +667,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 			return true;
 		}
 
-		#region ACTION BUTTON MENU ITEMS
+		#region ACTION BUTTON MENU ITEMS //====================================================
 		#region Bug Actions
 		private void actionMenu_SendWriteupClick(object sender,EventArgs e) {
 			if(!ValidateJob(_jobCur)) {
@@ -807,6 +811,10 @@ namespace OpenDental.InternalTools.Job_Manager {
 			if(!ValidateJob(_jobCur)) {
 				return;
 			}
+			if(_jobCur.Category==JobCategory.Feature && _jobCur.ListJobLinks.FindAll(x => x.LinkType==JobLinkType.Request).Count==0) {
+				MessageBox.Show("All feature requests jobs must have feature requests attached.");
+				return;
+			}
 			IsChanged=true;
 			_jobCur.UserNumConcept=Security.CurUser.UserNum;
 			_jobCur.IsApprovalNeeded=true;
@@ -814,6 +822,10 @@ namespace OpenDental.InternalTools.Job_Manager {
 		}
 
 		private void actionMenu_RequestJobApprovalClick(object sender,EventArgs e) {
+			if(_jobCur.Category==JobCategory.Feature && _jobCur.ListJobLinks.FindAll(x => x.LinkType==JobLinkType.Request).Count==0) {
+				MessageBox.Show("All feature requests jobs must have feature requests attached.");
+				return;
+			}
 			if(!ValidateJob(_jobCur)) {
 				return;
 			}
@@ -907,10 +919,38 @@ namespace OpenDental.InternalTools.Job_Manager {
 		}
 		#endregion
 
+		private void actionMenu_EmailAttachedClick(object sender,EventArgs e) {
+			FormEmailJobs FormEJ = new FormEmailJobs();
+			FormEJ.JobCur=_jobCur.Copy();
+			FormEJ.ShowDialog();
+			if(FormEJ.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			_jobCur.DateTimeCustContact=MiscData.GetNowDateTime();
+			_jobCur.UserNumCustContact=Security.CurUser.UserNum;
+			_jobOld.DateTimeCustContact=MiscData.GetNowDateTime();
+			_jobOld.UserNumCustContact=Security.CurUser.UserNum;
+			if(!IsNew) {
+				Job job = Jobs.GetOne(_jobCur.JobNum);
+				job.DateTimeCustContact=MiscData.GetNowDateTime();
+				job.UserNumCustContact=Security.CurUser.UserNum;
+				Jobs.Update(job);
+				Signalods.SetInvalid(InvalidType.Jobs,KeyType.Job,_jobCur.JobNum);
+			}
+			SaveJob(_jobCur);
+		}
 
 		private void actionMenu_ImplementedClick(object sender,EventArgs e) {
 			if(!ValidateJob(_jobCur)) {
 				return;
+			}
+			if(string.IsNullOrEmpty(_jobCur.JobVersion)) {
+				InputBox inBox = new InputBox("Version cannot be left blank.\r\ne.g. \"N/A\" or 16.1.4;15.4.30");
+				inBox.ShowDialog();
+				if(inBox.DialogResult!=DialogResult.OK || string.IsNullOrEmpty(inBox.textResult.Text)) {
+					return;
+				}
+				_jobCur.JobVersion=inBox.textResult.Text;
 			}
 			IsChanged=true;
 			_jobCur.PhaseCur=JobPhase.Documentation;
@@ -945,7 +985,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 			IsOverride=true;
 		}
 
-		#endregion
+		#endregion ACTION BUTTON MENU ITEMS //=================================================
 
 		///<summary>If returns false if selection is cancelled. DefaultUserNum is usually the currently set usernum for a given role.</summary>
 		private bool PickUserByJobPermission(string prompt, JobPerm jobPerm,out long selectedNum, long suggestedUserNum = 0,bool AllowNone = true,bool AllowAll = true) {
@@ -1118,6 +1158,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 			IsChanged=true;
 			_jobCur.ParentNum=0;
 			textParent.Text="";
+			//todoSave
 		}
 
 		private void butParentPick_Click(object sender,EventArgs e) {
@@ -1139,6 +1180,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 			IsChanged=true;
 			_jobCur.ParentNum=job.JobNum;
 			textParent.Text=job.ToString();
+			//TOdo: save
 		}
 
 		private void butSave_Click(object sender,EventArgs e) {
@@ -1697,14 +1739,14 @@ namespace OpenDental.InternalTools.Job_Manager {
 				IsChanged=true;
 			}
 			else {
-				if(FormJNE.JobNoteCur!=null) {
+				if(FormJNE.JobNoteCur==null) {
 					JobNotes.Delete(jobNote.JobNoteNum);
 				}
 				else {
 					JobNotes.Update(FormJNE.JobNoteCur);
 				}
 			}
-			_jobCur.ListJobNotes.RemoveAll(x => x.JobNoteNum==jobNote.JobNoteNum);//should remove only one
+			_jobCur.ListJobNotes.RemoveAt(e.Row);// (x => x.JobNoteNum==jobNote.JobNoteNum);//should remove only one
 			if(FormJNE.JobNoteCur!=null) {
 				_jobCur.ListJobNotes.Add(FormJNE.JobNoteCur);
 			}
