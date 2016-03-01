@@ -740,14 +740,6 @@ namespace OpenDental {
 
 		private void butAddJob_Click(object sender,EventArgs e) {
 			FormJobNew FormJN=new FormJobNew();
-			if(treeJobs.SelectedNode!=null && (treeJobs.SelectedNode.Tag is Job)) {
-				Job jobSelected=(Job)treeJobs.SelectedNode.Tag;
-				FormJN.JobCur.ParentNum=jobSelected.JobNum;
-				FormJN.JobCur.UserNumExpert=jobSelected.UserNumExpert;
-				FormJN.JobCur.Category=jobSelected.Category;
-				FormJN.JobCur.Priority=jobSelected.Priority;
-				FormJN.JobCur.IsNew=true;
-			}
 			FormJN.ShowDialog();
 			if(FormJN.DialogResult!=DialogResult.OK) {
 				return;
