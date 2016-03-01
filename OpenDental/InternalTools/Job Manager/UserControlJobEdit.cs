@@ -1684,7 +1684,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 			}
 			else {
 				Job jobFromDB = Jobs.GetOne(_jobCur.JobNum);//Get from DB to ensure freshest copy (Lists not filled)
-				int.TryParse(textEstHours.Text,out _jobCur.HoursEstimate);
+				int.TryParse(textEstHours.Text,out jobFromDB.HoursEstimate);
 				Jobs.Update(jobFromDB);//update the checkout num.
 				Signalods.SetInvalid(InvalidType.Jobs,KeyType.Job,_jobCur.JobNum);//send signal that the job has been checked out.
 			}
@@ -1701,7 +1701,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 			}
 			else {
 				Job jobFromDB = Jobs.GetOne(_jobCur.JobNum);//Get from DB to ensure freshest copy (Lists not filled)
-				int.TryParse(textActualHours.Text,out _jobCur.HoursActual);
+				int.TryParse(textActualHours.Text,out jobFromDB.HoursActual);
 				Jobs.Update(jobFromDB);//update the checkout num.
 				Signalods.SetInvalid(InvalidType.Jobs,KeyType.Job,_jobCur.JobNum);//send signal that the job has been checked out.
 			}
