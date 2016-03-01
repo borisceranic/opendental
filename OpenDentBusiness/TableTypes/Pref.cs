@@ -346,6 +346,8 @@ namespace OpenDentBusiness {
 		///We are using "Writeoff" since "PPO Discount" was only used for a brief time in 15.3 while it was Beta and no customer requested it</summary>
 		InsWriteoffDescript,
 		IntermingleFamilyDefault,
+		JobManagerDefaultEmail,
+		JobManagerDefaultBillingMsg,
 		LabelPatientDefaultSheetDefNum,
 		///<summary>Used to determine how many windows are displayed throughout the program, translation, charting, and other features. Version 15.4.1</summary>
 		LanguageAndRegion,
