@@ -174,11 +174,24 @@ namespace OpenDentBusiness {
 
 		///<summary>Returns all users that are associated to the permission passed in.  Returns empty list if no matches found.</summary>
 		public static List<Userod> GetUsersByJobRole(JobPerm jobPerm,bool showHidden) {
+			//No need to check RemotingRole; no call to db.
 			List<JobPermission> listJobRoles=JobPermissions.GetList().FindAll(x=>x.JobPermType==jobPerm);
 			if(showHidden) {
 				return UserodC.GetListt().FindAll(x=>listJobRoles.Any(y=>x.UserNum==y.UserNum));
 			}
 			return UserodC.GetListShort().FindAll(x=>listJobRoles.Any(y=>x.UserNum==y.UserNum));
+		}
+
+		///<summary>Gets all non-hidden users that have an associated provider.</summary>
+		public static List<Userod> GetUsersWithProviders() {
+			//No need to check RemotingRole; no call to db.
+			return UserodC.GetListShort().FindAll(x => x.ProvNum!=0);
+		}
+
+		///<summary>Returns all users associated to the provider passed in.  Returns empty list if no matches found.</summary>
+		public static List<Userod> GetUsersByProvNum(long provNum) {
+			//No need to check RemotingRole; no call to db.
+			return UserodC.GetListShort().FindAll(x => x.ProvNum==provNum);
 		}
 
 		///<summary>This handles situations where we have a usernum, but not a user.  And it handles usernum of zero.  Pass in a list of users to save making a deep copy of the userod cache if you are going to be calling this method repeatedly.  js Must maintain 2 overloads instead of optional parameter for my dll.</summary>

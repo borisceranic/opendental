@@ -316,7 +316,7 @@ namespace OpenDental {
 					|| emailMessage.SentOrReceived==EmailSentOrReceived.WebMailSentRead) 
 			{
 				//web mail uses special secure messaging portal
-				FormWebMailMessageEdit FormWMME=new FormWebMailMessageEdit(emailMessage.PatNum,emailMessage.EmailMessageNum);
+				FormWebMailMessageEdit FormWMME=new FormWebMailMessageEdit(emailMessage.PatNum,emailMessage);
 				//Will return Abort if validation fails on load or message was deleted, in which case do not set email as read.
 				if(FormWMME.ShowDialog() != DialogResult.Abort) {
 					EmailMessages.UpdateSentOrReceivedRead(emailMessage);//Mark the message read.
@@ -413,7 +413,7 @@ namespace OpenDental {
 						if(emailMessage.MsgDateTime != DateTime.MinValue) {
 							logText+="\r\n"+Lan.g(this,"Date")+": "+emailMessage.MsgDateTime.ToShortDateString()+". ";
 						}
-						SecurityLogs.MakeLogEntry(Permissions.WebmailDelete,emailMessage.PatNum,Lan.g(this,"Webmail deleted.")+" "+logText);
+						SecurityLogs.MakeLogEntry(Permissions.WebMailDelete,emailMessage.PatNum,Lan.g(this,"Webmail deleted.")+" "+logText);
 				}
 				else {//Not a web mail message.
 					EmailMessages.Delete(emailMessage);

@@ -7404,8 +7404,8 @@ namespace OpenDental {
 					|| msg.SentOrReceived==EmailSentOrReceived.WebMailSentRead) 
 				{
 					//web mail uses special secure messaging portal
-					FormWebMailMessageEdit FormWMME=new FormWebMailMessageEdit(PatCur.PatNum,msg.EmailMessageNum);
-					if(FormWMME.ShowDialog()==DialogResult.Cancel) {//This will cause an unneccesary refresh in the cazse of a validation error with the webmail
+					FormWebMailMessageEdit FormWMME=new FormWebMailMessageEdit(PatCur.PatNum,msg);
+					if(FormWMME.ShowDialog()==DialogResult.Cancel) {//This will cause an unneccesary refresh in the case of a validation error with the webmail
 						return;
 					}
 				}

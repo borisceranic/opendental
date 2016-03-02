@@ -506,9 +506,9 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","User Query");
 				case Permissions.UserQueryAdmin:
 					return Lans.g("enumPermissions","Command Query");
-				case Permissions.WebmailDelete:
+				case Permissions.WebMailDelete:
 					return Lans.g("enumPermissions","Webmail Delete");
-				case Permissions.WebmailSend:
+				case Permissions.WebMailSend:
 					return Lans.g("enumPermissions","Webmail Send");
 				case Permissions.WikiListSetup:
 					return Lans.g("enumPermissions","Wiki List Setup");

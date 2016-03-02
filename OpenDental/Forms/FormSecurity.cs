@@ -564,7 +564,7 @@ namespace OpenDental{
 					node.Nodes.Add(node2);
 				node2=SetNode(Permissions.EmailSend);
 					node.Nodes.Add(node2);
-				node2=SetNode(Permissions.WebmailSend);
+				node2=SetNode(Permissions.WebMailSend);
 					node.Nodes.Add(node2);
 				node2=SetNode(Permissions.SheetEdit);
 					node.Nodes.Add(node2);

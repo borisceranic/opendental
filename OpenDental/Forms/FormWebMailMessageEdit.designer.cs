@@ -47,6 +47,7 @@ namespace OpenDental{
 			this.textBody = new OpenDental.ODtextBox();
 			this.butSend = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.butProvPick = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// textTo
@@ -59,35 +60,35 @@ namespace OpenDental{
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(22, 36);
+			this.label1.Location = new System.Drawing.Point(12, 36);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(92, 14);
+			this.label1.Size = new System.Drawing.Size(102, 14);
 			this.label1.TabIndex = 11;
 			this.label1.Text = "To:";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textFrom
 			// 
-			this.textFrom.Location = new System.Drawing.Point(119, 63);
+			this.textFrom.Location = new System.Drawing.Point(119, 59);
 			this.textFrom.Name = "textFrom";
 			this.textFrom.ReadOnly = true;
-			this.textFrom.Size = new System.Drawing.Size(305, 20);
+			this.textFrom.Size = new System.Drawing.Size(270, 20);
 			this.textFrom.TabIndex = 2;
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(22, 66);
+			this.label3.Location = new System.Drawing.Point(12, 62);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(92, 14);
+			this.label3.Size = new System.Drawing.Size(102, 14);
 			this.label3.TabIndex = 13;
 			this.label3.Text = "From:";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(22, 113);
+			this.label2.Location = new System.Drawing.Point(12, 113);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(92, 14);
+			this.label2.Size = new System.Drawing.Size(102, 14);
 			this.label2.TabIndex = 13;
 			this.label2.Text = "Message:";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -104,9 +105,9 @@ namespace OpenDental{
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(22, 90);
+			this.label4.Location = new System.Drawing.Point(12, 90);
 			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(92, 14);
+			this.label4.Size = new System.Drawing.Size(102, 14);
 			this.label4.TabIndex = 16;
 			this.label4.Text = "Subject:";
 			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -116,9 +117,9 @@ namespace OpenDental{
 			this.labelNotification.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.labelNotification.ForeColor = System.Drawing.SystemColors.ControlText;
-			this.labelNotification.Location = new System.Drawing.Point(92, 294);
+			this.labelNotification.Location = new System.Drawing.Point(17, 329);
 			this.labelNotification.Name = "labelNotification";
-			this.labelNotification.Size = new System.Drawing.Size(577, 14);
+			this.labelNotification.Size = new System.Drawing.Size(652, 14);
 			this.labelNotification.TabIndex = 17;
 			this.labelNotification.Text = "Warning: Patient email is not setup properly. No notification email will be sent " +
     "to this patient.";
@@ -158,7 +159,7 @@ namespace OpenDental{
 			// 
 			this.listAttachments.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.listAttachments.Location = new System.Drawing.Point(430, 27);
+			this.listAttachments.Location = new System.Drawing.Point(431, 23);
 			this.listAttachments.Name = "listAttachments";
 			this.listAttachments.Size = new System.Drawing.Size(321, 56);
 			this.listAttachments.TabIndex = 20;
@@ -194,7 +195,7 @@ namespace OpenDental{
 			this.butDelete.CornerRadius = 4F;
 			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
 			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(39, 311);
+			this.butDelete.Location = new System.Drawing.Point(39, 346);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(75, 24);
 			this.butDelete.TabIndex = 22;
@@ -204,13 +205,14 @@ namespace OpenDental{
 			// butAttach
 			// 
 			this.butAttach.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAttach.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.butAttach.Autosize = true;
 			this.butAttach.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAttach.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAttach.CornerRadius = 4F;
-			this.butAttach.Location = new System.Drawing.Point(430, 3);
+			this.butAttach.Location = new System.Drawing.Point(678, 1);
 			this.butAttach.Name = "butAttach";
-			this.butAttach.Size = new System.Drawing.Size(75, 20);
+			this.butAttach.Size = new System.Drawing.Size(74, 21);
 			this.butAttach.TabIndex = 21;
 			this.butAttach.Text = "Attach...";
 			this.butAttach.Click += new System.EventHandler(this.butAttach_Click);
@@ -224,7 +226,7 @@ namespace OpenDental{
 			this.butPreview.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPreview.CornerRadius = 4F;
 			this.butPreview.Image = global::OpenDental.Properties.Resources.butPreview;
-			this.butPreview.Location = new System.Drawing.Point(39, 267);
+			this.butPreview.Location = new System.Drawing.Point(39, 302);
 			this.butPreview.Name = "butPreview";
 			this.butPreview.Size = new System.Drawing.Size(74, 24);
 			this.butPreview.TabIndex = 5;
@@ -244,7 +246,8 @@ namespace OpenDental{
 			this.textBody.QuickPasteType = OpenDentBusiness.QuickPasteType.Email;
 			this.textBody.ReadOnly = true;
 			this.textBody.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textBody.Size = new System.Drawing.Size(632, 178);
+			this.textBody.Size = new System.Drawing.Size(632, 213);
+			this.textBody.SpellCheckIsEnabled = false;
 			this.textBody.TabIndex = 4;
 			this.textBody.Text = "";
 			// 
@@ -256,7 +259,7 @@ namespace OpenDental{
 			this.butSend.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSend.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSend.CornerRadius = 4F;
-			this.butSend.Location = new System.Drawing.Point(595, 311);
+			this.butSend.Location = new System.Drawing.Point(595, 346);
 			this.butSend.Name = "butSend";
 			this.butSend.Size = new System.Drawing.Size(75, 24);
 			this.butSend.TabIndex = 6;
@@ -271,17 +274,32 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(676, 311);
+			this.butCancel.Location = new System.Drawing.Point(676, 346);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 7;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
+			// butProvPick
+			// 
+			this.butProvPick.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butProvPick.Autosize = true;
+			this.butProvPick.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butProvPick.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butProvPick.CornerRadius = 4F;
+			this.butProvPick.Location = new System.Drawing.Point(395, 59);
+			this.butProvPick.Name = "butProvPick";
+			this.butProvPick.Size = new System.Drawing.Size(29, 20);
+			this.butProvPick.TabIndex = 23;
+			this.butProvPick.Text = "...";
+			this.butProvPick.Click += new System.EventHandler(this.butProvPick_Click);
+			// 
 			// FormWebMailMessageEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(780, 347);
+			this.ClientSize = new System.Drawing.Size(780, 382);
+			this.Controls.Add(this.butProvPick);
 			this.Controls.Add(this.butDelete);
 			this.Controls.Add(this.listAttachments);
 			this.Controls.Add(this.butAttach);
@@ -301,6 +319,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Menu = this.mainMenu1;
+			this.MinimumSize = new System.Drawing.Size(628, 273);
 			this.Name = "FormWebMailMessageEdit";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Web Mail Message Edit";
@@ -334,5 +353,6 @@ namespace OpenDental{
 		private System.Windows.Forms.MenuItem menuItemAttachmentRemove;
 		private System.Windows.Forms.MenuItem menuItemAttachmentPreview;
 		private UI.Button butDelete;
+		private UI.Button butProvPick;
 	}
 }

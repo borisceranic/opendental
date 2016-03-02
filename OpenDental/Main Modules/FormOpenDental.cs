@@ -3444,7 +3444,7 @@ namespace OpenDental{
 		}
 
 		private void OnWebMail_Click() {
-			if(!Security.IsAuthorized(Permissions.WebmailSend)) {
+			if(!Security.IsAuthorized(Permissions.WebMailSend)) {
 				return;
 			}
 			FormWebMailMessageEdit FormWMME=new FormWebMailMessageEdit(CurPatNum);

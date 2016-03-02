@@ -35,11 +35,14 @@ namespace OpenDental{
 		private UI.Button butSelectNone;
 		///<summary>Setting to true will show a none button and will allow 0 to be returned in the SelectedProvNum variable.  It will be -1 if the user cancels out of the window.</summary>
 		public bool IsNoneAvailable=false;
+		///<summary>Will be set to a specific list of providers passed in.  Will be null if no defined list of providers is desired.</summary>
+		private List<Provider> _listProviders;
 		
 		///<summary></summary>
-		public FormProviderPick() {
+		public FormProviderPick(List<Provider> listProviders=null) {
 			InitializeComponent();
 			Lan.F(this);
+			_listProviders=listProviders;
 		}
 
 		///<summary></summary>
@@ -296,7 +299,13 @@ namespace OpenDental{
 			if(IsStudentPicker) {
 				classNum=_schoolClasses[comboClass.SelectedIndex].SchoolClassNum;
 			}
-			List<Provider> listProvs=Providers.GetFilteredProviderList(provNum,textLName.Text,textFName.Text,classNum);
+			List<Provider> listProvs;
+			if(_listProviders!=null) {//User wants to use a specific list of providers.
+				listProvs=_listProviders;
+			}
+			else {
+				listProvs=Providers.GetFilteredProviderList(provNum,textLName.Text,textFName.Text,classNum);
+			}
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col;

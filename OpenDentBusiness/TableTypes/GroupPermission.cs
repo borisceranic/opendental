@@ -200,7 +200,7 @@ namespace OpenDentBusiness{
 		///<summary>85- Allows user to send unsecured email</summary>
 		EmailSend,
 		///<summary>86- Allows user to send webmail</summary>
-		WebmailSend,
+		WebMailSend,
 		///<summary>87- Allows user to run command queries. Command queries are any non-SELECT queries for any non-temporary table.</summary>
 		UserQueryAdmin,
 		///<summary>88- Security permission for assignment of benefits.</summary>
@@ -222,7 +222,7 @@ namespace OpenDentBusiness{
 		///<summary>96- Allows user to edit a completed appointment.</summary>
 		AppointmentCompleteEdit,
 		///<summary>97- Audit trail for deleting webmail messages.  There is no user interface in the security window for this permission.</summary>
-		WebmailDelete,
+		WebMailDelete,
 		///<summary>98- Audit trail for saving a patient with required fields missing.  There is no user interface in the security window for this 
 		///permission.</summary>
 		RequiredFields,

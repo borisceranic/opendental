@@ -4584,7 +4584,7 @@ namespace OpenDental {
 					|| email.SentOrReceived==EmailSentOrReceived.WebMailSentRead) 
 				{
 					//web mail uses special secure messaging portal
-					FormWebMailMessageEdit FormWMME=new FormWebMailMessageEdit(PatCur.PatNum,email.EmailMessageNum);
+					FormWebMailMessageEdit FormWMME=new FormWebMailMessageEdit(PatCur.PatNum,email);
 					if(FormWMME.ShowDialog()==DialogResult.OK) {
 						ModuleSelected(PatCur.PatNum);
 					}

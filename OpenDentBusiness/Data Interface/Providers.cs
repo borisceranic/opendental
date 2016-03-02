@@ -288,6 +288,19 @@ namespace OpenDentBusiness{
 			return null;
 		}
 
+		///<summary>Gets all providers that have the matching prov nums.  Returns an empty list if no matches.</summary>
+		public static List<Provider> GetProvsByProvNums(List<long> listProvNums) {
+			//No need to check RemotingRole; no call to db.
+			List<Provider> listProviders=new List<Provider>();
+			foreach(long provNum in listProvNums) {
+				Provider provider=GetProv(provNum);
+				if(provider!=null) {
+					listProviders.Add(provider);
+				}
+			}
+			return listProviders;
+		}
+
 		///<summary>Gets a list of providers from ListLong.  If none found or if either LName or FName are an empty string, returns an empty list.  There may be more than on provider with the same FName and LName so we will return a list of all such providers.  Usually only one will exist with the FName and LName provided so list returned will have count 0 or 1 normally.  Name match is not case sensitive.</summary>
 		public static List<Provider> GetProvsByFLName(string lName,string fName) {
 			//No need to check RemotingRole; no call to db.
