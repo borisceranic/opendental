@@ -65,13 +65,20 @@ namespace OpenDentalGraph {
 			}
 		}
 
-		public long AdjTypeCur
+		public long AdjTypeDefNumCur
 		{
 			get
-			{ return ListAdjTypes[comboAdjType.SelectedIndex].DefNum; }
+			{
+				if(comboAdjType.SelectedIndex==-1) {
+					return 0;
+				}
+				else {
+					return ListAdjTypes[comboAdjType.SelectedIndex].DefNum;
+				}
+			}
 			set
 			{
-				for(int i=0;i>ListAdjTypes.Count();i++) {
+				for(int i=0;i<ListAdjTypes.Count();i++) {
 					if(ListAdjTypes[i].DefNum==value) {
 						comboAdjType.SelectedIndex=i;
 						return;
@@ -115,10 +122,7 @@ namespace OpenDentalGraph {
 			foreach(Def adjType in ListAdjTypes) {
 				comboAdjType.Items.Add(adjType.ItemName);
 			}
-			if(comboAdjType.Items.Count>0) {
-				comboAdjType.SelectedIndex=0;
-			}
-			else {
+			if(comboAdjType.Items.Count<=0) {
 				comboAdjType.Items.Add(Lans.g(this,"Adj types not setup"));
 				radioRunAdjs.Enabled=false;
 			}
