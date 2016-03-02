@@ -129,11 +129,17 @@ namespace OpenDental {
 					}
 				}
 				textTo.Text=_patCur.GetNameFL();
-				_provCur=Providers.GetProv(_patCur.PriProv);
-				if(_provUserCur!=null) {
-					_provCur=_provUserCur;
+				Provider patPriProv=Providers.GetProv(_patCur.PriProv);
+				//Check to see if the patients primary provider has a user associated to them.
+				if(_listProviders.Any(x => x.ProvNum==patPriProv.ProvNum)) {
+					//The patients primary provider has at least one user associated to them.
+					_provCur=patPriProv;
 				}
-				textFrom.Text=_provCur.GetFormalName();
+				//Now check to see if there is a provider associated to the user currently logged in.
+				if(_provUserCur!=null) {
+					_provCur=_provUserCur;//Always prefer the provider that is associated to the user currently logged in.
+				}
+				textFrom.Text=(_provCur==null) ? "" : _provCur.GetFormalName();
 			}
 			else {//An existing email has been passed in.
 				_provCur=Providers.GetProv(_emailMessage.ProvNumWebMail);
@@ -267,6 +273,10 @@ namespace OpenDental {
 		///If the user has chosen a different provider as the From provider this will prompt them to enter a password for any user associated to them.
 		///Loops through all users associated to the From provider until the credentials typed in match.</summary>
 		private bool VerifyFromProvider() {
+			if(_provCur==null) {
+				MsgBox.Show(this,"Invalid From provider.");
+				return false;
+			}
 			//Don't require validating credentials if the user currently logged in is associated to the selected provider.
 			if(_provUserCur!=null && _provUserCur.ProvNum==_provCur.ProvNum) {
 				return true;
