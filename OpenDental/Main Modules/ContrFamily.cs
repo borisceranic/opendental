@@ -2072,6 +2072,9 @@ namespace OpenDental{
 		}
 
 		private int sortPatientListBySuperFamily(Patient pat1,Patient pat2) {
+			if(pat1.PatNum==pat2.PatNum) {
+				return 0;
+			}
 			if(pat1.PatNum==pat1.SuperFamily) {//Superheads always go to the top no matter what.
 						return -1;
 			}
