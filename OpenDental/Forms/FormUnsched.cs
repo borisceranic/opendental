@@ -378,9 +378,13 @@ namespace OpenDental{
 					return;
 				}
 			}
-			for(int i=0;i<grid.SelectedIndices.Length;i++) {
-				Appointments.Delete(ListUn[grid.SelectedIndices[i]].AptNum);
-				SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,ListUn[grid.SelectedIndices[i]].PatNum,
+		List<long> listSelectedAptNums=new List<long>();
+			foreach(int i in grid.SelectedIndices) {
+				listSelectedAptNums.Add(ListUn[i].AptNum);
+			}
+			Appointments.Delete(listSelectedAptNums);
+			foreach(int i in grid.SelectedIndices) {
+				SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,ListUn[i].PatNum,
 					Lan.g(this,"Appointment deleted from the Unscheduled list."));
 			}
 			FillGrid();

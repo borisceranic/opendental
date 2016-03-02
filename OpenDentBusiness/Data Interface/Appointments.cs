@@ -1915,6 +1915,90 @@ namespace OpenDentBusiness{
 			DeletedObjects.SetDeleted(DeletedObjectType.Appointment,aptNum);
 		}
 
+		///<summary>Deletes the apts and cleans up objects pointing to these apts.  If the patient is new, sets DateFirstVisit.
+		///Updates procedurelog.ProcDate to today for procedures attached to the appointment if the ProcDate is invalid.
+		///Updates procedurelog.PlannedAptNum (for planned apts) or procedurelog.AptNum (for all other AptStatuses); sets to 0.
+		///Updates labcase.PlannedAptNum (for planned apts) or labcase.AptNum (for all other AptStatuses); sets to 0.
+		///Deletes any rows in the plannedappt table with this AptNum.
+		///Updates appointment.NextAptNum (for planned apts) of any apt pointing to this planned apt; sets to 0;
+		///Deletes any rows in the apptfield table with this AptNum.
+		///Makes an entry in the deletedobject table.
+		///Deletes ApptComm entries that were created for this appointment.</summary>
+		public static void Delete(List<long> aptNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),aptNums);
+				return;
+			}
+			if(aptNums==null || aptNums.Count<1) {
+				return;
+			}
+			string command="SELECT PatNum,IsNewPatient,AptStatus,AptNum FROM appointment WHERE AptNum IN("+String.Join(",",aptNums)+")";
+			DataTable table = Db.GetTable(command);
+			if(table.Rows.Count<1) {
+				return;//All entries were already deleted or did not exist.
+			}
+			List<long> listPlannedAptNums = new List<long>();  //List of AptNums for planned appointments only
+			List<long> listNotPlannedAptNums = new List<long>();  //List of AptNums for all appointments that are not planned
+			List<long> listAllAptNums = new List<long>();  //List of AptNums for all appointments
+			foreach(DataRow row in table.Rows) {
+				if(row["IsNewPatient"].ToString()=="1") {
+					//Potentially improve this to not run one at a time
+					Patient pat = Patients.GetPat(PIn.Long(row["PatNum"].ToString()));
+					Procedures.SetDateFirstVisit(DateTime.MinValue,3,pat);
+				}
+				if(row["AptStatus"].ToString()=="6") {//planned
+					listPlannedAptNums.Add(PIn.Long(row["AptNum"].ToString()));
+				}
+				else {//Everything else
+					listNotPlannedAptNums.Add(PIn.Long(row["AptNum"].ToString()));
+				}
+				listAllAptNums.Add(PIn.Long(row["AptNum"].ToString()));
+			}
+			//procs
+			command="UPDATE procedurelog SET ProcDate="+DbHelper.Curdate()
+				+" WHERE ProcDate<"+POut.Date(new DateTime(1880,1,1))
+				+" AND (AptNum IN("+String.Join(",",listAllAptNums)+") OR PlannedAptNum IN("+String.Join(",",listAllAptNums)+"))"
+				+" AND procedurelog.ProcStatus="+POut.Int((int)ProcStat.TP);//Only change procdate for TP procedures
+			Db.NonQ(command);
+			if(listPlannedAptNums.Count!=0) {
+				command="UPDATE procedurelog SET PlannedAptNum=0 WHERE PlannedAptNum IN("+String.Join(",",listPlannedAptNums)+")";
+				Db.NonQ(command);
+			}
+			if(listNotPlannedAptNums.Count!=0) {
+				command="UPDATE procedurelog SET AptNum=0 WHERE AptNum IN("+String.Join(",",listNotPlannedAptNums)+")";
+				Db.NonQ(command);
+			}
+			//labcases
+			if(listPlannedAptNums.Count!=0) {
+				command="UPDATE labcase SET PlannedAptNum=0 WHERE PlannedAptNum IN("+String.Join(",",listPlannedAptNums)+")";
+				Db.NonQ(command);
+			}
+			if(listNotPlannedAptNums.Count!=0) {
+				command="UPDATE labcase SET AptNum=0 WHERE AptNum IN("+String.Join(",",listNotPlannedAptNums)+")";
+				Db.NonQ(command);
+			}
+			//plannedappt
+			command="DELETE FROM plannedappt WHERE AptNum IN("+String.Join(",",listAllAptNums)+")";
+			Db.NonQ(command);
+			//if deleting a planned appt, make sure there are no appts with NextAptNum (which should be named PlannedAptNum) pointing to this appt
+			if(listPlannedAptNums.Count!=0) {
+				command="UPDATE appointment SET NextAptNum=0 WHERE NextAptNum IN("+String.Join(",",listNotPlannedAptNums)+")";
+				Db.NonQ(command);
+			}
+			//apptfield
+			command="DELETE FROM apptfield WHERE AptNum IN("+String.Join(",",listAllAptNums)+")";
+			Db.NonQ(command);
+			Appointments.ClearFkey(listAllAptNums);//Zero securitylog FKey column for row to be deleted.
+			//we will not reset item orders here
+			ApptComms.DeleteForAppts(listAllAptNums);
+			command="DELETE FROM appointment WHERE AptNum IN("+String.Join(",",listAllAptNums)+")";
+			Db.NonQ(command);
+			foreach(long aptNum in listAllAptNums) {
+				//Potentially improve this to not run one at a time
+				DeletedObjects.SetDeleted(DeletedObjectType.Appointment,aptNum);
+			}
+		}
+
 		/// <summary>If make5minute is false, then result will be in 10 or 15 minutes blocks and will need a later conversion step before going to db.</summary>
 		public static string CalculatePattern(long provDent,long provHyg,List<long> codeNums,bool make5minute) {
 			StringBuilder strBTime=new StringBuilder("");
