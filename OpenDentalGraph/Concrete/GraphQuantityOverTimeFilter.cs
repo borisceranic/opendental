@@ -235,7 +235,7 @@ namespace OpenDentalGraph {
 								break;
 							case BrokenApptGraphOptionsCtrl.RunFor.adjustment:
 								//use the broken adjustment cache to get all broken adjustments filtered by the selected adjType.
-								rawData.AddRange(DashboardCache.BrokenAdjs.Cache.Where(x => x.AdjType==_brokenApptsCtrl.AdjTypeCur).Select(x => GetBrokenApptDataPoint(x)));
+								rawData.AddRange(DashboardCache.BrokenAdjs.Cache.Where(x => x.AdjType==_brokenApptsCtrl.AdjTypeDefNumCur).Select(x => GetBrokenApptDataPoint(x)));
 								break;
 							case BrokenApptGraphOptionsCtrl.RunFor.procedure:
 								//use the broken proc cache to get all relevant broken procedures.
@@ -340,6 +340,8 @@ namespace OpenDentalGraph {
 			public bool IncludePaySplits { get; set; }
 			public bool IncludeInsuranceClaims { get; set; }
 			public BrokenApptGraphOptionsCtrl.Grouping CurGrouping { get;set;}
+			public BrokenApptGraphOptionsCtrl.RunFor CurRunFor { get; set; }
+			public long CurAdjTypeDefNum { get; set; }
 		}
 		#endregion
 
@@ -360,6 +362,8 @@ namespace OpenDentalGraph {
 				case DashboardCellType.BrokenApptGraph:
 					return new GraphQuantityOverTimeFilterSettings() {
 						CurGrouping=_brokenApptsCtrl.CurGrouping,
+						CurRunFor=_brokenApptsCtrl.CurRunFor,
+						CurAdjTypeDefNum=_brokenApptsCtrl.AdjTypeDefNumCur,
 					};
 				case DashboardCellType.AccountsReceivableGraph:
 				case DashboardCellType.NewPatientsGraph:
@@ -388,6 +392,8 @@ namespace OpenDentalGraph {
 						break;
 					case DashboardCellType.BrokenApptGraph:
 						_brokenApptsCtrl.CurGrouping=settings.CurGrouping;
+						_brokenApptsCtrl.CurRunFor=settings.CurRunFor;
+						_brokenApptsCtrl.AdjTypeDefNumCur=settings.CurAdjTypeDefNum;
 						break;
 					case DashboardCellType.AccountsReceivableGraph:
 					case DashboardCellType.NewPatientsGraph:
