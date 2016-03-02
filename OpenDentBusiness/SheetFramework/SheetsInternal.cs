@@ -1848,7 +1848,7 @@ Fam Urgent Fin Note: [famFinUrgNote]"
 			y+=rowH+110;
 			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewRect(76,y,200,150));
 			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("CODE:",sheetDef.FontSize,sheetDef.FontName,true,86,y,150,rowH));
-			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("S = Seal",sheetDef.FontSize,sheetDef.FontName,false,86,y+20,150,rowH));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("S = Sealant Needed",sheetDef.FontSize,sheetDef.FontName,false,86,y+20,150,rowH));
 			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("PS = Previously Sealed/Intact",sheetDef.FontSize,sheetDef.FontName,false,86,y+40,190,rowH));
 			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("C = Carious",sheetDef.FontSize,sheetDef.FontName,false,86,y+60,150,rowH));
 			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("F = Filled",sheetDef.FontSize,sheetDef.FontName,false,86,y+80,150,rowH));
