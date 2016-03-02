@@ -341,7 +341,8 @@ namespace OpenDentalGraph {
 			public bool IncludeInsuranceClaims { get; set; }
 			public BrokenApptGraphOptionsCtrl.Grouping CurGrouping { get;set;}
 			public BrokenApptGraphOptionsCtrl.RunFor CurRunFor { get; set; }
-			public long CurAdjTypeDefNum { get; set; }
+			public long AdjTypeDefNum { get; set; }
+			
 		}
 		#endregion
 
@@ -363,7 +364,7 @@ namespace OpenDentalGraph {
 					return new GraphQuantityOverTimeFilterSettings() {
 						CurGrouping=_brokenApptsCtrl.CurGrouping,
 						CurRunFor=_brokenApptsCtrl.CurRunFor,
-						CurAdjTypeDefNum=_brokenApptsCtrl.AdjTypeDefNumCur,
+						AdjTypeDefNum=_brokenApptsCtrl.AdjTypeDefNumCur,
 					};
 				case DashboardCellType.AccountsReceivableGraph:
 				case DashboardCellType.NewPatientsGraph:
@@ -393,7 +394,7 @@ namespace OpenDentalGraph {
 					case DashboardCellType.BrokenApptGraph:
 						_brokenApptsCtrl.CurGrouping=settings.CurGrouping;
 						_brokenApptsCtrl.CurRunFor=settings.CurRunFor;
-						_brokenApptsCtrl.AdjTypeDefNumCur=settings.CurAdjTypeDefNum;
+						_brokenApptsCtrl.AdjTypeDefNumCur=settings.AdjTypeDefNum;
 						break;
 					case DashboardCellType.AccountsReceivableGraph:
 					case DashboardCellType.NewPatientsGraph:

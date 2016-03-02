@@ -122,10 +122,7 @@ namespace OpenDentalGraph {
 			foreach(Def adjType in ListAdjTypes) {
 				comboAdjType.Items.Add(adjType.ItemName);
 			}
-			if(comboAdjType.Items.Count>0) {
-				comboAdjType.SelectedIndex=0;
-			}
-			else {
+			if(comboAdjType.Items.Count<=0) {
 				comboAdjType.Items.Add(Lans.g(this,"Adj types not setup"));
 				radioRunAdjs.Enabled=false;
 			}
