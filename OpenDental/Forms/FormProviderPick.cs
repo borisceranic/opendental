@@ -332,20 +332,14 @@ namespace OpenDental{
 				row.Cells.Add(listProvs[i].Abbr);
 				row.Cells.Add(listProvs[i].LName);
 				row.Cells.Add(listProvs[i].FName);
-				//wanted to do a background color here, but grid couldn't handle it.
-				if(IsStudentPicker) {
-					row.Tag=listProvs[i].ProvNum;
-				}
+				row.Tag=listProvs[i].ProvNum;
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			SelectedProvNum=ProviderC.ListShort[e.Row].ProvNum;
-			if(IsStudentPicker) {
-				SelectedProvNum=PIn.Long(gridMain.Rows[gridMain.GetSelectedIndex()].Tag.ToString());
-			}
+			SelectedProvNum=PIn.Long(gridMain.Rows[gridMain.GetSelectedIndex()].Tag.ToString());
 			DialogResult=DialogResult.OK;
 		}
 
@@ -378,10 +372,7 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please select a provider first.");
 				return;
 			}
-			SelectedProvNum=ProviderC.ListShort[gridMain.GetSelectedIndex()].ProvNum;
-			if(IsStudentPicker) {
-				SelectedProvNum=PIn.Long(gridMain.Rows[gridMain.GetSelectedIndex()].Tag.ToString());
-			}
+			SelectedProvNum=PIn.Long(gridMain.Rows[gridMain.GetSelectedIndex()].Tag.ToString());
 			DialogResult=DialogResult.OK;
 		}
 

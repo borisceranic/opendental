@@ -93,6 +93,10 @@ namespace OpenDental {
 				//No valid "Notify" email setup for this practice yet.
 				error="Invalid Web Mail Notify email.  Configure a Web Mail Notify email address in E-mail Setup.";
 			}
+			List<Userod> listUsers=Userods.GetUsersWithProviders();
+			if(listUsers.Count < 1) {
+				error="Cannot send Web Mail until there is at least one User associated to a Provider.";
+			}
 			if(error!="") {
 				MsgBox.Show(this,error);
 				DialogResult=DialogResult.Abort;
@@ -104,7 +108,6 @@ namespace OpenDental {
 			if(Security.CurUser!=null) {
 				_provUserCur=Providers.GetProv(Security.CurUser.ProvNum);
 			}
-			List<Userod> listUsers=Userods.GetUsersWithProviders();
 			List<long> listProvNums=listUsers.Select(x => x.ProvNum).Distinct().ToList();
 			_listProviders=Providers.GetProvsByProvNums(listProvNums);
 			FillFields();
@@ -172,6 +175,7 @@ namespace OpenDental {
 				butSend.Text=Lan.g(this,"&Reply");
 				listAttachments.ContextMenu=new ContextMenu(new[] { menuItemAttachmentPreview });
 				labelNotification.Text="";
+				butProvPick.Enabled=false;
 			}
 			else {
 				comboRegardingPatient.Enabled=true;
@@ -183,6 +187,7 @@ namespace OpenDental {
 				butSend.Text=Lan.g(this,"&Send");
 				listAttachments.ContextMenu=contextMenuAttachments;//contains a remove and open
 				//labelNotification.Text will be set in VerifyInputs based on input values
+				butProvPick.Enabled=true;
 			}
 		}
 
