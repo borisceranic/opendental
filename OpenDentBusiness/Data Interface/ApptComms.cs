@@ -72,6 +72,19 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
+		///<summary></summary>
+		public static void DeleteForAppts(List<long> apptNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),apptNums);
+				return;
+			}
+			if(apptNums==null || apptNums.Count<1) {
+				return;
+			}
+			string command="DELETE FROM apptcomm WHERE ApptNum IN("+String.Join(",",apptNums)+")";
+			Db.NonQ(command);
+		}
+
 		///<summary>Creates two ApptComm items, one to send using dayInterval, and one to send using hourInterval.</summary>
 		public static void InsertForAppt(Appointment appt,double dayInterval,double hourInterval,DateTime automationBeginPref,DateTime automationEndPref) {
 			if(appt.AptStatus!=ApptStatus.Scheduled && appt.AptStatus!=ApptStatus.ASAP) {
