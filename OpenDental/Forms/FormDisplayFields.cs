@@ -1,8 +1,6 @@
 using System;
-using System.Drawing;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Linq;
 using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
@@ -372,11 +370,9 @@ namespace OpenDental{
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			DisplayField tempField=ListShowing[e.Row].Copy();
 			if(tempField.Category==DisplayFieldCategory.OrthoChart) {
-				if(tempField.InternalName=="Signature Box") {
-					return;//There is nothing to edit for the Signature Box field.
-				}
 				FormDisplayFieldOrthoEdit FormDFOE=new FormDisplayFieldOrthoEdit();
 				FormDFOE.FieldCur=ListShowing[e.Row];
+				FormDFOE.ListShowing=ListShowing;
 				FormDFOE.ShowDialog();
 				if(FormDFOE.DialogResult!=DialogResult.OK) {
 					ListShowing[e.Row]=tempField.Copy();
@@ -547,6 +543,11 @@ namespace OpenDental{
 				return;
 			}
 			if(Category==DisplayFieldCategory.OrthoChart) {
+				if(ListShowing.Count(x=>x.InternalName=="Signature")>1) {
+					MessageBox.Show(Lan.g(this,"Only one display field can be a signature field. Fields that have the signature field checkbox checked:")+" "
+						+string.Join(", ",ListShowing.FindAll(x => x.InternalName=="Signature").Select(x => x.Description)));
+					return;
+				}
 				DisplayFields.SaveListForOrthoChart(ListShowing);
 			}
 			else {
