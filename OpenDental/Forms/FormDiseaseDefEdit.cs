@@ -295,6 +295,13 @@ namespace OpenDental{
 			else {
 				textICD9.Text=i9descript;
 			}
+			Icd10 i10=Icd10s.GetByCode(DiseaseDefCur.Icd10Code);
+			if(i10==null) {
+				textIcd10.Text=DiseaseDefCur.Icd10Code;
+			}
+			else {
+				textIcd10.Text=i10.Icd10Code+"-"+i10.Description;
+			}
 			string sdescript=Snomeds.GetCodeAndDescription(DiseaseDefCur.SnomedCode);
 			if(sdescript=="") {
 				textSnomed.Text=DiseaseDefCur.SnomedCode;
