@@ -1632,6 +1632,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 				}
 				job.UserNumCheckout=0;
 				Jobs.Update(job);
+				IsChanged=false;
 				Signalods.SetInvalid(InvalidType.Jobs,KeyType.Job,job.JobNum);
 			}
 		}
