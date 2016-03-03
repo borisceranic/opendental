@@ -133,13 +133,13 @@ namespace OpenDentBusiness {
 		FeeColors,
 		///<summary>35- Provider specialties.  General, Hygienist, Pediatric, Primary Care Physician, etc.</summary>
 		ProviderSpecialties,
-		///<summary>36- </summary>
+		///<summary>36- Reason why a claim proc was rejected. This must be set on each individual claim proc.</summary>
 		ClaimPaymentTracking,
 		///<summary>37- Procedure quick charge list for patient accounts.</summary>
 		AccountQuickCharge,
-		///<summary>38- Procedure quick charge list for patient accounts.</summary>
+		///<summary>38- Insurance verification status such as 'Verified', 'Unverified', 'Pending Verification'.</summary>
 		InsuranceVerificationStatus,
-		///<summary>39- Procedure quick charge list for patient accounts.</summary>
+		///<summary>39- Regions that clinics can be assigned to.</summary>
 		Regions
 	}
 
