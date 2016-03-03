@@ -38,7 +38,6 @@ namespace OpenDental{
 		private Dictionary<long,string> patientNames;
 		private List<Clinic> _listUserClinics;
 		private ContextMenuStrip _menuRightClick;
-		public PatientSelectedEventHandler PatientGoTo;
 
 		///<summary></summary>
 		public FormASAP() {
@@ -290,8 +289,7 @@ namespace OpenDental{
 
 		private void SelectPatient_Click() {
 			Patient pat=Patients.GetPat(ListASAP[grid.SelectedIndices[grid.SelectedIndices.Length-1]].PatNum);//If multiple selected, just take the last one to remain consistent with SendPinboard_Click.
-			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
-			PatientGoTo(this,eArgs);
+			FormOpenDental.S_Contr_PatientSelected(pat);
 		}
 
 		private void FillGrid(){
@@ -388,8 +386,7 @@ namespace OpenDental{
 				return;
 			}
 			Patient pat=Patients.GetPat(ListASAP[grid.SelectedIndices[grid.SelectedIndices.Length-1]].PatNum); //If multiple selected, just use the last one.
-			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
-			PatientGoTo(this,eArgs); //Selects the patient in OpenDental.
+			FormOpenDental.S_Contr_PatientSelected(pat); //Selects the patient in OpenDental.
 			GotoModule.GotoChart(pat.PatNum);
 		}
 
@@ -425,8 +422,7 @@ namespace OpenDental{
 			int currentScroll=grid.ScrollValue;
 			SelectedPatNum=ListASAP[e.Row].PatNum;
 			Patient pat=Patients.GetPat(SelectedPatNum);
-			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
-			PatientGoTo(this,eArgs);
+			FormOpenDental.S_Contr_PatientSelected(pat);
 			FormApptEdit FormAE=new FormApptEdit(ListASAP[e.Row].AptNum);
 			FormAE.PinIsVisible=true;
 			FormAE.ShowDialog();

@@ -64,7 +64,6 @@ namespace OpenDental{
 			this.userControlTasks1.Name = "userControlTasks1";
 			this.userControlTasks1.Size = new System.Drawing.Size(885, 671);
 			this.userControlTasks1.TabIndex = 0;
-			this.userControlTasks1.GoToChanged += new System.EventHandler(this.userControlTasks1_GoToChanged);
 			this.userControlTasks1.Resize += new System.EventHandler(this.userControlTasks1_Resize);
 			// 
 			// FormTasks

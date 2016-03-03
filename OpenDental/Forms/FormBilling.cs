@@ -54,9 +54,6 @@ namespace OpenDental{
 		private bool isPrinting=false;
 		private DataTable table;
 		private Label labelSentElect;
-		///<summary></summary>
-		[Category("Property Changed"),Description("Event raised when user wants to go to a patient or related object.")]
-		public event PatientSelectedEventHandler GoToChanged=null;
 		private bool isInitial=true;
 		private ComboBox comboClinic;
 		private Label labelClinic;
@@ -69,13 +66,6 @@ namespace OpenDental{
 
 		///<summary>List of emails not attached to a clinic, the practice default, or a user.</summary>
 		private List<EmailAddress> _listEmailAddresses;
-
-		protected void OnGoToChanged(long patNum) {
-			if(GoToChanged!=null) {
-				Patient pat=Patients.GetPat(patNum);
-				GoToChanged(this,new PatientSelectedEventArgs(pat));
-			}
-		}
 
 		///<summary></summary>
 		public FormBilling(){
@@ -750,7 +740,8 @@ namespace OpenDental{
 			}
 			else{
 				long patNum=PIn.Long(table.Rows[gridBill.SelectedIndices[0]]["PatNum"].ToString());
-				OnGoToChanged(patNum);
+				FormOpenDental.S_Contr_PatientSelected(Patients.GetPat(patNum));
+				GotoModule.GotoAccount(0);
 				SendToBack();//??
 			}
 		}

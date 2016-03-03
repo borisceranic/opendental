@@ -54,7 +54,6 @@ namespace OpenDental{
 		private List<Clinic> _listUserClinics;
 		private ContextMenuStrip _menuRightClick;
 		private ComboBox comboEmailFrom;
-		public PatientSelectedEventHandler PatientGoTo;
 		private GroupBox groupBox2;
 		private List<EmailAddress> _listEmailAddresses;
 
@@ -522,8 +521,7 @@ namespace OpenDental{
 			//If multiple selected, just take the last one to remain consistent with SendPinboard_Click.
 			long patNum=PIn.Long(Table.Rows[gridMain.SelectedIndices[gridMain.SelectedIndices.Length-1]]["PatNum"].ToString());
 			Patient pat=Patients.GetPat(patNum);
-			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
-			PatientGoTo(this,eArgs);
+			FormOpenDental.S_Contr_PatientSelected(pat);
 		}
 
 		private void gridMain_MouseUp(object sender,MouseEventArgs e) {
@@ -547,8 +545,7 @@ namespace OpenDental{
 			//If multiple selected, just take the last one to remain consistent with SendPinboard_Click.
 			long patNum=PIn.Long(Table.Rows[gridMain.SelectedIndices[gridMain.SelectedIndices.Length-1]]["PatNum"].ToString());
 			Patient pat=Patients.GetPat(patNum);
-			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
-			PatientGoTo(this,eArgs);
+			FormOpenDental.S_Contr_PatientSelected(pat);
 			GotoModule.GotoChart(pat.PatNum);
 		}
 
@@ -693,8 +690,7 @@ namespace OpenDental{
 			Cursor=Cursors.WaitCursor;
 			long selectedApt=PIn.Long(Table.Rows[e.Row]["AptNum"].ToString());
 			Patient pat=Patients.GetPat(PIn.Long(Table.Rows[e.Row]["PatNum"].ToString()));
-			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
-			PatientGoTo(this,eArgs);
+			FormOpenDental.S_Contr_PatientSelected(pat);
 			FormApptEdit FormA=new FormApptEdit(selectedApt);
 			FormA.PinIsVisible=true;
 			FormA.ShowDialog();

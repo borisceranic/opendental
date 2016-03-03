@@ -104,9 +104,6 @@ namespace OpenDental {
 		private Patient PatCur;
 		private List <InsPlan> PlanList;
 		private List<InsSub> SubList;
-		///<summary></summary>
-		[Category("Data"),Description("Occurs when user changes current patient, usually by clicking on the Select Patient button.")]
-		public event PatientSelectedEventHandler PatientSelected=null;
 		///<summary>For one patient. Allows highlighting rows.</summary>
 		private Appointment[] ApptList;
 		private System.Drawing.Printing.PrintDocument pd2;
@@ -3843,14 +3840,6 @@ namespace OpenDental {
 			}
 		}
 
-		///<summary></summary>
-		private void OnPatientSelected(Patient pat) {
-			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
-			if(PatientSelected!=null){
-				PatientSelected(this,eArgs);
-			}
-		}
-
 		private void Tool_Rx_Click(){
 			if(!Security.IsAuthorized(Permissions.RxCreate)) {
 				return;
@@ -4800,7 +4789,7 @@ namespace OpenDental {
 				return;
 			}
 			if(FormE.ResultOnClosing==EhrFormResult.PatientSelect) {
-				OnPatientSelected(Patients.GetPat(FormE.PatNum));
+				FormOpenDental.S_Contr_PatientSelected(Patients.GetPat(FormE.PatNum));
 				ModuleSelected(FormE.PatNum);
 			}
 		}
@@ -7453,7 +7442,7 @@ namespace OpenDental {
 			if(GotoType == TaskObjectType.Patient) {
 				if(keyNum != 0) {
 					Patient pat = Patients.GetPat(keyNum);
-					OnPatientSelected(pat);
+					FormOpenDental.S_Contr_PatientSelected(pat);
 					ModuleSelected(pat.PatNum);
 					return;
 				}
@@ -9711,7 +9700,7 @@ namespace OpenDental {
 					FormR.ShowDialog();
 					if(FormR.GotoPatNum!=0) {
 						Patient pat=Patients.GetPat(FormR.GotoPatNum);
-						OnPatientSelected(pat);
+						FormOpenDental.S_Contr_PatientSelected(pat);
 						GotoModule.GotoFamily(FormR.GotoPatNum);
 						return;
 					}
@@ -9823,7 +9812,7 @@ namespace OpenDental {
 				FormP.IsNew=false;
 				FormP.ShowDialog();
 				if(FormP.DialogResult==DialogResult.OK) {
-					OnPatientSelected(PatCur);
+					FormOpenDental.S_Contr_PatientSelected(PatCur);
 				}
 			}
 			ModuleSelected(PatCur.PatNum);

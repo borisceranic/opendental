@@ -98,9 +98,6 @@ namespace OpenDental{
 		private System.Windows.Forms.ImageList imageListMain;
 		///<summary>A list of all ProcTP objects for the selected tp.</summary>
 		private ProcTP[] ProcTPSelectList;
-		///<summary></summary>
-		[Category("Data"),Description("Occurs when user changes current patient, usually by clicking on the Select Patient button.")]
-		public event PatientSelectedEventHandler PatientSelected=null;
 		private List <PatPlan> PatPlanList;
 		private List <Benefit> BenefitList;
 		private List<Procedure> ProcListFiltered;
@@ -1077,14 +1074,6 @@ namespace OpenDental{
 
 		private void butSaveTP_Click(object sender,EventArgs e) {
 			ToolBarMainCreate_Click();
-		}
-
-		///<summary></summary>
-		private void OnPatientSelected(Patient pat) {
-			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
-			if(PatientSelected!=null){
-				PatientSelected(this,eArgs);
-			}
 		}
 
 		private void FillPlans(){

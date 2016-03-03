@@ -63,9 +63,6 @@ namespace OpenDental {
 		private Panel panelUnderline;
 		private Panel panelVertLine;
 		private System.Windows.Forms.PictureBox pictureBoxMain;
-		///<summary></summary>
-		[Category("Data"),Description("Occurs when user changes current patient, usually by clicking on the Select Patient button.")]
-		public event PatientSelectedEventHandler PatientSelected=null;
 		private ContextMenu menuForms;
 		private ContextMenuStrip MountMenu;
 
@@ -795,14 +792,6 @@ namespace OpenDental {
 			ToolBarMain.Invalidate();
 			ToolBarPaint.Invalidate();
 			FillDocList(false);
-		}
-
-		///<summary></summary>
-		private void OnPatientSelected(Patient pat) {
-			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
-			if(PatientSelected!=null) {
-				PatientSelected(this,eArgs);
-			}
 		}
 
 		///<summary>Applies to all tools.</summary>

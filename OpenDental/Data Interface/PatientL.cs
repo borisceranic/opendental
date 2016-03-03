@@ -129,27 +129,6 @@ namespace OpenDental{
 			return retVal;
 		}
 	}
-	
-	///<summary></summary>
-	public class PatientSelectedEventArgs{
-		private Patient pat;
-
-		///<summary></summary>
-		public PatientSelectedEventArgs(Patient pat){
-			this.pat=pat;
-		}
-
-		///<summary></summary>
-		public Patient Pat {
-			get{ 
-				return pat;
-			}
-		}
-
-	}
-
-	///<summary></summary>
-	public delegate void PatientSelectedEventHandler(object sender,PatientSelectedEventArgs e);
 
 
 }

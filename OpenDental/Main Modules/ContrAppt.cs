@@ -26,8 +26,6 @@ using OpenDental.Bridges;
 
 namespace OpenDental {
 
-	public delegate void SendSmsClick(long patNum,string defaultMessage);
-
 	///<summary></summary>
 	public class ContrAppt:System.Windows.Forms.UserControl {
 		private OpenDental.ContrApptSheet ContrApptSheet2;
@@ -82,9 +80,6 @@ namespace OpenDental {
 		private System.Windows.Forms.ContextMenu menuBlockout;
 		private System.Windows.Forms.ContextMenu menuWeeklyApt;
 		private List<Schedule> SchedListPeriod;
-		///<summary></summary>
-		[Category("Data"),Description("Occurs when user changes current patient, usually by clicking on the Select Patient button.")]
-		public event PatientSelectedEventHandler PatientSelected=null;
 		private OpenDental.UI.Button butSearch;
 		private System.Windows.Forms.GroupBox groupSearch;
 		private OpenDental.UI.Button butSearchNext;
@@ -182,8 +177,6 @@ namespace OpenDental {
 		private List<ApptView> _listApptViews;
 		private FormTrackNext FormTN;
 		private FormUnsched FormUnsched2;
-		///<summary>Should be set to FormOpenDental.OnTxtMsg_Click()</summary>
-		public SendSmsClick SendSmsClickDelegate;
 		///<summary></summary>
 		[Category("Data"),Description("Occurs when a user has taken action on an item needing an action taken.")]
 		public event ActionNeededEventHandler ActionTaken=null;
@@ -1789,14 +1782,6 @@ namespace OpenDental {
 			OnPatientSelected(PatCurNum,PatCurName,hasEmail,chartNumber);
 		}*/
 
-		///<summary>Sends the PatientSelected event on up to the main form.  The only result is that the main window now knows the new patNum and patName.  Does nothing else.  Does not trigger any other methods to run which might cause a loop.  Only called from RefreshModulePatient, but it's separate so that it's the same as in the other modules.</summary>
-		private void OnPatientSelected(Patient pat) {
-			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
-			if(PatientSelected!=null) {
-				PatientSelected(this,eArgs);
-			}
-		}
-
 		/*This was resulting in too many firings of ModuleSelected
 		///<summary>Currently only used when comboView really does change.  Otherwise, just call ModuleSelected.  Triggered in FunctionKeyPress, SetView, and  FillViews</summary>
 		private void comboView_SelectedIndexChanged(object sender,System.EventArgs e) {
@@ -2443,7 +2428,7 @@ namespace OpenDental {
 			//if aptNum is already in DS, then use that row.  Otherwise, get a new row.
 			//it will set pt to the last appt on the pinboard.
 			RefreshModuleDataPatient(PIn.Long(row["PatNum"].ToString()));
-			OnPatientSelected(PatCur);
+			FormOpenDental.S_Contr_PatientSelected(PatCur);
 			//RefreshModulePatient(PIn.PInt(row["PatNum"].ToString()));
 			mouseIsDown=false;
 			boolAptMoved=false;
@@ -2454,7 +2439,7 @@ namespace OpenDental {
 			RefreshModuleDataPatient(PIn.Long(pinBoard.ApptList[pinBoard.SelectedIndex].DataRoww["PatNum"].ToString()));
 			RefreshModuleScreenPatient();
 			CancelPinMouseDown=false;
-			OnPatientSelected(PatCur);
+			FormOpenDental.S_Contr_PatientSelected(PatCur);
 			//The line above can trigger a popup dialog which can cause the tempAppt to get stuck to the mouse
 			//RefreshModulePatient(PIn.PInt(pinBoard.ApptList[pinBoard.SelectedIndex].DataRoww["PatNum"].ToString()));
 			//Since this is usually caused by user mouse, then it goes right into pinBoard_MouseDown().
@@ -3142,7 +3127,7 @@ namespace OpenDental {
 				}
 				RefreshModuleDataPatient(PIn.Long(ContrApptSingle3[thisIndex].DataRoww["PatNum"].ToString()));
 				RefreshModuleScreenPatient();
-				OnPatientSelected(PatCur);
+				FormOpenDental.S_Contr_PatientSelected(PatCur);
 				//RefreshModulePatient(PIn.PInt(ContrApptSingle3[thisIndex].DataRoww["PatNum"].ToString()));
 				if(e.Button==MouseButtons.Right) {
 					menuApt.MenuItems.RemoveByKey("Phone Div");
@@ -3404,7 +3389,7 @@ namespace OpenDental {
 				mouseIsDown=false;
 				TempApptSingle.Dispose();
 				RefreshModuleDataPatient(PatCur.PatNum);
-				OnPatientSelected(PatCur);
+				FormOpenDental.S_Contr_PatientSelected(PatCur);
 				//RefreshModulePatient(PatCurNum);
 				RefreshPeriod();
 				bubbleAptNum=0;
@@ -3444,7 +3429,7 @@ namespace OpenDental {
 					ContrApptSheet2.DrawShadow();
 				}
 				RefreshModuleDataPatient(PatCur.PatNum);
-				OnPatientSelected(PatCur);
+				FormOpenDental.S_Contr_PatientSelected(PatCur);
 				//RefreshModulePatient(PatCurNum);
 				TempApptSingle.Dispose();
 				return;
@@ -3712,7 +3697,7 @@ namespace OpenDental {
 				}
 			}
 			RefreshModuleDataPatient(PatCur.PatNum);
-			OnPatientSelected(PatCur);
+			FormOpenDental.S_Contr_PatientSelected(PatCur);
 			//RefreshModulePatient(PatCurNum);
 			RefreshPeriod();
 			SetInvalid();
@@ -4133,7 +4118,7 @@ namespace OpenDental {
 				}
 				if(PatCur==null || FormPS.SelectedPatNum!=PatCur.PatNum) {//if the patient was changed
 					RefreshModuleDataPatient(FormPS.SelectedPatNum);
-					OnPatientSelected(PatCur);
+					FormOpenDental.S_Contr_PatientSelected(PatCur);
 					//RefreshModulePatient(FormPS.SelectedPatNum);
 				}
 				Appointment apt;
@@ -4205,7 +4190,7 @@ namespace OpenDental {
 							AutomationL.Trigger(AutomationTrigger.CreateApptNewPat,null,apt.PatNum);
 						}
 						RefreshModuleDataPatient(PatCur.PatNum);
-						OnPatientSelected(PatCur);
+						FormOpenDental.S_Contr_PatientSelected(PatCur);
 						//RefreshModulePatient(PatCurNum);
 						RefreshPeriod();
 						if(apt!=null && !HasValidStartTime(apt)) {
@@ -4301,14 +4286,14 @@ namespace OpenDental {
 				case OtherResult.CopyToPinBoard:
 					SendToPinBoard(FormAO.AptNumsSelected);
 					RefreshModuleDataPatient(FormAO.SelectedPatNum);
-					OnPatientSelected(PatCur);
+					FormOpenDental.S_Contr_PatientSelected(PatCur);
 					//RefreshModulePatient(FormAO.SelectedPatNum);
 					RefreshPeriod();
 					break;
 				case OtherResult.NewToPinBoard:
 					SendToPinBoard(FormAO.AptNumsSelected);
 					RefreshModuleDataPatient(FormAO.SelectedPatNum);
-					OnPatientSelected(PatCur);
+					FormOpenDental.S_Contr_PatientSelected(PatCur);
 					//RefreshModulePatient(FormAO.SelectedPatNum);
 					RefreshPeriod();
 					break;
@@ -4326,7 +4311,7 @@ namespace OpenDental {
 				case OtherResult.CreateNew:
 					ContrApptSingle.SelectedAptNum=FormAO.AptNumsSelected[0];
 					RefreshModuleDataPatient(FormAO.SelectedPatNum);
-					OnPatientSelected(PatCur);
+					FormOpenDental.S_Contr_PatientSelected(PatCur);
 					//RefreshModulePatient(FormAO.SelectedPatNum);
 					RefreshPeriod();
 					Appointment apt=Appointments.GetOneApt(ContrApptSingle.SelectedAptNum);
@@ -4367,7 +4352,7 @@ namespace OpenDental {
 					ContrApptSingle.SelectedAptNum=FormAO.AptNumsSelected[0];
 					AppointmentL.DateSelected=PIn.Date(FormAO.DateJumpToString);
 					RefreshModuleDataPatient(FormAO.SelectedPatNum);
-					OnPatientSelected(PatCur);
+					FormOpenDental.S_Contr_PatientSelected(PatCur);
 					if(ApptDrawing.IsWeeklyView) {
 						if((int)AppointmentL.DateSelected.DayOfWeek==0) {//if sunday
 							WeekStartDate=AppointmentL.DateSelected.AddDays(-6).Date;//go back to the previous monday
@@ -4417,7 +4402,6 @@ namespace OpenDental {
 			//Reselect existing window if available, if not create a new instance
 			if(FormUnsched2==null || FormUnsched2.IsDisposed) {
 				FormUnsched2=new FormUnsched();
-				FormUnsched2.PatientGoTo=PatientSelected;
 			}
 			FormUnsched2.Show();
 			if(FormUnsched2.WindowState==FormWindowState.Minimized) {//only applicable if re-using an existing instance
@@ -4429,7 +4413,6 @@ namespace OpenDental {
 		private void OnASAPList_Click() {
 			if(FormASAP==null || FormASAP.IsDisposed) {
 				FormASAP=new FormASAP();
-				FormASAP.PatientGoTo=PatientSelected;
 			}
 			FormASAP.Show();
 			if(FormASAP.WindowState==FormWindowState.Minimized) {
@@ -4486,7 +4469,6 @@ namespace OpenDental {
 		private void OnConfirm_Click() {
 			if(FormConfirmL==null || FormConfirmL.IsDisposed) {
 				FormConfirmL=new FormConfirmList();
-				FormConfirmL.PatientGoTo=PatientSelected;
 			}
 			FormConfirmL.Show();
 			if(FormConfirmL.WindowState==FormWindowState.Minimized) {
@@ -4498,7 +4480,6 @@ namespace OpenDental {
 		private void OnTrack_Click() {
 			if(FormTN==null || FormTN.IsDisposed) {
 				FormTN=new FormTrackNext();
-				FormTN.PatientGoTo=PatientSelected;
 			}
 			FormTN.Show();
 			if(FormTN.WindowState==FormWindowState.Minimized) {
@@ -4910,7 +4891,7 @@ namespace OpenDental {
 			}
 			else {
 				RefreshModuleDataPatient(PIn.Long(pinBoard.ApptList[pinBoard.SelectedIndex].DataRoww["PatNum"].ToString()));
-				OnPatientSelected(PatCur);
+				FormOpenDental.S_Contr_PatientSelected(PatCur);
 				//RefreshModulePatient(PIn.PInt(pinBoard.ApptList[pinBoard.SelectedIndex].DataRoww["PatNum"].ToString()));
 			}
 		}
@@ -5016,14 +4997,9 @@ namespace OpenDental {
 					}
 					break;
 				case "Send Text":
-					if(SendSmsClickDelegate!=null) {
-						SendSmsClickDelegate(Appointments.GetOneApt(ContrApptSingle.ClickedAptNum).PatNum,"");
-					}
+					FormOpenDental.S_OnTxtMsg_Click(Appointments.GetOneApt(ContrApptSingle.ClickedAptNum).PatNum,"");
 					break;
 				case "Send Confirmation Text":
-					if(SendSmsClickDelegate==null) {
-						break;
-					}
 					Appointment appt=Appointments.GetOneApt(ContrApptSingle.ClickedAptNum);
 					Patient pat=Patients.GetPat(appt.PatNum);
 					string message=PrefC.GetString(PrefName.ConfirmTextMessage);
@@ -5031,7 +5007,7 @@ namespace OpenDental {
 					message=message.Replace("[NameFL]",pat.GetNameFL());
 					message=message.Replace("[date]",appt.AptDateTime.ToShortDateString());
 					message=message.Replace("[time]",appt.AptDateTime.ToShortTimeString());
-					SendSmsClickDelegate(pat.PatNum,message);
+					FormOpenDental.S_OnTxtMsg_Click(pat.PatNum,message);
 					break;
 			}
 		}
@@ -6057,7 +6033,7 @@ namespace OpenDental {
 				//	PatientSelected(this,eArgs);
 				//}
 				//Contr_PatientSelected(this,eArgs);
-				OnPatientSelected(pat);
+				FormOpenDental.S_Contr_PatientSelected(pat);
 				GotoModule.GotoAppointment(apt.AptDateTime,apt.AptNum);
 			}
 		}

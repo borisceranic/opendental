@@ -32,7 +32,6 @@ namespace OpenDental{
 		private List<Clinic> _listUserClinics;
 		private IContainer components;
 		private ContextMenuStrip menuRightClick;
-		public PatientSelectedEventHandler PatientGoTo;
 
 		///<summary>PatientGoTo must be set before calling Show() or ShowDialog().</summary>
 		public FormTrackNext(){
@@ -400,7 +399,7 @@ namespace OpenDental{
 			//If multiple selected, just take the last one to remain consistent with SendPinboard_Click.
 			long patNum=AptList[gridMain.SelectedIndices[gridMain.SelectedIndices.Length-1]].PatNum;
 			Patient pat=Patients.GetPat(patNum);
-			PatientGoTo(this,new OpenDental.PatientSelectedEventArgs(pat));
+			FormOpenDental.S_Contr_PatientSelected(pat);
 		}
 
 		private void SeeChart_Click() {
@@ -410,8 +409,7 @@ namespace OpenDental{
 			}
 			//Only one can be selected at a time in this grid, but just in case we change it in the future it will select the last one in the list to be consistent with other patient selections.
 			Patient pat=Patients.GetPat(AptList[gridMain.SelectedIndices[gridMain.SelectedIndices.Length-1]].PatNum);
-			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
-			PatientGoTo(this,eArgs);
+			FormOpenDental.S_Contr_PatientSelected(pat);
 			GotoModule.GotoChart(pat.PatNum);
 		}
 
@@ -433,8 +431,7 @@ namespace OpenDental{
 			int currentSelection=gridMain.GetSelectedIndex();
 			int currentScroll=gridMain.ScrollValue;
 			Patient pat=Patients.GetPat(AptList[e.Row].PatNum);//Only one can be selected at a time in this grid.
-			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
-			PatientGoTo(this,eArgs);
+			FormOpenDental.S_Contr_PatientSelected(pat);
 			FormApptEdit FormAE=new FormApptEdit(AptList[e.Row].AptNum);
 			FormAE.PinIsVisible=true;
 			FormAE.ShowDialog();

@@ -36,7 +36,6 @@ namespace OpenDental{
 		private Dictionary<long,string> patientNames;
 		private List<Clinic> _listUserClinics;
 		private List<long> _listAptSelected;
-		public PatientSelectedEventHandler PatientGoTo;
 
 		///<summary>PatientGoTo must be set before calling Show() or ShowDialog().</summary>
 		public FormUnsched(){
@@ -342,7 +341,7 @@ namespace OpenDental{
 			//If multiple selected, just take the last one to remain consistent with SendPinboard_Click.
 			long patNum=ListUn[grid.SelectedIndices[grid.SelectedIndices.Length-1]].PatNum;
 			Patient pat=Patients.GetPat(patNum);
-			PatientGoTo(this,new OpenDental.PatientSelectedEventArgs(pat));
+			FormOpenDental.S_Contr_PatientSelected(pat);
 		}
 
 		///<summary>If multiple patients are selected in UnchedList, will select the last patient to remain consistent with sending to pinboard behavior.</summary>
@@ -352,8 +351,7 @@ namespace OpenDental{
 				return;
 			}
 			Patient pat=Patients.GetPat(ListUn[grid.SelectedIndices[grid.SelectedIndices.Length-1]].PatNum);//If multiple selected, just take the last one to remain consistent with SendPinboard_Click.
-			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
-			PatientGoTo(this,eArgs);
+			FormOpenDental.S_Contr_PatientSelected(pat);
 			GotoModule.GotoChart(pat.PatNum);
 		}
 
@@ -462,8 +460,7 @@ namespace OpenDental{
 			int currentSelection=e.Row;//tbApts.SelectedRow;
 			int currentScroll=grid.ScrollValue;//tbApts.ScrollValue;
 			Patient pat=Patients.GetPat(ListUn[e.Row].PatNum);//If multiple selected, just take the one that was clicked on.
-			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
-			PatientGoTo(this,eArgs);
+			FormOpenDental.S_Contr_PatientSelected(pat);
 			FormApptEdit FormAE=new FormApptEdit(ListUn[e.Row].AptNum);
 			FormAE.PinIsVisible=true;
 			FormAE.ShowDialog();

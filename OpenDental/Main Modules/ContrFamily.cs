@@ -24,9 +24,6 @@ namespace OpenDental{
 		private OpenDental.UI.ODToolBar ToolBarMain;
 		///<summary>All recalls for this entire family.</summary>
 		private List<Recall> RecallList;
-		///<summary></summary>
-		[Category("Data"),Description("Occurs when user changes current patient, usually by clicking on the Select Patient button.")]
-		public event PatientSelectedEventHandler PatientSelected=null;
 		private Patient PatCur;
 		private Family FamCur;
 		private OpenDental.UI.ODPictureBox picturePat;
@@ -503,14 +500,6 @@ namespace OpenDental{
 			}
 		}
 
-		///<summary>Public so it can be used from plugin.</summary>
-		public void OnPatientSelected(Patient pat){
-			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
-			if(PatientSelected!=null){
-				PatientSelected(this,eArgs);
-			}
-		}
-
 		#region gridPatient
 
 		private void gridPat_CellDoubleClick(object sender,ODGridClickEventArgs e) {
@@ -533,7 +522,7 @@ namespace OpenDental{
 					FormR.ShowDialog();
 					if(FormR.GotoPatNum!=0) {
 						Patient pat=Patients.GetPat(FormR.GotoPatNum);
-						OnPatientSelected(pat);
+						FormOpenDental.S_Contr_PatientSelected(pat);
 						GotoModule.GotoFamily(FormR.GotoPatNum);
 						return;
 					}
@@ -635,7 +624,7 @@ namespace OpenDental{
 					OnPatientSelected(PatCur.PatNum,PatCur.GetNameLF(),PatCur.Email!="",PatCur.ChartNumber);
 				}*/
 				if(FormP.DialogResult==DialogResult.OK) {
-					OnPatientSelected(PatCur);
+					FormOpenDental.S_Contr_PatientSelected(PatCur);
 				}
 			}
 			ModuleSelected(PatCur.PatNum);
@@ -1101,7 +1090,7 @@ namespace OpenDental{
 			//}
 			//tbFamily.SelectedRow=e.Row;
 			//tbFamily.ColorRow(e.Row,Color.DarkSalmon);
-			OnPatientSelected(FamCur.ListPats[e.Row]);
+			FormOpenDental.S_Contr_PatientSelected(FamCur.ListPats[e.Row]);
 			ModuleSelected(FamCur.ListPats[e.Row].PatNum);
 		}
 
@@ -1110,7 +1099,7 @@ namespace OpenDental{
 			FormP.IsNew=false;
 			FormP.ShowDialog();
 			if(FormP.DialogResult==DialogResult.OK) {
-				OnPatientSelected(PatCur);
+				FormOpenDental.S_Contr_PatientSelected(PatCur);
 			}
 			ModuleSelected(PatCur.PatNum);
 		}
@@ -1163,7 +1152,7 @@ namespace OpenDental{
 			FormPE.IsNew=true;
 			FormPE.ShowDialog();
 			if(FormPE.DialogResult==DialogResult.OK){
-				OnPatientSelected(tempPat);
+				FormOpenDental.S_Contr_PatientSelected(tempPat);
 				ModuleSelected(tempPat.PatNum);
 			}
 			else{
@@ -1289,7 +1278,7 @@ namespace OpenDental{
 							Recalls.Update(RecallList[i]);
 						}
 					}
-					OnPatientSelected(new Patient());
+					FormOpenDental.S_Contr_PatientSelected(new Patient());
 					ModuleSelected(0);
 					//does not delete notes or plans, etc.
 				}
@@ -1316,7 +1305,7 @@ namespace OpenDental{
 					}
 				}
 				ModuleSelected(PatOld.Guarantor);//Sets PatCur to PatOld guarantor.
-				OnPatientSelected(PatCur);//PatCur is now the Guarantor.
+				FormOpenDental.S_Contr_PatientSelected(PatCur);//PatCur is now the Guarantor.
 			}
 			PatientL.RemoveFromMenu(PatOld.GetNameLF(),PatOld.PatNum);//Always remove deleted patients from the dropdown menu.
 		}
@@ -2096,7 +2085,7 @@ namespace OpenDental{
 		}
 
 		private void gridSuperFam_CellClick(object sender,ODGridClickEventArgs e) {
-			OnPatientSelected(SuperFamilyGuarantors[e.Row]);
+			FormOpenDental.S_Contr_PatientSelected(SuperFamilyGuarantors[e.Row]);
 			ModuleSelected(SuperFamilyGuarantors[e.Row].PatNum);
 		}
 

@@ -54,7 +54,7 @@ namespace OpenDental{
 		private TextBox textDays;
 		///<summary></summary>
 		[Category("Data"),Description("Occurs when user changes current patient, usually by clicking on the Select Patient button.")]
-		public event PatientSelectedEventHandler PatientSelected=null;
+		//public event PatientSelectedEventHandler PatientSelected=null;
 		///<summary>Collection of Signals</summary>
 		private List<Signalod> SignalList;
 		private SigElementDef[] sigElementDefUser;
@@ -823,14 +823,6 @@ namespace OpenDental{
 			}
 		}*/
 
-		///<summary>Sends the PatientSelected event on up to the main form.  The only result is that the main window now knows the new patNum and patName.  Does nothing else.  Does not trigger any other methods to run which might cause a loop.  Only called from RefreshModulePatient, but it's separate so that it's the same as in the other modules.</summary>
-		private void OnPatientSelected(Patient pat) {
-			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
-			if(PatientSelected!=null){
-				PatientSelected(this,eArgs);
-			}
-		}
-
 		private void butSendClaims_Click(object sender, System.EventArgs e) {
 			if(!Security.IsAuthorized(Permissions.ClaimSend)) {
 				return;
@@ -861,7 +853,7 @@ namespace OpenDental{
 			FormCPL.ShowDialog();
 			if(FormCPL.GotoPatNum!=0 && FormCPL.GotoClaimNum!=0) {
 				Patient pat=Patients.GetPat(FormCPL.GotoPatNum);
-				OnPatientSelected(pat);
+				FormOpenDental.S_Contr_PatientSelected(pat);
 				GotoModule.GotoClaim(FormCPL.GotoClaimNum);
 			}
 		}
@@ -923,7 +915,6 @@ namespace OpenDental{
 				FormB.Close();
 			}
 			FormB=new FormBilling();
-			FormB.GoToChanged += new PatientSelectedEventHandler(formBilling_GoToChanged);
 			FormB.ClinicNum=clinicNum;
 			FormB.Show();//FormBilling has a Go To option and is shown as a non-modal window so the user can view the patient account and the billing list at the same time.
 			FormB.BringToFront();
@@ -942,18 +933,13 @@ namespace OpenDental{
 			}
 		}
 
-		private void formBilling_GoToChanged(object sender,PatientSelectedEventArgs e) {
-			OnPatientSelected(e.Pat);
-			GotoModule.GotoAccount(0);
-		}
-
 		private void formClaimsSend_GoToChanged(ODEventArgs e) {
 			if(e.Name!="FormClaimSend_GoTo") {
 				return;
 			}
 			ClaimSendQueueItem claimSendQueueItem=(ClaimSendQueueItem)e.Tag;
 			Patient pat=Patients.GetPat(claimSendQueueItem.PatNum);
-			OnPatientSelected(pat);
+			FormOpenDental.S_Contr_PatientSelected(pat);
 			GotoModule.GotoClaim(claimSendQueueItem.ClaimNum);
 		}
 
@@ -990,7 +976,7 @@ namespace OpenDental{
 				return;
 			}
 			//ok signifies that a database was restored
-			OnPatientSelected(null);
+			FormOpenDental.S_Contr_PatientSelected(new Patient());//unload patient after restore.
 			//ParentForm.Text=PrefC.GetString(PrefName.MainWindowTitle");
 			DataValid.SetInvalid(true);
 			ModuleSelected(PatCurNum);

@@ -1089,7 +1089,7 @@ namespace OpenDental {
 				FillComboJobs();
 				return;
 			}
-			FormOpenDental.GoToJob(_listJobs[comboJobs.SelectedIndex].JobNum);
+			FormOpenDental.S_GoToJob(_listJobs[comboJobs.SelectedIndex].JobNum);
 		}
 
 		private void FillGrid() {
@@ -1343,6 +1343,7 @@ namespace OpenDental {
 			GotoKeyNum=TaskCur.KeyNum;
 			DialogResult=DialogResult.OK;
 			Close();
+			FormOpenDental.S_TaskGoTo(GotoType,GotoKeyNum);
 		}
 
 		private void butChangeUser_Click(object sender,EventArgs e) {

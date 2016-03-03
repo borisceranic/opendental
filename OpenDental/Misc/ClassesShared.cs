@@ -250,8 +250,6 @@ namespace OpenDental{
 
 	///<summary>Used to trigger a global event to jump between modules and perform actions in other modules.  PatNum is optional.  If 0, then no effect.</summary>
 	public class GotoModule{
-		///<summary></summary>
-		public static event ModuleEventHandler ModuleSelected;
 
 		/*
 		///<summary>This triggers a global event which the main form responds to by going directly to a module.</summary>
@@ -304,14 +302,9 @@ namespace OpenDental{
 
 		///<summary></summary>
 		protected static void OnModuleSelected(ModuleEventArgs e){
-			if(ModuleSelected !=null){
-				ModuleSelected(e);
-			}
+			FormOpenDental.S_GotoModule_ModuleSelected(e);
 		}
 	}
-
-	///<summary>This is used for our global module events.</summary>
-	public delegate void ModuleEventHandler(ModuleEventArgs e);
 
 	///<summary></summary>
 	public class ModuleEventArgs : System.EventArgs{
@@ -322,7 +315,7 @@ namespace OpenDental{
 		private long claimNum;
 		private long patNum;
 		private long docNum;//image
-		
+
 		///<summary></summary>
 		public ModuleEventArgs(DateTime dateSelected,List<long> pinAppts,long selectedAptNum,int iModule,
 			long claimNum,long patNum,long docNum)

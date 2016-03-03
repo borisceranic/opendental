@@ -30,7 +30,6 @@ namespace OpenDental {
 		///<summary>The column index of the Status column within the Messages grid.
 		///This is a class-wide variable to prevent bugs if we decide to change the column order of the Messages grid.</summary>
 		private int _columnStatusIdx=0;
-		public PatientSelectedEventHandler PatientGoTo;
 		private List<SmsFromMobile> _listSmsFromMobile=new List<SmsFromMobile>();
 		private List<SmsToMobile> _listSmsToMobile=new List<SmsToMobile>();
 
@@ -532,8 +531,7 @@ namespace OpenDental {
 				MsgBox.Show(this,"Please select a message with a valid patient attached.");
 				return;
 			}
-			PatientSelectedEventArgs psea=new PatientSelectedEventArgs(Patients.GetPat(patNum));
-			PatientGoTo(this,psea);
+			FormOpenDental.S_Contr_PatientSelected(Patients.GetPat(patNum));
 		}
 
 		private void butReply_Click(object sender,EventArgs e) {

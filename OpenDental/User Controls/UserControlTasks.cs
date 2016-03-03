@@ -32,9 +32,6 @@ namespace OpenDental {
 		public TaskObjectType GotoType;
 		///<summary>After closing, if this is not zero, then it will jump to the specified patient.</summary>
 		public long GotoKeyNum;
-		///<summary></summary>
-		[Category("Property Changed"),Description("Event raised when user wants to go to a patient or related object.")]
-		public event EventHandler GoToChanged=null;
 		///<summary>All notes for the showing tasks, ordered by date time.</summary>
 		private List<TaskNote> TaskNoteList;
 		private const int _TriageListNum=1697;
@@ -55,12 +52,6 @@ namespace OpenDental {
 		///<summary>The parent might call this if it gets a signal that a relevant task was added from another workstation.  The parent should only call this if it has been verified that there is a change to tasks.</summary>
 		public void RefreshTasks(){
 			FillGrid();
-		}
-
-		protected void OnGoToChanged() {
-			if(GoToChanged!=null) {
-				GoToChanged(this,new EventArgs());
-			}
 		}
 
 		///<summary>And resets the tabs if the user changes.</summary>
@@ -760,7 +751,7 @@ namespace OpenDental {
 			if(FormT.GotoType!=TaskObjectType.None) {
 				GotoType=FormT.GotoType;
 				GotoKeyNum=FormT.GotoKeyNum;
-				OnGoToChanged();
+				FormOpenDental.S_TaskGoTo(GotoType,GotoKeyNum);
 			}
 			if(!this.IsDisposed) {
 				FillGrid();
@@ -1070,7 +1061,7 @@ namespace OpenDental {
 			Task task=TasksList[clickedI-TaskListsList.Count];
 			GotoType=task.ObjectType;
 			GotoKeyNum=task.KeyNum;
-			OnGoToChanged();
+			FormOpenDental.S_TaskGoTo(GotoType,GotoKeyNum);
 		}
 
 		///<summary>A recursive function that duplicates an entire existing TaskList.  For the initial loop, make changes to the original taskList before passing it in.  That way, Date and type are only set in initial loop.  All children preserve original dates and types.  The isRepeating value will be applied in all loops.  Also, make sure to change the parent num to the new one before calling this function.  The taskListNum will always change, because we are inserting new record into database.  Sending null in for oldList will cause all existing subscriptions to the old list to be deleted.  In order for the new list to have the same subscriptions as the old list (as in a Cut/Paste), send in the old task list.</summary>

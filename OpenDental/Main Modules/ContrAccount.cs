@@ -123,9 +123,6 @@ namespace OpenDental {
 		///<summary></summary>
 		private Patient PatCur;
 		private PatientNote PatientNoteCur;
-		///<summary></summary>
-		[Category("Data"),Description("Occurs when user changes current patient, usually by clicking on the Select Patient button.")]
-		public event PatientSelectedEventHandler PatientSelected=null;
 		private RepeatCharge[] RepeatChargeList;
 		private int OriginalMousePos;
 		private bool MouseIsDownOnSplitter;
@@ -2840,7 +2837,7 @@ namespace OpenDental {
 				FormPayPlan2=new FormPayPlan(PatCur,payplan);
 				FormPayPlan2.ShowDialog();
 				if(FormPayPlan2.GotoPatNum!=0){
-					OnPatientSelected(Patients.GetPat(FormPayPlan2.GotoPatNum));
+					FormOpenDental.S_Contr_PatientSelected(Patients.GetPat(FormPayPlan2.GotoPatNum));
 					ModuleSelected(FormPayPlan2.GotoPatNum,false);
 					return;
 				}
@@ -2856,7 +2853,7 @@ namespace OpenDental {
 				FormPayPlan2=new FormPayPlan(PatCur,payplan);
 				FormPayPlan2.ShowDialog();
 				if(FormPayPlan2.GotoPatNum!=0) {
-					OnPatientSelected(Patients.GetPat(FormPayPlan2.GotoPatNum));
+					FormOpenDental.S_Contr_PatientSelected(Patients.GetPat(FormPayPlan2.GotoPatNum));
 					ModuleSelected(FormPayPlan2.GotoPatNum,false);
 					return;
 				}
@@ -2877,11 +2874,11 @@ namespace OpenDental {
 				return;
 			}
 			if(e.Row==FamCur.ListPats.Length){//last row
-				OnPatientSelected(FamCur.ListPats[0]);
+				FormOpenDental.S_Contr_PatientSelected(FamCur.ListPats[0]);
 				ModuleSelected(FamCur.ListPats[0].PatNum,true);
 			}
 			else{
-				OnPatientSelected(FamCur.ListPats[e.Row]);
+				FormOpenDental.S_Contr_PatientSelected(FamCur.ListPats[e.Row]);
 				ModuleSelected(FamCur.ListPats[e.Row].PatNum);
 			}
 		}
@@ -2933,14 +2930,6 @@ namespace OpenDental {
 			}
 			else if(e.Button.Tag.GetType()==typeof(Program)) {
 				ProgramL.Execute(((Program)e.Button.Tag).ProgramNum,PatCur);
-			}
-		}
-
-		///<summary></summary>
-		private void OnPatientSelected(Patient pat) {
-			PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
-			if(PatientSelected!=null){
-				PatientSelected(this,eArgs);
 			}
 		}
 
@@ -3621,7 +3610,7 @@ namespace OpenDental {
 			FormPP.IsNew=true;
 			FormPP.ShowDialog();
 			if(FormPP.GotoPatNum!=0) {
-				OnPatientSelected(Patients.GetPat(FormPayPlan2.GotoPatNum));
+				FormOpenDental.S_Contr_PatientSelected(Patients.GetPat(FormPayPlan2.GotoPatNum));
 				ModuleSelected(FormPP.GotoPatNum);//switches to other patient.
 			}
 			else{
@@ -4697,7 +4686,7 @@ namespace OpenDental {
 				FormP.IsNew=false;
 				FormP.ShowDialog();
 				if(FormP.DialogResult==DialogResult.OK) {
-					OnPatientSelected(PatCur);
+					FormOpenDental.S_Contr_PatientSelected(PatCur);
 				}
 			}
 			ModuleSelected(PatCur.PatNum);
@@ -4915,7 +4904,7 @@ namespace OpenDental {
 			if(GotoType == TaskObjectType.Patient) {
 				if(keyNum != 0) {
 					Patient pat = Patients.GetPat(keyNum);
-					OnPatientSelected(pat);
+					FormOpenDental.S_Contr_PatientSelected(pat);
 					ModuleSelected(pat.PatNum);
 					return;
 				}

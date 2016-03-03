@@ -65,6 +65,10 @@ using EHR;
 namespace OpenDental{
 	///<summary></summary>
 	public class FormOpenDental:System.Windows.Forms.Form, ISignalProcessor{
+		///<summary>This is the singleton instance of the FormOpenDental. This allows us to have S_ methods that are public static
+		///and can be called from anywhere in the program to update FormOpenDental.</summary>
+		private static FormOpenDental _formOpenDentalS;
+
 		private System.ComponentModel.IContainer components;
 		//private bool[,] buttonDown=new bool[2,6];
 		private System.Windows.Forms.Timer timerTimeIndic;
@@ -370,20 +374,21 @@ namespace OpenDental{
 		private MenuItem menuItem4;
 		private MenuItem menuItemPassword;
 		private MenuItem menuItemEmailSettings;
-        private MenuItem menuItemInsVerification;
-        private FormSmsTextMessaging _formSmsTextMessaging;
+    private MenuItem menuItemInsVerification;
+    private FormSmsTextMessaging _formSmsTextMessaging;
 		private FormQuery _formUserQuery;
 		private OpenDentalGraph.FormDashboardEditTab _formDashboardEditTab;
 		private MenuItem menuItemReportsStandard;
 		private MenuItem menuItemReportsGraphic;
 		private MenuItem menuItemReportsUserQuery;
-
+		//consider rewriting this to use new FormOpenDental singleton method pattern.
 		[Category("Data"),Description("Occurs when a user has taken action on an item needing action taken.")]
 		public event ActionNeededEventHandler ActionTaken=null;
-		private static FormJobManager2 _formJobManager2; //singleton
+		private FormJobManager2 _formJobManager2; //singleton
 
 		///<summary></summary>
 		public FormOpenDental(string[] cla){
+			_formOpenDentalS=this;
 			Logger.openlog.Log("Initializing Open Dental...",Logger.Severity.INFO);
 			CommandLineArgs=cla;
 			Splash=new FormSplash();
@@ -408,52 +413,33 @@ namespace OpenDental{
 			myOutlookBar.Dock=DockStyle.Left;
 			myOutlookBar.ButtonClicked+=new ButtonClickedEventHandler(myOutlookBar_ButtonClicked);
 			this.Controls.Add(myOutlookBar);
+			//MAIN MODULE CONTROLS
 			//contrAppt
-			ContrAppt2=new ContrAppt();
-			ContrAppt2.Visible=false;
-			ContrAppt2.PatientSelected+=new PatientSelectedEventHandler(Contr_PatientSelected);
-			ContrAppt2.ActionTaken+=ContrAppt2_ActionTaken;
+			ContrAppt2=new ContrAppt() { Visible=false };
+			ContrAppt2.ActionTaken+=ContrAppt2_ActionTaken;//consider rewriting this to use new FormOpenDental singleton method pattern.
 			this.Controls.Add(ContrAppt2);
 			//contrFamily
-			ContrFamily2=new ContrFamily();
-			ContrFamily2.Visible=false;
-			ContrFamily2.PatientSelected+=new PatientSelectedEventHandler(Contr_PatientSelected);
+			ContrFamily2=new ContrFamily() { Visible=false };
 			this.Controls.Add(ContrFamily2);
 			//contrFamilyEcw
-			ContrFamily2Ecw=new ContrFamilyEcw();
-			ContrFamily2Ecw.Visible=false;
-			//ContrFamily2Ecw.PatientSelected+=new PatientSelectedEventHandler(Contr_PatientSelected);
+			ContrFamily2Ecw=new ContrFamilyEcw() { Visible=false };
 			this.Controls.Add(ContrFamily2Ecw);
 			//contrAccount
-			ContrAccount2=new ContrAccount();
-			ContrAccount2.Visible=false;
-			ContrAccount2.PatientSelected+=new PatientSelectedEventHandler(Contr_PatientSelected);
+			ContrAccount2=new ContrAccount() { Visible=false };
 			this.Controls.Add(ContrAccount2);
 			//contrTreat
-			ContrTreat2=new ContrTreat();
-			ContrTreat2.Visible=false;
-			ContrTreat2.PatientSelected+=new PatientSelectedEventHandler(Contr_PatientSelected);
+			ContrTreat2=new ContrTreat() { Visible=false };
 			this.Controls.Add(ContrTreat2);
 			//contrChart
-			ContrChart2=new ContrChart();
-			ContrChart2.Visible=false;
-			ContrChart2.PatientSelected+=new PatientSelectedEventHandler(Contr_PatientSelected);
+			ContrChart2=new ContrChart() { Visible=false };
 			this.Controls.Add(ContrChart2);
 			//contrImages
-			ContrImages2=new ContrImages();
-			ContrImages2.Visible=false;
-			ContrImages2.PatientSelected+=new PatientSelectedEventHandler(Contr_PatientSelected);
+			ContrImages2=new ContrImages() { Visible=false };
 			this.Controls.Add(ContrImages2);
 			//contrManage
-			ContrManage2=new ContrStaff();
-			ContrManage2.Visible=false;
-			ContrManage2.PatientSelected+=new PatientSelectedEventHandler(Contr_PatientSelected);
+			ContrManage2=new ContrStaff() { Visible=false };
 			this.Controls.Add(ContrManage2);
-			//userControlTasks
-			userControlTasks1=new UserControlTasks();
-			userControlTasks1.Visible=false;
-			userControlTasks1.GoToChanged+=new EventHandler(userControlTasks1_GoToChanged);
-			GotoModule.ModuleSelected+=new ModuleEventHandler(GotoModule_ModuleSelected);
+			userControlTasks1=new UserControlTasks() { Visible=false };
 			this.Controls.Add(userControlTasks1);
 			panelSplitter.ContextMenu=menuSplitter;
 			menuItemDockBottom.Checked=true;
@@ -2631,7 +2617,6 @@ namespace OpenDental{
 				//Remove the menu items that are only needed for HQ like Default CC Procedures
 				menuItemAccount.MenuItems.Clear();
 			}
-			ContrAppt2.SendSmsClickDelegate=OnTxtMsg_Click;//used in the appointment right click context menu.
 			if(PrefC.GetString(PrefName.LanguageAndRegion)!=CultureInfo.CurrentCulture.Name && !ComputerPrefs.LocalComputer.NoShowLanguage) {
 				if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Warning, having mismatched language setting between the workstation and server may cause the program "
 					+"to behave in unexpected ways. Would you like to view the setup window?"))
@@ -3169,7 +3154,7 @@ namespace OpenDental{
 		}
 
 		///<summary>Causes the toolbar to be laid out again.</summary>
-		public void LayoutToolBar() {
+		private void LayoutToolBar() {
 			ToolBarMain.Buttons.Clear();
 			ODToolBarButton button;
 			button=new ODToolBarButton(Lan.g(this,"Select Patient"),0,"","Patient");
@@ -3286,11 +3271,15 @@ namespace OpenDental{
 			FillPatientButton(pat);
 		}
 
+		public static void S_Contr_PatientSelected(Patient pat) {
+			_formOpenDentalS.Contr_PatientSelected(pat);
+		}
+
 		///<summary>Happens when any of the modules changes the current patient or when this main form changes the patient.  The calling module should refresh itself.  The current patNum is stored here in the parent form so that when switching modules, the parent form knows which patient to call up for that module.</summary>
-		private void Contr_PatientSelected(object sender,PatientSelectedEventArgs e) {
-			CurPatNum=e.Pat.PatNum;
+		private void Contr_PatientSelected(Patient pat) {
+			CurPatNum=pat.PatNum;
 			RefreshCurrentModule();
-			FillPatientButton(e.Pat);
+			FillPatientButton(pat);
 		}
 
 		///<Summary>Serves four functions.  1. Sends the new patient to the dropdown menu for select patient.  2. Changes which toolbar buttons are enabled.  3. Sets main form text. 4. Displays any popup.</Summary>
@@ -3766,6 +3755,10 @@ namespace OpenDental{
 
 		#region SMS Text Messaging
 
+		public static void S_OnTxtMsg_Click(long patNum,string startingText = "") {
+			_formOpenDentalS.OnTxtMsg_Click(patNum,startingText);
+		}
+
 		///<summary>Called from the text message button and the right click context menu for an appointment.</summary>
 		private void OnTxtMsg_Click(long patNum, string startingText="") {
 			if(patNum==0) {
@@ -3839,7 +3832,6 @@ namespace OpenDental{
 				if(!String.IsNullOrEmpty(_butText.NotificationText)) {
 					_formSmsTextMessaging.UnreadMessageCount=PIn.Long(_butText.NotificationText);
 				}
-				_formSmsTextMessaging.PatientGoTo+=Contr_PatientSelected;
 				_formSmsTextMessaging.FormClosed+=FormSmsTextMessaging_FormClosed;
 			}
 			_formSmsTextMessaging.Show();
@@ -4174,6 +4166,11 @@ namespace OpenDental{
 			Signalods.Insert(sig);
 		}
 
+		///<summary>Referenced at least 40 times indirectly.</summary>
+		public static void S_GotoModule_ModuleSelected(ModuleEventArgs e) {
+			_formOpenDentalS.GotoModule_ModuleSelected(e);
+		}
+
 		private void GotoModule_ModuleSelected(ModuleEventArgs e){
 			if(e.DateSelected.Year>1880){
 				AppointmentL.DateSelected=e.DateSelected;
@@ -4498,7 +4495,6 @@ namespace OpenDental{
 					this.BringToFront();//don't know if this is doing anything.
 					FormTaskEdit FormT = new FormTaskEdit(tasksPopup[i],tasksPopup[i].Copy());
 					FormT.IsPopup=true;
-					FormT.Closing+=new CancelEventHandler(TaskGoToEvent);
 					FormT.Show();//non-modal
 				}
 			}
@@ -4610,11 +4606,6 @@ namespace OpenDental{
 			menuItemEServices.Enabled=true;
 			menuItemListenerService.Enabled=false;
 			menuItemListenerService.Enabled=true;
-		}
-
-		public void TaskGoToEvent(object sender, CancelEventArgs e){
-			FormTaskEdit FormT=(FormTaskEdit)sender;
-			TaskGoTo(FormT.GotoType,FormT.GotoKeyNum);
 		}
 
 		/////<summary>Gives users 15 seconds to finish what they were doing before the program shuts down.</summary>
@@ -5128,41 +5119,37 @@ namespace OpenDental{
 			timerDisabledKey.Start();
 		}
 
-		private void userControlTasks1_GoToChanged(object sender,EventArgs e) {
-			TaskGoTo(userControlTasks1.GotoType,userControlTasks1.GotoKeyNum);
+		public static void S_TaskGoTo(TaskObjectType taskOT,long keyNum) {
+			_formOpenDentalS.TaskGoTo(taskOT,keyNum);
 		}
 
 		private void TaskGoTo(TaskObjectType taskOT,long keyNum){
-			if(taskOT==TaskObjectType.None) {
+			if(taskOT==TaskObjectType.None || keyNum==0) {
 				return;
 			}
 			if(taskOT==TaskObjectType.Patient) {
-				if(keyNum!=0) {
-					CurPatNum=keyNum;
-					Patient pat=Patients.GetPat(CurPatNum);
-					RefreshCurrentModule();
-					FillPatientButton(pat);
-				}
+				CurPatNum=keyNum;
+				Patient pat=Patients.GetPat(CurPatNum);
+				RefreshCurrentModule();
+				FillPatientButton(pat);
 			}
 			if(taskOT==TaskObjectType.Appointment) {
-				if(keyNum!=0) {
-					Appointment apt=Appointments.GetOneApt(keyNum);
-					if(apt==null) {
-						MsgBox.Show(this,"Appointment has been deleted, so it's not available.");
-						return;
-					}
-					DateTime dateSelected=DateTime.MinValue;
-					if(apt.AptStatus==ApptStatus.Planned || apt.AptStatus==ApptStatus.UnschedList) {
-						//I did not add feature to put planned or unsched apt on pinboard.
-						MsgBox.Show(this,"Cannot navigate to appointment.  Use the Other Appointments button.");
-						//return;
-					}
-					else {
-						dateSelected=apt.AptDateTime;
-					}
-					CurPatNum=apt.PatNum;//OnPatientSelected(apt.PatNum);
-					GotoModule.GotoAppointment(dateSelected,apt.AptNum);
+				Appointment apt=Appointments.GetOneApt(keyNum);
+				if(apt==null) {
+					MsgBox.Show(this,"Appointment has been deleted, so it's not available.");
+					return;
 				}
+				DateTime dateSelected=DateTime.MinValue;
+				if(apt.AptStatus==ApptStatus.Planned || apt.AptStatus==ApptStatus.UnschedList) {
+					//I did not add feature to put planned or unsched apt on pinboard.
+					MsgBox.Show(this,"Cannot navigate to appointment.  Use the Other Appointments button.");
+					//return;
+				}
+				else {
+					dateSelected=apt.AptDateTime;
+				}
+				CurPatNum=apt.PatNum;//OnPatientSelected(apt.PatNum);
+				GotoModule.GotoAppointment(dateSelected,apt.AptNum);
 			}
 		}
 
@@ -6103,9 +6090,13 @@ namespace OpenDental{
 			_formJobManager2.BringToFront();
 		}
 
+		public static void S_GoToJob(long jobNum) {
+			_formOpenDentalS.GoToJob(jobNum);
+		}
+
 		///<summary>Can be called from anywhere in OD layer to load job. 
 		///It is in FormOpenDental because this is where the static reference to theJob Manager is.</summary>
-		public static void GoToJob(long jobNum) {
+		private void GoToJob(long jobNum) {
 			if(_formJobManager2==null || _formJobManager2.IsDisposed) {
 				_formJobManager2=new FormJobManager2();
 			}
@@ -6123,11 +6114,7 @@ namespace OpenDental{
 			if(FormL.GoToAptNum!=0) {
 				Appointment apt=Appointments.GetOneApt(FormL.GoToAptNum);
 				Patient pat=Patients.GetPat(apt.PatNum);
-				PatientSelectedEventArgs eArgs=new OpenDental.PatientSelectedEventArgs(pat);
-				//if(PatientSelected!=null){
-				//	PatientSelected(this,eArgs);
-				//}
-				Contr_PatientSelected(this,eArgs);
+				S_Contr_PatientSelected(pat);
 				//OnPatientSelected(pat.PatNum,pat.GetNameLF(),pat.Email!="",pat.ChartNumber);
 				GotoModule.GotoAppointment(apt.AptDateTime,apt.AptNum);
 			}
@@ -6890,7 +6877,7 @@ namespace OpenDental{
 		//protected delegate void ProcessCommandLineDelegate(string[] args);
 
 		///<summary></summary>
-		public void ProcessCommandLine(string[] args) {
+		private void ProcessCommandLine(string[] args) {
 			//if(!Programs.UsingEcwTight() && args.Length==0){
 			if(!Programs.UsingEcwTightOrFullMode() && args.Length==0){//May have to modify to accept from other sw.
 				SetModuleSelected();
@@ -7209,7 +7196,7 @@ namespace OpenDental{
 
 		///<summary>HQ Only. Digest results of ProcessHqMetrics and update form controls accordingly.
 		///phoneList is the list of all phone rows just pulled from the database.  phone is the one that we should display here, and it can be null.</summary>
-		public void OnProcessHqMetricsResults(List<PhoneEmpDefault> phoneEmpDefaultList,List<Phone> phoneList,List<Task> listOfficesDown,Phone phone,bool isTriageOperator) {
+		private void OnProcessHqMetricsResults(List<PhoneEmpDefault> phoneEmpDefaultList,List<Phone> phoneList,List<Task> listOfficesDown,Phone phone,bool isTriageOperator) {
 			try {
 				//Send the phoneList to the 2 places where it's needed.
 				//1) Send to the small display in the main OD form (quick-glance).
