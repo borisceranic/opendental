@@ -309,7 +309,7 @@ namespace OpenDental {
 						drawFieldSpecial(sheet,field,g,null);
 						break;
 					case SheetFieldType.Grid:
-						drawFieldGrid(field,sheet,g,null,_dataSet,_stmt,_medLab);
+						drawFieldGrid(field,sheet,g,null,_dataSet,_stmt,_medLab,true);
 						break;
 					case SheetFieldType.InputField:
 					case SheetFieldType.OutputText:
@@ -954,7 +954,9 @@ namespace OpenDental {
 		}
 
 		///<Summary>DataSet should be prefilled with AccountModules.GetAccount() before calling this method if printing a statement.</Summary>
-		public static void drawFieldGrid(SheetField field,Sheet sheet,Graphics g,XGraphics gx,DataSet dataSet,Statement stmt,MedLab medLab) {
+		public static void drawFieldGrid(SheetField field,Sheet sheet,Graphics g,XGraphics gx,DataSet dataSet,Statement stmt,MedLab medLab,
+			bool isPrinting=false) 
+		{
 			Sheets.SetPageMargin(sheet,_printMargin);
 			UI.ODGrid odGrid=new UI.ODGrid();//Only used for measurements, also contains printing/drawing logic.
 			odGrid.FontForSheets=new Font(field.FontName,field.FontSize,field.FontIsBold?FontStyle.Bold:FontStyle.Regular);
@@ -1160,7 +1162,7 @@ namespace OpenDental {
 				#endregion
 				#region Draw Row
 				if(gx==null) {
-					odGrid.PrintRow(i,g,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint+_yAdjCurRow,odGrid.PrintRows[i].IsBottomRow,true);
+					odGrid.PrintRow(i,g,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint+_yAdjCurRow,odGrid.PrintRows[i].IsBottomRow,true,isPrinting);
 				}
 				else {
 					odGrid.PrintRowX(i,gx,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint+_yAdjCurRow,odGrid.PrintRows[i].IsBottomRow,true);
