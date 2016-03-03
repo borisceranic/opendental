@@ -112,9 +112,9 @@ namespace OpenDental{
 			//Trial users should never be able to update a database.
 			if(PrefC.GetString(PrefName.RegistrationKey)!="") {//Allow databases with no reg key to update.  Needed by our conversion department.
 				if(isSilent) {
-					ExitCode=191;//Trial versions cannot connect to live databases
+					FormOpenDental.ExitCode=191;//Trial versions cannot connect to live databases
 					Application.Exit();
-					return;
+					return false;
 				}
 				MsgBox.Show(this,"Trial versions cannot connect to live databases.  Please run the Setup.exe in the AtoZ folder to reinstall your original version.");
 				return false;
