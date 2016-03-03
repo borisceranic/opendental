@@ -317,7 +317,7 @@ namespace OpenDentBusiness{
 				else {
 					phone=PrefC.GetString(PrefName.PracticePhone);
 				}
-				if(PrefC.GetLanguageAndRegion().Name.Right(2)=="US" && clinic.Phone.Length==10) {
+				if(PrefC.GetLanguageAndRegion().Name.Right(2)=="US" && phone.Length==10) {
 					//Phone format "### ### ####" per Nathan's request
 					phone = string.Format("{0} {1} {2}",phone.Substring(0,3),phone.Substring(3,3),phone.Substring(6));
 				}
