@@ -69,8 +69,8 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (claimAttach.ClaimAttachNum),
 					POut.Long  (claimAttach.ClaimNum),
-					POut.String(claimAttach.DisplayedFileName),
-					POut.String(claimAttach.ActualFileName),
+					            claimAttach.DisplayedFileName,
+					            claimAttach.ActualFileName,
 				});
 			}
 			return table;

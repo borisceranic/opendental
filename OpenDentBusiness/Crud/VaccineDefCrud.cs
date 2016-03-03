@@ -68,8 +68,8 @@ namespace OpenDentBusiness.Crud{
 			foreach(VaccineDef vaccineDef in listVaccineDefs) {
 				table.Rows.Add(new object[] {
 					POut.Long  (vaccineDef.VaccineDefNum),
-					POut.String(vaccineDef.CVXCode),
-					POut.String(vaccineDef.VaccineName),
+					            vaccineDef.CVXCode,
+					            vaccineDef.VaccineName,
 					POut.Long  (vaccineDef.DrugManufacturerNum),
 				});
 			}

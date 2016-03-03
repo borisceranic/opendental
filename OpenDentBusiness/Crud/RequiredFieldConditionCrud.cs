@@ -84,7 +84,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (requiredFieldCondition.RequiredFieldNum),
 					POut.Int   ((int)requiredFieldCondition.ConditionType),
 					POut.Int   ((int)requiredFieldCondition.Operator),
-					POut.String(requiredFieldCondition.ConditionValue),
+					            requiredFieldCondition.ConditionValue,
 					POut.Int   ((int)requiredFieldCondition.ConditionRelationship),
 				});
 			}

@@ -81,12 +81,12 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (evaluationCriterion.EvaluationCriterionNum),
 					POut.Long  (evaluationCriterion.EvaluationNum),
-					POut.String(evaluationCriterion.CriterionDescript),
+					            evaluationCriterion.CriterionDescript,
 					POut.Bool  (evaluationCriterion.IsCategoryName),
 					POut.Long  (evaluationCriterion.GradingScaleNum),
-					POut.String(evaluationCriterion.GradeShowing),
+					            evaluationCriterion.GradeShowing,
 					POut.Float (evaluationCriterion.GradeNumber),
-					POut.String(evaluationCriterion.Notes),
+					            evaluationCriterion.Notes,
 					POut.Int   (evaluationCriterion.ItemOrder),
 					POut.Float (evaluationCriterion.MaxPointsPoss),
 				});

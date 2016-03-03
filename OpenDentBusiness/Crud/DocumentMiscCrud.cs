@@ -71,9 +71,9 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (documentMisc.DocMiscNum),
 					POut.Date  (documentMisc.DateCreated),
-					POut.String(documentMisc.FileName),
+					            documentMisc.FileName,
 					POut.Int   ((int)documentMisc.DocMiscType),
-					POut.String(documentMisc.RawBase64),
+					            documentMisc.RawBase64,
 				});
 			}
 			return table;

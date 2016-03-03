@@ -69,8 +69,8 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (apptField.ApptFieldNum),
 					POut.Long  (apptField.AptNum),
-					POut.String(apptField.FieldName),
-					POut.String(apptField.FieldValue),
+					            apptField.FieldName,
+					            apptField.FieldValue,
 				});
 			}
 			return table;

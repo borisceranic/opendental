@@ -68,7 +68,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(TerminalActive terminalActive in listTerminalActives) {
 				table.Rows.Add(new object[] {
 					POut.Long  (terminalActive.TerminalActiveNum),
-					POut.String(terminalActive.ComputerName),
+					            terminalActive.ComputerName,
 					POut.Int   ((int)terminalActive.TerminalStatus),
 					POut.Long  (terminalActive.PatNum),
 				});

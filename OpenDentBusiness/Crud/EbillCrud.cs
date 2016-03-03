@@ -75,9 +75,9 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (ebill.EbillNum),
 					POut.Long  (ebill.ClinicNum),
-					POut.String(ebill.ClientAcctNumber),
-					POut.String(ebill.ElectUserName),
-					POut.String(ebill.ElectPassword),
+					            ebill.ClientAcctNumber,
+					            ebill.ElectUserName,
+					            ebill.ElectPassword,
 					POut.Int   ((int)ebill.PracticeAddress),
 					POut.Int   ((int)ebill.RemitAddress),
 				});

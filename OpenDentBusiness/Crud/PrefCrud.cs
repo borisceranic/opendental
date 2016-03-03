@@ -68,9 +68,9 @@ namespace OpenDentBusiness.Crud{
 			foreach(Pref pref in listPrefs) {
 				table.Rows.Add(new object[] {
 					POut.Long  (pref.PrefNum),
-					POut.String(pref.PrefName),
-					POut.String(pref.ValueString),
-					POut.String(pref.Comments),
+					            pref.PrefName,
+					            pref.ValueString,
+					            pref.Comments,
 				});
 			}
 			return table;

@@ -108,7 +108,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Int   ((int)hL7DefMessage.EventType),
 					POut.Int   ((int)hL7DefMessage.InOrOut),
 					POut.Int   (hL7DefMessage.ItemOrder),
-					POut.String(hL7DefMessage.Note),
+					            hL7DefMessage.Note,
 					POut.Int   ((int)hL7DefMessage.MessageStructure),
 				});
 			}

@@ -79,7 +79,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Date  (installmentPlan.DateFirstPayment),
 					POut.Double(installmentPlan.MonthlyPayment),
 					POut.Float (installmentPlan.APR),
-					POut.String(installmentPlan.Note),
+					            installmentPlan.Note,
 				});
 			}
 			return table;

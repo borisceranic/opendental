@@ -75,8 +75,8 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (patField.PatFieldNum),
 					POut.Long  (patField.PatNum),
-					POut.String(patField.FieldName),
-					POut.String(patField.FieldValue),
+					            patField.FieldName,
+					            patField.FieldValue,
 					POut.Long  (patField.SecUserNumEntry),
 					POut.Date  (patField.SecDateEntry),
 					POut.DateT (patField.SecDateTEdit),

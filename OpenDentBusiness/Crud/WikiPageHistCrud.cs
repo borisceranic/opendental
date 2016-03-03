@@ -73,8 +73,8 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (wikiPageHist.WikiPageNum),
 					POut.Long  (wikiPageHist.UserNum),
-					POut.String(wikiPageHist.PageTitle),
-					POut.String(wikiPageHist.PageContent),
+					            wikiPageHist.PageTitle,
+					            wikiPageHist.PageContent,
 					POut.DateT (wikiPageHist.DateTimeSaved),
 					POut.Bool  (wikiPageHist.IsDeleted),
 				});

@@ -72,7 +72,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(CovCat covCat in listCovCats) {
 				table.Rows.Add(new object[] {
 					POut.Long  (covCat.CovCatNum),
-					POut.String(covCat.Description),
+					            covCat.Description,
 					POut.Int   (covCat.DefaultPercent),
 					POut.Byte  (covCat.CovOrder),
 					POut.Bool  (covCat.IsHidden),

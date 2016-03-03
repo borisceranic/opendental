@@ -106,18 +106,18 @@ namespace OpenDentBusiness.Crud{
 			foreach(Document document in listDocuments) {
 				table.Rows.Add(new object[] {
 					POut.Long  (document.DocNum),
-					POut.String(document.Description),
+					            document.Description,
 					POut.DateT (document.DateCreated),
 					POut.Long  (document.DocCategory),
 					POut.Long  (document.PatNum),
-					POut.String(document.FileName),
+					            document.FileName,
 					POut.Int   ((int)document.ImgType),
 					POut.Bool  (document.IsFlipped),
 					POut.Int   (document.DegreesRotated),
-					POut.String(document.ToothNumbers),
-					POut.String(document.Note),
+					            document.ToothNumbers,
+					            document.Note,
 					POut.Bool  (document.SigIsTopaz),
-					POut.String(document.Signature),
+					            document.Signature,
 					POut.Int   (document.CropX),
 					POut.Int   (document.CropY),
 					POut.Int   (document.CropW),
@@ -126,8 +126,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Int   (document.WindowingMax),
 					POut.Long  (document.MountItemNum),
 					POut.DateT (document.DateTStamp),
-					POut.String(document.RawBase64),
-					POut.String(document.Thumbnail),
+					            document.RawBase64,
+					            document.Thumbnail,
 				});
 			}
 			return table;

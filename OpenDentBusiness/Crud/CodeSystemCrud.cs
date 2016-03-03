@@ -72,11 +72,11 @@ namespace OpenDentBusiness.Crud{
 			foreach(CodeSystem codeSystem in listCodeSystems) {
 				table.Rows.Add(new object[] {
 					POut.Long  (codeSystem.CodeSystemNum),
-					POut.String(codeSystem.CodeSystemName),
-					POut.String(codeSystem.VersionCur),
-					POut.String(codeSystem.VersionAvail),
-					POut.String(codeSystem.HL7OID),
-					POut.String(codeSystem.Note),
+					            codeSystem.CodeSystemName,
+					            codeSystem.VersionCur,
+					            codeSystem.VersionAvail,
+					            codeSystem.HL7OID,
+					            codeSystem.Note,
 				});
 			}
 			return table;

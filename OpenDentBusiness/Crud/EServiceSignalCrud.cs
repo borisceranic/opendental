@@ -82,9 +82,9 @@ namespace OpenDentBusiness.Crud{
 					POut.Int   (eServiceSignal.ReasonCategory),
 					POut.Int   (eServiceSignal.ReasonCode),
 					POut.Int   ((int)eServiceSignal.Severity),
-					POut.String(eServiceSignal.Description),
+					            eServiceSignal.Description,
 					POut.DateT (eServiceSignal.SigDateTime),
-					POut.String(eServiceSignal.Tag),
+					            eServiceSignal.Tag,
 					POut.Bool  (eServiceSignal.IsProcessed),
 				});
 			}

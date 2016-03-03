@@ -82,8 +82,8 @@ namespace OpenDentBusiness.Crud{
 			foreach(Operatory operatory in listOperatorys) {
 				table.Rows.Add(new object[] {
 					POut.Long  (operatory.OperatoryNum),
-					POut.String(operatory.OpName),
-					POut.String(operatory.Abbrev),
+					            operatory.OpName,
+					            operatory.Abbrev,
 					POut.Int   (operatory.ItemOrder),
 					POut.Bool  (operatory.IsHidden),
 					POut.Long  (operatory.ProvDentist),

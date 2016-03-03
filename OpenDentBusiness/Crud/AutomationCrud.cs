@@ -76,13 +76,13 @@ namespace OpenDentBusiness.Crud{
 			foreach(Automation automation in listAutomations) {
 				table.Rows.Add(new object[] {
 					POut.Long  (automation.AutomationNum),
-					POut.String(automation.Description),
+					            automation.Description,
 					POut.Int   ((int)automation.Autotrigger),
-					POut.String(automation.ProcCodes),
+					            automation.ProcCodes,
 					POut.Int   ((int)automation.AutoAction),
 					POut.Long  (automation.SheetDefNum),
 					POut.Long  (automation.CommType),
-					POut.String(automation.MessageContent),
+					            automation.MessageContent,
 				});
 			}
 			return table;

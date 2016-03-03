@@ -68,7 +68,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(ProcApptColor procApptColor in listProcApptColors) {
 				table.Rows.Add(new object[] {
 					POut.Long  (procApptColor.ProcApptColorNum),
-					POut.String(procApptColor.CodeRange),
+					            procApptColor.CodeRange,
 					POut.Bool  (procApptColor.ShowPreviousDate),
 					POut.Int   (procApptColor.ColorText.ToArgb()),
 				});

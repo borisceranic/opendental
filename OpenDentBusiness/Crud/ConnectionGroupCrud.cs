@@ -64,7 +64,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(ConnectionGroup connectionGroup in listConnectionGroups) {
 				table.Rows.Add(new object[] {
 					POut.Long  (connectionGroup.ConnectionGroupNum),
-					POut.String(connectionGroup.Description),
+					            connectionGroup.Description,
 				});
 			}
 			return table;

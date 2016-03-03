@@ -82,12 +82,12 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (labResult.LabResultNum),
 					POut.Long  (labResult.LabPanelNum),
 					POut.DateT (labResult.DateTimeTest),
-					POut.String(labResult.TestName),
+					            labResult.TestName,
 					POut.DateT (labResult.DateTStamp),
-					POut.String(labResult.TestID),
-					POut.String(labResult.ObsValue),
-					POut.String(labResult.ObsUnits),
-					POut.String(labResult.ObsRange),
+					            labResult.TestID,
+					            labResult.ObsValue,
+					            labResult.ObsUnits,
+					            labResult.ObsRange,
 					POut.Int   ((int)labResult.AbnormalFlag),
 				});
 			}

@@ -72,7 +72,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (supplyOrder.SupplyOrderNum),
 					POut.Long  (supplyOrder.SupplierNum),
 					POut.Date  (supplyOrder.DatePlaced),
-					POut.String(supplyOrder.Note),
+					            supplyOrder.Note,
 					POut.Double(supplyOrder.AmountTotal),
 				});
 			}

@@ -76,13 +76,13 @@ namespace OpenDentBusiness.Crud{
 			foreach(DiseaseDef diseaseDef in listDiseaseDefs) {
 				table.Rows.Add(new object[] {
 					POut.Long  (diseaseDef.DiseaseDefNum),
-					POut.String(diseaseDef.DiseaseName),
+					            diseaseDef.DiseaseName,
 					POut.Int   (diseaseDef.ItemOrder),
 					POut.Bool  (diseaseDef.IsHidden),
 					POut.DateT (diseaseDef.DateTStamp),
-					POut.String(diseaseDef.ICD9Code),
-					POut.String(diseaseDef.SnomedCode),
-					POut.String(diseaseDef.Icd10Code),
+					            diseaseDef.ICD9Code,
+					            diseaseDef.SnomedCode,
+					            diseaseDef.Icd10Code,
 				});
 			}
 			return table;

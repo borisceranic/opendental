@@ -75,11 +75,11 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (smsPhone.SmsPhoneNum),
 					POut.Long  (smsPhone.ClinicNum),
-					POut.String(smsPhone.PhoneNumber),
+					            smsPhone.PhoneNumber,
 					POut.DateT (smsPhone.DateTimeActive),
 					POut.DateT (smsPhone.DateTimeInactive),
-					POut.String(smsPhone.InactiveCode),
-					POut.String(smsPhone.CountryCode),
+					            smsPhone.InactiveCode,
+					            smsPhone.CountryCode,
 				});
 			}
 			return table;

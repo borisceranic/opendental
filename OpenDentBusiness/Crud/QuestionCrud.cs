@@ -74,8 +74,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (question.QuestionNum),
 					POut.Long  (question.PatNum),
 					POut.Int   (question.ItemOrder),
-					POut.String(question.Description),
-					POut.String(question.Answer),
+					            question.Description,
+					            question.Answer,
 					POut.Long  (question.FormPatNum),
 				});
 			}

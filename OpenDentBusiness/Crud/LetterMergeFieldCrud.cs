@@ -67,7 +67,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (letterMergeField.FieldNum),
 					POut.Long  (letterMergeField.LetterMergeNum),
-					POut.String(letterMergeField.FieldName),
+					            letterMergeField.FieldName,
 				});
 			}
 			return table;

@@ -90,20 +90,20 @@ namespace OpenDentBusiness.Crud{
 			foreach(Equipment equipment in listEquipments) {
 				table.Rows.Add(new object[] {
 					POut.Long  (equipment.EquipmentNum),
-					POut.String(equipment.Description),
-					POut.String(equipment.SerialNumber),
-					POut.String(equipment.ModelYear),
+					            equipment.Description,
+					            equipment.SerialNumber,
+					            equipment.ModelYear,
 					POut.Date  (equipment.DatePurchased),
 					POut.Date  (equipment.DateSold),
 					POut.Double(equipment.PurchaseCost),
 					POut.Double(equipment.MarketValue),
-					POut.String(equipment.Location),
+					            equipment.Location,
 					POut.Date  (equipment.DateEntry),
 					POut.Long  (equipment.ProvNumCheckedOut),
 					POut.Date  (equipment.DateCheckedOut),
 					POut.Date  (equipment.DateExpectedBack),
-					POut.String(equipment.DispenseNote),
-					POut.String(equipment.Status),
+					            equipment.DispenseNote,
+					            equipment.Status,
 				});
 			}
 			return table;

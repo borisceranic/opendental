@@ -70,10 +70,10 @@ namespace OpenDentBusiness.Crud{
 			foreach(ProcButton procButton in listProcButtons) {
 				table.Rows.Add(new object[] {
 					POut.Long  (procButton.ProcButtonNum),
-					POut.String(procButton.Description),
+					            procButton.Description,
 					POut.Int   (procButton.ItemOrder),
 					POut.Long  (procButton.Category),
-					POut.String(procButton.ButtonImage),
+					            procButton.ButtonImage,
 				});
 			}
 			return table;

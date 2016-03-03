@@ -71,7 +71,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (erxLog.ErxLogNum),
 					POut.Long  (erxLog.PatNum),
-					POut.String(erxLog.MsgText),
+					            erxLog.MsgText,
 					POut.DateT (erxLog.DateTStamp),
 					POut.Long  (erxLog.ProvNum),
 				});

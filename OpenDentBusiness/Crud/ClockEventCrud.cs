@@ -94,7 +94,7 @@ namespace OpenDentBusiness.Crud{
 					POut.DateT (clockEvent.TimeEntered1),
 					POut.DateT (clockEvent.TimeDisplayed1),
 					POut.Int   ((int)clockEvent.ClockStatus),
-					POut.String(clockEvent.Note),
+					            clockEvent.Note,
 					POut.DateT (clockEvent.TimeEntered2),
 					POut.DateT (clockEvent.TimeDisplayed2),
 					POut.Time  (clockEvent.OTimeHours),

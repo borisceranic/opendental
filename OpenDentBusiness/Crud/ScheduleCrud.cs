@@ -88,7 +88,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Int   ((int)schedule.SchedType),
 					POut.Long  (schedule.ProvNum),
 					POut.Long  (schedule.BlockoutType),
-					POut.String(schedule.Note),
+					            schedule.Note,
 					POut.Int   ((int)schedule.Status),
 					POut.Long  (schedule.EmployeeNum),
 					POut.DateT (schedule.DateTStamp),

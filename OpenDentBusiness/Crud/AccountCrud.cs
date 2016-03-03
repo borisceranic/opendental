@@ -72,9 +72,9 @@ namespace OpenDentBusiness.Crud{
 			foreach(Account account in listAccounts) {
 				table.Rows.Add(new object[] {
 					POut.Long  (account.AccountNum),
-					POut.String(account.Description),
+					            account.Description,
 					POut.Int   ((int)account.AcctType),
-					POut.String(account.BankNumber),
+					            account.BankNumber,
 					POut.Bool  (account.Inactive),
 					POut.Int   (account.AccountColor.ToArgb()),
 				});

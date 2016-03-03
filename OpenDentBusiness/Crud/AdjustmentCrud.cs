@@ -93,7 +93,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (adjustment.PatNum),
 					POut.Long  (adjustment.AdjType),
 					POut.Long  (adjustment.ProvNum),
-					POut.String(adjustment.AdjNote),
+					            adjustment.AdjNote,
 					POut.Date  (adjustment.ProcDate),
 					POut.Long  (adjustment.ProcNum),
 					POut.Date  (adjustment.DateEntry),

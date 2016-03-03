@@ -379,7 +379,7 @@ using System.Drawing;"+rn);
 							strb.Append("POut.Float (");
 							break;
 						case "String":
-							strb.Append("POut.String(");
+							strb.Append("            ");
 							break;
 						case "TimeSpan":
 							strb.Append("POut.Time  (");
@@ -388,7 +388,8 @@ using System.Drawing;"+rn);
 				strb.Append(classLowerCase+"."+field.Name
 					+(field.FieldType.Name=="Color" ? ".ToArgb()" : "")
 					+(field.FieldType.Name=="Interval" ? ".ToInt()" : "")
-					+"),");
+					+(field.FieldType.Name=="String" ? "" : ")")
+					+",");
 			}
 			strb.Append(rn+t4+"});");
 			strb.Append(rn+t3+"}");

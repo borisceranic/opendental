@@ -66,8 +66,8 @@ namespace OpenDentBusiness.Crud{
 			foreach(Letter letter in listLetters) {
 				table.Rows.Add(new object[] {
 					POut.Long  (letter.LetterNum),
-					POut.String(letter.Description),
-					POut.String(letter.BodyText),
+					            letter.Description,
+					            letter.BodyText,
 				});
 			}
 			return table;

@@ -87,17 +87,17 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (claimCondCodeLog.ClaimCondCodeLogNum),
 					POut.Long  (claimCondCodeLog.ClaimNum),
-					POut.String(claimCondCodeLog.Code0),
-					POut.String(claimCondCodeLog.Code1),
-					POut.String(claimCondCodeLog.Code2),
-					POut.String(claimCondCodeLog.Code3),
-					POut.String(claimCondCodeLog.Code4),
-					POut.String(claimCondCodeLog.Code5),
-					POut.String(claimCondCodeLog.Code6),
-					POut.String(claimCondCodeLog.Code7),
-					POut.String(claimCondCodeLog.Code8),
-					POut.String(claimCondCodeLog.Code9),
-					POut.String(claimCondCodeLog.Code10),
+					            claimCondCodeLog.Code0,
+					            claimCondCodeLog.Code1,
+					            claimCondCodeLog.Code2,
+					            claimCondCodeLog.Code3,
+					            claimCondCodeLog.Code4,
+					            claimCondCodeLog.Code5,
+					            claimCondCodeLog.Code6,
+					            claimCondCodeLog.Code7,
+					            claimCondCodeLog.Code8,
+					            claimCondCodeLog.Code9,
+					            claimCondCodeLog.Code10,
 				});
 			}
 			return table;

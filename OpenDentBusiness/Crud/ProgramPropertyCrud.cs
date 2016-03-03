@@ -73,9 +73,9 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (programProperty.ProgramPropertyNum),
 					POut.Long  (programProperty.ProgramNum),
-					POut.String(programProperty.PropertyDesc),
-					POut.String(programProperty.PropertyValue),
-					POut.String(programProperty.ComputerName),
+					            programProperty.PropertyDesc,
+					            programProperty.PropertyValue,
+					            programProperty.ComputerName,
 					POut.Long  (programProperty.ClinicNum),
 				});
 			}

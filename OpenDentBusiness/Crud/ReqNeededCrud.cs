@@ -68,7 +68,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(ReqNeeded reqNeeded in listReqNeededs) {
 				table.Rows.Add(new object[] {
 					POut.Long  (reqNeeded.ReqNeededNum),
-					POut.String(reqNeeded.Descript),
+					            reqNeeded.Descript,
 					POut.Long  (reqNeeded.SchoolCourseNum),
 					POut.Long  (reqNeeded.SchoolClassNum),
 				});

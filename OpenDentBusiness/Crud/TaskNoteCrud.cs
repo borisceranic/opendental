@@ -73,7 +73,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (taskNote.TaskNum),
 					POut.Long  (taskNote.UserNum),
 					POut.DateT (taskNote.DateTimeNote),
-					POut.String(taskNote.Note),
+					            taskNote.Note,
 				});
 			}
 			return table;

@@ -69,8 +69,8 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (covSpan.CovSpanNum),
 					POut.Long  (covSpan.CovCatNum),
-					POut.String(covSpan.FromCode),
-					POut.String(covSpan.ToCode),
+					            covSpan.FromCode,
+					            covSpan.ToCode,
 				});
 			}
 			return table;

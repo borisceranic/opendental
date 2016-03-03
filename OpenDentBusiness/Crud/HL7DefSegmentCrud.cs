@@ -88,7 +88,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Bool  (hL7DefSegment.CanRepeat),
 					POut.Bool  (hL7DefSegment.IsOptional),
 					POut.Int   ((int)hL7DefSegment.SegmentName),
-					POut.String(hL7DefSegment.Note),
+					            hL7DefSegment.Note,
 				});
 			}
 			return table;

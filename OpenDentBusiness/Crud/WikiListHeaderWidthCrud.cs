@@ -68,8 +68,8 @@ namespace OpenDentBusiness.Crud{
 			foreach(WikiListHeaderWidth wikiListHeaderWidth in listWikiListHeaderWidths) {
 				table.Rows.Add(new object[] {
 					POut.Long  (wikiListHeaderWidth.WikiListHeaderWidthNum),
-					POut.String(wikiListHeaderWidth.ListName),
-					POut.String(wikiListHeaderWidth.ColName),
+					            wikiListHeaderWidth.ListName,
+					            wikiListHeaderWidth.ColName,
 					POut.Int   (wikiListHeaderWidth.ColWidth),
 				});
 			}

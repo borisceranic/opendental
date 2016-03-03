@@ -110,7 +110,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Date  (screen.Birthdate),
 					POut.Long  (screen.ScreenGroupNum),
 					POut.Int   (screen.ScreenGroupOrder),
-					POut.String(screen.Comments),
+					            screen.Comments,
 					POut.Long  (screen.ScreenPatNum),
 					POut.Long  (screen.SheetNum),
 				});

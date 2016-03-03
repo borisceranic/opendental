@@ -78,7 +78,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (rxAlert.DiseaseDefNum),
 					POut.Long  (rxAlert.AllergyDefNum),
 					POut.Long  (rxAlert.MedicationNum),
-					POut.String(rxAlert.NotificationMsg),
+					            rxAlert.NotificationMsg,
 					POut.Bool  (rxAlert.IsHighSignificance),
 				});
 			}

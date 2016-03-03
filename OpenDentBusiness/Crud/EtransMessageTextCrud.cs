@@ -64,7 +64,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(EtransMessageText etransMessageText in listEtransMessageTexts) {
 				table.Rows.Add(new object[] {
 					POut.Long  (etransMessageText.EtransMessageTextNum),
-					POut.String(etransMessageText.MessageText),
+					            etransMessageText.MessageText,
 				});
 			}
 			return table;

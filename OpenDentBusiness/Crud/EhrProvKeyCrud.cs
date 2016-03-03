@@ -77,11 +77,11 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (ehrProvKey.EhrProvKeyNum),
 					POut.Long  (ehrProvKey.PatNum),
-					POut.String(ehrProvKey.LName),
-					POut.String(ehrProvKey.FName),
-					POut.String(ehrProvKey.ProvKey),
+					            ehrProvKey.LName,
+					            ehrProvKey.FName,
+					            ehrProvKey.ProvKey,
 					POut.Float (ehrProvKey.FullTimeEquiv),
-					POut.String(ehrProvKey.Notes),
+					            ehrProvKey.Notes,
 					POut.Int   (ehrProvKey.YearValue),
 				});
 			}

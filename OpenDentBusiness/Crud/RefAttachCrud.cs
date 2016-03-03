@@ -90,7 +90,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Date  (refAttach.RefDate),
 					POut.Bool  (refAttach.IsFrom),
 					POut.Int   ((int)refAttach.RefToStatus),
-					POut.String(refAttach.Note),
+					            refAttach.Note,
 					POut.Bool  (refAttach.IsTransitionOfCare),
 					POut.Long  (refAttach.ProcNum),
 					POut.Date  (refAttach.DateProcComplete),

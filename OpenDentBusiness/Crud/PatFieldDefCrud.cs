@@ -72,9 +72,9 @@ namespace OpenDentBusiness.Crud{
 			foreach(PatFieldDef patFieldDef in listPatFieldDefs) {
 				table.Rows.Add(new object[] {
 					POut.Long  (patFieldDef.PatFieldDefNum),
-					POut.String(patFieldDef.FieldName),
+					            patFieldDef.FieldName,
 					POut.Int   ((int)patFieldDef.FieldType),
-					POut.String(patFieldDef.PickList),
+					            patFieldDef.PickList,
 					POut.Int   (patFieldDef.ItemOrder),
 					POut.Bool  (patFieldDef.IsHidden),
 				});

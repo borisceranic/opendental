@@ -115,16 +115,16 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (etrans.CarrierNum2),
 					POut.Long  (etrans.PatNum),
 					POut.Int   (etrans.BatchNumber),
-					POut.String(etrans.AckCode),
+					            etrans.AckCode,
 					POut.Int   (etrans.TransSetNum),
-					POut.String(etrans.Note),
+					            etrans.Note,
 					POut.Long  (etrans.EtransMessageTextNum),
 					POut.Long  (etrans.AckEtransNum),
 					POut.Long  (etrans.PlanNum),
 					POut.Long  (etrans.InsSubNum),
-					POut.String(etrans.TranSetId835),
-					POut.String(etrans.CarrierNameRaw),
-					POut.String(etrans.PatientNameRaw),
+					            etrans.TranSetId835,
+					            etrans.CarrierNameRaw,
+					            etrans.PatientNameRaw,
 				});
 			}
 			return table;

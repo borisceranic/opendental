@@ -96,7 +96,7 @@ namespace OpenDentBusiness.Crud{
 					POut.DateT (labCase.DateTimeRecd),
 					POut.DateT (labCase.DateTimeChecked),
 					POut.Long  (labCase.ProvNum),
-					POut.String(labCase.Instructions),
+					            labCase.Instructions,
 					POut.Double(labCase.LabFee),
 				});
 			}

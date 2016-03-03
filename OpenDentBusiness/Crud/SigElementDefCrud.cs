@@ -77,8 +77,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Byte  (sigElementDef.LightRow),
 					POut.Int   (sigElementDef.LightColor.ToArgb()),
 					POut.Int   ((int)sigElementDef.SigElementType),
-					POut.String(sigElementDef.SigText),
-					POut.String(sigElementDef.Sound),
+					            sigElementDef.SigText,
+					            sigElementDef.Sound,
 					POut.Int   (sigElementDef.ItemOrder),
 				});
 			}

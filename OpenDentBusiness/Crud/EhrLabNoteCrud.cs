@@ -71,7 +71,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (ehrLabNote.EhrLabNoteNum),
 					POut.Long  (ehrLabNote.EhrLabNum),
 					POut.Long  (ehrLabNote.EhrLabResultNum),
-					POut.String(ehrLabNote.Comments),
+					            ehrLabNote.Comments,
 				});
 			}
 			return table;

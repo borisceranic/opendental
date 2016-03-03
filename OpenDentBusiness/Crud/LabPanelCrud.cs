@@ -81,13 +81,13 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (labPanel.LabPanelNum),
 					POut.Long  (labPanel.PatNum),
-					POut.String(labPanel.RawMessage),
-					POut.String(labPanel.LabNameAddress),
+					            labPanel.RawMessage,
+					            labPanel.LabNameAddress,
 					POut.DateT (labPanel.DateTStamp),
-					POut.String(labPanel.SpecimenCondition),
-					POut.String(labPanel.SpecimenSource),
-					POut.String(labPanel.ServiceId),
-					POut.String(labPanel.ServiceName),
+					            labPanel.SpecimenCondition,
+					            labPanel.SpecimenSource,
+					            labPanel.ServiceId,
+					            labPanel.ServiceName,
 					POut.Long  (labPanel.MedicalOrderNum),
 				});
 			}

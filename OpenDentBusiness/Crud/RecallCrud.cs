@@ -94,7 +94,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Date  (recall.DatePrevious),
 					POut.Int   (recall.RecallInterval.ToInt()),
 					POut.Long  (recall.RecallStatus),
-					POut.String(recall.Note),
+					            recall.Note,
 					POut.Bool  (recall.IsDisabled),
 					POut.DateT (recall.DateTStamp),
 					POut.Long  (recall.RecallTypeNum),

@@ -71,7 +71,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (procButtonItem.ProcButtonItemNum),
 					POut.Long  (procButtonItem.ProcButtonNum),
-					POut.String(procButtonItem.OldCode),
+					            procButtonItem.OldCode,
 					POut.Long  (procButtonItem.AutoCodeNum),
 					POut.Long  (procButtonItem.CodeNum),
 				});

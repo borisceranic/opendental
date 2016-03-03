@@ -81,7 +81,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Double(mapArea.YPos),
 					POut.Double(mapArea.Width),
 					POut.Double(mapArea.Height),
-					POut.String(mapArea.Description),
+					            mapArea.Description,
 					POut.Int   ((int)mapArea.ItemType),
 				});
 			}

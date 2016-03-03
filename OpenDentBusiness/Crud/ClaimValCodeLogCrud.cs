@@ -73,8 +73,8 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (claimValCodeLog.ClaimValCodeLogNum),
 					POut.Long  (claimValCodeLog.ClaimNum),
-					POut.String(claimValCodeLog.ClaimField),
-					POut.String(claimValCodeLog.ValCode),
+					            claimValCodeLog.ClaimField,
+					            claimValCodeLog.ValCode,
 					POut.Double(claimValCodeLog.ValAmount),
 					POut.Int   (claimValCodeLog.Ordinal),
 				});

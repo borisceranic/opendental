@@ -71,9 +71,9 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (gradingScaleItem.GradingScaleItemNum),
 					POut.Long  (gradingScaleItem.GradingScaleNum),
-					POut.String(gradingScaleItem.GradeShowing),
+					            gradingScaleItem.GradeShowing,
 					POut.Float (gradingScaleItem.GradeNumber),
-					POut.String(gradingScaleItem.Description),
+					            gradingScaleItem.Description,
 				});
 			}
 			return table;

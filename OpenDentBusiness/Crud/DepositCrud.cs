@@ -71,9 +71,9 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (deposit.DepositNum),
 					POut.Date  (deposit.DateDeposit),
-					POut.String(deposit.BankAccountInfo),
+					            deposit.BankAccountInfo,
 					POut.Double(deposit.Amount),
-					POut.String(deposit.Memo),
+					            deposit.Memo,
 				});
 			}
 			return table;

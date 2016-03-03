@@ -85,7 +85,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (insVerifyHist.FKey),
 					POut.Long  (insVerifyHist.DefNum),
 					POut.Date  (insVerifyHist.DateLastAssigned),
-					POut.String(insVerifyHist.Note),
+					            insVerifyHist.Note,
 				});
 			}
 			return table;

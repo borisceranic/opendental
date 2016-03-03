@@ -70,10 +70,10 @@ namespace OpenDentBusiness.Crud{
 			foreach(SigButDef sigButDef in listSigButDefs) {
 				table.Rows.Add(new object[] {
 					POut.Long  (sigButDef.SigButDefNum),
-					POut.String(sigButDef.ButtonText),
+					            sigButDef.ButtonText,
 					POut.Int   (sigButDef.ButtonIndex),
 					POut.Byte  (sigButDef.SynchIcon),
-					POut.String(sigButDef.ComputerName),
+					            sigButDef.ComputerName,
 				});
 			}
 			return table;

@@ -76,13 +76,13 @@ namespace OpenDentBusiness.Crud{
 			foreach(ReplicationServer replicationServer in listReplicationServers) {
 				table.Rows.Add(new object[] {
 					POut.Long  (replicationServer.ReplicationServerNum),
-					POut.String(replicationServer.Descript),
+					            replicationServer.Descript,
 					POut.Int   (replicationServer.ServerId),
 					POut.Long  (replicationServer.RangeStart),
 					POut.Long  (replicationServer.RangeEnd),
-					POut.String(replicationServer.AtoZpath),
+					            replicationServer.AtoZpath,
 					POut.Bool  (replicationServer.UpdateBlocked),
-					POut.String(replicationServer.SlaveMonitor),
+					            replicationServer.SlaveMonitor,
 				});
 			}
 			return table;

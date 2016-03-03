@@ -68,8 +68,8 @@ namespace OpenDentBusiness.Crud{
 			foreach(InsFilingCode insFilingCode in listInsFilingCodes) {
 				table.Rows.Add(new object[] {
 					POut.Long  (insFilingCode.InsFilingCodeNum),
-					POut.String(insFilingCode.Descript),
-					POut.String(insFilingCode.EclaimCode),
+					            insFilingCode.Descript,
+					            insFilingCode.EclaimCode,
 					POut.Int   (insFilingCode.ItemOrder),
 				});
 			}

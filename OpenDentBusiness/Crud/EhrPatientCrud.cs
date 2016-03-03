@@ -70,10 +70,10 @@ namespace OpenDentBusiness.Crud{
 			foreach(EhrPatient ehrPatient in listEhrPatients) {
 				table.Rows.Add(new object[] {
 					POut.Long  (ehrPatient.PatNum),
-					POut.String(ehrPatient.MotherMaidenFname),
-					POut.String(ehrPatient.MotherMaidenLname),
+					            ehrPatient.MotherMaidenFname,
+					            ehrPatient.MotherMaidenLname,
 					POut.Int   ((int)ehrPatient.VacShareOk),
-					POut.String(ehrPatient.MedicaidState),
+					            ehrPatient.MedicaidState,
 				});
 			}
 			return table;

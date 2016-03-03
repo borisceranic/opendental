@@ -76,8 +76,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (def.DefNum),
 					POut.Int   ((int)def.Category),
 					POut.Int   (def.ItemOrder),
-					POut.String(def.ItemName),
-					POut.String(def.ItemValue),
+					            def.ItemName,
+					            def.ItemValue,
 					POut.Int   (def.ItemColor.ToArgb()),
 					POut.Bool  (def.IsHidden),
 				});

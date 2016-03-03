@@ -71,7 +71,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (labTurnaround.LabTurnaroundNum),
 					POut.Long  (labTurnaround.LaboratoryNum),
-					POut.String(labTurnaround.Description),
+					            labTurnaround.Description,
 					POut.Int   (labTurnaround.DaysPublished),
 					POut.Int   (labTurnaround.DaysActual),
 				});

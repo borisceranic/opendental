@@ -74,12 +74,12 @@ namespace OpenDentBusiness.Crud{
 			foreach(AllergyDef allergyDef in listAllergyDefs) {
 				table.Rows.Add(new object[] {
 					POut.Long  (allergyDef.AllergyDefNum),
-					POut.String(allergyDef.Description),
+					            allergyDef.Description,
 					POut.Bool  (allergyDef.IsHidden),
 					POut.DateT (allergyDef.DateTStamp),
 					POut.Int   ((int)allergyDef.SnomedType),
 					POut.Long  (allergyDef.MedicationNum),
-					POut.String(allergyDef.UniiCode),
+					            allergyDef.UniiCode,
 				});
 			}
 			return table;

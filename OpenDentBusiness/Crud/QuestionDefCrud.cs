@@ -68,7 +68,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(QuestionDef questionDef in listQuestionDefs) {
 				table.Rows.Add(new object[] {
 					POut.Long  (questionDef.QuestionDefNum),
-					POut.String(questionDef.Description),
+					            questionDef.Description,
 					POut.Int   (questionDef.ItemOrder),
 					POut.Int   ((int)questionDef.QuestType),
 				});

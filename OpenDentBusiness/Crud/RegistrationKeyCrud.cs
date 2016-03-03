@@ -87,8 +87,8 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (registrationKey.RegistrationKeyNum),
 					POut.Long  (registrationKey.PatNum),
-					POut.String(registrationKey.RegKey),
-					POut.String(registrationKey.Note),
+					            registrationKey.RegKey,
+					            registrationKey.Note,
 					POut.Date  (registrationKey.DateStarted),
 					POut.Date  (registrationKey.DateDisabled),
 					POut.Date  (registrationKey.DateEnded),

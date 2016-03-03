@@ -80,11 +80,11 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (ehrNotPerformed.EhrNotPerformedNum),
 					POut.Long  (ehrNotPerformed.PatNum),
 					POut.Long  (ehrNotPerformed.ProvNum),
-					POut.String(ehrNotPerformed.CodeValue),
-					POut.String(ehrNotPerformed.CodeSystem),
-					POut.String(ehrNotPerformed.CodeValueReason),
-					POut.String(ehrNotPerformed.CodeSystemReason),
-					POut.String(ehrNotPerformed.Note),
+					            ehrNotPerformed.CodeValue,
+					            ehrNotPerformed.CodeSystem,
+					            ehrNotPerformed.CodeValueReason,
+					            ehrNotPerformed.CodeSystemReason,
+					            ehrNotPerformed.Note,
 					POut.Date  (ehrNotPerformed.DateEntry),
 				});
 			}

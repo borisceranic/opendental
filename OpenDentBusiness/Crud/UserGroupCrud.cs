@@ -66,7 +66,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(UserGroup userGroup in listUserGroups) {
 				table.Rows.Add(new object[] {
 					POut.Long  (userGroup.UserGroupNum),
-					POut.String(userGroup.Description),
+					            userGroup.Description,
 					POut.Long  (userGroup.UserGroupNumCEMT),
 				});
 			}

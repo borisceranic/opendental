@@ -84,7 +84,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (jobReview.JobNum),
 					POut.Long  (jobReview.ReviewerNum),
 					POut.DateT (jobReview.DateTStamp),
-					POut.String(jobReview.Description),
+					            jobReview.Description,
 					POut.Int   ((int)jobReview.ReviewStatus),
 				});
 			}

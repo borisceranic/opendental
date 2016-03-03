@@ -72,8 +72,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (orthoChart.OrthoChartNum),
 					POut.Long  (orthoChart.PatNum),
 					POut.Date  (orthoChart.DateService),
-					POut.String(orthoChart.FieldName),
-					POut.String(orthoChart.FieldValue),
+					            orthoChart.FieldName,
+					            orthoChart.FieldValue,
 				});
 			}
 			return table;

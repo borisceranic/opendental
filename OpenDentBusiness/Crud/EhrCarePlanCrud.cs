@@ -71,8 +71,8 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (ehrCarePlan.EhrCarePlanNum),
 					POut.Long  (ehrCarePlan.PatNum),
-					POut.String(ehrCarePlan.SnomedEducation),
-					POut.String(ehrCarePlan.Instructions),
+					            ehrCarePlan.SnomedEducation,
+					            ehrCarePlan.Instructions,
 					POut.Date  (ehrCarePlan.DatePlanned),
 				});
 			}

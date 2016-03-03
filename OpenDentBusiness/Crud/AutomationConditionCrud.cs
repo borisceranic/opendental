@@ -73,7 +73,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (automationCondition.AutomationNum),
 					POut.Int   ((int)automationCondition.CompareField),
 					POut.Int   ((int)automationCondition.Comparison),
-					POut.String(automationCondition.CompareString),
+					            automationCondition.CompareString,
 				});
 			}
 			return table;

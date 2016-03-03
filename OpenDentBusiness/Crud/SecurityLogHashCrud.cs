@@ -67,7 +67,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (securityLogHash.SecurityLogHashNum),
 					POut.Long  (securityLogHash.SecurityLogNum),
-					POut.String(securityLogHash.LogHash),
+					            securityLogHash.LogHash,
 				});
 			}
 			return table;

@@ -68,9 +68,9 @@ namespace OpenDentBusiness.Crud{
 			foreach(QuickPasteCat quickPasteCat in listQuickPasteCats) {
 				table.Rows.Add(new object[] {
 					POut.Long  (quickPasteCat.QuickPasteCatNum),
-					POut.String(quickPasteCat.Description),
+					            quickPasteCat.Description,
 					POut.Int   (quickPasteCat.ItemOrder),
-					POut.String(quickPasteCat.DefaultForTypes),
+					            quickPasteCat.DefaultForTypes,
 				});
 			}
 			return table;

@@ -90,8 +90,8 @@ namespace OpenDentBusiness.Crud{
 			foreach(Userod userod in listUserods) {
 				table.Rows.Add(new object[] {
 					POut.Long  (userod.UserNum),
-					POut.String(userod.UserName),
-					POut.String(userod.Password),
+					            userod.UserName,
+					            userod.Password,
 					POut.Long  (userod.UserGroupNum),
 					POut.Long  (userod.EmployeeNum),
 					POut.Long  (userod.ClinicNum),

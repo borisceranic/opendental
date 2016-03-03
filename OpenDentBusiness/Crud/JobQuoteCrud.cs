@@ -72,8 +72,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (jobQuote.JobQuoteNum),
 					POut.Long  (jobQuote.JobNum),
 					POut.Long  (jobQuote.PatNum),
-					POut.String(jobQuote.Amount),
-					POut.String(jobQuote.Note),
+					            jobQuote.Amount,
+					            jobQuote.Note,
 				});
 			}
 			return table;

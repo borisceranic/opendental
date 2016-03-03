@@ -68,9 +68,9 @@ namespace OpenDentBusiness.Crud{
 			foreach(Cdcrec cdcrec in listCdcrecs) {
 				table.Rows.Add(new object[] {
 					POut.Long  (cdcrec.CdcrecNum),
-					POut.String(cdcrec.CdcrecCode),
-					POut.String(cdcrec.HeirarchicalCode),
-					POut.String(cdcrec.Description),
+					            cdcrec.CdcrecCode,
+					            cdcrec.HeirarchicalCode,
+					            cdcrec.Description,
 				});
 			}
 			return table;

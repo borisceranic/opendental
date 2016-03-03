@@ -78,7 +78,7 @@ namespace OpenDentBusiness.Crud{
 					POut.DateT (timeAdjust.TimeEntry),
 					POut.Time  (timeAdjust.RegHours),
 					POut.Time  (timeAdjust.OTimeHours),
-					POut.String(timeAdjust.Note),
+					            timeAdjust.Note,
 					POut.Bool  (timeAdjust.IsAuto),
 				});
 			}

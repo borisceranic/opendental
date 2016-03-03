@@ -77,7 +77,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (toothGridCol.ToothGridColNum),
 					POut.Long  (toothGridCol.SheetFieldNum),
-					POut.String(toothGridCol.NameItem),
+					            toothGridCol.NameItem,
 					POut.Int   ((int)toothGridCol.CellType),
 					POut.Int   (toothGridCol.ItemOrder),
 					POut.Int   (toothGridCol.ColumnWidth),

@@ -69,7 +69,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (evaluationDef.EvaluationDefNum),
 					POut.Long  (evaluationDef.SchoolCourseNum),
-					POut.String(evaluationDef.EvalTitle),
+					            evaluationDef.EvalTitle,
 					POut.Long  (evaluationDef.GradingScaleNum),
 				});
 			}

@@ -85,10 +85,10 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (hL7DefField.HL7DefFieldNum),
 					POut.Long  (hL7DefField.HL7DefSegmentNum),
 					POut.Int   (hL7DefField.OrdinalPos),
-					POut.String(hL7DefField.TableId),
+					            hL7DefField.TableId,
 					POut.Int   ((int)hL7DefField.DataType),
-					POut.String(hL7DefField.FieldName),
-					POut.String(hL7DefField.FixedText),
+					            hL7DefField.FieldName,
+					            hL7DefField.FixedText,
 				});
 			}
 			return table;

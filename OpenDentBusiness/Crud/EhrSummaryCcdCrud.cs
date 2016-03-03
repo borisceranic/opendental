@@ -72,7 +72,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (ehrSummaryCcd.EhrSummaryCcdNum),
 					POut.Long  (ehrSummaryCcd.PatNum),
 					POut.Date  (ehrSummaryCcd.DateSummary),
-					POut.String(ehrSummaryCcd.ContentSummary),
+					            ehrSummaryCcd.ContentSummary,
 					POut.Long  (ehrSummaryCcd.EmailAttachNum),
 				});
 			}

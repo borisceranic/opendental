@@ -78,7 +78,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Byte  (patPlan.Ordinal),
 					POut.Bool  (patPlan.IsPending),
 					POut.Int   ((int)patPlan.Relationship),
-					POut.String(patPlan.PatID),
+					            patPlan.PatID,
 					POut.Long  (patPlan.InsSubNum),
 				});
 			}

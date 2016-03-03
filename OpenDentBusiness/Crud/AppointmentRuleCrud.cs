@@ -70,9 +70,9 @@ namespace OpenDentBusiness.Crud{
 			foreach(AppointmentRule appointmentRule in listAppointmentRules) {
 				table.Rows.Add(new object[] {
 					POut.Long  (appointmentRule.AppointmentRuleNum),
-					POut.String(appointmentRule.RuleDesc),
-					POut.String(appointmentRule.CodeStart),
-					POut.String(appointmentRule.CodeEnd),
+					            appointmentRule.RuleDesc,
+					            appointmentRule.CodeStart,
+					            appointmentRule.CodeEnd,
 					POut.Bool  (appointmentRule.IsEnabled),
 				});
 			}

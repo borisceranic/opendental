@@ -83,11 +83,11 @@ namespace OpenDentBusiness.Crud{
 					POut.DateT (ehrMeasureEvent.DateTEvent),
 					POut.Int   ((int)ehrMeasureEvent.EventType),
 					POut.Long  (ehrMeasureEvent.PatNum),
-					POut.String(ehrMeasureEvent.MoreInfo),
-					POut.String(ehrMeasureEvent.CodeValueEvent),
-					POut.String(ehrMeasureEvent.CodeSystemEvent),
-					POut.String(ehrMeasureEvent.CodeValueResult),
-					POut.String(ehrMeasureEvent.CodeSystemResult),
+					            ehrMeasureEvent.MoreInfo,
+					            ehrMeasureEvent.CodeValueEvent,
+					            ehrMeasureEvent.CodeSystemEvent,
+					            ehrMeasureEvent.CodeValueResult,
+					            ehrMeasureEvent.CodeSystemResult,
 					POut.Long  (ehrMeasureEvent.FKey),
 				});
 			}

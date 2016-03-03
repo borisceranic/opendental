@@ -74,12 +74,12 @@ namespace OpenDentBusiness.Crud{
 			foreach(Contact contact in listContacts) {
 				table.Rows.Add(new object[] {
 					POut.Long  (contact.ContactNum),
-					POut.String(contact.LName),
-					POut.String(contact.FName),
-					POut.String(contact.WkPhone),
-					POut.String(contact.Fax),
+					            contact.LName,
+					            contact.FName,
+					            contact.WkPhone,
+					            contact.Fax,
 					POut.Long  (contact.Category),
-					POut.String(contact.Notes),
+					            contact.Notes,
 				});
 			}
 			return table;
