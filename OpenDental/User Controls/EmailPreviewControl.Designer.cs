@@ -177,6 +177,7 @@
 			// gridAttachments
 			// 
 			this.gridAttachments.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridAttachments.HasAddButton = false;
 			this.gridAttachments.HasMultilineHeaders = false;
 			this.gridAttachments.HScrollVisible = false;
 			this.gridAttachments.Location = new System.Drawing.Point(750, 21);
@@ -263,6 +264,7 @@
 			this.textSubject.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
 			this.textSubject.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
 			this.textSubject.Size = new System.Drawing.Size(658, 20);
+			this.textSubject.SpellCheckIsEnabled = false;
 			this.textSubject.TabIndex = 7;
 			this.textSubject.Text = "";
 			this.textSubject.WordWrap = false;
@@ -272,6 +274,7 @@
 			this.textSignedBy.AcceptsTab = true;
 			this.textSignedBy.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.textSignedBy.BackColor = System.Drawing.SystemColors.Control;
 			this.textSignedBy.DetectUrls = false;
 			this.textSignedBy.Location = new System.Drawing.Point(89, 121);
 			this.textSignedBy.Multiline = false;
@@ -317,8 +320,6 @@
 			this.textFromAddress.TabIndex = 1;
 			this.textFromAddress.Text = "";
 			this.textFromAddress.WordWrap = false;
-			this.textFromAddress.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textFromAddress_KeyUp);
-			this.textFromAddress.Leave += new System.EventHandler(this.textFromAddress_Leave);
 			// 
 			// butAttach
 			// 
@@ -377,6 +378,7 @@
 			this.textBodyText.QuickPasteType = OpenDentBusiness.QuickPasteType.Email;
 			this.textBodyText.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textBodyText.Size = new System.Drawing.Size(884, 242);
+			this.textBodyText.SpellCheckIsEnabled = false;
 			this.textBodyText.TabIndex = 8;
 			this.textBodyText.Text = "";
 			this.textBodyText.TextChanged += new System.EventHandler(this.textBodyText_TextChanged);
