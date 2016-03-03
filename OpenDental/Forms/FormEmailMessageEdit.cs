@@ -167,7 +167,7 @@ namespace OpenDental{
 			this.butInsertTemplate.Size = new System.Drawing.Size(74, 26);
 			this.butInsertTemplate.TabIndex = 2;
 			this.butInsertTemplate.Text = "Insert";
-			this.butInsertTemplate.Click += new System.EventHandler(this.butInsertTemmplate_Click);
+			this.butInsertTemplate.Click += new System.EventHandler(this.butInsertTemplate_Click);
 			// 
 			// butDeleteTemplate
 			// 
@@ -623,14 +623,14 @@ namespace OpenDental{
 			FillTemplates();
 		}
 
-		private void butInsertTemmplate_Click(object sender, System.EventArgs e) {
+		private void butInsertTemplate_Click(object sender, System.EventArgs e) {
 			if(listTemplates.SelectedIndex==-1){
 				MessageBox.Show(Lan.g(this,"Please select an item first."));
 				return;
 			}
 			if(emailPreview.BodyText!="" || emailPreview.Subject!="" || emailPreview.HasAttachments){
-				if(MessageBox.Show(Lan.g(this,"Replace exising e-mail text with text from the template?  Existing attachments will not be deleted."),
-					"",MessageBoxButtons.OKCancel)!=DialogResult.OK){
+				if(MessageBox.Show(Lan.g(this,"Replace exising e-mail text with text from the template?  Existing attachments will not be deleted.")
+					,"",MessageBoxButtons.OKCancel)!=DialogResult.OK){
 					return;
 				}
 			}
@@ -687,12 +687,13 @@ namespace OpenDental{
 		///<summary>Sets the default autograph that shows in the message body. 
 		///The default autograph is determined to be the first autograph with an email that matches the email address of the sender.</summary>
 		private void SetDefaultAutograph() {
-			string fromAddress=EmailMessages.GetAddressSimple(emailPreview.FromAddress.Trim());
+			string emailUserName=EmailMessages.GetAddressSimple(emailPreview.GetOutgoingEmailAddress().EmailUsername);
+			string emailSender=EmailMessages.GetAddressSimple(emailPreview.GetOutgoingEmailAddress().SenderAddress);
 			string autographEmail;
 			for(int i=0;i<EmailAutographs.Listt.Count;i++) {
 				autographEmail=EmailMessages.GetAddressSimple(EmailAutographs.Listt[i].EmailAddress.Trim());
 				//Use Contains() because an autograph can theoretically have multiple email addresses associated with it.
-				if(autographEmail.Contains(fromAddress)) {
+				if(autographEmail.Contains(emailUserName) || autographEmail.Contains(emailSender)) {
 					InsertAutograph(EmailAutographs.Listt[i]);
 					break;
 				}
@@ -707,6 +708,9 @@ namespace OpenDental{
 		}
 		
 		private void listAutographs_DoubleClick(object sender,EventArgs e) { //edit an autograph
+			if(listAutographs.SelectedIndex==-1) {
+				return;
+			}
 			FormEmailAutographEdit FormEAE=new FormEmailAutographEdit(EmailAutographs.Listt[listAutographs.SelectedIndex]);
 			FormEAE.ShowDialog();
 			if(FormEAE.DialogResult==DialogResult.OK) {
@@ -748,6 +752,9 @@ namespace OpenDental{
 		}
 
 		private void butEditAutograph_Click(object sender,EventArgs e) {
+			if(listAutographs.SelectedIndex==-1) {
+				return;
+			}
 			FormEmailAutographEdit FormEAE=new FormEmailAutographEdit(EmailAutographs.Listt[listAutographs.SelectedIndex]);
 			FormEAE.ShowDialog();
 			if(FormEAE.DialogResult==DialogResult.OK) {

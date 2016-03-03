@@ -317,8 +317,6 @@
 			this.textFromAddress.TabIndex = 1;
 			this.textFromAddress.Text = "";
 			this.textFromAddress.WordWrap = false;
-			this.textFromAddress.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textFromAddress_KeyUp);
-			this.textFromAddress.Leave += new System.EventHandler(this.textFromAddress_Leave);
 			// 
 			// butAttach
 			// 

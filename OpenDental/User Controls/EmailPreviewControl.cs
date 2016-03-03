@@ -159,6 +159,7 @@ namespace OpenDental {
 
 		private void FillComboEmail() {
 			_listEmailAddresses=EmailAddresses.GetListt();//Does not include user specific email addresses.
+			EmailAddress emailAddressDefault=null;
 			Clinic[] listClinicsAll=Clinics.GetList();
 			for(int i=0;i<listClinicsAll.Length;i++) {//Exclude any email addresses that are associated to a clinic.
 				_listEmailAddresses.RemoveAll(x => x.EmailAddressNum==listClinicsAll[i].EmailAddressNum);
@@ -169,7 +170,8 @@ namespace OpenDental {
 			_listEmailAddresses.RemoveAll(x => x.EmailAddressNum==PrefC.GetLong(PrefName.EmailNotifyAddressNum));
 			comboEmailFrom.Items.Add(Lan.g(this,"Practice/Clinic"));//default
 			comboEmailFrom.SelectedIndex=0;
-			textFromAddress.Text=EmailAddresses.GetByClinic(ClinicNum).EmailUsername;
+			emailAddressDefault=EmailAddresses.GetByClinic(ClinicNum);
+			textFromAddress.Text=(emailAddressDefault.SenderAddress=="")?emailAddressDefault.EmailUsername:emailAddressDefault.SenderAddress;
 			//Add all email addresses which are not associated to a user, a clinic, or either of the default email addresses.
 			for(int i=0;i<_listEmailAddresses.Count;i++) {
 				comboEmailFrom.Items.Add(_listEmailAddresses[i].EmailUsername);
@@ -177,24 +179,31 @@ namespace OpenDental {
 			//Add user specific email address if present.
 			EmailAddress emailAddressMe=EmailAddresses.GetForUser(Security.CurUser.UserNum);//can be null
 			if(emailAddressMe!=null) {
+				emailAddressDefault=emailAddressMe;
 				_listEmailAddresses.Insert(0,emailAddressMe);
 				comboEmailFrom.Items.Insert(1,Lan.g(this,"Me")+" <"+emailAddressMe.EmailUsername+">");//Just below Practice/Clinic
 				comboEmailFrom.SelectedIndex=1;
-				textFromAddress.Text=emailAddressMe.EmailUsername;
-			}
-		}
-
-		private void comboEmailFrom_SelectionChangeCommitted(object sender,EventArgs e) {
-			if(comboEmailFrom.SelectedIndex==0) { //clinic/practice default
-				textFromAddress.Text=EmailAddresses.GetByClinic(ClinicNum).EmailUsername;
-			}
-			else { //me or static email address
-				textFromAddress.Text=_listEmailAddresses[comboEmailFrom.SelectedIndex-1].EmailUsername;//-1 to account for predefined "Clinic/Practice" item in combobox
+				textFromAddress.Text=(emailAddressMe.SenderAddress=="")?emailAddressMe.EmailUsername:emailAddressMe.SenderAddress;
 			}
 			if(!_isComposing || !_isSigningEnabled) {
 				return;
 			}
-			SetSig(EmailMessages.GetCertFromPrivateStore(textFromAddress.Text));
+			SetSig(EmailMessages.GetCertFromPrivateStore(emailAddressDefault.EmailUsername));
+		}
+
+		private void comboEmailFrom_SelectionChangeCommitted(object sender,EventArgs e) {
+			EmailAddress emailAddressSelected=null;
+			if(comboEmailFrom.SelectedIndex==0) {
+				emailAddressSelected=EmailAddresses.GetByClinic(ClinicNum);
+			}
+			else { //me or static email address
+				emailAddressSelected=_listEmailAddresses[comboEmailFrom.SelectedIndex-1];//-1 to account for predefined "Clinic/Practice" item in combobox
+			}
+			textFromAddress.Text=(emailAddressSelected.SenderAddress=="")?emailAddressSelected.EmailUsername:emailAddressSelected.SenderAddress;
+			if(!_isComposing || !_isSigningEnabled) {
+				return;
+			}
+			SetSig(EmailMessages.GetCertFromPrivateStore(emailAddressSelected.EmailUsername));
 		}
 
 		#region Attachments
@@ -371,20 +380,6 @@ namespace OpenDental {
 
 		#region Signature
 
-		private void textFromAddress_KeyUp(object sender,KeyEventArgs e) {
-			if(!_isComposing || !_isSigningEnabled) {
-				return;
-			}
-			SetSig(EmailMessages.GetCertFromPrivateStore(textFromAddress.Text));
-		}
-
-		private void textFromAddress_Leave(object sender,EventArgs e) {
-			if(!_isComposing || !_isSigningEnabled) {
-				return;
-			}
-			SetSig(EmailMessages.GetCertFromPrivateStore(textFromAddress.Text));
-		}
-
 		private void butSig_Click(object sender,EventArgs e) {
 			FormEmailDigitalSignature form=new FormEmailDigitalSignature(_certSig);
 			if(form.ShowDialog()==DialogResult.OK) {
@@ -399,10 +394,15 @@ namespace OpenDental {
 			textSignedBy.Visible=false;
 			textSignedBy.Text="";
 			butSig.Visible=false;
+			textFromAddress.ReadOnly=false;
 			if(certSig!=null) {
 				labelSignedBy.Visible=true;
 				textSignedBy.Visible=true;
 				textSignedBy.Text=EmailMessages.GetSubjectEmailNameFromSignature(certSig);
+				//Show the user that, if the message is signed, then the sender will always look like the address on the certificate,
+				//even if they have a Sender Address setup.  Otherwise we would be misrepresenting how the Sender Address feature works.
+				textFromAddress.Text=textSignedBy.Text;
+				textFromAddress.ReadOnly=true;
 				butSig.Visible=true;
 			}
 		}
