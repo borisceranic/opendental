@@ -852,6 +852,7 @@ namespace OpenDental {
 				idx+=2;
 			}
 			comboUser.SelectedIndex=idx;
+			this.Text="Job Manager"+(comboUser.Text=="" ? "" : " - "+comboUser.Text);
 			FillGridActions();
 			FillGridMyJobs();
 		}
