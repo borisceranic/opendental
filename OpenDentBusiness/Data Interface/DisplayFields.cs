@@ -295,10 +295,7 @@ namespace OpenDentBusiness {
 				//list.Add(new DisplayField("Abbr",110,category){Description="Abbr"});
 			}
 			else if(category==DisplayFieldCategory.OrthoChart) {
-				//Ortho charts have only one predefined column.  Most display fields are user defined.
-				DisplayField df=new DisplayField("Signature",100,DisplayFieldCategory.OrthoChart);
-				df.Description=Lans.g("FormDisplayFields","Signature");
-				list.Add(df);
+				//Ortho chart has no default columns. User must explicitly set up columns.
 			}
 			else if(category==DisplayFieldCategory.AppointmentBubble) {
 				list.Add(new DisplayField("Patient Name",0,category));
@@ -599,11 +596,6 @@ namespace OpenDentBusiness {
 			}
 			else if(category==DisplayFieldCategory.OrthoChart) {
 				list=GetForCategory(DisplayFieldCategory.OrthoChart); //The display fields that the user has already saved
-				//If there are any ortho charts with a signature column present, the Signature display field will already be present.
-				if(!list.Any(x => x.InternalName=="Signature")) {
-					DisplayField disField=new DisplayField("Signature",100,DisplayFieldCategory.OrthoChart);
-					list.Add(disField);
-				}
 				List<string> listDistinctFieldNames=OrthoCharts.GetDistinctFieldNames();
 				foreach(string fieldName in listDistinctFieldNames) {
 					//If there aren't any display fields with the current field name, create one and add it to the list of available fields.

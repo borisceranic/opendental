@@ -107,7 +107,7 @@ namespace OpenDental {
 			col=new ODGridColumn(Lan.g(this,"Date"),70);
 			gridMain.Columns.Add(col);
 			for(int i=0;i<_listOrthDisplayFields.Count;i++) {
-				if(_listOrthDisplayFields[i].PickList!="") {
+				if(!string.IsNullOrEmpty(_listOrthDisplayFields[i].PickList)) {
 					List<string> listComboOptions=_listOrthDisplayFields[i].PickList.Split(new string[] { "\r\n" },StringSplitOptions.None).ToList();
 					col=new ODGridColumn(_listOrthDisplayFields[i].Description,_listOrthDisplayFields[i].ColumnWidth,listComboOptions);
 				}
@@ -134,7 +134,7 @@ namespace OpenDental {
 					if(_listOrthDisplayFields[j].InternalName != "Signature") {
 						cellValue=_tableOrtho.Rows[i][j+1].ToString();
 					}
-					if(_listOrthDisplayFields[j].PickList!="") {
+					if(!string.IsNullOrEmpty(_listOrthDisplayFields[j].PickList)) {
 						List<string> listComboOptions=_listOrthDisplayFields[j].PickList.Split(new string[] { "\r\n" },StringSplitOptions.None).ToList();
 						int selectedIndex=listComboOptions.FindIndex(x => x==cellValue);
 						row.Cells.Add(cellValue,selectedIndex);
@@ -231,14 +231,17 @@ namespace OpenDental {
 			_topazNeedsSaved=true;
 		}
 
+		///<summary>Displays the signature for this row when clicking on the Date column or the Signature column. The gridMain_CellEnter event
+		///does not fire when the column is not editable.</summary>
 		private void gridMain_CellClick(object sender,ODGridClickEventArgs e) {
-			if(e.Col!=0 && e.Col!=_sigColIdx) {
+			if(e.Col!=0 && e.Col!=_sigColIdx) {//If not the date column or the signature column, return.
 				return;
 			}
 			SetSignatureButtonVisibility(e.Row);
 			SetSignature(e.Row);
 		}
 
+		///<summary>Saves the signature to the data table if it hasn't been and displays the signature for this row.</summary>
 		private void gridMain_CellEnter(object sender,ODGridClickEventArgs e) {
 			if(!_showSigBox) {
 				return;
@@ -315,6 +318,9 @@ namespace OpenDental {
 		///<summary>Displays the signature that is saved in the data table in the signature box. Colors the grid row green if the signature is valid, 
 		///red if invalid, or white if blank. Puts "Valid" or "Invalid" in the grid's signature column.</summary>
 		private void SetSignature(int gridRow) {
+			if(!_showSigBox) {
+				return;
+			}
 			DateTime orthoDate=PIn.Date(_tableOrtho.Rows[gridRow][0].ToString());
 			OrthoSignature sig=new OrthoSignature(_tableOrtho.Rows[gridRow][_sigColIdx].ToString());
 			if(sig.SigString=="") {
@@ -338,6 +344,8 @@ namespace OpenDental {
 			}
 		}
 
+		///<summary>Removes the Sign Topaz button and the Clear Signature button from the signature box if the user does not have OrthoChartEdit
+		///permissions for that date.</summary>
 		private void SetSignatureButtonVisibility(int gridRow) {
 			DateTime orthoDate=PIn.Date(gridMain.Rows[gridRow].Cells[0].Text);
 			if(Security.IsAuthorized(Permissions.OrthoChartEdit,orthoDate,true)) {
@@ -351,6 +359,9 @@ namespace OpenDental {
 		///<summary>Saves the signature to the data table. The signature is hashed using the patient name, the date of service, and all ortho chart fields
 		///(even the ones not showing).</summary>
 		private void SaveSignatureToTable(int gridRow) {
+			if(!_showSigBox) {
+				return;
+			}
 			DateTime orthoDate=PIn.Date(_tableOrtho.Rows[gridRow][0].ToString());//First column will always be the date.
 			if(!Security.IsAuthorized(Permissions.OrthoChartEdit,orthoDate,true)) {
 				return;

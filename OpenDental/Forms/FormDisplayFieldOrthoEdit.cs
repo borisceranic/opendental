@@ -1,7 +1,6 @@
 using System;
 using System.Drawing;
-using System.Collections;
-using System.ComponentModel;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using OpenDentBusiness;
 
@@ -20,11 +19,12 @@ namespace OpenDental{
 		/// <summary>Required designer variable.</summary>
 		private System.ComponentModel.Container components = null;
 		public DisplayField FieldCur;
+		public List<DisplayField> ListShowing;
 		private Label labelLine;
 		private TextBox textPickList;
 		private UI.Button butDown;
 		private UI.Button butUp;
-		private Label labelSignature;
+		private CheckBox checkSignature;
 		private Font headerFont=new Font(FontFamily.GenericSansSerif,8.5f,FontStyle.Bold);
 
 		public FormDisplayFieldOrthoEdit()
@@ -72,7 +72,7 @@ namespace OpenDental{
 			this.textWidth = new OpenDental.ValidNum();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
-			this.labelSignature = new System.Windows.Forms.Label();
+			this.checkSignature = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// textDescription
@@ -133,7 +133,7 @@ namespace OpenDental{
 			// labelLine
 			// 
 			this.labelLine.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.labelLine.Location = new System.Drawing.Point(6, 108);
+			this.labelLine.Location = new System.Drawing.Point(6, 130);
 			this.labelLine.Name = "labelLine";
 			this.labelLine.Size = new System.Drawing.Size(130, 14);
 			this.labelLine.TabIndex = 89;
@@ -147,11 +147,11 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textPickList.HideSelection = false;
-			this.textPickList.Location = new System.Drawing.Point(142, 108);
+			this.textPickList.Location = new System.Drawing.Point(142, 130);
 			this.textPickList.Multiline = true;
 			this.textPickList.Name = "textPickList";
 			this.textPickList.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-			this.textPickList.Size = new System.Drawing.Size(249, 286);
+			this.textPickList.Size = new System.Drawing.Size(249, 260);
 			this.textPickList.TabIndex = 20;
 			// 
 			// butDown
@@ -199,7 +199,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(414, 333);
+			this.butOK.Location = new System.Drawing.Point(414, 329);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 26);
 			this.butOK.TabIndex = 35;
@@ -214,29 +214,29 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(414, 368);
+			this.butCancel.Location = new System.Drawing.Point(414, 364);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 26);
 			this.butCancel.TabIndex = 40;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
-			// labelSignature
+			// checkSignature
 			// 
-			this.labelSignature.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.labelSignature.Location = new System.Drawing.Point(12, 10);
-			this.labelSignature.Name = "labelSignature";
-			this.labelSignature.Size = new System.Drawing.Size(486, 16);
-			this.labelSignature.TabIndex = 90;
-			this.labelSignature.Text = "This display field will also cause a signature box to show in the Ortho Chart win" +
-    "dow.";
-			this.labelSignature.Visible = false;
+			this.checkSignature.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkSignature.Location = new System.Drawing.Point(142, 106);
+			this.checkSignature.Name = "checkSignature";
+			this.checkSignature.Size = new System.Drawing.Size(328, 18);
+			this.checkSignature.TabIndex = 91;
+			this.checkSignature.TabStop = false;
+			this.checkSignature.Text = "Check to show a signature box in the Ortho Chart.";
+			this.checkSignature.CheckedChanged += new System.EventHandler(this.checkSignature_CheckedChanged);
 			// 
 			// FormDisplayFieldOrthoEdit
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(510, 406);
-			this.Controls.Add(this.labelSignature);
+			this.ClientSize = new System.Drawing.Size(510, 402);
+			this.Controls.Add(this.checkSignature);
 			this.Controls.Add(this.butDown);
 			this.Controls.Add(this.butUp);
 			this.Controls.Add(this.labelLine);
@@ -269,7 +269,8 @@ namespace OpenDental{
 			textWidth.Text=FieldCur.ColumnWidth.ToString();
 			textPickList.Text=FieldCur.PickList;
 			if(FieldCur.InternalName=="Signature") {
-				labelSignature.Visible=true;
+				checkSignature.Checked=true;
+				labelLine.Visible=false;
 				textPickList.Visible=false;
 				butUp.Visible=false;
 				butDown.Visible=false;
@@ -403,6 +404,18 @@ namespace OpenDental{
 			}
 		}
 
+		private void checkSignature_CheckedChanged(object sender,EventArgs e) {
+			if(checkSignature.Checked && textPickList.Text != "") {
+				MsgBox.Show(this,"To make this display field a signature field, remove the pick list values first.");
+				checkSignature.Checked=false;
+				return;
+			}
+			labelLine.Visible=(!checkSignature.Checked);
+			textPickList.Visible=(!checkSignature.Checked);
+			butUp.Visible=(!checkSignature.Checked);
+			butDown.Visible=(!checkSignature.Checked);
+		}
+
 		private void butOK_Click(object sender, System.EventArgs e) {
 			if(textWidth.errorProvider1.GetError(textWidth)!="") {
 				MsgBox.Show(this,"Please fix data entry errors first.");
@@ -411,6 +424,12 @@ namespace OpenDental{
 			FieldCur.Description=textDescription.Text;
 			FieldCur.ColumnWidth=PIn.Int(textWidth.Text);
 			FieldCur.PickList=textPickList.Text;
+			if(checkSignature.Checked) {
+				FieldCur.InternalName="Signature";
+			}
+			else {
+				FieldCur.InternalName="";
+			}
 			DialogResult=DialogResult.OK;
 		}
 
