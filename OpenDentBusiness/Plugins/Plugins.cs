@@ -113,6 +113,9 @@ namespace OpenDentBusiness {
 
 		///<summary>Will return true if a plugin implements this method, replacing the default behavior.</summary>
 		public static bool HookMethod(object sender,string hookName,params object[] parameters) {
+			if(PluginList==null) {
+					return false;//PluginList will be null here for the eConnector.
+			}
 			for(int i=0;i<PluginList.Count;i++) {
 				//if there are multiple plugins, we use the first implementation that we come to.
 				if(PluginList[i].Plugin.HookMethod(sender,hookName,parameters)) {
