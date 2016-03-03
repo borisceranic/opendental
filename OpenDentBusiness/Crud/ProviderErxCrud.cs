@@ -73,7 +73,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (providerErx.ProviderErxNum),
 					POut.Long  (providerErx.PatNum),
-					POut.String(providerErx.NationalProviderID),
+					            providerErx.NationalProviderID,
 					POut.Bool  (providerErx.IsEnabled),
 					POut.Bool  (providerErx.IsIdentifyProofed),
 					POut.Bool  (providerErx.IsSentToHq),

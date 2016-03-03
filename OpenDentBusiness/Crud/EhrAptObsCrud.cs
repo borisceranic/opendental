@@ -77,9 +77,9 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (ehrAptObs.AptNum),
 					POut.Int   ((int)ehrAptObs.IdentifyingCode),
 					POut.Int   ((int)ehrAptObs.ValType),
-					POut.String(ehrAptObs.ValReported),
-					POut.String(ehrAptObs.UcumCode),
-					POut.String(ehrAptObs.ValCodeSystem),
+					            ehrAptObs.ValReported,
+					            ehrAptObs.UcumCode,
+					            ehrAptObs.ValCodeSystem,
 				});
 			}
 			return table;

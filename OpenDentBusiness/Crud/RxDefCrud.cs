@@ -76,11 +76,11 @@ namespace OpenDentBusiness.Crud{
 			foreach(RxDef rxDef in listRxDefs) {
 				table.Rows.Add(new object[] {
 					POut.Long  (rxDef.RxDefNum),
-					POut.String(rxDef.Drug),
-					POut.String(rxDef.Sig),
-					POut.String(rxDef.Disp),
-					POut.String(rxDef.Refills),
-					POut.String(rxDef.Notes),
+					            rxDef.Drug,
+					            rxDef.Sig,
+					            rxDef.Disp,
+					            rxDef.Refills,
+					            rxDef.Notes,
 					POut.Bool  (rxDef.IsControlled),
 					POut.Long  (rxDef.RxCui),
 				});

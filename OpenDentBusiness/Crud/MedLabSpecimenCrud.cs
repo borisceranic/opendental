@@ -71,8 +71,8 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (medLabSpecimen.MedLabSpecimenNum),
 					POut.Long  (medLabSpecimen.MedLabNum),
-					POut.String(medLabSpecimen.SpecimenID),
-					POut.String(medLabSpecimen.SpecimenDescript),
+					            medLabSpecimen.SpecimenID,
+					            medLabSpecimen.SpecimenDescript,
 					POut.DateT (medLabSpecimen.DateTimeCollected),
 				});
 			}

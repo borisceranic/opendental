@@ -84,16 +84,16 @@ namespace OpenDentBusiness.Crud{
 			foreach(Pharmacy pharmacy in listPharmacys) {
 				table.Rows.Add(new object[] {
 					POut.Long  (pharmacy.PharmacyNum),
-					POut.String(pharmacy.PharmID),
-					POut.String(pharmacy.StoreName),
-					POut.String(pharmacy.Phone),
-					POut.String(pharmacy.Fax),
-					POut.String(pharmacy.Address),
-					POut.String(pharmacy.Address2),
-					POut.String(pharmacy.City),
-					POut.String(pharmacy.State),
-					POut.String(pharmacy.Zip),
-					POut.String(pharmacy.Note),
+					            pharmacy.PharmID,
+					            pharmacy.StoreName,
+					            pharmacy.Phone,
+					            pharmacy.Fax,
+					            pharmacy.Address,
+					            pharmacy.Address2,
+					            pharmacy.City,
+					            pharmacy.State,
+					            pharmacy.Zip,
+					            pharmacy.Note,
 					POut.DateT (pharmacy.DateTStamp),
 				});
 			}

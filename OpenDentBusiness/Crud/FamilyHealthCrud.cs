@@ -73,7 +73,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (familyHealth.PatNum),
 					POut.Int   ((int)familyHealth.Relationship),
 					POut.Long  (familyHealth.DiseaseDefNum),
-					POut.String(familyHealth.PersonName),
+					            familyHealth.PersonName,
 				});
 			}
 			return table;

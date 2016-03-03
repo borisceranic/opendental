@@ -76,13 +76,13 @@ namespace OpenDentBusiness.Crud{
 			foreach(Dunning dunning in listDunnings) {
 				table.Rows.Add(new object[] {
 					POut.Long  (dunning.DunningNum),
-					POut.String(dunning.DunMessage),
+					            dunning.DunMessage,
 					POut.Long  (dunning.BillingType),
 					POut.Byte  (dunning.AgeAccount),
 					POut.Int   ((int)dunning.InsIsPending),
-					POut.String(dunning.MessageBold),
-					POut.String(dunning.EmailSubject),
-					POut.String(dunning.EmailBody),
+					            dunning.MessageBold,
+					            dunning.EmailSubject,
+					            dunning.EmailBody,
 				});
 			}
 			return table;

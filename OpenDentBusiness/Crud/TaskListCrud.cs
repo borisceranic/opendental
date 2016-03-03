@@ -78,7 +78,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(TaskList taskList in listTaskLists) {
 				table.Rows.Add(new object[] {
 					POut.Long  (taskList.TaskListNum),
-					POut.String(taskList.Descript),
+					            taskList.Descript,
 					POut.Long  (taskList.Parent),
 					POut.Date  (taskList.DateTL),
 					POut.Bool  (taskList.IsRepeating),

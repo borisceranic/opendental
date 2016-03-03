@@ -68,9 +68,9 @@ namespace OpenDentBusiness.Crud{
 			foreach(RxNorm rxNorm in listRxNorms) {
 				table.Rows.Add(new object[] {
 					POut.Long  (rxNorm.RxNormNum),
-					POut.String(rxNorm.RxCui),
-					POut.String(rxNorm.MmslCode),
-					POut.String(rxNorm.Description),
+					            rxNorm.RxCui,
+					            rxNorm.MmslCode,
+					            rxNorm.Description,
 				});
 			}
 			return table;

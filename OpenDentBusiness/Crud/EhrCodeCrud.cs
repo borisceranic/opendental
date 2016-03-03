@@ -80,14 +80,14 @@ namespace OpenDentBusiness.Crud{
 			foreach(EhrCode ehrCode in listEhrCodes) {
 				table.Rows.Add(new object[] {
 					POut.Long  (ehrCode.EhrCodeNum),
-					POut.String(ehrCode.MeasureIds),
-					POut.String(ehrCode.ValueSetName),
-					POut.String(ehrCode.ValueSetOID),
-					POut.String(ehrCode.QDMCategory),
-					POut.String(ehrCode.CodeValue),
-					POut.String(ehrCode.Description),
-					POut.String(ehrCode.CodeSystem),
-					POut.String(ehrCode.CodeSystemOID),
+					            ehrCode.MeasureIds,
+					            ehrCode.ValueSetName,
+					            ehrCode.ValueSetOID,
+					            ehrCode.QDMCategory,
+					            ehrCode.CodeValue,
+					            ehrCode.Description,
+					            ehrCode.CodeSystem,
+					            ehrCode.CodeSystemOID,
 					POut.Bool  (ehrCode.IsInDb),
 				});
 			}

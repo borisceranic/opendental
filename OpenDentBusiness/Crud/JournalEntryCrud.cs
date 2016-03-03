@@ -85,9 +85,9 @@ namespace OpenDentBusiness.Crud{
 					POut.Date  (journalEntry.DateDisplayed),
 					POut.Double(journalEntry.DebitAmt),
 					POut.Double(journalEntry.CreditAmt),
-					POut.String(journalEntry.Memo),
-					POut.String(journalEntry.Splits),
-					POut.String(journalEntry.CheckNumber),
+					            journalEntry.Memo,
+					            journalEntry.Splits,
+					            journalEntry.CheckNumber,
 					POut.Long  (journalEntry.ReconcileNum),
 				});
 			}

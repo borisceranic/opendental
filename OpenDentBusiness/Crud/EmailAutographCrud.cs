@@ -68,9 +68,9 @@ namespace OpenDentBusiness.Crud{
 			foreach(EmailAutograph emailAutograph in listEmailAutographs) {
 				table.Rows.Add(new object[] {
 					POut.Long  (emailAutograph.EmailAutographNum),
-					POut.String(emailAutograph.Description),
-					POut.String(emailAutograph.EmailAddress),
-					POut.String(emailAutograph.AutographText),
+					            emailAutograph.Description,
+					            emailAutograph.EmailAddress,
+					            emailAutograph.AutographText,
 				});
 			}
 			return table;

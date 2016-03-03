@@ -72,8 +72,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (eobAttach.EobAttachNum),
 					POut.Long  (eobAttach.ClaimPaymentNum),
 					POut.DateT (eobAttach.DateTCreated),
-					POut.String(eobAttach.FileName),
-					POut.String(eobAttach.RawBase64),
+					            eobAttach.FileName,
+					            eobAttach.RawBase64,
 				});
 			}
 			return table;

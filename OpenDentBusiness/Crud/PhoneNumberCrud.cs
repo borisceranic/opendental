@@ -67,7 +67,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (phoneNumber.PhoneNumberNum),
 					POut.Long  (phoneNumber.PatNum),
-					POut.String(phoneNumber.PhoneNumberVal),
+					            phoneNumber.PhoneNumberVal,
 				});
 			}
 			return table;

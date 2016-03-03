@@ -68,9 +68,9 @@ namespace OpenDentBusiness.Crud{
 			foreach(ApptFieldDef apptFieldDef in listApptFieldDefs) {
 				table.Rows.Add(new object[] {
 					POut.Long  (apptFieldDef.ApptFieldDefNum),
-					POut.String(apptFieldDef.FieldName),
+					            apptFieldDef.FieldName,
 					POut.Int   ((int)apptFieldDef.FieldType),
-					POut.String(apptFieldDef.PickList),
+					            apptFieldDef.PickList,
 				});
 			}
 			return table;

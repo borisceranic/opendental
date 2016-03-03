@@ -93,20 +93,20 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (creditCard.CreditCardNum),
 					POut.Long  (creditCard.PatNum),
-					POut.String(creditCard.Address),
-					POut.String(creditCard.Zip),
-					POut.String(creditCard.XChargeToken),
-					POut.String(creditCard.CCNumberMasked),
+					            creditCard.Address,
+					            creditCard.Zip,
+					            creditCard.XChargeToken,
+					            creditCard.CCNumberMasked,
 					POut.Date  (creditCard.CCExpiration),
 					POut.Int   (creditCard.ItemOrder),
 					POut.Double(creditCard.ChargeAmt),
 					POut.Date  (creditCard.DateStart),
 					POut.Date  (creditCard.DateStop),
-					POut.String(creditCard.Note),
+					            creditCard.Note,
 					POut.Long  (creditCard.PayPlanNum),
-					POut.String(creditCard.PayConnectToken),
+					            creditCard.PayConnectToken,
 					POut.Date  (creditCard.PayConnectTokenExp),
-					POut.String(creditCard.Procedures),
+					            creditCard.Procedures,
 				});
 			}
 			return table;

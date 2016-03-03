@@ -78,7 +78,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (jobControl.JobControlNum),
 					POut.Long  (jobControl.UserNum),
 					POut.Int   ((int)jobControl.JobControlType),
-					POut.String(jobControl.ControlData),
+					            jobControl.ControlData,
 					POut.Int   (jobControl.XPos),
 					POut.Int   (jobControl.YPos),
 					POut.Int   (jobControl.Width),

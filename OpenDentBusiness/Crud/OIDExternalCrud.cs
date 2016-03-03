@@ -81,8 +81,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (oIDExternal.OIDExternalNum),
 					POut.Int   ((int)oIDExternal.IDType),
 					POut.Long  (oIDExternal.IDInternal),
-					POut.String(oIDExternal.IDExternal),
-					POut.String(oIDExternal.rootExternal),
+					            oIDExternal.IDExternal,
+					            oIDExternal.rootExternal,
 				});
 			}
 			return table;

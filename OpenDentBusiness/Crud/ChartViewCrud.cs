@@ -82,7 +82,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(ChartView chartView in listChartViews) {
 				table.Rows.Add(new object[] {
 					POut.Long  (chartView.ChartViewNum),
-					POut.String(chartView.Description),
+					            chartView.Description,
 					POut.Int   (chartView.ItemOrder),
 					POut.Int   ((int)chartView.ProcStatuses),
 					POut.Int   ((int)chartView.ObjectTypes),

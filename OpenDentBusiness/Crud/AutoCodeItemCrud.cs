@@ -69,7 +69,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (autoCodeItem.AutoCodeItemNum),
 					POut.Long  (autoCodeItem.AutoCodeNum),
-					POut.String(autoCodeItem.OldCode),
+					            autoCodeItem.OldCode,
 					POut.Long  (autoCodeItem.CodeNum),
 				});
 			}

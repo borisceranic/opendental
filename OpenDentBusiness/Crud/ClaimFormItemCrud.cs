@@ -79,9 +79,9 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (claimFormItem.ClaimFormItemNum),
 					POut.Long  (claimFormItem.ClaimFormNum),
-					POut.String(claimFormItem.ImageFileName),
-					POut.String(claimFormItem.FieldName),
-					POut.String(claimFormItem.FormatString),
+					            claimFormItem.ImageFileName,
+					            claimFormItem.FieldName,
+					            claimFormItem.FormatString,
 					POut.Float (claimFormItem.XPos),
 					POut.Float (claimFormItem.YPos),
 					POut.Float (claimFormItem.Width),

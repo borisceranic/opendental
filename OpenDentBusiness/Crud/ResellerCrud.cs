@@ -69,8 +69,8 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (reseller.ResellerNum),
 					POut.Long  (reseller.PatNum),
-					POut.String(reseller.UserName),
-					POut.String(reseller.ResellerPassword),
+					            reseller.UserName,
+					            reseller.ResellerPassword,
 				});
 			}
 			return table;

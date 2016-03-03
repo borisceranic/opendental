@@ -66,7 +66,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(Computer computer in listComputers) {
 				table.Rows.Add(new object[] {
 					POut.Long  (computer.ComputerNum),
-					POut.String(computer.CompName),
+					            computer.CompName,
 					POut.DateT (computer.LastHeartBeat),
 				});
 			}

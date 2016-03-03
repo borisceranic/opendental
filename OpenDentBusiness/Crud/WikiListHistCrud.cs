@@ -73,9 +73,9 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (wikiListHist.WikiListHistNum),
 					POut.Long  (wikiListHist.UserNum),
-					POut.String(wikiListHist.ListName),
-					POut.String(wikiListHist.ListHeaders),
-					POut.String(wikiListHist.ListContent),
+					            wikiListHist.ListName,
+					            wikiListHist.ListHeaders,
+					            wikiListHist.ListContent,
 					POut.DateT (wikiListHist.DateTimeSaved),
 				});
 			}

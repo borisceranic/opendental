@@ -72,8 +72,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (toothGridCell.ToothGridCellNum),
 					POut.Long  (toothGridCell.SheetFieldNum),
 					POut.Long  (toothGridCell.ToothGridColNum),
-					POut.String(toothGridCell.ValueEntered),
-					POut.String(toothGridCell.ToothNum),
+					            toothGridCell.ValueEntered,
+					            toothGridCell.ToothNum,
 				});
 			}
 			return table;

@@ -73,7 +73,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (userOdPref.UserNum),
 					POut.Long  (userOdPref.Fkey),
 					POut.Int   ((int)userOdPref.FkeyType),
-					POut.String(userOdPref.ValueString),
+					            userOdPref.ValueString,
 				});
 			}
 			return table;

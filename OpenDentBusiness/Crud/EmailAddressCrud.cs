@@ -80,13 +80,13 @@ namespace OpenDentBusiness.Crud{
 			foreach(EmailAddress emailAddress in listEmailAddresss) {
 				table.Rows.Add(new object[] {
 					POut.Long  (emailAddress.EmailAddressNum),
-					POut.String(emailAddress.SMTPserver),
-					POut.String(emailAddress.EmailUsername),
-					POut.String(emailAddress.EmailPassword),
+					            emailAddress.SMTPserver,
+					            emailAddress.EmailUsername,
+					            emailAddress.EmailPassword,
 					POut.Int   (emailAddress.ServerPort),
 					POut.Bool  (emailAddress.UseSSL),
-					POut.String(emailAddress.SenderAddress),
-					POut.String(emailAddress.Pop3ServerIncoming),
+					            emailAddress.SenderAddress,
+					            emailAddress.Pop3ServerIncoming,
 					POut.Int   (emailAddress.ServerPortIncoming),
 					POut.Long  (emailAddress.UserNum),
 				});

@@ -68,9 +68,9 @@ namespace OpenDentBusiness.Crud{
 			foreach(Cvx cvx in listCvxs) {
 				table.Rows.Add(new object[] {
 					POut.Long  (cvx.CvxNum),
-					POut.String(cvx.CvxCode),
-					POut.String(cvx.Description),
-					POut.String(cvx.IsActive),
+					            cvx.CvxCode,
+					            cvx.Description,
+					            cvx.IsActive,
 				});
 			}
 			return table;

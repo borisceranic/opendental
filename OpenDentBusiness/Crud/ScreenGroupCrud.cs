@@ -76,13 +76,13 @@ namespace OpenDentBusiness.Crud{
 			foreach(ScreenGroup screenGroup in listScreenGroups) {
 				table.Rows.Add(new object[] {
 					POut.Long  (screenGroup.ScreenGroupNum),
-					POut.String(screenGroup.Description),
+					            screenGroup.Description,
 					POut.Date  (screenGroup.SGDate),
-					POut.String(screenGroup.ProvName),
+					            screenGroup.ProvName,
 					POut.Long  (screenGroup.ProvNum),
 					POut.Int   ((int)screenGroup.PlaceService),
-					POut.String(screenGroup.County),
-					POut.String(screenGroup.GradeSchool),
+					            screenGroup.County,
+					            screenGroup.GradeSchool,
 				});
 			}
 			return table;

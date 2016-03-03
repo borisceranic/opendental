@@ -80,15 +80,15 @@ namespace OpenDentBusiness.Crud{
 			foreach(MedLabFacility medLabFacility in listMedLabFacilitys) {
 				table.Rows.Add(new object[] {
 					POut.Long  (medLabFacility.MedLabFacilityNum),
-					POut.String(medLabFacility.FacilityName),
-					POut.String(medLabFacility.Address),
-					POut.String(medLabFacility.City),
-					POut.String(medLabFacility.State),
-					POut.String(medLabFacility.Zip),
-					POut.String(medLabFacility.Phone),
-					POut.String(medLabFacility.DirectorTitle),
-					POut.String(medLabFacility.DirectorLName),
-					POut.String(medLabFacility.DirectorFName),
+					            medLabFacility.FacilityName,
+					            medLabFacility.Address,
+					            medLabFacility.City,
+					            medLabFacility.State,
+					            medLabFacility.Zip,
+					            medLabFacility.Phone,
+					            medLabFacility.DirectorTitle,
+					            medLabFacility.DirectorLName,
+					            medLabFacility.DirectorFName,
 				});
 			}
 			return table;

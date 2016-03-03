@@ -66,8 +66,8 @@ namespace OpenDentBusiness.Crud{
 			foreach(Site site in listSites) {
 				table.Rows.Add(new object[] {
 					POut.Long  (site.SiteNum),
-					POut.String(site.Description),
-					POut.String(site.Note),
+					            site.Description,
+					            site.Note,
 				});
 			}
 			return table;

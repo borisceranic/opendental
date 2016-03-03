@@ -84,7 +84,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(ApptView apptView in listApptViews) {
 				table.Rows.Add(new object[] {
 					POut.Long  (apptView.ApptViewNum),
-					POut.String(apptView.Description),
+					            apptView.Description,
 					POut.Int   (apptView.ItemOrder),
 					POut.Byte  (apptView.RowsPerIncr),
 					POut.Bool  (apptView.OnlyScheduledProvs),

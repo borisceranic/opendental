@@ -66,8 +66,8 @@ namespace OpenDentBusiness.Crud{
 			foreach(EmailMessageUid emailMessageUid in listEmailMessageUids) {
 				table.Rows.Add(new object[] {
 					POut.Long  (emailMessageUid.EmailMessageUidNum),
-					POut.String(emailMessageUid.MsgId),
-					POut.String(emailMessageUid.RecipientAddress),
+					            emailMessageUid.MsgId,
+					            emailMessageUid.RecipientAddress,
 				});
 			}
 			return table;

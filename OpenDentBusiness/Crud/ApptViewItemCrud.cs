@@ -83,7 +83,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (apptViewItem.ApptViewNum),
 					POut.Long  (apptViewItem.OpNum),
 					POut.Long  (apptViewItem.ProvNum),
-					POut.String(apptViewItem.ElementDesc),
+					            apptViewItem.ElementDesc,
 					POut.Byte  (apptViewItem.ElementOrder),
 					POut.Int   (apptViewItem.ElementColor.ToArgb()),
 					POut.Int   ((int)apptViewItem.ElementAlignment),

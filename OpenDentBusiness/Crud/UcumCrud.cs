@@ -68,8 +68,8 @@ namespace OpenDentBusiness.Crud{
 			foreach(Ucum ucum in listUcums) {
 				table.Rows.Add(new object[] {
 					POut.Long  (ucum.UcumNum),
-					POut.String(ucum.UcumCode),
-					POut.String(ucum.Description),
+					            ucum.UcumCode,
+					            ucum.Description,
 					POut.Bool  (ucum.IsInUse),
 				});
 			}

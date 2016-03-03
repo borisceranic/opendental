@@ -80,9 +80,9 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (procNote.ProcNum),
 					POut.DateT (procNote.EntryDateTime),
 					POut.Long  (procNote.UserNum),
-					POut.String(procNote.Note),
+					            procNote.Note,
 					POut.Bool  (procNote.SigIsTopaz),
-					POut.String(procNote.Signature),
+					            procNote.Signature,
 				});
 			}
 			return table;

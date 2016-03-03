@@ -70,7 +70,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(AppointmentType appointmentType in listAppointmentTypes) {
 				table.Rows.Add(new object[] {
 					POut.Long  (appointmentType.AppointmentTypeNum),
-					POut.String(appointmentType.AppointmentTypeName),
+					            appointmentType.AppointmentTypeName,
 					POut.Int   (appointmentType.AppointmentTypeColor.ToArgb()),
 					POut.Int   (appointmentType.ItemOrder),
 					POut.Bool  (appointmentType.IsHidden),

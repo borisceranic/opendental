@@ -66,8 +66,8 @@ namespace OpenDentBusiness.Crud{
 			foreach(DrugManufacturer drugManufacturer in listDrugManufacturers) {
 				table.Rows.Add(new object[] {
 					POut.Long  (drugManufacturer.DrugManufacturerNum),
-					POut.String(drugManufacturer.ManufacturerName),
-					POut.String(drugManufacturer.ManufacturerCode),
+					            drugManufacturer.ManufacturerName,
+					            drugManufacturer.ManufacturerCode,
 				});
 			}
 			return table;

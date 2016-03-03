@@ -70,9 +70,9 @@ namespace OpenDentBusiness.Crud{
 			foreach(LetterMerge letterMerge in listLetterMerges) {
 				table.Rows.Add(new object[] {
 					POut.Long  (letterMerge.LetterMergeNum),
-					POut.String(letterMerge.Description),
-					POut.String(letterMerge.TemplateName),
-					POut.String(letterMerge.DataFileName),
+					            letterMerge.Description,
+					            letterMerge.TemplateName,
+					            letterMerge.DataFileName,
 					POut.Long  (letterMerge.Category),
 				});
 			}

@@ -85,7 +85,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (fee.FeeNum),
 					POut.Double(fee.Amount),
-					POut.String(fee.OldCode),
+					            fee.OldCode,
 					POut.Long  (fee.FeeSched),
 					POut.Bool  (fee.UseDefaultFee),
 					POut.Bool  (fee.UseDefaultCov),

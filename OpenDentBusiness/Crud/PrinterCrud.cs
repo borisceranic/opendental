@@ -72,7 +72,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (printer.PrinterNum),
 					POut.Long  (printer.ComputerNum),
 					POut.Int   ((int)printer.PrintSit),
-					POut.String(printer.PrinterName),
+					            printer.PrinterName,
 					POut.Bool  (printer.DisplayPrompt),
 				});
 			}

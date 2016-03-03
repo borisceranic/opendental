@@ -83,12 +83,12 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (evaluation.InstructNum),
 					POut.Long  (evaluation.StudentNum),
 					POut.Long  (evaluation.SchoolCourseNum),
-					POut.String(evaluation.EvalTitle),
+					            evaluation.EvalTitle,
 					POut.Date  (evaluation.DateEval),
 					POut.Long  (evaluation.GradingScaleNum),
-					POut.String(evaluation.OverallGradeShowing),
+					            evaluation.OverallGradeShowing,
 					POut.Float (evaluation.OverallGradeNumber),
-					POut.String(evaluation.Notes),
+					            evaluation.Notes,
 				});
 			}
 			return table;

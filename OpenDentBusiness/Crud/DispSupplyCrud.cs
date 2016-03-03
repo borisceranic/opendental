@@ -76,7 +76,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (dispSupply.ProvNum),
 					POut.Date  (dispSupply.DateDispensed),
 					POut.Float (dispSupply.DispQuantity),
-					POut.String(dispSupply.Note),
+					            dispSupply.Note,
 				});
 			}
 			return table;

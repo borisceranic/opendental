@@ -76,13 +76,13 @@ namespace OpenDentBusiness.Crud{
 			foreach(DisplayField displayField in listDisplayFields) {
 				table.Rows.Add(new object[] {
 					POut.Long  (displayField.DisplayFieldNum),
-					POut.String(displayField.InternalName),
+					            displayField.InternalName,
 					POut.Int   (displayField.ItemOrder),
-					POut.String(displayField.Description),
+					            displayField.Description,
 					POut.Int   (displayField.ColumnWidth),
 					POut.Int   ((int)displayField.Category),
 					POut.Long  (displayField.ChartViewNum),
-					POut.String(displayField.PickList),
+					            displayField.PickList,
 				});
 			}
 			return table;

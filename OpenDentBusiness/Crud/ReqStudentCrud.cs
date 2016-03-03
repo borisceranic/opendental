@@ -79,7 +79,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (reqStudent.ReqStudentNum),
 					POut.Long  (reqStudent.ReqNeededNum),
-					POut.String(reqStudent.Descript),
+					            reqStudent.Descript,
 					POut.Long  (reqStudent.SchoolCourseNum),
 					POut.Long  (reqStudent.ProvNum),
 					POut.Long  (reqStudent.AptNum),

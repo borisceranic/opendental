@@ -91,9 +91,9 @@ namespace OpenDentBusiness.Crud{
 					POut.Int   (dashboardCell.CellRow),
 					POut.Int   (dashboardCell.CellColumn),
 					POut.Int   ((int)dashboardCell.CellType),
-					POut.String(dashboardCell.CellSettings),
+					            dashboardCell.CellSettings,
 					POut.DateT (dashboardCell.LastQueryTime),
-					POut.String(dashboardCell.LastQueryData),
+					            dashboardCell.LastQueryData,
 					POut.Int   (dashboardCell.RefreshRateSeconds),
 				});
 			}

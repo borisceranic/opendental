@@ -75,11 +75,11 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (hL7Msg.HL7MsgNum),
 					POut.Int   ((int)hL7Msg.HL7Status),
-					POut.String(hL7Msg.MsgText),
+					            hL7Msg.MsgText,
 					POut.Long  (hL7Msg.AptNum),
 					POut.DateT (hL7Msg.DateTStamp),
 					POut.Long  (hL7Msg.PatNum),
-					POut.String(hL7Msg.Note),
+					            hL7Msg.Note,
 				});
 			}
 			return table;

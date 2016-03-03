@@ -84,17 +84,17 @@ namespace OpenDentBusiness.Crud{
 			foreach(CentralConnection centralConnection in listCentralConnections) {
 				table.Rows.Add(new object[] {
 					POut.Long  (centralConnection.CentralConnectionNum),
-					POut.String(centralConnection.ServerName),
-					POut.String(centralConnection.DatabaseName),
-					POut.String(centralConnection.MySqlUser),
-					POut.String(centralConnection.MySqlPassword),
-					POut.String(centralConnection.ServiceURI),
-					POut.String(centralConnection.OdUser),
-					POut.String(centralConnection.OdPassword),
-					POut.String(centralConnection.Note),
+					            centralConnection.ServerName,
+					            centralConnection.DatabaseName,
+					            centralConnection.MySqlUser,
+					            centralConnection.MySqlPassword,
+					            centralConnection.ServiceURI,
+					            centralConnection.OdUser,
+					            centralConnection.OdPassword,
+					            centralConnection.Note,
 					POut.Int   (centralConnection.ItemOrder),
 					POut.Bool  (centralConnection.WebServiceIsEcw),
-					POut.String(centralConnection.ConnectionStatus),
+					            centralConnection.ConnectionStatus,
 				});
 			}
 			return table;

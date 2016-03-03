@@ -66,8 +66,8 @@ namespace OpenDentBusiness.Crud{
 			foreach(County county in listCountys) {
 				table.Rows.Add(new object[] {
 					POut.Long  (county.CountyNum),
-					POut.String(county.CountyName),
-					POut.String(county.CountyCode),
+					            county.CountyName,
+					            county.CountyCode,
 				});
 			}
 			return table;

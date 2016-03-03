@@ -76,7 +76,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (oIDInternal.OIDInternalNum),
 					POut.Int   ((int)oIDInternal.IDType),
-					POut.String(oIDInternal.IDRoot),
+					            oIDInternal.IDRoot,
 				});
 			}
 			return table;

@@ -103,7 +103,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (taskHist.TaskListNum),
 					POut.Date  (taskHist.DateTask),
 					POut.Long  (taskHist.KeyNum),
-					POut.String(taskHist.Descript),
+					            taskHist.Descript,
 					POut.Int   ((int)taskHist.TaskStatus),
 					POut.Bool  (taskHist.IsRepeating),
 					POut.Int   ((int)taskHist.DateType),

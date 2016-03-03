@@ -70,10 +70,10 @@ namespace OpenDentBusiness.Crud{
 			foreach(RecallType recallType in listRecallTypes) {
 				table.Rows.Add(new object[] {
 					POut.Long  (recallType.RecallTypeNum),
-					POut.String(recallType.Description),
+					            recallType.Description,
 					POut.Int   (recallType.DefaultInterval.ToInt()),
-					POut.String(recallType.TimePattern),
-					POut.String(recallType.Procedures),
+					            recallType.TimePattern,
+					            recallType.Procedures,
 				});
 			}
 			return table;

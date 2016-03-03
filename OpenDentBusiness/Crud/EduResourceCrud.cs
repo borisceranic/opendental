@@ -78,11 +78,11 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (eduResource.EduResourceNum),
 					POut.Long  (eduResource.DiseaseDefNum),
 					POut.Long  (eduResource.MedicationNum),
-					POut.String(eduResource.LabResultID),
-					POut.String(eduResource.LabResultName),
-					POut.String(eduResource.LabResultCompare),
-					POut.String(eduResource.ResourceUrl),
-					POut.String(eduResource.SmokingSnoMed),
+					            eduResource.LabResultID,
+					            eduResource.LabResultName,
+					            eduResource.LabResultCompare,
+					            eduResource.ResourceUrl,
+					            eduResource.SmokingSnoMed,
 				});
 			}
 			return table;

@@ -72,8 +72,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (reminderRule.ReminderRuleNum),
 					POut.Int   ((int)reminderRule.ReminderCriterion),
 					POut.Long  (reminderRule.CriterionFK),
-					POut.String(reminderRule.CriterionValue),
-					POut.String(reminderRule.Message),
+					            reminderRule.CriterionValue,
+					            reminderRule.Message,
 				});
 			}
 			return table;

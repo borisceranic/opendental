@@ -72,8 +72,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (quickPasteNote.QuickPasteNoteNum),
 					POut.Long  (quickPasteNote.QuickPasteCatNum),
 					POut.Int   (quickPasteNote.ItemOrder),
-					POut.String(quickPasteNote.Note),
-					POut.String(quickPasteNote.Abbreviation),
+					            quickPasteNote.Note,
+					            quickPasteNote.Abbreviation,
 				});
 			}
 			return table;

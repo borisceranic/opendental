@@ -78,11 +78,11 @@ namespace OpenDentBusiness.Crud{
 			foreach(ClaimForm claimForm in listClaimForms) {
 				table.Rows.Add(new object[] {
 					POut.Long  (claimForm.ClaimFormNum),
-					POut.String(claimForm.Description),
+					            claimForm.Description,
 					POut.Bool  (claimForm.IsHidden),
-					POut.String(claimForm.FontName),
+					            claimForm.FontName,
 					POut.Float (claimForm.FontSize),
-					POut.String(claimForm.UniqueID),
+					            claimForm.UniqueID,
 					POut.Bool  (claimForm.PrintImages),
 					POut.Int   (claimForm.OffsetX),
 					POut.Int   (claimForm.OffsetY),

@@ -74,8 +74,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (jobProject.JobProjectNum),
 					POut.Long  (jobProject.RootProjectNum),
 					POut.Long  (jobProject.ParentProjectNum),
-					POut.String(jobProject.Title),
-					POut.String(jobProject.Description),
+					            jobProject.Title,
+					            jobProject.Description,
 					POut.Int   ((int)jobProject.ProjectStatus),
 				});
 			}

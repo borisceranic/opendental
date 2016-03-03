@@ -80,13 +80,13 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (ehrLabSpecimenCondition.EhrLabSpecimenConditionNum),
 					POut.Long  (ehrLabSpecimenCondition.EhrLabSpecimenNum),
-					POut.String(ehrLabSpecimenCondition.SpecimenConditionID),
-					POut.String(ehrLabSpecimenCondition.SpecimenConditionText),
-					POut.String(ehrLabSpecimenCondition.SpecimenConditionCodeSystemName),
-					POut.String(ehrLabSpecimenCondition.SpecimenConditionIDAlt),
-					POut.String(ehrLabSpecimenCondition.SpecimenConditionTextAlt),
-					POut.String(ehrLabSpecimenCondition.SpecimenConditionCodeSystemNameAlt),
-					POut.String(ehrLabSpecimenCondition.SpecimenConditionTextOriginal),
+					            ehrLabSpecimenCondition.SpecimenConditionID,
+					            ehrLabSpecimenCondition.SpecimenConditionText,
+					            ehrLabSpecimenCondition.SpecimenConditionCodeSystemName,
+					            ehrLabSpecimenCondition.SpecimenConditionIDAlt,
+					            ehrLabSpecimenCondition.SpecimenConditionTextAlt,
+					            ehrLabSpecimenCondition.SpecimenConditionCodeSystemNameAlt,
+					            ehrLabSpecimenCondition.SpecimenConditionTextOriginal,
 				});
 			}
 			return table;

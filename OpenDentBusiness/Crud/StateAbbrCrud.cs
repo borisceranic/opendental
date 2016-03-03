@@ -68,8 +68,8 @@ namespace OpenDentBusiness.Crud{
 			foreach(StateAbbr stateAbbr in listStateAbbrs) {
 				table.Rows.Add(new object[] {
 					POut.Long  (stateAbbr.StateAbbrNum),
-					POut.String(stateAbbr.Description),
-					POut.String(stateAbbr.Abbr),
+					            stateAbbr.Description,
+					            stateAbbr.Abbr,
 					POut.Int   (stateAbbr.MedicaidIDLength),
 				});
 			}

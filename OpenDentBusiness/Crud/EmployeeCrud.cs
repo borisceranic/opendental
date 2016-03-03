@@ -76,13 +76,13 @@ namespace OpenDentBusiness.Crud{
 			foreach(Employee employee in listEmployees) {
 				table.Rows.Add(new object[] {
 					POut.Long  (employee.EmployeeNum),
-					POut.String(employee.LName),
-					POut.String(employee.FName),
-					POut.String(employee.MiddleI),
+					            employee.LName,
+					            employee.FName,
+					            employee.MiddleI,
 					POut.Bool  (employee.IsHidden),
-					POut.String(employee.ClockStatus),
+					            employee.ClockStatus,
 					POut.Int   (employee.PhoneExt),
-					POut.String(employee.PayrollID),
+					            employee.PayrollID,
 				});
 			}
 			return table;

@@ -72,9 +72,9 @@ namespace OpenDentBusiness.Crud{
 			foreach(Medication medication in listMedications) {
 				table.Rows.Add(new object[] {
 					POut.Long  (medication.MedicationNum),
-					POut.String(medication.MedName),
+					            medication.MedName,
 					POut.Long  (medication.GenericNum),
-					POut.String(medication.Notes),
+					            medication.Notes,
 					POut.DateT (medication.DateTStamp),
 					POut.Long  (medication.RxCui),
 				});

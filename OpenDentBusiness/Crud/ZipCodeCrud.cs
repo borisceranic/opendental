@@ -70,9 +70,9 @@ namespace OpenDentBusiness.Crud{
 			foreach(ZipCode zipCode in listZipCodes) {
 				table.Rows.Add(new object[] {
 					POut.Long  (zipCode.ZipCodeNum),
-					POut.String(zipCode.ZipCodeDigits),
-					POut.String(zipCode.City),
-					POut.String(zipCode.State),
+					            zipCode.ZipCodeDigits,
+					            zipCode.City,
+					            zipCode.State,
 					POut.Bool  (zipCode.IsFrequent),
 				});
 			}

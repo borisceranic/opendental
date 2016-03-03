@@ -81,11 +81,11 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (repeatCharge.RepeatChargeNum),
 					POut.Long  (repeatCharge.PatNum),
-					POut.String(repeatCharge.ProcCode),
+					            repeatCharge.ProcCode,
 					POut.Double(repeatCharge.ChargeAmt),
 					POut.Date  (repeatCharge.DateStart),
 					POut.Date  (repeatCharge.DateStop),
-					POut.String(repeatCharge.Note),
+					            repeatCharge.Note,
 					POut.Bool  (repeatCharge.CopyNoteToProc),
 					POut.Bool  (repeatCharge.CreatesClaim),
 					POut.Bool  (repeatCharge.IsEnabled),

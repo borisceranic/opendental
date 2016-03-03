@@ -78,7 +78,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(FeeSched feeSched in listFeeScheds) {
 				table.Rows.Add(new object[] {
 					POut.Long  (feeSched.FeeSchedNum),
-					POut.String(feeSched.Description),
+					            feeSched.Description,
 					POut.Int   ((int)feeSched.FeeSchedType),
 					POut.Int   (feeSched.ItemOrder),
 					POut.Bool  (feeSched.IsHidden),

@@ -67,7 +67,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (schoolClass.SchoolClassNum),
 					POut.Int   (schoolClass.GradYear),
-					POut.String(schoolClass.Descript),
+					            schoolClass.Descript,
 				});
 			}
 			return table;

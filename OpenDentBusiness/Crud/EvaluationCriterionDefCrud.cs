@@ -75,7 +75,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (evaluationCriterionDef.EvaluationCriterionDefNum),
 					POut.Long  (evaluationCriterionDef.EvaluationDefNum),
-					POut.String(evaluationCriterionDef.CriterionDescript),
+					            evaluationCriterionDef.CriterionDescript,
 					POut.Bool  (evaluationCriterionDef.IsCategoryName),
 					POut.Long  (evaluationCriterionDef.GradingScaleNum),
 					POut.Int   (evaluationCriterionDef.ItemOrder),

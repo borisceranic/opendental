@@ -75,7 +75,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (claimSnapshot.ClaimSnapshotNum),
 					POut.Long  (claimSnapshot.ProcNum),
-					POut.String(claimSnapshot.ClaimType),
+					            claimSnapshot.ClaimType,
 					POut.Double(claimSnapshot.Writeoff),
 					POut.Double(claimSnapshot.InsPayEst),
 					POut.Double(claimSnapshot.Fee),

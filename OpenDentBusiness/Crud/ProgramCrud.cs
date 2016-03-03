@@ -82,16 +82,16 @@ namespace OpenDentBusiness.Crud{
 			foreach(Program program in listPrograms) {
 				table.Rows.Add(new object[] {
 					POut.Long  (program.ProgramNum),
-					POut.String(program.ProgName),
-					POut.String(program.ProgDesc),
+					            program.ProgName,
+					            program.ProgDesc,
 					POut.Bool  (program.Enabled),
-					POut.String(program.Path),
-					POut.String(program.CommandLine),
-					POut.String(program.Note),
-					POut.String(program.PluginDllName),
-					POut.String(program.ButtonImage),
-					POut.String(program.FileTemplate),
-					POut.String(program.FilePath),
+					            program.Path,
+					            program.CommandLine,
+					            program.Note,
+					            program.PluginDllName,
+					            program.ButtonImage,
+					            program.FileTemplate,
+					            program.FilePath,
 				});
 			}
 			return table;

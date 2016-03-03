@@ -89,17 +89,17 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (supply.SupplyNum),
 					POut.Long  (supply.SupplierNum),
-					POut.String(supply.CatalogNumber),
-					POut.String(supply.Descript),
+					            supply.CatalogNumber,
+					            supply.Descript,
 					POut.Long  (supply.Category),
 					POut.Int   (supply.ItemOrder),
 					POut.Float (supply.LevelDesired),
 					POut.Bool  (supply.IsHidden),
 					POut.Double(supply.Price),
-					POut.String(supply.BarCodeOrID),
+					            supply.BarCodeOrID,
 					POut.Float (supply.DispDefaultQuant),
 					POut.Int   (supply.DispUnitsCount),
-					POut.String(supply.DispUnitDesc),
+					            supply.DispUnitDesc,
 					POut.Float (supply.LevelOnHand),
 				});
 			}

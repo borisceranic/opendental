@@ -80,13 +80,13 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (ehrLabSpecimenRejectReason.EhrLabSpecimenRejectReasonNum),
 					POut.Long  (ehrLabSpecimenRejectReason.EhrLabSpecimenNum),
-					POut.String(ehrLabSpecimenRejectReason.SpecimenRejectReasonID),
-					POut.String(ehrLabSpecimenRejectReason.SpecimenRejectReasonText),
-					POut.String(ehrLabSpecimenRejectReason.SpecimenRejectReasonCodeSystemName),
-					POut.String(ehrLabSpecimenRejectReason.SpecimenRejectReasonIDAlt),
-					POut.String(ehrLabSpecimenRejectReason.SpecimenRejectReasonTextAlt),
-					POut.String(ehrLabSpecimenRejectReason.SpecimenRejectReasonCodeSystemNameAlt),
-					POut.String(ehrLabSpecimenRejectReason.SpecimenRejectReasonTextOriginal),
+					            ehrLabSpecimenRejectReason.SpecimenRejectReasonID,
+					            ehrLabSpecimenRejectReason.SpecimenRejectReasonText,
+					            ehrLabSpecimenRejectReason.SpecimenRejectReasonCodeSystemName,
+					            ehrLabSpecimenRejectReason.SpecimenRejectReasonIDAlt,
+					            ehrLabSpecimenRejectReason.SpecimenRejectReasonTextAlt,
+					            ehrLabSpecimenRejectReason.SpecimenRejectReasonCodeSystemNameAlt,
+					            ehrLabSpecimenRejectReason.SpecimenRejectReasonTextOriginal,
 				});
 			}
 			return table;

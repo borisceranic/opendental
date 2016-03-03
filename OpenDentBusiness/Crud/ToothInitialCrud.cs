@@ -75,10 +75,10 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (toothInitial.ToothInitialNum),
 					POut.Long  (toothInitial.PatNum),
-					POut.String(toothInitial.ToothNum),
+					            toothInitial.ToothNum,
 					POut.Int   ((int)toothInitial.InitialType),
 					POut.Float (toothInitial.Movement),
-					POut.String(toothInitial.DrawingSegment),
+					            toothInitial.DrawingSegment,
 					POut.Int   (toothInitial.ColorDraw.ToArgb()),
 				});
 			}

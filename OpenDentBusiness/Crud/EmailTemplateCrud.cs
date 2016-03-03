@@ -68,9 +68,9 @@ namespace OpenDentBusiness.Crud{
 			foreach(EmailTemplate emailTemplate in listEmailTemplates) {
 				table.Rows.Add(new object[] {
 					POut.Long  (emailTemplate.EmailTemplateNum),
-					POut.String(emailTemplate.Subject),
-					POut.String(emailTemplate.BodyText),
-					POut.String(emailTemplate.Description),
+					            emailTemplate.Subject,
+					            emailTemplate.BodyText,
+					            emailTemplate.Description,
 				});
 			}
 			return table;

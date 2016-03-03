@@ -67,7 +67,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (insFilingCodeSubtype.InsFilingCodeSubtypeNum),
 					POut.Long  (insFilingCodeSubtype.InsFilingCodeNum),
-					POut.String(insFilingCodeSubtype.Descript),
+					            insFilingCodeSubtype.Descript,
 				});
 			}
 			return table;

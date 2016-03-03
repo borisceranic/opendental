@@ -79,7 +79,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (popup.PopupNum),
 					POut.Long  (popup.PatNum),
-					POut.String(popup.Description),
+					            popup.Description,
 					POut.Bool  (popup.IsDisabled),
 					POut.Int   ((int)popup.PopupLevel),
 					POut.Long  (popup.UserNum),

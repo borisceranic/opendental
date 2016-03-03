@@ -68,9 +68,9 @@ namespace OpenDentBusiness.Crud{
 			foreach(UserQuery userQuery in listUserQuerys) {
 				table.Rows.Add(new object[] {
 					POut.Long  (userQuery.QueryNum),
-					POut.String(userQuery.Description),
-					POut.String(userQuery.FileName),
-					POut.String(userQuery.QueryText),
+					            userQuery.Description,
+					            userQuery.FileName,
+					            userQuery.QueryText,
 				});
 			}
 			return table;

@@ -64,7 +64,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(DictCustom dictCustom in listDictCustoms) {
 				table.Rows.Add(new object[] {
 					POut.Long  (dictCustom.DictCustomNum),
-					POut.String(dictCustom.WordText),
+					            dictCustom.WordText,
 				});
 			}
 			return table;

@@ -67,7 +67,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (accountingAutoPay.AccountingAutoPayNum),
 					POut.Long  (accountingAutoPay.PayType),
-					POut.String(accountingAutoPay.PickList),
+					            accountingAutoPay.PickList,
 				});
 			}
 			return table;

@@ -80,10 +80,10 @@ namespace OpenDentBusiness.Crud{
 			foreach(SheetDef sheetDef in listSheetDefs) {
 				table.Rows.Add(new object[] {
 					POut.Long  (sheetDef.SheetDefNum),
-					POut.String(sheetDef.Description),
+					            sheetDef.Description,
 					POut.Int   ((int)sheetDef.SheetType),
 					POut.Float (sheetDef.FontSize),
-					POut.String(sheetDef.FontName),
+					            sheetDef.FontName,
 					POut.Int   (sheetDef.Width),
 					POut.Int   (sheetDef.Height),
 					POut.Bool  (sheetDef.IsLandscape),

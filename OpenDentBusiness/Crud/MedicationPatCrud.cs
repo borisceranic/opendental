@@ -86,14 +86,14 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (medicationPat.MedicationPatNum),
 					POut.Long  (medicationPat.PatNum),
 					POut.Long  (medicationPat.MedicationNum),
-					POut.String(medicationPat.PatNote),
+					            medicationPat.PatNote,
 					POut.DateT (medicationPat.DateTStamp),
 					POut.Date  (medicationPat.DateStart),
 					POut.Date  (medicationPat.DateStop),
 					POut.Long  (medicationPat.ProvNum),
-					POut.String(medicationPat.MedDescript),
+					            medicationPat.MedDescript,
 					POut.Long  (medicationPat.RxCui),
-					POut.String(medicationPat.NewCropGuid),
+					            medicationPat.NewCropGuid,
 					POut.Bool  (medicationPat.IsCpoe),
 				});
 			}

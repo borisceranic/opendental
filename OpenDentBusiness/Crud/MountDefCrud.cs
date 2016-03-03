@@ -72,7 +72,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(MountDef mountDef in listMountDefs) {
 				table.Rows.Add(new object[] {
 					POut.Long  (mountDef.MountDefNum),
-					POut.String(mountDef.Description),
+					            mountDef.Description,
 					POut.Int   (mountDef.ItemOrder),
 					POut.Bool  (mountDef.IsRadiograph),
 					POut.Int   (mountDef.Width),

@@ -93,13 +93,13 @@ namespace OpenDentBusiness.Crud{
 			foreach(Signalod signalod in listSignalods) {
 				table.Rows.Add(new object[] {
 					POut.Long  (signalod.SignalNum),
-					POut.String(signalod.FromUser),
-					POut.String(signalod.ITypes),
+					            signalod.FromUser,
+					            signalod.ITypes,
 					POut.Date  (signalod.DateViewing),
 					POut.Int   ((int)signalod.SigType),
-					POut.String(signalod.SigText),
+					            signalod.SigText,
 					POut.DateT (signalod.SigDateTime),
-					POut.String(signalod.ToUser),
+					            signalod.ToUser,
 					POut.DateT (signalod.AckTime),
 					POut.Long  (signalod.TaskNum),
 					POut.Long  (signalod.FKey),

@@ -83,12 +83,12 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (vaccineObs.VaccinePatNum),
 					POut.Int   ((int)vaccineObs.ValType),
 					POut.Int   ((int)vaccineObs.IdentifyingCode),
-					POut.String(vaccineObs.ValReported),
+					            vaccineObs.ValReported,
 					POut.Int   ((int)vaccineObs.ValCodeSystem),
 					POut.Long  (vaccineObs.VaccineObsNumGroup),
-					POut.String(vaccineObs.UcumCode),
+					            vaccineObs.UcumCode,
 					POut.Date  (vaccineObs.DateObs),
-					POut.String(vaccineObs.MethodCode),
+					            vaccineObs.MethodCode,
 				});
 			}
 			return table;

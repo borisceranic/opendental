@@ -76,10 +76,10 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (ehrQuarterlyKey.EhrQuarterlyKeyNum),
 					POut.Int   (ehrQuarterlyKey.YearValue),
 					POut.Int   (ehrQuarterlyKey.QuarterValue),
-					POut.String(ehrQuarterlyKey.PracticeName),
-					POut.String(ehrQuarterlyKey.KeyValue),
+					            ehrQuarterlyKey.PracticeName,
+					            ehrQuarterlyKey.KeyValue,
 					POut.Long  (ehrQuarterlyKey.PatNum),
-					POut.String(ehrQuarterlyKey.Notes),
+					            ehrQuarterlyKey.Notes,
 				});
 			}
 			return table;

@@ -76,13 +76,13 @@ namespace OpenDentBusiness.Crud{
 			foreach(Supplier supplier in listSuppliers) {
 				table.Rows.Add(new object[] {
 					POut.Long  (supplier.SupplierNum),
-					POut.String(supplier.Name),
-					POut.String(supplier.Phone),
-					POut.String(supplier.CustomerId),
-					POut.String(supplier.Website),
-					POut.String(supplier.UserName),
-					POut.String(supplier.Password),
-					POut.String(supplier.Note),
+					            supplier.Name,
+					            supplier.Phone,
+					            supplier.CustomerId,
+					            supplier.Website,
+					            supplier.UserName,
+					            supplier.Password,
+					            supplier.Note,
 				});
 			}
 			return table;

@@ -73,7 +73,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (custRefEntry.PatNumCust),
 					POut.Long  (custRefEntry.PatNumRef),
 					POut.Date  (custRefEntry.DateEntry),
-					POut.String(custRefEntry.Note),
+					            custRefEntry.Note,
 				});
 			}
 			return table;

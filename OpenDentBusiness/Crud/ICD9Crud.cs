@@ -68,8 +68,8 @@ namespace OpenDentBusiness.Crud{
 			foreach(ICD9 iCD9 in listICD9s) {
 				table.Rows.Add(new object[] {
 					POut.Long  (iCD9.ICD9Num),
-					POut.String(iCD9.ICD9Code),
-					POut.String(iCD9.Description),
+					            iCD9.ICD9Code,
+					            iCD9.Description,
 					POut.DateT (iCD9.DateTStamp),
 				});
 			}

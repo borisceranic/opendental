@@ -68,7 +68,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(AutoCode autoCode in listAutoCodes) {
 				table.Rows.Add(new object[] {
 					POut.Long  (autoCode.AutoCodeNum),
-					POut.String(autoCode.Description),
+					            autoCode.Description,
 					POut.Bool  (autoCode.IsHidden),
 					POut.Bool  (autoCode.LessIntrusive),
 				});

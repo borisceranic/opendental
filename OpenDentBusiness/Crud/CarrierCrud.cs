@@ -100,17 +100,17 @@ namespace OpenDentBusiness.Crud{
 			foreach(Carrier carrier in listCarriers) {
 				table.Rows.Add(new object[] {
 					POut.Long  (carrier.CarrierNum),
-					POut.String(carrier.CarrierName),
-					POut.String(carrier.Address),
-					POut.String(carrier.Address2),
-					POut.String(carrier.City),
-					POut.String(carrier.State),
-					POut.String(carrier.Zip),
-					POut.String(carrier.Phone),
-					POut.String(carrier.ElectID),
+					            carrier.CarrierName,
+					            carrier.Address,
+					            carrier.Address2,
+					            carrier.City,
+					            carrier.State,
+					            carrier.Zip,
+					            carrier.Phone,
+					            carrier.ElectID,
 					POut.Bool  (carrier.NoSendElect),
 					POut.Bool  (carrier.IsCDA),
-					POut.String(carrier.CDAnetVersion),
+					            carrier.CDAnetVersion,
 					POut.Long  (carrier.CanadianNetworkNum),
 					POut.Bool  (carrier.IsHidden),
 					POut.Byte  (carrier.CanadianEncryptionMethod),
@@ -118,7 +118,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (carrier.SecUserNumEntry),
 					POut.Date  (carrier.SecDateEntry),
 					POut.DateT (carrier.SecDateTEdit),
-					POut.String(carrier.TIN),
+					            carrier.TIN,
 				});
 			}
 			return table;

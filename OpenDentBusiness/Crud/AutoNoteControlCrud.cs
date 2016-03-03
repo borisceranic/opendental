@@ -70,10 +70,10 @@ namespace OpenDentBusiness.Crud{
 			foreach(AutoNoteControl autoNoteControl in listAutoNoteControls) {
 				table.Rows.Add(new object[] {
 					POut.Long  (autoNoteControl.AutoNoteControlNum),
-					POut.String(autoNoteControl.Descript),
-					POut.String(autoNoteControl.ControlType),
-					POut.String(autoNoteControl.ControlLabel),
-					POut.String(autoNoteControl.ControlOptions),
+					            autoNoteControl.Descript,
+					            autoNoteControl.ControlType,
+					            autoNoteControl.ControlLabel,
+					            autoNoteControl.ControlOptions,
 				});
 			}
 			return table;

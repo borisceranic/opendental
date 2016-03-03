@@ -76,9 +76,9 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (encounter.EncounterNum),
 					POut.Long  (encounter.PatNum),
 					POut.Long  (encounter.ProvNum),
-					POut.String(encounter.CodeValue),
-					POut.String(encounter.CodeSystem),
-					POut.String(encounter.Note),
+					            encounter.CodeValue,
+					            encounter.CodeSystem,
+					            encounter.Note,
 					POut.Date  (encounter.DateEncounter),
 				});
 			}

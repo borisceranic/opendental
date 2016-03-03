@@ -66,8 +66,8 @@ namespace OpenDentBusiness.Crud{
 			foreach(AutoNote autoNote in listAutoNotes) {
 				table.Rows.Add(new object[] {
 					POut.Long  (autoNote.AutoNoteNum),
-					POut.String(autoNote.AutoNoteName),
-					POut.String(autoNote.MainText),
+					            autoNote.AutoNoteName,
+					            autoNote.MainText,
 				});
 			}
 			return table;

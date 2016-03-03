@@ -70,7 +70,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (patientRace.PatientRaceNum),
 					POut.Long  (patientRace.PatNum),
 					POut.Int   ((int)patientRace.Race),
-					POut.String(patientRace.CdcrecCode),
+					            patientRace.CdcrecCode,
 				});
 			}
 			return table;

@@ -78,11 +78,11 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (dashboardLayout.DashboardLayoutNum),
 					POut.Long  (dashboardLayout.UserNum),
 					POut.Long  (dashboardLayout.UserGroupNum),
-					POut.String(dashboardLayout.DashboardTabName),
+					            dashboardLayout.DashboardTabName,
 					POut.Int   (dashboardLayout.DashboardTabOrder),
 					POut.Int   (dashboardLayout.DashboardRows),
 					POut.Int   (dashboardLayout.DashboardColumns),
-					POut.String(dashboardLayout.DashboardGroupName),
+					            dashboardLayout.DashboardGroupName,
 				});
 			}
 			return table;

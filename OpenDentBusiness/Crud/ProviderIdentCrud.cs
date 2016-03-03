@@ -71,9 +71,9 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (providerIdent.ProviderIdentNum),
 					POut.Long  (providerIdent.ProvNum),
-					POut.String(providerIdent.PayorID),
+					            providerIdent.PayorID,
 					POut.Int   ((int)providerIdent.SuppIDType),
-					POut.String(providerIdent.IDNumber),
+					            providerIdent.IDNumber,
 				});
 			}
 			return table;

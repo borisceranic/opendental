@@ -74,9 +74,9 @@ namespace OpenDentBusiness.Crud{
 			foreach(ProcButtonQuick procButtonQuick in listProcButtonQuicks) {
 				table.Rows.Add(new object[] {
 					POut.Long  (procButtonQuick.ProcButtonQuickNum),
-					POut.String(procButtonQuick.Description),
-					POut.String(procButtonQuick.CodeValue),
-					POut.String(procButtonQuick.Surf),
+					            procButtonQuick.Description,
+					            procButtonQuick.CodeValue,
+					            procButtonQuick.Surf,
 					POut.Int   (procButtonQuick.YPos),
 					POut.Int   (procButtonQuick.ItemOrder),
 					POut.Bool  (procButtonQuick.IsLabel),

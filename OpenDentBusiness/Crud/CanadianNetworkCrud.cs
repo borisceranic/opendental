@@ -70,9 +70,9 @@ namespace OpenDentBusiness.Crud{
 			foreach(CanadianNetwork canadianNetwork in listCanadianNetworks) {
 				table.Rows.Add(new object[] {
 					POut.Long  (canadianNetwork.CanadianNetworkNum),
-					POut.String(canadianNetwork.Abbrev),
-					POut.String(canadianNetwork.Descript),
-					POut.String(canadianNetwork.CanadianTransactionPrefix),
+					            canadianNetwork.Abbrev,
+					            canadianNetwork.Descript,
+					            canadianNetwork.CanadianTransactionPrefix,
 					POut.Bool  (canadianNetwork.CanadianIsRprHandler),
 				});
 			}

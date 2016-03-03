@@ -72,11 +72,11 @@ namespace OpenDentBusiness.Crud{
 			foreach(ElectID electID in listElectIDs) {
 				table.Rows.Add(new object[] {
 					POut.Long  (electID.ElectIDNum),
-					POut.String(electID.PayorID),
-					POut.String(electID.CarrierName),
+					            electID.PayorID,
+					            electID.CarrierName,
 					POut.Bool  (electID.IsMedicaid),
-					POut.String(electID.ProviderTypes),
-					POut.String(electID.Comments),
+					            electID.ProviderTypes,
+					            electID.Comments,
 				});
 			}
 			return table;

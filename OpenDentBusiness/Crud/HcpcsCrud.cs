@@ -66,8 +66,8 @@ namespace OpenDentBusiness.Crud{
 			foreach(Hcpcs hcpcs in listHcpcss) {
 				table.Rows.Add(new object[] {
 					POut.Long  (hcpcs.HcpcsNum),
-					POut.String(hcpcs.HcpcsCode),
-					POut.String(hcpcs.DescriptionShort),
+					            hcpcs.HcpcsCode,
+					            hcpcs.DescriptionShort,
 				});
 			}
 			return table;

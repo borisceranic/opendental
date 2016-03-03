@@ -70,9 +70,9 @@ namespace OpenDentBusiness.Crud{
 			foreach(Language language in listLanguages) {
 				table.Rows.Add(new object[] {
 					POut.Long  (language.LanguageNum),
-					POut.String(language.EnglishComments),
-					POut.String(language.ClassType),
-					POut.String(language.English),
+					            language.EnglishComments,
+					            language.ClassType,
+					            language.English,
 					POut.Bool  (language.IsObsolete),
 				});
 			}

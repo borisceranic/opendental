@@ -71,8 +71,8 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (emailAttach.EmailAttachNum),
 					POut.Long  (emailAttach.EmailMessageNum),
-					POut.String(emailAttach.DisplayedFileName),
-					POut.String(emailAttach.ActualFileName),
+					            emailAttach.DisplayedFileName,
+					            emailAttach.ActualFileName,
 					POut.Long  (emailAttach.EmailTemplateNum),
 				});
 			}

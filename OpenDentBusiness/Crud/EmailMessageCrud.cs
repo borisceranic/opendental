@@ -89,18 +89,18 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (emailMessage.EmailMessageNum),
 					POut.Long  (emailMessage.PatNum),
-					POut.String(emailMessage.ToAddress),
-					POut.String(emailMessage.FromAddress),
-					POut.String(emailMessage.Subject),
-					POut.String(emailMessage.BodyText),
+					            emailMessage.ToAddress,
+					            emailMessage.FromAddress,
+					            emailMessage.Subject,
+					            emailMessage.BodyText,
 					POut.DateT (emailMessage.MsgDateTime),
 					POut.Int   ((int)emailMessage.SentOrReceived),
-					POut.String(emailMessage.RecipientAddress),
-					POut.String(emailMessage.RawEmailIn),
+					            emailMessage.RecipientAddress,
+					            emailMessage.RawEmailIn,
 					POut.Long  (emailMessage.ProvNumWebMail),
 					POut.Long  (emailMessage.PatNumSubj),
-					POut.String(emailMessage.CcAddress),
-					POut.String(emailMessage.BccAddress),
+					            emailMessage.CcAddress,
+					            emailMessage.BccAddress,
 				});
 			}
 			return table;

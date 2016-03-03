@@ -72,8 +72,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (procCodeNote.ProcCodeNoteNum),
 					POut.Long  (procCodeNote.CodeNum),
 					POut.Long  (procCodeNote.ProvNum),
-					POut.String(procCodeNote.Note),
-					POut.String(procCodeNote.ProcTime),
+					            procCodeNote.Note,
+					            procCodeNote.ProcTime,
 				});
 			}
 			return table;
