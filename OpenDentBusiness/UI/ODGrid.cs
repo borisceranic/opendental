@@ -1265,7 +1265,7 @@ namespace OpenDental.UI {
 		#region Printing
 
 		///<summary></summary>
-		public void PrintRow(int rowI,Graphics g,int x=0,int y=0,bool isBottom=false,bool isSheetGrid=false) {
+		public void PrintRow(int rowI,Graphics g,int x=0,int y=0,bool isBottom=false,bool isSheetGrid=false,bool isPrintingSheet=false) {
 			Font tempFont=new Font(FontFamily.GenericSansSerif,cellFontSize,FontStyle.Regular);
 			if(FontForSheets!=null) {
 				tempFont=new Font(FontForSheets,FontStyle.Regular);
@@ -1428,7 +1428,15 @@ namespace OpenDental.UI {
 					tempFont=new Font(tempFont,(tempFont.Bold)?(FontStyle.Bold | FontStyle.Underline):FontStyle.Underline);
 				}
 				if(columns[i].ImageList==null) {
-					g.DrawString(rows[rowI].Cells[i].Text,tempFont,textBrush,textRect,_format);
+					if(isPrintingSheet) {
+						//Using a slightly smaller font because g.DrawString draws text slightly larger when using the printer's graphics
+						Font smallerFont=new Font(tempFont.FontFamily,(float)(tempFont.Size*0.96),tempFont.Style);
+						g.DrawString(rows[rowI].Cells[i].Text,smallerFont,textBrush,textRect,_format);
+						smallerFont.Dispose();
+					}
+					else {//Viewing the grid normally
+						g.DrawString(rows[rowI].Cells[i].Text,tempFont,textBrush,textRect,_format);
+					}
 				}
 				else {
 					int imageIndex=-1;
