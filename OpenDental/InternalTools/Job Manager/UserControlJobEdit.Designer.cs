@@ -444,8 +444,8 @@
 			this.textEditorMain.ReadOnly = false;
 			this.textEditorMain.Size = new System.Drawing.Size(575, 263);
 			this.textEditorMain.TabIndex = 260;
-			this.textEditorMain.SaveClick += new OpenDental.ODtextEditorSaveEventHandler(this.textEditorMain_SaveClick);
-			this.textEditorMain.OnTextEdited += new OpenDental.OdtextEditor.textChangedEventHandler(this.textEditorMain_OnTextEdited);
+			this.textEditorMain.SaveClick += new OpenDental.ODtextEditorSaveEventHandler(this.textEditor_SaveClick);
+			this.textEditorMain.OnTextEdited += new OpenDental.OdtextEditor.textChangedEventHandler(this.textEditor_OnTextEdited);
 			// 
 			// textParent
 			// 
@@ -643,7 +643,8 @@
 			this.textEditorDocumentation.ReadOnly = false;
 			this.textEditorDocumentation.Size = new System.Drawing.Size(754, 253);
 			this.textEditorDocumentation.TabIndex = 261;
-			this.textEditorDocumentation.SaveClick += new OpenDental.ODtextEditorSaveEventHandler(this.textEditorDocumentation_SaveClick);
+			this.textEditorDocumentation.SaveClick += new OpenDental.ODtextEditorSaveEventHandler(this.textEditor_SaveClick);
+			this.textEditorDocumentation.OnTextEdited += new OpenDental.OdtextEditor.textChangedEventHandler(this.textEditor_OnTextEdited);
 			// 
 			// tabHistory
 			// 

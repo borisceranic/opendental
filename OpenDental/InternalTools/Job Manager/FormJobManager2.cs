@@ -932,6 +932,7 @@ namespace OpenDental {
 			foreach(KeyValuePair<long,Job> kvp in dictNewJobs) {
 				UpdateGridMyJobs(kvp.Key,kvp.Value);
 			}
+			FillGridWorkSummary();
 		}
 
 		private void gridAction_CellClick(object sender,ODGridClickEventArgs e) {
