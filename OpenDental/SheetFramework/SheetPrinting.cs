@@ -1225,10 +1225,13 @@ namespace OpenDental {
 						Columns.RemoveAll(x => x.InternalName=="Fee");
 					}
 					if(!checkShowIns) {
-						Columns.RemoveAll(x => x.InternalName=="Pri Ins" || x.InternalName=="Sec Ins" || x.InternalName=="Pat");
+						Columns.RemoveAll(x => x.InternalName=="Pri Ins" || x.InternalName=="Sec Ins");
 					}
 					if(!checkShowDiscount) {
 						Columns.RemoveAll(x => x.InternalName=="Discount");
+					}
+					if(!checkShowIns && !checkShowDiscount) {
+						Columns.RemoveAll(x => x.InternalName=="Pat");
 					}
 					//recenters the GridColumnStylesCollection on the page.
 					field.XPos=(sheet.WidthPage-Columns.Sum(x => x.ColumnWidth))/2;
