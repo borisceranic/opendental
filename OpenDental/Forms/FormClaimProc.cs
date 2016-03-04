@@ -1,8 +1,8 @@
 using System;
-using System.Drawing;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using OpenDentBusiness;
 
@@ -1524,6 +1524,11 @@ namespace OpenDental
 			if(comboPayTracker.SelectedIndex==-1) {
 				comboPayTracker.SelectedIndex=0;
 			}
+			if(new[] { ClaimProcStatus.CapComplete,ClaimProcStatus.CapEstimate,ClaimProcStatus.Estimate }.Contains(ClaimProcOld.Status)
+				|| ClaimProcOld.ClaimPaymentNum > 0) 
+			{
+				comboStatus.Enabled=false;
+			}
 			FillInitialAmounts();
 			ComputeAmounts();
 			//MessageBox.Show(panelEstimateInfo.Visible.ToString());
@@ -1926,24 +1931,25 @@ namespace OpenDental
 		private void comboStatus_SelectionChangeCommitted(object sender,EventArgs e) {
 			//MessageBox.Show(listStatus.SelectedIndex.ToString());
 			//new selected index will already be set
-			if(ClaimProcCur.Status!=ClaimProcStatus.Estimate//not an estimate
+			if(ClaimProcOld.Status!=ClaimProcStatus.Estimate//not an estimate
 				&& comboStatus.SelectedIndex==0)//and clicked on estimate
 			{
-				SetComboStatus(ClaimProcCur.Status);//no change
+				SetComboStatus(ClaimProcOld.Status);//no change
 				return;
 			}
-			if(ClaimProcCur.Status==ClaimProcStatus.Estimate) {//is an estimate
-				SetComboStatus(ClaimProcCur.Status);//no change
-				return;
-			}
-			if(ClaimProcCur.Status==ClaimProcStatus.CapComplete	|| ClaimProcCur.Status==ClaimProcStatus.CapEstimate) {//is a cap procedure
-				SetComboStatus(ClaimProcCur.Status);//no change
-				return;
-			}
-			if(ClaimProcCur.ClaimPaymentNum>0) {
-				SetComboStatus(ClaimProcCur.Status);//no change
-				return;
-			}
+			//The comboStatus box is disabled if it is an estimate or a cap claim or if the claim is attached to a payment.
+			//if(ClaimProcOld.Status==ClaimProcStatus.Estimate) {//is an estimate (Should this check ClaimProcOld.Status instead of ClaimProcCur.Status?)
+			//	SetComboStatus(ClaimProcOld.Status);//no change
+			//	return;
+			//}
+			//if(new[] { ClaimProcStatus.CapComplete,ClaimProcStatus.CapEstimate }.Contains(ClaimProcOld.Status)) {//is a cap procedure
+			//	SetComboStatus(ClaimProcOld.Status);//no change, not allowed to change status of Cap claims (uses ClaimProcOld)
+			//	return;
+			//}
+			//if(ClaimProcOld.ClaimPaymentNum>0) {
+			//	SetComboStatus(ClaimProcOld.Status);//no change
+			//	return;
+			//}
 			switch(comboStatus.SelectedIndex) {
 				case 0:
 					ClaimProcCur.Status=ClaimProcStatus.Estimate;
