@@ -2891,15 +2891,14 @@ namespace OpenDental.UI {
 				int selectionStart=editBox.SelectionStart;
 				List<ODGridColumn> listCols=new List<ODGridColumn>();
 				for(int i=0;i<columns.Count;i++) {
-					listCols.Add(new ODGridColumn(columns[i].Heading,columns[i].ColWidth,columns[i].IsEditable));
-					listCols[i].TextAlign=columns[i].TextAlign;
+					listCols.Add(columns[i].Copy());
 				}
 				List<ODGridRow> listRows=new List<ODGridRow>();
 				ODGridRow row;
 				for(int i=0;i<rows.Count;i++) {
 					row=new ODGridRow();
 					for(int j=0;j<rows[i].Cells.Count;j++) {
-						row.Cells.Add(new ODGridCell(rows[i].Cells[j].Text));
+						row.Cells.Add(new ODGridCell(rows[i].Cells[j].Text,rows[i].Cells[j].SelectedIndex));
 					}
 					row.Tag=rows[i].Tag;
 					listRows.Add(row);
@@ -2907,14 +2906,14 @@ namespace OpenDental.UI {
 				BeginUpdate();
 				columns.Clear();
 				for(int i=0;i<listCols.Count;i++) {
-					columns.Add(new ODGridColumn(listCols[i].Heading,listCols[i].ColWidth,listCols[i].IsEditable));
-					columns[i].TextAlign=listCols[i].TextAlign;
+					columns.Add(listCols[i].Copy());
 				}
 				rows.Clear();
 				for(int i=0;i<listRows.Count;i++) {
 					row=new ODGridRow();
 					for(int j=0;j<listRows[i].Cells.Count;j++) {
 						row.Cells.Add(listRows[i].Cells[j].Text);
+						row.Cells[j].SelectedIndex=listRows[i].Cells[j].SelectedIndex;
 					}
 					row.Tag=listRows[i].Tag;
 					rows.Add(row);
