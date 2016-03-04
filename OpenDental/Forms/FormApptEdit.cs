@@ -1876,6 +1876,7 @@ namespace OpenDental{
 			if(FormP.DialogResult!=DialogResult.OK){
 				return;
 			}
+			//we can go to the db for this proc because FormProcEdit saves changes before returning to this form
 			if(Procedures.GetOneProc(proc.ProcNum,true).ProcStatus==ProcStat.D) {//User deleted the procedure.
 				_listProcsMoved.Remove(_listProcs[e.Row]);
 				_listProcs.RemoveAt(e.Row);
@@ -2407,7 +2408,7 @@ namespace OpenDental{
 				Procedures.ComputeEstimates(proc,pat.PatNum,ClaimProcList,false,PlanList,PatPlanList,benefitList,pat.Age,SubList);
 				listAddedProcs.Add(proc);
 			}
-			//Get from db to remove nulls. Consider initializing dates and strings instead.
+			//Get from db to remove nulls. Consider initializing dates and strings instead.  Safe to get from DB since they were just inserted above.
 			_listProcs.AddRange(Procedures.GetManyProc(listAddedProcs.Select(x => x.ProcNum).ToList(),false));
 			listQuickAdd.SelectedIndex=-1;
 			_listProcs.Sort(ProcedureLogic.CompareProcedures);
@@ -2558,8 +2559,9 @@ namespace OpenDental{
 			FillFields();
 		}
 
-		///<summary>Called from butOK_Click and butPin_Click</summary>
-		private bool UpdateToDB(){
+		///<summary>Called from butOK_Click and butPin_Click. Only saves appointment infomration to DB. Procedure information is updated to _listProcs for
+		///use with syncing later.</summary>
+		private bool UpdateListAndDB(){
 			DateTime dateTimeAskedToArrive=DateTime.MinValue;
 			if((AptOld.AptStatus==ApptStatus.Complete && comboStatus.SelectedIndex!=1)
 				|| (AptOld.AptStatus==ApptStatus.Broken && comboStatus.SelectedIndex!=4)) //Un-completing or un-breaking the appt.  We must use selectedindex due to AptCur gets updated later UpdateDB()
@@ -3104,7 +3106,7 @@ namespace OpenDental{
 			gridProg.NoteSpanStart=2;
 			gridProg.NoteSpanStop=7;
 			gridProg.Rows.Clear();
-			List <Procedure> procsForDay=Procedures.GetProcsForPatByDate(AptCur.PatNum,AptCur.AptDateTime);
+			List<Procedure> procsForDay=_listProcs.FindAll(x => x.ProcDate.Date==AptCur.AptDateTime.Date || x.DateEntryC.Date==AptCur.AptDateTime.Date);
 			for(int i=0;i<procsForDay.Count;i++){
 				Procedure proc=procsForDay[i];
 				ProcedureCode procCode=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum);
@@ -3210,28 +3212,22 @@ namespace OpenDental{
 		private void butComplete_Click(object sender,EventArgs e) {
 			//This is only used with eCW HL7 interface.
 			if(butComplete.Text=="Finish && Send") {
-				List<Procedure> procs=Procedures.GetProcsForSingle(AptCur.AptNum,false);
-				string duplicateProcs=ProcedureL.ProcsContainDuplicates(procs);
+				List<Procedure> listProcsForAppt=_listProcs.FindAll(x => x.AptNum==AptCur.AptNum);
+				string duplicateProcs=ProcedureL.ProcsContainDuplicates(listProcsForAppt);
 				if(duplicateProcs!="") {
 					MessageBox.Show(duplicateProcs);
 					return;
 				}
 				if(ProgramProperties.GetPropVal(ProgramName.eClinicalWorks,"ProcNotesNoIncomplete")=="1") {
-					for(int i=0;i<procs.Count;i++) {
-						Procedure proc=Procedures.GetOneProc(procs[i].ProcNum,true);//To get the most recent note for the proc
-						if(proc.Note!=null && proc.Note.Contains("\"\"")) {
-							MsgBox.Show(this,"This appointment cannot be sent because there are incomplete procedure notes.");
-							return;
-						}
+					if(listProcsForAppt.Any(x => x.Note!=null && x.Note.Contains("\"\""))) {
+						MsgBox.Show(this,"This appointment cannot be sent because there are incomplete procedure notes.");
+						return;
 					}
 				}
 				if(ProgramProperties.GetPropVal(ProgramName.eClinicalWorks,"ProcRequireSignature")=="1") {
-					for(int i=0;i<procs.Count;i++) {
-						Procedure proc=Procedures.GetOneProc(procs[i].ProcNum,true);//To get the most recent note with signature for the proc
-						if(!string.IsNullOrEmpty(proc.Note)	&& string.IsNullOrEmpty(proc.Signature)) {
-							MsgBox.Show(this,"This appointment cannot be sent because there are unsigned procedure notes.");
-							return;
-						}
+					if(listProcsForAppt.Any(x => !string.IsNullOrEmpty(x.Note) && string.IsNullOrEmpty(x.Signature))) {
+						MsgBox.Show(this,"This appointment cannot be sent because there are unsigned procedure notes.");
+						return;
 					}
 				}
 				////check to make sure that the appointment and all attached procedures are marked complete as required.
@@ -3252,15 +3248,16 @@ namespace OpenDental{
 					return;
 				}
 				comboStatus.SelectedIndex=1;//Set the appointment status to complete. This will trigger the procedures to be completed in UpdateToDB() as well.
-				if(!UpdateToDB()) {
+				if(!UpdateListAndDB()) {//procedure changes saved to db in sync call in form closing
 					return;
 				}
-				procs=Procedures.GetProcsForSingle(AptCur.AptNum,false);
+				listProcsForAppt=_listProcs.FindAll(x => x.AptNum==AptCur.AptNum);//may not be necessary
 				//Send DFT to eCW containing the attached procedures for this appointment in a .pdf file.				
 				string pdfDataStr=GenerateProceduresIntoPdf();
 				if(HL7Defs.IsExistingHL7Enabled()) {
 					//MessageConstructor.GenerateDFT(procs,EventTypeHL7.P03,pat,Patients.GetPat(pat.Guarantor),AptCur.AptNum,"progressnotes",pdfDataStr);
-					MessageHL7 messageHL7=MessageConstructor.GenerateDFT(procs,EventTypeHL7.P03,pat,Patients.GetPat(pat.Guarantor),AptCur.AptNum,"progressnotes",pdfDataStr);
+					MessageHL7 messageHL7=MessageConstructor.GenerateDFT(listProcsForAppt,EventTypeHL7.P03,pat,Patients.GetPat(pat.Guarantor),AptCur.AptNum,
+						"progressnotes",pdfDataStr);
 					if(messageHL7==null) {
 						MsgBox.Show(this,"There is no DFT message type defined for the enabled HL7 definition.");
 						return;
@@ -3308,7 +3305,7 @@ namespace OpenDental{
 		}
 
 		private void butTask_Click(object sender,EventArgs e) {
-			if(!UpdateToDB()) {
+			if(!UpdateListAndDB()) {//procedure changes saved to db in sync call in form closing
 				return;
 			}
 			FormTaskListSelect FormT=new FormTaskListSelect(TaskObjectType.Appointment);//,AptCur.AptNum);
@@ -3330,8 +3327,9 @@ namespace OpenDental{
 		}
 
 		private void butPin_Click(object sender,System.EventArgs e) {
-			if(!UpdateToDB())
+			if(!UpdateListAndDB()) {//procedure changes saved to db in sync call in form closing
 				return;
+			}
 			PinClicked=true;
 			DialogResult=DialogResult.OK;
 		}
@@ -3475,7 +3473,7 @@ namespace OpenDental{
 					}
 				}
 			}
-			if(!UpdateToDB()){
+			if(!UpdateListAndDB()) {//procedure changes saved to db in sync call in form closing
 				return;
 			}
 			bool isCreateAppt=false;
