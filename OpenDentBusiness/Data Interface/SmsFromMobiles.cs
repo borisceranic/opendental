@@ -229,15 +229,16 @@ namespace OpenDentBusiness{
 				string phoneRegexp=ConvertPhoneToRegexp(phonePat,countryCode);
 				//DO NOT POut THESE PHONE NUMBERS. They have been cleaned for use in this function by dirtyPhoneHelper.
 				string command="SELECT PatNum, Guarantor FROM patient WHERE "
-					+DbHelper.Regexp("HmPhone",phoneRegexp)+" "
-					+"OR "+DbHelper.Regexp("WkPhone",phoneRegexp)+" "
-					+"OR "+DbHelper.Regexp("WirelessPhone",phoneRegexp);
+					+"PatStatus NOT IN ("+POut.Int((int)PatientStatus.Archived)+","+POut.Int((int)PatientStatus.Deleted)+") "
+					+"AND ("+DbHelper.Regexp("HmPhone",phoneRegexp)+" "
+						+"OR "+DbHelper.Regexp("WkPhone",phoneRegexp)+" "
+						+"OR "+DbHelper.Regexp("WirelessPhone",phoneRegexp)+")";
 				DataTable table=Db.GetTable(command);
 				foreach(DataRow row in table.Rows) {
 					retVal.Add(new Tuple<long,long>(PIn.Long(row["PatNum"].ToString()),PIn.Long(row["Guarantor"].ToString())));
 				}
 			}
-			catch {	
+			catch {
 				//should only happen if phone number is blank, if so, return empty list below.
 			}
 			return retVal;
