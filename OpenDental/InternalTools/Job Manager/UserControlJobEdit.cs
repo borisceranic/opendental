@@ -498,12 +498,14 @@ namespace OpenDental.InternalTools.Job_Manager {
 					MessageBox.Show("Unsupported job status. Add to UserControlJobEdit.CheckPermissions()");
 					break;
 			}
-			//Disable description and title if "Checked out"
+			//Disable description, documentation, and title if "Checked out"
 			textEditorMain.Enabled=true;//might still be read only.
+			textEditorDocumentation.Enabled=true;
 			if(_jobCur.UserNumCheckout!=0 && _jobCur.UserNumCheckout!=Security.CurUser.UserNum) {
 				textTitle.ReadOnly=true;
 				textEditorMain.ReadOnly=true;
 				textEditorMain.Enabled=false;
+				textEditorDocumentation.Enabled=false;
 			}
 			if(IsChangeRequest) {
 				textEditorMain.ReadOnly=false;
@@ -521,6 +523,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 				gridCustomerQuotes.HasAddButton=true;
 				textEditorMain.ReadOnly=false;
 				textEditorMain.Enabled=true;
+				textEditorDocumentation.Enabled=true;
 			}
 		}
 
@@ -641,6 +644,10 @@ namespace OpenDental.InternalTools.Job_Manager {
 				default:
 					actionMenu.MenuItems.Add(new MenuItem("Unhandled status "+_jobCur.PhaseCur.ToString(),(o,ea)=> { }) { Enabled=false });
 					break;
+			}
+			if(_jobCur.UserNumCheckout>0 && _jobCur.UserNumCheckout!=Security.CurUser.UserNum && !_isOverride) {
+				//disable all menu items if job is checked out by other user.
+				actionMenu.MenuItems.OfType<MenuItem>().ToList().ForEach(x => x.Enabled=false);
 			}
 			if(JobPermissions.IsAuthorized(JobPerm.Override,true)) {
 				actionMenu.MenuItems.Add("-");
@@ -1198,6 +1205,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 			_isLoading=true;
 			//Validation must happen before this is called.
 			job.Description=textEditorMain.MainRtf;
+			job.Documentation=textEditorDocumentation.MainRtf;
 			job.HoursActual=PIn.Int(textActualHours.Text);
 			job.HoursEstimate=PIn.Int(textEstHours.Text);
 			if(IsChangeRequest) {
@@ -1613,12 +1621,15 @@ namespace OpenDental.InternalTools.Job_Manager {
 			}
 		}
 
-		private void textEditorMain_SaveClick(object sender,EventArgs e) {
+		///<summary>SaveClick for both the Descritpion and Documentation</summary>
+		private void textEditor_SaveClick(object sender,EventArgs e) {
 			if(_isLoading) {
 				return;
 			}
 			_jobCur.Description=textEditorMain.MainRtf;
 			_jobOld.Description=textEditorMain.MainRtf;
+			_jobCur.Documentation=textEditorDocumentation.MainRtf;
+			_jobOld.Documentation=textEditorDocumentation.MainRtf;
 			_jobCur.UserNumCheckout=0;
 			_jobOld.UserNumCheckout=0;
 			if(IsNew) {
@@ -1627,6 +1638,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 			else {
 				Job job = Jobs.GetOne(_jobCur.JobNum);
 				job.Description=textEditorMain.MainRtf;
+				job.Documentation=textEditorDocumentation.MainRtf;
 				if(IsChangeRequest) {
 					job.IsApprovalNeeded=true;
 				}
@@ -1637,25 +1649,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 			}
 		}
 
-		private void textEditorDocumentation_SaveClick(object sender,EventArgs e) {
-			if(_isLoading) {
-				return;
-			}
-			_jobCur.Documentation=textEditorDocumentation.MainRtf;
-			_jobOld.Documentation=textEditorDocumentation.MainRtf;
-			if(IsNew) {
-				IsChanged=true;
-			}
-			else {
-				Job job = Jobs.GetOne(_jobCur.JobNum);
-				job.Documentation=textEditorDocumentation.MainRtf;
-				job.IsApprovalNeeded=_jobCur.IsApprovalNeeded;//needed for change requests.
-				Jobs.Update(job);
-				Signalods.SetInvalid(InvalidType.Jobs,KeyType.Job,job.JobNum);
-			}
-		}
-
-		private void textEditorMain_OnTextEdited() {
+		private void textEditor_OnTextEdited() {
 			if(_isLoading) {
 				return;
 			}
@@ -1865,6 +1859,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 				menu.Show(gridFeatureReq,gridFeatureReq.PointToClient(Cursor.Position));
 			}
 		}
+
 	}//end class
 
 }//end namespace
