@@ -1449,7 +1449,7 @@ namespace OpenDental{
 				if(fields[i].InternalName=="Discount" && !checkShowDiscount.Checked) {
 					continue;
 				}
-				if(fields[i].InternalName=="Pat" && !checkShowIns.Checked) {
+				if(fields[i].InternalName=="Pat" && !checkShowIns.Checked && !checkShowDiscount.Checked) {
 					continue;
 				}
 				if(fields[i].InternalName=="Fee" 
@@ -1580,7 +1580,7 @@ namespace OpenDental{
 							}
 							break;
 						case "Pat":
-							if(checkShowIns.Checked) {
+							if(checkShowIns.Checked || checkShowDiscount.Checked) {
 								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()=="Total"
 									|| RowsMain[i].Description.ToString()=="Subtotal")
 								{
