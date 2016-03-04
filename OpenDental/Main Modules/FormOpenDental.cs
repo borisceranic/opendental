@@ -2450,6 +2450,11 @@ namespace OpenDental{
 					}
 					if(Security.CurUser==null) {//normal manual log in process
 						Userod adminUser=Userods.GetAdminUser();
+						if(adminUser==null) {
+							MsgBox.Show(this,"There are no users with the SecurityAdmin permission.  Call support.");
+							Application.Exit();
+							return;
+						}
 						if(adminUser.Password=="") {
 							Security.CurUser=adminUser.Copy();
 							SecurityLogs.MakeLogEntry(Permissions.UserLogOnOff,0,"User: "+Security.CurUser.UserName+" has logged on.");
