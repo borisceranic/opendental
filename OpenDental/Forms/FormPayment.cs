@@ -871,8 +871,7 @@ namespace OpenDental {
 			for(int i=0;i<_listPaySplits.Count;i++) {
 				_listPaySplitsOld.Add(_listPaySplits[i].Copy());
 			}
-			//If not new but this payment was attached to payplan, check and enable the box.
-			if(_listPaySplits.Count > 0 && _listPaySplits[0].PayPlanNum!=0) {
+			if(_listPaySplits.Any(x => x.PayPlanNum!=0)) {//If any paysplit has a payplannum, check and enable the box.
 				checkPayPlan.Enabled=true;
 				checkPayPlan.Checked=true;
 			}
@@ -1181,6 +1180,7 @@ namespace OpenDental {
 			//if(FormPS.ShowDialog()==DialogResult.OK){
 			FillMain();
 			//}
+			setCheckPayPlanHelper(true);
 		}
 
 		private void butAdd_Click(object sender,System.EventArgs e) {
@@ -1201,6 +1201,7 @@ namespace OpenDental {
 			}
 			_listPaySplits.Add(PaySplitCur);
 			FillMain();
+			setCheckPayPlanHelper(true);
 		}
 
 		private void butPay_Click(object sender,EventArgs e) {
@@ -1235,9 +1236,24 @@ namespace OpenDental {
 		}
 
 		private void checkPayPlan_Click(object sender,EventArgs e) {
-			if(checkPayPlan.Checked && _listPaySplits.Count>1) {//Trying to check box when there's more than one paysplit in the payment.
-				MsgBox.Show(this,"Cannot apply payment to a payment plan when there is more than one paysplit.");
-				checkPayPlan.Checked=false;
+			if(checkPayPlan.Checked && _listPaySplits.Count>1) {
+				MsgBox.Show(this,"To assign payment to payment plan, edit individual pay splits.");
+			}
+			else if(!checkPayPlan.Checked && _listPaySplits.Count>1) {
+				MsgBox.Show(this,"To unassign payment from payment plan, edit individual pay splits.");
+			}
+			setCheckPayPlanHelper(false);
+		}
+
+		///<summary>Determines the state of the Attached to Payment Plan checkbox based on a variety of factors.  Set forceUpdate to true to update the check no matter what.</summary>
+		private void setCheckPayPlanHelper(bool forceUpdate) {
+			if(_listPaySplits.Count>1 || forceUpdate) {
+				if(_listPaySplits.Any(x => x.PayPlanNum!=0)) {//If any paysplit has a payplannum, check and enable the box.
+					checkPayPlan.Checked=true;
+				}
+				else {
+					checkPayPlan.Checked=false;
+				}
 			}
 		}
 
@@ -2177,6 +2193,7 @@ namespace OpenDental {
 				textAmount.Text=FormPSM.AmtTotal.ToString("F");
 			}
 			FillMain();
+			setCheckPayPlanHelper(true);
 		}
 
 		private void butDeleteAll_Click(object sender,System.EventArgs e) {
@@ -2268,13 +2285,13 @@ namespace OpenDental {
 					return false;
 				}
 			}
-			if(checkPayPlan.Checked) {//This checkbox is disabled if there are no payplans.  This checkbox can't be checked if there's more than 1 paysplit in the list.
-				if(!CreateSplitForPayPlan()) {
+			if(checkPayPlan.Checked && _listPaySplits.Count<2) {//This checkbox is disabled if there are no payplans.
+				if(!CreateSplitForPayPlan()) {//One or zero paysplits, create a payplan split for the user.
 					return false;
 				}
 				FillMain();//Shows the user the new paysplit that was created and updates the textTotal text box (error checked below).
 			}
-			else if(_listPaySplits.Count>0 && _listPaySplits[0].PayPlanNum!=0) {
+			else if(!checkPayPlan.Checked && _listPaySplits.Count==1 && _listPaySplits[0].PayPlanNum!=0) {
 				_listPaySplits[0].PayPlanNum=0;
 			}
 			bool accountingSynchRequired=false;
