@@ -1524,6 +1524,7 @@ namespace OpenDental
 			if(comboPayTracker.SelectedIndex==-1) {
 				comboPayTracker.SelectedIndex=0;
 			}
+			//Not allowed to change status if estimate, cap claim, or attached to a claim payment.
 			if(new[] { ClaimProcStatus.CapComplete,ClaimProcStatus.CapEstimate,ClaimProcStatus.Estimate }.Contains(ClaimProcOld.Status)
 				|| ClaimProcOld.ClaimPaymentNum > 0) 
 			{
