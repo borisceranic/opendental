@@ -1332,66 +1332,51 @@ namespace OpenDental{
 			comboUnschedStatus.SelectedIndex=0;
 			//Consider making a local copy of DefC.Short[(int)DefCat.RecallUnschedStatus] because each call creates a deep copy of the cache . 
 			//This is due to the new thread safe cache pattern implemented in 15.1
-			List<Def> listRecallUnschedStatus=DefC.Short[(int)DefCat.RecallUnschedStatus].ToList();
-			for(int i=0;i<listRecallUnschedStatus.Count;i++) {
-				Def def=listRecallUnschedStatus[i];
-				comboUnschedStatus.Items.Add(def.ItemName);
-				if(def.DefNum==AptCur.UnschedStatus)
+			for(int i=0;i<DefC.Short[(int)DefCat.RecallUnschedStatus].Length;i++) {
+				comboUnschedStatus.Items.Add(DefC.Short[(int)DefCat.RecallUnschedStatus][i].ItemName);
+				if(DefC.Short[(int)DefCat.RecallUnschedStatus][i].DefNum==AptCur.UnschedStatus)
 					comboUnschedStatus.SelectedIndex=i+1;
 			}
-			List<Def> listApptConfirmed=DefC.Short[(int)DefCat.ApptConfirmed].ToList();
 			for(int i=0;i<DefC.Short[(int)DefCat.ApptConfirmed].Length;i++) {
-				Def def=listApptConfirmed[i];
-				comboConfirmed.Items.Add(def.ItemName);
-				if(def.DefNum==AptCur.Confirmed) {
+				comboConfirmed.Items.Add(DefC.Short[(int)DefCat.ApptConfirmed][i].ItemName);
+				if(DefC.Short[(int)DefCat.ApptConfirmed][i].DefNum==AptCur.Confirmed) {
 					comboConfirmed.SelectedIndex=i;
 				}
 			}
 			checkTimeLocked.Checked=AptCur.TimeLocked;
 			textNote.Text=AptCur.Note;
-			List<Def> listApptProcsQuickAdd=DefC.Short[(int)DefCat.ApptProcsQuickAdd].ToList();
 			for(int i=0;i<DefC.Short[(int)DefCat.ApptProcsQuickAdd].Length;i++) {
-				Def def=listApptProcsQuickAdd[i];
-				listQuickAdd.Items.Add(def.ItemName);
+				listQuickAdd.Items.Add(DefC.Short[(int)DefCat.ApptProcsQuickAdd][i].ItemName);
 			}
 			comboClinic.Items.Add(Lan.g(this,"none"));
 			comboClinic.SelectedIndex=0;
-			List<Clinic> listClinics=Clinics.List.ToList();
-			for(int i=0;i<listClinics.Count;i++) {
-				Clinic clinic=listClinics[i];
-				comboClinic.Items.Add(clinic.Description);
-				if(clinic.ClinicNum==AptCur.ClinicNum)
+			for(int i=0;i<Clinics.List.Length;i++) {
+				comboClinic.Items.Add(Clinics.List[i].Description);
+				if(Clinics.List[i].ClinicNum==AptCur.ClinicNum)
 					comboClinic.SelectedIndex=i+1;
 			}
 			if(IsNew) {
 				//Try to auto-select a provider when in Orion mode. Only for new appointments so we don't change historical data.
 				AptCur.ProvNum=Providers.GetOrionProvNum(AptCur.ProvNum);
 			}
-			List<Provider> listProvs=ProviderC.ListShort;
-			int it=0;
-			foreach(Provider prov in listProvs) {
-				comboProvNum.Items.Add(prov.Abbr);
-				if(prov.ProvNum==AptCur.ProvNum) {
-					comboProvNum.SelectedIndex=it;
-				}
-				it++;
+			for(int i=0;i<ProviderC.ListShort.Count;i++) {
+				comboProvNum.Items.Add(ProviderC.ListShort[i].Abbr);
+				if(ProviderC.ListShort[i].ProvNum==AptCur.ProvNum)
+					comboProvNum.SelectedIndex=i;
 			}
 			comboProvHyg.Items.Add(Lan.g(this,"none"));
 			comboProvHyg.SelectedIndex=0;
-			for(int i=0;i<listProvs.Count;i++) {
-				Provider prov=listProvs[i];
-				comboProvHyg.Items.Add(prov.Abbr);
-				if(prov.ProvNum==AptCur.ProvHyg)
+			for(int i=0;i<ProviderC.ListShort.Count;i++) {
+				comboProvHyg.Items.Add(ProviderC.ListShort[i].Abbr);
+				if(ProviderC.ListShort[i].ProvNum==AptCur.ProvHyg)
 					comboProvHyg.SelectedIndex=i+1;
 			}
 			checkIsHygiene.Checked=AptCur.IsHygiene;
 			comboAssistant.Items.Add(Lan.g(this,"none"));
 			comboAssistant.SelectedIndex=0;
-			List<Employee> listEmps=Employees.ListShort.ToList();
-			for(int i=0;i<listEmps.Count;i++) {
-				Employee emp=listEmps[i];
-				comboAssistant.Items.Add(emp.FName);
-				if(emp.EmployeeNum==AptCur.Assistant)
+			for(int i=0;i<Employees.ListShort.Length;i++) {
+				comboAssistant.Items.Add(Employees.ListShort[i].FName);
+				if(Employees.ListShort[i].EmployeeNum==AptCur.Assistant)
 					comboAssistant.SelectedIndex=i+1;
 			}
 			textLabCase.Text=GetLabCaseDescript();
