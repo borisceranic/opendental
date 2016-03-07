@@ -138,12 +138,16 @@ namespace OpenDental{
 			this.label8 = new System.Windows.Forms.Label();
 			this.checkReturnAdd = new System.Windows.Forms.CheckBox();
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
+			this.textDown = new OpenDental.ValidDouble();
 			this.label12 = new System.Windows.Forms.Label();
+			this.textRight = new OpenDental.ValidDouble();
 			this.label13 = new System.Windows.Forms.Label();
 			this.checkGroupFamilies = new System.Windows.Forms.CheckBox();
 			this.label14 = new System.Windows.Forms.Label();
 			this.label15 = new System.Windows.Forms.Label();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
+			this.textDaysFuture = new OpenDental.ValidNumber();
+			this.textDaysPast = new OpenDental.ValidNumber();
 			this.label25 = new System.Windows.Forms.Label();
 			this.comboStatusMailedRecall = new System.Windows.Forms.ComboBox();
 			this.comboStatusEmailedRecall = new System.Windows.Forms.ComboBox();
@@ -151,7 +155,10 @@ namespace OpenDental{
 			this.listTypes = new System.Windows.Forms.ListBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.textMaxReminders = new OpenDental.ValidNumber();
 			this.label4 = new System.Windows.Forms.Label();
+			this.textDaysSecondReminder = new OpenDental.ValidNumber();
+			this.textDaysFirstReminder = new OpenDental.ValidNumber();
 			this.label2 = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
 			this.comboStatusEmailedConfirm = new System.Windows.Forms.ComboBox();
@@ -167,6 +174,7 @@ namespace OpenDental{
 			this.tabRecallConfirmationSetup = new System.Windows.Forms.TabPage();
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.tabConfirmationAutomation = new System.Windows.Forms.TabPage();
+			this.butAdd = new OpenDental.UI.Button();
 			this.gridConfirmationRules = new OpenDental.UI.ODGrid();
 			this.tabReminderSetup = new System.Windows.Forms.TabPage();
 			this.groupBox11 = new System.Windows.Forms.GroupBox();
@@ -178,14 +186,22 @@ namespace OpenDental{
 			this.groupBox10 = new System.Windows.Forms.GroupBox();
 			this.label7 = new System.Windows.Forms.Label();
 			this.label11 = new System.Windows.Forms.Label();
+			this.textHoursPrior = new OpenDental.ValidDouble();
+			this.textDaysPrior = new OpenDental.ValidDouble();
 			this.label20 = new System.Windows.Forms.Label();
 			this.label10 = new System.Windows.Forms.Label();
 			this.gridPriorities = new OpenDental.UI.ODGrid();
 			this.groupBox9 = new System.Windows.Forms.GroupBox();
 			this.label23 = new System.Windows.Forms.Label();
+			this.textApptCount = new OpenDental.ValidNumber();
+			this.textTextCount = new OpenDental.ValidNumber();
 			this.label31 = new System.Windows.Forms.Label();
 			this.label29 = new System.Windows.Forms.Label();
+			this.textNeitherCount = new OpenDental.ValidNumber();
+			this.textEmailCount = new OpenDental.ValidNumber();
 			this.label30 = new System.Windows.Forms.Label();
+			this.butUp = new OpenDental.UI.Button();
+			this.butDown = new OpenDental.UI.Button();
 			this.checkSendAll = new System.Windows.Forms.CheckBox();
 			this.textMessageText = new System.Windows.Forms.RichTextBox();
 			this.label16 = new System.Windows.Forms.Label();
@@ -203,22 +219,6 @@ namespace OpenDental{
 			this.dateRunStart = new System.Windows.Forms.DateTimePicker();
 			this.label17 = new System.Windows.Forms.Label();
 			this.label18 = new System.Windows.Forms.Label();
-			this.textDown = new OpenDental.ValidDouble();
-			this.textRight = new OpenDental.ValidDouble();
-			this.textDaysFuture = new OpenDental.ValidNumber();
-			this.textDaysPast = new OpenDental.ValidNumber();
-			this.textMaxReminders = new OpenDental.ValidNumber();
-			this.textDaysSecondReminder = new OpenDental.ValidNumber();
-			this.textDaysFirstReminder = new OpenDental.ValidNumber();
-			this.butAdd = new OpenDental.UI.Button();
-			this.textHoursPrior = new OpenDental.ValidDouble();
-			this.textDaysPrior = new OpenDental.ValidDouble();
-			this.textApptCount = new OpenDental.ValidNumber();
-			this.textTextCount = new OpenDental.ValidNumber();
-			this.textNeitherCount = new OpenDental.ValidNumber();
-			this.textEmailCount = new OpenDental.ValidNumber();
-			this.butUp = new OpenDental.UI.Button();
-			this.butDown = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.groupBox2.SuspendLayout();
@@ -279,6 +279,15 @@ namespace OpenDental{
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Adjust Postcard Position in Inches";
 			// 
+			// textDown
+			// 
+			this.textDown.Location = new System.Drawing.Point(110, 43);
+			this.textDown.MaxVal = 100000000D;
+			this.textDown.MinVal = -100000000D;
+			this.textDown.Name = "textDown";
+			this.textDown.Size = new System.Drawing.Size(73, 20);
+			this.textDown.TabIndex = 6;
+			// 
 			// label12
 			// 
 			this.label12.Location = new System.Drawing.Point(48, 42);
@@ -287,6 +296,15 @@ namespace OpenDental{
 			this.label12.TabIndex = 5;
 			this.label12.Text = "Down";
 			this.label12.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textRight
+			// 
+			this.textRight.Location = new System.Drawing.Point(110, 18);
+			this.textRight.MaxVal = 100000000D;
+			this.textRight.MinVal = -100000000D;
+			this.textRight.Name = "textRight";
+			this.textRight.Size = new System.Drawing.Size(73, 20);
+			this.textRight.TabIndex = 4;
 			// 
 			// label13
 			// 
@@ -339,6 +357,24 @@ namespace OpenDental{
 			this.groupBox3.TabIndex = 54;
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Recall List Default View";
+			// 
+			// textDaysFuture
+			// 
+			this.textDaysFuture.Location = new System.Drawing.Point(192, 54);
+			this.textDaysFuture.MaxVal = 10000;
+			this.textDaysFuture.MinVal = 0;
+			this.textDaysFuture.Name = "textDaysFuture";
+			this.textDaysFuture.Size = new System.Drawing.Size(53, 20);
+			this.textDaysFuture.TabIndex = 66;
+			// 
+			// textDaysPast
+			// 
+			this.textDaysPast.Location = new System.Drawing.Point(192, 32);
+			this.textDaysPast.MaxVal = 10000;
+			this.textDaysPast.MinVal = 0;
+			this.textDaysPast.Name = "textDaysPast";
+			this.textDaysPast.Size = new System.Drawing.Size(53, 20);
+			this.textDaysPast.TabIndex = 65;
 			// 
 			// label25
 			// 
@@ -412,6 +448,15 @@ namespace OpenDental{
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Also show in list if # of days since";
 			// 
+			// textMaxReminders
+			// 
+			this.textMaxReminders.Location = new System.Drawing.Point(192, 60);
+			this.textMaxReminders.MaxVal = 10000;
+			this.textMaxReminders.MinVal = 0;
+			this.textMaxReminders.Name = "textMaxReminders";
+			this.textMaxReminders.Size = new System.Drawing.Size(53, 20);
+			this.textMaxReminders.TabIndex = 68;
+			// 
 			// label4
 			// 
 			this.label4.Location = new System.Drawing.Point(44, 59);
@@ -420,6 +465,24 @@ namespace OpenDental{
 			this.label4.TabIndex = 67;
 			this.label4.Text = "Max # Reminders (e.g. 4)";
 			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textDaysSecondReminder
+			// 
+			this.textDaysSecondReminder.Location = new System.Drawing.Point(192, 38);
+			this.textDaysSecondReminder.MaxVal = 10000;
+			this.textDaysSecondReminder.MinVal = 0;
+			this.textDaysSecondReminder.Name = "textDaysSecondReminder";
+			this.textDaysSecondReminder.Size = new System.Drawing.Size(53, 20);
+			this.textDaysSecondReminder.TabIndex = 66;
+			// 
+			// textDaysFirstReminder
+			// 
+			this.textDaysFirstReminder.Location = new System.Drawing.Point(192, 16);
+			this.textDaysFirstReminder.MaxVal = 10000;
+			this.textDaysFirstReminder.MinVal = 0;
+			this.textDaysFirstReminder.Name = "textDaysFirstReminder";
+			this.textDaysFirstReminder.Size = new System.Drawing.Size(53, 20);
+			this.textDaysFirstReminder.TabIndex = 65;
 			// 
 			// label2
 			// 
@@ -598,6 +661,23 @@ namespace OpenDental{
 			this.tabConfirmationAutomation.Text = "Confirmation Automation";
 			this.tabConfirmationAutomation.UseVisualStyleBackColor = true;
 			// 
+			// butAdd
+			// 
+			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAdd.Autosize = true;
+			this.butAdd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAdd.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAdd.CornerRadius = 4F;
+			this.butAdd.Image = global::OpenDental.Properties.Resources.Add;
+			this.butAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butAdd.Location = new System.Drawing.Point(35, 394);
+			this.butAdd.Name = "butAdd";
+			this.butAdd.Size = new System.Drawing.Size(75, 24);
+			this.butAdd.TabIndex = 69;
+			this.butAdd.Text = "Add";
+			this.butAdd.UseVisualStyleBackColor = true;
+			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
+			// 
 			// gridConfirmationRules
 			// 
 			this.gridConfirmationRules.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -670,7 +750,6 @@ namespace OpenDental{
 			// 
 			this.textMessageEmail.Location = new System.Drawing.Point(52, 128);
 			this.textMessageEmail.Name = "textMessageEmail";
-			this.textMessageEmail.ReadOnly = true;
 			this.textMessageEmail.Size = new System.Drawing.Size(337, 82);
 			this.textMessageEmail.TabIndex = 95;
 			this.textMessageEmail.Text = "Appointment Reminder: [nameF] is scheduled for [apptTime] on [apptDate] at [clini" +
@@ -725,6 +804,28 @@ namespace OpenDental{
 			this.label11.TabIndex = 14;
 			this.label11.Text = "Days Prior";
 			this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textHoursPrior
+			// 
+			this.textHoursPrior.Location = new System.Drawing.Point(77, 18);
+			this.textHoursPrior.MaxVal = 100000000D;
+			this.textHoursPrior.MinVal = 0D;
+			this.textHoursPrior.Name = "textHoursPrior";
+			this.textHoursPrior.Size = new System.Drawing.Size(51, 20);
+			this.textHoursPrior.TabIndex = 13;
+			this.textHoursPrior.Text = "0";
+			this.textHoursPrior.Leave += new System.EventHandler(this.textHourInterval_Leave);
+			// 
+			// textDaysPrior
+			// 
+			this.textDaysPrior.Location = new System.Drawing.Point(77, 50);
+			this.textDaysPrior.MaxVal = 100000000D;
+			this.textDaysPrior.MinVal = 0D;
+			this.textDaysPrior.Name = "textDaysPrior";
+			this.textDaysPrior.Size = new System.Drawing.Size(51, 20);
+			this.textDaysPrior.TabIndex = 12;
+			this.textDaysPrior.Text = "0";
+			this.textDaysPrior.Leave += new System.EventHandler(this.textDayInterval_Leave);
 			// 
 			// label20
 			// 
@@ -785,6 +886,28 @@ namespace OpenDental{
 			this.label23.Text = "Texts to be sent:";
 			this.label23.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
+			// textApptCount
+			// 
+			this.textApptCount.Location = new System.Drawing.Point(255, 94);
+			this.textApptCount.MaxVal = 255;
+			this.textApptCount.MinVal = 0;
+			this.textApptCount.Name = "textApptCount";
+			this.textApptCount.ReadOnly = true;
+			this.textApptCount.Size = new System.Drawing.Size(51, 20);
+			this.textApptCount.TabIndex = 88;
+			this.textApptCount.Text = "0";
+			// 
+			// textTextCount
+			// 
+			this.textTextCount.Location = new System.Drawing.Point(255, 16);
+			this.textTextCount.MaxVal = 255;
+			this.textTextCount.MinVal = 0;
+			this.textTextCount.Name = "textTextCount";
+			this.textTextCount.ReadOnly = true;
+			this.textTextCount.Size = new System.Drawing.Size(51, 20);
+			this.textTextCount.TabIndex = 76;
+			this.textTextCount.Text = "0";
+			// 
 			// label31
 			// 
 			this.label31.Location = new System.Drawing.Point(23, 94);
@@ -803,6 +926,28 @@ namespace OpenDental{
 			this.label29.Text = "Emails to be sent:";
 			this.label29.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
+			// textNeitherCount
+			// 
+			this.textNeitherCount.Location = new System.Drawing.Point(255, 68);
+			this.textNeitherCount.MaxVal = 255;
+			this.textNeitherCount.MinVal = 0;
+			this.textNeitherCount.Name = "textNeitherCount";
+			this.textNeitherCount.ReadOnly = true;
+			this.textNeitherCount.Size = new System.Drawing.Size(51, 20);
+			this.textNeitherCount.TabIndex = 86;
+			this.textNeitherCount.Text = "0";
+			// 
+			// textEmailCount
+			// 
+			this.textEmailCount.Location = new System.Drawing.Point(255, 42);
+			this.textEmailCount.MaxVal = 255;
+			this.textEmailCount.MinVal = 0;
+			this.textEmailCount.Name = "textEmailCount";
+			this.textEmailCount.ReadOnly = true;
+			this.textEmailCount.Size = new System.Drawing.Size(51, 20);
+			this.textEmailCount.TabIndex = 84;
+			this.textEmailCount.Text = "0";
+			// 
 			// label30
 			// 
 			this.label30.Location = new System.Drawing.Point(23, 68);
@@ -811,6 +956,36 @@ namespace OpenDental{
 			this.label30.TabIndex = 85;
 			this.label30.Text = "No send method (can\'t be sent):";
 			this.label30.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// butUp
+			// 
+			this.butUp.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butUp.Autosize = false;
+			this.butUp.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butUp.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butUp.CornerRadius = 4F;
+			this.butUp.Image = global::OpenDental.Properties.Resources.up;
+			this.butUp.Location = new System.Drawing.Point(52, 216);
+			this.butUp.Name = "butUp";
+			this.butUp.Size = new System.Drawing.Size(30, 30);
+			this.butUp.TabIndex = 17;
+			this.butUp.UseVisualStyleBackColor = true;
+			this.butUp.Click += new System.EventHandler(this.butUp_Click);
+			// 
+			// butDown
+			// 
+			this.butDown.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butDown.Autosize = false;
+			this.butDown.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butDown.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butDown.CornerRadius = 4F;
+			this.butDown.Image = global::OpenDental.Properties.Resources.down;
+			this.butDown.Location = new System.Drawing.Point(52, 252);
+			this.butDown.Name = "butDown";
+			this.butDown.Size = new System.Drawing.Size(30, 30);
+			this.butDown.TabIndex = 18;
+			this.butDown.UseVisualStyleBackColor = true;
+			this.butDown.Click += new System.EventHandler(this.butDown_Click);
 			// 
 			// checkSendAll
 			// 
@@ -828,7 +1003,6 @@ namespace OpenDental{
 			// 
 			this.textMessageText.Location = new System.Drawing.Point(52, 38);
 			this.textMessageText.Name = "textMessageText";
-			this.textMessageText.ReadOnly = true;
 			this.textMessageText.Size = new System.Drawing.Size(337, 64);
 			this.textMessageText.TabIndex = 69;
 			this.textMessageText.Text = "Appointment Reminder: [nameF] is scheduled for [apptTime] on [apptDate] at [clini" +
@@ -983,182 +1157,6 @@ namespace OpenDental{
 			this.label18.Size = new System.Drawing.Size(32, 15);
 			this.label18.TabIndex = 4;
 			this.label18.Text = "Start";
-			// 
-			// textDown
-			// 
-			this.textDown.Location = new System.Drawing.Point(110, 43);
-			this.textDown.MaxVal = 100000000D;
-			this.textDown.MinVal = -100000000D;
-			this.textDown.Name = "textDown";
-			this.textDown.Size = new System.Drawing.Size(73, 20);
-			this.textDown.TabIndex = 6;
-			// 
-			// textRight
-			// 
-			this.textRight.Location = new System.Drawing.Point(110, 18);
-			this.textRight.MaxVal = 100000000D;
-			this.textRight.MinVal = -100000000D;
-			this.textRight.Name = "textRight";
-			this.textRight.Size = new System.Drawing.Size(73, 20);
-			this.textRight.TabIndex = 4;
-			// 
-			// textDaysFuture
-			// 
-			this.textDaysFuture.Location = new System.Drawing.Point(192, 54);
-			this.textDaysFuture.MaxVal = 10000;
-			this.textDaysFuture.MinVal = 0;
-			this.textDaysFuture.Name = "textDaysFuture";
-			this.textDaysFuture.Size = new System.Drawing.Size(53, 20);
-			this.textDaysFuture.TabIndex = 66;
-			// 
-			// textDaysPast
-			// 
-			this.textDaysPast.Location = new System.Drawing.Point(192, 32);
-			this.textDaysPast.MaxVal = 10000;
-			this.textDaysPast.MinVal = 0;
-			this.textDaysPast.Name = "textDaysPast";
-			this.textDaysPast.Size = new System.Drawing.Size(53, 20);
-			this.textDaysPast.TabIndex = 65;
-			// 
-			// textMaxReminders
-			// 
-			this.textMaxReminders.Location = new System.Drawing.Point(192, 60);
-			this.textMaxReminders.MaxVal = 10000;
-			this.textMaxReminders.MinVal = 0;
-			this.textMaxReminders.Name = "textMaxReminders";
-			this.textMaxReminders.Size = new System.Drawing.Size(53, 20);
-			this.textMaxReminders.TabIndex = 68;
-			// 
-			// textDaysSecondReminder
-			// 
-			this.textDaysSecondReminder.Location = new System.Drawing.Point(192, 38);
-			this.textDaysSecondReminder.MaxVal = 10000;
-			this.textDaysSecondReminder.MinVal = 0;
-			this.textDaysSecondReminder.Name = "textDaysSecondReminder";
-			this.textDaysSecondReminder.Size = new System.Drawing.Size(53, 20);
-			this.textDaysSecondReminder.TabIndex = 66;
-			// 
-			// textDaysFirstReminder
-			// 
-			this.textDaysFirstReminder.Location = new System.Drawing.Point(192, 16);
-			this.textDaysFirstReminder.MaxVal = 10000;
-			this.textDaysFirstReminder.MinVal = 0;
-			this.textDaysFirstReminder.Name = "textDaysFirstReminder";
-			this.textDaysFirstReminder.Size = new System.Drawing.Size(53, 20);
-			this.textDaysFirstReminder.TabIndex = 65;
-			// 
-			// butAdd
-			// 
-			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAdd.Autosize = true;
-			this.butAdd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butAdd.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butAdd.CornerRadius = 4F;
-			this.butAdd.Image = global::OpenDental.Properties.Resources.Add;
-			this.butAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butAdd.Location = new System.Drawing.Point(35, 394);
-			this.butAdd.Name = "butAdd";
-			this.butAdd.Size = new System.Drawing.Size(75, 24);
-			this.butAdd.TabIndex = 69;
-			this.butAdd.Text = "Add";
-			this.butAdd.UseVisualStyleBackColor = true;
-			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
-			// 
-			// textHoursPrior
-			// 
-			this.textHoursPrior.Location = new System.Drawing.Point(77, 18);
-			this.textHoursPrior.MaxVal = 100000000D;
-			this.textHoursPrior.MinVal = 0D;
-			this.textHoursPrior.Name = "textHoursPrior";
-			this.textHoursPrior.Size = new System.Drawing.Size(51, 20);
-			this.textHoursPrior.TabIndex = 13;
-			this.textHoursPrior.Text = "0";
-			this.textHoursPrior.Leave += new System.EventHandler(this.textHourInterval_Leave);
-			// 
-			// textDaysPrior
-			// 
-			this.textDaysPrior.Location = new System.Drawing.Point(77, 50);
-			this.textDaysPrior.MaxVal = 100000000D;
-			this.textDaysPrior.MinVal = 0D;
-			this.textDaysPrior.Name = "textDaysPrior";
-			this.textDaysPrior.Size = new System.Drawing.Size(51, 20);
-			this.textDaysPrior.TabIndex = 12;
-			this.textDaysPrior.Text = "0";
-			this.textDaysPrior.Leave += new System.EventHandler(this.textDayInterval_Leave);
-			// 
-			// textApptCount
-			// 
-			this.textApptCount.Location = new System.Drawing.Point(255, 94);
-			this.textApptCount.MaxVal = 255;
-			this.textApptCount.MinVal = 0;
-			this.textApptCount.Name = "textApptCount";
-			this.textApptCount.ReadOnly = true;
-			this.textApptCount.Size = new System.Drawing.Size(51, 20);
-			this.textApptCount.TabIndex = 88;
-			this.textApptCount.Text = "0";
-			// 
-			// textTextCount
-			// 
-			this.textTextCount.Location = new System.Drawing.Point(255, 16);
-			this.textTextCount.MaxVal = 255;
-			this.textTextCount.MinVal = 0;
-			this.textTextCount.Name = "textTextCount";
-			this.textTextCount.ReadOnly = true;
-			this.textTextCount.Size = new System.Drawing.Size(51, 20);
-			this.textTextCount.TabIndex = 76;
-			this.textTextCount.Text = "0";
-			// 
-			// textNeitherCount
-			// 
-			this.textNeitherCount.Location = new System.Drawing.Point(255, 68);
-			this.textNeitherCount.MaxVal = 255;
-			this.textNeitherCount.MinVal = 0;
-			this.textNeitherCount.Name = "textNeitherCount";
-			this.textNeitherCount.ReadOnly = true;
-			this.textNeitherCount.Size = new System.Drawing.Size(51, 20);
-			this.textNeitherCount.TabIndex = 86;
-			this.textNeitherCount.Text = "0";
-			// 
-			// textEmailCount
-			// 
-			this.textEmailCount.Location = new System.Drawing.Point(255, 42);
-			this.textEmailCount.MaxVal = 255;
-			this.textEmailCount.MinVal = 0;
-			this.textEmailCount.Name = "textEmailCount";
-			this.textEmailCount.ReadOnly = true;
-			this.textEmailCount.Size = new System.Drawing.Size(51, 20);
-			this.textEmailCount.TabIndex = 84;
-			this.textEmailCount.Text = "0";
-			// 
-			// butUp
-			// 
-			this.butUp.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butUp.Autosize = false;
-			this.butUp.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butUp.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butUp.CornerRadius = 4F;
-			this.butUp.Image = global::OpenDental.Properties.Resources.up;
-			this.butUp.Location = new System.Drawing.Point(52, 216);
-			this.butUp.Name = "butUp";
-			this.butUp.Size = new System.Drawing.Size(30, 30);
-			this.butUp.TabIndex = 17;
-			this.butUp.UseVisualStyleBackColor = true;
-			this.butUp.Click += new System.EventHandler(this.butUp_Click);
-			// 
-			// butDown
-			// 
-			this.butDown.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butDown.Autosize = false;
-			this.butDown.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butDown.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butDown.CornerRadius = 4F;
-			this.butDown.Image = global::OpenDental.Properties.Resources.down;
-			this.butDown.Location = new System.Drawing.Point(52, 252);
-			this.butDown.Name = "butDown";
-			this.butDown.Size = new System.Drawing.Size(30, 30);
-			this.butDown.TabIndex = 18;
-			this.butDown.UseVisualStyleBackColor = true;
-			this.butDown.Click += new System.EventHandler(this.butDown_Click);
 			// 
 			// butOK
 			// 
@@ -2075,7 +2073,6 @@ namespace OpenDental{
 			}
 			if(!SmsPhones.IsIntegratedTextingEnabled() || !SmsPhones.IsTextingForCountry("US")) {
 				Prefs.UpdateString(PrefName.ApptReminderDayMessage,PIn.String(textMessageText.Text));
-				textMessageText.Text=PrefC.GetString(PrefName.ApptReminderDayMessage);
 			}
 			Prefs.UpdateString(PrefName.ApptReminderEmailMessage,textMessageEmail.Text);
 			string sendOrder="";
