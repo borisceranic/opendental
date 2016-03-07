@@ -1608,8 +1608,8 @@ namespace OpenDental.InternalTools.Job_Manager {
 			}
 			timerVersion.Stop();
 			textVersion.BackColor=Color.White;
-			_jobCur.Title=textVersion.Text;
-			_jobOld.Title=textVersion.Text;
+			_jobCur.JobVersion=textVersion.Text;
+			_jobOld.JobVersion=textVersion.Text;
 			if(IsNew) {
 				IsChanged=true;
 			}
