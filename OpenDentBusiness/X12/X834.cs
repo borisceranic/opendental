@@ -1870,7 +1870,7 @@ namespace OpenDentBusiness {
 		public X12_N1 SponsorName;
 		///<summary>Loop 1000B N1</summary>
 		public X12_N1 Payer;
-		///<summary>Loop 1000C N1 and Loop 1100C ACT</summary>
+		///<summary>Loop 1000C N1 and Loop 1100C ACT.</summary>
 		public List<Hx834_Broker> ListBrokers=new List<Hx834_Broker>();
 		///<summary>Loop 2000</summary>
 		public List<Hx834_Member> ListMembers=new List<Hx834_Member>();
