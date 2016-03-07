@@ -1692,6 +1692,7 @@ namespace OpenDentBusiness {
 		///<summary>The insurance plan group number.  Specified at member level in format.</summary>
 		public string GroupNum;
 
+		///<summary>Converts the code in MemberLevelDetail.MaintenanceTypeCode to a human readable string.</summary>
 		public string GetPatMaintTypeDescript() {
 			if(MemberLevelDetail==null) {
 				return "";
