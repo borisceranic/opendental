@@ -8,7 +8,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormRxSetup : System.Windows.Forms.Form{
+	public class FormRxSetup : ODForm {
 		private System.ComponentModel.Container components = null;
 		private OpenDental.UI.Button butAdd;
 		private OpenDental.UI.Button butAdd2;

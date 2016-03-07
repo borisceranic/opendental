@@ -6,7 +6,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	/// <summary></summary>
-	public class FormDisplayFieldOrthoEdit : System.Windows.Forms.Form{
+	public class FormDisplayFieldOrthoEdit : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private TextBox textDescription;

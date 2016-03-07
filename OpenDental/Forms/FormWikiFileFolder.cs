@@ -10,7 +10,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormWikiFileFolder:Form {
+	public partial class FormWikiFileFolder:ODForm {
 		public bool IsFolderMode;
 		public string SelectedLink;
 

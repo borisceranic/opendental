@@ -16,7 +16,7 @@ namespace OpenDental {
 	/// <summary>
 	/// This Form is primarily used by the dental office to upload sheetDefs
 	/// </summary>
-	public partial class FormWebFormSetup:Form {
+	public partial class FormWebFormSetup:ODForm {
 
 		string RegistrationKey=PrefC.GetString(PrefName.RegistrationKey);
 		string SheetDefAddress="";

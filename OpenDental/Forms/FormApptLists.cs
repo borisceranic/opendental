@@ -8,7 +8,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormApptLists : System.Windows.Forms.Form{
+	public class FormApptLists : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label label2;

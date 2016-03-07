@@ -6,7 +6,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	/// <summary></summary>
-	public class FormChartView : System.Windows.Forms.Form{
+	public class FormChartView : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.ODGrid gridMain;
 		/// <summary>

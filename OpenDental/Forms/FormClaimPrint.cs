@@ -14,7 +14,7 @@ using CodeBase;
 
 namespace OpenDental{
 	///<summary></summary>
-	public class FormClaimPrint : System.Windows.Forms.Form{
+	public class FormClaimPrint : ODForm {
 		private OpenDental.UI.Button butClose;
 		private System.Windows.Forms.PrintPreviewControl Preview2;
 		private System.Drawing.Printing.PrintDocument pd2;

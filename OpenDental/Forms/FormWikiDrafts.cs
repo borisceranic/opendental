@@ -10,7 +10,7 @@ using OpenDental.UI;
 using CodeBase;
 
 namespace OpenDental {
-	public partial class FormWikiDrafts:Form {
+	public partial class FormWikiDrafts:ODForm {
 		private List<WikiPage> _listWikiPage;
 		public FormWiki OwnerForm;
 

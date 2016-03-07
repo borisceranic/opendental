@@ -6,7 +6,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEhrLabResultEdit2014:Form {
+	public partial class FormEhrLabResultEdit2014:ODForm {
 		public EhrLabResult EhrLabResultCur;
 		public bool IsImport;
 		public bool IsViewOnly;

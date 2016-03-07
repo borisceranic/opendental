@@ -10,7 +10,7 @@ using System.Drawing.Printing;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormCDSILabResult:Form {
+	public partial class FormCDSILabResult:ODForm {
 		private List<Ucum> _listUCUM;
 		///<summary>CDSI Trigger formatted text. This is the form result.</summary>
 		public string ResultCDSITriggerText;

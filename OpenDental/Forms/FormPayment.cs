@@ -19,7 +19,7 @@ using OpenDentBusiness;
 
 namespace OpenDental {
 	///<summary></summary>
-	public class FormPayment:System.Windows.Forms.Form {
+	public class FormPayment:ODForm {
 		private OpenDental.UI.Button butOK;
 		private OpenDental.UI.Button butCancel;
 		private System.Windows.Forms.Label label1;

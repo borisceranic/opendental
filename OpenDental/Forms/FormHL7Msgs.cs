@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormHL7Msgs:Form {
+	public partial class FormHL7Msgs:ODForm {
 		private long SelectedPatNum;
 		private List<HL7Msg> MsgList;
 		///<summary>This gets set externally beforehand.  Lets user quickly select the HL7 messages for the current patient.</summary>

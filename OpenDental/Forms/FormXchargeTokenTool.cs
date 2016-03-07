@@ -9,7 +9,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormXchargeTokenTool:Form {
+	public partial class FormXchargeTokenTool:ODForm {
 		private List<CreditCard> _listCreditCards;
 		///<summary>The X-Charge Username for the FormOpenDental.ClinicNum clinic.  Validated on load.</summary>
 		private string _xUsername;

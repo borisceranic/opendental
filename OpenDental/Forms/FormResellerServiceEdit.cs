@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormResellerServiceEdit:Form {
+	public partial class FormResellerServiceEdit:ODForm {
 		private ResellerService ResellerServiceCur;
 		public bool IsNew;
 

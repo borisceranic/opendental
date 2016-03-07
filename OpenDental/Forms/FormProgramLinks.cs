@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormProgramLinks : System.Windows.Forms.Form{
+	public class FormProgramLinks : ODForm {
 		private System.Windows.Forms.ListBox listProgram;
 		private System.ComponentModel.Container components = null;
 		private OpenDental.UI.Button butClose;

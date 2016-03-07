@@ -13,7 +13,7 @@ using System.Collections.Generic;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormDefEdit : System.Windows.Forms.Form{
+	public class FormDefEdit : ODForm {
 		private System.Windows.Forms.Label labelName;
 		private System.Windows.Forms.Label labelValue;
 		private System.Windows.Forms.TextBox textName;

@@ -9,7 +9,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormPhoneEmpDefaultEscalationEdit:Form {
+	public partial class FormPhoneEmpDefaultEscalationEdit:ODForm {
 
 		///<summary>Master list of employees. Only get this once.</summary>
 		List<PhoneEmpDefault> _listPED=PhoneEmpDefaults.Refresh();

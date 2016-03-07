@@ -13,7 +13,7 @@ namespace OpenDental
 	/// <summary>
 	/// Summary description for FormClaimPayTotal.
 	/// </summary>
-	public class FormClaimPayTotal : System.Windows.Forms.Form
+	public class FormClaimPayTotal : ODForm
 	{
 		private OpenDental.ValidDouble textWriteOff;
 		private System.Windows.Forms.TextBox textInsPayAllowed;

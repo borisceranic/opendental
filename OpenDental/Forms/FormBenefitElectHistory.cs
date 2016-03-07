@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormBenefitElectHistory:Form {
+	public partial class FormBenefitElectHistory:ODForm {
 		private List<Etrans> list;
 		private long PlanNum;
 		private long PatPlanNum;

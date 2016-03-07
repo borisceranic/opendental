@@ -7,7 +7,7 @@ using System.Text;
 using System.Windows.Forms;
 
 namespace OpenDental {
-	public partial class FormBackupReminder:Form {
+	public partial class FormBackupReminder:ODForm {
 		public FormBackupReminder() {
 			InitializeComponent();
 			Lan.F(this);

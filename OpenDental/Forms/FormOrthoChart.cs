@@ -10,7 +10,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormOrthoChart:Form {
+	public partial class FormOrthoChart:ODForm {
 		private PatField[] _arrayPatientFields;
 		private List<DisplayField> _listOrthDisplayFields;
 		private List<OrthoChart> _listOrthoCharts;

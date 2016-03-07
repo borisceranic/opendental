@@ -10,7 +10,7 @@ using OpenDental.UI;
 using System.IO;
 
 namespace OpenDental {
-	public partial class FormWikiImages:Form {
+	public partial class FormWikiImages:ODForm {
 		///<summary>This contains the entire qualified names including path and extension.</summary>
 		private List<string> ImageNamesList;
 		public string SelectedImageName;

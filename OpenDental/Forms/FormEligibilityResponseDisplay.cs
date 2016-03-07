@@ -12,7 +12,7 @@ using System.Xml;
 
 namespace OpenDental {
 	///<summary></summary>
-	public class FormEligibilityResponseDisplay:System.Windows.Forms.Form {
+	public class FormEligibilityResponseDisplay:ODForm {
 		private OpenDental.UI.Button butClose;
 		private Label LblPatientName;
 		private DataGridView dataGridView1;

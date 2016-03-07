@@ -19,7 +19,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormUpdate : System.Windows.Forms.Form{
+	public class FormUpdate : ODForm {
 		private OpenDental.UI.Button butClose;
 		private System.Windows.Forms.Label labelVersion;
 		private OpenDental.UI.Button butDownload;

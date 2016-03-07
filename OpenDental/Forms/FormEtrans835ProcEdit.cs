@@ -11,7 +11,7 @@ using OpenDental.UI;
 using CodeBase;
 
 namespace OpenDental {
-	public partial class FormEtrans835ProcEdit:Form {
+	public partial class FormEtrans835ProcEdit:ODForm {
 
 		private Hx835_Proc _proc;
 		private decimal _patientPortionSum;

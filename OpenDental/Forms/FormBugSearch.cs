@@ -10,7 +10,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormBugSearch:Form {
+	public partial class FormBugSearch:ODForm {
 		private List<Bug> _listBugsAll=null;
 
 		public Bug BugCur;

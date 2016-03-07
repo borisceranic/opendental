@@ -7,7 +7,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormProcButtonEdit:System.Windows.Forms.Form {
+	public class FormProcButtonEdit:ODForm {
 		private IContainer components;
 		private System.Windows.Forms.ListBox listAutoCodes;
 		private System.Windows.Forms.Label label1;

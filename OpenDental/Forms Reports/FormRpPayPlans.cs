@@ -17,7 +17,7 @@ namespace OpenDental
 	/// <summary>
 	/// Summary description for FormRpApptWithPhones.
 	/// </summary>
-	public class FormRpPayPlans:System.Windows.Forms.Form {
+	public class FormRpPayPlans:ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private CheckBox checkHideCompletePlans;

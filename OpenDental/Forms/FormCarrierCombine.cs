@@ -10,7 +10,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormCarrierCombine : System.Windows.Forms.Form{
+	public class FormCarrierCombine : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private OpenDental.Forms.TableCarriers tbCarriers;

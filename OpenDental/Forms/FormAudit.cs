@@ -13,7 +13,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormAudit : System.Windows.Forms.Form{
+	public class FormAudit : ODForm {
 		private OpenDental.UI.ODGrid grid;
 		private System.Windows.Forms.Label label2;
 		private OpenDental.ValidDate textDateFrom;

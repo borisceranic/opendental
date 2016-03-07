@@ -3,7 +3,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormXchargeTrans:Form {
+	public partial class FormXchargeTrans:ODForm {
 		public int TransactionType;
 		public decimal CashBackAmount;
 		public bool SaveToken;

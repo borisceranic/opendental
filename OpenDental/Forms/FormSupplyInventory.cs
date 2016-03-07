@@ -11,7 +11,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormSupplyInventory:Form {
+	public partial class FormSupplyInventory:ODForm {
 		private List<SupplyNeeded> listNeeded;
 		private int pagesPrinted;
 		private bool headingPrinted;

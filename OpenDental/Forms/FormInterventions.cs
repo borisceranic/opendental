@@ -10,7 +10,7 @@ using OpenDental.UI;
 using OpenDental;
 
 namespace OpenDental {
-	public partial class FormInterventions:Form {
+	public partial class FormInterventions:ODForm {
 		public Patient PatCur;
 		private List<Intervention> listIntervention;
 		private List<MedicationPat> listMedPats;

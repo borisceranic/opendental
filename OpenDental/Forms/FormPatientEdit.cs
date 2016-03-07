@@ -17,7 +17,7 @@ using System.Linq;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormPatientEdit : System.Windows.Forms.Form{
+	public class FormPatientEdit : ODForm {
 		private System.Windows.Forms.Label labelLName;
 		private System.Windows.Forms.Label labelFName;
 		private System.Windows.Forms.Label labelMiddleI;
@@ -350,6 +350,7 @@ namespace OpenDental{
 			this.textChartNumber = new System.Windows.Forms.TextBox();
 			this.textBirthdate = new OpenDental.ValidDate();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.checkSameForSuperFam = new System.Windows.Forms.CheckBox();
 			this.butShowMap = new OpenDental.UI.Button();
 			this.butEditZip = new OpenDental.UI.Button();
 			this.textZip = new System.Windows.Forms.TextBox();
@@ -449,7 +450,6 @@ namespace OpenDental{
 			this.labelReferredFrom = new System.Windows.Forms.Label();
 			this.textMedicaidState = new System.Windows.Forms.TextBox();
 			this.labelRequiredField = new System.Windows.Forms.Label();
-			this.checkSameForSuperFam = new System.Windows.Forms.CheckBox();
 			this.groupBox2.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.groupNotes.SuspendLayout();
@@ -947,6 +947,17 @@ namespace OpenDental{
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Address and Phone";
 			// 
+			// checkSameForSuperFam
+			// 
+			this.checkSameForSuperFam.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkSameForSuperFam.Location = new System.Drawing.Point(288, 14);
+			this.checkSameForSuperFam.Name = "checkSameForSuperFam";
+			this.checkSameForSuperFam.Size = new System.Drawing.Size(168, 17);
+			this.checkSameForSuperFam.TabIndex = 62;
+			this.checkSameForSuperFam.TabStop = false;
+			this.checkSameForSuperFam.Text = "Same for entire super family";
+			this.checkSameForSuperFam.Visible = false;
+			// 
 			// butShowMap
 			// 
 			this.butShowMap.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -1040,6 +1051,7 @@ namespace OpenDental{
 			this.textAddrNotes.QuickPasteType = OpenDentBusiness.QuickPasteType.PatAddressNote;
 			this.textAddrNotes.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textAddrNotes.Size = new System.Drawing.Size(224, 52);
+			this.textAddrNotes.SpellCheckIsEnabled = false;
 			this.textAddrNotes.TabIndex = 0;
 			this.textAddrNotes.TabStop = false;
 			this.textAddrNotes.Text = "";
@@ -2010,20 +2022,8 @@ namespace OpenDental{
 			this.labelRequiredField.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			this.labelRequiredField.Visible = false;
 			// 
-			// checkBox1
-			// 
-			this.checkSameForSuperFam.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkSameForSuperFam.Location = new System.Drawing.Point(288, 14);
-			this.checkSameForSuperFam.Name = "checkBox1";
-			this.checkSameForSuperFam.Size = new System.Drawing.Size(168, 17);
-			this.checkSameForSuperFam.TabIndex = 62;
-			this.checkSameForSuperFam.TabStop = false;
-			this.checkSameForSuperFam.Text = "Same for entire super family";
-			this.checkSameForSuperFam.Visible = false;
-			// 
 			// FormPatientEdit
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
 			this.ClientSize = new System.Drawing.Size(974, 696);
 			this.Controls.Add(this.textMedicaidState);
@@ -2111,7 +2111,6 @@ namespace OpenDental{
 			this.MinimizeBox = false;
 			this.Name = "FormPatientEdit";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Patient Information";
 			this.Closing += new System.ComponentModel.CancelEventHandler(this.FormPatientEdit_Closing);
 			this.Load += new System.EventHandler(this.FormPatientEdit_Load);

@@ -13,7 +13,7 @@ using System.Security.Cryptography;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormEcwDiagAdv:Form {
+	public partial class FormEcwDiagAdv:ODForm {
 		private string connString;
 		private string username="ecwUser";
 		private string password="l69Rr4Rmj4CjiCTLxrIblg==";//encrypted

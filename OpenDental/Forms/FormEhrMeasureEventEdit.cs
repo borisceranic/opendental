@@ -4,7 +4,7 @@ using OpenDentBusiness;
 
 namespace OpenDental {
 	///<summary>Only used for editing smoking documentation.</summary>
-	public partial class FormEhrMeasureEventEdit:Form {
+	public partial class FormEhrMeasureEventEdit:ODForm {
 		private EhrMeasureEvent _measureEventCur;
 		public string MeasureDescript;
 

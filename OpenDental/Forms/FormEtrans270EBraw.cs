@@ -11,7 +11,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEtrans270EBraw:Form {
+	public partial class FormEtrans270EBraw:ODForm {
 		public EB271 EB271val;
 
 		public FormEtrans270EBraw() {

@@ -14,7 +14,7 @@ using OpenDentBusiness;
 namespace OpenDental {
 	///<summary>Internet browser window for NewCrop.  This is essentially a Microsoft Internet Explorer control embedded into our form.
 	///The browser.ScriptErrorsSuppressed is true in order to prevent javascript error popups from annoying the user.</summary>
-	public partial class FormErx:Form {
+	public partial class FormErx:ODForm {
 
 		private string urlBrowseTo="";
 		///<summary>The PatNum of the patient eRx was opened for.  The patient is tied to the window so that when the window is closed the Chart

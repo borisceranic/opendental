@@ -11,7 +11,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormFeeScheds:System.Windows.Forms.Form {
+	public class FormFeeScheds:ODForm {
 		private OpenDental.UI.Button butAdd;
 		private OpenDental.UI.Button butClose;
 		/// <summary>

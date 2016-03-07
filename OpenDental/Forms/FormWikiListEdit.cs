@@ -13,7 +13,7 @@ using CodeBase;
 using System.Text.RegularExpressions;
 
 namespace OpenDental {
-	public partial class FormWikiListEdit:Form {
+	public partial class FormWikiListEdit:ODForm {
 		///<summary>Name of the wiki list being manipulated. This does not include the "wikilist" prefix. i.e. "networkdevices" not "wikilistnetworkdevices"</summary>
 		public string WikiListCurName;
 		public bool IsNew;

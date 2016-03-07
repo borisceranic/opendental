@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEhrQuarterlyKeyEditCust:Form {
+	public partial class FormEhrQuarterlyKeyEditCust:ODForm {
 		public EhrQuarterlyKey KeyCur;
 
 		public FormEhrQuarterlyKeyEditCust() {

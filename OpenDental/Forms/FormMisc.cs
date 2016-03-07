@@ -9,7 +9,7 @@ using System.IO;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormMisc : System.Windows.Forms.Form{
+	public class FormMisc : ODForm {
 		private OpenDental.UI.Button butOK;
 		private OpenDental.UI.Button butCancel;
 		private IContainer components;

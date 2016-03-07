@@ -15,7 +15,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormLetters : System.Windows.Forms.Form{
+	public class FormLetters : ODForm {
 		private System.Windows.Forms.Label label1;
 		private OpenDental.UI.Button butAdd;
 		private System.Windows.Forms.ListBox listLetters;

@@ -11,7 +11,7 @@ using System.Xml;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEmailCertRegister:Form {
+	public partial class FormEmailCertRegister:ODForm {
 
 		public FormEmailCertRegister(string emailAddress) {
 			InitializeComponent();

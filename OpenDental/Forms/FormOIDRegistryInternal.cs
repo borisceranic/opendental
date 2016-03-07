@@ -7,7 +7,7 @@ using OpenDental.UI;
 using System.Xml;
 
 namespace OpenDental {
-	public partial class FormOIDRegistryInternal:Form {
+	public partial class FormOIDRegistryInternal:ODForm {
 		private List<OIDInternal> _listOIDInternal;
 		///<summary>Used for refence to construct recommended values.</summary>
 		private string _rootOIDString;

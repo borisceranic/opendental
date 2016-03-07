@@ -10,7 +10,7 @@ using System.Drawing.Printing;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormEhrQualityMeasureEdit:Form {
+	public partial class FormEhrQualityMeasureEdit:ODForm {
 		public QualityMeasure Qcur;
 		private DataTable table;
 		public DateTime DateStart;

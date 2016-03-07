@@ -9,7 +9,7 @@ using OpenDental.UI;
 using CodeBase;
 
 namespace OpenDental {
-	public partial class FormJobHistoryView:Form {
+	public partial class FormJobHistoryView:ODForm {
 		private JobEvent _jobEvent;
 
 		///<summary>Opens with links to the passed in JobNum.</summary>

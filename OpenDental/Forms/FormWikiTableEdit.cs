@@ -13,7 +13,7 @@ using CodeBase;
 using System.Text.RegularExpressions;
 
 namespace OpenDental {
-	public partial class FormWikiTableEdit:Form {
+	public partial class FormWikiTableEdit:ODForm {
 		///<summary>Both an incoming and outgoing parameter.</summary>
 		public string Markup;
 		private DataTable Table;

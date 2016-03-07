@@ -9,7 +9,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary>Lists all insurance plans for which the supplied patient is the subscriber. Lets you select an insurance plan based on a patNum. SelectedPlan will contain the plan selected.</summary>
-	public class FormClaimCreate : System.Windows.Forms.Form{
+	public class FormClaimCreate : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private System.ComponentModel.Container components = null;

@@ -8,7 +8,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormRpRecall : System.Windows.Forms.Form{
+	public class FormRpRecall : ODForm {
 		private System.Windows.Forms.Label labelPatient;
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;

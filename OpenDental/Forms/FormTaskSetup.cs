@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormTaskSetup:Form {
+	public partial class FormTaskSetup:ODForm {
 		private List<Userod> UserList;
 		private List<Userod> UserListOld;
 		private List<TaskList> TrunkList;

@@ -9,7 +9,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormContacts : System.Windows.Forms.Form{
+	public class FormContacts : ODForm {
 		private OpenDental.UI.Button butOK;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.ListBox listCategory;

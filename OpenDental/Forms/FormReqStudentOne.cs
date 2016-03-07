@@ -11,7 +11,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormReqStudentOne : System.Windows.Forms.Form{
+	public class FormReqStudentOne : ODForm {
 		private OpenDental.UI.Button butCancel;
 		/// <summary>
 		/// Required designer variable.

@@ -10,7 +10,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormCommPrefPicker:Form {
+	public partial class FormCommPrefPicker:ODForm {
 		public ContactMethod ContMethCur;
 
 		public FormCommPrefPicker() {

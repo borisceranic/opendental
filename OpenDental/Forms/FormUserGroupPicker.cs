@@ -7,7 +7,7 @@ using OpenDentBusiness;
 using System.Collections.Generic;
 
 namespace OpenDental{
-	public class FormUserGroupPicker:System.Windows.Forms.Form {
+	public class FormUserGroupPicker:ODForm {
 		private ListBox listGroups;
 		private UI.Button butOK;
 		private UI.Button butCancel;

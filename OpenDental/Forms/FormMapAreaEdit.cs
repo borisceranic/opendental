@@ -3,7 +3,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormMapAreaEdit:Form {
+	public partial class FormMapAreaEdit:ODForm {
 
 		///<summary>The item being edited</summary>
 		public MapArea MapItem;

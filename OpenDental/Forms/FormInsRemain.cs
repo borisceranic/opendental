@@ -5,7 +5,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormInsRemain:Form {
+	public partial class FormInsRemain:ODForm {
 
 		private Patient _patCur;
 		private Family _famCur;

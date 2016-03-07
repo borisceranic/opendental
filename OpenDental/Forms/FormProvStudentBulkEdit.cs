@@ -8,7 +8,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormProvStudentBulkEdit:Form {
+	public partial class FormProvStudentBulkEdit:ODForm {
 
 		public FormProvStudentBulkEdit() {
 			InitializeComponent();

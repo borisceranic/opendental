@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormSupplyEdit:Form {
+	public partial class FormSupplyEdit:ODForm {
 		public Supply Supp;
 		public List<Supplier> ListSupplier;
 		private bool isHiddenInitialVal;

@@ -6,7 +6,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormTreatPlanCurEdit:Form {
+	public partial class FormTreatPlanCurEdit:ODForm {
 		public TreatPlan TreatPlanCur;
 		///<summary>The patient's current unassigned treatment plan or a new treatment plan if the patient does not have an unassigned plan.</summary>
 		private TreatPlan _treatPlanUnassigned;

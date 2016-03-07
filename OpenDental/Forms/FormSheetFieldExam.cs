@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormSheetFieldExam:Form {
+	public partial class FormSheetFieldExam:ODForm {
 		private List<SheetDef> AvailExamDefs;
 		public string ExamFieldSelected;
 

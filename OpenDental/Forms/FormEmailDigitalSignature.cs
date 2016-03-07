@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEmailDigitalSignature:Form {
+	public partial class FormEmailDigitalSignature:ODForm {
 
 		private X509Certificate2 _certSig;
 		private bool _isTrusted;

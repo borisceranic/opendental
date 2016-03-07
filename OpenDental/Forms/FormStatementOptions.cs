@@ -13,7 +13,7 @@ using System.Text.RegularExpressions;
 
 namespace OpenDental{
 	///<summary></summary>
-	public class FormStatementOptions : System.Windows.Forms.Form{
+	public class FormStatementOptions : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private System.ComponentModel.IContainer components;// Required designer variable.

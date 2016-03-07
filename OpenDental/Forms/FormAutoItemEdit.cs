@@ -7,7 +7,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	///<summary></summary>
-	public class FormAutoItemEdit : System.Windows.Forms.Form{
+	public class FormAutoItemEdit : ODForm {
 		private System.ComponentModel.Container components = null;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.TextBox textADA;

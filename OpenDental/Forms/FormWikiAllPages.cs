@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormWikiAllPages:Form {
+	public partial class FormWikiAllPages:ODForm {
 		private List<WikiPage> listWikiPages;
 		///<summary>Need a reference to the form where this was launched from so that we can tell it to refresh later.</summary>
 		public FormWikiEdit OwnerForm;

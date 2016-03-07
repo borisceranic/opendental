@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormCreditCardManage:Form {
+	public partial class FormCreditCardManage:ODForm {
 		private Patient PatCur;
 		private List<CreditCard> creditCards;
 

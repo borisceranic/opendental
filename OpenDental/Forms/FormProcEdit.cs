@@ -24,7 +24,7 @@ using System.Linq;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormProcEdit : System.Windows.Forms.Form{
+	public class FormProcEdit : ODForm {
 		private System.Windows.Forms.Label labelDate;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.Label labelAmount;

@@ -10,7 +10,7 @@ using System.IO;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormUcums:Form {
+	public partial class FormUcums:ODForm {
 		public bool IsSelectionMode;
 		public Ucum SelectedUcum;
 		private List<Ucum> _listUcum;

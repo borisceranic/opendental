@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormJobReviewEdit:Form {
+	public partial class FormJobReviewEdit:ODForm {
 		private JobReview _jobReviewCur;
 		private List<Userod> _listReviewers;
 

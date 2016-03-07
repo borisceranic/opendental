@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormClaimPayList:Form {
+	public partial class FormClaimPayList:ODForm {
 		List<ClaimPayment> ListClaimPay;
 		///<summary>If this is not zero upon closing, then we will jump to the account module of that patient and highlight the claim.</summary>
 		public long GotoClaimNum;

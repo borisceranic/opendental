@@ -10,7 +10,7 @@ using OpenDental.UI;
 
 namespace OpenDental {
 	///<summary></summary>
-	public class FormEtrans835ClaimPay : System.Windows.Forms.Form {
+	public class FormEtrans835ClaimPay : ODForm {
 		private OpenDental.ValidDouble textWriteOff;
 		private System.Windows.Forms.TextBox textInsPayAllowed;
 		private System.Windows.Forms.TextBox textClaimFee;

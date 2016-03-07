@@ -20,7 +20,7 @@ using PdfSharp.Pdf.Printing;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormBilling : System.Windows.Forms.Form{
+	public class FormBilling : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butAll;
 		private OpenDental.UI.Button butNone;

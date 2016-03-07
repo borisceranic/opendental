@@ -12,7 +12,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormTimeCardManage:Form {
+	public partial class FormTimeCardManage:ODForm {
 		private int SelectedPayPeriod;
 		private DateTime DateStart;
 		private DateTime DateStop;

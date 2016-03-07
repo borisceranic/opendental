@@ -10,7 +10,7 @@ using OpenDental.ReportingComplex;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormRpProcNotBilledIns : System.Windows.Forms.Form{
+	public class FormRpProcNotBilledIns : ODForm {
 		private System.Windows.Forms.MonthCalendar date2;
 		private System.Windows.Forms.MonthCalendar date1;
 		private System.Windows.Forms.Label labelTO;

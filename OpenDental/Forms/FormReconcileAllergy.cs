@@ -5,7 +5,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormReconcileAllergy:Form {
+	public partial class FormReconcileAllergy:ODForm {
 		public List<AllergyDef> ListAllergyDefNew;
 		public List<Allergy> ListAllergyNew;
 		private List<Allergy> _listAllergyReconcile;

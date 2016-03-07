@@ -8,7 +8,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormTrojanHelp : System.Windows.Forms.Form{
+	public class FormTrojanHelp : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private RichTextBox textMain;
 		/// <summary>

@@ -8,7 +8,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormApptTypes:Form {
+	public partial class FormApptTypes:ODForm {
 		private List<AppointmentType> _listApptTypes;
 		private bool _isChanged=false;
 

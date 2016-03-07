@@ -10,7 +10,7 @@ using System.Drawing.Printing;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormEhrQualityMeasureEdit2014:Form {
+	public partial class FormEhrQualityMeasureEdit2014:ODForm {
 		public QualityMeasure MeasureCur;
 		///<summary>Used to pass a patnum back up to the chart module.</summary>
 		public long selectedPatNum;

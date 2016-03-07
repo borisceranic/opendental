@@ -5,7 +5,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormEhrMedicalOrders:Form {
+	public partial class FormEhrMedicalOrders:ODForm {
 		public Patient _patCur;
 		private DataTable table;
 		///<summary>If this is true after exiting, then launch MedicationPat dialog.</summary>

@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormEhrProvKeysCustomer:Form {
+	public partial class FormEhrProvKeysCustomer:ODForm {
 		private List<EhrProvKey> listKeys;
 		private List<EhrQuarterlyKey> listKeysQuart;
 		public long Guarantor;

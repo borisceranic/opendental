@@ -3,7 +3,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEhrProviderKeyEdit:Form {
+	public partial class FormEhrProviderKeyEdit:ODForm {
 		private EhrProvKey _keyCur;
 
 		///<summary>Only used from FormEhrProviderKeys.  keyCur can be a blank new key.  keyCur cannot be null.</summary>

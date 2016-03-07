@@ -3,7 +3,7 @@ using System;
 using System.Windows.Forms;
 
 namespace OpenDental {
-	public partial class FormDentalSchoolSetup:Form {
+	public partial class FormDentalSchoolSetup:ODForm {
 
 		public FormDentalSchoolSetup() {
 			InitializeComponent();

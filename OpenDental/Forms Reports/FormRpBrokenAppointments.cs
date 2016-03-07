@@ -10,7 +10,7 @@ using OpenDentBusiness;
 
 namespace OpenDental {
 	///<summary></summary>
-	public partial class FormRpBrokenAppointments:Form {
+	public partial class FormRpBrokenAppointments:ODForm {
 
 		private List<Clinic> _listClinics;
 		private List<Def> _listPosAdjTypes;

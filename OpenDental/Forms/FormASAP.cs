@@ -10,7 +10,7 @@ using OpenDental.UI;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormASAP:System.Windows.Forms.Form {
+	public class FormASAP:ODForm {
 		private IContainer components;
 		private OpenDental.UI.Button butClose;
 		///<summary></summary>

@@ -12,7 +12,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormScreenGroupEdit:System.Windows.Forms.Form {
+	public class FormScreenGroupEdit:ODForm {
 		private IContainer components;
 		private System.Windows.Forms.Label label14;
 		private System.Windows.Forms.Label label13;

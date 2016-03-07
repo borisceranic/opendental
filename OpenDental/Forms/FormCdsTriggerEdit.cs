@@ -15,7 +15,7 @@ using OpenDental.UI;
 using System.Text.RegularExpressions;
 
 namespace OpenDental {
-	public partial class FormCdsTriggerEdit:Form {
+	public partial class FormCdsTriggerEdit:ODForm {
 		public bool IsNew;
 		public EhrTrigger EhrTriggerCur;
 

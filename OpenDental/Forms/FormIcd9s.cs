@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormIcd9s:Form {
+	public partial class FormIcd9s:ODForm {
 		public bool IsSelectionMode;
 		public ICD9 SelectedIcd9;
 		private List<ICD9> icd9List;

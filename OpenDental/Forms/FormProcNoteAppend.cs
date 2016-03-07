@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using CodeBase;
 
 namespace OpenDental {
-	public partial class FormProcNoteAppend:Form {
+	public partial class FormProcNoteAppend:ODForm {
 		public Procedure ProcCur;
 
 		public FormProcNoteAppend() {

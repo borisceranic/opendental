@@ -9,7 +9,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormApptFieldEdit:System.Windows.Forms.Form {
+	public class FormApptFieldEdit:ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		/// <summary>

@@ -12,7 +12,7 @@ using OpenDental.UI;
 using System.Diagnostics;
 
 namespace OpenDental {
-	public partial class FormVitalsignEdit2014:Form {
+	public partial class FormVitalsignEdit2014:ODForm {
 		public Vitalsign VitalsignCur;
 		private Patient patCur;
 		public int ageBeforeJanFirst;

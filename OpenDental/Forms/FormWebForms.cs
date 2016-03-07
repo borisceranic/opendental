@@ -15,7 +15,7 @@ using OpenDentBusiness.HL7;
 using System.Threading;
 
 namespace OpenDental {
-	public partial class FormWebForms:Form {
+	public partial class FormWebForms:ODForm {
 		
 		/// <summary>
 		/// This Form does 3 things: 

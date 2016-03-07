@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEhrVaccinePatEdit:Form {
+	public partial class FormEhrVaccinePatEdit:ODForm {
 		public VaccinePat VaccinePatCur;
 		public bool IsNew;
 		private long _provNumSelectedOrdering;

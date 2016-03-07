@@ -10,7 +10,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormRpInsOverpaid:System.Windows.Forms.Form {
+	public class FormRpInsOverpaid:ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private Label label1;

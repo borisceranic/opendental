@@ -12,7 +12,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormXchargeSetup : System.Windows.Forms.Form{
+	public class FormXchargeSetup : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private LinkLabel linkLabel1;

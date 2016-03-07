@@ -13,7 +13,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormClearinghouseEdit : System.Windows.Forms.Form{
+	public class FormClearinghouseEdit : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		/// <summary>

@@ -10,7 +10,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormRecallEdit : System.Windows.Forms.Form{
+	public class FormRecallEdit : ODForm {
 		private OpenDental.UI.Button butCancel;
 		/// <summary>
 		/// Required designer variable.

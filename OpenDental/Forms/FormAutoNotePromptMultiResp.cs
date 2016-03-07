@@ -7,7 +7,7 @@ using System.Text;
 using System.Windows.Forms;
 
 namespace OpenDental {
-	public partial class FormAutoNotePromptMultiResp:Form {
+	public partial class FormAutoNotePromptMultiResp:ODForm {
 		///<summary>Set this value externally.</summary>
 		public string PromptText;
 		///<summary>What the user picked.</summary>

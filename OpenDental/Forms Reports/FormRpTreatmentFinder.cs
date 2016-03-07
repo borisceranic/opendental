@@ -13,7 +13,7 @@ using PdfSharp.Pdf;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormRpTreatmentFinder:System.Windows.Forms.Form {
+	public class FormRpTreatmentFinder:ODForm {
 		private OpenDental.UI.Button butCancel;
 		private System.ComponentModel.Container components = null;
 		private Label label1;

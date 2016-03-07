@@ -12,7 +12,7 @@ using OpenDental.UI;
 using CodeBase;
 
 namespace OpenDental {
-	public partial class FormEhrLabNoteEdit:Form {
+	public partial class FormEhrLabNoteEdit:ODForm {
 		public EhrLabNote LabNoteCur;
 		public bool IsImport;
 		public bool IsViewOnly;

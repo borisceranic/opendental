@@ -13,7 +13,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormTimeCard:System.Windows.Forms.Form {
+	public class FormTimeCard:ODForm {
 		private System.Windows.Forms.Label labelRegularTime;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.Label label3;

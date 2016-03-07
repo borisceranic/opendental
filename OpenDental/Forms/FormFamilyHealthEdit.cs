@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormFamilyHealthEdit:Form {
+	public partial class FormFamilyHealthEdit:ODForm {
 		public FamilyHealth FamilyHealthCur;
 		private DiseaseDef DisDefCur;
 

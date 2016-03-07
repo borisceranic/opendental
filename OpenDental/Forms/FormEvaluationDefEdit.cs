@@ -8,7 +8,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormEvaluationDefEdit:Form {
+	public partial class FormEvaluationDefEdit:ODForm {
 		private EvaluationDef _evalDefCur;
 		private List<EvaluationCriterionDef> _criterionDefsForEval;
 		private Dictionary<long,GradingScale> _gradingScales;

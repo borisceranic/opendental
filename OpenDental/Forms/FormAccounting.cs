@@ -12,7 +12,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormAccounting:System.Windows.Forms.Form {
+	public class FormAccounting:ODForm {
 		private OpenDental.UI.ODToolBar ToolBarMain;
 		private OpenDental.UI.ODGrid gridMain;
 		private IContainer components;

@@ -9,7 +9,7 @@ using OpenDental.ReportingComplex;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormRpNewPatients:System.Windows.Forms.Form {
+	public class FormRpNewPatients:ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private System.ComponentModel.Container components = null;

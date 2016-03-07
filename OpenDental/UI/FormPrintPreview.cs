@@ -13,7 +13,7 @@ using OpenDentBusiness;
 
 namespace OpenDental.UI{
 	///<summary></summary>
-	public class FormPrintPreview:System.Windows.Forms.Form {
+	public class FormPrintPreview:ODForm {
 		private System.ComponentModel.IContainer components;
 		///<summary></summary>
 		private int TotalPages;

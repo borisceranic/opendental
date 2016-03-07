@@ -11,7 +11,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormLanguagesUsed:System.Windows.Forms.Form {
+	public class FormLanguagesUsed:ODForm {
 		private OpenDental.UI.Button butCancel;
 		private ListBox listAvailable;
 		private Label label1;

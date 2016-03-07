@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormWikiSetup:Form {
+	public partial class FormWikiSetup:ODForm {
 
 		public FormWikiSetup() {
 			InitializeComponent();

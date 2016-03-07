@@ -10,7 +10,7 @@ using OpenDental.UI;
 using CodeBase;
 
 namespace OpenDental {
-	public partial class FormJobLinks:Form {
+	public partial class FormJobLinks:ODForm {
 		private long _jobNum;
 		///<summary>A list of bugs, features, and tasks related to this job.</summary>
 		private List<JobLink> _jobLinks;

@@ -8,7 +8,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormEvaluationDefs:Form {
+	public partial class FormEvaluationDefs:ODForm {
 		/// <summary>This mode is only used for picking an evaluationdef for a brand new evaluation.</summary>
 		public bool IsSelectionMode=false;
 		public int CourseIndex;

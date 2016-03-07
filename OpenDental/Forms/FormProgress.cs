@@ -9,7 +9,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormProgress : System.Windows.Forms.Form{
+	public class FormProgress : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private System.Windows.Forms.ProgressBar progressBar1;
 		private System.Windows.Forms.Label label1;

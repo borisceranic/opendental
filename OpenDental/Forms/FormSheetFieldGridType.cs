@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormSheetFieldGridType:Form {
+	public partial class FormSheetFieldGridType:ODForm {
 		public SheetDef SheetDefCur;
 		public string SelectedSheetGridType;
 		private List<string> listGridTypes;

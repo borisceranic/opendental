@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEtrans835Print:Form {
+	public partial class FormEtrans835Print:ODForm {
 
 		private X835 _x835;
 		private int _pagesPrintedCount;

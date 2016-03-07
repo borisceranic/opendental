@@ -13,7 +13,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormSchedule:System.Windows.Forms.Form {
+	public class FormSchedule:ODForm {
 		private OpenDental.UI.ODGrid gridMain;
 		private OpenDental.UI.Button butRefresh;
 		private ValidDate textDateTo;

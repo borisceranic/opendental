@@ -11,7 +11,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormTerminalManager:System.Windows.Forms.Form {
+	public class FormTerminalManager:ODForm {
 		private OpenDental.UI.ODGrid gridMain;
 		private Label label1;
 		private Label label2;

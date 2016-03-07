@@ -9,7 +9,7 @@ using OpenDentBusiness;
 
 namespace OpenDental {
 	///<summary>Was never finished/implemented.  It's a mess.</summary>
-	public partial class FormScreenPatEdit:Form {
+	public partial class FormScreenPatEdit:ODForm {
 		//public ScreenPat ScreenPatCur;
 		//private Patient PatCur;
 		//public ScreenGroup ScreenGroupCur;

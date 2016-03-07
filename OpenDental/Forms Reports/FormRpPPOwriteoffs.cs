@@ -15,7 +15,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormRpPPOwriteoffs : System.Windows.Forms.Form{
+	public class FormRpPPOwriteoffs : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private MonthCalendar date2;

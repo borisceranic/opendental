@@ -11,7 +11,7 @@ using OpenDentBusiness.HL7;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormEhrLabPanelImport:Form {
+	public partial class FormEhrLabPanelImport:ODForm {
 		private List<MedicalOrder> listLabOrders;
 		private long patNum;
 		private string fName;

@@ -5,7 +5,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormReconcileProblem:Form {
+	public partial class FormReconcileProblem:ODForm {
 		public List<DiseaseDef> ListProblemDefNew;
 		public List<Disease> ListProblemNew;
 		private List<Disease> _listProblemReconcile;

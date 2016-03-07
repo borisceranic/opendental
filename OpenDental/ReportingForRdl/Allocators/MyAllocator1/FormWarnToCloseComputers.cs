@@ -11,7 +11,7 @@ namespace OpenDental.Reporting.Allocators.MyAllocator1
 	/// <summary>
 	/// DialogResult values are either Yes or No (cancel is indicated by No)
 	/// </summary>
-	public partial class FormWarnToCloseComputers : Form
+	public partial class FormWarnToCloseComputers :ODForm
 	{
 		public FormWarnToCloseComputers()
 		{

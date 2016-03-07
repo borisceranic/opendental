@@ -14,7 +14,7 @@ namespace OpenDental.Eclaims
 	/// <summary>
 	/// Summary description for FormTerminal.
 	/// </summary>
-	public class FormTerminal : System.Windows.Forms.Form
+	public class FormTerminal : ODForm
 	{
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label label2;

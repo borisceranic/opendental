@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormWikiRename:Form {
+	public partial class FormWikiRename:ODForm {
 		public string PageTitle;
 
 		public FormWikiRename() {

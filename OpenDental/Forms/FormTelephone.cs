@@ -9,7 +9,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	/// <summary></summary>
-	public class FormTelephone : System.Windows.Forms.Form{
+	public class FormTelephone : ODForm {
 		private OpenDental.UI.Button butClose;
 		private OpenDental.UI.Button butReformat;
 		private System.Windows.Forms.Label label1;

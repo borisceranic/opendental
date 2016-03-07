@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDental.UI;
 
 namespace OpenDental.Bridges {
-	public partial class FormTrophyNamePick:Form {
+	public partial class FormTrophyNamePick:ODForm {
 		public List<TrophyFolder> ListMatches;
 		///<summary>If dialogResult is OK, then this will contain the picked folder name.  If blank, then the calling class will need to generate a new folder name.</summary>
 		public string PickedName;

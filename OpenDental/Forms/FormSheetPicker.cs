@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormSheetPicker:Form {
+	public partial class FormSheetPicker:ODForm {
 		public SheetTypeEnum SheetType;
 		private List<SheetDef> listSheets;
 		///<summary>Only if OK.</summary>

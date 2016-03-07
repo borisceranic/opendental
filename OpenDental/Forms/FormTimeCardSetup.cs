@@ -13,7 +13,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormTimeCardSetup:System.Windows.Forms.Form {
+	public class FormTimeCardSetup:ODForm {
 		private OpenDental.UI.Button butAdd;
 		private OpenDental.UI.Button butClose;
 		/// <summary>

@@ -13,7 +13,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormToothChartingBig:System.Windows.Forms.Form {
+	public class FormToothChartingBig:ODForm {
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>

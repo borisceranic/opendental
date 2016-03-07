@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace OpenDental{
 ///<summary>All this dialog does is set the patnum and it is up to the calling form to do an immediate refresh, or possibly just change the patnum back to what it was.  So the other patient fields must remain intact during all logic in this form, especially if SelectionModeOnly.</summary>
-	public class FormPatientSelect : System.Windows.Forms.Form{
+	public class FormPatientSelect : ODForm{
 		private System.Windows.Forms.Label label1;
 		private IContainer components;
 		private Patients Patients;

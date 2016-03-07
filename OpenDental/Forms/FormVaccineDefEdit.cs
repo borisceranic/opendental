@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormVaccineDefEdit:Form {
+	public partial class FormVaccineDefEdit:ODForm {
 		public VaccineDef VaccineDefCur;
 		public bool IsNew;
 

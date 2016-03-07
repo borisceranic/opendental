@@ -8,7 +8,7 @@ using CodeBase;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormEmailAddressEdit:System.Windows.Forms.Form {
+	public class FormEmailAddressEdit:ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private System.Windows.Forms.Label label1;

@@ -10,7 +10,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEquipment:Form {
+	public partial class FormEquipment:ODForm {
 		private List<Equipment> listEquip;
 		private int pagesPrinted;
 		private bool headingPrinted;

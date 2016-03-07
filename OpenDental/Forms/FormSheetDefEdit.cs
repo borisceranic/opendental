@@ -17,7 +17,7 @@ using CodeBase;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormSheetDefEdit:Form {
+	public partial class FormSheetDefEdit:ODForm {
 		public SheetDef SheetDefCur;
 		public bool IsInternal;
 		private bool MouseIsDown;

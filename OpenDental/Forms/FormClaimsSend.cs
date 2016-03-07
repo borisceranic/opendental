@@ -18,7 +18,7 @@ using CodeBase;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormClaimsSend:System.Windows.Forms.Form {
+	public class FormClaimsSend:ODForm {
 		private System.Windows.Forms.Label label6;
 		private System.ComponentModel.IContainer components;
 		private System.Windows.Forms.ImageList imageList1;

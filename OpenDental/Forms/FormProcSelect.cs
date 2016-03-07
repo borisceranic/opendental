@@ -9,7 +9,7 @@ using OpenDental.UI;
 
 namespace OpenDental{
 	/// <summary></summary>
-	public class FormProcSelect : System.Windows.Forms.Form{
+	public class FormProcSelect : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private System.Windows.Forms.Label label1;

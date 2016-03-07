@@ -10,7 +10,7 @@ using OpenDental.UI;
 namespace OpenDental{
 	/// <summary>
 	/// </summary>
-	public class FormPatFieldDefs:System.Windows.Forms.Form {
+	public class FormPatFieldDefs:ODForm {
 		private OpenDental.UI.Button butClose;
 		private OpenDental.UI.Button butAdd;
 		private System.ComponentModel.IContainer components;

@@ -8,7 +8,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	///<summary>This report is never referenced and is poorly named.  Appears that this form is a copy of the screen report and was never modified or finished.</summary>
-	public class FormRpPHRawProc : System.Windows.Forms.Form{
+	public class FormRpPHRawProc : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private System.Windows.Forms.MonthCalendar date2;

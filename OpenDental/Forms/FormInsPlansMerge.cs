@@ -12,7 +12,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormInsPlansMerge:System.Windows.Forms.Form {
+	public class FormInsPlansMerge:ODForm {
 		private System.ComponentModel.Container components = null;// Required designer variable.
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;

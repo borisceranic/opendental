@@ -10,7 +10,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormGraphEmployeeTime:Form {
+	public partial class FormGraphEmployeeTime:ODForm {
 		private List<PointF> listCalls;
 		private float[] buckets;//a bucket can hold partial people.
 		private DateTime DateShowing;

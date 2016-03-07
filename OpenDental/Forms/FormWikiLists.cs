@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormWikiLists:Form {
+	public partial class FormWikiLists:ODForm {
 		private List<string> wikiLists;
 
 		public FormWikiLists() {

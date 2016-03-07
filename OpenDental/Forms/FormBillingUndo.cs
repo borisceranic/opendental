@@ -9,7 +9,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormBillingUndo : System.Windows.Forms.Form{
+	public class FormBillingUndo : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butUndo;
 		private Label label1;

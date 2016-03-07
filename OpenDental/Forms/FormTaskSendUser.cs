@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormTaskSendUser:Form {
+	public partial class FormTaskSendUser:ODForm {
 		private List<TaskList> FilteredList;
 		///<summary>If OK, then this will contain the selected TaskListNum</summary>
 		public long TaskListNum;

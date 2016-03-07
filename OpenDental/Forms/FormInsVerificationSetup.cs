@@ -3,7 +3,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormInsVerificationSetup:Form {
+	public partial class FormInsVerificationSetup:ODForm {
 		private bool _hasChanged;
 
 		public FormInsVerificationSetup() {

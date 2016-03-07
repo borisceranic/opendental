@@ -12,7 +12,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormFeeSchedPickRemote:Form {
+	public partial class FormFeeSchedPickRemote:ODForm {
 
 		///<summary>Url must include trailing slash.</summary>
 		public string Url="";

@@ -10,7 +10,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormProcTools : System.Windows.Forms.Form{
+	public class FormProcTools : ODForm {
 		private OpenDental.UI.Button butClose;
 		/// <summary>
 		/// Required designer variable.

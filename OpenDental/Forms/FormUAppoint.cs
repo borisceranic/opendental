@@ -14,7 +14,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	/// <summary> </summary>
-	public class FormUAppoint:System.Windows.Forms.Form {
+	public class FormUAppoint:ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private System.Windows.Forms.CheckBox checkEnabled;

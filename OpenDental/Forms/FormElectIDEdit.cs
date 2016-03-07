@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormElectIDEdit:Form {
+	public partial class FormElectIDEdit:ODForm {
 
 		///<summary>Must be set before calling Show() or ShowDialog().</summary>
 		public ElectID electIDCur;

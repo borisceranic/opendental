@@ -12,7 +12,7 @@ using Acrobat;
 using AFORMAUTLib;//Acrobat forms
 
 namespace OpenDental {
-	public partial class FormSheetImport:Form {
+	public partial class FormSheetImport:ODForm {
 		public Sheet SheetCur;
 		public Document DocCur;
 		private List<SheetImportRow> Rows;

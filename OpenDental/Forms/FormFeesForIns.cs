@@ -12,7 +12,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormFeesForIns : System.Windows.Forms.Form{
+	public class FormFeesForIns : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private OpenDental.UI.ODGrid gridMain;

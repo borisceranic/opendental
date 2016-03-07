@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormRecallListUndo:Form {
+	public partial class FormRecallListUndo:ODForm {
 		public FormRecallListUndo() {
 			InitializeComponent();
 			Lan.F(this);

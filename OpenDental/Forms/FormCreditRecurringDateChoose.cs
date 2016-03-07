@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormCreditRecurringDateChoose:Form {
+	public partial class FormCreditRecurringDateChoose:ODForm {
 		private CreditCard CreditCardCur;
 		private DateTime lastMonth;
 		private DateTime thisMonth;

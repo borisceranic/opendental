@@ -9,7 +9,7 @@ using System.Xml;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormEhrSummaryOfCare:Form {
+	public partial class FormEhrSummaryOfCare:ODForm {
 		public Patient PatCur;
 		private List<EhrMeasureEvent> _listHistorySent;
 		private List<EhrSummaryCcd> _listCcdRec;

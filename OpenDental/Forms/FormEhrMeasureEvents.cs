@@ -8,7 +8,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormEhrMeasureEvents:Form {
+	public partial class FormEhrMeasureEvents:ODForm {
 		private List<string> _typeNames;
 		private List<EhrMeasureEvent> _listEhrMeasureEvents;
 

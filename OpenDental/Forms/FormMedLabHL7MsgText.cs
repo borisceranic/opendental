@@ -4,7 +4,7 @@ using System.IO;
 using System.Windows.Forms;
 
 namespace OpenDental {
-	public partial class FormMedLabHL7MsgText:Form {
+	public partial class FormMedLabHL7MsgText:ODForm {
 		public List<string[]> ListFileNamesDatesMod; 
 
  		public FormMedLabHL7MsgText() {

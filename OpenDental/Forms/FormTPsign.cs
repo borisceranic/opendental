@@ -17,7 +17,7 @@ namespace OpenDental{
 	public delegate List<Document> SaveFileAsDocDelegate(bool isSigSave,Sheet sheetTP);
 
 	///<summary></summary>
-	public class FormTPsign : System.Windows.Forms.Form{
+	public class FormTPsign : ODForm {
 		private System.ComponentModel.IContainer components;
 		///<summary></summary>
 		public int TotalPages;

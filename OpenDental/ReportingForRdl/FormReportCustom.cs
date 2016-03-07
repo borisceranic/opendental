@@ -15,7 +15,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	/// <summary></summary>
-	public class FormReportCustom:System.Windows.Forms.Form {
+	public class FormReportCustom:ODForm {
 		private fyiReporting.RdlViewer.RdlViewer viewer;
 		private OpenDental.UI.ODToolBar ToolBarMain;
 		private System.Windows.Forms.ImageList imageListMain;

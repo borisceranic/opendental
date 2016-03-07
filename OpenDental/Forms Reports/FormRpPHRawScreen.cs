@@ -8,7 +8,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormRpPHRawScreen : System.Windows.Forms.Form{
+	public class FormRpPHRawScreen : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private System.Windows.Forms.MonthCalendar date2;

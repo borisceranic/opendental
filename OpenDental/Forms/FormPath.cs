@@ -9,7 +9,7 @@ using CodeBase;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormPath : System.Windows.Forms.Form{
+	public class FormPath : ODForm {
 		private OpenDental.UI.Button butOK;
 		private OpenDental.UI.Button butCancel;
 		private System.ComponentModel.Container components = null;

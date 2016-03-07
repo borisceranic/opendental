@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormUpdateInProgress:Form {
+	public partial class FormUpdateInProgress:ODForm {
 		private string _updateComputerName;
 
 		public FormUpdateInProgress(string updateComputerName) {

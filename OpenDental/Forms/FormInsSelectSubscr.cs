@@ -8,7 +8,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	/// <summary>For a given subscriber, this list all their plans.  User then selects one plan from the list or creates a blank plan.</summary>
-	public class FormInsSelectSubscr : System.Windows.Forms.Form{
+	public class FormInsSelectSubscr : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private System.Windows.Forms.ListBox listPlans;

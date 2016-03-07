@@ -11,7 +11,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormRxNorms:Form {
+	public partial class FormRxNorms:ODForm {
 		private List<RxNorm> rxList;
 		///<summary>When this window is used for selecting an RxNorm (medication.RxCui), then use must click OK, None, or double click in grid.  In those cases, this field will have a value.  If None was clicked, it will be a new RxNorm with an RxCui of zero.</summary>
 		public RxNorm SelectedRxNorm;

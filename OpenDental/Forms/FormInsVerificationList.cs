@@ -9,7 +9,7 @@ using OpenDental.UI;
 using System.Linq;
 
 namespace OpenDental {
-	public partial class FormInsVerificationList:Form {
+	public partial class FormInsVerificationList:ODForm {
 		///<summary>-1 represents "All", and 0 represents "none".</summary>
 		private long _verifyUserNum=-1;
 		///<summary>0 represents "Unassign".</summary>

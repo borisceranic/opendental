@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormPayorTypeEdit:Form {
+	public partial class FormPayorTypeEdit:ODForm {
 		public bool IsNew;
 		private PayorType PayorTypeCur;
 		private int _selectedIndex;//used to keep track of the selected index in the comboSopCode drop down box since we are setting the text differently than the contents of the drop down list

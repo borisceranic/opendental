@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormSmsTextMessaging:Form {
+	public partial class FormSmsTextMessaging:ODForm {
 
 		private List<Clinic> _listClinics=null;
 		///<summary>Set before showing this form.  If true, will initially show sent messages.</summary>

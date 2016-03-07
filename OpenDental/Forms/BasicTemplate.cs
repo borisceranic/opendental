@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class BasicTemplate:Form {
+	public partial class BasicTemplate:ODForm {
 
 		public BasicTemplate() {
 			InitializeComponent();

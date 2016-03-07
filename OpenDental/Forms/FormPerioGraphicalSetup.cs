@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormPerioGraphicalSetup:Form {
+	public partial class FormPerioGraphicalSetup:ODForm {
 
 		public FormPerioGraphicalSetup() {
 			InitializeComponent();

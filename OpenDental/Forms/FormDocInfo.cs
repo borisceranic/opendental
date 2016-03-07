@@ -19,7 +19,7 @@ using CodeBase;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormDocInfo : System.Windows.Forms.Form{
+	public class FormDocInfo : ODForm {
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label label2;
 		private OpenDental.UI.Button butOK;

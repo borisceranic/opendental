@@ -10,7 +10,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormTranslationCat : System.Windows.Forms.Form{
+	public class FormTranslationCat : ODForm {
 		private System.Windows.Forms.ListBox listCats;
 		private System.Windows.Forms.Label label1;
 		private OpenDental.UI.Button butClose;

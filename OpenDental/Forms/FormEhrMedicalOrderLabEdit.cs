@@ -11,7 +11,7 @@ using OpenDental;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormEhrMedicalOrderLabEdit:Form {
+	public partial class FormEhrMedicalOrderLabEdit:ODForm {
 		public MedicalOrder MedOrderCur;
 		public bool IsNew;
 		private List<LabPanel> listPanels;

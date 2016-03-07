@@ -9,7 +9,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEhrQuarterlyKeys:Form {
+	public partial class FormEhrQuarterlyKeys:ODForm {
 		private List<EhrQuarterlyKey> listKeys;
 
 		public FormEhrQuarterlyKeys() {

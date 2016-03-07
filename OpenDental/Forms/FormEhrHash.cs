@@ -10,7 +10,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEhrHash:Form {
+	public partial class FormEhrHash:ODForm {
 		public FormEhrHash() {
 			InitializeComponent();
 		}

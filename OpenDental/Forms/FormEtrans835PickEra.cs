@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEtrans835PickEra:Form {
+	public partial class FormEtrans835PickEra:ODForm {
 		private List<Etrans> _listEtrans;
 
 		public FormEtrans835PickEra(List<Etrans> listEtrans) {

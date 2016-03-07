@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormWikiExternalLink:Form {
+	public partial class FormWikiExternalLink:ODForm {
 		public string URL;
 		public string DisplayText;
 

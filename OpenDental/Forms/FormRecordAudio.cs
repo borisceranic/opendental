@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace OpenDental {
-	public partial class FormRecordAudio:Form {
+	public partial class FormRecordAudio:ODForm {
 		public string Sound;
 		private DateTime _recordStart;
 		private string _tempPath;

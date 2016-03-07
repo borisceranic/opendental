@@ -10,7 +10,7 @@ using OpenDental.UI;
 using System.Drawing.Printing;
 
 namespace OpenDental {
-	public partial class FormPatListResultsEHR2014:Form {
+	public partial class FormPatListResultsEHR2014:ODForm {
 		private List<EhrPatListElement2014> elementList;
 		private DataTable table;
 		private bool _headingPrinted;

@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormPopupAudit:Form {
+	public partial class FormPopupAudit:ODForm {
 		public Popup PopupCur;
 		public Patient PatCur;
 		///<summary>All archived popups for the current popup</summary>

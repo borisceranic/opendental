@@ -12,7 +12,7 @@ using OpenDental.UI;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormTranslation : System.Windows.Forms.Form{
+	public class FormTranslation : ODForm {
 		private OpenDental.UI.Button butClose;
 		private System.ComponentModel.Container components = null;
 		private Language[] LanList;

@@ -12,7 +12,7 @@ using OpenDentBusiness;
 using CodeBase;
 
 namespace OpenDental.Eclaims {
-	public partial class FormCCDPrint:Form {
+	public partial class FormCCDPrint:ODForm {
 
 		#region Internal Variables
 

@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using OpenDentBusiness.HL7;
 
 namespace OpenDental {
-	public partial class FormEhrAptObses:Form {
+	public partial class FormEhrAptObses:ODForm {
 
 		private Appointment _appt=null;
 

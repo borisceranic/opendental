@@ -7,7 +7,7 @@ using System.Text;
 using System.Windows.Forms;
 
 namespace OpenDental {
-	public partial class FormSheetImportEnumPicker:Form {
+	public partial class FormSheetImportEnumPicker:ODForm {
 		public bool ShowClearButton;
 
 		public FormSheetImportEnumPicker(string prompt) {

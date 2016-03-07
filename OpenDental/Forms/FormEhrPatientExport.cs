@@ -7,7 +7,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEhrPatientExport:Form {
+	public partial class FormEhrPatientExport:ODForm {
 		DataTable table;
 
 		public FormEhrPatientExport() {

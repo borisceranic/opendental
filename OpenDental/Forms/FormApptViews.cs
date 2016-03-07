@@ -10,7 +10,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormApptViews : System.Windows.Forms.Form{
+	public class FormApptViews : ODForm {
 		private System.Windows.Forms.Label label1;
 		private OpenDental.UI.Button butDown;
 		private OpenDental.UI.Button butUp;

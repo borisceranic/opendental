@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using CodeBase;
 
 namespace OpenDental {
-	public partial class FormEhrSetup:Form {
+	public partial class FormEhrSetup:ODForm {
 		public FormEhrSetup() {
 			InitializeComponent();
 			Lan.F(this);

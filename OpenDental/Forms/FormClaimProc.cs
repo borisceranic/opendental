@@ -11,7 +11,7 @@ namespace OpenDental
 	/// <summary>
 	/// Summary description for FormClaimProcEdit.
 	/// </summary>
-	public class FormClaimProc : System.Windows.Forms.Form
+	public class FormClaimProc : ODForm
 	{
 		private OpenDental.UI.Button butOK;
 		private OpenDental.UI.Button butCancel;

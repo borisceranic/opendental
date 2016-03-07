@@ -8,7 +8,7 @@ using OpenDental.UI;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormEmployeeSelect : System.Windows.Forms.Form{
+	public class FormEmployeeSelect : ODForm {
 		private OpenDental.UI.Button butClose;
 		private System.ComponentModel.Container components = null;
 		private OpenDental.UI.Button butAdd;

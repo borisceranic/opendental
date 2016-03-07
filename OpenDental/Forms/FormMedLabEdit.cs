@@ -10,7 +10,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormMedLabEdit:Form {
+	public partial class FormMedLabEdit:ODForm {
 		///<summary>Passed in, or set here if selecting a new patient for medlab. Can be null.</summary>
 		public Patient PatCur;
 		///<summary>List of all MedLabs linked to this patient and specimen. Passed in from calling class, or set here if newly attached to patient.</summary>

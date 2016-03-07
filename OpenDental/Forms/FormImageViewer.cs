@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 namespace OpenDental{
 	///<summary>Eventually, the user will be able to edit some image display settings and do a Documents.UpdateCur, but they can't actually make changes to the image.</summary>
-	public class FormImageViewer : System.Windows.Forms.Form{
+	public class FormImageViewer : ODForm {
 		private OpenDental.UI.ODToolBar ToolBarMain;
 		private System.Windows.Forms.PictureBox PictureBox1;
 		private System.ComponentModel.IContainer components;

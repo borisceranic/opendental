@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace OpenDental.Reporting.Allocators.MyAllocator1
 {
-	public partial class FormReport_ProviderIncomeReport : Form
+	public partial class FormReport_ProviderIncomeReport :ODForm
 	{
 		private DateTime _FromDate;
 		private DateTime _ToDate;

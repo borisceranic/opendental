@@ -23,7 +23,7 @@ using CodeBase;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormInsPlan : System.Windows.Forms.Form{
+	public class FormInsPlan : ODForm {
 		private System.ComponentModel.IContainer components;
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.Label label6;

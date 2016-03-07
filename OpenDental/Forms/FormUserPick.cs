@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using System.Linq;
 
 namespace OpenDental {
-	public partial class FormUserPick:Form {
+	public partial class FormUserPick:ODForm {
 		///<summary>The filtered list of Users to pick from.</summary>
 		public List<Userod> ListUserodsFiltered;
 		public List<Userod> ListUserodsShowing;

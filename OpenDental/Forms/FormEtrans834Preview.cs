@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using CodeBase;
 
 namespace OpenDental {
-	public partial class FormEtrans834Preview:Form {
+	public partial class FormEtrans834Preview:ODForm {
 
 		private ODThread _odThread=null;
 		private delegate void Preview834Delegate();

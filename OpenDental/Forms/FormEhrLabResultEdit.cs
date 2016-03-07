@@ -10,7 +10,7 @@ using System.Drawing.Printing;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormEhrLabResultEdit:Form {
+	public partial class FormEhrLabResultEdit:ODForm {
 		public bool IsNew;
 		public LabResult LabCur;
 		

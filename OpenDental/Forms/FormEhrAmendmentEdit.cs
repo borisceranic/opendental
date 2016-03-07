@@ -3,7 +3,7 @@ using System;
 using System.Windows.Forms;
 
 namespace OpenDental {
-	public partial class FormEhrAmendmentEdit:Form {
+	public partial class FormEhrAmendmentEdit:ODForm {
 		private EhrAmendment EhrAmendmentCur;
 
 		public FormEhrAmendmentEdit(EhrAmendment ehrAmdCur) {

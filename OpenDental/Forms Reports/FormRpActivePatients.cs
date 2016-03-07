@@ -8,7 +8,7 @@ using OpenDentBusiness;
 using OpenDental.ReportingComplex;
 
 namespace OpenDental {
-	public partial class FormRpActivePatients:Form {
+	public partial class FormRpActivePatients:ODForm {
 		private List<Clinic> _listClinics;
 		private List<Provider> _listProviders;
 		private List<Def> _listBillingTypeDefs;

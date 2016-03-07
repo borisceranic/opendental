@@ -8,7 +8,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	///<summary>Email autograph edit.</summary>
-	public class FormEmailAutographEdit:System.Windows.Forms.Form {
+	public class FormEmailAutographEdit:ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		/// <summary>Required designer variable.</summary>

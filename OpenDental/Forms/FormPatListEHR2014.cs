@@ -8,7 +8,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormPatListEHR2014:Form {
+	public partial class FormPatListEHR2014:ODForm {
 		private List<EhrPatListElement2014> _elementList;
 
 		public FormPatListEHR2014() {

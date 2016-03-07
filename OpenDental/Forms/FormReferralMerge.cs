@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormReferralMerge:Form {
+	public partial class FormReferralMerge:ODForm {
 		private long _referralNumInto;
 		private long _referralNumFrom;
 

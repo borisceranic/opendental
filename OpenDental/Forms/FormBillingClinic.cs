@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormBillingClinic:Form {
+	public partial class FormBillingClinic:ODForm {
 		///<summary>0 - all clinics.</summary>
 		public long ClinicNum;
 		private List<Clinic> _listClinics;

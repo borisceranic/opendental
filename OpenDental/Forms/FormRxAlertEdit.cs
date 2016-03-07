@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormRxAlertEdit:Form {
+	public partial class FormRxAlertEdit:ODForm {
 		private RxAlert RxAlertCur;
 		private RxDef RxDefCur;
 

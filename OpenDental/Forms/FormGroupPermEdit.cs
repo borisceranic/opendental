@@ -7,7 +7,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormGroupPermEdit : System.Windows.Forms.Form{
+	public class FormGroupPermEdit : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private System.Windows.Forms.TextBox textName;

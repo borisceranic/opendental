@@ -8,7 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 namespace OpenDental {
-	public partial class FormEhrLabOrderEdit2014:Form {
+	public partial class FormEhrLabOrderEdit2014:ODForm {
 		long PatCurNum;
 		public EhrLab EhrLabCur;
 		private EhrLab ParentLab;

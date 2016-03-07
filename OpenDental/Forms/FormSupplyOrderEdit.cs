@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormSupplyOrderEdit:Form {
+	public partial class FormSupplyOrderEdit:ODForm {
 		public SupplyOrder Order;
 		public List<Supplier> ListSupplier;
 

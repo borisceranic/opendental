@@ -11,7 +11,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	///<summary></summary>
-	public class FormPayPlanChargeEdit : System.Windows.Forms.Form{
+	public class FormPayPlanChargeEdit : ODForm {
 		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.Label label5;
 		private System.ComponentModel.Container components = null;// Required designer variable.

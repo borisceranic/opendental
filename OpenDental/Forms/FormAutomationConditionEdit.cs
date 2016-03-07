@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormAutomationConditionEdit:Form {
+	public partial class FormAutomationConditionEdit:ODForm {
 		public bool IsNew;
 		public AutomationCondition ConditionCur;
 

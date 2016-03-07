@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEhrExportCCD:Form {
+	public partial class FormEhrExportCCD:ODForm {
 		private Patient _patCur;
 		private string _ccd;
 

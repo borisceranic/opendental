@@ -7,7 +7,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	///<summary></summary>
-	public class FormQueryEdit : System.Windows.Forms.Form{
+	public class FormQueryEdit : ODForm {
 		private System.ComponentModel.Container components = null;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label label2;

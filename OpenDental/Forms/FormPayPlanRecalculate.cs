@@ -8,7 +8,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormPayPlanRecalculate:Form {
+	public partial class FormPayPlanRecalculate:ODForm {
 
 		public bool IsPrepay=true;
 		public bool IsRecalculateInterest=true;

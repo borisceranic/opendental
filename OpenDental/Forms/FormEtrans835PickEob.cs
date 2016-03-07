@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEtrans835PickEob:Form {
+	public partial class FormEtrans835PickEob:ODForm {
 
 		private string _messageText835;
 		private List<string> _listEobTranIds;

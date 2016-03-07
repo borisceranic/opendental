@@ -10,7 +10,7 @@ using CodeBase;
 using System.Linq;
 
 namespace OpenDental {
-	public partial class FormEmailInbox:Form {
+	public partial class FormEmailInbox:ODForm {
 		///<summary>Do not access directly.  Instead use AddressInbox.</summary>
 		private EmailAddress _addressInbox=null;
 		private List<EmailMessage> ListEmailMessages;

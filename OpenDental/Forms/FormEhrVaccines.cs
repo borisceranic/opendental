@@ -6,7 +6,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormEhrVaccines:Form {
+	public partial class FormEhrVaccines:ODForm {
 		public Patient PatCur;
 		private List<VaccinePat> VaccineList;
 		private EhrPatient _ehrPatientCur;

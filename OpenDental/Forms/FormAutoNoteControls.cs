@@ -11,7 +11,7 @@ using OpenDental.UI;
 
 namespace OpenDental {
 
-	public partial class FormAutoNoteControls:Form {
+	public partial class FormAutoNoteControls:ODForm {
 		///<summary>If OK, then this is the control that the user selected.</summary>
 		public long SelectedControlNum;
 

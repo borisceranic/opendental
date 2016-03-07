@@ -12,7 +12,7 @@ using EHR;
 #endif
 
 namespace OpenDental {
-	public partial class FormEhrProvKeyEditCust:Form {
+	public partial class FormEhrProvKeyEditCust:ODForm {
 		public EhrProvKey KeyCur;
 
 		public FormEhrProvKeyEditCust() {

@@ -8,7 +8,7 @@ using OpenDentBusiness.HL7;
 using System.Linq;
 
 namespace OpenDental {
-	public partial class FormPatientAddAll:Form {
+	public partial class FormPatientAddAll:ODForm {
 		public string LName;
 		public string FName;
 		public DateTime Birthdate;

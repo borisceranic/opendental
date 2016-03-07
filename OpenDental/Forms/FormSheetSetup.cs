@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormSheetSetup:Form {
+	public partial class FormSheetSetup:ODForm {
 		private bool changed;
 
 		public FormSheetSetup() {

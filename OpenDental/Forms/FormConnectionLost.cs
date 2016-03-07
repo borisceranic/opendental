@@ -8,7 +8,7 @@ using OpenDentBusiness;
 using CodeBase;
 
 namespace OpenDental {
-	public partial class FormConnectionLost:Form {
+	public partial class FormConnectionLost:ODForm {
 
 		///<summary>Optionally set errorMessage to override the label text that is displayed to the user.</summary>
 		public FormConnectionLost(string errorMessage="") {

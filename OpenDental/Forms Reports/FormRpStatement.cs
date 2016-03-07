@@ -23,7 +23,7 @@ using MigraDoc.DocumentObjectModel.Tables;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormRpStatement : System.Windows.Forms.Form{
+	public class FormRpStatement : ODForm {
 		private System.Windows.Forms.PrintPreviewControl printPreviewControl2;
 		private OpenDental.UI.Button butPrint;
 		private OpenDental.UI.Button butClose;

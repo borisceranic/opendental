@@ -12,7 +12,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormClaimForms : System.Windows.Forms.Form{
+	public class FormClaimForms : ODForm {
 		private System.Windows.Forms.ListBox listClaimForms;
 		private OpenDental.UI.Button butAdd;
 		private OpenDental.UI.Button butClose;

@@ -7,7 +7,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormRpReferrals : System.Windows.Forms.Form	{
+	public class FormRpReferrals : ODForm	{
 		private System.Windows.Forms.TabPage tabData;
 		private OpenDental.UI.Button butCheckAll;
 		private OpenDental.UI.Button butClear;

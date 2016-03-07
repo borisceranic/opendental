@@ -17,7 +17,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary>This is getting very outdated.  I realize it is difficult to use and will be phased out soon. The report displayed will be based on report.TableQ and report.</summary>
-	public class FormQuery : System.Windows.Forms.Form{
+	public class FormQuery : ODForm {
 		private OpenDental.UI.Button butClose;
 		private System.Windows.Forms.DataGrid grid2;
 		private System.Windows.Forms.GroupBox groupBox1;
@@ -531,7 +531,6 @@ namespace OpenDental{
 			// 
 			// FormQuery
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butClose;
 			this.ClientSize = new System.Drawing.Size(963, 788);
 			this.Controls.Add(this.splitContainerQuery);
@@ -546,7 +545,6 @@ namespace OpenDental{
 			this.MinimumSize = new System.Drawing.Size(894, 486);
 			this.Name = "FormQuery";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Query";
 			this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
 			this.Closing += new System.ComponentModel.CancelEventHandler(this.FormQuery_Closing);

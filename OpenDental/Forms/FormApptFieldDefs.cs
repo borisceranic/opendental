@@ -8,7 +8,7 @@ using OpenDentBusiness;
 namespace OpenDental{
 	/// <summary>
 	/// </summary>
-	public class FormApptFieldDefs:System.Windows.Forms.Form {
+	public class FormApptFieldDefs:ODForm {
 		private OpenDental.UI.Button butClose;
 		private System.Windows.Forms.ListBox listMain;
 		private OpenDental.UI.Button butAdd;

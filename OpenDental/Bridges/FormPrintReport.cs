@@ -9,7 +9,7 @@ using System.Drawing.Drawing2D;
 
 namespace OpenDental {
 	///<summary>This class is pretty much only coded for 8.5 inch X 11 inch sheets of paper, but with a little work could be made for more general sizes of paper, perhaps sometime in the future.</summary>
-	public partial class FormPrintReport:Form {
+	public partial class FormPrintReport:ODForm {
 
 		///<summary>If pageNumberFont is set, then the page number is displayed using the page number information.</summary>
 		private Font pageNumberFont=null;

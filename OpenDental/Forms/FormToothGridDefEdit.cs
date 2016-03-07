@@ -7,7 +7,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	/// <summary></summary>
-	public class FormToothGridDefEdit:System.Windows.Forms.Form {
+	public class FormToothGridDefEdit:ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private Label label1;

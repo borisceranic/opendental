@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormApptProcs:Form {
+	public partial class FormApptProcs:ODForm {
 		//public int PatNum;
 		private List<Procedure> ProcList;
 		///<summary>If form closes with OK, this contains selected proc num.</summary>

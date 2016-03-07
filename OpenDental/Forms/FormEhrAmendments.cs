@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace OpenDental {
-	public partial class FormEhrAmendments:Form {
+	public partial class FormEhrAmendments:ODForm {
 		private List<EhrAmendment> ListAmendments;
 		public Patient PatCur;
 

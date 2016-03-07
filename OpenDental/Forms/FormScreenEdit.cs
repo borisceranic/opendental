@@ -9,7 +9,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormScreenEdit : System.Windows.Forms.Form{
+	public class FormScreenEdit : ODForm {
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>

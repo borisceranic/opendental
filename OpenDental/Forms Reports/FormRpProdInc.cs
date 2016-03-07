@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormRpProdInc : System.Windows.Forms.Form{
+	public class FormRpProdInc : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 

@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormProvStudentEdit:Form {
+	public partial class FormProvStudentEdit:ODForm {
 		private long _autoUserName;
 		private bool _isGeneratingAbbr=true;
 		private Userod _existingUser;

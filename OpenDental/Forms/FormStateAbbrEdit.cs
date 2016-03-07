@@ -3,7 +3,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormStateAbbrEdit:Form {
+	public partial class FormStateAbbrEdit:ODForm {
 		private StateAbbr _stateAbbrCur;
 
 		public FormStateAbbrEdit(StateAbbr stateAbbr) {

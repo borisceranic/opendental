@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormPatFieldCurrencyEdit:Form {
+	public partial class FormPatFieldCurrencyEdit:ODForm {
 		public bool IsNew;
 		private PatField _fieldCur;
 		private PatField _fieldOld;

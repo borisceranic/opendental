@@ -8,7 +8,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormRpInsCo : System.Windows.Forms.Form{
+	public class FormRpInsCo : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private System.Windows.Forms.Label labelPatName;

@@ -11,7 +11,7 @@ using CodeBase;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormDatabaseMaintTemp:Form {
+	public partial class FormDatabaseMaintTemp:ODForm {
 		//private bool backupMade;
 		private string duplicateClaimProcInfo;
 		private string duplicateSuppInfo;

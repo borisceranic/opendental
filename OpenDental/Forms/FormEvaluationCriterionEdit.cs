@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEvaluationCriterionEdit:Form {
+	public partial class FormEvaluationCriterionEdit:ODForm {
 		//This window is currently not in use. All of the functions this window provides are now available directly from the EvaluationEdit window.
 		//If there is ever more functionality added to EvaluationCriterion then this window may once again be necessary, but as of 06/24/2014 this window has been deprecated.
 		private EvaluationCriterion _evalCritCur;

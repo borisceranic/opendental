@@ -8,7 +8,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormAutoCodeLessIntrusive:System.Windows.Forms.Form {
+	public class FormAutoCodeLessIntrusive:ODForm {
 		private System.Windows.Forms.Label labelMain;
 		/// <summary>
 		/// Required designer variable.

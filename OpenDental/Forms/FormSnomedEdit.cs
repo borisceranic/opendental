@@ -9,7 +9,7 @@ using OpenDentBusiness;
 
 namespace OpenDental {
 	///<summary>Users are not allowed to edit or delete individual SNOMED codes so this is really a view only form.</summary>
-	public partial class FormSnomedEdit:Form {
+	public partial class FormSnomedEdit:ODForm {
 		private Snomed SnomedCur;
 		//public bool IsNew;
 

@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormOrthoChartEdit:Form {
+	public partial class FormOrthoChartEdit:ODForm {
 		public OrthoChart OrthoCur;
 		public bool IsNew;
 

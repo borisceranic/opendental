@@ -9,7 +9,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	/// <summary>This form shows all of the security log entries for one fKey item. So far this only applies to a single appointment or a single procedure code.</summary>
-	public class FormAuditOneType : System.Windows.Forms.Form{
+	public class FormAuditOneType : ODForm {
 		private OpenDental.UI.ODGrid grid;
 		private long PatNum;
 		private Label labelDisclaimer;

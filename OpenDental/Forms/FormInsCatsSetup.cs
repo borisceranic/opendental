@@ -8,7 +8,7 @@ using OpenDentBusiness;
 
 namespace OpenDental {
 	///<summary></summary>
-	public class FormInsCatsSetup:System.Windows.Forms.Form {
+	public class FormInsCatsSetup:ODForm {
 		private System.ComponentModel.Container components=null;
 		private OpenDental.UI.Button butOK;
 		private OpenDental.UI.Button butAddSpan;

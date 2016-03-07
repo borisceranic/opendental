@@ -12,7 +12,7 @@ using OpenDentBusiness.UI;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormProcCodeEdit : System.Windows.Forms.Form{
+	public class FormProcCodeEdit : ODForm {
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label labelTreatArea;
 		private System.Windows.Forms.Label label5;

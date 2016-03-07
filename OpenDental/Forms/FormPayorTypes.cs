@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormPayorTypes:Form {
+	public partial class FormPayorTypes:ODForm {
 		private List<PayorType> ListPayorTypes;
 		public Patient PatCur;
 

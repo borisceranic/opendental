@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormSheetDef:Form {
+	public partial class FormSheetDef:ODForm {
 		///<summary></summary>
 		public SheetDef SheetDefCur;
 		//private List<SheetFieldDef> AvailFields;

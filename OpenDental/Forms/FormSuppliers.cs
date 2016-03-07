@@ -9,7 +9,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormSuppliers:Form {
+	public partial class FormSuppliers:ODForm {
 		private List<Supplier> _listSuppliers;
 
 		public FormSuppliers() {

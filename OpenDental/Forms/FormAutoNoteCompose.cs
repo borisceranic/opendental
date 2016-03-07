@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormAutoNoteCompose:Form {
+	public partial class FormAutoNoteCompose:ODForm {
 		public string CompletedNote;
 
 		public FormAutoNoteCompose() {

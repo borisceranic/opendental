@@ -10,7 +10,7 @@ using System.IO;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormHcpcs:Form {
+	public partial class FormHcpcs:ODForm {
 		public bool IsSelectionMode;
 		public Hcpcs SelectedHcpcs;
 		private List<Hcpcs> listHcpcses;

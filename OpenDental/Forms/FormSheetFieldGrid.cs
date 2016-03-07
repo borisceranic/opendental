@@ -9,7 +9,7 @@ using OpenDental.UI;
 using System.Linq;
 
 namespace OpenDental {
-	public partial class FormSheetFieldGrid:Form {
+	public partial class FormSheetFieldGrid:ODForm {
 		public SheetDef SheetDefCur;
 		public SheetFieldDef SheetFieldDefCur;
 		public bool IsReadOnly;

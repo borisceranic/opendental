@@ -20,7 +20,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormPrntScrn : System.Windows.Forms.Form{
+	public class FormPrntScrn : ODForm {
 		private System.Windows.Forms.Label label1;
 		private System.Drawing.Printing.PrintDocument pd2;
 		private System.Windows.Forms.PrintPreviewControl printPreviewControl2;

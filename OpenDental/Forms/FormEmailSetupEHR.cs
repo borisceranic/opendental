@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEmailSetupEHR:Form {
+	public partial class FormEmailSetupEHR:ODForm {
 		public FormEmailSetupEHR() {
 			InitializeComponent();
 			Lan.F(this);

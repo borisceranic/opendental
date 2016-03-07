@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEvaluationCriterionDefEdit:Form {
+	public partial class FormEvaluationCriterionDefEdit:ODForm {
 		EvaluationCriterionDef _evalCritDef;
 		GradingScale _gradeScale;
 

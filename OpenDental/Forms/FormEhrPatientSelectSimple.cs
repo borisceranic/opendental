@@ -8,7 +8,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormEhrPatientSelectSimple:Form {
+	public partial class FormEhrPatientSelectSimple:ODForm {
 		public long SelectedPatNum;
 		private DataTable table;
 		public string FName;

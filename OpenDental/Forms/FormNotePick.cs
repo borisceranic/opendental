@@ -9,7 +9,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormNotePick:System.Windows.Forms.Form {
+	public class FormNotePick:ODForm {
 		private OpenDental.UI.Button butOK;
 		private OpenDental.UI.ODGrid gridMain;
 		private Label label1;

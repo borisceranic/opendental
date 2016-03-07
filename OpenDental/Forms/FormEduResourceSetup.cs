@@ -10,7 +10,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormEduResourceSetup:Form {
+	public partial class FormEduResourceSetup:ODForm {
 		private List<EduResource> eduResourceList;
 
 		public FormEduResourceSetup() {

@@ -12,7 +12,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	///<summary></summary>
-	public class FormAdjust : System.Windows.Forms.Form{
+	public class FormAdjust : ODForm {
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.Label label5;

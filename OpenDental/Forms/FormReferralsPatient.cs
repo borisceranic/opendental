@@ -7,7 +7,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	/// <summary></summary>
-	public class FormReferralsPatient : System.Windows.Forms.Form{
+	public class FormReferralsPatient : ODForm {
 		private OpenDental.UI.Button butClose;
 		private UI.Button butOK;
 		private OpenDental.UI.Button butAddFrom;

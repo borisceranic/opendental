@@ -12,7 +12,7 @@ using OpenDental.UI;
 using CodeBase;
 
 namespace OpenDental {
-	public partial class FormEhrLabOrderImport:Form {
+	public partial class FormEhrLabOrderImport:ODForm {
 		public string Hl7LabMessage;
 		private List<EhrLab> ListEhrLabs;
 		public Patient PatCur;

@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormApptQuickAdd:Form {
+	public partial class FormApptQuickAdd:ODForm {
 		///<summary>If form closes with OK, this contains selected code nums.  All codeNums will already have been checked for validity.</summary>
 		public List<long> SelectedCodeNums;
 		public Point ParentFormLocation;

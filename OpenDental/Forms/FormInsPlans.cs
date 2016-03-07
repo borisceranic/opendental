@@ -14,7 +14,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormInsPlans:System.Windows.Forms.Form {
+	public class FormInsPlans:ODForm {
 		private System.ComponentModel.Container components = null;// Required designer variable.
 		//private InsTemplates InsTemplates;
 		private OpenDental.UI.Button butBlank;

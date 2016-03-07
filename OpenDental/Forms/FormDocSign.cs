@@ -19,7 +19,7 @@ using CodeBase;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormDocSign:System.Windows.Forms.Form {
+	public class FormDocSign:ODForm {
 		private OpenDental.UI.Button butOK;
 		private OpenDental.UI.Button butCancel;
 		private System.ComponentModel.Container components = null;//required by designer

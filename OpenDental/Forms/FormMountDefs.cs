@@ -9,7 +9,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormMountDefs : System.Windows.Forms.Form{
+	public class FormMountDefs : ODForm {
 		private System.Windows.Forms.ListBox listMain;
 		private OpenDental.UI.Button butAdd;
 		private OpenDental.UI.Button butClose;

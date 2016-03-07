@@ -11,7 +11,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	///<summary></summary>
-	public class FormJournalEntryEdit : System.Windows.Forms.Form{
+	public class FormJournalEntryEdit : ODForm {
 		private System.Windows.Forms.Label labelMemo;
 		private System.Windows.Forms.Label labelDebit;
 		private System.ComponentModel.Container components = null;// Required designer variable.

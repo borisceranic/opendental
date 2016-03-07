@@ -8,7 +8,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormGradingScales:Form {
+	public partial class FormGradingScales:ODForm {
 		private List<GradingScale> _listGradingScales;
 		public GradingScale SelectedGradingScale;
 		/// <summary>This is set before showing the window to determine the usage of the window.  Default is false.</summary>

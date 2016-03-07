@@ -12,7 +12,7 @@ using OpenDental.UI;
 using System.Text.RegularExpressions;
 
 namespace OpenDental {
-	public partial class FormWiki:Form {
+	public partial class FormWiki:ODForm {
 		public WikiPage WikiPageCur;		
 		private List<string> historyNav;
 		///<summary>Number of pages back that you are browsing. Current page == 0, Oldest page == historyNav.Length. </summary>

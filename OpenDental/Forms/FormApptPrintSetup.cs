@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormApptPrintSetup:Form {
+	public partial class FormApptPrintSetup:ODForm {
 		public DateTime ApptPrintStartTime;
 		public DateTime ApptPrintStopTime;
 		public int ApptPrintFontSize;

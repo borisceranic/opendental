@@ -11,7 +11,7 @@ using CodeBase;
 
 namespace OpenDental{
 	/// <summary></summary>
-	public class FormImageSelectClaimAttach:System.Windows.Forms.Form {
+	public class FormImageSelectClaimAttach:ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private OpenDental.UI.ODGrid gridMain;

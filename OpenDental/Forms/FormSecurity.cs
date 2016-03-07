@@ -12,7 +12,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormSecurity:System.Windows.Forms.Form {
+	public class FormSecurity:ODForm {
 		private OpenDental.UI.Button butClose;
 		private OpenDental.UI.Button butAddGroup;
 		private OpenDental.UI.Button butAddUser;

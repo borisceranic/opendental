@@ -10,7 +10,7 @@ namespace OpenDental.ReportingComplex{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormParameterInput : System.Windows.Forms.Form{
+	public class FormParameterInput : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private OpenDental.UI.ContrMultInput MultInput2;

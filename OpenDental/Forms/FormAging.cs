@@ -7,7 +7,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	///<summary></summary>
-	public class FormAging : System.Windows.Forms.Form{
+	public class FormAging : ODForm {
 		private System.Windows.Forms.Label label1;
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;

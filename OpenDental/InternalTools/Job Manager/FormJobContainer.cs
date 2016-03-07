@@ -8,7 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 
 namespace OpenDental {
-	public partial class FormJobContainer:Form {
+	public partial class FormJobContainer:ODForm {
 		public FormJobContainer(Control control,string title) {
 			InitializeComponent();
 			this.Controls.Add(control);

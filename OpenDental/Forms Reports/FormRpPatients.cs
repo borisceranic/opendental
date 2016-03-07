@@ -8,7 +8,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormRpPatients : System.Windows.Forms.Form{
+	public class FormRpPatients : ODForm{
 		private System.Windows.Forms.TabControl tabPatients;
 		private System.Windows.Forms.TabPage tabFilters;
 		private System.Windows.Forms.TabPage tabData;

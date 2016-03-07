@@ -12,7 +12,7 @@ namespace OpenDental
 	/// <summary>
 	/// Summary description for FormClaimPayTotal.
 	/// </summary>
-	public class FormClaimPayPreAuth:System.Windows.Forms.Form
+	public class FormClaimPayPreAuth:ODForm
 	{
 		private OpenDental.ValidDouble textTotal;
 		private System.Windows.Forms.Label label1;

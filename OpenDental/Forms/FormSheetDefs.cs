@@ -12,7 +12,7 @@ using OpenDental.UI;
 
 namespace OpenDental{
 	/// <summary></summary>
-	public class FormSheetDefs:System.Windows.Forms.Form {
+	public class FormSheetDefs:ODForm {
 		private OpenDental.UI.Button butNew;
 		private OpenDental.UI.Button butClose;
 		/// <summary>

@@ -10,7 +10,7 @@ using OpenDental.UI;
 
 namespace OpenDental{
 	/// <summary>The Next appoinment tracking tool.</summary>
-	public class FormTrackNext : System.Windows.Forms.Form{
+	public class FormTrackNext : ODForm {
 		private OpenDental.UI.Button butClose;
 		private List<Appointment> AptList;
 		private OpenDental.UI.ODGrid gridMain;

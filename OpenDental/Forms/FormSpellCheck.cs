@@ -10,7 +10,7 @@ using OpenDental.UI;
 using System.Text.RegularExpressions;
 
 namespace OpenDental {
-	public partial class FormSpellCheck:Form {
+	public partial class FormSpellCheck:ODForm {
 
 		public FormSpellCheck() {
 			InitializeComponent();

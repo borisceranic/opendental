@@ -7,7 +7,7 @@ using OpenDental.ReportingComplex;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormXChargeReconcile:Form {
+	public partial class FormXChargeReconcile:ODForm {
 
 		public FormXChargeReconcile() {
 			InitializeComponent();

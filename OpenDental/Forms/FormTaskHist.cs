@@ -8,7 +8,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormTaskHist:Form {
+	public partial class FormTaskHist:ODForm {
 		public long TaskNumCur;
 		///<summary>Contains all TaskHists for the given TaskNumCur. Does not include the "current" revision of non-deleted tasks.</summary>
 		private List<TaskHist> _listTaskAudit;

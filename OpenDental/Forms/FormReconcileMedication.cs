@@ -5,7 +5,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormReconcileMedication:Form {
+	public partial class FormReconcileMedication:ODForm {
 		public List<MedicationPat> ListMedicationPatNew;
 		private List<MedicationPat> _listMedicationPatReconcile;
 		private List<MedicationPat> _listMedicationPatCur;

@@ -10,7 +10,7 @@ using System.Collections.Generic;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormRpClaimNotSent : System.Windows.Forms.Form{
+	public class FormRpClaimNotSent : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private System.Windows.Forms.Panel panel1;

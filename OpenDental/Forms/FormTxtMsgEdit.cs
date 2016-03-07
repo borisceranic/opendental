@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormTxtMsgEdit:Form {
+	public partial class FormTxtMsgEdit:ODForm {
 		///<summary>PatNum of the patient selected.  Required if sending message without loading form or loading with patient selected.</summary>
 		public long PatNum=0;
 		///<summary>WirelessPhone of the patient selected.  Required if sending message without loading form.  

@@ -11,7 +11,7 @@ using System.Drawing.Text;
 using System.Linq;
 
 namespace OpenDental {
-	public partial class FormJobNew:Form {
+	public partial class FormJobNew:ODForm {
 		public Job JobCur=new Job();
 
 		public FormJobNew() {

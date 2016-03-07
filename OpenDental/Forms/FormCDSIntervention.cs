@@ -8,7 +8,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormCDSIntervention:Form {
+	public partial class FormCDSIntervention:ODForm {
 		///<summary>This should be set to the result from EhrTriggers.TriggerMatch.</summary>
 		public List<CDSIntervention> ListCDSI;
 		/////<summary>This should be set to the result from EhrTriggers.TriggerMatch.  Key is a string that contains the message to be displayed.  

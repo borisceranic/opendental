@@ -11,7 +11,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormMedicationMerge:Form {
+	public partial class FormMedicationMerge:ODForm {
 		private Medication _medFrom;
 		private Medication _medInto;
 

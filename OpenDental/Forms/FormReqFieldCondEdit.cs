@@ -7,7 +7,7 @@ using System.Linq;
 using System.Windows.Forms;
 
 namespace OpenDental {
-	public partial class FormReqFieldCondEdit:Form {
+	public partial class FormReqFieldCondEdit:ODForm {
 		public bool IsNew;
 		///<summary>Holds all the conditions that are the same type as the condition being loaded.</summary>
 		private List<RequiredFieldCondition> _listReqFieldConds;

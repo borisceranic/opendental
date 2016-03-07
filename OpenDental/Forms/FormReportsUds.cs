@@ -12,7 +12,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormReportsUds:Form {
+	public partial class FormReportsUds:ODForm {
 		private DateTime DateFrom;
 		private DateTime DateTo;
 

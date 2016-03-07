@@ -4,7 +4,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormProcBroken:Form {
+	public partial class FormProcBroken:ODForm {
 		public bool IsNew;
 		private Procedure _procCur;
 		private Procedure _procOld;

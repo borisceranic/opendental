@@ -7,7 +7,7 @@ using CodeBase;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEhrSummaryCcdEdit:Form {
+	public partial class FormEhrSummaryCcdEdit:ODForm {
 		public string StrXmlFilePath;
 		public bool DidPrint;
 		///<summary>Will be set to the patient that this CCD message is indicated for.  Can be null if not meant for incorporating into a patient's account.</summary>

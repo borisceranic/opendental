@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormTimeCardRuleEdit:Form {
+	public partial class FormTimeCardRuleEdit:ODForm {
 
 		public TimeCardRule timeCardRule;
 		private List<Employee> _listEmployees;

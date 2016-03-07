@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEhrCarePlanEdit:Form {
+	public partial class FormEhrCarePlanEdit:ODForm {
 
 		private EhrCarePlan _ehrCarePlan;
 		private Snomed _snomedGoal;

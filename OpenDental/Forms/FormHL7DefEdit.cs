@@ -6,7 +6,7 @@ using OpenDental.UI;
 
 namespace OpenDental {
 	/// <summary></summary>
-	public partial class FormHL7DefEdit:System.Windows.Forms.Form {
+	public partial class FormHL7DefEdit:ODForm {
 		public HL7Def HL7DefCur;
 
 		///<summary></summary>

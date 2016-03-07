@@ -12,7 +12,7 @@ using System.Linq;
 using System.Xml;
 
 namespace OpenDental {
-	public partial class FormJobSearch:Form {
+	public partial class FormJobSearch:ODForm {
 		public string InitialSearchString="";
 		private List<Job> _listJobsAll;
 		private List<Job> _listJobsFiltered;

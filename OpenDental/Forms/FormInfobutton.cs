@@ -15,7 +15,7 @@ using OpenDental.UI;
 using System.Net;
 
 namespace OpenDental {
-	public partial class FormInfobutton:Form {
+	public partial class FormInfobutton:ODForm {
 		public Patient PatCur;
 		///<summary>Usually filled from within the form by using Patcur.PriProv</summary>
 		public Provider ProvCur;

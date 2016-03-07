@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormReferenceEntryEdit:Form {
+	public partial class FormReferenceEntryEdit:ODForm {
 		private CustRefEntry CustRefEntryCur;
 
 		public FormReferenceEntryEdit(CustRefEntry refEntry) {

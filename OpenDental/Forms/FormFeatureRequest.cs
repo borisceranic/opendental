@@ -20,7 +20,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormFeatureRequest:System.Windows.Forms.Form {
+	public class FormFeatureRequest:ODForm {
 		private OpenDental.UI.Button butClose;
 		private System.Windows.Forms.Label label1;
 		private IContainer components;

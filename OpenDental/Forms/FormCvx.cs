@@ -10,7 +10,7 @@ using System.IO;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormCvxs:Form {
+	public partial class FormCvxs:ODForm {
 		public bool IsSelectionMode;
 		public Cvx SelectedCvx;
 		private List<Cvx> listCvxs;

@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEhrVitalsignEdit:Form {
+	public partial class FormEhrVitalsignEdit:ODForm {
 		public Vitalsign VitalsignCur;
 		private Patient patCur;
 

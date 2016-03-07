@@ -14,7 +14,7 @@ using OpenDentBusiness.Mobile;
 
 namespace OpenDental {
 	///<summary>THIS FORM HAS BEEN DEPRECATED!!! All functionality that previously existed in this form has been moved to FormPatientPortalSetup.</summary>
-	public partial class FormMobile:Form {
+	public partial class FormMobile:ODForm {
 		private static MobileWeb.Mobile mb=new MobileWeb.Mobile();
 		private static int BatchSize=100;
 		///<summary>All statements of a patient are not uploaded. The limit is defined by the recent [statementLimitPerPatient] records</summary>

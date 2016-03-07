@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormPaymentPlanOptions:Form {
+	public partial class FormPaymentPlanOptions:ODForm {
 
 		public FormPaymentPlanOptions(PaymentSchedule paySchedule) {
 			InitializeComponent();

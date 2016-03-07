@@ -12,7 +12,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormPhoneTiles:Form {
+	public partial class FormPhoneTiles:ODForm {
 		///<summary>When the GoToChanged event fires, this tells us which patnum.</summary>
 		public long GotoPatNum;
 		///<summary></summary>

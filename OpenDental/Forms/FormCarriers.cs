@@ -14,7 +14,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormCarriers : System.Windows.Forms.Form{
+	public class FormCarriers : ODForm {
 		private OpenDental.UI.Button butAdd;
 		private System.ComponentModel.IContainer components;
 		private System.Windows.Forms.ToolTip toolTip1;

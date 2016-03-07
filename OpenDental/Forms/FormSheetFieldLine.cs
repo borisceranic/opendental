@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormSheetFieldLine:Form {
+	public partial class FormSheetFieldLine:ODForm {
 		///<summary>This is the object we are editing.</summary>
 		public SheetFieldDef SheetFieldDefCur;
 		///<summary>We need access to a few other fields of the sheetDef.</summary>

@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEncounterTool:Form {
+	public partial class FormEncounterTool:ODForm {
 		private List<string> _listRecEncCodes;
 		public int EncListSelectedIdx=-1;
 		public string EncCodeValue;

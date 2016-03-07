@@ -35,7 +35,7 @@ using CodeBase;
 
 
 namespace OpenDental {
-	public partial class FormRpLaserLabels:System.Windows.Forms.Form {
+	public partial class FormRpLaserLabels:ODForm {
 		private DataTable AddrTable;
 		private DataTable RptAddrTable;
 		private int pagesPrinted;

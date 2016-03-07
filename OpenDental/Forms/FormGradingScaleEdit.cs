@@ -8,7 +8,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormGradingScaleEdit:Form {
+	public partial class FormGradingScaleEdit:ODForm {
 		private List<GradingScaleItem> _listGradingScaleItems;
 		private GradingScale _gradingScaleCur;
 		///<summary>False when grading scale is in use by an evaluation.</summary>

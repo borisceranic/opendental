@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using OpenDental.Eclaims;
 
 namespace OpenDental {
-	public partial class FormCanadaPaymentReconciliation:Form {
+	public partial class FormCanadaPaymentReconciliation:ODForm {
 
 		List<Carrier> carriers=new List<Carrier>();
 

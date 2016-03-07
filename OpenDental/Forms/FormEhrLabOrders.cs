@@ -6,7 +6,7 @@ using OpenDental.UI;
 using CodeBase;
 
 namespace OpenDental {
-	public partial class FormEhrLabOrders:Form {
+	public partial class FormEhrLabOrders:ODForm {
 		public List<EhrLab> ListEhrLabs;
 		public Patient PatCur;
 

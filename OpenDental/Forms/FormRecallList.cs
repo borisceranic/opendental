@@ -23,7 +23,7 @@ using CodeBase;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormRecallList : System.Windows.Forms.Form{
+	public class FormRecallList : ODForm {
 		private OpenDental.UI.Button butClose;
 		private OpenDental.UI.Button butRefresh;
 		private System.Windows.Forms.GroupBox groupBox1;

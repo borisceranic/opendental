@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace OpenDental.Reporting.Allocators.MyAllocator1
 {
-	public partial class FormReport_GuarantorAllocationCheck : Form
+	public partial class FormReport_GuarantorAllocationCheck :ODForm
 	{
 		private MyAllocator1.SupportingCode.Report1_GuarantorAllocation _Report_GA = null;
 		private int _Guarantor = -1;

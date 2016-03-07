@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormImages:Form {
+	public partial class FormImages:ODForm {
 		///<summary>Right now, this form only supports claimpayment and amendment mode.   Others will be added later.</summary>
 		public long ClaimPaymentNum;
 		public EhrAmendment EhrAmendmentCur;

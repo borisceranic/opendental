@@ -11,7 +11,7 @@ using OpenDental.UI;
 
 namespace OpenDental {
 	/// <summary></summary>
-	public partial class FormHL7MsgEdit:System.Windows.Forms.Form {
+	public partial class FormHL7MsgEdit:ODForm {
 		public HL7Msg MsgCur;
 
 		///<summary></summary>

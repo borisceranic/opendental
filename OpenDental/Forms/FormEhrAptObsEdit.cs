@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEhrAptObsEdit:Form {
+	public partial class FormEhrAptObsEdit:ODForm {
 
 		private EhrAptObs _ehrAptObsCur=null;
 		private Appointment _appt=null;

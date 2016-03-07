@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormInsPayFix:Form {
+	public partial class FormInsPayFix:ODForm {
 		public FormInsPayFix() {
 			InitializeComponent();
 			Lan.F(this);

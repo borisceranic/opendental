@@ -10,7 +10,7 @@ using OpenDentBusiness;
 
 namespace OpenDental {
 	/// <summary></summary>
-	public partial class FormInnoDb:System.Windows.Forms.Form {
+	public partial class FormInnoDb:ODForm {
 
 		/// <summary></summary>
 		public FormInnoDb() {

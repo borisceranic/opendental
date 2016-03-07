@@ -9,7 +9,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormInsSpanEdit:System.Windows.Forms.Form {
+	public class FormInsSpanEdit:ODForm {
 		private System.Windows.Forms.TextBox textFrom;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.Label label3;

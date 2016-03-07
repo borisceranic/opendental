@@ -8,7 +8,7 @@ namespace OpenDental {
 	/// <summary>
 	/// Summary description for FormRpApptWithPhones.
 	/// </summary>
-	public class FormRpRouting:System.Windows.Forms.Form {
+	public class FormRpRouting:ODForm {
 		private System.Windows.Forms.ListBox listProv;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label label2;

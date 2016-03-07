@@ -16,7 +16,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormClaimReports : System.Windows.Forms.Form{
+	public class FormClaimReports : ODForm {
 		private OpenDental.UI.Button butClose;
 		private System.Windows.Forms.Label labelRetrieving;
 		private System.Windows.Forms.ComboBox comboClearhouse;

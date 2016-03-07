@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormReplicationEdit:Form {
+	public partial class FormReplicationEdit:ODForm {
 		public ReplicationServer RepServ;
 
 		public FormReplicationEdit() {

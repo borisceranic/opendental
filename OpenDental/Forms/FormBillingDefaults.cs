@@ -9,7 +9,7 @@ using System.Linq;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormBillingDefaults:Form {
+	public partial class FormBillingDefaults:ODForm {
 		private List<Clinic> _listClinics;
 		private List<Ebill> _listEbills;
 		///<summary>The eBill corresponding to the currently selected clinic if clinics are enabled.</summary>

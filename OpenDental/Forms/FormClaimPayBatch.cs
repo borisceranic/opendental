@@ -11,7 +11,7 @@ using OpenDental.UI;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormClaimPayBatch:System.Windows.Forms.Form {
+	public class FormClaimPayBatch:ODForm {
 		private OpenDental.ValidDouble textAmount;
 		private OpenDental.ValidDate textDate;
 		private System.Windows.Forms.TextBox textBankBranch;

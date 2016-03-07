@@ -7,7 +7,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	/// <summary></summary>
-	public class FormQuestionDefEdit : System.Windows.Forms.Form{
+	public class FormQuestionDefEdit : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private System.Windows.Forms.TextBox textQuestion;

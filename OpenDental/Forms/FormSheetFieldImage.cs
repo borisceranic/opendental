@@ -11,7 +11,7 @@ using OpenDentBusiness;
 using CodeBase;
 
 namespace OpenDental {
-	public partial class FormSheetFieldImage:Form {
+	public partial class FormSheetFieldImage:ODForm {
 		///<summary>This is the object we are editing.</summary>
 		public SheetFieldDef SheetFieldDefCur;
 		///<summary>We need access to a few other fields of the sheetDef.</summary>

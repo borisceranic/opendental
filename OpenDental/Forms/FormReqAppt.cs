@@ -12,7 +12,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormReqAppt : System.Windows.Forms.Form{
+	public class FormReqAppt : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.ODGrid gridStudents;
 		/// <summary>

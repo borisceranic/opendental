@@ -16,7 +16,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormProcCodes:System.Windows.Forms.Form {
+	public class FormProcCodes:ODForm {
 		private System.ComponentModel.Container components = null;
 		///<summary>If IsSelectionMode=true and DialogResult=OK, then this will contain the selected CodeNum.</summary>
 		public long SelectedCodeNum;

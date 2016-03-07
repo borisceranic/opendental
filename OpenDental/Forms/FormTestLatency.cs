@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using System.Diagnostics;
 
 namespace OpenDental {
-	public partial class FormTestLatency:Form {
+	public partial class FormTestLatency:ODForm {
 		public FormTestLatency() {
 			InitializeComponent();
 			Lan.F(this);

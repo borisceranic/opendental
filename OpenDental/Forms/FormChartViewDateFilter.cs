@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormChartViewDateFilter:Form {
+	public partial class FormChartViewDateFilter:ODForm {
 		///<summary>Set this date before opening the form.  Also after OK, this date is available to the calling class.</summary>
 		public DateTime DateStart;
 		///<summary>Set this date before opening the form.  Also after OK, this date is available to the calling class.</summary>

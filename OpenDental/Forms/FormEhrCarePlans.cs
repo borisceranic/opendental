@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEhrCarePlans:Form {
+	public partial class FormEhrCarePlans:ODForm {
 
 		private Patient _patCur;
 		private List<EhrCarePlan> _listCarePlans;

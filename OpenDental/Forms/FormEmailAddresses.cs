@@ -10,7 +10,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEmailAddresses:Form {
+	public partial class FormEmailAddresses:ODForm {
 		public bool IsSelectionMode;
 		public long EmailAddressNum;
 		///<summary>If true, a signal for invalid Email cache will be sent out upon closing.</summary>

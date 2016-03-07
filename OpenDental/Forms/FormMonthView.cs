@@ -7,7 +7,7 @@ using System.Text;
 using System.Windows.Forms;
 
 namespace OpenDental {
-	public partial class FormMonthView:Form {
+	public partial class FormMonthView:ODForm {
 		public FormMonthView() {
 			InitializeComponent();
 			Lan.F(this);

@@ -6,7 +6,7 @@ using OpenDentBusiness;
 using System.Drawing.Drawing2D;
 
 namespace OpenDental {
-	public partial class FormEhrGrowthCharts:Form {
+	public partial class FormEhrGrowthCharts:ODForm {
 		public long PatNum;
 		private Patient pat;
 		private const float border=50f;
@@ -167,7 +167,7 @@ using System.Text;
 using System.Windows.Forms;
 
 namespace OpenDental {
-	public partial class FormGrowthCharts:Form {
+	public partial class FormGrowthCharts:ODForm {
 		private float patNum;
 		private const float border=10f;
 		private Pen thinPen=new Pen(Color.Gray,1f);

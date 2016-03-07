@@ -10,7 +10,7 @@ using OpenDental.UI;
 using CodeBase;
 
 namespace OpenDental {
-	public partial class FormWikiHistory:Form {
+	public partial class FormWikiHistory:ODForm {
 		public string PageTitleCur;
 		private List<WikiPageHist> ListWikiPageHists;
 

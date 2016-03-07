@@ -9,7 +9,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormReference:Form {
+	public partial class FormReference:ODForm {
 		private DataTable RefTable;
 		public List<CustReference> SelectedCustRefs;
 		public long GotoPatNum;

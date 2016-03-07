@@ -9,7 +9,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormAccountingAutoPayEdit : System.Windows.Forms.Form{
+	public class FormAccountingAutoPayEdit : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private ComboBox comboPayType;

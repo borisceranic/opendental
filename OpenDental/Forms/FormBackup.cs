@@ -18,7 +18,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormBackup : System.Windows.Forms.Form{
+	public class FormBackup : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private System.Windows.Forms.Label label1;
 		private OpenDental.UI.Button butRestore;

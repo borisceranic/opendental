@@ -15,7 +15,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormCreditRecurringCharges:Form {
+	public partial class FormCreditRecurringCharges:ODForm {
 		private DataTable table;
 		private PrintDocument pd;
 		private int pagesPrinted;

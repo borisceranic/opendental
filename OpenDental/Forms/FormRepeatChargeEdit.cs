@@ -10,7 +10,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormRepeatChargeEdit : Form{
+	public class FormRepeatChargeEdit :ODForm{
 		private Button butCancel;
 		private Button butOK;
 		/// <summary>

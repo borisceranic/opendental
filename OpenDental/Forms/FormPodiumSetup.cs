@@ -9,7 +9,7 @@ using System.Linq;
 using OpenDentBusiness.WebBridges;
 
 namespace OpenDental {
-	public partial class FormPodiumSetup:Form {
+	public partial class FormPodiumSetup:ODForm {
 		private Program _progCur;
 		private ProgramProperty _apiToken;
 		private ProgramProperty _compName;

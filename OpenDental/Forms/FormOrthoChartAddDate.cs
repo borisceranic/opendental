@@ -9,7 +9,7 @@ using OpenDentBusiness;
 
 namespace OpenDental {
 	///<summary>Cannot return OK without a proper date.</summary>
-	public partial class FormOrthoChartAddDate:Form {
+	public partial class FormOrthoChartAddDate:ODForm {
 		public DateTime SelectedDate;
 
 		public FormOrthoChartAddDate() {

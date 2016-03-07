@@ -10,7 +10,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormRepeatChargesUpdate : Form{
+	public class FormRepeatChargesUpdate :ODForm{
 		// ReSharper disable once InconsistentNaming
 		private UI.Button butCancel;
 		// ReSharper disable once InconsistentNaming

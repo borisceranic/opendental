@@ -12,7 +12,7 @@ using System.Drawing.Printing;
 using System.Linq;
 
 namespace OpenDental {
-	public partial class FormSupplies:Form {
+	public partial class FormSupplies:ODForm {
 		///<summary>A cached copy of supplies obtained on window load.</summary>
 		private List<Supply> _listSupplies;
 		///<summary>Used to sync at the close of the window.</summary>

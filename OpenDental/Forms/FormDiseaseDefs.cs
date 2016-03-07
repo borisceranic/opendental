@@ -10,7 +10,7 @@ using OpenDentBusiness;
 namespace OpenDental{
 	/// <summary>
 	/// </summary>
-	public class FormDiseaseDefs:System.Windows.Forms.Form {
+	public class FormDiseaseDefs:ODForm {
 		private OpenDental.UI.Button butClose;
 		private OpenDental.UI.Button butAdd;
 		private System.ComponentModel.IContainer components;

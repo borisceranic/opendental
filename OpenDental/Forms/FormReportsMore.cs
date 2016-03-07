@@ -9,7 +9,7 @@ namespace OpenDental {
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormReportsMore:System.Windows.Forms.Form {
+	public class FormReportsMore:ODForm {
 		private OpenDental.UI.Button butClose;
 		private Label label1;
 		private Label label2;

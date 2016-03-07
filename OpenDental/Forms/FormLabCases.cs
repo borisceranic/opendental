@@ -14,7 +14,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormLabCases : System.Windows.Forms.Form{
+	public class FormLabCases : ODForm {
 		private OpenDental.UI.Button butClose;
 		private System.ComponentModel.Container components = null;
 		private ODGrid gridMain;

@@ -8,7 +8,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormPractice : System.Windows.Forms.Form{
+	public class FormPractice : ODForm {
 		private System.Windows.Forms.Label label12;
 		private System.Windows.Forms.Label label10;
 		private System.Windows.Forms.TextBox textBankNumber;

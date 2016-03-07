@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormPatientPickWebForm:Form {
+	public partial class FormPatientPickWebForm:ODForm {
 		private List<Patient> listPats;
 		///<summary>If OK.  Can be zero to indicate create new patient.  A result of Cancel indicates quit importing altogether.</summary>
 		public long SelectedPatNum;

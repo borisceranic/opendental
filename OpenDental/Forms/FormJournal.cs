@@ -12,7 +12,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormJournal:System.Windows.Forms.Form {
+	public class FormJournal:ODForm {
 		private OpenDental.UI.ODToolBar ToolBarMain;
 		private OpenDental.UI.ODGrid gridMain;
 		private IContainer components;

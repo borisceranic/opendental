@@ -17,7 +17,7 @@ using System.Collections.Generic;
 namespace OpenDental.ReportingComplex
 {
 	///<summary></summary>
-	public class FormReportComplex : System.Windows.Forms.Form{
+	public class FormReportComplex : ODForm {
 		private System.ComponentModel.IContainer components;
 		private System.Drawing.Printing.PrintDocument pd2;
 		private System.Windows.Forms.PageSetupDialog setupDialog2;

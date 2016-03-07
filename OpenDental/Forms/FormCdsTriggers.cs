@@ -14,7 +14,7 @@ using System.IO;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormCdsTriggers:Form {
+	public partial class FormCdsTriggers:ODForm {
 		public List<EhrTrigger> ListEhrTriggers;
 
 		public FormCdsTriggers() {

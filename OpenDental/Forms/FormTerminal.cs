@@ -13,7 +13,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormTerminal:System.Windows.Forms.Form {
+	public class FormTerminal:ODForm {
 		private OpenDental.UI.Button butDone;
 		private Timer timer1;
 		private TextBox textWelcome;

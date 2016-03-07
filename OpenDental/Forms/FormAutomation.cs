@@ -10,7 +10,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormAutomation:System.Windows.Forms.Form {
+	public class FormAutomation:ODForm {
 		private OpenDental.UI.Button butAdd;
 		private OpenDental.UI.Button butClose;
 		/// <summary>

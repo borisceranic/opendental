@@ -10,7 +10,7 @@ using System.IO;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormCpts:Form {
+	public partial class FormCpts:ODForm {
 		public bool IsSelectionMode;
 		public Cpt SelectedCpt;
 		private List<Cpt> listCpts;

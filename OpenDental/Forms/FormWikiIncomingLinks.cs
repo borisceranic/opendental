@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormWikiIncomingLinks:Form {
+	public partial class FormWikiIncomingLinks:ODForm {
 		public string PageTitleCur;
 		public WikiPage JumpToPage;
 		private List<WikiPage> ListWikiPages;

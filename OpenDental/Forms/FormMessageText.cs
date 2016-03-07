@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormMessageText : System.Windows.Forms.Form{
+	public class FormMessageText : ODForm {
 		private OpenDental.UI.Button butOK;
 		private System.Windows.Forms.Timer timer2;
 		///<summary></summary>

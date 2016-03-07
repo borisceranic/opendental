@@ -7,7 +7,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEhrPatientSmoking:Form {
+	public partial class FormEhrPatientSmoking:ODForm {
 		public Patient PatCur;
 		///<summary>A copy of the original patient object, as it was when this form was first opened.</summary>
 		private Patient _patOld;

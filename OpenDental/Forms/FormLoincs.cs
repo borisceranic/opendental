@@ -11,7 +11,7 @@ using OpenDental.UI;
 using OpenDental;
 
 namespace OpenDental {
-	public partial class FormLoincs:Form {
+	public partial class FormLoincs:ODForm {
 		public bool IsSelectionMode;
 		public Loinc SelectedLoinc;
 		private List<Loinc> listLoincSearch;

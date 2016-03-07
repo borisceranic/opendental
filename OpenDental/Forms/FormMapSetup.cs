@@ -6,7 +6,7 @@ using System.Drawing;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormMapSetup:Form {
+	public partial class FormMapSetup:ODForm {
 
 		#region Init
 		

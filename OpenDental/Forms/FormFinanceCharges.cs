@@ -7,7 +7,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormFinanceCharges : System.Windows.Forms.Form{
+	public class FormFinanceCharges : ODForm {
 		private OpenDental.ValidDate textDate;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.GroupBox groupBox1;

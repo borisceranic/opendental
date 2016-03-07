@@ -12,7 +12,7 @@ using System.Text;
 
 namespace OpenDental{
 	/// <summary></summary>
-	public class FormRegistrationKeyEdit : System.Windows.Forms.Form{
+	public class FormRegistrationKeyEdit : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private TextBox textKey;

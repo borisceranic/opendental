@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormAllergySetup:Form {
+	public partial class FormAllergySetup:ODForm {
 		private List<AllergyDef> listAllergyDefs;
 		public bool IsSelectionMode;
 		public long SelectedAllergyDefNum;

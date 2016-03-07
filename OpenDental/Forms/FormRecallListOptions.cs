@@ -7,7 +7,7 @@ using System.Text;
 using System.Windows.Forms;
 
 namespace OpenDental {
-	public partial class FormRecallListOptions:Form {
+	public partial class FormRecallListOptions:ODForm {
 		public FormRecallListOptions() {
 			InitializeComponent();
 			Lan.F(this);

@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace OpenDental{
 	/// <summary></summary>
-	public class FormLicense : System.Windows.Forms.Form{
+	public class FormLicense : ODForm {
 		private OpenDental.UI.Button butClose;
 		private RichTextBox richTextAgreement;
 		private RichTextBox textGPL;

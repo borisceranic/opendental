@@ -15,7 +15,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormRpCapitation : System.Windows.Forms.Form{
+	public class FormRpCapitation : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private ValidDate textDateStart;

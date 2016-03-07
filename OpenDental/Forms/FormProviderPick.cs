@@ -10,7 +10,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary>Pick a provider from the list.</summary>
-	public class FormProviderPick:System.Windows.Forms.Form {
+	public class FormProviderPick:ODForm {
 		private OpenDental.UI.Button butClose;
 		private IContainer components;
 		private OpenDental.UI.ODGrid gridMain;

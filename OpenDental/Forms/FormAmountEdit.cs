@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormAmountEdit:Form {
+	public partial class FormAmountEdit:ODForm {
 		public decimal Amount;
 		private string _text;
 

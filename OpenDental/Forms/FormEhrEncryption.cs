@@ -13,7 +13,7 @@ using OpenDentBusiness;
 using System.Net;
 
 namespace OpenDental {
-	public partial class FormEhrEncryption:Form {
+	public partial class FormEhrEncryption:ODForm {
 		private byte[] key;
 
 		public FormEhrEncryption() {

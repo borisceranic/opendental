@@ -8,7 +8,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	///<summary></summary>
-	public class FormEmployeeEdit : System.Windows.Forms.Form{
+	public class FormEmployeeEdit : ODForm {
 		private System.Windows.Forms.TextBox textLName;
 		private System.Windows.Forms.TextBox textFName;
 		private System.Windows.Forms.TextBox textMI;

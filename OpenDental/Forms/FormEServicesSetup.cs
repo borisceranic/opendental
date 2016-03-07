@@ -23,7 +23,7 @@ using OpenDentBusiness.WebServiceMainHQ;
 
 namespace OpenDental {
 	///<summary>Form manages all eServices setup.  Also includes monitoring for the Listener Service that is required for HQ hosted eServices.</summary>
-	public partial class FormEServicesSetup:Form {
+	public partial class FormEServicesSetup:ODForm {
 		private static MobileWeb.Mobile mb=new MobileWeb.Mobile();
 		private static int _batchSize=100;
 		///<summary>All statements of a patient are not uploaded. The limit is defined by the recent [statementLimitPerPatient] records</summary>

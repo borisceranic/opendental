@@ -10,7 +10,7 @@ using CodeBase;
 using System.Linq;
 
 namespace OpenDental {
-	public partial class FormJobPermissions:Form {
+	public partial class FormJobPermissions:ODForm {
 		private long _userNum;
 		private List<JobPermission> _jobPermissions;
 

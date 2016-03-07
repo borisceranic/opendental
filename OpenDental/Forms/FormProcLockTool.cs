@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormProcLockTool:Form {
+	public partial class FormProcLockTool:ODForm {
 		public FormProcLockTool() {
 			InitializeComponent();
 			Lan.F(this);

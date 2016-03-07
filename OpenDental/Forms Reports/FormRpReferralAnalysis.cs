@@ -9,7 +9,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormRpReferralAnalysis:System.Windows.Forms.Form {
+	public class FormRpReferralAnalysis:ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private System.ComponentModel.Container components = null;

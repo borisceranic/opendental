@@ -7,7 +7,7 @@ using System.Text;
 using System.Windows.Forms;
 
 namespace OpenDental {
-	public partial class FormAutoNotePromptPreview:Form {
+	public partial class FormAutoNotePromptPreview:ODForm {
 		public string ResultText;
 
 		public FormAutoNotePromptPreview() {

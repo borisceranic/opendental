@@ -12,7 +12,7 @@ using System.IO;
 using System.Xml;
 
 namespace OpenDental {
-	public partial class FormWikiListHistory:Form {
+	public partial class FormWikiListHistory:ODForm {
 		///<summary>Set from outside this form to load all appropriate data into the form during Form_Load().</summary>
 		public string ListNameCur;
 		public bool IsReverted;

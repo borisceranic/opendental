@@ -10,7 +10,7 @@ namespace OpenDental
 	/// <summary>
 	/// Summary description for FormRpApptWithPhones.
 	/// </summary>
-	public class FormRpAppointments : System.Windows.Forms.Form {
+	public class FormRpAppointments : ODForm {
 		private System.Windows.Forms.ListBox listProvs;
 		private System.Windows.Forms.Label label1;
 		private OpenDental.UI.Button butCancel;

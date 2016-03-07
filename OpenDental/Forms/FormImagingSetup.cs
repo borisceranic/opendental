@@ -8,7 +8,7 @@ using OpenDental.UI;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormImagingSetup:System.Windows.Forms.Form {
+	public class FormImagingSetup:ODForm {
 		private OpenDental.UI.Button butOK;
 		private OpenDental.UI.Button butCancel;
 		private System.Windows.Forms.Label label12;

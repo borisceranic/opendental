@@ -10,7 +10,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormUserGroups : System.Windows.Forms.Form{
+	public class FormUserGroups : ODForm {
 		private OpenDental.UI.Button butClose;
 		private ListBox listGroups;
 		private OpenDental.UI.Button butAddGroup;

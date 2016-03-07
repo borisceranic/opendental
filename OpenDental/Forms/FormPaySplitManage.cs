@@ -8,7 +8,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormPaySplitManage:Form {
+	public partial class FormPaySplitManage:ODForm {
 		///<summary>List of current paysplits for this payment.</summary>
 		public List<PaySplit> ListSplitsCur;
 		///<summary>List of current account charges for the family.  Gets filled from AutoSplitForPayment</summary>

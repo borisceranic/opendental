@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormAutoNoteBuild : Form {
+	public partial class FormAutoNoteBuild :ODForm {
 		///<summary>The current AutoNoteControl that is being edited, whether new or not.</summary>
 		public AutoNoteControl ControlCur;
 		public AutoNote AutoNoteCur;

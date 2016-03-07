@@ -13,7 +13,7 @@ using System.Collections;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormRpOutstandingIns:Form {
+	public partial class FormRpOutstandingIns:ODForm {
 		private ODGrid gridMain;
 		private CheckBox checkPreauth;
 		private Label labelProv;

@@ -7,7 +7,7 @@ using OpenDentBusiness;
 using CodeBase;
 
 namespace OpenDental {
-	public partial class FormEtrans834Import:Form {
+	public partial class FormEtrans834Import:ODForm {
 
 		private ODThread _odThread=null;
 		private delegate void Update834Delegate();

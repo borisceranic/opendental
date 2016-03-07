@@ -9,7 +9,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	/// <summary></summary>
-	public class FormDisplayFieldCategories:System.Windows.Forms.Form {
+	public class FormDisplayFieldCategories:ODForm {
 		private Label label1;
 		/// <summary>
 		/// Required designer variable.

@@ -21,7 +21,7 @@ using OpenDentBusiness;
 namespace OpenDental {
 
 	///<summary></summary>
-	public class FormRpReceivablesBreakdown:System.Windows.Forms.Form {
+	public class FormRpReceivablesBreakdown:ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private System.ComponentModel.Container components = null;

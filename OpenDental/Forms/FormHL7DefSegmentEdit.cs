@@ -11,7 +11,7 @@ using OpenDental.UI;
 
 namespace OpenDental {
 	/// <summary></summary>
-	public partial class FormHL7DefSegmentEdit:System.Windows.Forms.Form {
+	public partial class FormHL7DefSegmentEdit:ODForm {
 		public HL7DefSegment HL7DefSegCur;
 		public bool IsHL7DefInternal;
 		public HL7InternalType InternalType;

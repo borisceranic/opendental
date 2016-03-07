@@ -8,7 +8,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormPasswordReset : System.Windows.Forms.Form{
+	public class FormPasswordReset : ODForm {
 		private OpenDental.UI.Button butOK;
 		private System.Windows.Forms.Label label1;
 		private System.ComponentModel.Container components = null;

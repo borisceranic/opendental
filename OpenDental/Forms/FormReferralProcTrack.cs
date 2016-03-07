@@ -10,7 +10,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormReferralProcTrack:Form {
+	public partial class FormReferralProcTrack:ODForm {
 		DataTable Table;
 		List<RefAttach> RefAttachList;
 		DateTime DateFrom;

@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormBlockoutDuplicatesFix:Form {
+	public partial class FormBlockoutDuplicatesFix:ODForm {
 		public FormBlockoutDuplicatesFix() {
 			InitializeComponent();
 			Lan.F(this);

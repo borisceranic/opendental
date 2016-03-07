@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormReminderRuleEdit:Form {
+	public partial class FormReminderRuleEdit:ODForm {
 		public ReminderRule RuleCur = new ReminderRule();
 		//both the RuleCur.ReminderCriterion and RuleCur.CriterionFK will be altered below in response to user actions.
 		public bool IsNew;

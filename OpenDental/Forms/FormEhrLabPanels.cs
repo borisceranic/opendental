@@ -11,7 +11,7 @@ using OpenDental.UI;
 using CodeBase;
 
 namespace OpenDental {
-	public partial class FormEhrLabPanels:Form {
+	public partial class FormEhrLabPanels:ODForm {
 		private List<LabPanel> listLP;
 		public Patient PatCur;
 		public bool IsSelectionMode;

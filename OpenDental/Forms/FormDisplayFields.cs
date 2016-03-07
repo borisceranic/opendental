@@ -7,7 +7,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	/// <summary></summary>
-	public class FormDisplayFields : System.Windows.Forms.Form{
+	public class FormDisplayFields : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.ODGrid gridMain;
 		/// <summary>

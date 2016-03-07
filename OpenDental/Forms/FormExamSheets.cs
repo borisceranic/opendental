@@ -10,7 +10,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormExamSheets:Form {
+	public partial class FormExamSheets:ODForm {
 		//DataTable table;
 		private List<Sheet> sheetList;
 		public long PatNum;

@@ -13,7 +13,7 @@ using CodeBase;
 using System.Text.RegularExpressions;
 
 namespace OpenDental {
-	public partial class FormWikiTableHeaders:Form {
+	public partial class FormWikiTableHeaders:ODForm {
 		public List<string> ColNames;
 		///<summary>Widths must always be specified.  Not optional.</summary>
 		public List<int> ColWidths;

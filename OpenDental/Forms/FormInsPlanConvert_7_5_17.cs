@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormInsPlanConvert_7_5_17:Form {
+	public partial class FormInsPlanConvert_7_5_17:ODForm {
 		public YN InsPlanConverstion_7_5_17_AutoMergeYN;
 
 		public FormInsPlanConvert_7_5_17() {

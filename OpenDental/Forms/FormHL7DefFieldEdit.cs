@@ -10,7 +10,7 @@ using OpenDentBusiness;
 
 namespace OpenDental {
 	/// <summary></summary>
-	public partial class FormHL7DefFieldEdit:Form {
+	public partial class FormHL7DefFieldEdit:ODForm {
 		public HL7DefField HL7DefFieldCur;
 		private List<FieldNameAndType> FieldNameList;
 		public bool IsHL7DefInternal;

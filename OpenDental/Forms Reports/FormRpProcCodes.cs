@@ -10,7 +10,7 @@ using OpenDental.ReportingComplex;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormRpProcCodes : System.Windows.Forms.Form{
+	public class FormRpProcCodes : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private System.Windows.Forms.ListBox listBoxFeeSched;

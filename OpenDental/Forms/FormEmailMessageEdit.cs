@@ -6,7 +6,7 @@ using CodeBase;
 using OpenDentBusiness;
 
 namespace OpenDental{
-	public class FormEmailMessageEdit : System.Windows.Forms.Form {
+	public class FormEmailMessageEdit : ODForm {
 		private OpenDental.UI.Button butCancel;
 		/// <summary>Required designer variable.</summary>
 		private System.ComponentModel.Container components = null;

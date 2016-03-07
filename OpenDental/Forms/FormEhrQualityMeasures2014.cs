@@ -17,7 +17,7 @@ using EHR;
 #endif
 
 namespace OpenDental {
-	public partial class FormEhrQualityMeasures2014:Form {
+	public partial class FormEhrQualityMeasures2014:ODForm {
 		private List<QualityMeasure> listQ;
 		private List<Provider> listProvsKeyed;
 		private long _provNum;

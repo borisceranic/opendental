@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormProcEditExplain:Form {
+	public partial class FormProcEditExplain:ODForm {
 		public static string Changes;
 		public static string Explanation;
 		public bool dpcChange;

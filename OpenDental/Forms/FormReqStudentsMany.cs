@@ -11,7 +11,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormReqStudentsMany : System.Windows.Forms.Form{
+	public class FormReqStudentsMany : ODForm {
 		private OpenDental.UI.Button butClose;
 		private OpenDental.UI.ODGrid gridMain;
 		/// <summary>

@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormTaskNoteEdit:Form {
+	public partial class FormTaskNoteEdit:ODForm {
 		public TaskNote TaskNoteCur;
 		///<summary>Only called when DialogResult is OK (for OK button and sometimes delete button).</summary>
 		public delegate void DelegateEditComplete(object sender);

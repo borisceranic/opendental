@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEhrPatientConfidentialPrefEdit:Form {
+	public partial class FormEhrPatientConfidentialPrefEdit:ODForm {
 		public Patient PatCur;
 		///<summary>A copy of the original patient object, as it was when this form was first opened.</summary>
 		private Patient PatOld;

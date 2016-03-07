@@ -8,7 +8,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	///<summary></summary>
-	public class FormAutoCodeEdit : System.Windows.Forms.Form{
+	public class FormAutoCodeEdit : ODForm {
 		private System.ComponentModel.Container components = null;
 		private System.Windows.Forms.CheckBox checkHidden;
 		private OpenDental.UI.Button butCancel;

@@ -11,7 +11,7 @@ using OpenDental.UI;
 using CodeBase;
 
 namespace OpenDental {
-	public partial class FormEtrans270Edit:Form {
+	public partial class FormEtrans270Edit:ODForm {
 		public Etrans EtransCur;
 		private Etrans EtransAck271;
 		private string MessageText;

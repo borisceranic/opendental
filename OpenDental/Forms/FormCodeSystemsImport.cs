@@ -12,7 +12,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormCodeSystemsImport:Form {
+	public partial class FormCodeSystemsImport:ODForm {
 		///<summary>All code systems available.</summary>
 		private List<CodeSystem> _listCodeSystems;
 		///<summary>If true then SNOMED CT codes will show in the list of available code systems for download.</summary>

@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEhrPatListElementEdit:Form {
+	public partial class FormEhrPatListElementEdit:ODForm {
 		public EhrPatListElement Element;
 		public bool IsNew; 
 		public bool Delete;

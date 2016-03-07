@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormProcButtons : System.Windows.Forms.Form{
+	public class FormProcButtons : ODForm {
 		private OpenDental.UI.Button butClose;
 		private OpenDental.UI.Button butAdd;
 		private OpenDental.UI.Button butDelete;

@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace OpenDental{
 	///<summary></summary>
-	public class FormAbout : System.Windows.Forms.Form{
+	public class FormAbout : ODForm{
 		private System.Windows.Forms.Label labelVersion;
 		private OpenDental.UI.Button butClose;
 		private System.Windows.Forms.Label label1;

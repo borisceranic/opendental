@@ -8,7 +8,7 @@ using OpenDentBusiness;
 using System.Text.RegularExpressions;
 
 namespace OpenDental {
-	public partial class FormEtrans835ClaimSelect:Form {
+	public partial class FormEtrans835ClaimSelect:ODForm {
 
 		///<summary>The selected patient.  Used to get list of claims to fill grid.</summary>
 		private long _patNum;

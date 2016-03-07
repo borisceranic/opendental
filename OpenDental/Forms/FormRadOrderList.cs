@@ -12,7 +12,7 @@ using System.Collections;
 namespace OpenDental {
 	///<summary>This form was originally designed to show providers all radiology procedures that are not flagged as CPOE.
 	///It is named generically because it can be enhanced in the future to actually show more than just radiology orders that need action.</summary>
-	public partial class FormRadOrderList:Form {
+	public partial class FormRadOrderList:ODForm {
 		private Userod _user;
 		private List<Procedure> _listNonCpoeProcs=new List<Procedure>();
 		private List<ProcedureCode> _listProcCodes=new List<ProcedureCode>();

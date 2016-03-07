@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace OpenDental{
 	///<summary></summary>
-	public class FormRpAging : System.Windows.Forms.Form{
+	public class FormRpAging : ODForm {
 		private System.ComponentModel.Container components = null;
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;

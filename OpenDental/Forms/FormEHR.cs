@@ -12,7 +12,7 @@ using EHR;
 #endif
 
 namespace OpenDental {
-	public partial class FormEHR:Form {
+	public partial class FormEHR:ODForm {
 		public long PatNum;
 		private Patient PatCur;
 		public PatientNote PatNotCur;

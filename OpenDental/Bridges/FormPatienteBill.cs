@@ -19,7 +19,7 @@ using System.Web;
 using System.Net;
 
 namespace OpenDental {
-	public partial class FormPatienteBill:Form {
+	public partial class FormPatienteBill:ODForm {
 		ArrayList PatientList = new ArrayList();
 		XmlDocument Doc = new XmlDocument();
 		string AuthenticationID = string.Empty;

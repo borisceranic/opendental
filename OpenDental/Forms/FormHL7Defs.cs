@@ -6,7 +6,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	/// <summary></summary>
-	public class FormHL7Defs:System.Windows.Forms.Form {
+	public class FormHL7Defs:ODForm {
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>

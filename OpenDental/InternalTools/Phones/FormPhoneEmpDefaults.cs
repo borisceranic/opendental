@@ -11,7 +11,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormPhoneEmpDefaults:System.Windows.Forms.Form {
+	public class FormPhoneEmpDefaults:ODForm {
 		private OpenDental.UI.ODGrid gridMain;
 		private IContainer components;
 		private OpenDental.UI.Button butClose;

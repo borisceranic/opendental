@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormProvEdit : System.Windows.Forms.Form{
+	public class FormProvEdit : ODForm {
 		private System.Windows.Forms.Label labelColor;
 		private System.Windows.Forms.Button butColor;
 		private System.Windows.Forms.Label label1;

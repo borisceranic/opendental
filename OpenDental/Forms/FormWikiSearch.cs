@@ -12,7 +12,7 @@ namespace OpenDental {
 	///<summary></summary>
 	public delegate void NavToPageDeligate(string pageTitle);
 
-	public partial class FormWikiSearch:Form {
+	public partial class FormWikiSearch:ODForm {
 		private List<string> listWikiPageTitles;
 		public string wikiPageTitleSelected;
 		public NavToPageDeligate NavToPage;

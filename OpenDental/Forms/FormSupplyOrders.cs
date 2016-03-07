@@ -10,7 +10,7 @@ using OpenDental.UI;
 using System.Drawing.Printing;
 
 namespace OpenDental {
-	public partial class FormSupplyOrders:Form {
+	public partial class FormSupplyOrders:ODForm {
 		private List<Supplier> _listSuppliers;
 		private List<SupplyOrder> _listOrdersAll;
 		private List<SupplyOrder> _listOrders;

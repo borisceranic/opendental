@@ -9,7 +9,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormClearinghouses:System.Windows.Forms.Form {
+	public class FormClearinghouses:ODForm {
 		private OpenDental.UI.Button butClose;
 		/// <summary>
 		/// Required designer variable.

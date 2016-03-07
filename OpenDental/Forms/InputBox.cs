@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace OpenDental{
 	/// <summary>A quick entry form for various purposes.  Pull the result from textResult.Text.</summary>
-	public class InputBox : System.Windows.Forms.Form{
+	public class InputBox : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		///<summary></summary>

@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormPhoneGraphDateEdit:Form {
+	public partial class FormPhoneGraphDateEdit:ODForm {
 		public DateTime DateEdit;
 		private List<PhoneGraph> ListPhoneGraphsForDate;
 		private List<PhoneEmpDefault> ListPhoneEmpDefaults;

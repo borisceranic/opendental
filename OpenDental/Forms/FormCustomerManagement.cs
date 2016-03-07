@@ -9,7 +9,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	/// <summary></summary>
-	public class FormCustomerManagement : System.Windows.Forms.Form{
+	public class FormCustomerManagement : ODForm {
 		private OpenDental.UI.Button butClose;
 		private OpenDental.UI.ODGrid gridMain;
 		private ContextMenu contextMain;

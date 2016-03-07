@@ -9,7 +9,7 @@ using OpenDental.UI;
 
 namespace OpenDental{
 	/// <summary></summary>
-	public class FormScreenGroups:System.Windows.Forms.Form {
+	public class FormScreenGroups:ODForm {
 		private System.Windows.Forms.TextBox textDateFrom;
 		private System.Windows.Forms.Label label2;
 		private OpenDental.UI.Button butRefresh;

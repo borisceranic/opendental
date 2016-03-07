@@ -9,7 +9,7 @@ using OpenDentBusiness;
 
 namespace OpenDental {
 	///<summary></summary>
-	public class FormReferralSelect:System.Windows.Forms.Form {
+	public class FormReferralSelect:ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private System.Windows.Forms.CheckBox checkHidden;

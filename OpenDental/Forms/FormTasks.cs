@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace OpenDental{
 	/// <summary></summary>
-	public class FormTasks:System.Windows.Forms.Form, ISignalProcessor {
+	public class FormTasks:ODForm, ISignalProcessor {
 		//private System.ComponentModel.IContainer components;
 		/////<summary>After closing, if this is not zero, then it will jump to the object specified in GotoKeyNum.</summary>
 		//public TaskObjectType GotoType;

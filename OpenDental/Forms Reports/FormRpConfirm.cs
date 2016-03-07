@@ -7,7 +7,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormRpConfirm : System.Windows.Forms.Form{
+	public class FormRpConfirm : ODForm{
 		private System.Windows.Forms.Label labelPatient;
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 
 namespace OpenDental {
-	public partial class FormDefaultCCProcs:Form {
+	public partial class FormDefaultCCProcs:ODForm {
 		private string _defaultCCProcs;
 
 		public FormDefaultCCProcs() {

@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormSpellChecker:Form {
+	public partial class FormSpellChecker:ODForm {
 
 		public string TextRtf {
 			get {

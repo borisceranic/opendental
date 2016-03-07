@@ -7,7 +7,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormZipCodes : System.Windows.Forms.Form{
+	public class FormZipCodes : ODForm {
 		private OpenDental.TableZips tbZips;
 		private OpenDental.UI.Button butAdd;
 		private OpenDental.UI.Button butDelete;

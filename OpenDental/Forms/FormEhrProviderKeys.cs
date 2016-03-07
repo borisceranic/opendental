@@ -5,7 +5,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEhrProviderKeys:Form {
+	public partial class FormEhrProviderKeys:ODForm {
 		private List<EhrProvKey> _listKeys;
 
 		public FormEhrProviderKeys() {

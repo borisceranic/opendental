@@ -8,7 +8,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	/// <summary>Lets the user choose which payment plan to attach a payment to if there are more than one available.</summary>
-	public class FormPayPlanSelect : System.Windows.Forms.Form{
+	public class FormPayPlanSelect : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		/// <summary>

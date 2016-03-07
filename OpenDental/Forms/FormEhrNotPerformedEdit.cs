@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEhrNotPerformedEdit:Form {
+	public partial class FormEhrNotPerformedEdit:ODForm {
 		public EhrNotPerformed EhrNotPerfCur;
 		public int SelectedItemIndex;
 		public bool IsDateReadOnly;

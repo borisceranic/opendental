@@ -10,7 +10,7 @@ using OpenDental.UI;
 using OpenDental;
 
 namespace OpenDental {
-	public partial class FormEhrNotPerformed:Form {
+	public partial class FormEhrNotPerformed:ODForm {
 		private List<EhrNotPerformed> listNotPerf;
 		public Patient PatCur;
 

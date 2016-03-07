@@ -9,7 +9,7 @@ using OpenDental.UI;
 using System.Linq;
 
 namespace OpenDental {
-	public partial class FormProcCodeEditMore:Form {
+	public partial class FormProcCodeEditMore:ODForm {
 		private List<Fee> _listFees;
 		private ProcedureCode _procCode;
 		private List<FeeSched> _listFeeScheds;

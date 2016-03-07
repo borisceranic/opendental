@@ -5,7 +5,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormSnomeds:Form {
+	public partial class FormSnomeds:ODForm {
 		public bool IsSelectionMode;
 		public bool IsMultiSelectMode;
 		public Snomed SelectedSnomed;

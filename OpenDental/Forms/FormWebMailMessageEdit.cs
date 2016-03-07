@@ -12,7 +12,7 @@ using System.Linq;
 namespace OpenDental {
 	///<summary>DialogResult will be Abort if message was unable to be read. 
 	///If message is read successfully (Ok or Cancel), then caller is responsible for updating SentOrReceived to read (where applicable).</summary>
-	public partial class FormWebMailMessageEdit:Form {
+	public partial class FormWebMailMessageEdit:ODForm {
 		private EmailMessage _secureMessage;
 		private EmailMessage _insecureMessage;
 		private EmailAddress _emailAddressSender;

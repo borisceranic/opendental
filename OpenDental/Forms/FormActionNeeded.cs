@@ -12,7 +12,7 @@ namespace OpenDental {
 	///<summary>This window was created as part of a concept that spawned from request #4221.
 	///Nathan wants to keep this window around for future versions when we introduce more "things" that need action to be taken by users.
 	///It will serve as a window to show (one item in the grid at a time) that they can double click on to get to other sections of the program.</summary>
-	public partial class FormActionNeeded:Form {
+	public partial class FormActionNeeded:ODForm {
 		//private List<ActionObj> _listActionObjs=new List<ActionObj>();
 
 		///<summary></summary>

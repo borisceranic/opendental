@@ -13,7 +13,7 @@ using CodeBase;
 using SparksToothChart;
 
 namespace OpenDental {
-	public partial class FormPerioGraphical:Form {
+	public partial class FormPerioGraphical:ODForm {
 		public PerioExam PerioExamCur;
 		public Patient PatCur;
 		//public List<PerioMeasure> ListPerioMeasures; 

@@ -8,7 +8,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormEvaluationReport:Form {
+	public partial class FormEvaluationReport:ODForm {
 		//This window is currently unfinished. Once grading has received a final review this will be easier to complete.
 		//As of 06/24/2014 the implementation of this wil most likely be evaluation name based.
 		//Reports will be able to be run for all evaluations with identical names and they will roll up into a grade.

@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormLogoffWarning:System.Windows.Forms.Form {
+	public class FormLogoffWarning:ODForm {
 		private System.Windows.Forms.Timer timer;
 		private OpenDental.UI.Button butCancel;
 		private Label label1;

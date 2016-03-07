@@ -11,7 +11,7 @@ using CodeBase;
 
 namespace OpenDental{
 	///<summary></summary>
-	public class FormApptsOther : System.Windows.Forms.Form{
+	public class FormApptsOther : ODForm {
 		private System.Windows.Forms.CheckBox checkDone;
 		private OpenDental.UI.Button butCancel;
 		private System.ComponentModel.Container components = null;

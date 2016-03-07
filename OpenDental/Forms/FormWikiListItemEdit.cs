@@ -13,7 +13,7 @@ using CodeBase;
 using System.Text.RegularExpressions;
 
 namespace OpenDental {
-	public partial class FormWikiListItemEdit:Form {
+	public partial class FormWikiListItemEdit:ODForm {
 		///<summary>Name of the wiki list.</summary>
 		public string WikiListCurName;
 		public long ItemNum;

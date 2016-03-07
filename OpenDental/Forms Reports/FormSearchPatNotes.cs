@@ -9,7 +9,7 @@ namespace OpenDental
 	/// <summary>
 	/// Summary description for FormSearchPatNotes.
 	/// </summary>
-	public class FormSearchPatNotes : System.Windows.Forms.Form
+	public class FormSearchPatNotes : ODForm
 	{
 		private System.Windows.Forms.Label lblSearchPharse;
 		private System.Windows.Forms.TextBox textPharse;

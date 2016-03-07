@@ -13,7 +13,7 @@ using System.Linq;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormSheetFillEdit:Form {
+	public partial class FormSheetFillEdit:ODForm {
 		///<summary>Will be null if deleted.</summary>
 		public Sheet SheetCur;
 		private bool mouseIsDown;

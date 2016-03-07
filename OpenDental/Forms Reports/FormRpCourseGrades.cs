@@ -14,7 +14,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormRpCourseGrades : System.Windows.Forms.Form{
+	public class FormRpCourseGrades : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private System.Windows.Forms.ComboBox comboSchoolCourse;

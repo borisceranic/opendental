@@ -12,7 +12,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormAccountPick:System.Windows.Forms.Form {
+	public class FormAccountPick:ODForm {
 		private OpenDental.UI.ODGrid gridMain;
 		private IContainer components;
 		private CheckBox checkInactive;

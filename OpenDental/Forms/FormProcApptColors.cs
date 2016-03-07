@@ -10,7 +10,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormProcApptColors:System.Windows.Forms.Form {
+	public class FormProcApptColors:ODForm {
 		private OpenDental.UI.Button butAdd;
 		private OpenDental.UI.Button butClose;
 		/// <summary>

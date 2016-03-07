@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormProcButtonQuickEdit:Form {
+	public partial class FormProcButtonQuickEdit:ODForm {
 		public ProcButtonQuick pbqCur;
 		public bool IsNew;
 

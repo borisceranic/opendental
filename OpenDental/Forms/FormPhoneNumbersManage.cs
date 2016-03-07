@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormPhoneNumbersManage:Form {
+	public partial class FormPhoneNumbersManage:ODForm {
 		public long PatNum;
 		private Patient Pat;
 		private List<PhoneNumber> otherList;

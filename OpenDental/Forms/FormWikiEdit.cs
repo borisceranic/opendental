@@ -13,7 +13,7 @@ using System.Xml;
 using System.Text.RegularExpressions;
 
 namespace OpenDental {
-	public partial class FormWikiEdit:Form {
+	public partial class FormWikiEdit:ODForm {
 		public WikiPage WikiPageCur;
 		///<summary>Need a reference to the form where this was launched from so that we can tell it to refresh later.</summary>
 		public FormWiki OwnerForm;

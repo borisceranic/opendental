@@ -10,7 +10,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEhrEduBrowser:Form {
+	public partial class FormEhrEduBrowser:ODForm {
 		public string ResourceURL;
 		public bool DidPrint;
 

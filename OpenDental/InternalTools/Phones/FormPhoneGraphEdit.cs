@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormPhoneGraphEdit:Form {
+	public partial class FormPhoneGraphEdit:ODForm {
 		private long EmployeeNum;
 		public PhoneGraph PhoneGraphCur;
 

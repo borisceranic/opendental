@@ -7,7 +7,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormComputers : System.Windows.Forms.Form{
+	public class FormComputers : ODForm {
 		private System.ComponentModel.Container components = null;
 		private OpenDental.UI.Button butClose;
 		private System.Windows.Forms.Label label1;

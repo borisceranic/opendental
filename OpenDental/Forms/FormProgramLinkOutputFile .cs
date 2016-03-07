@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormProgramLinkOutputFile:Form {
+	public partial class FormProgramLinkOutputFile:ODForm {
 
 		private Program _curProg;
 

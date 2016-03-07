@@ -10,7 +10,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormBlockoutCutCopyPaste:System.Windows.Forms.Form {
+	public class FormBlockoutCutCopyPaste:ODForm {
 		private GroupBox groupBox1;
 		private OpenDental.UI.Button butCopyWeek;
 		private OpenDental.UI.Button butCopyDay;

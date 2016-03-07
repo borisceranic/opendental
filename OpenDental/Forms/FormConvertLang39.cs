@@ -9,7 +9,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormConvertLang39 : System.Windows.Forms.Form{
+	public class FormConvertLang39 : ODForm {
 		private OpenDental.UI.Button butOK;
 		private System.Windows.Forms.TextBox textOldCode;
 		private System.Windows.Forms.Label label2;

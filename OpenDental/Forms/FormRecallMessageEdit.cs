@@ -3,7 +3,7 @@ using System;
 using System.Windows.Forms;
 
 namespace OpenDental {
-	public partial class FormRecallMessageEdit:Form {
+	public partial class FormRecallMessageEdit:ODForm {
 		public string MessageVal;
 		private PrefName _prefName;
 

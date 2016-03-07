@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormShutdown:Form {
+	public partial class FormShutdown:ODForm {
 		///<summary>Set to true if part of the update process.  Makes it behave more discretely to avoid worrying people.</summary>
 		public bool IsUpdate;
 

@@ -8,7 +8,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormEvaluations:Form {
+	public partial class FormEvaluations:ODForm {
 		private Provider _userProv;
 		private List<Provider> _listInstructor;
 

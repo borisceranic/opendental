@@ -11,7 +11,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormRequestEdit:Form {
+	public partial class FormRequestEdit:ODForm {
 		public long RequestId;
 		public bool IsAdminMode;
 		//private Request ReqCur;

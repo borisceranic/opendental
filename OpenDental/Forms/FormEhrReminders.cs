@@ -10,7 +10,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormEhrReminders:Form {
+	public partial class FormEhrReminders:ODForm {
 		public Patient PatCur;
 		public List<ReminderRule> listReminders;
 		public List<EhrMeasureEvent> reminderSentList;

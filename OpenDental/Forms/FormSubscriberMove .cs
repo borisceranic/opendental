@@ -11,7 +11,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormSubscriberMove:Form {
+	public partial class FormSubscriberMove:ODForm {
 
 		private InsPlan _intoInsPlan;
 		private InsPlan _fromInsPlan;

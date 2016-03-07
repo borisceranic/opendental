@@ -12,7 +12,7 @@ using System.Xml;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormEhrElectronicCopy:Form {
+	public partial class FormEhrElectronicCopy:ODForm {
 		public Patient PatCur;
 		private List<EhrMeasureEvent> listHistory;
 

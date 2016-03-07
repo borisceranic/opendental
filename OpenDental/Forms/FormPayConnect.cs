@@ -12,7 +12,7 @@ using MigraDoc.DocumentObjectModel;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormPayConnect:Form {
+	public partial class FormPayConnect:ODForm {
 		private Payment _paymentCur;
 		private Patient _patCur;
 		private string _amountInit;

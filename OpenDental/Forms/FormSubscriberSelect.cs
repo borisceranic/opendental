@@ -7,7 +7,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	/// <summary>Only used when adding an insurance plan from ContrFamily.  Lets user select the subscriber from </summary>
-	public class FormSubscriberSelect : System.Windows.Forms.Form{
+	public class FormSubscriberSelect : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private System.Windows.Forms.ListBox listPats;

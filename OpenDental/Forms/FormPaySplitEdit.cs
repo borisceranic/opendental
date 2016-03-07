@@ -11,7 +11,7 @@ namespace OpenDental
 	/// <summary>
 	/// Summary description for FormPaySplitEdit.
 	/// </summary>
-	public class FormPaySplitEdit : System.Windows.Forms.Form
+	public class FormPaySplitEdit : ODForm
 	{
 		private OpenDental.UI.Button ButCancel;
 		private OpenDental.UI.Button butOK;

@@ -7,7 +7,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	///<summary></summary>
-	public class FormAutoCode : System.Windows.Forms.Form{
+	public class FormAutoCode : ODForm {
 		private System.Windows.Forms.ListBox listAutoCodes;
 		private OpenDental.UI.Button butClose;
 		private OpenDental.UI.Button butAdd;

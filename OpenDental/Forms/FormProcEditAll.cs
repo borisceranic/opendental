@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormProcEditAll:Form {
+	public partial class FormProcEditAll:ODForm {
 		public List<Procedure> ProcList;
 		private List<Procedure> ProcOldList;
 		//private bool StartedAttachedToClaim;

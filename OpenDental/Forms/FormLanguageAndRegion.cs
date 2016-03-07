@@ -6,7 +6,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormLanguageAndRegion:Form {
+	public partial class FormLanguageAndRegion:ODForm {
 		private List<CultureInfo> _listAllCultures;
 
 		public FormLanguageAndRegion() {

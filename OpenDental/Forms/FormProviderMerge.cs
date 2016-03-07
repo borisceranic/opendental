@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormProviderMerge:Form {
+	public partial class FormProviderMerge:ODForm {
 
 		public FormProviderMerge() {
 			InitializeComponent();

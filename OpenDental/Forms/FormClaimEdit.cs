@@ -22,7 +22,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormClaimEdit : System.Windows.Forms.Form{
+	public class FormClaimEdit : ODForm {
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.Label label8;

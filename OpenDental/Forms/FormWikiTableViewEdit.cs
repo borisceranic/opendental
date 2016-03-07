@@ -9,7 +9,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormWikiTableViewEdit:Form {
+	public partial class FormWikiTableViewEdit:ODForm {
 		public WikiView WikiViewCur;
 		///<summary>Passed in.  Some will show in the listbox and some in the grid.</summary>
 		public List<string> ColsAll;

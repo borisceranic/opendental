@@ -11,7 +11,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	///<summary></summary>
-	public class FormBillingOptions : System.Windows.Forms.Form{
+	public class FormBillingOptions : ODForm {
 		private System.ComponentModel.Container components = null;
 		private OpenDental.UI.Button butCancel;
 		//private FormQuery FormQuery2;

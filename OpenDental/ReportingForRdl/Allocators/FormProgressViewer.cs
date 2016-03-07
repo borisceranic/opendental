@@ -47,7 +47,7 @@ namespace OpenDental.Reporting.Allocators.MyAllocator1
 	///		CONTINOUS_PROGRESS	The progress bar will just cycle while work is done.  Does not affect messages.
 	/// Author:	Daniel W. Krueger
 	/// </summary>
-	public partial class FormProgressViewer : Form
+	public partial class FormProgressViewer :ODForm
 	{
 		private  BackgroundWorker bw = new BackgroundWorker();
 		private DoWorkEventHandler _AsyncMethod = null; //void bw_DoWork(object sender, DoWorkEventArgs e)

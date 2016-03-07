@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 using CodeBase;
 
 namespace OpenDental {
-	public partial class FormRpArizonaPrimaryCareEligibility:Form {
+	public partial class FormRpArizonaPrimaryCareEligibility:ODForm {
 
 		public FormRpArizonaPrimaryCareEligibility() {
 			InitializeComponent();

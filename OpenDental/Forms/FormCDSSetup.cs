@@ -15,7 +15,7 @@ using Ionic.Zip;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormCDSSetup:Form {
+	public partial class FormCDSSetup:ODForm {
 		private List<CDSPermission> _listCdsPermissions;
 		private List<CDSPermission> _listCdsPermissionsOld;
 

@@ -75,6 +75,10 @@ namespace CodeBase {
 			return Name;
 		}
 
+		public void SetApartmentState(ApartmentState aptState) {
+			_thread.SetApartmentState(aptState);
+		}
+
 		///<summary>Start all threads for a given group. If thread has already been started then take no action on that thread.</summary>
 		public static void StartThreadsByGroupName(string groupName) {
 			List<ODThread> listOdThreadsForGroup=GetThreadsByGroupName(groupName);

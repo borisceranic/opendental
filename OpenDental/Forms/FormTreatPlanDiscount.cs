@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormTreatmentPlanDiscount:Form {
+	public partial class FormTreatmentPlanDiscount:ODForm {
 		private List<Procedure> _oldListProcs;
 		private List<Procedure> _listProcs;
 

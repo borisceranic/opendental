@@ -10,7 +10,7 @@ using CodeBase;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormJobManager2:Form, ISignalProcessor {
+	public partial class FormJobManager2:ODForm, ISignalProcessor {
 		///<summary>All jobs</summary>
 		private List<Job> _listJobsAll=new List<Job>();
 		///<summary>Jobs to be displayed in tree.</summary>

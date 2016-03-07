@@ -10,7 +10,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormReplicationSetup:Form {
+	public partial class FormReplicationSetup:ODForm {
 		private bool changed;
 
 		public FormReplicationSetup() {

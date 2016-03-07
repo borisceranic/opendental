@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormScheduleDayEdit:System.Windows.Forms.Form {
+	public class FormScheduleDayEdit:ODForm {
 		private OpenDental.UI.Button butAddTime;
 		private OpenDental.UI.Button butCloseOffice;
 		private OpenDental.UI.Button butCancel;

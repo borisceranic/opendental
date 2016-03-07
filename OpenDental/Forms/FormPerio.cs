@@ -14,7 +14,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormPerio : System.Windows.Forms.Form{
+	public class FormPerio : ODForm {
 		private OpenDental.UI.Button but7;
 		private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.RadioButton radioLeft;

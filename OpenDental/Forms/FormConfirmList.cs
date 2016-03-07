@@ -17,7 +17,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormConfirmList : System.Windows.Forms.Form{
+	public class FormConfirmList : ODForm {
 		private OpenDental.UI.Button butClose;
 		private OpenDental.UI.Button butRefresh;
 		private System.Windows.Forms.GroupBox groupBox1;

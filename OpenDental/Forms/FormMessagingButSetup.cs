@@ -9,7 +9,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormMessagingButSetup : System.Windows.Forms.Form{
+	public class FormMessagingButSetup : ODForm {
 		private OpenDental.UI.Button butCancel;
 		/// <summary>
 		/// Required designer variable.

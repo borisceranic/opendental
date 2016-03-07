@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormVitalsigns:Form {
+	public partial class FormVitalsigns:ODForm {
 		private List<Vitalsign> listVs;
 		public long PatNum;
 

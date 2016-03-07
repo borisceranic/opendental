@@ -6,7 +6,7 @@ using OpenDentBusiness.HL7;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormMedLabPatSelect:Form {
+	public partial class FormMedLabPatSelect:ODForm {
 		public List<MedLab> ListMedLabs;
 		public Patient PatCur;
 

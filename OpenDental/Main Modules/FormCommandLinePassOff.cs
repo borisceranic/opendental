@@ -10,7 +10,7 @@ using System.Xml.Serialization;
 using System.Windows.Forms;
 
 namespace OpenDental {
-	public partial class FormCommandLinePassOff:Form {
+	public partial class FormCommandLinePassOff:ODForm {
 		public string[] CommandLineArgs;
 
 		public FormCommandLinePassOff() {

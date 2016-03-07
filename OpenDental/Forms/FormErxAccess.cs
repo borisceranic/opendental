@@ -8,7 +8,7 @@ using OpenDentBusiness;
 
 namespace OpenDental {
 	///<summary>This form is only visible at HQ, or possibly at a distributor HQ.  This form is used to control provider access to eRx.</summary>
-	public partial class FormErxAccess:Form {
+	public partial class FormErxAccess:ODForm {
 
 		private Patient _patCur;
 		private List<ProviderErx> _listProvErxs;

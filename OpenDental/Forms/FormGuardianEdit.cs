@@ -4,7 +4,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormGuardianEdit:Form {
+	public partial class FormGuardianEdit:ODForm {
 
 		private Guardian _guardianCur;
 		private Family _fam;

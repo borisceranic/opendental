@@ -8,7 +8,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormRequiredFields:Form {
+	public partial class FormRequiredFields:ODForm {
 		private List<RequiredField> _listReqFields;
 		private RequiredField _reqFieldCur;
 		///<summary>Keeps track of which enum value is at which index.</summary>

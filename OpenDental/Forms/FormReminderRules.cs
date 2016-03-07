@@ -10,7 +10,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormReminderRules:Form {
+	public partial class FormReminderRules:ODForm {
 		public List<ReminderRule> listReminders;
 		public FormReminderRules() {
 			InitializeComponent();

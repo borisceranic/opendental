@@ -11,7 +11,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	///<summary></summary>
-	public class FormBenefitEdit : System.Windows.Forms.Form{
+	public class FormBenefitEdit : ODForm {
 		private System.Windows.Forms.Label labelCode;
 		private System.Windows.Forms.Label labelAmount;
 		private System.Windows.Forms.Label label2;

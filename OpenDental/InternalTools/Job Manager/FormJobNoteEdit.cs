@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormJobNoteEdit:Form {
+	public partial class FormJobNoteEdit:ODForm {
 		public JobNote _jobNote;
 
 		public FormJobNoteEdit(JobNote jobNote) {

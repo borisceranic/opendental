@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Text;
 
 namespace OpenDental {
-	public partial class FormMapHQ:Form {
+	public partial class FormMapHQ:ODForm {
 		#region Private Members
 		///<summary>Keep track of full screen state</summary>
 		private bool _isFullScreen;

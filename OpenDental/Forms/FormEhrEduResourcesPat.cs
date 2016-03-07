@@ -10,7 +10,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEhrEduResourcesPat:Form {
+	public partial class FormEhrEduResourcesPat:ODForm {
 		public Patient patCur;
 		private List<EduResource> eduResourceList = new List<EduResource>();
 		private List<EhrMeasureEvent> eduMeasureProvidedList = new List<EhrMeasureEvent>();

@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormEncounterEdit:Form {
+	public partial class FormEncounterEdit:ODForm {
 		private Encounter _encCur;
 		private Patient _patCur;
 		private long _provNumSelected;

@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental.Reporting.Allocators.MyAllocator1 {
-	public partial class FormInstallAllocator_Provider:Form {
+	public partial class FormInstallAllocator_Provider:ODForm {
 		//private static string _InitialMessage = "Welcome to the Provider Allocation Setup\r\nPlease read the following:";
 
 		public FormInstallAllocator_Provider() {

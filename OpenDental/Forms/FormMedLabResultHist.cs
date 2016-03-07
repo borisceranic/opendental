@@ -5,7 +5,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormMedLabResultHist:Form {
+	public partial class FormMedLabResultHist:ODForm {
 		public Patient PatCur;
 		public MedLabResult ResultCur;
 

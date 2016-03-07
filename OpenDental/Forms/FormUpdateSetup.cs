@@ -11,7 +11,7 @@ using Ionic.Zip;
 
 namespace OpenDental{
 	/// <summary></summary>
-	public class FormUpdateSetup : System.Windows.Forms.Form{
+	public class FormUpdateSetup : ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private TextBox textWebsitePath;

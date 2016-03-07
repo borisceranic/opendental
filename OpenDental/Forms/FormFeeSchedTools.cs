@@ -20,7 +20,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormFeeSchedTools : System.Windows.Forms.Form{
+	public class FormFeeSchedTools :ODForm {
 		private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.Label label1;
 		private OpenDental.UI.Button butCopy;

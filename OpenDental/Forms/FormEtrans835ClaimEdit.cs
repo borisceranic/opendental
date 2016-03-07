@@ -11,7 +11,7 @@ using OpenDental.UI;
 using CodeBase;
 
 namespace OpenDental {
-	public partial class FormEtrans835ClaimEdit:Form {
+	public partial class FormEtrans835ClaimEdit:ODForm {
 
 		private Hx835_Claim _claimPaid;
 		private Claim _claim;

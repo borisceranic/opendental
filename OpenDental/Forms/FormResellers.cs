@@ -9,7 +9,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormResellers:Form {
+	public partial class FormResellers:ODForm {
 		private DataTable TableResellers;
 
 		public FormResellers() {

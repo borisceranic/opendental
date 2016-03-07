@@ -9,7 +9,7 @@ using OpenDentBusiness;
 
 namespace OpenDental {
 	///<summary>Was never finished/implemented.</summary>
-	public partial class FormScreenSetup:Form {
+	public partial class FormScreenSetup:ODForm {
 		//List<SheetDef> listSheets;
 
 		public FormScreenSetup() {

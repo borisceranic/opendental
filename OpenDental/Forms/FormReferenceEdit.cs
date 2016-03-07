@@ -9,7 +9,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormReferenceEdit:Form {
+	public partial class FormReferenceEdit:ODForm {
 		private CustReference RefCur;
 		private List<CustRefEntry> RefEntryList;
 

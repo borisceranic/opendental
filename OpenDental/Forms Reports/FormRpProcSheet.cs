@@ -8,7 +8,7 @@ using OpenDental.ReportingComplex;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormRpProcSheet : System.Windows.Forms.Form{
+	public class FormRpProcSheet : ODForm {
 		private System.ComponentModel.Container components = null;
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;

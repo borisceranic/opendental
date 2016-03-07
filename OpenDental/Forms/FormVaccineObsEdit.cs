@@ -4,7 +4,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormVaccineObsEdit:Form {
+	public partial class FormVaccineObsEdit:ODForm {
 
 		private VaccineObs _vaccineObsCur;
 

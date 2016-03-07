@@ -14,7 +14,7 @@ using System.Windows.Forms;
 using System.Xml;
 
 namespace OpenDental {
-	public partial class FormNewCropBilling:Form {
+	public partial class FormNewCropBilling:ODForm {
 
 		public FormNewCropBilling() {
 			InitializeComponent();

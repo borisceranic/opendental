@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEhrSettings:Form {
+	public partial class FormEhrSettings:ODForm {
 		private List<string> ListRecEncCodes;
 		private List<string> ListRecPregCodes;
 		private int OldEncListSelectedIdx;

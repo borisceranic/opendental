@@ -5,7 +5,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormMedLabs:Form {
+	public partial class FormMedLabs:ODForm {
 		public Patient PatCur;
 		///<summary>Used to show the labs for a specific patient.  May be the same as PatCur or a different selected patient or null for all patients.</summary>
 		private Patient _selectedPat;

@@ -5,7 +5,7 @@ using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormInterventionEdit:Form {
+	public partial class FormInterventionEdit:ODForm {
 		public Intervention InterventionCur;
 		///<summary>This bool will determine if we show every intervention type we support or only a specific subset related to the form we launch from.  Currently only set to true when adding an intervention from FormInterventions when pressing the Add button.</summary>
 		public bool IsAllTypes;

@@ -10,7 +10,7 @@ using OpenDentBusiness;
 using EhrLaboratories;
 
 namespace OpenDental {
-	public partial class FormPatListElementEditEHR2014:Form {
+	public partial class FormPatListElementEditEHR2014:ODForm {
 		public EhrPatListElement2014 Element;
 		public bool IsNew;
 		public bool Delete;

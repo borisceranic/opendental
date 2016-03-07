@@ -11,7 +11,7 @@ using OpenDental.UI;
 
 namespace OpenDental {
 
-	public partial class FormAutoNoteEdit : Form {
+	public partial class FormAutoNoteEdit :ODForm {
 		public bool IsNew;
 		public AutoNote AutoNoteCur;
 		private int textSelectionStart;

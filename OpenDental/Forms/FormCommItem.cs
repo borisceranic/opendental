@@ -11,7 +11,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	///<summary></summary>
-	public class FormCommItem : System.Windows.Forms.Form{
+	public class FormCommItem : ODForm{
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label label6;
 		private System.ComponentModel.Container components = null;// Required designer variable.

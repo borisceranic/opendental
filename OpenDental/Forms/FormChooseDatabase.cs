@@ -20,7 +20,7 @@ using CodeBase;
 
 namespace OpenDental{
 	///<summary></summary>
-	public class FormChooseDatabase : System.Windows.Forms.Form{
+	public class FormChooseDatabase : ODForm {
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.Label label3;

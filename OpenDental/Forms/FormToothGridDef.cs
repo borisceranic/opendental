@@ -9,7 +9,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	/// <summary></summary>
-	public class FormToothGridDef:System.Windows.Forms.Form {
+	public class FormToothGridDef:ODForm {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.ODGrid gridMain;
 		/// <summary>

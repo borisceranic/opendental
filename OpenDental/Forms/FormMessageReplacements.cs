@@ -9,7 +9,7 @@ using OpenDental.UI;
 
 namespace OpenDental {
 	///<summary>If using selection mode, call FormMessageReplacements modally.  If not in selection mode, non-modal instances are fine.</summary>
-	public partial class FormMessageReplacements:Form {
+	public partial class FormMessageReplacements:ODForm {
 
 		private MessageReplaceType _replaceTypes;
 		public bool IsSelectionMode;

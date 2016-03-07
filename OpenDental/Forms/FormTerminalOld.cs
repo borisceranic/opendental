@@ -12,7 +12,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormTerminalOld:System.Windows.Forms.Form {
+	public class FormTerminalOld:ODForm {
 		private OpenDental.UI.Button butClose;
 		private OpenDental.UI.Button butSubmit;
 		private TabControl tabMain;

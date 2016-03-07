@@ -10,7 +10,7 @@ using CodeBase;
 using System.IO;
 
 namespace OpenDental {
-	public partial class FormEhrLabImageEdit:Form {
+	public partial class FormEhrLabImageEdit:ODForm {
 		private long _ehrLabNum;
 		private long _patNum;
 		///<summary>List of EHR Lab Images attached to this EhrLabNum. This list will be retrieved from the database on init and then modified while dialog is up. Final list will be inserted into database if user clicks OK.</summary>

@@ -11,7 +11,7 @@ using OpenDental.UI;
 using CodeBase;
 
 namespace OpenDental {
-	public partial class FormEtrans835Edit:Form {
+	public partial class FormEtrans835Edit:ODForm {
 
 		public string TranSetId835;
 		///<summary>Must be set before the form is shown.</summary>

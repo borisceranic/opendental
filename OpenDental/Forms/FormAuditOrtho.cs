@@ -8,7 +8,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormAuditOrtho:Form {
+	public partial class FormAuditOrtho:ODForm {
 		///<summary>Should be passed in from calling function.</summary>
 		public SortedDictionary<DateTime,List<SecurityLog>> DictDateOrthoLogs;
 		public List<SecurityLog> PatientFieldLogs;

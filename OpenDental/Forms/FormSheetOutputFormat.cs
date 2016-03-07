@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormSheetOutputFormat:Form {
+	public partial class FormSheetOutputFormat:ODForm {
 		public int PaperCopies;
 		public bool EmailPatOrLab;
 		public string EmailPatOrLabAddress;

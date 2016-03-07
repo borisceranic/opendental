@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormRpPrintPreview : System.Windows.Forms.Form{
+	public class FormRpPrintPreview : ODForm {
 		///<summary></summary>
 		public System.Windows.Forms.PrintPreviewControl printPreviewControl2;
 		private OpenDental.UI.Button butNext;

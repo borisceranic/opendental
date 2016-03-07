@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormDrugManufacturerEdit:Form {
+	public partial class FormDrugManufacturerEdit:ODForm {
 		public DrugManufacturer DrugManufacturerCur;
 		public bool IsNew;
 

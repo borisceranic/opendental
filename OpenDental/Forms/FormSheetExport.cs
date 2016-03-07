@@ -11,7 +11,7 @@ using OpenDentBusiness;
 
 
 namespace OpenDental {
-	public partial class FormSheetExport:Form {
+	public partial class FormSheetExport:ODForm {
 
 		public FormSheetExport() {
 			InitializeComponent();

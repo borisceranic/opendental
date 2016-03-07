@@ -18,7 +18,7 @@ namespace OpenDental {
 	/// <summary>
 	/// Summary description for FormCheckDatabase.
 	/// </summary>
-	public class FormDatabaseMaintenance:System.Windows.Forms.Form {
+	public class FormDatabaseMaintenance:ODForm {
 		private OpenDental.UI.Button butClose;
 		private System.Windows.Forms.TextBox textBox1;
 		private OpenDental.UI.Button butCheck;

@@ -19,7 +19,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormLetterMerges : System.Windows.Forms.Form{
+	public class FormLetterMerges : ODForm {
 		private System.Windows.Forms.Label label1;
 		private OpenDental.UI.Button butAdd;
 		private OpenDental.UI.Button butCancel;

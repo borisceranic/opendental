@@ -10,7 +10,7 @@ using OpenDental;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEduResourceEdit:Form {
+	public partial class FormEduResourceEdit:ODForm {
 		public bool IsNew;
 		public EduResource EduResourceCur;
 

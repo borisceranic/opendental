@@ -10,7 +10,7 @@ using System.IO;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormIcd10s:Form {
+	public partial class FormIcd10s:ODForm {
 		public bool IsSelectionMode;
 		public Icd10 SelectedIcd10;
 		private List<Icd10> listIcd10s;

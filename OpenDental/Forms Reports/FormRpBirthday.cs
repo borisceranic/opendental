@@ -16,7 +16,7 @@ namespace OpenDental
 	/// <summary>
 	/// Summary description for FormRpApptWithPhones.
 	/// </summary>
-	public class FormRpBirthday : System.Windows.Forms.Form
+	public class FormRpBirthday : ODForm
 	{
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.Label label2;

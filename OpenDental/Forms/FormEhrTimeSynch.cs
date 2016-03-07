@@ -10,7 +10,7 @@ using OpenDentBusiness;
 
 namespace OpenDental {
 	///<summary>Only shows for EHR users.  Synchronizes local time to specified NIST server.</summary>
-	public partial class FormEhrTimeSynch:Form {
+	public partial class FormEhrTimeSynch:ODForm {
 		private DateTime _timeNist;
 		private DateTime _timeServer;
 		private DateTime _timeLocal;

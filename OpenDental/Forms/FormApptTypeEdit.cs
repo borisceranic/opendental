@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormApptTypeEdit:Form {
+	public partial class FormApptTypeEdit:ODForm {
 		public AppointmentType AppointmentTypeCur;
 
 		public FormApptTypeEdit() {

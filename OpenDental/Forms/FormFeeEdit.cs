@@ -7,7 +7,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormFeeEdit : System.Windows.Forms.Form{
+	public class FormFeeEdit : ODForm {
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.TextBox textBox1;
 		private OpenDental.ValidDouble textFee;

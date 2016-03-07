@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormReqNeededs:System.Windows.Forms.Form {
+	public class FormReqNeededs:ODForm {
 		private OpenDental.UI.Button butClose;
 		private OpenDental.UI.Button butAdd;
 		private System.ComponentModel.Container components = null;

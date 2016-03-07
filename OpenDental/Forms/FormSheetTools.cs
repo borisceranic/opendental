@@ -11,7 +11,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormSheetTools:Form {
+	public partial class FormSheetTools:ODForm {
 		public bool HasSheetsChanged=false;//Whether or not sheets have been edited/added/deleted from the DB from within this form.
 		public long ImportedSheetDefNum=0;//The primary key of the last sheet that was imported.
 

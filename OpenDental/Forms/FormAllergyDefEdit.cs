@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormAllergyDefEdit:Form {
+	public partial class FormAllergyDefEdit:ODForm {
 		public AllergyDef AllergyDefCur;
 
 		public FormAllergyDefEdit() {

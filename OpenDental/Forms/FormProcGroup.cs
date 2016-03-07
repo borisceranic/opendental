@@ -21,7 +21,7 @@ using OpenDental.UI;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormProcGroup:System.Windows.Forms.Form {
+	public class FormProcGroup:ODForm {
 		private System.Windows.Forms.Label label7;
 		private OpenDental.UI.Button butOK;
 		private OpenDental.UI.Button butCancel;

@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormClaimResend:Form {
+	public partial class FormClaimResend:ODForm {
 
 		public FormClaimResend() {
 			InitializeComponent();

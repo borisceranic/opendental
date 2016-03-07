@@ -7,7 +7,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormRpUnearnedIncome:System.Windows.Forms.Form {
+	public class FormRpUnearnedIncome:ODForm {
 		private System.ComponentModel.Container components = null;
 		private MonthCalendar date2;
 		private MonthCalendar date1;

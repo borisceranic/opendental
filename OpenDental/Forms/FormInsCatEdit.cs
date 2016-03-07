@@ -8,7 +8,7 @@ using OpenDentBusiness;
 
 namespace OpenDental {
 	///<summary></summary>
-	public class FormInsCatEdit:System.Windows.Forms.Form {
+	public class FormInsCatEdit:ODForm {
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.TextBox textDescription;

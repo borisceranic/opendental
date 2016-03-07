@@ -10,7 +10,7 @@ using System.ComponentModel;
 using System.Globalization;
 
 namespace OpenDental {
-	public partial class FormTaskSearch:Form {
+	public partial class FormTaskSearch:ODForm {
 
 		private DataTable _tableTasks;
 		private List<Def> _listTaskPriorities;

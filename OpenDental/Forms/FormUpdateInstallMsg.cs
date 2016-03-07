@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormUpdateInstallMsg:Form {
+	public partial class FormUpdateInstallMsg:ODForm {
 
 		public FormUpdateInstallMsg() {
 			InitializeComponent();

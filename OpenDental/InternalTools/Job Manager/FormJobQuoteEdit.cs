@@ -7,7 +7,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormJobQuoteEdit:Form {
+	public partial class FormJobQuoteEdit:ODForm {
 		private JobQuote _jobQuote;
 
 		///<summary>Used for existing Reviews. Pass in the jobNum and the jobReviewNum.</summary>

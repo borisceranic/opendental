@@ -12,7 +12,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormDefEditImages:System.Windows.Forms.Form {
+	public class FormDefEditImages:ODForm {
 		private System.Windows.Forms.Label labelName;
 		private System.Windows.Forms.TextBox textName;
 		private System.Windows.Forms.ColorDialog colorDialog1;

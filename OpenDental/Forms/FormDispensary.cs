@@ -8,7 +8,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormDispensary:Form {
+	public partial class FormDispensary:ODForm {
 
 		public FormDispensary() {
 			InitializeComponent();

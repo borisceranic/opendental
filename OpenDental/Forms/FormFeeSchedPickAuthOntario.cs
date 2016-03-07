@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormFeeSchedPickAuthOntario:Form {
+	public partial class FormFeeSchedPickAuthOntario:ODForm {
 
 		public string ODAMemberNumber {
 			get {

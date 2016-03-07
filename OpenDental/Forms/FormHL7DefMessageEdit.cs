@@ -11,7 +11,7 @@ using OpenDental.UI;
 
 namespace OpenDental {
 	/// <summary></summary>
-	public partial class FormHL7DefMessageEdit:System.Windows.Forms.Form {
+	public partial class FormHL7DefMessageEdit:ODForm {
 		public HL7DefMessage HL7DefMesCur;
 		public bool IsHL7DefInternal;
 		public HL7InternalType InternalType;

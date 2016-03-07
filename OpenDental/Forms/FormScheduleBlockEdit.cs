@@ -8,7 +8,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 ///<summary></summary>
-	public class FormScheduleBlockEdit : System.Windows.Forms.Form	{
+	public class FormScheduleBlockEdit : ODForm	{
 		private System.ComponentModel.Container components = null;
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;

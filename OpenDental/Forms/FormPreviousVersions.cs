@@ -8,7 +8,7 @@ using OpenDentBusiness;
 using OpenDental.UI;
 
 namespace OpenDental {
-	public partial class FormPreviousVersions:Form {
+	public partial class FormPreviousVersions:ODForm {
 
 		public FormPreviousVersions() {
 			InitializeComponent();

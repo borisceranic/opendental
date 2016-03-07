@@ -7,7 +7,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	/// <summary>This control should not be resized, except by the user. Dentists can enter sensitive information in the area below what is normally shown.</summary>
-	public class FormPopupDisplay:System.Windows.Forms.Form {
+	public class FormPopupDisplay:ODForm {
 		private OpenDental.UI.Button butOK;
 		private TextBox textDescription;
 		/// <summary>

@@ -9,7 +9,7 @@ using OpenDentBusiness;
 
 namespace OpenDental {
 	/// <summary>This window cannot even be accessed any longer.</summary>
-	public partial class FormIcd9Edit:Form {
+	public partial class FormIcd9Edit:ODForm {
 		private ICD9 Icd9Cur;
 		public bool IsNew;
 

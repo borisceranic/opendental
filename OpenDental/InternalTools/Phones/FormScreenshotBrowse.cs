@@ -9,7 +9,7 @@ using System.Text;
 using System.Windows.Forms;
 
 namespace OpenDental {
-	public partial class FormScreenshotBrowse:Form {
+	public partial class FormScreenshotBrowse:ODForm {
 		public string ScreenshotPath;
 		private string[] files;
 

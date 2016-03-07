@@ -3,7 +3,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental {
-	public partial class FormEhrMedicalOrderRadEdit:Form {
+	public partial class FormEhrMedicalOrderRadEdit:ODForm {
 		public MedicalOrder MedOrderCur;
 		public bool IsNew;
 
