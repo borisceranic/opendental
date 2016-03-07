@@ -1643,6 +1643,7 @@ namespace OpenDental{
 			textDaysPrior.Text=_daysPrior.ToString();
 			_hoursPrior=PrefC.GetDouble(PrefName.ApptReminderHourInterval);
 			textHoursPrior.Text=_hoursPrior.ToString();
+			checkSendAll.Checked=PrefC.GetBool(PrefName.ApptReminderSendAll);
 			FillPriorityMetrics();
 		}
 
