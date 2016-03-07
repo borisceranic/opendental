@@ -565,6 +565,13 @@ namespace OpenDental {
 				MsgBox.Show(this,"Selected message does not have a valid phone number to send to.");
 				return;
 			}
+			if(PrefC.HasClinicsEnabled && clinicNum==0) {
+				clinicNum=PrefC.GetLong(PrefName.TextingDefaultClinicNum);
+				if(clinicNum==0) {
+					MsgBox.Show(this,"No default clinic setup for texting.");
+					return;
+				}
+			}
 			try {
         if(Plugins.HookMethod(this,"FormSmsTextMessaging.butReply_Click_sendSmsSingle",patNum,mobileNumber,textReply.Text,YN.Yes))
         {

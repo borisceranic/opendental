@@ -489,7 +489,7 @@ namespace OpenDentBusiness{
 			}
 			Clinic clinic=GetClinic(clinicNum);
 			if(clinic==null) {
-				return false;
+				return false;//also handles clinicNum=0 which happens when default clinic not initialized.
 			}
 			return clinic.SmsContractDate.Year>1880;
 		}

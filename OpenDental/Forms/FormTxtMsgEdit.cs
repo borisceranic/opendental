@@ -62,19 +62,18 @@ namespace OpenDental {
 				return false;
 			}
 			if(SmsPhones.IsIntegratedTextingEnabled()) {
-				if(clinicNum==0 && PrefC.GetDateT(PrefName.SmsContractDate).Year<1880) { //Checking for practice (clinics turned off).
-					//Technically this should be impossible and should never happen.
+				if(!PrefC.HasClinicsEnabled && PrefC.GetDateT(PrefName.SmsContractDate).Year<1880) { //Checking for practice (clinics turned off).
 					MsgBox.Show(this,"Integrated Texting has not been enabled.");
 					return false;
 				}
-				else if(!PrefC.GetBool(PrefName.EasyNoClinics) && !Clinics.IsTextingEnabled(clinicNum)) { //Checking for specific clinic.
+				else if(PrefC.HasClinicsEnabled && !Clinics.IsTextingEnabled(clinicNum)) { //Checking for specific clinic.
 					//This is likely to happen a few times per office until they setup texting properly.
 					if(clinicNum!=0) {
 						MessageBox.Show(Lans.g(this,"Integrated Texting has not been enabled for the following clinic")+":\r\n"+Clinics.GetClinic(clinicNum).Description+".");
 					}
 					else {
 						//Should never happen. This message is precautionary.
-						MessageBox.Show(Lans.g(this,"Integrated Texting has not been enabled for the following clinic")+":\r\nHeadquarters.");
+						MsgBox.Show(this,"The default texting clinic has not been set.");
 					}
 					return false;
 				}
@@ -158,13 +157,8 @@ namespace OpenDental {
 					return;
 				}
 				long clinicNum= Clinics.ClinicNum;
-				if(clinicNum==0) {  //If no clinic selected, follow logic from SmsPhones.GetClinicNumForTexting()
-					if(PrefC.GetBool(PrefName.EasyNoClinics) || Clinics.List.Length==0) {
-						clinicNum=0;//0 used for no clinics
-					}
-					else {
-						clinicNum=Clinics.List[0].ClinicNum;
-					}
+				if(clinicNum==0) {
+						clinicNum=PrefC.GetLong(PrefName.TextingDefaultClinicNum);
 				}
 				if(!SendText(0,textWirelessPhone.Text,textMessage.Text,YN.Unknown,clinicNum,SmsMessageSource.DirectSms)) {  //0 as PatNum to denote no pat specified
 					return;//Allow the user to try again.  A message was already shown to the user inside SendText().

@@ -633,6 +633,7 @@ namespace OpenDentBusiness {
 		TempFolderDateFirstCleaned,
 		TerminalClosePassword,
 		TextMsgOkStatusTreatAsNo,
+		TextingDefaultClinicNum,
 		TimeCardADPExportIncludesName,
 		///<summary>0=Sun,1=Mon...6=Sat</summary>
 		TimeCardOvertimeFirstDayOfWeek,

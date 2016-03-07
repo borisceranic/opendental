@@ -383,14 +383,14 @@ namespace OpenDentBusiness{
 		///<summary>Returns 0 if clinics not in use, or patient.ClinicNum if assigned to a clinic, or ClinicNum of first clinic.</summary>
 		public static long GetClinicNumForTexting(long patNum) {
 			//No need to check RemotingRole; no call to db.
-			if(PrefC.GetBool(PrefName.EasyNoClinics) || Clinics.List.Length==0) {
+			if(!PrefC.HasClinicsEnabled || Clinics.List.Length==0) {
 				return 0;//0 used for no clinics
 			}
 			Clinic clinic=Clinics.GetClinic(Patients.GetPat(patNum).ClinicNum);//if patnum invalid will throw unhandled exception.
 			if(clinic!=null) {//if pat assigned to invalid clinic or clinic num 0
 				return clinic.ClinicNum;
 			}
-			return Clinics.List[0].ClinicNum;
+			return PrefC.GetLong(PrefName.TextingDefaultClinicNum);
 		}
 
 		///<summary>Returns true if there is an active phone for the country code.</summary>

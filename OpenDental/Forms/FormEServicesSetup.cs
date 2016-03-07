@@ -178,6 +178,11 @@ namespace OpenDental {
 			if(_clinicCur==null && _listClinics.Count>0) {
 				_clinicCur=_listClinics[0];//default to first clinic in list, if no clinics were passed into this form using the constructor.
 			}
+			if(!PrefC.HasClinicsEnabled) {
+				gridClinics.Height+=29;
+				butDefaultClinic.Visible=false;
+				butDefaultClinicClear.Visible=false;
+			}
 			FillComboClinicSms();
 			textCountryCode.Text=CultureInfo.CurrentCulture.Name.Substring(CultureInfo.CurrentCulture.Name.Length-2);
 			FillGridClinics();
@@ -1530,15 +1535,15 @@ namespace OpenDental {
 			_listClinics=Clinics.GetForUserod(Security.CurUser);//refresh potentially changed data.
 			gridClinics.BeginUpdate();
 			gridClinics.Columns.Clear();
-			ODGridColumn col=new ODGridColumn(Lan.g(this,"Location"),150);
-			gridClinics.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Subscribed"),80);
-			gridClinics.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Limit"),80);
-			gridClinics.Columns.Add(col);
+			if(PrefC.HasClinicsEnabled) {
+				gridClinics.Columns.Add(new ODGridColumn(Lan.g(this,"Def"),30) { TextAlign=HorizontalAlignment.Center });
+			}
+			gridClinics.Columns.Add(new ODGridColumn(Lan.g(this,"Location"),150));
+			gridClinics.Columns.Add(new ODGridColumn(Lan.g(this,"Subscribed"),80));
+			gridClinics.Columns.Add(new ODGridColumn(Lan.g(this,"Limit"),80));
 			gridClinics.Rows.Clear();
 			ODGridRow row;
-			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
+			if(!PrefC.HasClinicsEnabled) {
 				row=new ODGridRow();
 				row.Cells.Add(PrefC.GetString(PrefName.PracticeTitle));
 				row.Cells.Add(PrefC.GetDate(PrefName.SmsContractDate).Year>1800?"Yes":"No");
@@ -1546,8 +1551,10 @@ namespace OpenDental {
 				gridClinics.Rows.Add(row);
 			}
 			else {
+				long defClinic = PrefC.GetLong(PrefName.TextingDefaultClinicNum);
 				for(int i=0;i<_listClinics.Count;i++) {
 					row=new ODGridRow();
+					row.Cells.Add(_listClinics[i].ClinicNum==defClinic ? "X" : "");
 					row.Cells.Add(_listClinics[i].Description);
 					row.Cells.Add(_listClinics[i].SmsContractDate.Year>1800?"Yes":"No");
 					row.Cells.Add(_listClinics[i].SmsMonthlyLimit.ToString("c",new CultureInfo("en-US")));//Charge this month (Must always be in USD)
@@ -1555,6 +1562,24 @@ namespace OpenDental {
 				}
 			}
 			gridClinics.EndUpdate();
+		}
+
+		private void butDefaultClinic_Click(object sender,EventArgs e) {
+			if(gridClinics.GetSelectedIndex()<0) {
+				MsgBox.Show(this,"Select clinic to make default.");
+				return;
+			}
+			//TODO: permissions check?
+			Prefs.UpdateLong(PrefName.TextingDefaultClinicNum,_listClinics[gridClinics.GetSelectedIndex()].ClinicNum);
+			Signalods.SetInvalid(InvalidType.Prefs);
+			FillGridClinics();
+		}
+
+		private void butDefaultClinicClear_Click(object sender,EventArgs e) {
+			//TODO: permissions check?
+			Prefs.UpdateLong(PrefName.TextingDefaultClinicNum,0);
+			Signalods.SetInvalid(InvalidType.Prefs);
+			FillGridClinics();
 		}
 
 		private void FillGridSmsUsage() {

@@ -122,6 +122,8 @@ namespace OpenDental{
 			this.labelWebSchedEnable = new System.Windows.Forms.Label();
 			this.labelWebSchedDesc = new System.Windows.Forms.Label();
 			this.tabSmsServices = new System.Windows.Forms.TabPage();
+			this.butDefaultClinicClear = new OpenDental.UI.Button();
+			this.butDefaultClinic = new OpenDental.UI.Button();
 			this.butBackMonth = new OpenDental.UI.Button();
 			this.dateTimePickerSms = new System.Windows.Forms.DateTimePicker();
 			this.groupBox5 = new System.Windows.Forms.GroupBox();
@@ -1323,6 +1325,8 @@ namespace OpenDental{
 			// tabSmsServices
 			// 
 			this.tabSmsServices.BackColor = System.Drawing.SystemColors.Control;
+			this.tabSmsServices.Controls.Add(this.butDefaultClinicClear);
+			this.tabSmsServices.Controls.Add(this.butDefaultClinic);
 			this.tabSmsServices.Controls.Add(this.butBackMonth);
 			this.tabSmsServices.Controls.Add(this.dateTimePickerSms);
 			this.tabSmsServices.Controls.Add(this.groupBox5);
@@ -1337,9 +1341,42 @@ namespace OpenDental{
 			this.tabSmsServices.TabIndex = 6;
 			this.tabSmsServices.Text = "Texting Services";
 			// 
+			// butDefaultClinicClear
+			// 
+			this.butDefaultClinicClear.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butDefaultClinicClear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butDefaultClinicClear.Autosize = true;
+			this.butDefaultClinicClear.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butDefaultClinicClear.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butDefaultClinicClear.CornerRadius = 4F;
+			this.butDefaultClinicClear.Location = new System.Drawing.Point(167, 214);
+			this.butDefaultClinicClear.Name = "butDefaultClinicClear";
+			this.butDefaultClinicClear.Size = new System.Drawing.Size(81, 23);
+			this.butDefaultClinicClear.TabIndex = 269;
+			this.butDefaultClinicClear.Text = "Clear Default";
+			this.butDefaultClinicClear.UseVisualStyleBackColor = true;
+			this.butDefaultClinicClear.Click += new System.EventHandler(this.butDefaultClinicClear_Click);
+			// 
+			// butDefaultClinic
+			// 
+			this.butDefaultClinic.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butDefaultClinic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butDefaultClinic.Autosize = true;
+			this.butDefaultClinic.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butDefaultClinic.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butDefaultClinic.CornerRadius = 4F;
+			this.butDefaultClinic.Location = new System.Drawing.Point(254, 214);
+			this.butDefaultClinic.Name = "butDefaultClinic";
+			this.butDefaultClinic.Size = new System.Drawing.Size(81, 23);
+			this.butDefaultClinic.TabIndex = 262;
+			this.butDefaultClinic.Text = "Set Default";
+			this.butDefaultClinic.UseVisualStyleBackColor = true;
+			this.butDefaultClinic.Click += new System.EventHandler(this.butDefaultClinic_Click);
+			// 
 			// butBackMonth
 			// 
 			this.butBackMonth.AdjustImageLocation = new System.Drawing.Point(-3, -1);
+			this.butBackMonth.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butBackMonth.Autosize = true;
 			this.butBackMonth.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butBackMonth.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -1356,6 +1393,7 @@ namespace OpenDental{
 			// 
 			// dateTimePickerSms
 			// 
+			this.dateTimePickerSms.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.dateTimePickerSms.CustomFormat = "MMM yyyy";
 			this.dateTimePickerSms.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
 			this.dateTimePickerSms.Location = new System.Drawing.Point(585, 481);
@@ -1537,11 +1575,10 @@ namespace OpenDental{
 			this.gridClinics.HasAddButton = false;
 			this.gridClinics.HasMultilineHeaders = false;
 			this.gridClinics.HScrollVisible = false;
-			this.gridClinics.Location = new System.Drawing.Point(13, 6);
+			this.gridClinics.Location = new System.Drawing.Point(6, 6);
 			this.gridClinics.Name = "gridClinics";
 			this.gridClinics.ScrollValue = 0;
-			this.gridClinics.SelectionMode = OpenDental.UI.GridSelectionMode.None;
-			this.gridClinics.Size = new System.Drawing.Size(322, 231);
+			this.gridClinics.Size = new System.Drawing.Size(334, 202);
 			this.gridClinics.TabIndex = 249;
 			this.gridClinics.Title = "Subscription Information";
 			this.gridClinics.TranslationName = "FormEServicesSetup";
@@ -1551,6 +1588,7 @@ namespace OpenDental{
 			// butFwdMonth
 			// 
 			this.butFwdMonth.AdjustImageLocation = new System.Drawing.Point(5, -1);
+			this.butFwdMonth.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butFwdMonth.Autosize = false;
 			this.butFwdMonth.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butFwdMonth.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -1569,6 +1607,7 @@ namespace OpenDental{
 			// butThisMonth
 			// 
 			this.butThisMonth.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butThisMonth.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butThisMonth.Autosize = false;
 			this.butThisMonth.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butThisMonth.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -2072,6 +2111,7 @@ namespace OpenDental{
 		private System.Windows.Forms.CheckBox checkAllowEConnectorComm;
 		private System.Windows.Forms.TextBox textEConnectorListeningType;
 		private System.Windows.Forms.Label label38;
-
+		private UI.Button butDefaultClinic;
+		private UI.Button butDefaultClinicClear;
 	}
 }

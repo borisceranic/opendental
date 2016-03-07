@@ -395,8 +395,12 @@ namespace OpenDentBusiness{
 			else {
 				message=FillMessage(PrefC.GetString(PrefName.ApptReminderDayMessage),pat,appt);
 			}
+			long clinicNum = SmsPhones.GetClinicNumForTexting(pat.PatNum);
+			if(PrefC.HasClinicsEnabled && clinicNum==0) {
+				return Lans.g("ApptComms","Default texting clinic not setup.");
+			}
 			try {
-				SmsToMobiles.SendSmsSingle(pat.PatNum,patPhone,message,pat.ClinicNum,SmsMessageSource.Reminder);
+				SmsToMobiles.SendSmsSingle(pat.PatNum,patPhone,message,clinicNum,SmsMessageSource.Reminder);
 			}
 			catch(Exception ex) {
 				return ex.Message+"  ";
