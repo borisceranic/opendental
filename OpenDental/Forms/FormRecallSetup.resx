@@ -117,6 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="label16.Text" xml:space="preserve">
+    <value>Appointment reminders are e-mails and/or text messages sent to the patient at defined intervals prior to the appointment.  Enable one or both messages to begin reminding patients of appointments.
+Make sure texting is turned on in order to get the most from this feature.  </value>
+  </data>
   <data name="label19.Text" xml:space="preserve">
     <value>The Run Times option below will affect both the Web Sched automation and the Appointment Reminder automation.  
 It dictates the time interval in which the Listener service will automatically notify patients.
