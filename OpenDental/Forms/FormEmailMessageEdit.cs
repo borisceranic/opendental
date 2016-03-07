@@ -687,6 +687,9 @@ namespace OpenDental{
 		///<summary>Sets the default autograph that shows in the message body. 
 		///The default autograph is determined to be the first autograph with an email that matches the email address of the sender.</summary>
 		private void SetDefaultAutograph() {
+			if(!emailPreview.IsComposing) {
+				return;
+			}
 			string emailUserName=EmailMessages.GetAddressSimple(emailPreview.GetOutgoingEmailAddress().EmailUsername);
 			string emailSender=EmailMessages.GetAddressSimple(emailPreview.GetOutgoingEmailAddress().SenderAddress);
 			string autographEmail;
