@@ -136,10 +136,12 @@ namespace OpenDental {
 					try {
 						maxAllowedPacket=MiscData.SetMaxAllowedPacket(defaultMaxAllowedPacketSize);
 					}
-					catch(Exception) {
+					catch(Exception ex) {
 						//Do nothing.  Either maxAllowedPacket is set to something small (e.g. 10MB) and we failed to update it to 40MB (should be fine)
 						//             OR we failed to get and set the global variable due to MySQL permissions and a UE was thrown.
 						//             Regardless, if maxAllowedPacket is 0 (the only thing that we can't have happen) it will get updated to 40MB later down.
+						EventLog.WriteEntry("OpenDental","Error updating max_allowed_packet from "+maxAllowedPacket
+							+" to "+defaultMaxAllowedPacketSize+":\r\n"+ex.Message,EventLogEntryType.Error);
 					}
 				}
 			}
@@ -153,15 +155,27 @@ namespace OpenDental {
 			using(MemoryStream memStream=new MemoryStream()) {
 				try {
 					ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Compressing new update files...")));
-					zipFile.AddDirectory(folderUpdate);
-					zipFile.Save(memStream);
+					try {
+						zipFile.AddDirectory(folderUpdate);
+						zipFile.Save(memStream);
+					}
+					catch(Exception ex) {
+						EventLog.WriteEntry("OpenDental","Error compressing UpdateFiles:\r\n"+ex.Message,EventLogEntryType.Error);
+						throw ex;
+					}
 					StringBuilder strBuilder=new StringBuilder();
 					byte[] zipFileBytes=new byte[memStream.Length];
 					int readBytes=0;
 					memStream.Position=0;//Start at the beginning of the stream.
 					ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Converting new update files...")));
-					while((readBytes=memStream.Read(zipFileBytes,0,zipFileBytes.Length))>0) {
-						strBuilder.Append(Convert.ToBase64String(zipFileBytes,0,readBytes));
+					try {
+						while((readBytes=memStream.Read(zipFileBytes,0,zipFileBytes.Length))>0) {
+							strBuilder.Append(Convert.ToBase64String(zipFileBytes,0,readBytes));
+						}
+					}
+					catch(Exception ex) {
+						EventLog.WriteEntry("OpenDental","Error converting UpdateFiles to Base64:\r\n"+ex.Message,EventLogEntryType.Error);
+						throw ex;
 					}
 					//Now we need to break up the Base64 string into payloads that are small enough to send to MySQL.
 					//Each character in Base64 represents 6 bits.  Therefore, 4 chars are used to represent 3 bytes
@@ -171,15 +185,33 @@ namespace OpenDental {
 					List<string> listRawBase64s=new List<string>();
 					string strBase64=strBuilder.ToString();
 					ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Creating new update file payloads...")));
-					for(int i=0;i<strBase64.Length;i+=charsPerPayload) {
-						listRawBase64s.Add(strBase64.Substring(i,Math.Min(charsPerPayload,strBase64.Length-i)));
+					try { 
+						for(int i=0;i<strBase64.Length;i+=charsPerPayload) {
+							listRawBase64s.Add(strBase64.Substring(i,Math.Min(charsPerPayload,strBase64.Length-i)));
+						}
+					}
+					catch(Exception ex) {
+						EventLog.WriteEntry("OpenDental","Error creating UpdateFile payloads:\r\n"+ex.Message,EventLogEntryType.Error);
+						throw ex;
 					}
 					//Now we have a list of Base64 strings each of which are guaranteed to successfully send to MySQL under the max_packet_allowed limitation.
 					//Clear and prep the current UpdateFiles row in the documentmisc table for the updated binaries.
 					long docNum=DocumentMiscs.SetUpdateFilesZip();
 					ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Inserting new update files into database...")));
-					foreach(string rawBase64 in listRawBase64s) {
-						DocumentMiscs.AppendRawBase64ForDoc(rawBase64,docNum);
+					try {
+						foreach(string rawBase64 in listRawBase64s) {
+							DocumentMiscs.AppendRawBase64ForDoc(rawBase64,docNum);
+						}
+					}
+					catch(Exception ex) {
+						EventLog.WriteEntry("OpenDental","Error inserting UpdateFiles into database:"
+							+"\r\n"+ex.Message
+							+"\r\n  docNum: "+docNum
+							+"\r\n  maxAllowedPacket: "+maxAllowedPacket
+							+"\r\n  charsPerPayload: "+charsPerPayload
+							+"\r\n  strBase64.Length: "+strBase64.Length
+							+"\r\n  listRawBase64s.Count: "+listRawBase64s.Count,EventLogEntryType.Error);
+						throw ex;
 					}
 				}
 				catch(Exception) {
