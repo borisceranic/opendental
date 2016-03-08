@@ -500,6 +500,8 @@ namespace OpenDentBusiness {
 		QuickBooksIncomeAccount,
 		///<summary>Date when user upgraded to or past 15.4.1 and started using ADA procedures to count CPOE radiology orders for EHR.</summary>
 		RadiologyDateStartedUsing154,
+		///<summary>Boolean.  True if random primary keys have been turned on.
+		///Causes all CRUD classes to look for an unused random PK before inserting instead of leaving it up to auto incrementing.</summary>
 		RandomPrimaryKeys,
 		RecallAdjustDown,
 		RecallAdjustRight,
