@@ -64,8 +64,11 @@ namespace OpenDental
 		///<summary>Stores the procedure for this ClaimProc if applicable</summary>
 		//private Procedure procCur;
 		private ClaimProc ClaimProcCur;
-		///<summary>If user hits cancel, then the claimproc is reset using this.</summary>
+		///<summary>If user hits cancel, then the claimproc is reset using this.  Do not modify the values in this claimproc anywhere in this form.</summary>
 		private ClaimProc ClaimProcOld;
+		///<summary>Similar to ClaimProcOld, except this variable is set at the end of initialization, because the ClaimProcCur can change during
+		///initialization, due to calling ComputeAmounts()</summary>
+		public ClaimProc ClaimProcInitial;
 		private OpenDental.ValidDouble textCopayOverride;
 		private System.Windows.Forms.Panel panelClaimExtras;
 		///<summary>The procedure to which this claimproc is attached.</summary>
@@ -1532,6 +1535,7 @@ namespace OpenDental
 			}
 			FillInitialAmounts();
 			ComputeAmounts();
+			ClaimProcInitial=ClaimProcCur.Copy();
 			//MessageBox.Show(panelEstimateInfo.Visible.ToString());
 		}
 

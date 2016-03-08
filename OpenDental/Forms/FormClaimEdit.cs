@@ -34,7 +34,7 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textPredeterm;
 		private OpenDental.ValidDate textDateRec;
 		private OpenDental.ValidDate textDateSent;
-		private System.ComponentModel.Container components = null;// Required designer variable.
+		private IContainer components;
 		private OpenDental.UI.Button butOK;
 		///<summary></summary>
 		public bool IsNew;
@@ -353,6 +353,7 @@ namespace OpenDental{
 		private ValidNum textRadiographs;
 		private Label label74;
 		private ValidDouble textShareOfCost;
+		private ErrorProvider _recalcErrorProvider;
 		private long _provNumTreatSelected;
 
 		///<summary></summary>
@@ -385,6 +386,7 @@ namespace OpenDental{
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormClaimEdit));
 			this.label3 = new System.Windows.Forms.Label();
 			this.label6 = new System.Windows.Forms.Label();
@@ -656,6 +658,7 @@ namespace OpenDental{
 			this.labelBatch = new System.Windows.Forms.Label();
 			this.label89 = new System.Windows.Forms.Label();
 			this.butViewEra = new OpenDental.UI.Button();
+			this._recalcErrorProvider = new System.Windows.Forms.ErrorProvider(this.components);
 			this.butPickProvTreat = new OpenDental.UI.Button();
 			this.butPickProvBill = new OpenDental.UI.Button();
 			this.butResend = new OpenDental.UI.Button();
@@ -704,6 +707,7 @@ namespace OpenDental{
 			this.groupBox9.SuspendLayout();
 			this.tabHistory.SuspendLayout();
 			this.groupEnterPayment.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this._recalcErrorProvider)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// label3
@@ -3463,6 +3467,10 @@ namespace OpenDental{
 			this.butViewEra.Text = "View ERA";
 			this.butViewEra.Click += new System.EventHandler(this.butViewEra_Click);
 			// 
+			// _recalcErrorProvider
+			// 
+			this._recalcErrorProvider.ContainerControl = this;
+			// 
 			// butPickProvTreat
 			// 
 			this.butPickProvTreat.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -3898,6 +3906,7 @@ namespace OpenDental{
 			this.groupBox9.PerformLayout();
 			this.tabHistory.ResumeLayout(false);
 			this.groupEnterPayment.ResumeLayout(false);
+			((System.ComponentModel.ISupportInitialize)(this._recalcErrorProvider)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -3992,12 +4001,12 @@ namespace OpenDental{
 			comboClaimType.Items.Add(Lan.g(this,"PreAuth"));
 			comboClaimType.Items.Add(Lan.g(this,"Other"));
 			comboClaimType.Items.Add(Lan.g(this,"Capitation"));
-			comboClaimStatus.Items.Add(Lan.g(this,"Unsent"));
-			comboClaimStatus.Items.Add(Lan.g(this,"Hold until Pri received"));
+			comboClaimStatus.Items.Add(Lan.g(this,"Unsent"));//0
+			comboClaimStatus.Items.Add(Lan.g(this,"Hold until Pri received"));//1
 			comboClaimStatus.Items.Add(Lan.g(this,"Waiting to Send"));//2
-			comboClaimStatus.Items.Add(Lan.g(this,"Probably Sent"));
-			comboClaimStatus.Items.Add(Lan.g(this,"Sent - Verified"));
-			comboClaimStatus.Items.Add(Lan.g(this,"Received"));
+			comboClaimStatus.Items.Add(Lan.g(this,"Probably Sent"));//3
+			comboClaimStatus.Items.Add(Lan.g(this,"Sent - Verified"));//4
+			comboClaimStatus.Items.Add(Lan.g(this,"Received"));//5
 			comboSpecialProgram.Items.Clear();
 			for(int i=0;i<Enum.GetNames(typeof(EnumClaimSpecialProgram)).Length;i++) {
 				comboSpecialProgram.Items.Add(Enum.GetNames(typeof(EnumClaimSpecialProgram))[i]);
@@ -4549,6 +4558,9 @@ namespace OpenDental{
 			ClaimL.CalculateAndUpdate(ProcList,PlanList,ClaimCur,PatPlanList,benefitList,PatCur.Age,SubList);
 			ClaimProcList=ClaimProcs.Refresh(PatCur.PatNum);
 			FillGrids();
+			if(!_recalcErrorProvider.GetError(this.butRecalc).Equals(String.Empty)) {//ClaimProcedures values have been modified.
+				_recalcErrorProvider.SetError(this.butRecalc,String.Empty);//Above logic results in no longer have missmatching estimates and totals.
+			}
 		}
 
 		private void FillGrids(){
@@ -4828,16 +4840,68 @@ namespace OpenDental{
 					return;
 				}
 			}
-			List<ClaimProcHist> histList=null;
-			List<ClaimProcHist> loopList=null;
-			FormClaimProc FormCP=new FormClaimProc(ClaimProcsForClaim[e.Row],null,FamCur,PatCur,PlanList,histList,ref loopList,PatPlanList,true,SubList);
-			FormCP.IsInClaim=true;
-			FormCP.ShowDialog();
-			if(FormCP.DialogResult!=DialogResult.OK){
+			ClaimProc claimProcCur=ClaimProcsForClaim[e.Row];
+			if(!CheckRecalcEstimates(claimProcCur)) {
 				return;
 			}
 			ClaimProcList=ClaimProcs.Refresh(PatCur.PatNum);
 			FillGrids();
+		}
+
+		private bool CheckRecalcEstimates(ClaimProc claimProc) {
+			List<ClaimProcHist> histList=null;
+			List<ClaimProcHist> loopList=null;
+			FormClaimProc FormCP=new FormClaimProc(claimProc,null,FamCur,PatCur,PlanList,histList,ref loopList,PatPlanList,true,SubList);
+			FormCP.IsInClaim=true;
+			FormCP.ShowDialog();
+			if(FormCP.DialogResult!=DialogResult.OK) {
+				return false;
+			}
+			if(claimProc.Status!=ClaimProcStatus.NotReceived) {
+				return true;
+			}
+			ClaimProc ClaimProcInitial=FormCP.ClaimProcInitial;//Unedited ClaimProc with base estimates calculated in FormClaimProc.
+			bool isClaimProcRecalcNeeded=false;
+			isClaimProcRecalcNeeded=IsRecalcNeeded(claimProc.DedApplied,claimProc.DedEstOverride,claimProc.DedEst,
+				ClaimProcInitial.DedEstOverride,ClaimProcInitial.DedEst);
+			isClaimProcRecalcNeeded|=IsRecalcNeeded(claimProc.InsPayEst,claimProc.InsEstTotalOverride,claimProc.InsEstTotal,
+				ClaimProcInitial.InsEstTotalOverride,ClaimProcInitial.InsEstTotal);
+			isClaimProcRecalcNeeded|=IsRecalcNeeded(claimProc.WriteOff,claimProc.WriteOffEstOverride,claimProc.WriteOffEst,
+				ClaimProcInitial.WriteOffEstOverride,ClaimProcInitial.WriteOffEst);
+			if(isClaimProcRecalcNeeded) {//Claim Procedure values have changed.
+				//We require that the user clicks Recalculate Estimates to remove this error due to the complexity of how ClaimProcs are edited
+				//and how their base estimates are calulated.  Ideally we would be able to loop through ClaimProcList and and check for conflicting
+				//estimates and values.However we can not do this currently due to FormClaimProc handiling the base estimate calculations in ComputeAmounts()
+				//and that we save the ClaimProc to the DB when exiting the edit window.
+				_recalcErrorProvider.SetError(this.butRecalc,Lan.g(this,
+				 "Claim procedures values have been changed.\n"
+				 +"Modified values can result in claim totals not matching claim procedure sums.\n"
+				 +"Click to recalculate the claim totals and claim procedure estimates\n"
+				 +"Otherwise, ignore to leave values unchanged."));
+			}
+			return true;
+		}
+		
+		private bool IsRecalcNeeded(double claimInfoAmt,double overrideAmt,double baseAmt,double initOverrideAmt,double initBaseAmt) {
+			//Get pertinent base amount.
+			double initAmt=initBaseAmt;
+			if(initOverrideAmt!=-1) {
+				initAmt=initOverrideAmt;
+			}
+			//Get pertinent initial amount.
+			double amt=baseAmt;
+			if(overrideAmt!=-1) {
+				amt=overrideAmt;
+			}
+			//Verify that the amount was changed by the user.
+			if(amt.IsEqual(initAmt)) {
+				return false;
+			}
+			//If pertinent amount is different than claim info amount, then the user probably wants to recalculate, since the claimproc is NotReceived.
+			if(!claimInfoAmt.IsEqual(amt)) {
+				return true;
+			}
+			return false;
 		}
 
 		private void gridPay_CellClick(object sender,ODGridClickEventArgs e) {
