@@ -4635,7 +4635,8 @@ namespace OpenDental {
 					XmlDocument doc=new XmlDocument();
 					doc.LoadXml(result);
 					XmlNodeList listNodes=doc.SelectNodes("//Prov");
-					bool isCacheRefresNeeded=false;
+					bool[] arrayIsSentToHq=new bool[ProviderErxs.Listt.Count];
+					bool isCacheRefreshNeeded=false;
 					for(int i=0;i<listNodes.Count;i++) {//Loop through providers.
 						XmlNode nodeProv=listNodes[i];
 						string provNpi="";
@@ -4664,15 +4665,29 @@ namespace OpenDental {
 						if(oldProvErx==null) {
 							continue;
 						}
+						arrayIsSentToHq[ProviderErxs.Listt.IndexOf(oldProvErx)]=true;
 						ProviderErx provErx=oldProvErx.Clone();
 						provErx.IsEnabled=isProvEnabled;
 						provErx.IsIdentifyProofed=isProvIdp;
 						provErx.IsSentToHq=true;
 						if(ProviderErxs.Update(provErx,oldProvErx)) {
-							isCacheRefresNeeded=true;
-						}						
+							isCacheRefreshNeeded=true;
+						}
 					}
-					if(isCacheRefresNeeded) {
+					//Any proverxs which are in the local customer database but not sent to HQ, flag as unsent.
+					//Providererx records were being deleted from HQ due to a sync issue at HQ.
+					for(int i=0;i<arrayIsSentToHq.Length;i++) {
+						if(arrayIsSentToHq[i]) {
+							continue;
+						}
+						ProviderErx provErx=ProviderErxs.Listt[i];
+						ProviderErx oldProvErx=provErx.Clone();
+						provErx.IsSentToHq=false;
+						if(ProviderErxs.Update(provErx,oldProvErx)) {
+							isCacheRefreshNeeded=true;
+						}	
+					}
+					if(isCacheRefreshNeeded) {
 						DataValid.SetInvalid(InvalidType.ProviderErxs);
 					}
 					if(Prefs.UpdateDateT(PrefName.NewCropDateLastAccessCheck,DateTimeOD.Today)) {
