@@ -7361,7 +7361,7 @@ namespace OpenDental {
 			if(newStatus==ProcStat.EO){
 				ProcCur.ProcDate=DateTime.MinValue;
 			}
-			else if(textDate.errorProvider1.GetError(textDate)!=""){
+			else if(textDate.Text=="" || textDate.errorProvider1.GetError(textDate)!=""){
 				ProcCur.ProcDate=DateTimeOD.Today;
 			}
 			else{
@@ -7522,7 +7522,7 @@ namespace OpenDental {
 			if(newStatus==ProcStat.EO){
 				ProcCur.ProcDate=DateTime.MinValue;
 			}
-			else if(textDate.errorProvider1.GetError(textDate)!=""){
+			else if(textDate.Text=="" || textDate.errorProvider1.GetError(textDate)!=""){
 				ProcCur.ProcDate=DateTimeOD.Today;
 			}
 			else{
