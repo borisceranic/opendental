@@ -321,8 +321,10 @@ namespace OpenDentBusiness
 			rawText=seg.rawText;
 		}
 
-		private X12Segment(){
-
+		///<summary>The segment will represent an invalid segment or end of file segment.
+		///Useful to escape X12 loops which require a segment to be present.
+		///The SegmentID will be set to "INVALID", because this string will never match a real segment ID (real segment IDs are 3 characters)</summary>
+		public X12Segment() : this("INVALID",new X12Separators()) {
 		}
 
 		public override string ToString() {
@@ -396,13 +398,13 @@ namespace OpenDentBusiness
 	}
 
 	///<summary></summary>
-	public struct X12Separators{
+	public class X12Separators{
 		///<summary>usually ~</summary>
-		public string Segment;
+		public string Segment="~";
 		///<summary>usually *</summary>
-		public string Element;
+		public string Element="*";
 		///<summary>usually :</summary>
-		public string Subelement;
+		public string Subelement=":";
 	}
 
 	#region Segments

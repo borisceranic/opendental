@@ -25,7 +25,7 @@ namespace OpenDentBusiness {
 				if(_segNum < _listSegments.Count) {
 					return _listSegments[_segNum];
 				}
-				return _listSegments[_listSegments.Count-1];
+				return new X12Segment();
 			}
 		}
 
