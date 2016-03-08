@@ -120,19 +120,13 @@ namespace OpenDentBusiness {
 			for(int i=0;i<tableNames.Length;i++) {
 				//Alert anyone that cares that we are optimizing this table.
 				ODEvent.Fire(new ODEventArgs("RepairAndOptimizeProgress",Lans.g("MiscData","Optimizing table")+": "+tableNames[i]));
-				command="OPTIMIZE TABLE `"+tableNames[i]+"`";
-				if(!isLogged) {
-					Db.NonQ(command);
-				}
-				else {
-					tableLog=Db.GetTable(command);
-					for(int r=0;r<tableLog.Rows.Count;r++) {//usually only 1 row, unless something abnormal is found.
-						retVal.AppendLine(tableLog.Rows[r][0].ToString().PadRight(50,' ')+"| "+tableLog.Rows[r][1].ToString()+" | "+tableLog.Rows[r][2].ToString()+" | "+tableLog.Rows[r][3].ToString());
-					}
+				string optimizeResult=OptimizeTable(tableNames[i],isLogged);
+				if(isLogged) {
+					retVal.AppendLine(optimizeResult);
 				}
 			}
 			for(int i=0;i<tableNames.Length;i++) {
-				//Alert anyone that cares that we are optimizing this table.
+				//Alert anyone that cares that we are repairing this table.
 				ODEvent.Fire(new ODEventArgs("RepairAndOptimizeProgress",Lans.g("MiscData","Repairing table")+": "+tableNames[i]));
 				command="REPAIR TABLE `"+tableNames[i]+"`";
 				if(!isLogged) {
@@ -141,11 +135,53 @@ namespace OpenDentBusiness {
 				else {
 					tableLog=Db.GetTable(command);
 					for(int r=0;r<tableLog.Rows.Count;r++) {//usually only 1 row, unless something abnormal is found.
-						retVal.AppendLine(tableLog.Rows[r][0].ToString().PadRight(50,' ')+"| "+tableLog.Rows[r][1].ToString()+" | "+tableLog.Rows[r][2].ToString()+" | "+tableLog.Rows[r][3].ToString());
+						retVal.AppendLine(tableLog.Rows[r]["Table"].ToString().PadRight(50,' ')
+							+" | "+tableLog.Rows[r]["Op"].ToString()
+							+" | "+tableLog.Rows[r]["Msg_type"].ToString()
+							+" | "+tableLog.Rows[r]["Msg_text"].ToString());
 					}
 				}
 			}
 			return retVal.ToString();
+		}
+
+		///<summary>Optimizes the table passed in.  Set hasResult to true to return a string representation of the query results.
+		///Does not attempt the optimize if random PKs is turned on or if the table is of storage engine InnoDB.
+		///See wiki page [[Database Storage Engine Comparison: InnoDB vs MyISAM]] for reasons why.</summary>
+		public static string OptimizeTable(string tableName,bool hasResult=false) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),tableName,hasResult);
+			}
+			if(DataConnection.DBtype!=DatabaseType.MySql) {
+				return "";
+			}
+			string retVal="";
+			if(PrefC.GetBool(PrefName.RandomPrimaryKeys)) {
+				retVal=tableName+" "+Lans.g("MiscData","skipped due to using random primary keys.");
+			}
+			//Check to see if the table has its storage engine set to InnoDB.
+			string command="SELECT ENGINE FROM information_schema.TABLES "
+				+"WHERE TABLE_SCHEMA='"+POut.String(DataConnection.GetDatabaseName())+"' "
+				+"AND TABLE_NAME='"+POut.String(tableName)+"' ";
+			string storageEngine=Db.GetScalar(command);
+			if(storageEngine.ToLower()=="innodb") {
+				retVal=tableName+" "+Lans.g("MiscData","skipped due to using the InnoDB storage engine.");
+			}
+			//Only run OPTIMIZE if random PKs are not used and the table is not using the InnoDB storage engine.
+			if(retVal=="") {
+				command="OPTIMIZE TABLE `"+tableName+"`";//Ticks used in case user has added custom tables with unusual characters.
+				DataTable tableLog=Db.GetTable(command);
+				if(hasResult) {
+					//Loop through any rows returned and return the results.  Often times will only be one row unless there was a problem with optimizing.
+					foreach(DataRow row in tableLog.Rows) {
+						retVal+=(row["Table"].ToString().PadRight(50,' ')
+							+" | "+row["Op"].ToString()
+							+" | "+row["Msg_type"].ToString()
+							+" | "+row["Msg_text"].ToString());
+					}
+				}
+			}
+			return retVal;
 		}
 
 		///<summary>This method updates many invalid date columns to '0001-01-01' and a few invalid DateTStamp columns to '1970-01-01 00:00:01'.
@@ -5898,8 +5934,7 @@ HAVING cnt>1";
 			command="DROP TABLE "+tableName+";";
 			Db.NonQ(command);
 			//To reclaim that space on the disk you have to do an Optimize.
-			command="OPTIMIZE TABLE etransmessagetext";
-			Db.NonQ(command);
+			DatabaseMaintenance.OptimizeTable("etransmessagetext");
 		}
 
 		///<summary>Return values look like 'MyISAM' or 'InnoDB'. Will return empty string on error.</summary>
@@ -6130,8 +6165,7 @@ HAVING cnt>1";
 			if(DataConnection.DBtype==DatabaseType.MySql && listEmailMessages.Count!=noChangeCount) {//Using MySQL and something actually changed.
 				//Optimize the emailmessage table so that the user can see the space savings within a File Explorer right away.
 				ODEvent.Fire(new ODEventArgs("RawEmailCleanUp",Lans.g("DatabaseMaintenance","Optimizing the email message table...")));
-				command="OPTIMIZE TABLE emailmessage";
-				Db.NonQ(command);
+				DatabaseMaintenance.OptimizeTable("emailmessage");
 			}
 			string strResults=Lans.g("DatabaseMaintenance","Done.  No clean up required.");
 			if(cleanedCount > 0 || errorCount > 0) {
