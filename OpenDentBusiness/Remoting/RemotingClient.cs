@@ -15,17 +15,62 @@ using CodeBase;
 namespace OpenDentBusiness {
 	public class RemotingClient {
 		///<summary>This dll will be in one of these three roles.  There can be a dll on the client and a dll on the server, both involved in the logic.  This keeps track of which one is which.</summary>
-		[ThreadStatic]
-		public static RemotingRole RemotingRole;
+		private static RemotingRole _remotingRole;
 		///<summary>If ClientWeb, then this is the URL to the server.</summary>
-		[ThreadStatic]
-		public static string ServerURI;
+		private static string _serverUri;
 		///<summary>If ClientWeb (middle tier user), proxy settings can be picked up from MiddleTierProxyConfig.xml.</summary>
 		public static string MidTierProxyAddress;
 		///<summary>If ClientWeb (middle tier user), proxy settings can be picked up from MiddleTierProxyConfig.xml.</summary>
 		public static string MidTierProxyUserName;
 		///<summary>If ClientWeb (middle tier user), proxy settings can be picked up from MiddleTierProxyConfig.xml.</summary>
 		public static string MidTierProxyPassword;
+		///<summary>Thread static version of RemotingRole</summary>
+		[ThreadStatic]
+		public static RemotingRole _remotingRoleT;
+		///<summary>Thread static version of ServerURI</summary>
+		[ThreadStatic]
+		public static string _serverUriT;
+
+		///<summary>Returns either the thread specific RemotingRole or the globally set RemotingRole.</summary>
+		public static RemotingRole RemotingRole {
+			get {
+				if(String.IsNullOrEmpty(_serverUriT)) {
+					return _remotingRole;
+				}
+				return _remotingRoleT;
+			}
+			set {
+				_remotingRole=value;
+				_remotingRoleT=value;
+			}
+		}
+
+		///<summary>Returns either the thread specific Server URI or the globally set Server URI.</summary>
+		public static string ServerURI {
+			get {
+				if(String.IsNullOrEmpty(_serverUriT)) {
+					return _serverUri;
+				}
+				return _serverUriT;
+			}
+			set {
+				_serverUri=value;
+				_serverUriT=value;
+			}
+		}
+
+		public static void SetRemotingT(string serverURI,RemotingRole remotingRole) {
+			_remotingRoleT=remotingRole;
+			_serverUriT=serverURI;
+		}
+
+		public static void SetRemotingRoleT(RemotingRole remotingRole) {
+			_remotingRoleT=remotingRole;
+		}
+
+		public static void SetServerURIT(string serverURI) {
+			_serverUriT=serverURI;
+		}
 
 		public static DataTable ProcessGetTable(DtoGetTable dto) {
 			string result=SendAndReceive(dto);
