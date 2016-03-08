@@ -94,12 +94,12 @@ namespace OpenDentBusiness{
 			return Crud.ProviderErxCrud.Update(providerErx,oldProviderErx);
 		}
 
-		///<summary>Inserts, updates, or deletes the passed in list against the current cached rows.  Returns true if db changes were made.</summary>
-		public static bool Sync(List<ProviderErx> listNew) {
+		///<summary>Inserts, updates, or deletes the passed in list verses the old list.  Returns true if db changes were made.</summary>
+		public static bool Sync(List<ProviderErx> listNew,List<ProviderErx> listOld) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-					return Meth.GetBool(MethodBase.GetCurrentMethod(),listNew);
+					return Meth.GetBool(MethodBase.GetCurrentMethod(),listNew,listOld);
 			}
-			return Crud.ProviderErxCrud.Sync(listNew,Listt);
+			return Crud.ProviderErxCrud.Sync(listNew,listOld);
 		}
 
 		/*

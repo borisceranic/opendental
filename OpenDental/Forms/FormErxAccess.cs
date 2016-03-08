@@ -115,7 +115,8 @@ namespace OpenDental {
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
-			ProviderErxs.Sync(_listProvErxs);//No cache refresh because this is an HQ only form.
+			List <ProviderErx> listOldProvErxs=ProviderErxs.Refresh(_patCur.PatNum);
+			ProviderErxs.Sync(_listProvErxs,listOldProvErxs);//No cache refresh because this is an HQ only form.
 			DialogResult=DialogResult.OK;
 		}
 
