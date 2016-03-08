@@ -242,22 +242,8 @@ namespace OpenDentBusiness{
 		///<summary>RemotingRole has not yet been set to ClientWeb, but it will if this succeeds.  Will throw an exception if server cannot validate username and password.  configPath will be empty from a workstation and filled from the server.  If Ecw, odpass will actually be the hash.</summary>
 		public static Userod LogInWeb(string oduser,string odpass,string configPath,string clientVersionStr,bool usingEcw) {
 			//Very unusual method.  Remoting role can't be checked, but is implied by the presence of a value in configPath.
-			if(configPath != "") {//RemotingRole.ServerWeb
-				Userods.LoadDatabaseInfoFromFile(ODFileUtils.CombinePaths(configPath,"OpenDentalServerConfig.xml"));
-				//ODFileUtils.CombinePaths(
-				//  ,"OpenDentalServerConfig.xml"));
-				//Path.GetDirectoryName(Application.ExecutablePath),"OpenDentalServerConfig.xml"));
-				//Application.StartupPath,"OpenDentalServerConfig.xml"));
-				//Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),"OpenDentalServerConfig.xml"));
-				//Environment.CurrentDirectory,"OpenDentalServerConfig.xml"));
-				//Then, check username and password
+			if(RemotingClient.RemotingRole==RemotingRole.ServerWeb) {
 				Userod user=Userods.CheckUserAndPassword(oduser,odpass,usingEcw);
-				/*#if DEBUG
-					if(oduser==""){
-						user=Userods.GetUserByName("Admin",usingEcw);//without checking password.  Makes debugging faster.
-						//No, don't do it this way.  This is the server, so need to pass it in properly from the client or Security.PasswordTyped will be absent on the server.
-					}
-				#endif*/
 				if(user==null) {
 					throw new Exception("Invalid username or password.");
 				}

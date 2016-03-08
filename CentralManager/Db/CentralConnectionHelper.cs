@@ -40,52 +40,36 @@ namespace CentralManager {
 		public static bool UpdateCentralConnection(CentralConnection centralConnection,bool refreshCache) {
 			UTF8Encoding enc=new UTF8Encoding();
 			byte[] EncryptionKey=enc.GetBytes("mQlEGebnokhGFEFV");//Gotten from FormCentralManager constructor. Only place that does anything like this.
-			string webServiceURI="";
 			string computerName="";
 			string database="";
 			string user="";
 			string password="";
-			string odPassword="";
-			if(centralConnection.DatabaseName!="") {
+			if(centralConnection.ServerName!="") {//Direct connection
 				computerName=centralConnection.ServerName;
 				database=centralConnection.DatabaseName;
 				user=centralConnection.MySqlUser;
 				if(centralConnection.MySqlPassword!="") {
 					password=CentralConnections.Decrypt(centralConnection.MySqlPassword,EncryptionKey);
 				}
-				RemotingClient.ServerURI="";
-			}
-			else if(centralConnection.ServiceURI!="") {
-				webServiceURI=centralConnection.ServiceURI;
-				RemotingClient.ServerURI=webServiceURI;
 				try {
-					odPassword=CentralConnections.Decrypt(centralConnection.OdPassword,EncryptionKey);
-					Security.CurUser=Security.LogInWeb(centralConnection.OdUser,odPassword,"",Application.ProductVersion,centralConnection.WebServiceIsEcw);
-					Security.PasswordTyped=odPassword;
+					DataConnection.DBtype=DatabaseType.MySql;
+					OpenDentBusiness.DataConnection dcon=new OpenDentBusiness.DataConnection();
+					dcon.SetDbT(computerName,database,user,password,"","",DataConnection.DBtype);
+					RemotingClient.SetRemotingRoleT(RemotingRole.ClientDirect);
+					if(refreshCache) {
+						Cache.RefreshCache(((int)InvalidType.AllLocal).ToString());
+					}
 				}
 				catch {
 					return false;
 				}
 			}
+			else if(centralConnection.ServiceURI!="") {//Middle tier connection
+				RemotingClient.SetServerURIT(centralConnection.ServiceURI);
+				RemotingClient.SetRemotingRoleT(RemotingRole.ClientWeb);
+			}
 			else {
 				MessageBox.Show("Either a database or a Middle Tier URI must be specified in the connection.");
-				return false;
-			}
-			try {
-				if(RemotingClient.ServerURI!="") {
-					RemotingClient.RemotingRole=RemotingRole.ClientWeb;
-				}
-				else {
-					DataConnection.DBtype=DatabaseType.MySql;
-					OpenDentBusiness.DataConnection dcon=new OpenDentBusiness.DataConnection();
-					dcon.SetDbT(computerName,database,user,password,"","",DataConnection.DBtype);
-					RemotingClient.RemotingRole=RemotingRole.ClientDirect;
-				}
-				if(refreshCache) {
-					Cache.RefreshCache(((int)InvalidType.AllLocal).ToString());
-				}
-			}
-			catch {
 				return false;
 			}
 			return true;
