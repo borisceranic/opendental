@@ -229,7 +229,7 @@ namespace OpenDentBusiness{
 				case Permissions.EquipmentDelete:
 				//case Permissions.SheetEdit:
 				//case Permissions.CommlogEdit:
-				case Permissions.ImageDelete:
+				//case Permissions.ImageDelete:
 				case Permissions.PerioEdit:
 				case Permissions.ProcEditShowFee:
 				case Permissions.AdjustmentEditZero:
