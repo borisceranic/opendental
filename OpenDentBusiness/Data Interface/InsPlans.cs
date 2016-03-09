@@ -890,7 +890,14 @@ namespace OpenDentBusiness {
 			}
 			//PPO always returns the PPO fee for the code or substituted code.
 			if(planType=="p") {
-				return Fees.GetAmount(substCodeNum,feeSched,clinicNum,provNum);
+				double allowedSub=Fees.GetAmount(substCodeNum,feeSched,clinicNum,provNum);
+				double allowedNoSub=Fees.GetAmount(codeNum,feeSched,clinicNum,provNum);
+				if(allowedSub==-1								//The fee for the substitution code is blank
+					|| allowedSub > allowedNoSub) //or the downgrade fee is more expensive than the original fee
+				{ 
+					return allowedNoSub;//Use the fee from the original code
+				}
+				return allowedSub;
 			}
 			//or, if not PPO, and an allowed fee schedule exists, then we use that.
 			if(allowedFeeSched!=0) {
