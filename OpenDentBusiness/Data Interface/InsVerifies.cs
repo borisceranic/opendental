@@ -18,13 +18,18 @@ namespace OpenDentBusiness{
 		
 		///<summary>Gets one InsVerify from the db that has the given fkey and verify type.</summary>
 		public static InsVerify GetOneByFKey(long fkey,VerifyTypes verifyType) {
-			//TODO Remoting Role
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<InsVerify>(MethodBase.GetCurrentMethod(),fkey,verifyType);
+			}
 			string command="SELECT * FROM insverify WHERE FKey="+POut.Long(fkey)+" AND VerifyType="+POut.Int((int)verifyType)+"";
 			return Crud.InsVerifyCrud.SelectOne(command);
 		}
 		
 		///<summary>Gets one InsVerifyNum from the db that has the given fkey and verify type.</summary>
 		public static long GetInsVerifyNumByFKey(long fkey,VerifyTypes verifyType) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetLong(MethodBase.GetCurrentMethod(),fkey,verifyType);
+			}
 			string command="SELECT * FROM insverify WHERE FKey="+POut.Long(fkey)+" AND VerifyType="+POut.Int((int)verifyType)+"";
 			InsVerify insVerify=Crud.InsVerifyCrud.SelectOne(command);
 			if(insVerify==null) {
