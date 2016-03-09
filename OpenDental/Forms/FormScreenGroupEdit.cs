@@ -42,6 +42,7 @@ namespace OpenDental{
 		private UI.Button butStartScreens;
 		private Label label4;
 		private ContextMenu patContextMenu;
+		private List<Provider> _listProvs;
 
 		///<summary></summary>
 		public FormScreenGroupEdit(ScreenGroup screenGroup) {
@@ -438,9 +439,10 @@ namespace OpenDental{
 			textScreenDate.Text=_screenGroup.SGDate.ToShortDateString();
 			textDescription.Text=_screenGroup.Description;
 			textProvName.Text=_screenGroup.ProvName;//has to be filled before provnum
-			for(int i=0;i<ProviderC.ListShort.Count;i++) {
-				comboProv.Items.Add(ProviderC.ListShort[i].Abbr);
-				if(_screenGroup.ProvNum==ProviderC.ListShort[i].ProvNum) {
+			_listProvs=ProviderC.GetListShort();
+			for(int i=0;i<_listProvs.Count;i++) {
+				comboProv.Items.Add(_listProvs[i].Abbr);
+				if(_screenGroup.ProvNum==_listProvs[i].ProvNum) {
 					comboProv.SelectedIndex=i;
 				}
 			}
@@ -729,6 +731,11 @@ namespace OpenDental{
 				if(_listScreens.Count!=0) {
 					screen.ScreenGroupOrder=_listScreens.Last().ScreenGroupOrder+1;//increments for next
 				}
+				List<SheetField> listChartOrigVals=new List<SheetField>();
+				SheetField sheetFieldTreatment=sheet.SheetFields.Find(x=>x.FieldName=="ChartSealantTreatment");
+				SheetField sheetFieldComplete=sheet.SheetFields.Find(x=>x.FieldName=="ChartSealantComplete");
+				listChartOrigVals.Add(sheetFieldTreatment==null ? null : sheetFieldTreatment.Copy());//Adds null entry if it's not found, which is fine.
+				listChartOrigVals.Add(sheetFieldComplete==null ? null : sheetFieldComplete.Copy());//Adds null entry if it's not found, which is fine.
 				FormSheetFillEdit FormSFE=new FormSheetFillEdit(sheet);
 				FormSFE.ShowDialog();
 				if(FormSFE.DialogResult!=DialogResult.OK) {
@@ -737,16 +744,15 @@ namespace OpenDental{
 				if(FormSFE.SheetCur!=null) {//It wasn't deleted, create a screen.
 					Screens.CreateScreenFromSheet(sheet,screen);
 					//Now try and process the screening chart for treatment planned sealants.
-					foreach(SheetField field in sheet.SheetFields) {
-						if(field.FieldName=="ChartSealantTreatment") {
-							if(ProcedureCodes.GetCodeNum("D1351")==0) {
-								MsgBox.Show(this,"The required sealant code is not present in the database.  The screening chart will not be processed.");
-								break;
-							}
-							Screens.ProcessScreenChart(sheet,ScreenChartType.TP);
-							break;
-						}
+					if(ProcedureCodes.GetCodeNum("D1351")==0) {
+						MsgBox.Show(this,"The required sealant code is not present in the database.  The screening chart will not be processed.");
+						break;
 					}
+					long provNum=0;
+					if(comboProv.SelectedIndex!=-1) {
+						provNum=_listProvs[comboProv.SelectedIndex].ProvNum;
+					}
+					Screens.ProcessScreenChart(sheet,ScreenChartType.TP|ScreenChartType.C,provNum,FormSFE.SheetCur.SheetNum,listChartOrigVals);//Process both TP and Compl charts.
 				}
 				screen.ScreenGroupOrder++;
 				FillGrid();
@@ -777,22 +783,26 @@ namespace OpenDental{
 				MsgBox.Show(this,"Sheet no longer exists.  It may have been deleted from the Chart Module.");
 				return;
 			}
+			List<SheetField> listChartOrigVals=new List<SheetField>();
+			SheetField sheetFieldTreatment=sheet.SheetFields.Find(x=>x.FieldName=="ChartSealantTreatment");
+			SheetField sheetFieldComplete=sheet.SheetFields.Find(x=>x.FieldName=="ChartSealantComplete");
+			listChartOrigVals.Add(sheetFieldTreatment==null ? null : sheetFieldTreatment.Copy());//Adds null entry if it's not found, which is fine.
+			listChartOrigVals.Add(sheetFieldComplete==null ? null : sheetFieldComplete.Copy());//Adds null entry if it's not found, which is fine.
 			FormSheetFillEdit FormSFE=new FormSheetFillEdit(sheet);
 			if(FormSFE.ShowDialog()==DialogResult.OK) {
 				//Now try and process the screening chart for completed sealants.
 				if(FormSFE.SheetCur==null) {
 					return;
 				}
-				foreach(SheetField field in sheet.SheetFields) {
-					if(field.FieldName=="ChartSealantComplete") {
-						if(ProcedureCodes.GetCodeNum("D1351")==0) {
-							MsgBox.Show(this,"The required sealant code is not present in the database.  The screening chart will not be processed.");
-							break;
-						}
-						Screens.ProcessScreenChart(sheet,ScreenChartType.C);
-						break;
-					}
+				if(ProcedureCodes.GetCodeNum("D1351")==0) {
+					MsgBox.Show(this,"The required sealant code is not present in the database.  The screening chart will not be processed.");
+					return;
 				}
+				long provNum=0;
+				if(comboProv.SelectedIndex!=-1) {
+					provNum=_listProvs[comboProv.SelectedIndex].ProvNum;
+				}
+				Screens.ProcessScreenChart(sheet,ScreenChartType.TP|ScreenChartType.C,provNum,FormSFE.SheetCur.SheetNum,listChartOrigVals);						
 			}
 		}
 
@@ -840,8 +850,8 @@ namespace OpenDental{
 		private void comboProv_SelectedIndexChanged(object sender, System.EventArgs e) {
 			if(comboProv.SelectedIndex!=-1) {//if a prov was selected
 				//set the provname accordingly
-				textProvName.Text=ProviderC.ListShort[comboProv.SelectedIndex].LName+", "
-					+ProviderC.ListShort[comboProv.SelectedIndex].FName;
+				textProvName.Text=_listProvs[comboProv.SelectedIndex].LName+", "
+					+_listProvs[comboProv.SelectedIndex].FName;
 			}
 		}
 
