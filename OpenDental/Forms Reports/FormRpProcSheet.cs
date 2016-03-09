@@ -380,6 +380,11 @@ namespace OpenDental{
 			}
 			DataTable table=RpProcSheet.GetIndividualTable(date1.SelectionStart,date2.SelectionStart,_listProvNums,_listClinicNums,textCode.Text,
 				isAnyClinicMedical);
+			if(table.Columns.Contains("ToothNum")) {
+				foreach(DataRow row in table.Rows) {
+					row["ToothNum"]=Tooth.GetToothLabel(row["ToothNum"].ToString());
+				}
+			}
 			string subtitleProvs=ConstructProviderSubtitle();
 			string subtitleClinics=ConstructClinicSubtitle();
 			Font font=new Font("Tahoma",9);

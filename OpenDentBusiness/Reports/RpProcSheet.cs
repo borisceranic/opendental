@@ -6,7 +6,7 @@ using System.Reflection;
 namespace OpenDentBusiness {
 	public class RpProcSheet {
 
-		///<summary>If not using clinics then supply an empty list of clinicNums.  listClinicNums must have at least one item if using clinics.</summary>
+		///<summary>If not using clinics then supply an empty list of clinicNums.  listClinicNums must have at least one item if using clinics. Not formatted for display</summary>
 		public static DataTable GetIndividualTable(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,string procCode,
 			bool isAnyClinicMedical) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
