@@ -183,10 +183,12 @@ namespace OpenDentBusiness {
 		///<summary>Creates a new procedure with the patient, surface, toothnum, and status for the specified procedure code.
 		///Make sure to make a security log after calling this method.
 		///This method requires that Security.CurUser be set prior to invoking.</summary>
-		public static Procedure CreateProcForPat(long patNum,long codeNum,string surf,int toothNum,ProcStat procStatus) {
+		public static Procedure CreateProcForPat(long patNum,long codeNum,string surf,int toothNum,ProcStat procStatus,long provNum) {
 			//No need to check RemotingRole; no call to db.
 			Patient pat=Patients.GetPat(patNum);
-			long provNum=Patients.GetProvNum(pat);
+			if(provNum==0) {
+				provNum=Patients.GetProvNum(pat);
+			}
 			Procedure proc=new Procedure();
 			proc.PatNum=pat.PatNum;
 			proc.ClinicNum=Clinics.ClinicNum;

@@ -126,29 +126,57 @@ namespace OpenDentBusiness{
 		///<summary>Takes a screening sheet that is associated to a patient and processes any corresponding ScreenCharts found.
 		///Processing will create treatment planned or completed procedures for the patient.
 		///Supply the sheet and then a bitwise enum of screen chart types to digest.</summary>
-		public static void ProcessScreenChart(Sheet sheet,ScreenChartType chartTypes) {
+		public static void ProcessScreenChart(Sheet sheet,ScreenChartType chartTypes,long provNum,long sheetNum,List<SheetField> listChartOrigVals) {
 			//No need to check RemotingRole; no call to db.
 			if(sheet==null || sheet.PatNum==0) {
 				return;//An invalid screening sheet was passed in.
 			}
 			string[] toothValues=new string[0];
-			foreach(SheetField field in sheet.SheetFields) {//Go through the supplied sheet's fields and find that field.
-				if((chartTypes.HasFlag(ScreenChartType.TP) && field.FieldName=="ChartSealantTreatment")
-					|| (chartTypes.HasFlag(ScreenChartType.C) && field.FieldName=="ChartSealantComplete")) 
-				{
+			string[] oldToothValues=new string[0];
+			foreach(SheetField field in sheet.SheetFields) {//Go through the supplied sheet's fields and find the field.
+				if(chartTypes.HasFlag(ScreenChartType.TP) && field.FieldName=="ChartSealantTreatment") {
 					toothValues=field.FieldValue.Split(';');
-					ScreenChartType chartType=(field.FieldName=="ChartSealantTreatment") ? ScreenChartType.TP : ScreenChartType.C;
-					ProcessScreenChartHelper(sheet.PatNum,toothValues,chartType);
-					continue;
+					if(listChartOrigVals[0]!=null) {//Shouldn't be null if ChartSealantTreatment exists
+						oldToothValues=listChartOrigVals[0].FieldValue.Split(';');
+					}
+					ScreenChartType chartType=ScreenChartType.TP;
+					ProcessScreenChartHelper(sheet.PatNum,toothValues,chartType,provNum,sheetNum,oldToothValues);
+					break;
+				}
+			}
+			toothValues=new string[0];
+			foreach(SheetField field in sheet.SheetFields) {//Go through the supplied sheet's fields and find the field.
+				if(chartTypes.HasFlag(ScreenChartType.C) && field.FieldName=="ChartSealantComplete") {
+					toothValues=field.FieldValue.Split(';');
+					if(listChartOrigVals[1]!=null) {//Shouldn't be null if ChartSealantTreatment exists
+						oldToothValues=listChartOrigVals[1].FieldValue.Split(';');
+					}
+					ScreenChartType chartType=ScreenChartType.C;
+					ProcessScreenChartHelper(sheet.PatNum,toothValues,chartType,provNum,sheetNum,oldToothValues);
+					break;
 				}
 			}
 		}
 
-		///<summary>Helper method so that we do not have to duplicate code.</summary>
-		private static void ProcessScreenChartHelper(long patNum,string[] toothValues,ScreenChartType chartType) {
+		///<summary>Helper method so that we do not have to duplicate code.  The length of toothValues must match the length of chartOrigVals.</summary>
+		private static void ProcessScreenChartHelper(long patNum,string[] toothValues,ScreenChartType chartType,long provNum,long sheetNum,string[] chartOrigVals) {
 			for(int i=0;i<toothValues.Length;i++) {//toothValues is in the order from low to high tooth number in the chart
-				if(!toothValues[i].Contains("S")) {
+				if(!toothValues[i].Contains("S")) {//No sealant, nothing to do.
 					continue;
+				}
+				//Logic to determine if the "S" changed surfaces or was erased between the time the toothchart was opened and when it was submitted.
+				string[] newSurfaces=toothValues[i].Split(',');
+				string[] origSurfaces=chartOrigVals[i].Split(',');
+				bool isDiff=false;
+				for(int j=0;j<origSurfaces.Length;j++) {//Both arrays have the same length unless the chart doesn't exist in the original.
+					if((newSurfaces[j]=="S" && origSurfaces[j]!="S") || (newSurfaces[j]!="S" && origSurfaces[j]=="S")) {//"S" changed surfaces or was removed.
+						isDiff=true;
+						break;
+					}
+				}
+				//If there is no difference don't make any duplicates.  We don't care if they changed a surface from N to PS for example, only S surfaces are important.
+				if(!isDiff) {
+					continue;//All the "S" surfaces are the same.
 				}
 				string surf="";
 				#region Parse ScreenChart FieldValues
@@ -204,33 +232,32 @@ namespace OpenDentBusiness{
 					isRight=true;
 					isLing=false;
 				}
-				string[] surfaces=toothValues[i].Split(',');
 				if(isMolar) {
 					if(isRight) {
-						if(surfaces[0]=="S") {
+						if(newSurfaces[0]=="S") {
 							surf+="D";
 						}
-						if(surfaces[1]=="S") {
+						if(newSurfaces[1]=="S") {
 							surf+="M";
 						}
 					}
 					else {//Is Left side
-						if(surfaces[0]=="S") {
+						if(newSurfaces[0]=="S") {
 							surf+="M";
 						}
-						if(surfaces[1]=="S") {
+						if(newSurfaces[1]=="S") {
 							surf+="D";
 						}
 					}
-					if(isLing && surfaces[2]=="S") {
+					if(isLing && newSurfaces[2]=="S") {
 						surf+="L";
 					}
-					if(!isLing && surfaces[2]=="S") {
+					if(!isLing && newSurfaces[2]=="S") {
 						surf+="B";
 					}
 				}
 				else {//Front teeth, only look at 3rd surface position in control as that's the only one the user can see.
-					if(surfaces[2]=="S") {
+					if(newSurfaces[2]=="S") {
 						surf="O";//NOTE: Not sure what surface to enter here... This is just a placeholder for now until we figure it out...
 					}
 				}
@@ -240,14 +267,14 @@ namespace OpenDentBusiness{
 					if(Procedures.GetProcForPatByToothSurfStat(patNum,toothNum,surf,ProcStat.TP)!=null) {
 						continue;
 					}
-					Procedure proc=Procedures.CreateProcForPat(patNum,ProcedureCodes.GetCodeNum("D1351"),surf,toothNum,ProcStat.TP);
+					Procedure proc=Procedures.CreateProcForPat(patNum,ProcedureCodes.GetCodeNum("D1351"),surf,toothNum,ProcStat.TP,provNum);
 					SecurityLogs.MakeLogEntry(Permissions.ProcEdit,patNum,"D1351 "+Lans.g("Screens","treatment planned during screening with tooth")
 						+" "+proc.ToothNum.ToString()+" "+Lans.g("Screens","and surface")+" "+proc.Surf);
 				}
 				else if(chartType==ScreenChartType.C) {
 					Procedure proc=Procedures.GetProcForPatByToothSurfStat(patNum,toothNum,surf,ProcStat.TP);
 					if(proc==null) {//A TP procedure does not already exist.
-						proc=Procedures.CreateProcForPat(patNum,ProcedureCodes.GetCodeNum("D1351"),surf,toothNum,ProcStat.C);
+						proc=Procedures.CreateProcForPat(patNum,ProcedureCodes.GetCodeNum("D1351"),surf,toothNum,ProcStat.C,provNum);
 					}
 					else {//TP proc already exists, set it complete.
 						Procedure procOld=proc.Copy();
