@@ -130,6 +130,9 @@ namespace OpenDental {
 				butAddSpecial.Visible=true;
 				_toothChart=GetToothChartHelper(0);
 			}
+			if(SheetDefCur.SheetType==SheetTypeEnum.Screening) {
+				butScreenChart.Visible=true;
+			}
 			textDescription.Text=SheetDefCur.Description;
 			panelMain.Height=SheetDefCur.HeightTotal;
 			FillFieldList();
