@@ -281,6 +281,17 @@ namespace OpenDentBusiness{
 						listEmpNumsWithClinic.Add(listEmpsShort[i].EmployeeNum);
 						listEmpsWithClinic.Add(listEmpsShort[i]);
 					}
+					//If you have no UserClinics then you are unrestricted and should show up in all lists.
+					else if(listUserClinics.Count==0) {
+						if(!listEmpNumsUnassigned.Contains(listEmpsShort[i].EmployeeNum)) {
+							listEmpNumsUnassigned.Add(listEmpsShort[i].EmployeeNum);
+							listEmpsUnassigned.Add(listEmpsShort[i]);
+						}
+						if(!listEmpNumsWithClinic.Contains(listEmpsShort[i].EmployeeNum)) {
+							listEmpNumsWithClinic.Add(listEmpsShort[i].EmployeeNum);
+							listEmpsWithClinic.Add(listEmpsShort[i]);
+						}
+					}
 				}
 			}
 			//Returning the 'All' employee list was handled above.  We now only care about two scenarios.
