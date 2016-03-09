@@ -50,14 +50,18 @@ namespace OpenDentBusiness{
 			List<Clinic> listClinics = Clinics.GetForUserod(Security.CurUser);
 			switch(PrefC.GetString(PrefName.ClinicTrackLast)) {
 				case "Workstation":
-					if(listClinics.Any(x => x.ClinicNum==ComputerPrefs.LocalComputer.ClinicNum)) {//user is restricted and does not have access to the computerpref clinic
-						_clinicNum=ComputerPrefs.LocalComputer.ClinicNum;//last used clinic on workstation
+					if(Security.CurUser.ClinicIsRestricted && Security.CurUser.ClinicNum!=ComputerPrefs.LocalComputer.ClinicNum) {//The user is restricted and it's not the clinic this computer has by default
+						//User's default clinic isn't the LocalComputer's clinic, see if they have access to the Localcomputer's clinic, if so, use it.
+						Clinic clinic=listClinics.Find(x => x.ClinicNum==ComputerPrefs.LocalComputer.ClinicNum);
+						if(clinic!=null) {
+							_clinicNum=clinic.ClinicNum;
+						}
+						else {
+							_clinicNum=Security.CurUser.ClinicNum;//Use the user's default clinic if they don't have access to LocalComputer's clinic.
+						}
 					}
-					else if(Security.CurUser.ClinicIsRestricted && listClinics.Any(x => x.ClinicNum==Security.CurUser.ClinicNum)) {
-						_clinicNum=Security.CurUser.ClinicNum;//default clinic num if not available
-					}
-					else if(listClinics.Count>0) {
-						_clinicNum=listClinics[0].ClinicNum;//first clinic if default not available
+					else {//The user is not restricted, just use the clinic in the ComputerPref table.
+						_clinicNum=ComputerPrefs.LocalComputer.ClinicNum;
 					}
 					return;//Error
 				case "User":
