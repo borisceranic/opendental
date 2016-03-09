@@ -32,6 +32,8 @@ namespace OpenDental {
 			textYPos.Text=SheetFieldDefCur.YPos.ToString();
 			textWidth.Text=SheetFieldDefCur.Width.ToString();
 			textHeight.Text=SheetFieldDefCur.Height.ToString();
+			textTabOrder.Text=SheetFieldDefCur.TabOrder.ToString();
+			textReportable.Text=SheetFieldDefCur.ReportableName;
 			if(SheetFieldDefCur.FieldValue!="") {
 				_selectedOption=SheetFieldDefCur.FieldValue.Split(';')[0];
 				string[] arrayOptions=SheetFieldDefCur.FieldValue.Split(';')[1].Split('|');
@@ -142,6 +144,8 @@ namespace OpenDental {
 			SheetFieldDefCur.YPos=PIn.Int(textYPos.Text);
 			SheetFieldDefCur.Width=PIn.Int(textWidth.Text);
 			SheetFieldDefCur.Height=PIn.Int(textHeight.Text);
+			SheetFieldDefCur.TabOrder=PIn.Int(textTabOrder.Text);
+			SheetFieldDefCur.ReportableName=PIn.String(textReportable.Text);
 			//ComboBox FieldValue will be:  selectedItem;all|possible|options|here|with|selectedItem|also
 			//This is so we don't have to change the database schema for combo boxes.
 			SheetFieldDefCur.FieldValue=_selectedOption+";";//NOTE: ; can change to whatever.  Maybe {?  Maybe something else not used often like @?
