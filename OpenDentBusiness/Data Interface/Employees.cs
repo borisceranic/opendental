@@ -281,6 +281,16 @@ namespace OpenDentBusiness{
 						listEmpNumsWithClinic.Add(listEmpsShort[i].EmployeeNum);
 						listEmpsWithClinic.Add(listEmpsShort[i]);
 					}
+					else if(listUserClinics.Count==0) {
+						if(!listEmpNumsUnassigned.Contains(listEmpsShort[i].EmployeeNum)) {
+							listEmpNumsUnassigned.Add(listEmpsShort[i].EmployeeNum);
+							listEmpsUnassigned.Add(listEmpsShort[i]);
+						}
+						if(!listEmpNumsWithClinic.Contains(listEmpsShort[i].EmployeeNum)) {
+							listEmpNumsWithClinic.Add(listEmpsShort[i].EmployeeNum);
+							listEmpsWithClinic.Add(listEmpsShort[i]);
+						}
+					}
 				}
 			}
 			//Returning the 'All' employee list was handled above.  We now only care about two scenarios.
