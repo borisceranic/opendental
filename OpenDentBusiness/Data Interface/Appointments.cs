@@ -1156,7 +1156,10 @@ namespace OpenDentBusiness{
 				}
 				row["patientName"]+=PatientLogic.GetNameLF(raw.Rows[i]["patLName"].ToString(),raw.Rows[i]["patFName"].ToString(),
 					raw.Rows[i]["patPreferred"].ToString(),raw.Rows[i]["patMiddleI"].ToString());
-				row["patientNameF"]=raw.Rows[i]["patFName"].ToString();
+				if(raw.Rows[i]["apptIsNewPatient"].ToString()=="1") {
+					row["patientNameF"]="NP-";
+				}
+				row["patientNameF"]+=raw.Rows[i]["patFName"].ToString();
 				row["PatNum"]=raw.Rows[i]["apptPatNum"].ToString();
 				row["patNum"]="PatNum: "+raw.Rows[i]["apptPatNum"].ToString();
 				row["GuarNum"]=raw.Rows[i]["patGuarantor"].ToString();
