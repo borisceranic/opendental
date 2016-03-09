@@ -299,7 +299,7 @@ namespace OpenDental{
 			}
 			try{
 				if(textHours.Text.Contains(":")){
-					TimeSpan.Parse(textHours.Text);
+					ClockEvents.ParseHours(textHours.Text);
 				}
 				else{
 					Double.Parse(textHours.Text);
@@ -314,7 +314,7 @@ namespace OpenDental{
 			TimeAdjustCur.TimeEntry=DateTime.Parse(textTimeEntry.Text);
 			TimeSpan hoursEntered;
 			if(textHours.Text.Contains(":")){
-				hoursEntered=TimeSpan.Parse(textHours.Text);
+				hoursEntered=ClockEvents.ParseHours(textHours.Text);//we know this will work because we tested ParseHours above.
 			}
 			else{
 				hoursEntered=TimeSpan.FromHours(Double.Parse(textHours.Text));

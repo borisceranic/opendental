@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Reflection;
 
 namespace OpenDentBusiness{
@@ -385,6 +386,73 @@ namespace OpenDentBusiness{
 			else {//Colon format without seconds
 				return span.ToStringHmm();//blank if zero
 			}
+		}
+
+		///<summary>Avoids some funky behavior from TimeSpan.Parse(). Surround in try/catch.
+		///Valid formats: 
+		///			hh:mm
+		///			hh:mm:ss
+		///			hh:mm:ss.fff 
+		///TimeSpan.Parse("23:00:00") returns 23 hours.
+		///TimeSpan.Parse("25:00:00") returns 25 days.
+		///In this method, '25:00:00' is treated as 25 hours.
+		/// </summary>
+		public static TimeSpan ParseHours(string timeString) {
+			//No remoting role check; no call to db
+			string[] parts=timeString.TrimStart('-').Split(new[] { ':' });
+			if(parts.Length>3) {
+				//User input more than hours i.e. 00:00:00:00 this only accepts hours.
+				throw new Exception("Invalid format");
+			}
+			if(parts.Any(x => string.IsNullOrEmpty(x))) {
+				//Blank or contains a blank segment
+				throw new Exception("Invalid format");
+			}
+			bool IsNegative=timeString.StartsWith("-");
+			TimeSpan retVal=TimeSpan.Zero;
+			//Hours
+			if(parts.Length>=1){
+				double hours=0;
+				if(double.TryParse(parts[0],out hours)) {
+					//retVal=retVal.Add(TimeSpan.FromHours(hours));
+					retVal+=TimeSpan.FromHours(hours);
+				}
+				else {
+					throw new Exception("Invalid format");
+				}
+			}
+			//Minutes
+			if(parts.Length>=2) {
+				int minutes=0;
+				if(int.TryParse(parts[1],out minutes) && minutes<60 && minutes>=0) {
+					//if(retVal<TimeSpan.Zero) {//Negative adjustment
+					//	minutes*=-1;
+					//}
+					//retVal=retVal.Add(TimeSpan.FromMinutes(minutes));
+					retVal+=TimeSpan.FromMinutes(minutes);
+				}
+				else {
+					throw new Exception("Invalid format");
+				}
+			}
+			//Seconds
+			if(parts.Length==3) {
+				double seconds=0;
+				if(double.TryParse(parts[2],out seconds) && seconds<60 && seconds>=0) {
+					//if(retVal<TimeSpan.Zero) {//Negative adjustment
+					//	seconds*=-1;
+					//}
+					//retVal=retVal.Add(TimeSpan.FromSeconds(seconds));
+					retVal+=TimeSpan.FromSeconds(seconds);
+				}
+				else {
+					throw new Exception("Invalid format");
+				}
+			}
+			if(IsNegative) {
+				retVal=-retVal;
+			}
+			return retVal;
 		}
 
 		///<summary>Returns clockevent information for all non-hidden employees.  Used only in the time card manage window.  Set isAll to true to return all employee time cards (used for clinics).</summary>
