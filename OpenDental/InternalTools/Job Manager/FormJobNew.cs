@@ -24,7 +24,7 @@ namespace OpenDental {
 			}
 			JobCur.IsNew=true;
 			Text="New Job"+(JobCur.Title.Length>0?" - "+JobCur.Title:"");
-			controlJobEdit.LoadJob(JobCur);
+			controlJobEdit.LoadJob(JobCur,new TreeNode("New Job") { Tag=JobCur });
 		}
 
 		private void userControlJobEdit1_SaveClick(object sender,EventArgs e) {

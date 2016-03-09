@@ -48,12 +48,12 @@
 			this.tabManage = new System.Windows.Forms.TabPage();
 			this.gridWorkSummary = new OpenDental.UI.ODGrid();
 			this.tabMyJobs = new System.Windows.Forms.TabPage();
+			this.checkShowVersion = new System.Windows.Forms.CheckBox();
 			this.checkShowComplete = new System.Windows.Forms.CheckBox();
 			this.gridMyJobs = new OpenDental.UI.ODGrid();
 			this.butSearch = new OpenDental.UI.Button();
 			this.butMe = new OpenDental.UI.Button();
 			this.butAddJob = new OpenDental.UI.Button();
-			this.checkShowVersion = new System.Windows.Forms.CheckBox();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
@@ -217,6 +217,7 @@
 			this.treeJobs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.treeJobs.HideSelection = false;
 			this.treeJobs.Indent = 9;
 			this.treeJobs.Location = new System.Drawing.Point(3, 118);
 			this.treeJobs.Name = "treeJobs";
@@ -328,6 +329,7 @@
 			this.userControlJobEdit.Size = new System.Drawing.Size(1012, 640);
 			this.userControlJobEdit.TabIndex = 0;
 			this.userControlJobEdit.SaveClick += new System.EventHandler(this.userControlJobEdit_SaveClick);
+			this.userControlJobEdit.RequestJob += new OpenDental.InternalTools.Job_Manager.UserControlJobEdit.RequestJobEvent(this.userControlJobEdit_RequestJob);
 			this.userControlJobEdit.JobOverride += new OpenDental.InternalTools.Job_Manager.UserControlJobEdit.JobOverrideEvent(this.userControlJobEdit_JobOverride);
 			// 
 			// tabManage
@@ -370,6 +372,16 @@
 			this.tabMyJobs.Size = new System.Drawing.Size(1018, 646);
 			this.tabMyJobs.TabIndex = 4;
 			this.tabMyJobs.Text = "Jobs By User";
+			// 
+			// checkShowVersion
+			// 
+			this.checkShowVersion.Location = new System.Drawing.Point(128, 6);
+			this.checkShowVersion.Name = "checkShowVersion";
+			this.checkShowVersion.Size = new System.Drawing.Size(184, 20);
+			this.checkShowVersion.TabIndex = 245;
+			this.checkShowVersion.Text = "Show Version";
+			this.checkShowVersion.UseVisualStyleBackColor = true;
+			this.checkShowVersion.CheckedChanged += new System.EventHandler(this.checkShowVersion_CheckedChanged);
 			// 
 			// checkShowComplete
 			// 
@@ -442,16 +454,6 @@
 			this.butAddJob.TabIndex = 227;
 			this.butAddJob.Text = "Add Job";
 			this.butAddJob.Click += new System.EventHandler(this.butAddJob_Click);
-			// 
-			// checkShowVersion
-			// 
-			this.checkShowVersion.Location = new System.Drawing.Point(128, 6);
-			this.checkShowVersion.Name = "checkShowVersion";
-			this.checkShowVersion.Size = new System.Drawing.Size(184, 20);
-			this.checkShowVersion.TabIndex = 245;
-			this.checkShowVersion.Text = "Show Version";
-			this.checkShowVersion.UseVisualStyleBackColor = true;
-			this.checkShowVersion.CheckedChanged += new System.EventHandler(this.checkShowVersion_CheckedChanged);
 			// 
 			// FormJobManager2
 			// 
