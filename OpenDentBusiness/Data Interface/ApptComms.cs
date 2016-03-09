@@ -63,6 +63,17 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary></summary>
+		public static void TruncateAll() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod());
+				return;
+			}
+			//Truncate also resets autoincrement, this is ok for the apptcomm table.
+			string command="TRUNCATE TABLE apptcomm";
+			Db.NonQ(command);
+		}
+
+		///<summary></summary>
 		public static void DeleteForAppt(long apptNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),apptNum);
@@ -92,19 +103,22 @@ namespace OpenDentBusiness{
 			}
 			ApptComm apptComm;
 			DateTime daySend=appt.AptDateTime.Subtract(TimeSpan.FromDays(dayInterval));
+			bool isAutomationWindowDisabled=automationBeginPref.TimeOfDay==automationEndPref.TimeOfDay;
 			//This prevents a UE while pre-inserting new appointments and prevents adding reminder if the interval can't be reached.
 			if(dayInterval > 0 && appt.AptNum!=0 && daySend > DateTime.Now) {
 				apptComm=new ApptComm();
 				apptComm.ApptNum=appt.AptNum;
 				apptComm.ApptCommType=IntervalType.Daily;
-				DateTime automationBegin=new DateTime(daySend.Year,daySend.Month,daySend.Day
-					,automationBeginPref.Hour,automationBeginPref.Minute,automationBeginPref.Second);
-				if(daySend.TimeOfDay<automationBegin.TimeOfDay && automationBeginPref.TimeOfDay!=automationEndPref.TimeOfDay) {
-					//The reminder is scheduled to be sent prior to automation beginning.  Let's schedule it to send the night before.
-					DateTime automationEnd=new DateTime(daySend.Year,daySend.Month,daySend.Day
-						,automationEndPref.Hour,automationEndPref.Minute,automationEndPref.Second);//Make sure to use the reminder's day/month/year, then subtract one day.
-					DateTime dateSend=automationEnd.Subtract(TimeSpan.FromDays(1)).Subtract(TimeSpan.FromMinutes(30));//Schedule it for 30 minutes prior to automation end to make sure it attempts sending.
-					apptComm.DateTimeSend=dateSend;
+				DateTime automationBegin=daySend.Date.AddSeconds(automationBeginPref.TimeOfDay.TotalSeconds);
+				//automationEnd is the last moment of the day we are allowed to send.(date of automationEnd, time of automationEndPref - 30 minutes.)
+				DateTime automationEnd=daySend.Date.AddSeconds(automationEndPref.TimeOfDay.TotalSeconds).AddMinutes(-30);
+				if(daySend.TimeOfDay<automationBegin.TimeOfDay && !isAutomationWindowDisabled) {
+					//Apptcomm scheduled before the day starts, Send it at the end of the previous day.
+					apptComm.DateTimeSend=automationEnd.AddDays(-1);
+				}
+				else if(daySend.TimeOfDay>automationEnd.TimeOfDay && !isAutomationWindowDisabled) {
+					//Apptcomm scheduled after the day ends, Send it at the end of the current day.
+					apptComm.DateTimeSend=automationEnd;
 				}
 				else { 
 					apptComm.DateTimeSend=daySend;//Setting the ApptComm reminder to be sent dayInterval days before the appt.
@@ -116,14 +130,16 @@ namespace OpenDentBusiness{
 				apptComm=new ApptComm();
 				apptComm.ApptNum=appt.AptNum;
 				apptComm.ApptCommType=IntervalType.Hourly;
-				DateTime automationBegin=new DateTime(hourSend.Year,hourSend.Month,hourSend.Day
-					,automationBeginPref.Hour,automationBeginPref.Minute,automationBeginPref.Second);
-				if(hourSend.TimeOfDay<automationBegin.TimeOfDay && automationBeginPref.TimeOfDay!=automationEndPref.TimeOfDay) {
-					//The reminder is supposed to be sent prior to automation beginning.  Let's schedule it to send the night before.
-					DateTime automationEnd=new DateTime(hourSend.Year,hourSend.Month,hourSend.Day
-						,automationEndPref.Hour,automationEndPref.Minute,automationEndPref.Second);//Make sure to use the reminder's day/month/year, then subtract one day.
-					DateTime sendDate=automationEnd.Subtract(TimeSpan.FromDays(1)).Subtract(TimeSpan.FromMinutes(30));//Schedule it for 30 minutes prior to automation end to make sure it attempts sending.
-					apptComm.DateTimeSend=sendDate;
+				DateTime automationBegin=hourSend.Date.AddSeconds(automationBeginPref.TimeOfDay.TotalSeconds);
+				//automationEnd is the last moment of the day we are allowed to send.(date of automationEnd, time of automationEndPref - 30 minutes.)
+				DateTime automationEnd=hourSend.Date.AddSeconds(automationEndPref.TimeOfDay.TotalSeconds).AddMinutes(-30);
+				if(hourSend.TimeOfDay<automationBegin.TimeOfDay && !isAutomationWindowDisabled) {
+					//Apptcomm scheduled before the day starts, Send it at the end of the previous day.
+					apptComm.DateTimeSend=automationEnd.AddDays(-1);
+				}
+				else if(hourSend.TimeOfDay>automationEnd.TimeOfDay && !isAutomationWindowDisabled) {
+					//Apptcomm scheduled after the day ends, Send it at the end of the current day.
+					apptComm.DateTimeSend=automationEnd;
 				}
 				else { 
 					apptComm.DateTimeSend=hourSend;//Setting the ApptComm reminder to be sent HourInterval hours before the appt.
@@ -132,7 +148,7 @@ namespace OpenDentBusiness{
 			}
 		}
 
-		///<summary>Inserts appointment reminders for all future appointments.  
+		///<summary>"Resets" the ApptComm table. Truncates all existing ApptComms and inserts appointment reminders for all future appointments.  
 		///Used when automated appt reminder settings are changed so we can make sure all future appointments have appropriate reminders.</summary>
 		public static void InsertForFutureAppts() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -146,8 +162,8 @@ namespace OpenDentBusiness{
 			double hourInterval=PrefC.GetDouble(PrefName.ApptReminderHourInterval);
 			DateTime automationBeginPref=PrefC.GetDateT(PrefName.AutomaticCommunicationTimeStart);
 			DateTime automationEndPref=PrefC.GetDateT(PrefName.AutomaticCommunicationTimeEnd);
+			TruncateAll();
 			foreach(Appointment appt in listFutureAppts) {
-				DeleteForAppt(appt.AptNum);
 				//Get the DateTime automation end
 				InsertForAppt(appt,dayInterval,hourInterval,automationBeginPref,automationEndPref);
 			}
