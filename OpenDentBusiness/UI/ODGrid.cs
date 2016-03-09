@@ -123,6 +123,8 @@ namespace OpenDental.UI {
 		private int _printHeight;
 		private bool _hasMultilineHeaders;
 		private bool _hasAddButton;
+		/// <summary>Truncates the note to this many characters.</summary>
+		private int _noteLengthLimit=10000;
 
 		///<summary></summary>
 		public ODGrid() {
@@ -697,7 +699,12 @@ namespace OpenDental.UI {
 						_rowHeights[i]=imageH;
 					}
 					if(noteW>0 && rows[i].Note!="") {
-						NoteHeights[i]=(int)g.MeasureString(rows[i].Note,cellFontNormal,noteW,_format).Height;//Notes cannot be bold.  Always normal font.
+						if(rows[i].Note.Length<=_noteLengthLimit) {//Limiting the characters shown because large emails can cause OD to hang.
+							NoteHeights[i]=(int)g.MeasureString(rows[i].Note,cellFontNormal,noteW,_format).Height;//Notes cannot be bold.  Always normal font.
+						}
+						else {
+							NoteHeights[i]=(int)g.MeasureString(rows[i].Note.Substring(0,_noteLengthLimit),cellFontNormal,noteW,_format).Height;
+						}
 					}
 					if(i==0) {
 						RowLocs[i]=0;
@@ -1120,7 +1127,12 @@ namespace OpenDental.UI {
 					ColPos[NoteSpanStop]+columns[NoteSpanStop].ColWidth-ColPos[NoteSpanStart],
 					NoteHeights[rowI]);
 				_format.Alignment=StringAlignment.Near;
-				g.DrawString(rows[rowI].Note,cellFont,textBrush,textRect,_format);
+				if(rows[rowI].Note.Length<=_noteLengthLimit) {
+					g.DrawString(rows[rowI].Note,cellFont,textBrush,textRect,_format);
+				}
+				else {
+					g.DrawString(rows[rowI].Note.Substring(0,_noteLengthLimit),cellFont,textBrush,textRect,_format);
+				}
 			}
 		}
 
@@ -2114,7 +2126,12 @@ namespace OpenDental.UI {
 						noteW+=(int)((float)columns[i].ColWidth);
 					}
 					if(NoteRemaining=="") {//We are not in the middle of a note.
-						NoteRemaining=rows[RowsPrinted].Note;//The note remaining is the whole note.
+						if(rows[RowsPrinted].Note.Length<=_noteLengthLimit) {
+							NoteRemaining=rows[RowsPrinted].Note;//The note remaining is the whole note.
+						}
+						else {
+							NoteRemaining=rows[RowsPrinted].Note.Substring(0,_noteLengthLimit);//The note remaining is the whole note up to the note length limit.
+						}
 					}
 					noteHeight=(int)g.MeasureString(NoteRemaining,cellFont,noteW,_format).Height; //This is how much height the rest of the note will take.
 					bool roomForRestOfNote=false;
