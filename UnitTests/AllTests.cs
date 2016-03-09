@@ -3485,7 +3485,102 @@ namespace UnitTests {
 			return "59: Passed.  The mixture of providers with multiple clinic specific fees were correctly returned.\r\n";
 		}
 
-
-
+		///<summary>Downgrade insurance estimates #1. The PPO fee schedule has a blank fee for the downgraded code.</summary>
+		public static string TestSixty(int specificTest) {
+			if(specificTest != 0 && specificTest != 60) {
+				return "";
+			}
+			string suffix="60";
+			Patient pat=PatientT.CreatePatient(suffix);
+			long ucrFeeSchedNum=FeeSchedT.CreateFeeSched(FeeScheduleType.Normal,"UCR Fees"+suffix);
+			long ppoFeeSchedNum=FeeSchedT.CreateFeeSched(FeeScheduleType.Normal,"PPO Downgrades"+suffix);
+			Carrier carrier=CarrierT.CreateCarrier(suffix);
+			InsPlan plan=InsPlanT.CreateInsPlan(carrier.CarrierNum);
+			InsSub sub=InsSubT.CreateInsSub(pat.PatNum,plan.PlanNum);
+			long subNum=sub.InsSubNum;
+			BenefitT.CreateCategoryPercent(plan.PlanNum,EbenefitCategory.Restorative,100);
+			PatPlanT.CreatePatPlan(1,pat.PatNum,subNum);
+			ProcedureCode originalProcCode=ProcedureCodes.GetProcCode("D2393");
+			ProcedureCode downgradeProcCode=ProcedureCodes.GetProcCode("D2160");
+			originalProcCode.SubstitutionCode="D2160";
+			originalProcCode.SubstOnlyIf=SubstitutionCondition.Always;
+			ProcedureCodes.Update(originalProcCode);
+			FeeT.CreateFee(ucrFeeSchedNum,originalProcCode.CodeNum,300);
+			FeeT.CreateFee(ucrFeeSchedNum,downgradeProcCode.CodeNum,100);
+			FeeT.CreateFee(ppoFeeSchedNum,originalProcCode.CodeNum,120);
+			//No fee entered for D2160 in PPO Downgrades
+			Procedure proc=ProcedureT.CreateProcedure(pat,"D2393",ProcStat.C,"1",300);//Tooth 1
+			List<ClaimProc> claimProcs=ClaimProcs.Refresh(pat.PatNum);
+			List<ClaimProc> claimProcListOld=new List<ClaimProc>();
+			Family fam=Patients.GetFamily(pat.PatNum);
+			List<InsSub> subList=InsSubs.RefreshForFam(fam);
+			List<InsPlan> planList=InsPlans.RefreshForSubList(subList);
+			List<PatPlan> patPlans=PatPlans.Refresh(pat.PatNum);
+			List<Benefit> benefitList=Benefits.Refresh(patPlans,subList);
+			List<Procedure> ProcList=Procedures.Refresh(pat.PatNum);
+			InsPlan insPlan=planList[0];//Should only be one
+			insPlan.PlanType="p";
+			insPlan.FeeSched=ppoFeeSchedNum;
+			InsPlans.Update(insPlan);
+			//Creates the claim in the same manner as the account module, including estimates.
+			Claim claim=ClaimT.CreateClaim("P",patPlans,planList,claimProcs,ProcList,pat,ProcList,benefitList,subList);
+			ClaimProc clProc=ClaimProcs.Refresh(pat.PatNum)[0];//Should only be one
+			if(clProc.InsEstTotal != 120 || clProc.WriteOff != 180) {
+				throw new Exception("Incorrect claim proc values returned:\r\n"
+					+"\tClaim proc Ins Est should be $120, returned value:"+clProc.InsEstTotal.ToString("C")+"\r\n"
+					+"\tClaim proc Writeoff should be $180, returned value:"+clProc.WriteOff.ToString("C")+"\r\n");
+			}
+			return "60: Passed. Procedure code downgrades function properly when the downgrade fee is blank.\r\n";
 		}
+
+		///<summary>Downgrade insurance estimates #2. The PPO fee schedule has a higher fee for the downgraded code than for the original code.</summary>
+		public static string TestSixtyOne(int specificTest) {
+			if(specificTest != 0 && specificTest != 61) {
+				return "";
+			}
+			string suffix="61";
+			Patient pat=PatientT.CreatePatient(suffix);
+			long ucrFeeSchedNum=FeeSchedT.CreateFeeSched(FeeScheduleType.Normal,"UCR Fees"+suffix);
+			long ppoFeeSchedNum=FeeSchedT.CreateFeeSched(FeeScheduleType.Normal,"PPO Downgrades"+suffix);
+			Carrier carrier=CarrierT.CreateCarrier(suffix);
+			InsPlan plan=InsPlanT.CreateInsPlan(carrier.CarrierNum);
+			InsSub sub=InsSubT.CreateInsSub(pat.PatNum,plan.PlanNum);
+			long subNum=sub.InsSubNum;
+			BenefitT.CreateCategoryPercent(plan.PlanNum,EbenefitCategory.Restorative,100);
+			PatPlanT.CreatePatPlan(1,pat.PatNum,subNum);
+			ProcedureCode originalProcCode=ProcedureCodes.GetProcCode("D2391");
+			ProcedureCode downgradeProcCode=ProcedureCodes.GetProcCode("D2140");
+			originalProcCode.SubstitutionCode="D2140";
+			originalProcCode.SubstOnlyIf=SubstitutionCondition.Always;
+			ProcedureCodes.Update(originalProcCode);
+			FeeT.CreateFee(ucrFeeSchedNum,originalProcCode.CodeNum,140);
+			FeeT.CreateFee(ucrFeeSchedNum,downgradeProcCode.CodeNum,120);
+			FeeT.CreateFee(ppoFeeSchedNum,originalProcCode.CodeNum,80);
+			FeeT.CreateFee(ppoFeeSchedNum,downgradeProcCode.CodeNum,100);
+			Procedure proc=ProcedureT.CreateProcedure(pat,"D2391",ProcStat.C,"1",140);//Tooth 1
+			List<ClaimProc> claimProcs=ClaimProcs.Refresh(pat.PatNum);
+			List<ClaimProc> claimProcListOld=new List<ClaimProc>();
+			Family fam=Patients.GetFamily(pat.PatNum);
+			List<InsSub> subList=InsSubs.RefreshForFam(fam);
+			List<InsPlan> planList=InsPlans.RefreshForSubList(subList);
+			List<PatPlan> patPlans=PatPlans.Refresh(pat.PatNum);
+			List<Benefit> benefitList=Benefits.Refresh(patPlans,subList);
+			List<Procedure> ProcList=Procedures.Refresh(pat.PatNum);
+			InsPlan insPlan=planList[0];//Should only be one
+			insPlan.PlanType="p";
+			insPlan.FeeSched=ppoFeeSchedNum;
+			InsPlans.Update(insPlan);
+			//Creates the claim in the same manner as the account module, including estimates.
+			Claim claim=ClaimT.CreateClaim("P",patPlans,planList,claimProcs,ProcList,pat,ProcList,benefitList,subList);
+			ClaimProc clProc=ClaimProcs.Refresh(pat.PatNum)[0];//Should only be one
+			if(clProc.InsEstTotal != 80 || clProc.WriteOff != 60) {
+				throw new Exception("Incorrect claim proc values returned:\r\n"
+					+"\tClaim proc Ins Est should be $80, returned value:"+clProc.InsEstTotal.ToString("C")+"\r\n"
+					+"\tClaim proc Writeoff should be $60, returned value:"+clProc.WriteOff.ToString("C")+"\r\n");
+			}
+			return "61: Passed. Procedure code downgrades function properly when the downgraded fee minus the writeoff is less than the allowed amount.\r\n";
+		}
+
+
+	}
 }

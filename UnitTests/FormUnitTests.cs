@@ -582,6 +582,20 @@ namespace UnitTests {
 			catch(Exception ex) {
 				textResults.Text+="59: Failed. "+ex.Message;
 			}
+			try {
+				Application.DoEvents();
+				textResults.Text+=AllTests.TestSixty(specificTest);
+			}
+			catch(Exception ex) {
+				textResults.Text+="60: Failed. "+ex.Message;
+			}
+			try {
+				Application.DoEvents();
+				textResults.Text+=AllTests.TestSixtyOne(specificTest);
+			}
+			catch(Exception ex) {
+				textResults.Text+="61: Failed. "+ex.Message;
+			}
 			textResults.Text+="Done";
 			Cursor=Cursors.Default;
 		}
