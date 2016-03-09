@@ -150,13 +150,13 @@ namespace OpenDentBusiness {
 
 		///<summary>Not a database column.  Saved in database in the procnote table.  This note is only the most recent note from that table.  If user changes it, then the business layer handles it by adding another procnote to that table.</summary>
 		[CrudColumn(IsNotDbColumn=true)]
-		public string Note;
+		public string Note="";
 		///<summary>Not a database column.  Just used for now to set the user so that it can be saved with the ProcNote.</summary>
 		[CrudColumn(IsNotDbColumn=true)]
 		public long UserNum;
 		///<summary>Not a database column.  If viewing an individual procedure, then this will contain the encrypted signature.  If viewing a procedure list, this will typically just contain an "X" if a signature is present.  If user signs note, the signature will be encrypted before placing into this field.  Then it will be passed down and saved directly as is.</summary>
 		[CrudColumn(IsNotDbColumn=true)]
-		public string Signature;
+		public string Signature="";
 		///<summary>Not a database column.</summary>
 		[CrudColumn(IsNotDbColumn=true)]
 		public bool SigIsTopaz;
