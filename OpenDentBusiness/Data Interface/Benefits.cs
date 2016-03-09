@@ -434,11 +434,11 @@ namespace OpenDentBusiness {
 				return 0;
 			}
 			double retVal=benInd.MonetaryAmt;
-			#region reduce by amount individual already paid this year
-			//reduce by amount individual already paid this year--------------------------------------------------------------------
+			//Reduce by the sum of the deductibles on claim procs associated with claims in the benefit period for individual or family as appropriate
+			#region reduce by amount individual already paid this year			
 			//establish date range for procedures to consider
 			DateTime dateStart=BenefitLogic.ComputeRenewDate(procDate,plan.MonthRenew);
-			DateTime dateEnd=procDate;//I guess we don't want to consider anything after the date of this procedure.
+			DateTime dateEnd=dateStart.AddYears(1).AddDays(-1);//Consider all claim procs with a ProcDate within one year of the renew date
 			if(benInd.TimePeriod==BenefitTimePeriod.Lifetime) {
 				dateStart=DateTime.MinValue;
 			}
