@@ -21,11 +21,16 @@ namespace OpenDental.InternalTools.Job_Manager {
 		private bool _isChanged;
 		private bool _isOverride;
 		private bool _isLoading;
+		///<summary>Passed in to LoadJob from job manager, used to display job family.</summary>
+		private TreeNode _treeNode;
 
 		///<summary>Occurs whenever this control saves changes to DB, after the control has redrawn itself. 
 		/// Usually connected to either a form close or refresh.</summary>
 		[Category("Action"),Description("Whenever this control saves changes to DB, after the control has redrawn itself. Usually connected to either a form close or refresh.")]
 		public event EventHandler SaveClick=null;
+
+		public delegate void RequestJobEvent(object sender,long jobNum);
+		public event RequestJobEvent RequestJob=null;
 
 		public delegate void UpdateTitleEvent(object sender,string title);
 		public event UpdateTitleEvent TitleChanged=null;
@@ -81,12 +86,13 @@ namespace OpenDental.InternalTools.Job_Manager {
 		}
 
 		///<summary>Should only be called once when new job should be loaded into control. If called again, changes will be lost.</summary>
-		public void LoadJob(Job job) {
+		public void LoadJob(Job job,TreeNode treeNode) {
 			_isLoading=true;
 			this.Enabled=false;//disable control while it is filled.
 			_isOverride=false;
 			IsChangeRequest=false;
 			IsChanged=false;
+			_treeNode=treeNode;
 			if(job==null) {
 				_jobCur=new Job();
 			}
@@ -138,6 +144,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 
 		private void FillAllGrids() {
 			FillGridRoles();
+			FillTreeRelated();
 			FillGridWatchers();
 			FillGridCustQuote();
 			FillGridTasks();
@@ -183,6 +190,42 @@ namespace OpenDental.InternalTools.Job_Manager {
 			}
 			gridRoles.Rows.Add(row);
 			gridRoles.EndUpdate();
+		}
+
+		private void FillTreeRelated() {
+			labelRelatedJobs.Visible=!IsNew;
+			treeRelatedJobs.Visible=!IsNew;
+			if(IsNew) {
+				return;
+			}
+			treeRelatedJobs.Nodes.Clear();
+			//Color the current job grey
+			List<TreeNode> listNodes = new List<TreeNode>();
+			listNodes.Add(_treeNode);
+			for(int i = 0;i<listNodes.Count;i++) {
+				if(((Job)listNodes[i].Tag).JobNum==_jobCur.JobNum) {
+					listNodes[i].BackColor=Color.LightGray;
+				}
+				else {
+					listNodes[i].BackColor=Color.White;
+				}
+				listNodes.AddRange(listNodes[i].Nodes.Cast<TreeNode>());
+			}
+			treeRelatedJobs.Nodes.Add(_treeNode);
+			treeRelatedJobs.ExpandAll();
+		}
+
+		private void treeRelatedJobs_NodeMouseClick(object sender,TreeNodeMouseClickEventArgs e) {
+			if(IsNew || !(e.Node.Tag is Job)) {
+				return;
+			}
+			if(RequestJob!=null) {
+				RequestJob(this,((Job)e.Node.Tag).JobNum);
+			}
+		}
+
+		private void treeRelatedJobs_AfterSelect(object sender,TreeViewEventArgs e) {
+			treeRelatedJobs.SelectedNode=null;
 		}
 
 		private void FillGridWatchers() {
@@ -544,7 +587,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 			ContextMenu actionMenu=new System.Windows.Forms.ContextMenu();
 			switch(_jobCur.PhaseCur) {
 				case JobPhase.Concept:
-					perm=JobPermissions.IsAuthorized(JobPerm.Approval,true)||JobPermissions.IsAuthorized(JobPerm.Concept,true);//x
+					perm=JobPermissions.IsAuthorized(JobPerm.Approval,true)||JobPermissions.IsAuthorized(JobPerm.Concept,true)||_isOverride;//x
 					if(IsNew) {
 						actionMenu.MenuItems.Add(new MenuItem("Save Concept",(o,arg)=> {
 							if(!ValidateJob(_jobCur)) {
@@ -571,13 +614,16 @@ namespace OpenDental.InternalTools.Job_Manager {
 					break;
 				case JobPhase.Definiton:
 					if(!_jobCur.IsApprovalNeeded) {
-						if(JobPermissions.IsAuthorized(JobPerm.Approval,true) || JobPermissions.IsAuthorized(JobPerm.Writeup,true)) {
+						if(JobPermissions.IsAuthorized(JobPerm.Approval,true) || JobPermissions.IsAuthorized(JobPerm.Writeup,true) || _isOverride) {
 							actionMenu.MenuItems.Add(new MenuItem((_jobCur.UserNumExpert==0 ? "A" : "Rea")+"ssign Expert",actionMenu_AssignExpertClick) { Enabled=true });//x
 						}
 						perm=JobPermissions.IsAuthorized(JobPerm.Writeup,true) && (_jobCur.UserNumExpert==0 || _jobCur.UserNumExpert==Security.CurUser.UserNum);
 						actionMenu.MenuItems.Add(new MenuItem("Send for Approval",actionMenu_RequestJobApprovalClick) { Enabled=perm });//x
 						if(_jobCur.Category==JobCategory.Bug) {
 							actionMenu.MenuItems.Add(new MenuItem("Send to In Development",actionMenu_SendInDevelopmentClick) { Enabled=perm });//x
+						}
+						if(JobPermissions.IsAuthorized(JobPerm.Approval,true)) {
+							actionMenu.MenuItems.Add(new MenuItem("Unapprove Concept",actionMenu_UnapproveJobClick) { Enabled=true });//x
 						}
 					}
 					else {
@@ -589,10 +635,10 @@ namespace OpenDental.InternalTools.Job_Manager {
 					break;
 				case JobPhase.Development:
 					if(!_jobCur.IsApprovalNeeded) {
-						if(JobPermissions.IsAuthorized(JobPerm.Approval,true) || JobPermissions.IsAuthorized(JobPerm.Writeup,true)) {
+						if(JobPermissions.IsAuthorized(JobPerm.Approval,true) || JobPermissions.IsAuthorized(JobPerm.Writeup,true) || _isOverride) {
 							actionMenu.MenuItems.Add(new MenuItem((_jobCur.UserNumExpert==0 ? "A" : "Rea")+"ssign Expert",actionMenu_AssignExpertClick) { Enabled=true });//x
 						}
-						if(_jobCur.UserNumExpert==Security.CurUser.UserNum ) {//only expert may re-assign
+						if(JobPermissions.IsAuthorized(JobPerm.Approval,true) || _jobCur.UserNumExpert==Security.CurUser.UserNum  || _isOverride) {//only expert may re-assign
 							actionMenu.MenuItems.Add(new MenuItem((_jobCur.UserNumEngineer==0?"A":"Rea")+"ssign Engineer",actionMenu_AssignEngineerClick) { Enabled=true });//x
 						}
 						else if(_jobCur.UserNumEngineer==0 && JobPermissions.IsAuthorized(JobPerm.Engineer,true)) {
@@ -606,6 +652,9 @@ namespace OpenDental.InternalTools.Job_Manager {
 						bool isEngineer = JobPermissions.IsAuthorized(JobPerm.Engineer,true) && (_jobCur.UserNumEngineer==Security.CurUser.UserNum);
 						perm=(isExpert || isEngineer) && _jobCur.UserNumEngineer>0 && _jobCur.ListJobReviews.Count>0 && _jobCur.ListJobReviews.All(x => x.ReviewStatus==JobReviewStatus.Done);
 						actionMenu.MenuItems.Add(new MenuItem("Mark as Implemented",actionMenu_ImplementedClick) { Enabled=perm });//not until the engineer set, and reviews completed
+						if(JobPermissions.IsAuthorized(JobPerm.Approval,true)) {
+							actionMenu.MenuItems.Add(new MenuItem("Unapprove Concept",actionMenu_UnapproveJobClick) { Enabled=true });//x
+						}
 					}
 					else {
 						perm=JobPermissions.IsAuthorized(JobPerm.Approval,true);
@@ -629,7 +678,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 						break;//no menu items if already contacted.
 					}
 					perm=JobPermissions.IsAuthorized(JobPerm.NotifyCustomer,true) && (_jobCur.UserNumCustContact==0 || _jobCur.UserNumCustContact==Security.CurUser.UserNum);
-					if(JobPermissions.IsAuthorized(JobPerm.NotifyCustomer,true)) {
+					if(JobPermissions.IsAuthorized(JobPerm.NotifyCustomer,true) || _isOverride) {
 						actionMenu.MenuItems.Add(new MenuItem((_jobCur.UserNumCustContact==0 ? "A" : "Rea")+"ssign Contacter",actionMenu_AssignContacterClick) { Enabled=true });//x
 					}
 					actionMenu.MenuItems.Add(new MenuItem("Email Attached Customers",actionMenu_EmailAttachedClick) { Enabled=perm });//x
@@ -814,6 +863,20 @@ namespace OpenDental.InternalTools.Job_Manager {
 		}
 		#endregion
 		#region Request Approval/Reviews
+
+		private void actionMenu_UnapproveJobClick(object sender,EventArgs e) {
+			if(!ValidateJob(_jobCur)) {
+				return;
+			}
+			IsChanged=true;
+			_jobCur.PhaseCur=JobPhase.Concept;
+			_jobCur.IsApprovalNeeded=false;
+			_jobCur.UserNumApproverConcept=0;
+			_jobCur.UserNumApproverJob=0;
+			_jobCur.UserNumApproverChange=0;
+			SaveJob(_jobCur);
+		}
+
 		private void actionMenu_RequestConceptApprovalClick(object sender,EventArgs e) {
 			if(!ValidateJob(_jobCur)) {
 				return;
@@ -1162,10 +1225,18 @@ namespace OpenDental.InternalTools.Job_Manager {
 		}
 
 		private void butParentRemove_Click(object sender,EventArgs e) {
-			IsChanged=true;
 			_jobCur.ParentNum=0;
+			_jobOld.ParentNum=0;
 			textParent.Text="";
-			//todoSave
+			if(IsNew) {
+				IsChanged=true;
+			}
+			else {
+				Job jobCur = Jobs.GetOne(_jobCur.JobNum);
+				jobCur.ParentNum=0;
+				Jobs.Update(jobCur);
+				Signalods.SetInvalid(InvalidType.Jobs,KeyType.Job,jobCur.JobNum);
+			}
 		}
 
 		private void butParentPick_Click(object sender,EventArgs e) {
@@ -1174,20 +1245,28 @@ namespace OpenDental.InternalTools.Job_Manager {
 			if(inBox.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			long jobNum=0;
-			long.TryParse(new string(inBox.textResult.Text.Where(char.IsDigit).ToArray()),out jobNum);
-			Job job=Jobs.GetOne(jobNum);
+			long parentNum=0;
+			long.TryParse(new string(inBox.textResult.Text.Where(char.IsDigit).ToArray()),out parentNum);
+			Job job=Jobs.GetOne(parentNum);
 			if(job==null) {
 				return;
 			}
-			if(Jobs.CheckForLoop(_jobCur.JobNum,jobNum)) {
+			if(Jobs.CheckForLoop(_jobCur.JobNum,parentNum)) {
 				MsgBox.Show(this,"Invalid parent job, would create an infinite loop.");
 				return;
 			}
-			IsChanged=true;
 			_jobCur.ParentNum=job.JobNum;
+			_jobOld.ParentNum=job.JobNum;
 			textParent.Text=job.ToString();
-			//TOdo: save
+			if(IsNew) {
+				IsChanged=true;
+			}
+			else {
+				Job jobCur = Jobs.GetOne(_jobCur.JobNum);
+				jobCur.ParentNum=parentNum;
+				Jobs.Update(jobCur);
+				Signalods.SetInvalid(InvalidType.Jobs,KeyType.Job,jobCur.JobNum);
+			}
 		}
 
 		private void butSave_Click(object sender,EventArgs e) {
@@ -1255,7 +1334,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 				job.ListJobEvents.Add(JobEvents.GetOne(jobEventCur.JobEventNum));//to get correct time stamp
 			}
 			Signalods.SetInvalid(InvalidType.Jobs,KeyType.Job,job.JobNum);
-			LoadJob(job);
+			LoadJob(job,_treeNode);//Tree view may become out of date if viewing a job for an extended period of time.
 			if(SaveClick!=null) {
 				SaveClick(this,new EventArgs());
 			}

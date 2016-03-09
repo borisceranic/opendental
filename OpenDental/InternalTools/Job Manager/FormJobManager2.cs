@@ -284,9 +284,17 @@ namespace OpenDental {
 			row.Cells.Add(new ODGridCell(job.Title.Left(50,true)) { CellColor=cellColor });//first 50 characters.
 			Color cLightGreen = Color.FromArgb(236,255,236);//light green
 			long cellLong = job.OwnerNum;
-			row.Cells.Add(new ODGridCell(Userods.GetName(cellLong)) { CellColor=(cellLong==userNumHighlight ? cLightGreen : Color.Empty) });
-			row.Cells.Add(new ODGridCell(job.OwnerAction.GetDescription()) { CellColor=(cellLong==userNumHighlight ? cLightGreen : Color.Empty) });
-			row.Cells.Add(new ODGridCell(job.IsApprovalNeeded ? "X" : "") { CellColor=(cellLong==userNumHighlight ? cLightGreen : Color.Empty) });
+			if(job.UserNumCheckout==0) {
+				row.Cells.Add(new ODGridCell(Userods.GetName(cellLong)) { CellColor=(cellLong==userNumHighlight ? cLightGreen : Color.Empty) });
+				row.Cells.Add(new ODGridCell(job.OwnerAction.GetDescription()) { CellColor=(cellLong==userNumHighlight ? cLightGreen : Color.Empty) });
+				row.Cells.Add(new ODGridCell(job.IsApprovalNeeded ? "X" : "") { CellColor=(cellLong==userNumHighlight ? cLightGreen : Color.Empty) });
+			}
+			else {
+				cellLong = job.UserNumCheckout;
+				row.Cells.Add(new ODGridCell(Userods.GetName(cellLong)) { CellColor=Color.FromArgb(254,235,233) });
+				row.Cells.Add(new ODGridCell("Job Checked Out") { CellColor= Color.FromArgb(254,235,233) });
+				row.Cells.Add(new ODGridCell("") { CellColor = Color.FromArgb(254,235,233) });
+			}
 			cellLong = job.UserNumConcept;
 			row.Cells.Add(new ODGridCell(Userods.GetName(cellLong)) { CellColor=(cellLong==userNumHighlight ? cLightGreen : Color.Empty) });
 			cellLong = job.UserNumExpert;
@@ -444,7 +452,7 @@ namespace OpenDental {
 				case GroupJobsBy.MyHeirarchy:
 				case GroupJobsBy.Heirarchy:
 					foreach(Job job in _listJobsFiltered.Where(x=>x.ParentNum==0)) {//Add top level nodes.
-						TreeNode node=GetNodeHeirarchy(job);//get child nodes for each top level node.
+						TreeNode node=GetNodeHeirarchyFiltered(job);//get child nodes for each top level node.
 						treeJobs.Nodes.Add(node);
 					}
 					break;
@@ -546,9 +554,9 @@ namespace OpenDental {
 			return node;
 		}
 
-		///<summary>Recursive</summary>
-		private TreeNode GetNodeHeirarchy(Job job) {
-			TreeNode[] children=_listJobsFiltered.FindAll(x => x.ParentNum==job.JobNum).Select(GetNodeHeirarchy).ToArray();//can be enhanced by removing matches from the search set.
+		///<summary></summary>
+		private TreeNode GetNodeHeirarchyFiltered(Job job) {
+			TreeNode[] children=_listJobsFiltered.FindAll(x => x.ParentNum==job.JobNum).Select(GetNodeHeirarchyFiltered).ToArray();//can be enhanced by removing matches from the search set.
 			TreeNode node=new TreeNode(job.ToString()) { Tag=job };
 			if(children.Length>0) {
 				node.Nodes.AddRange(children);
@@ -557,6 +565,28 @@ namespace OpenDental {
 				node.BackColor=Color.FromArgb(255,255,230);
 			}
 			return node;
+		}
+		///<summary></summary>
+		private TreeNode GetNodeHeirarchyAll(Job job) {
+			TreeNode[] children = _listJobsAll.FindAll(x => x.ParentNum==job.JobNum).Select(GetNodeHeirarchyAll).ToArray();//can be enhanced by removing matches from the search set.
+			TreeNode node = new TreeNode(job.ToString()) { Tag=job };
+			if(children.Length>0) {
+				node.Nodes.AddRange(children);
+			}
+			return node;
+		}
+
+		///<summary>Similar to GetNodeHeirarchy, but used to build tree to be passed to job control.</summary>
+		private TreeNode GetJobTree(Job job) {
+			List<Job> jobHeirarchy = new List<Job> { job };
+			for(int i = 0;i<jobHeirarchy.Count;i++) {
+				Job j = _listJobsAll.FirstOrDefault(x => x.JobNum==jobHeirarchy[i].ParentNum);
+				if(j==null) {
+					break;
+				}
+				jobHeirarchy.Add(j);
+			}
+			return GetNodeHeirarchyAll(jobHeirarchy.Last());
 		}
 
 		///<summary>Check for heirarchical loops when moving a child job to a parent job. Returns true if loop is found. Example A>B>C>A would be a loop.</summary>
@@ -588,7 +618,7 @@ namespace OpenDental {
 			if(e.Node!=null && (e.Node.Tag is Job)) {
 				job=(Job)e.Node.Tag;
 			}
-			userControlJobEdit.LoadJob(job);
+			userControlJobEdit.LoadJob(job,GetJobTree(job));
 		}
 
 		private void treeJobs_ItemDrag(object sender,ItemDragEventArgs e) {
@@ -784,7 +814,7 @@ namespace OpenDental {
 		}
 
 		public void GoToJob(long jobNum) {
-			Job job = Jobs.GetOneFilled(jobNum);
+			Job job=Jobs.GetOneFilled(jobNum);
 			if(job==null) {
 				MessageBox.Show("Job not found.");
 				return;
@@ -792,7 +822,26 @@ namespace OpenDental {
 			if(JobUnsavedChangesCheck()) {
 				return;//there ARE unsaved changes that the user decided not to save.
 			}
-			userControlJobEdit.LoadJob(job);
+			//If launching from task, and job manager is not yet open, then GetJobTree will return an empty tree
+			//Wait until the data set is filled to continue.
+			int loopCount = 0;
+			while(_listJobsAll.Count==0 && loopCount<20) {
+				System.Threading.Thread.Sleep(100);
+				loopCount++;//in case the DB is empty or there is an error for some reason. do not wait more than 2 seconds. this is an arbitrary length of time.
+			}
+			userControlJobEdit.LoadJob(job,GetJobTree(job));
+		}
+
+		private void userControlJobEdit_RequestJob(object sender,long jobNum) {
+			Job job = _listJobsAll.FirstOrDefault(x=>x.JobNum==jobNum);
+			if(job==null) {
+				MessageBox.Show("Job not found.");//shouldn't happen if everything is working properly.
+				return;
+			}
+			if(JobUnsavedChangesCheck()) {
+				return;//there ARE unsaved changes that the user decided not to save.
+			}
+			userControlJobEdit.LoadJob(job,GetJobTree(job));
 		}
 
 		///<summary>For UI only. Never saved to DB.</summary>
@@ -803,7 +852,6 @@ namespace OpenDental {
 			User,
 			Status,
 			Owner
-
 		}
 
 		private void butSearch_Click(object sender,EventArgs e) {
@@ -825,7 +873,7 @@ namespace OpenDental {
 			if(JobUnsavedChangesCheck()) {
 				return;
 			}
-			userControlJobEdit.LoadJob(FormJS.SelectedJob);//can be null
+			userControlJobEdit.LoadJob(FormJS.SelectedJob,GetJobTree(FormJS.SelectedJob));//can be null
 		}
 
 		private void comboCategorySearch_SelectedIndexChanged(object sender,EventArgs e) {
@@ -873,7 +921,7 @@ namespace OpenDental {
 				return;
 			}
 			Job job = (Job)gridMyJobs.Rows[e.Row].Tag;
-			userControlJobEdit.LoadJob(job);
+			userControlJobEdit.LoadJob(job,GetJobTree(job));
 			FillGridActions();
 		}
 
@@ -943,7 +991,7 @@ namespace OpenDental {
 				return;
 			}
 			Job selectedjob = (Job)gridAction.Rows[e.Row].Tag;
-			userControlJobEdit.LoadJob(selectedjob);
+			userControlJobEdit.LoadJob(selectedjob,GetJobTree(selectedjob));
 			int idx=gridMyJobs.Rows.Cast<ODGridRow>().ToList().FindIndex(x => (x.Tag is Job) && ((Job)x.Tag).JobNum==selectedjob.JobNum);
 			if(idx>-1) {
 				gridMyJobs.SetSelected(idx,true);
@@ -1026,5 +1074,6 @@ namespace OpenDental {
 				return;
 			}
 		}
+
 	}
 }
