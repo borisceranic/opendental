@@ -742,7 +742,6 @@ namespace OpenDental {
 
 		public void Search_Clicked() {
 			FormTaskSearch FormTS=new FormTaskSearch();
-			FormTS.TaskGoToEvent+=TaskGoToEvent;
 			FormTS.Show();
 		}
 
@@ -822,7 +821,6 @@ namespace OpenDental {
 			}
 			else {//task
 				FormTaskEdit FormT=new FormTaskEdit(TasksList[clickedI-TaskListsList.Count],TasksList[clickedI-TaskListsList.Count].Copy());
-				FormT.Closing+=new CancelEventHandler(TaskGoToEvent);
 				FormT.Show();//non-modal
 			}
 		}
@@ -1047,7 +1045,6 @@ namespace OpenDental {
 				DataValid.SetInvalidTask(task.TaskNum,false);
 				FormTaskEdit FormT=new FormTaskEdit(task,task.Copy());
 				FormT.IsPopup=true;
-				FormT.Closing+=new CancelEventHandler(TaskGoToEvent);
 				FormT.Show();//non-modal
 			}
 			catch(Exception ex) {
@@ -1193,7 +1190,6 @@ namespace OpenDental {
 				//It's important to grab the task directly from the db because the status in this list is fake, being the "unread" status instead.
 				Task task=Tasks.GetOne(TasksList[e.Row-TaskListsList.Count].TaskNum);
 				FormTaskEdit FormT=new FormTaskEdit(task,task.Copy());
-				FormT.Closing+=new CancelEventHandler(TaskGoToEvent);
 				FormT.Show();//non-modal
 			}
 		}

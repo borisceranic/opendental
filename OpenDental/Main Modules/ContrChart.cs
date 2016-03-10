@@ -7381,7 +7381,6 @@ namespace OpenDental {
 				}
 				else {
 					FormTaskEdit FormT=new FormTaskEdit(task,task.Copy());
-					FormT.Closing+=new CancelEventHandler(TaskGoToEvent);
 					FormT.Show();//non-modal
 				}
 			}

@@ -27,7 +27,7 @@ namespace OpenDentBusiness {
 		}
 
 		public static string Left(this string s,int maxCharacters,bool hasElipsis=false) {
-			if(s==null || string.IsNullOrEmpty(s)) {
+			if(s==null || string.IsNullOrEmpty(s) || maxCharacters<1) {
 				return "";
 			}
 			if(s.Length>maxCharacters) {
@@ -40,7 +40,7 @@ namespace OpenDentBusiness {
 		}
 
 		public static string Right(this string s,int maxCharacters) {
-			if(s==null || string.IsNullOrEmpty(s)) {
+			if(s==null || string.IsNullOrEmpty(s) || maxCharacters<1) {
 				return "";
 			}
 			if(s.Length>maxCharacters) {

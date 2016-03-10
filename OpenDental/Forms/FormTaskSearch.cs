@@ -16,7 +16,6 @@ namespace OpenDental {
 		private List<Def> _listTaskPriorities;
 		private List<Userod> _listUsers;
 		public TaskObjectType GotoType;
-		public CancelEventHandler TaskGoToEvent;
 		public long UserNum;
 		public long GotoKeyNum;
 		public bool IsSelectionMode;
@@ -143,7 +142,6 @@ namespace OpenDental {
 			}
 			Task task=Tasks.GetOne(taskNum);
 			FormTaskEdit FormTE=new FormTaskEdit(task,task.Copy());
-			FormTE.Closing+=TaskGoToEvent;
 			FormTE.Closing+=RefreshGrid;
 			FormTE.Show();
 		}
@@ -199,7 +197,29 @@ namespace OpenDental {
 			dateCompletedFrom.Value=DateTime.UtcNow;
 			dateCompletedTo.Value=DateTime.UtcNow;
 			dateCompletedFrom.CustomFormat=" ";
-			dateCompletedTo.CustomFormat=" ";			
+			dateCompletedTo.CustomFormat=" ";
+		}
+
+		private void butNewTask_Click(object sender,EventArgs e) {
+			FormTaskListSelect FormTLS = new FormTaskListSelect(TaskObjectType.Patient);
+			FormTLS.ShowDialog();
+			if(FormTLS.DialogResult!=DialogResult.OK || FormTLS.SelectedTaskListNum==0) {
+				return;
+			}
+			Task task = new Task() { TaskListNum=-1 };//don't show it in any list yet.
+			Tasks.Insert(task);
+			Task taskOld = task.Copy();
+			task.UserNum=Security.CurUser.UserNum;
+			task.TaskListNum=FormTLS.SelectedTaskListNum;
+			FormTaskEdit FormTE = new FormTaskEdit(task,taskOld);
+			FormTE.IsNew=true;
+			FormTE.ShowDialog();//modal
+			if(FormTE.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			SelectedTaskNum=task.TaskNum;
+			DialogResult=DialogResult.OK;
+			Close();
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {

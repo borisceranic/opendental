@@ -35,6 +35,7 @@ namespace OpenDental{
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.comboReviewer = new System.Windows.Forms.ComboBox();
+			this.butLogin = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -105,6 +106,7 @@ namespace OpenDental{
 			this.textDescription.QuickPasteType = OpenDentBusiness.QuickPasteType.CommLog;
 			this.textDescription.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textDescription.Size = new System.Drawing.Size(389, 229);
+			this.textDescription.SpellCheckIsEnabled = false;
 			this.textDescription.TabIndex = 11;
 			this.textDescription.Text = "";
 			// 
@@ -164,10 +166,26 @@ namespace OpenDental{
 			this.comboReviewer.Size = new System.Drawing.Size(183, 21);
 			this.comboReviewer.TabIndex = 18;
 			// 
+			// butLogin
+			// 
+			this.butLogin.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butLogin.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butLogin.Autosize = true;
+			this.butLogin.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butLogin.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butLogin.CornerRadius = 4F;
+			this.butLogin.Location = new System.Drawing.Point(326, 95);
+			this.butLogin.Name = "butLogin";
+			this.butLogin.Size = new System.Drawing.Size(75, 24);
+			this.butLogin.TabIndex = 19;
+			this.butLogin.Text = "Login as...";
+			this.butLogin.Click += new System.EventHandler(this.butLogin_Click);
+			// 
 			// FormJobReviewEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(413, 396);
+			this.Controls.Add(this.butLogin);
 			this.Controls.Add(this.comboReviewer);
 			this.Controls.Add(this.textDescription);
 			this.Controls.Add(this.butDelete);
@@ -181,7 +199,6 @@ namespace OpenDental{
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormJobReviewEdit";
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Job Review Edit";
 			this.Load += new System.EventHandler(this.FormJobReviewEdit_Load);
 			this.ResumeLayout(false);
@@ -202,5 +219,6 @@ namespace OpenDental{
 		private UI.Button butDelete;
 		private ODtextBox textDescription;
 		private System.Windows.Forms.ComboBox comboReviewer;
+		private UI.Button butLogin;
 	}
 }
