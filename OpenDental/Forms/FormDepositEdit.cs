@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using OpenDental.Bridges;
 using OpenDental.UI;
 using OpenDentBusiness;
+using System.Diagnostics;
 
 namespace OpenDental{
 	/// <summary>
@@ -68,6 +69,7 @@ namespace OpenDental{
 		private Label label8;
 		private TextBox textItemNum;
 		private Label label9;
+		private UI.Button butPDF;
 		///<summary>Used to store DefNums in a 1:1 ratio for listInsPayType</summary>
 		private List<long> _insPayDefNums;
 
@@ -141,6 +143,7 @@ namespace OpenDental{
 			this.textDateStart = new OpenDental.ValidDate();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.butPDF = new OpenDental.UI.Button();
 			this.groupSelect.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -423,9 +426,9 @@ namespace OpenDental{
 			this.butPrint.CornerRadius = 4F;
 			this.butPrint.Image = global::OpenDental.Properties.Resources.butPrintSmall;
 			this.butPrint.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butPrint.Location = new System.Drawing.Point(605, 630);
+			this.butPrint.Location = new System.Drawing.Point(602, 632);
 			this.butPrint.Name = "butPrint";
-			this.butPrint.Size = new System.Drawing.Size(81, 24);
+			this.butPrint.Size = new System.Drawing.Size(75, 24);
 			this.butPrint.TabIndex = 108;
 			this.butPrint.Text = "&Print";
 			this.butPrint.Click += new System.EventHandler(this.butPrint_Click);
@@ -497,7 +500,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(789, 631);
+			this.butOK.Location = new System.Drawing.Point(800, 632);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 1;
@@ -512,17 +515,34 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(882, 631);
+			this.butCancel.Location = new System.Drawing.Point(881, 632);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 0;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
+			// butPDF
+			// 
+			this.butPDF.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPDF.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butPDF.Autosize = true;
+			this.butPDF.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPDF.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPDF.CornerRadius = 4F;
+			this.butPDF.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butPDF.Location = new System.Drawing.Point(683, 632);
+			this.butPDF.Name = "butPDF";
+			this.butPDF.Size = new System.Drawing.Size(75, 24);
+			this.butPDF.TabIndex = 123;
+			this.butPDF.TabStop = false;
+			this.butPDF.Text = "Create PDF";
+			this.butPDF.Click += new System.EventHandler(this.butPDF_Click);
+			// 
 			// FormDepositEdit
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(974, 667);
+			this.Controls.Add(this.butPDF);
 			this.Controls.Add(this.label9);
 			this.Controls.Add(this.textItemNum);
 			this.Controls.Add(this.label8);
@@ -1014,10 +1034,53 @@ namespace OpenDental{
 			Sheet sheet=SheetUtil.CreateSheet(sheetDef,0);
 			SheetParameter.SetParameter(sheet,"DepositNum",DepositCur.DepositNum);
 			SheetFiller.FillFields(sheet);
-			SheetUtil.CalculateHeights(sheet,this.CreateGraphics());
-			FormSheetFillEdit FormSF=new FormSheetFillEdit(sheet);
-			FormSF.ShowDialog();
-			DialogResult=DialogResult.OK;//this is imporant, since we don't want to insert the deposit slip twice.
+			Graphics g=this.CreateGraphics();
+			SheetUtil.CalculateHeights(sheet,g);
+			SheetPrinting.Print(sheet);
+			g.Dispose();
+		}
+		
+		private void butPDF_Click(object sender,EventArgs e) {
+			if(textDate.errorProvider1.GetError(textDate)!="") {
+				MsgBox.Show(this,"Please fix data entry errors first.");
+				return;
+			}
+			if(IsNew){
+				if(!SaveToDB()) {
+					return;
+				}
+			}
+			else{//not new
+				//Only allowed to change date and bank account info, NOT attached checks.
+				//We enforce security here based on date displayed, not date entered.
+				//If user is trying to change date without permission:
+				DateTime date=PIn.Date(textDate.Text);
+				if(Security.IsAuthorized(Permissions.DepositSlips,date,true)){
+					if(!SaveToDB()) {
+						return;
+					}
+				}
+				//if security.NotAuthorized, then it simply skips the save process before printing
+			}
+			SheetDef sheetDef=null;
+			List <SheetDef> depositSheetDefs=SheetDefs.GetCustomForType(SheetTypeEnum.DepositSlip);
+			if(depositSheetDefs.Count>0){
+				sheetDef=depositSheetDefs[0];
+				SheetDefs.GetFieldsAndParameters(sheetDef);
+			}
+			else{
+				sheetDef=SheetsInternal.DepositSlip();
+			}
+			//The below mimics FormSheetFillEdit.butPDF_Click() and the above butPrint_Click().
+			Sheet sheet=SheetUtil.CreateSheet(sheetDef,0);//Does not insert.
+			SheetParameter.SetParameter(sheet,"DepositNum",DepositCur.DepositNum);
+			SheetFiller.FillFields(sheet);
+			Graphics g=this.CreateGraphics();
+			SheetUtil.CalculateHeights(sheet,g);
+			string filePathAndName=PrefL.GetRandomTempFile(".pdf");
+			SheetPrinting.CreatePdf(sheet,filePathAndName,null);
+			g.Dispose();
+			Process.Start(filePathAndName);
 		}
 
 		///<summary>Saves the selected rows to database.  MUST close window after this.</summary>

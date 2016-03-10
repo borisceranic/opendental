@@ -5194,6 +5194,36 @@ namespace OpenDentBusiness {
 		}
 
 		[DbmMethod]
+		public static string SheetDepositSlips(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			command="SELECT SheetNum FROM sheet WHERE SheetType="+POut.Int((int)SheetTypeEnum.DepositSlip);
+			table=Db.GetTable(command);
+			if(isCheck) {
+				if(table.Rows.Count>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Deposit slip sheets")+": "+table.Rows.Count+"\r\n";
+				}
+			}
+			else {//fix
+				if(table.Rows.Count>0) {
+					for(int i=0;i<table.Rows.Count;i++) {
+						long sheetNum=PIn.Long(table.Rows[i]["SheetNum"].ToString());
+						command="DELETE FROM sheetfield WHERE SheetNum="+POut.Long(sheetNum);
+						Db.NonQ(command);
+						command="DELETE FROM sheet WHERE SheetNum="+POut.Long(sheetNum);
+						Db.NonQ(command);
+					}
+				}
+				if(table.Rows.Count>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Deposit slip sheets deleted")+": "+table.Rows.Count+"\r\n";
+				}
+			}
+			return log;
+		}
+
+		[DbmMethod]
 		public static string SignalInFuture(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
