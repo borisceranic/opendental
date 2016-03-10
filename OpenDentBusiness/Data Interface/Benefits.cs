@@ -867,7 +867,7 @@ namespace OpenDentBusiness {
 			//reduce individual max by amount already paid this year/lifetime---------------------------------------------------
 			//establish date range for procedures to consider
 			DateTime dateStart=BenefitLogic.ComputeRenewDate(procDate,plan.MonthRenew);
-			DateTime dateEnd=procDate;//don't consider anything after the date of this procedure.
+			DateTime dateEnd=dateStart.AddYears(1).AddDays(-1);//Consider all claim procs with a ProcDate within one year of the renew date
 			//Get deep copies of some cache classes so that we do not waste time in loops down below.
 			Hashtable hListProcCodes=ProcedureCodeC.GetHList();
 			List<CovCat> listCovCats=CovCatC.GetListShort();
