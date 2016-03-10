@@ -221,7 +221,7 @@ namespace OpenDental {
 			}
 			SelectedTaskNum=task.TaskNum;
 			if(this.TaskGoToEvent!=null) {
-				TaskGoToEvent(this,new CancelEventArgs());
+				TaskGoToEvent(FormTE,new CancelEventArgs());
 			}
 			DialogResult=DialogResult.OK;
 			Close();
