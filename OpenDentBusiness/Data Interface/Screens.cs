@@ -58,12 +58,12 @@ namespace OpenDentBusiness{
 						break;
 					case "Race/Ethnicity":
 						PatientRaceOld patientRace=PatientRaceOld.Unknown;
-						Enum.TryParse<PatientRaceOld>(field.FieldValue,out patientRace);
+						Enum.TryParse<PatientRaceOld>(field.FieldValue.Split(';')[0],out patientRace);
 						screen.RaceOld=patientRace;
 						break;
 					case "GradeLevel":
 						PatientGrade patientGrade=PatientGrade.Unknown;
-						Enum.TryParse<PatientGrade>(field.FieldValue,out patientGrade);
+						Enum.TryParse<PatientGrade>(field.FieldValue.Split(';')[0],out patientGrade);
 						screen.GradeLevel=patientGrade;
 						break;
 					case "Age":
@@ -76,7 +76,7 @@ namespace OpenDentBusiness{
 						break;
 					case "Urgency":
 						TreatmentUrgency treatmentUrgency=TreatmentUrgency.Unknown;
-						Enum.TryParse<TreatmentUrgency>(field.FieldValue,out treatmentUrgency);
+						Enum.TryParse<TreatmentUrgency>(field.FieldValue.Split(';')[0],out treatmentUrgency);
 						screen.Urgency=treatmentUrgency;
 						break;
 					case "HasCaries":
