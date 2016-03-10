@@ -186,7 +186,6 @@ namespace OpenDental {
 			try {
 				checkUseEConnector.Checked=PIn.Bool(_useEConnector.PropertyValue);
 				checkEnabled.Checked=_progCur.Enabled;
-				textPath.Text=_progCur.Path;
 				checkHideButtons.Checked=PIn.Bool(_disableAdvertising.PropertyValue);
 				textApptSetComplete.Text=_apptSetCompleteMins.PropertyValue;
 				textApptTimeArrived.Text=_apptTimeArrivedMins.PropertyValue;
@@ -265,7 +264,6 @@ namespace OpenDental {
 		private void SaveProgram() {
 			SaveClinicCurProgramPropertiesToDict();
 			_progCur.Enabled=checkEnabled.Checked;
-			_progCur.Path=textPath.Text;
 			UpdateProgramProperty(_useEConnector,POut.Bool(checkUseEConnector.Checked));
 			UpdateProgramProperty(_disableAdvertising,POut.Bool(checkHideButtons.Checked));
 			UpdateProgramProperty(_apptSetCompleteMins,textApptSetComplete.Text);
