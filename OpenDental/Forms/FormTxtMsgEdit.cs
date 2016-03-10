@@ -129,7 +129,7 @@ namespace OpenDental {
 			Commlog commlog=new Commlog();
 			commlog.CommDateTime=DateTime.Now;
 			commlog.DateTStamp=DateTime.Now;
-			commlog.CommType=DefC.Short[(int)DefCat.CommLogTypes][0].DefNum;//The first one in the list.  We can enhance later.
+			commlog.CommType=Commlogs.GetTypeAuto(CommItemTypeAuto.TEXT);
 			commlog.Mode_=CommItemMode.Text;
 			commlog.Note=msg;//phone,note
 			commlog.PatNum=patNum;

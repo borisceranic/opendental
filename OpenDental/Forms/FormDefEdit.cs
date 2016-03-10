@@ -400,9 +400,9 @@ namespace OpenDental{
 					break;
 				case DefCat.CommLogTypes:
 					if(textValue.Text!="" && textValue.Text!="MISC" && textValue.Text!="APPT" 
-						&& textValue.Text!="FIN" && textValue.Text!="RECALL") 
+						&& textValue.Text!="FIN" && textValue.Text!="RECALL" && textValue.Text!="TEXT") 
 					{
-						MessageBox.Show(Lan.g(this,"Valid values are blank,APPT,FIN,RECALL,or MISC."));
+						MessageBox.Show(Lan.g(this,"Valid values are blank,APPT,FIN,RECALL,MISC,or TEXT."));
 						return;
 					}
 					break;
