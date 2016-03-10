@@ -58,7 +58,9 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Patient First Name"),110);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Description"),210);
+			col=new ODGridColumn(Lan.g(this,"Description"),240);
+			gridMain.Columns.Add(col);
+			col=new ODGridColumn(Lan.g(this,"Deleted"),0,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			DataTable table=Sheets.GetWebFormSheetsTable(dateFrom,dateTo);
@@ -73,6 +75,7 @@ namespace OpenDental {
 					row.Cells.Add(pat.LName);
 					row.Cells.Add(pat.FName);
 					row.Cells.Add(table.Rows[i]["description"].ToString());
+					row.Cells.Add(table.Rows[i]["IsDeleted"].ToString()=="0" ? "" : "X");
 					row.Tag=sheetNum;
 					gridMain.Rows.Add(row);
 				}

@@ -72,6 +72,8 @@ namespace OpenDental {
 				butPrint.Visible=false;
 				butPDF.Visible=false;
 				butDelete.Visible=false;
+				butChangePat.Visible=false;
+				butRestore.Visible=false;
 				if(TerminalListenShut) {
 					timer1.Enabled=true;
 				}
@@ -99,6 +101,8 @@ namespace OpenDental {
 #endif
 				butDelete.Visible=false;
 				butOK.Visible=false;
+				butChangePat.Visible=false;
+				butRestore.Visible=false;
 				checkErase.Visible=false;
 				butCancel.Text="Close";
 			}
@@ -119,7 +123,13 @@ namespace OpenDental {
 				panelMain.Enabled=false;
 				butOK.Enabled=false;
 				butDelete.Enabled=false;
+				butChangePat.Enabled=false;
+				butRestore.Visible=false;
 				return;
+			}
+			if(SheetCur.IsDeleted && !IsStatement && !IsInTerminal) {
+				butDelete.Visible=false;
+				butRestore.Visible=true;
 			}
 			//So user has permission
 			bool isSigned=false;
@@ -802,6 +812,16 @@ namespace OpenDental {
 			DialogResult=DialogResult.OK;
 		}
 
+		private void butChangePat_Click(object sender,EventArgs e) {
+			FormPatientSelect FormPS=new FormPatientSelect();
+			FormPS.SelectionModeOnly=true;
+			if(FormPS.ShowDialog()==DialogResult.OK) {
+				SecurityLogs.MakeLogEntry(Permissions.SheetEdit,SheetCur.PatNum,Lan.g(this,"Sheet with ID")+" "+SheetCur.SheetNum+" "+Lan.g(this,"moved to PatNum")+" "+FormPS.SelectedPatNum);
+				SecurityLogs.MakeLogEntry(Permissions.SheetEdit,FormPS.SelectedPatNum,Lan.g(this,"Sheet with ID")+" "+SheetCur.SheetNum+" "+Lan.g(this,"moved from PatNum")+" "+SheetCur.PatNum);
+				SheetCur.PatNum=FormPS.SelectedPatNum;
+			}
+		}
+
 		private void butUnlock_Click(object sender,EventArgs e) {
 			//we already know the user has permission, because otherwise, button is not visible.
 			panelMain.Enabled=true;
@@ -1060,6 +1080,18 @@ namespace OpenDental {
 			DialogResult=DialogResult.OK;
 		}
 
+		private void butRestore_Click(object sender,EventArgs e) {
+			SheetCur.IsDeleted=false;
+			if(!VerifyRequiredFields()){
+				return;
+			}
+			if(!TryToSaveData()){
+				return;
+			}
+			SecurityLogs.MakeLogEntry(Permissions.SheetEdit,SheetCur.PatNum,SheetCur.Description+" from "+SheetCur.DateTimeSheet.ToShortDateString());
+			DialogResult=DialogResult.OK;
+		}
+
 		private void butOK_Click(object sender,EventArgs e) {
 			if(!VerifyRequiredFields()){
 				return;
@@ -1075,27 +1107,5 @@ namespace OpenDental {
 			DialogResult=DialogResult.Cancel;
 		}
 
-		
-
-		
-
-		
-
-	
-
-		
-
-		
-
-		
-
-		
-
-		
-		
-
-	
-
-		
 	}
 }

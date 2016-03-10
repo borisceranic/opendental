@@ -1096,8 +1096,11 @@ namespace OpenDentBusiness {
 					}
 				}
 				command+=") AND SheetType!="+POut.Long((int)SheetTypeEnum.Rx)+" "//rx are only accesssible from within Rx edit window.
-				+"AND SheetType!="+POut.Long((int)SheetTypeEnum.LabSlip)+" "//labslips are only accesssible from within the labslip edit window.
-				+"GROUP BY sheet.SheetNum,PatNum,Description,DateTimeSheet,SheetType "//Oracle compatible
+				+"AND SheetType!="+POut.Long((int)SheetTypeEnum.LabSlip)+" ";//labslips are only accesssible from within the labslip edit window.
+				if(!isAuditMode) {
+					command+="AND IsDeleted=0 ";//Don't show deleted sheets unless it's audit mode.
+				}
+				command+="GROUP BY sheet.SheetNum,PatNum,Description,DateTimeSheet,SheetType "//Oracle compatible
 				+"ORDER BY DateTimeSheet";
 				DataTable rawSheet=dcon.GetTable(command);
 				//SheetTypeEnum sheetType;

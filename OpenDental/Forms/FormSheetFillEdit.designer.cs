@@ -43,6 +43,8 @@ namespace OpenDental{
 			this.butPrint = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.butChangePat = new OpenDental.UI.Button();
+			this.butRestore = new OpenDental.UI.Button();
 			this.panel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -99,7 +101,7 @@ namespace OpenDental{
 			// checkErase
 			// 
 			this.checkErase.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.checkErase.Location = new System.Drawing.Point(698, 342);
+			this.checkErase.Location = new System.Drawing.Point(698, 289);
 			this.checkErase.Name = "checkErase";
 			this.checkErase.Size = new System.Drawing.Size(89, 20);
 			this.checkErase.TabIndex = 81;
@@ -160,7 +162,7 @@ namespace OpenDental{
 			this.butUnlock.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butUnlock.CornerRadius = 4F;
 			this.butUnlock.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butUnlock.Location = new System.Drawing.Point(697, 492);
+			this.butUnlock.Location = new System.Drawing.Point(697, 468);
 			this.butUnlock.Name = "butUnlock";
 			this.butUnlock.Size = new System.Drawing.Size(81, 24);
 			this.butUnlock.TabIndex = 89;
@@ -189,7 +191,7 @@ namespace OpenDental{
 			this.butPDF.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPDF.CornerRadius = 4F;
 			this.butPDF.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butPDF.Location = new System.Drawing.Point(698, 425);
+			this.butPDF.Location = new System.Drawing.Point(698, 380);
 			this.butPDF.Name = "butPDF";
 			this.butPDF.Size = new System.Drawing.Size(81, 24);
 			this.butPDF.TabIndex = 83;
@@ -224,7 +226,7 @@ namespace OpenDental{
 			this.butPrint.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPrint.CornerRadius = 4F;
 			this.butPrint.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butPrint.Location = new System.Drawing.Point(698, 395);
+			this.butPrint.Location = new System.Drawing.Point(698, 350);
 			this.butPrint.Name = "butPrint";
 			this.butPrint.Size = new System.Drawing.Size(81, 24);
 			this.butPrint.TabIndex = 80;
@@ -264,10 +266,48 @@ namespace OpenDental{
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
+			// butChangePat
+			// 
+			this.butChangePat.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butChangePat.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butChangePat.Autosize = true;
+			this.butChangePat.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butChangePat.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butChangePat.CornerRadius = 4F;
+			this.butChangePat.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butChangePat.Location = new System.Drawing.Point(697, 438);
+			this.butChangePat.Name = "butChangePat";
+			this.butChangePat.Size = new System.Drawing.Size(81, 24);
+			this.butChangePat.TabIndex = 90;
+			this.butChangePat.TabStop = false;
+			this.butChangePat.Text = "Change Pat";
+			this.butChangePat.UseVisualStyleBackColor = true;
+			this.butChangePat.Click += new System.EventHandler(this.butChangePat_Click);
+			// 
+			// butRestore
+			// 
+			this.butRestore.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butRestore.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butRestore.Autosize = true;
+			this.butRestore.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butRestore.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butRestore.CornerRadius = 4F;
+			this.butRestore.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butRestore.Location = new System.Drawing.Point(698, 520);
+			this.butRestore.Name = "butRestore";
+			this.butRestore.Size = new System.Drawing.Size(81, 24);
+			this.butRestore.TabIndex = 91;
+			this.butRestore.TabStop = false;
+			this.butRestore.Text = "Restore";
+			this.butRestore.UseVisualStyleBackColor = true;
+			this.butRestore.Click += new System.EventHandler(this.butRestore_Click);
+			// 
 			// FormSheetFillEdit
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(790, 672);
+			this.Controls.Add(this.butRestore);
+			this.Controls.Add(this.butChangePat);
 			this.Controls.Add(this.butUnlock);
 			this.Controls.Add(this.textDateTime);
 			this.Controls.Add(this.textShowInTerminal);
@@ -286,7 +326,6 @@ namespace OpenDental{
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormSheetFillEdit";
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Fill Sheet";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormSheetFillEdit_FormClosing);
 			this.Load += new System.EventHandler(this.FormSheetFillEdit_Load);
@@ -316,5 +355,7 @@ namespace OpenDental{
 		private System.Windows.Forms.Timer timer1;
 		private System.Windows.Forms.TextBox textDateTime;
 		private UI.Button butUnlock;
+		private UI.Button butChangePat;
+		private UI.Button butRestore;
 	}
 }

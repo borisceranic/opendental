@@ -201,9 +201,8 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),sheetNum);
 				return;
 			}
-			string command="DELETE FROM sheetfield WHERE SheetNum="+POut.Long(sheetNum);
+			string command="UPDATE sheet SET IsDeleted=1 WHERE SheetNum="+POut.Long(sheetNum);
 			Db.NonQ(command);
-			Crud.SheetCrud.Delete(sheetNum);
 		}
 
 		///<summary>Converts parameters into sheetfield objects, and then saves those objects in the database.  The parameters will never again enjoy full parameter status, but will just be read-only fields from here on out.  It ignores PatNum parameters, since those are already part of the sheet itself.</summary>
@@ -378,8 +377,9 @@ namespace OpenDentBusiness{
 			table.Columns.Add("timeOnly",typeof(TimeSpan));//to help with sorting
 			table.Columns.Add("PatNum");
 			table.Columns.Add("SheetNum");
+			table.Columns.Add("IsDeleted");
 			List<DataRow> rows=new List<DataRow>();
-			string command="SELECT DateTimeSheet,Description,PatNum,SheetNum "
+			string command="SELECT DateTimeSheet,Description,PatNum,SheetNum,IsDeleted "
 				+"FROM sheet WHERE " 
 				+"DateTimeSheet >= "+POut.Date(dateFrom)+" AND DateTimeSheet <= "+POut.Date(dateTo.AddDays(1))+ " "
 				+"AND IsWebForm = "+POut.Bool(true)+ " "
@@ -399,6 +399,7 @@ namespace OpenDentBusiness{
 					row["time"]=dateT.ToString("h:mm")+dateT.ToString("%t").ToLower();
 				}
 				row["timeOnly"]=dateT.TimeOfDay;
+				row["IsDeleted"]=rawSheet.Rows[i]["IsDeleted"].ToString();
 				rows.Add(row);
 			}
 			for(int i=0;i<rows.Count;i++) {

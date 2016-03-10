@@ -79,7 +79,18 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference (PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'TextingDefaultClinicNum','0')";
 					Db.NonQ(command);
 				}
-
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE sheet ADD IsDeleted tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE sheet ADD IsDeleted number(3)";
+					Db.NonQ(command);
+					command="UPDATE sheet SET IsDeleted = 0 WHERE IsDeleted IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE sheet MODIFY IsDeleted NOT NULL";
+					Db.NonQ(command);
+				}
 
 
 				command="UPDATE preference SET ValueString = '16.2.0.0' WHERE PrefName = 'DataBaseVersion'";

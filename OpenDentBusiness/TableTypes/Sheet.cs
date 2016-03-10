@@ -59,6 +59,8 @@ namespace OpenDentBusiness{
 		public bool IsWebForm;
 		///<summary>Forces old single page behavior, ignoring page breaks.</summary>
 		public bool IsMultiPage;
+		///<summary>Indicates whether or not this sheet has been marked deleted.</summary>
+		public bool IsDeleted;
 		
 		public Sheet Copy(){
 			Sheet retVal=(Sheet)this.MemberwiseClone();

@@ -60,6 +60,7 @@ namespace OpenDentBusiness.Crud{
 				sheet.ShowInTerminal= PIn.Byte  (row["ShowInTerminal"].ToString());
 				sheet.IsWebForm     = PIn.Bool  (row["IsWebForm"].ToString());
 				sheet.IsMultiPage   = PIn.Bool  (row["IsMultiPage"].ToString());
+				sheet.IsDeleted     = PIn.Bool  (row["IsDeleted"].ToString());
 				retVal.Add(sheet);
 			}
 			return retVal;
@@ -85,6 +86,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("ShowInTerminal");
 			table.Columns.Add("IsWebForm");
 			table.Columns.Add("IsMultiPage");
+			table.Columns.Add("IsDeleted");
 			foreach(Sheet sheet in listSheets) {
 				table.Rows.Add(new object[] {
 					POut.Long  (sheet.SheetNum),
@@ -101,6 +103,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Byte  (sheet.ShowInTerminal),
 					POut.Bool  (sheet.IsWebForm),
 					POut.Bool  (sheet.IsMultiPage),
+					POut.Bool  (sheet.IsDeleted),
 				});
 			}
 			return table;
@@ -141,7 +144,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="SheetNum,";
 			}
-			command+="SheetType,PatNum,DateTimeSheet,FontSize,FontName,Width,Height,IsLandscape,InternalNote,Description,ShowInTerminal,IsWebForm,IsMultiPage) VALUES(";
+			command+="SheetType,PatNum,DateTimeSheet,FontSize,FontName,Width,Height,IsLandscape,InternalNote,Description,ShowInTerminal,IsWebForm,IsMultiPage,IsDeleted) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(sheet.SheetNum)+",";
 			}
@@ -158,7 +161,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(sheet.Description)+"',"
 				+    POut.Byte  (sheet.ShowInTerminal)+","
 				+    POut.Bool  (sheet.IsWebForm)+","
-				+    POut.Bool  (sheet.IsMultiPage)+")";
+				+    POut.Bool  (sheet.IsMultiPage)+","
+				+    POut.Bool  (sheet.IsDeleted)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -191,7 +195,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="SheetNum,";
 			}
-			command+="SheetType,PatNum,DateTimeSheet,FontSize,FontName,Width,Height,IsLandscape,InternalNote,Description,ShowInTerminal,IsWebForm,IsMultiPage) VALUES(";
+			command+="SheetType,PatNum,DateTimeSheet,FontSize,FontName,Width,Height,IsLandscape,InternalNote,Description,ShowInTerminal,IsWebForm,IsMultiPage,IsDeleted) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(sheet.SheetNum)+",";
 			}
@@ -208,7 +212,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(sheet.Description)+"',"
 				+    POut.Byte  (sheet.ShowInTerminal)+","
 				+    POut.Bool  (sheet.IsWebForm)+","
-				+    POut.Bool  (sheet.IsMultiPage)+")";
+				+    POut.Bool  (sheet.IsMultiPage)+","
+				+    POut.Bool  (sheet.IsDeleted)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -233,7 +238,8 @@ namespace OpenDentBusiness.Crud{
 				+"Description   = '"+POut.String(sheet.Description)+"', "
 				+"ShowInTerminal=  "+POut.Byte  (sheet.ShowInTerminal)+", "
 				+"IsWebForm     =  "+POut.Bool  (sheet.IsWebForm)+", "
-				+"IsMultiPage   =  "+POut.Bool  (sheet.IsMultiPage)+" "
+				+"IsMultiPage   =  "+POut.Bool  (sheet.IsMultiPage)+", "
+				+"IsDeleted     =  "+POut.Bool  (sheet.IsDeleted)+" "
 				+"WHERE SheetNum = "+POut.Long(sheet.SheetNum);
 			Db.NonQ(command);
 		}
@@ -293,6 +299,10 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="IsMultiPage = "+POut.Bool(sheet.IsMultiPage)+"";
 			}
+			if(sheet.IsDeleted != oldSheet.IsDeleted) {
+				if(command!=""){ command+=",";}
+				command+="IsDeleted = "+POut.Bool(sheet.IsDeleted)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -342,6 +352,9 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			if(sheet.IsMultiPage != oldSheet.IsMultiPage) {
+				return true;
+			}
+			if(sheet.IsDeleted != oldSheet.IsDeleted) {
 				return true;
 			}
 			return false;
