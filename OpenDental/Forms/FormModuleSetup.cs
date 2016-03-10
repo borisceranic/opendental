@@ -132,7 +132,6 @@ namespace OpenDental{
 		private UI.Button butDiagnosisCode;
 		private CheckBox checkClaimsSendWindowValidateOnLoad;
 		private CheckBox checkProvColorChart;
-		private CheckBox checkPromptAutoSplit;
 		private TextBox textInsWriteoffDescript;
 		private Label label17;
 		private CheckBox checkBrokenApptAdjustment;
@@ -160,6 +159,8 @@ namespace OpenDental{
 		private Label label26;
 		private ComboBox comboSuperFamSort;
 		private CheckBox checkSuperFamSync;
+		private Label label27;
+		private ComboBox comboPaySplitManage;
 		private GroupBox groupBox3;
 
 		///<summary>Default constructor.  Opens the form with the Appts tab selected.</summary>
@@ -257,6 +258,7 @@ namespace OpenDental{
 			this.comboSearchBehavior = new System.Windows.Forms.ComboBox();
 			this.checkAppointmentTimeIsLocked = new System.Windows.Forms.CheckBox();
 			this.tabFamily = new System.Windows.Forms.TabPage();
+			this.checkSuperFamSync = new System.Windows.Forms.CheckBox();
 			this.label26 = new System.Windows.Forms.Label();
 			this.comboSuperFamSort = new System.Windows.Forms.ComboBox();
 			this.checkSelectProv = new System.Windows.Forms.CheckBox();
@@ -268,11 +270,12 @@ namespace OpenDental{
 			this.label15 = new System.Windows.Forms.Label();
 			this.comboCobRule = new System.Windows.Forms.ComboBox();
 			this.tabAccount = new System.Windows.Forms.TabPage();
+			this.label27 = new System.Windows.Forms.Label();
+			this.comboPaySplitManage = new System.Windows.Forms.ComboBox();
 			this.checkPaymentsUsePatClin = new System.Windows.Forms.CheckBox();
 			this.checkRecurChargPriProv = new System.Windows.Forms.CheckBox();
 			this.textInsWriteoffDescript = new System.Windows.Forms.TextBox();
 			this.label17 = new System.Windows.Forms.Label();
-			this.checkPromptAutoSplit = new System.Windows.Forms.CheckBox();
 			this.checkStatementsUseSheets = new System.Windows.Forms.CheckBox();
 			this.checkStoreCCTokens = new System.Windows.Forms.CheckBox();
 			this.checkAccountShowPaymentNums = new System.Windows.Forms.CheckBox();
@@ -338,7 +341,6 @@ namespace OpenDental{
 			this.colorDialog = new System.Windows.Forms.ColorDialog();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.checkSuperFamSync = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -1086,6 +1088,17 @@ namespace OpenDental{
 			this.tabFamily.TabIndex = 1;
 			this.tabFamily.Text = "Family";
 			// 
+			// checkSuperFamSync
+			// 
+			this.checkSuperFamSync.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkSuperFamSync.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkSuperFamSync.Location = new System.Drawing.Point(6, 259);
+			this.checkSuperFamSync.Name = "checkSuperFamSync";
+			this.checkSuperFamSync.Size = new System.Drawing.Size(434, 17);
+			this.checkSuperFamSync.TabIndex = 219;
+			this.checkSuperFamSync.Text = "Allow syncing patient information to all super family members";
+			this.checkSuperFamSync.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// label26
 			// 
 			this.label26.FlatStyle = System.Windows.Forms.FlatStyle.System;
@@ -1198,11 +1211,12 @@ namespace OpenDental{
 			// tabAccount
 			// 
 			this.tabAccount.BackColor = System.Drawing.SystemColors.Window;
+			this.tabAccount.Controls.Add(this.label27);
+			this.tabAccount.Controls.Add(this.comboPaySplitManage);
 			this.tabAccount.Controls.Add(this.checkPaymentsUsePatClin);
 			this.tabAccount.Controls.Add(this.checkRecurChargPriProv);
 			this.tabAccount.Controls.Add(this.textInsWriteoffDescript);
 			this.tabAccount.Controls.Add(this.label17);
-			this.tabAccount.Controls.Add(this.checkPromptAutoSplit);
 			this.tabAccount.Controls.Add(this.checkStatementsUseSheets);
 			this.tabAccount.Controls.Add(this.checkStoreCCTokens);
 			this.tabAccount.Controls.Add(this.checkAccountShowPaymentNums);
@@ -1227,11 +1241,31 @@ namespace OpenDental{
 			this.tabAccount.TabIndex = 2;
 			this.tabAccount.Text = "Account";
 			// 
+			// label27
+			// 
+			this.label27.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.label27.Location = new System.Drawing.Point(28, 345);
+			this.label27.Name = "label27";
+			this.label27.Size = new System.Drawing.Size(247, 15);
+			this.label27.TabIndex = 220;
+			this.label27.Text = "Payments prompt for auto split";
+			this.label27.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// comboPaySplitManage
+			// 
+			this.comboPaySplitManage.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboPaySplitManage.FormattingEnabled = true;
+			this.comboPaySplitManage.Location = new System.Drawing.Point(278, 342);
+			this.comboPaySplitManage.MaxDropDownItems = 30;
+			this.comboPaySplitManage.Name = "comboPaySplitManage";
+			this.comboPaySplitManage.Size = new System.Drawing.Size(163, 21);
+			this.comboPaySplitManage.TabIndex = 219;
+			// 
 			// checkPaymentsUsePatClin
 			// 
 			this.checkPaymentsUsePatClin.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkPaymentsUsePatClin.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkPaymentsUsePatClin.Location = new System.Drawing.Point(44, 298);
+			this.checkPaymentsUsePatClin.Location = new System.Drawing.Point(44, 283);
 			this.checkPaymentsUsePatClin.Name = "checkPaymentsUsePatClin";
 			this.checkPaymentsUsePatClin.Size = new System.Drawing.Size(396, 17);
 			this.checkPaymentsUsePatClin.TabIndex = 210;
@@ -1242,7 +1276,7 @@ namespace OpenDental{
 			// 
 			this.checkRecurChargPriProv.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkRecurChargPriProv.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkRecurChargPriProv.Location = new System.Drawing.Point(44, 340);
+			this.checkRecurChargPriProv.Location = new System.Drawing.Point(44, 324);
 			this.checkRecurChargPriProv.Name = "checkRecurChargPriProv";
 			this.checkRecurChargPriProv.Size = new System.Drawing.Size(396, 17);
 			this.checkRecurChargPriProv.TabIndex = 209;
@@ -1251,7 +1285,7 @@ namespace OpenDental{
 			// 
 			// textInsWriteoffDescript
 			// 
-			this.textInsWriteoffDescript.Location = new System.Drawing.Point(278, 319);
+			this.textInsWriteoffDescript.Location = new System.Drawing.Point(278, 303);
 			this.textInsWriteoffDescript.Name = "textInsWriteoffDescript";
 			this.textInsWriteoffDescript.Size = new System.Drawing.Size(163, 20);
 			this.textInsWriteoffDescript.TabIndex = 207;
@@ -1259,23 +1293,12 @@ namespace OpenDental{
 			// label17
 			// 
 			this.label17.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label17.Location = new System.Drawing.Point(16, 321);
+			this.label17.Location = new System.Drawing.Point(16, 305);
 			this.label17.Name = "label17";
 			this.label17.Size = new System.Drawing.Size(261, 16);
 			this.label17.TabIndex = 208;
 			this.label17.Text = "PPO writeoff description (blank for \"Writeoff\")";
 			this.label17.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// checkPromptAutoSplit
-			// 
-			this.checkPromptAutoSplit.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkPromptAutoSplit.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkPromptAutoSplit.Location = new System.Drawing.Point(44, 282);
-			this.checkPromptAutoSplit.Name = "checkPromptAutoSplit";
-			this.checkPromptAutoSplit.Size = new System.Drawing.Size(396, 17);
-			this.checkPromptAutoSplit.TabIndex = 206;
-			this.checkPromptAutoSplit.Text = "Prompt for autosplits on Payments";
-			this.checkPromptAutoSplit.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// checkStatementsUseSheets
 			// 
@@ -2033,20 +2056,8 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// checkSuperFamSync
-			// 
-			this.checkSuperFamSync.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkSuperFamSync.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkSuperFamSync.Location = new System.Drawing.Point(6, 259);
-			this.checkSuperFamSync.Name = "checkSuperFamSync";
-			this.checkSuperFamSync.Size = new System.Drawing.Size(434, 17);
-			this.checkSuperFamSync.TabIndex = 219;
-			this.checkSuperFamSync.Text = "Allow syncing patient information to all super family members";
-			this.checkSuperFamSync.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
 			// FormModuleSetup
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(543, 590);
 			this.Controls.Add(this.tabControl1);
 			this.Controls.Add(this.butCancel);
@@ -2056,7 +2067,6 @@ namespace OpenDental{
 			this.MinimizeBox = false;
 			this.Name = "FormModuleSetup";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Module Preferences";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormModuleSetup_FormClosing);
 			this.Load += new System.EventHandler(this.FormModuleSetup_Load);
@@ -2138,6 +2148,11 @@ namespace OpenDental{
 					comboProcDiscountType.SelectedIndex=i;
 				}
 			}
+			string[] paySplitEnumNames=Enum.GetNames(typeof(SplitManagerPromptType));
+			for(int i=0;i<paySplitEnumNames.Length;i++) {
+				comboPaySplitManage.Items.Add(paySplitEnumNames[i]);
+			}
+			comboPaySplitManage.SelectedIndex=PrefC.GetInt(PrefName.PaymentsPromptForAutoSplit);
 			//Check to see if any adjustment type preferences are hidden.
 			if(financeChargeAdjDefNum>0 && comboFinanceChargeAdjType.SelectedIndex==-1) {
 				comboFinanceChargeAdjType.Text=DefC.GetDef(DefCat.AdjTypes,financeChargeAdjDefNum).ItemName+" ("+Lan.g(this,"hidden")+")";
@@ -2231,7 +2246,6 @@ namespace OpenDental{
 			checkClaimMedTypeIsInstWhenInsPlanIsMedical.Checked=PrefC.GetBool(PrefName.ClaimMedTypeIsInstWhenInsPlanIsMedical);
 			checkAccountShowPaymentNums.Checked=PrefC.GetBool(PrefName.AccountShowPaymentNums);
 			checkStatementsUseSheets.Checked=PrefC.GetBool(PrefName.StatementsUseSheets);
-			checkPromptAutoSplit.Checked=PrefC.GetBool(PrefName.PaymentsPromptForAutoSplit);
 			textInsWriteoffDescript.Text=PrefC.GetString(PrefName.InsWriteoffDescript);
 			checkRecurChargPriProv.Checked=PrefC.GetBool(PrefName.RecurringChargesUsePriProv);
 			checkPaymentsUsePatClin.Checked=PrefC.GetBool(PrefName.PaymentsUsePatientClinic);
@@ -2613,6 +2627,7 @@ namespace OpenDental{
 				| Prefs.UpdateBool(PrefName.StoreCCtokens,checkStoreCCTokens.Checked)
 				| Prefs.UpdateLong(PrefName.FinanceChargeAdjustmentType,listPosAdjTypes[comboFinanceChargeAdjType.SelectedIndex].DefNum)
 				| Prefs.UpdateLong(PrefName.BillingChargeAdjustmentType,listPosAdjTypes[comboBillingChargeAdjType.SelectedIndex].DefNum)
+				| Prefs.UpdateInt(PrefName.PaymentsPromptForAutoSplit,comboPaySplitManage.SelectedIndex)
 				| Prefs.UpdateBool(PrefName.ProviderIncomeTransferShows,checkProviderIncomeShows.Checked)
 				| Prefs.UpdateBool(PrefName.ShowAccountFamilyCommEntries,checkShowFamilyCommByDefault.Checked)
 				| Prefs.UpdateBool(PrefName.ClaimFormTreatDentSaysSigOnFile,checkClaimFormTreatDentSaysSigOnFile.Checked)
@@ -2622,7 +2637,6 @@ namespace OpenDental{
 				| Prefs.UpdateBool(PrefName.ClaimMedTypeIsInstWhenInsPlanIsMedical,checkClaimMedTypeIsInstWhenInsPlanIsMedical.Checked)
 				| Prefs.UpdateBool(PrefName.AccountShowPaymentNums,checkAccountShowPaymentNums.Checked)
 				| Prefs.UpdateBool(PrefName.StatementsUseSheets,checkStatementsUseSheets.Checked)
-				| Prefs.UpdateBool(PrefName.PaymentsPromptForAutoSplit,checkPromptAutoSplit.Checked)
 				| Prefs.UpdateBool(PrefName.RecurringChargesUsePriProv,checkRecurChargPriProv.Checked)
 				| Prefs.UpdateString(PrefName.InsWriteoffDescript,textInsWriteoffDescript.Text)
 				| Prefs.UpdateBool(PrefName.PaymentsUsePatientClinic,checkPaymentsUsePatClin.Checked)

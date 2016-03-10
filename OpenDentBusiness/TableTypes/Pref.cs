@@ -424,7 +424,7 @@ namespace OpenDentBusiness {
 		PatientSelectUseFNameForPreferred,
 		///<summary>Boolean. This is the default for new computers, otherwise it uses the computerpref PatSelectSearchMode.</summary>
 		PatientSelectUsesSearchButton,
-		///<summary>Boolean. True by default.  If false, the Payment window follows old "Split to family" behavior.</summary>
+		///<summary>PaySplitManager enum. 1 by default. 0=DoNotUse, 1=Prompt, 2=Force</summary>
 		PaymentsPromptForAutoSplit,
 		///<summary>Boolean. True by default.  If false, Payment clinic will be determined by FormOpenDental.</summary>
 		PaymentsUsePatientClinic,

@@ -2258,7 +2258,7 @@ namespace OpenDental {
 					MessageBox.Show(Lan.g(this,"Please enter an amount."));
 					return false;
 				}
-				if(PIn.Double(textAmount.Text)==0 && !PrefC.GetBool(PrefName.PaymentsPromptForAutoSplit)) {
+				if(PIn.Double(textAmount.Text)==0 && PrefC.GetInt(PrefName.PaymentsPromptForAutoSplit)==0) {
 					MessageBox.Show(Lan.g(this,"Amount must not be zero unless this is a transfer."));
 					return false;
 				}
@@ -2360,10 +2360,14 @@ namespace OpenDental {
 			}
 			//PaymentCur.PatNum=PatCur.PatNum;//this is already done before opening this window.
 			//PaymentCur.ClinicNum already handled
-			if(_listPaySplits.Count==0 && PrefC.GetBool(PrefName.PaymentsPromptForAutoSplit)) {
+			if(_listPaySplits.Count==0 && PrefC.GetInt(PrefName.PaymentsPromptForAutoSplit)!=0) {
 				//The user has no splits and is trying to submit a payment.
 				//We need to ask if they want to autosplit the payment to start getting procedures associated to splits.
-				if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Would you like to autosplit the payment to outstanding family balances?")) {
+				if(PrefC.GetInt(PrefName.PaymentsPromptForAutoSplit)==1 && !MsgBox.Show(this,MsgBoxButtons.YesNo,"Would you like to autosplit the payment to outstanding family balances?")) {
+					//The PSM is prompted and they clicked no they don't want to autosplit.
+					AddOneSplit();
+				}
+				else {//Either the PSM is forced or they want to use the PSM to autosplit.
 					FormPaySplitManage FormPSM=new FormPaySplitManage();
 					FormPSM.PaymentAmt=PIn.Decimal(textAmount.Text);
 					FormPSM.FamCur=Patients.GetFamily(_patCur.PatNum);
@@ -2382,9 +2386,6 @@ namespace OpenDental {
 					else {//Cancel
 						AddOneSplit();//Someone decided to add a split and call it good if the user cancels out of the manager window.
 					}
-				}
-				else {//Either no allocation required, or user does not want to allocate.  Just add one split.
-					AddOneSplit();
 				}
 			}
 			else {

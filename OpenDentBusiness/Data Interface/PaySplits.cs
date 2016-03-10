@@ -291,7 +291,14 @@ namespace OpenDentBusiness{
 
 	}
 
-	
+	public enum SplitManagerPromptType {
+		///<summary>0</summary>
+		DoNotUse,
+		///<summary>1</summary>
+		Prompt,
+		///<summary>2</summary>
+		Force
+	}
 
 	
 
