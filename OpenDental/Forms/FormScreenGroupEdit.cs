@@ -658,7 +658,7 @@ namespace OpenDental{
 					FormSE.ScreenCur.ScreenGroupOrder=1;
 				}
 				else {
-					FormSE.ScreenCur=_listScreens[_listScreens.Count-1];//'remembers' the last entry
+					FormSE.ScreenCur=_listScreens[_listScreens.Count-1].Copy();//'remembers' the last entry
 					FormSE.ScreenCur.ScreenGroupOrder=FormSE.ScreenCur.ScreenGroupOrder+1;//increments for next
 				}
 				Patient pat=Patients.GetPat(screenPat.PatNum);//Get a patient so we can pre-fill some of the information (age/sex/birthdate/grade)
@@ -977,7 +977,7 @@ namespace OpenDental{
 			_screenGroup.SGDate=PIn.Date(textScreenDate.Text);
 			_screenGroup.Description=textDescription.Text;
 			_screenGroup.ProvName=textProvName.Text;
-			_screenGroup.ProvNum=comboProv.SelectedIndex+1;//this works for -1 also.
+			_screenGroup.ProvNum=comboProv.SelectedIndex==-1 ? 0 : _listProvs[comboProv.SelectedIndex].ProvNum;//ProvNum 0 is OK for screens.
 			if(comboCounty.SelectedIndex==-1) {
 				_screenGroup.County="";
 			}
