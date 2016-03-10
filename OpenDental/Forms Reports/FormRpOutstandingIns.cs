@@ -27,7 +27,7 @@ namespace OpenDental {
     private List<long> provNumList;
     private bool isAllProv;
     private bool isPreauth;
-		private DataTable Table;
+		private DataTable _table;
 		private UI.Button butPrint;
 		private ComboBoxMulti comboBoxMultiProv;
 		private bool headingPrinted;
@@ -128,7 +128,7 @@ namespace OpenDental {
 			// label2
 			// 
 			this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.label2.Location = new System.Drawing.Point(730, 480);
+			this.label2.Location = new System.Drawing.Point(696, 477);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(69, 18);
 			this.label2.TabIndex = 46;
@@ -138,7 +138,7 @@ namespace OpenDental {
 			// textBox1
 			// 
 			this.textBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.textBox1.Location = new System.Drawing.Point(805, 479);
+			this.textBox1.Location = new System.Drawing.Point(771, 476);
 			this.textBox1.Name = "textBox1";
 			this.textBox1.Size = new System.Drawing.Size(61, 20);
 			this.textBox1.TabIndex = 56;
@@ -234,7 +234,7 @@ namespace OpenDental {
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(880, 476);
+			this.butCancel.Location = new System.Drawing.Point(887, 474);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 45;
@@ -249,7 +249,7 @@ namespace OpenDental {
 			this.gridMain.HasAddButton = false;
 			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(12, 56);
+			this.gridMain.Location = new System.Drawing.Point(12, 50);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
 			this.gridMain.Size = new System.Drawing.Size(950, 406);
@@ -291,14 +291,14 @@ namespace OpenDental {
 			this.checkIgnoreCustom.TabIndex = 61;
 			this.checkIgnoreCustom.Text = "Ignore Custom Tracking";
 			this.checkIgnoreCustom.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkIgnoreCustom.CheckedChanged += new System.EventHandler(this.checkIgnoreCustom_CheckedChanged);
+			this.checkIgnoreCustom.Click += new System.EventHandler(this.checkIgnoreCustom_Click);
 			// 
 			// comboLastClaimTrack
 			// 
 			this.comboLastClaimTrack.FormattingEnabled = true;
 			this.comboLastClaimTrack.Location = new System.Drawing.Point(688, 28);
 			this.comboLastClaimTrack.Name = "comboLastClaimTrack";
-			this.comboLastClaimTrack.Size = new System.Drawing.Size(178, 21);
+			this.comboLastClaimTrack.Size = new System.Drawing.Size(144, 21);
 			this.comboLastClaimTrack.TabIndex = 62;
 			// 
 			// label3
@@ -307,7 +307,7 @@ namespace OpenDental {
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(181, 16);
 			this.label3.TabIndex = 63;
-			this.label3.Text = "Last Claim Custom Tracking Status";
+			this.label3.Text = "Last Custom Tracking Status";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// FormRpOutstandingIns
@@ -335,7 +335,6 @@ namespace OpenDental {
 			this.Controls.Add(this.gridMain);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormRpOutstandingIns";
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Outstanding Insurance Claims";
 			this.Load += new System.EventHandler(this.FormRpOutIns_Load);
 			this.ResumeLayout(false);
@@ -351,7 +350,7 @@ namespace OpenDental {
 				FillClinics();
 			}
 			FillCustomTrack();
-			FillGrid();
+			FillGrid(true);
 		}
 
 		private void FillProvs() {
@@ -392,7 +391,7 @@ namespace OpenDental {
 			comboLastClaimTrack.SelectedIndex=0;
 		}
 
-		private void FillGrid() {
+		private void FillGrid(bool isOnLoad=false) {
 			if(textDaysOldMin.Text.Trim()=="" || PIn.Double(textDaysOldMin.Text)==0) {
 				dateMin=DateTime.MinValue;
 			}
@@ -440,7 +439,23 @@ namespace OpenDental {
 				}
 			}
 			isPreauth=checkPreauth.Checked;
-			Table=RpOutstandingIns.GetOutInsClaims(isAllProv,provNumList,dateMin,dateMax,isPreauth,listClinicNums);
+			_table=RpOutstandingIns.GetOutInsClaims(isAllProv,provNumList,dateMin,dateMax,isPreauth,listClinicNums);
+			if(isOnLoad) {
+				for(int i=0;i<_table.Rows.Count;i++) {
+					if(_table.Rows[i]["DefNum"].ToString()!="") {
+						//If on load and the results have custom tracking entries, uncheck the "Ignore custom tracking" box so we can show it.
+						//If it's not on load don't do this check as the user manually set filters.
+						checkIgnoreCustom.Checked=false;
+						break;
+					}
+				}
+			}
+			if(checkIgnoreCustom.Checked) {
+				gridMain.Width=820;
+			}
+			else {
+				gridMain.Width=950;
+			}
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col;
@@ -460,30 +475,32 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Date Sent"),70);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Track Status"),90);
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Date Status"),70);
-			gridMain.Columns.Add(col);
+			if(!checkIgnoreCustom.Checked) {
+				col=new ODGridColumn(Lan.g(this,"Track Status"),90);
+				gridMain.Columns.Add(col);
+				col=new ODGridColumn(Lan.g(this,"Date Status"),70);
+				gridMain.Columns.Add(col);
+			}
 			col=new ODGridColumn(Lan.g(this,"Amount"),85,HorizontalAlignment.Right);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
 			string type;
 			total=0;
-			for(int i=0;i<Table.Rows.Count;i++){
-				DateTime dateLastLog=PIn.Date(Table.Rows[i]["DateLog"].ToString());
-				int daysSuppressed=PIn.Int(Table.Rows[i]["DaysSuppressed"].ToString());
+			for(int i=0;i<_table.Rows.Count;i++){
+				DateTime dateLastLog=PIn.Date(_table.Rows[i]["DateLog"].ToString());
+				int daysSuppressed=PIn.Int(_table.Rows[i]["DaysSuppressed"].ToString());
 				if(!checkIgnoreCustom.Checked && dateLastLog.AddDays(daysSuppressed)>DateTime.Today) {
 					continue;
 				}
-				long customTrackDefNum=PIn.Long(Table.Rows[i]["DefNum"].ToString());
+				long customTrackDefNum=PIn.Long(_table.Rows[i]["DefNum"].ToString());
 				if(comboLastClaimTrack.SelectedIndex!=0 && customTrackDefNum!=DefC.GetList(DefCat.ClaimCustomTracking)[comboLastClaimTrack.SelectedIndex-1].DefNum) {
 					continue;
 				}
 				row=new ODGridRow();
-				row.Cells.Add(Table.Rows[i]["CarrierName"].ToString());
-				row.Cells.Add(Table.Rows[i]["Phone"].ToString());
-				type=Table.Rows[i]["ClaimType"].ToString();
+				row.Cells.Add(_table.Rows[i]["CarrierName"].ToString());
+				row.Cells.Add(_table.Rows[i]["Phone"].ToString());
+				type=_table.Rows[i]["ClaimType"].ToString();
 				switch(type){
 					case "P":
 						type="Primary";
@@ -509,49 +526,51 @@ namespace OpenDental {
 				}
 				row.Cells.Add(type);
 				if(PrefC.GetBool(PrefName.ReportsShowPatNum)) {
-					row.Cells.Add(Table.Rows[i]["PatNum"].ToString()+"-"+Table.Rows[i]["LName"].ToString()+", "+Table.Rows[i]["FName"].ToString()+" "+Table.Rows[i]["MiddleI"].ToString());
+					row.Cells.Add(_table.Rows[i]["PatNum"].ToString()+"-"+_table.Rows[i]["LName"].ToString()+", "+_table.Rows[i]["FName"].ToString()+" "+_table.Rows[i]["MiddleI"].ToString());
 				}
 				else {
-					row.Cells.Add(Table.Rows[i]["LName"].ToString()+", "+Table.Rows[i]["FName"].ToString()+" "+Table.Rows[i]["MiddleI"].ToString());
+					row.Cells.Add(_table.Rows[i]["LName"].ToString()+", "+_table.Rows[i]["FName"].ToString()+" "+_table.Rows[i]["MiddleI"].ToString());
 				}
 				if(PrefC.HasClinicsEnabled) {
 					string clinicName="Unassigned";
 					for(int j=0;j<_listClinics.Count;j++) {
-						if(_listClinics[j].ClinicNum==PIn.Long(Table.Rows[i]["ClinicNum"].ToString())) {
+						if(_listClinics[j].ClinicNum==PIn.Long(_table.Rows[i]["ClinicNum"].ToString())) {
 							clinicName=_listClinics[j].Description;
 							break;
 						}
 					}
 					row.Cells.Add(clinicName);
 				}
-				DateTime dateService=PIn.Date(Table.Rows[i]["DateService"].ToString());
+				DateTime dateService=PIn.Date(_table.Rows[i]["DateService"].ToString());
 				if(dateService.Year<1880) {
 					row.Cells.Add("");
 				}
 				else{
 					row.Cells.Add(dateService.ToShortDateString());
 				}
-				row.Cells.Add(PIn.Date(Table.Rows[i]["DateSent"].ToString()).ToShortDateString());
-				if(customTrackDefNum==0) {
-					row.Cells.Add("-");
+				row.Cells.Add(PIn.Date(_table.Rows[i]["DateSent"].ToString()).ToShortDateString());
+				if(!checkIgnoreCustom.Checked) {
+					if(customTrackDefNum==0) {
+						row.Cells.Add("-");
+					}
+					else {
+						row.Cells.Add(DefC.GetList(DefCat.ClaimCustomTracking).First(x => x.DefNum==customTrackDefNum).ItemName);
+					}
+					DateTime dateLog=PIn.Date(_table.Rows[i]["DateLog"].ToString());
+					if(dateLog.Year<1880) {
+						row.Cells.Add("-");
+					}
+					else { 
+						row.Cells.Add(dateLog.ToShortDateString());
+					}
 				}
-				else {
-					row.Cells.Add(DefC.GetList(DefCat.ClaimCustomTracking).First(x => x.DefNum==customTrackDefNum).ItemName);
-				}
-				DateTime dateLog=PIn.Date(Table.Rows[i]["DateLog"].ToString());
-				if(dateLog.Year<1880) {
-					row.Cells.Add("-");
-				}
-				else { 
-					row.Cells.Add(dateLog.ToShortDateString());
-				}
-				row.Cells.Add(PIn.Double(Table.Rows[i]["ClaimFee"].ToString()).ToString("c"));
+				row.Cells.Add(PIn.Double(_table.Rows[i]["ClaimFee"].ToString()).ToString("c"));
 				row.Tag=new OutstandingInsClaim {
-					ClaimNum=PIn.Long(Table.Rows[i]["ClaimNum"].ToString()),
-					PatNum=PIn.Long(Table.Rows[i]["PatNum"].ToString())
+					ClaimNum=PIn.Long(_table.Rows[i]["ClaimNum"].ToString()),
+					PatNum=PIn.Long(_table.Rows[i]["PatNum"].ToString())
 				};
 				gridMain.Rows.Add(row);
-				total+=PIn.Decimal(Table.Rows[i]["ClaimFee"].ToString());
+				total+=PIn.Decimal(_table.Rows[i]["ClaimFee"].ToString());
 			}
 			textBox1.Text=total.ToString("c");
 			gridMain.EndUpdate();
@@ -574,7 +593,7 @@ namespace OpenDental {
 			FillGrid();
 		}
 
-		private void checkIgnoreCustom_CheckedChanged(object sender,EventArgs e) {
+		private void checkIgnoreCustom_Click(object sender,EventArgs e) {
 			FillGrid();
 		}
 
@@ -615,92 +634,11 @@ namespace OpenDental {
 		}
 
 		private void butPrint_Click(object sender,EventArgs e) {
-			////Validating of parameters is done during RefreshGrid().
-			//ReportSimpleGrid report=new ReportSimpleGrid();
-			//report.Query = "SELECT carrier.CarrierName,patient.HmPhone,claim.ClaimType,patient.FName,patient.LName,patient.MiddleI,patient.PatNum,claim.DateService,claim.DateSent,claim.ClaimFee,claim.ClaimNum "
-			//  +"FROM carrier,patient,claim,insplan "
-			//  +"WHERE carrier.CarrierNum = insplan.CarrierNum "
-			//  +"AND claim.PlanNum = insplan.PlanNum "
-			//  +"AND claim.PatNum = patient.PatNum "
-			//  +"AND claim.ClaimStatus='S' ";
-			//if(dateMin!=DateTime.MinValue) {
-			//  report.Query+="AND claim.DateSent <= "+POut.Date(dateMin)+" ";
-			//}
-			//if(dateMax!=DateTime.MinValue) {
-			//  report.Query+="AND claim.DateSent >= "+POut.Date(dateMax)+" ";
-			//}
-			//if(!isAllProv) {
-			//  if(provNumList.Count>0) {
-			//    report.Query+="AND claim.ProvBill IN (";
-			//    report.Query+=""+provNumList[0];
-			//    for(int i=1;i<provNumList.Count;i++) {
-			//      report.Query+=","+provNumList[i];
-			//    }
-			//    report.Query+=") ";
-			//  }
-			//}
-			//if(!isPreauth) {
-			//  report.Query+="AND claim.ClaimType!='Preauth' ";
-			//}
-			//report.Query+="ORDER BY carrier.Phone,insplan.PlanNum, carrier.Phone,insplan.PlanNum";
-			//FormQuery FormQuery2=new FormQuery(report);
-			//FormQuery2.IsReport=true;
-			//DataTable tableTemp= report.GetTempTable();
-			//report.TableQ=new DataTable(null);//new table no name
-			//for(int i=0;i<6;i++) {//add columns
-			//  report.TableQ.Columns.Add(new System.Data.DataColumn());//blank columns
-			//}
-			//report.InitializeColumns();
-			//for(int i=0;i<tableTemp.Rows.Count;i++) {//loop through data rows
-			//  DataRow row = report.TableQ.NewRow();//create new row called 'row' based on structure of TableQ
-			//  //start filling 'row'. First column is carrier:
-			//  row[0]=tableTemp.Rows[i][0];
-			//  row[1]=tableTemp.Rows[i][7];
-			//  if(PIn.String(tableTemp.Rows[i][2].ToString())=="P")
-			//    row[2]="Primary";
-			//  if(PIn.String(tableTemp.Rows[i][2].ToString())=="S")
-			//    row[2]="Secondary";
-			//  if(PIn.String(tableTemp.Rows[i][2].ToString())=="PreAuth")
-			//    row[2]="PreAuth";
-			//  if(PIn.String(tableTemp.Rows[i][2].ToString())=="Other")
-			//    row[2]="Other";
-			//  row[3]=tableTemp.Rows[i][4];
-			//  row[4]=(PIn.Date(tableTemp.Rows[i][3].ToString())).ToString("d");
-			//  row[5]=PIn.Double(tableTemp.Rows[i][6].ToString()).ToString("F");
-			//  //TimeSpan d = DateTime.Today.Subtract((PIn.PDate(tableTemp.Rows[i][5].ToString())));
-			//  //if(d.Days>5000)
-			//  //	row[4]="";
-			//  //else
-			//  //	row[4]=d.Days.ToString();
-			//  report.ColTotal[5]+=PIn.Double(tableTemp.Rows[i][6].ToString());
-			//  report.TableQ.Rows.Add(row);
-			//}
-			//FormQuery2.ResetGrid();//this is a method in FormQuery;
-			//report.Title="OUTSTANDING INSURANCE CLAIMS";
-			//report.SubTitle.Add(PrefC.GetString(PrefName.PracticeTitle));
-			//report.SubTitle.Add("Sent before "+dateMin.Date.ToShortDateString());
-			//report.ColPos[0]=20;
-			//report.ColPos[1]=210;
-			//report.ColPos[2]=330;
-			//report.ColPos[3]=430;
-			//report.ColPos[4]=600;
-			//report.ColPos[5]=690;
-			//report.ColPos[6]=770;
-			//report.ColCaption[0]=Lan.g(this,"Carrier");
-			//report.ColCaption[1]=Lan.g(this,"Phone");
-			//report.ColCaption[2]=Lan.g(this,"Type");
-			//report.ColCaption[3]=Lan.g(this,"Patient Name");
-			//report.ColCaption[4]=Lan.g(this,"Date of Service");
-			//report.ColCaption[5]=Lan.g(this,"Amount");
-			//report.ColAlign[5]=HorizontalAlignment.Right;
-			//FormQuery2.ShowDialog();
-			//DialogResult=DialogResult.OK;
 			pagesPrinted=0;
 			PrintDocument pd=new PrintDocument();
 			pd.PrintPage += new PrintPageEventHandler(this.pd_PrintPage);
 			pd.DefaultPageSettings.Margins=new Margins(25,25,40,40);
-			//pd.OriginAtMargins=true;
-			pd.DefaultPageSettings.Landscape=false;
+			pd.DefaultPageSettings.Landscape=!checkIgnoreCustom.Checked;//If we are including custom tracking, print in landscape mode.
 			if(pd.DefaultPageSettings.PrintableArea.Height==0) {
 				pd.DefaultPageSettings.PaperSize=new PaperSize("default",850,1100);
 			}
