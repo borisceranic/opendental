@@ -426,8 +426,8 @@ namespace OpenDental{
 					break;
 				case 11://"Commlog Types"
 					FormDefEdit.EnableValue=true;
-					FormDefEdit.ValueText=Lan.g(this,"APPT,FIN,RECALL,MISC");
-					FormDefEdit.HelpText=Lan.g(this,"Changes affect all current commlog entries.  In the second column, you can optionally specify APPT,FIN,RECALL,or MISC. Only one of each. This helps automate new entries.");
+					FormDefEdit.ValueText=Lan.g(this,"APPT,FIN,RECALL,MISC,TEXT");
+					FormDefEdit.HelpText=Lan.g(this,"Changes affect all current commlog entries.  In the second column, you can optionally specify APPT,FIN,RECALL,MISC,or TEXT. Only one of each. This helps automate new entries.");
 					break;
 				case 12://"Contact Categories":
 					//SelectedCat=(int)DefCat.ContactCategories;

@@ -196,7 +196,7 @@ namespace OpenDentBusiness{
 					Mode_=CommItemMode.Text,
 					Note="Text message sent: "+smsToMobile.MsgText,
 					PatNum=smsToMobile.PatNum,
-					CommType=Commlogs.GetTypeAuto(CommItemTypeAuto.MISC),
+					CommType=Commlogs.GetTypeAuto(CommItemTypeAuto.TEXT),
 					SentOrReceived=CommSentOrReceived.Sent
 				});
 			}

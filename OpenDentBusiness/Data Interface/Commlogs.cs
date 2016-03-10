@@ -216,7 +216,8 @@ namespace OpenDentBusiness{
 		APPT,
 		FIN,
 		RECALL,
-		MISC
+		MISC,
+		TEXT
 	}
 
 
