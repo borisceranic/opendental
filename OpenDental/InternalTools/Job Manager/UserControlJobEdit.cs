@@ -275,7 +275,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 				ODGridRow row=new ODGridRow() { Tag=task.TaskNum };//taskNum
 				row.Cells.Add(task.DateTimeEntry.ToShortDateString());
 				row.Cells.Add(TaskLists.GetOne(task.TaskListNum).Descript);
-				row.Cells.Add(task.DateTimeFinished.Year>1880?"X":"");
+				row.Cells.Add(task.TaskStatus==TaskStatusEnum.Done?"X":"");
 				row.Note=task.Descript.Left(100,true).Trim();
 				gridTasks.Rows.Add(row);
 			}
