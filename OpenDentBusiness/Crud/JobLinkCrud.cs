@@ -50,6 +50,7 @@ namespace OpenDentBusiness.Crud{
 				jobLink.JobNum    = PIn.Long  (row["JobNum"].ToString());
 				jobLink.FKey      = PIn.Long  (row["FKey"].ToString());
 				jobLink.LinkType  = (OpenDentBusiness.JobLinkType)PIn.Int(row["LinkType"].ToString());
+				jobLink.Tag       = PIn.String(row["Tag"].ToString());
 				retVal.Add(jobLink);
 			}
 			return retVal;
@@ -65,12 +66,14 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("JobNum");
 			table.Columns.Add("FKey");
 			table.Columns.Add("LinkType");
+			table.Columns.Add("Tag");
 			foreach(JobLink jobLink in listJobLinks) {
 				table.Rows.Add(new object[] {
 					POut.Long  (jobLink.JobLinkNum),
 					POut.Long  (jobLink.JobNum),
 					POut.Long  (jobLink.FKey),
 					POut.Int   ((int)jobLink.LinkType),
+					            jobLink.Tag,
 				});
 			}
 			return table;
@@ -111,14 +114,15 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="JobLinkNum,";
 			}
-			command+="JobNum,FKey,LinkType) VALUES(";
+			command+="JobNum,FKey,LinkType,Tag) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(jobLink.JobLinkNum)+",";
 			}
 			command+=
 				     POut.Long  (jobLink.JobNum)+","
 				+    POut.Long  (jobLink.FKey)+","
-				+    POut.Int   ((int)jobLink.LinkType)+")";
+				+    POut.Int   ((int)jobLink.LinkType)+","
+				+"'"+POut.String(jobLink.Tag)+"')";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -151,14 +155,15 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="JobLinkNum,";
 			}
-			command+="JobNum,FKey,LinkType) VALUES(";
+			command+="JobNum,FKey,LinkType,Tag) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(jobLink.JobLinkNum)+",";
 			}
 			command+=
 				     POut.Long  (jobLink.JobNum)+","
 				+    POut.Long  (jobLink.FKey)+","
-				+    POut.Int   ((int)jobLink.LinkType)+")";
+				+    POut.Int   ((int)jobLink.LinkType)+","
+				+"'"+POut.String(jobLink.Tag)+"')";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -173,7 +178,8 @@ namespace OpenDentBusiness.Crud{
 			string command="UPDATE joblink SET "
 				+"JobNum    =  "+POut.Long  (jobLink.JobNum)+", "
 				+"FKey      =  "+POut.Long  (jobLink.FKey)+", "
-				+"LinkType  =  "+POut.Int   ((int)jobLink.LinkType)+" "
+				+"LinkType  =  "+POut.Int   ((int)jobLink.LinkType)+", "
+				+"Tag       = '"+POut.String(jobLink.Tag)+"' "
 				+"WHERE JobLinkNum = "+POut.Long(jobLink.JobLinkNum);
 			Db.NonQ(command);
 		}
@@ -192,6 +198,10 @@ namespace OpenDentBusiness.Crud{
 			if(jobLink.LinkType != oldJobLink.LinkType) {
 				if(command!=""){ command+=",";}
 				command+="LinkType = "+POut.Int   ((int)jobLink.LinkType)+"";
+			}
+			if(jobLink.Tag != oldJobLink.Tag) {
+				if(command!=""){ command+=",";}
+				command+="Tag = '"+POut.String(jobLink.Tag)+"'";
 			}
 			if(command==""){
 				return false;
@@ -212,6 +222,9 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			if(jobLink.LinkType != oldJobLink.LinkType) {
+				return true;
+			}
+			if(jobLink.Tag != oldJobLink.Tag) {
 				return true;
 			}
 			return false;

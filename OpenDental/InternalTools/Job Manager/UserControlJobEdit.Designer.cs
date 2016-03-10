@@ -49,29 +49,30 @@
 			this.splitContainer2 = new System.Windows.Forms.SplitContainer();
 			this.labelRelatedJobs = new System.Windows.Forms.Label();
 			this.treeRelatedJobs = new System.Windows.Forms.TreeView();
+			this.butParentPick = new OpenDental.UI.Button();
 			this.gridRoles = new OpenDental.UI.ODGrid();
 			this.label1 = new System.Windows.Forms.Label();
+			this.textEditorMain = new OpenDental.OdtextEditor();
 			this.textParent = new System.Windows.Forms.TextBox();
+			this.butActions = new OpenDental.UI.Button();
+			this.butParentRemove = new OpenDental.UI.Button();
+			this.butSave = new OpenDental.UI.Button();
+			this.textEstHours = new OpenDental.ValidNumber();
 			this.label7 = new System.Windows.Forms.Label();
 			this.label8 = new System.Windows.Forms.Label();
+			this.textActualHours = new OpenDental.ValidNumber();
 			this.tabControlMain = new System.Windows.Forms.TabControl();
 			this.tabMain = new System.Windows.Forms.TabPage();
 			this.gridNotes = new OpenDental.UI.ODGrid();
 			this.tabReviews = new System.Windows.Forms.TabPage();
 			this.gridReview = new OpenDental.UI.ODGrid();
 			this.tabDocumentation = new System.Windows.Forms.TabPage();
+			this.textEditorDocumentation = new OpenDental.OdtextEditor();
 			this.tabHistory = new System.Windows.Forms.TabPage();
 			this.gridHistory = new OpenDental.UI.ODGrid();
 			this.timerTitle = new System.Windows.Forms.Timer(this.components);
 			this.timerVersion = new System.Windows.Forms.Timer(this.components);
-			this.butParentPick = new OpenDental.UI.Button();
-			this.textEditorMain = new OpenDental.OdtextEditor();
-			this.butActions = new OpenDental.UI.Button();
-			this.butParentRemove = new OpenDental.UI.Button();
-			this.butSave = new OpenDental.UI.Button();
-			this.textEstHours = new OpenDental.ValidNumber();
-			this.textActualHours = new OpenDental.ValidNumber();
-			this.textEditorDocumentation = new OpenDental.OdtextEditor();
+			this.gridFiles = new OpenDental.UI.ODGrid();
 			this.groupLinks.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
 			this.splitContainer2.Panel1.SuspendLayout();
@@ -88,6 +89,7 @@
 			// 
 			this.groupLinks.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupLinks.Controls.Add(this.gridFiles);
 			this.groupLinks.Controls.Add(this.gridBugs);
 			this.groupLinks.Controls.Add(this.gridFeatureReq);
 			this.groupLinks.Controls.Add(this.gridTasks);
@@ -111,7 +113,7 @@
 			this.gridBugs.Location = new System.Drawing.Point(5, 406);
 			this.gridBugs.Name = "gridBugs";
 			this.gridBugs.ScrollValue = 0;
-			this.gridBugs.Size = new System.Drawing.Size(223, 85);
+			this.gridBugs.Size = new System.Drawing.Size(223, 91);
 			this.gridBugs.TabIndex = 259;
 			this.gridBugs.Title = "Bugs";
 			this.gridBugs.TranslationName = "FormTaskEdit";
@@ -178,7 +180,7 @@
 			this.gridWatchers.HasAddButton = true;
 			this.gridWatchers.HasMultilineHeaders = false;
 			this.gridWatchers.HScrollVisible = false;
-			this.gridWatchers.Location = new System.Drawing.Point(6, 19);
+			this.gridWatchers.Location = new System.Drawing.Point(5, 19);
 			this.gridWatchers.Name = "gridWatchers";
 			this.gridWatchers.ScrollValue = 0;
 			this.gridWatchers.Size = new System.Drawing.Size(223, 91);
@@ -413,6 +415,21 @@
 			this.treeRelatedJobs.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeRelatedJobs_AfterSelect);
 			this.treeRelatedJobs.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeRelatedJobs_NodeMouseClick);
 			// 
+			// butParentPick
+			// 
+			this.butParentPick.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butParentPick.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butParentPick.Autosize = true;
+			this.butParentPick.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butParentPick.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butParentPick.CornerRadius = 4F;
+			this.butParentPick.Location = new System.Drawing.Point(715, 309);
+			this.butParentPick.Name = "butParentPick";
+			this.butParentPick.Size = new System.Drawing.Size(23, 20);
+			this.butParentPick.TabIndex = 307;
+			this.butParentPick.Text = "...";
+			this.butParentPick.Click += new System.EventHandler(this.butParentPick_Click);
+			// 
 			// gridRoles
 			// 
 			this.gridRoles.HasAddButton = false;
@@ -437,6 +454,24 @@
 			this.label1.Text = "Parent Job";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
+			// textEditorMain
+			// 
+			this.textEditorMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.textEditorMain.HasSaveButton = true;
+			this.textEditorMain.Location = new System.Drawing.Point(193, 0);
+			this.textEditorMain.MainRtf = "{\\rtf1\\ansi\\ansicpg1252\\deff0\\deflang1033{\\fonttbl{\\f0\\fnil\\fcharset0 Microsoft S" +
+    "ans Serif;}}\r\n\\viewkind4\\uc1\\pard\\f0\\fs17\\par\r\n}\r\n";
+			this.textEditorMain.MainText = "";
+			this.textEditorMain.MinimumSize = new System.Drawing.Size(450, 120);
+			this.textEditorMain.Name = "textEditorMain";
+			this.textEditorMain.ReadOnly = false;
+			this.textEditorMain.Size = new System.Drawing.Size(575, 306);
+			this.textEditorMain.TabIndex = 260;
+			this.textEditorMain.SaveClick += new OpenDental.ODtextEditorSaveEventHandler(this.textEditor_SaveClick);
+			this.textEditorMain.OnTextEdited += new OpenDental.OdtextEditor.textChangedEventHandler(this.textEditor_OnTextEdited);
+			// 
 			// textParent
 			// 
 			this.textParent.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
@@ -448,6 +483,65 @@
 			this.textParent.Size = new System.Drawing.Size(215, 20);
 			this.textParent.TabIndex = 304;
 			this.textParent.TabStop = false;
+			// 
+			// butActions
+			// 
+			this.butActions.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butActions.Autosize = true;
+			this.butActions.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butActions.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butActions.CornerRadius = 4F;
+			this.butActions.Image = global::OpenDental.Properties.Resources.arrowDownTriangle;
+			this.butActions.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.butActions.Location = new System.Drawing.Point(3, 3);
+			this.butActions.Name = "butActions";
+			this.butActions.Size = new System.Drawing.Size(95, 24);
+			this.butActions.TabIndex = 303;
+			this.butActions.Text = "Job Actions";
+			this.butActions.Click += new System.EventHandler(this.butActions_Click);
+			// 
+			// butParentRemove
+			// 
+			this.butParentRemove.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butParentRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butParentRemove.Autosize = true;
+			this.butParentRemove.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butParentRemove.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butParentRemove.CornerRadius = 4F;
+			this.butParentRemove.Image = global::OpenDental.Properties.Resources.deleteX;
+			this.butParentRemove.Location = new System.Drawing.Point(738, 309);
+			this.butParentRemove.Name = "butParentRemove";
+			this.butParentRemove.Size = new System.Drawing.Size(23, 20);
+			this.butParentRemove.TabIndex = 306;
+			this.butParentRemove.Click += new System.EventHandler(this.butParentRemove_Click);
+			// 
+			// butSave
+			// 
+			this.butSave.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butSave.Autosize = true;
+			this.butSave.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butSave.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butSave.CornerRadius = 4F;
+			this.butSave.Enabled = false;
+			this.butSave.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butSave.Location = new System.Drawing.Point(104, 3);
+			this.butSave.Name = "butSave";
+			this.butSave.Size = new System.Drawing.Size(83, 24);
+			this.butSave.TabIndex = 302;
+			this.butSave.Text = "Save Changes";
+			this.butSave.Visible = false;
+			this.butSave.Click += new System.EventHandler(this.butSave_Click);
+			// 
+			// textEstHours
+			// 
+			this.textEstHours.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.textEstHours.Location = new System.Drawing.Point(260, 310);
+			this.textEstHours.MaxVal = 255;
+			this.textEstHours.MinVal = 0;
+			this.textEstHours.Name = "textEstHours";
+			this.textEstHours.Size = new System.Drawing.Size(46, 20);
+			this.textEstHours.TabIndex = 269;
+			this.textEstHours.TextChanged += new System.EventHandler(this.textEstHours_TextChanged);
 			// 
 			// label7
 			// 
@@ -468,6 +562,17 @@
 			this.label8.TabIndex = 265;
 			this.label8.Text = "Hrs. Act.";
 			this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textActualHours
+			// 
+			this.textActualHours.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.textActualHours.Location = new System.Drawing.Point(383, 310);
+			this.textActualHours.MaxVal = 255;
+			this.textActualHours.MinVal = 0;
+			this.textActualHours.Name = "textActualHours";
+			this.textActualHours.Size = new System.Drawing.Size(46, 20);
+			this.textActualHours.TabIndex = 270;
+			this.textActualHours.TextChanged += new System.EventHandler(this.textActualHours_TextChanged);
 			// 
 			// tabControlMain
 			// 
@@ -550,6 +655,22 @@
 			this.tabDocumentation.TabIndex = 4;
 			this.tabDocumentation.Text = "Documentation";
 			// 
+			// textEditorDocumentation
+			// 
+			this.textEditorDocumentation.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.textEditorDocumentation.HasSaveButton = true;
+			this.textEditorDocumentation.Location = new System.Drawing.Point(3, 3);
+			this.textEditorDocumentation.MainRtf = "{\\rtf1\\ansi\\ansicpg1252\\deff0\\deflang1033{\\fonttbl{\\f0\\fnil\\fcharset0 Microsoft S" +
+    "ans Serif;}}\r\n\\viewkind4\\uc1\\pard\\f0\\fs17\\par\r\n}\r\n";
+			this.textEditorDocumentation.MainText = "";
+			this.textEditorDocumentation.MinimumSize = new System.Drawing.Size(450, 120);
+			this.textEditorDocumentation.Name = "textEditorDocumentation";
+			this.textEditorDocumentation.ReadOnly = false;
+			this.textEditorDocumentation.Size = new System.Drawing.Size(754, 297);
+			this.textEditorDocumentation.TabIndex = 261;
+			this.textEditorDocumentation.SaveClick += new OpenDental.ODtextEditorSaveEventHandler(this.textEditor_SaveClick);
+			this.textEditorDocumentation.OnTextEdited += new OpenDental.OdtextEditor.textChangedEventHandler(this.textEditor_OnTextEdited);
+			// 
 			// tabHistory
 			// 
 			this.tabHistory.BackColor = System.Drawing.SystemColors.Control;
@@ -587,124 +708,23 @@
 			this.timerVersion.Interval = 3000;
 			this.timerVersion.Tick += new System.EventHandler(this.timerVersion_Tick);
 			// 
-			// butParentPick
+			// gridFiles
 			// 
-			this.butParentPick.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butParentPick.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butParentPick.Autosize = true;
-			this.butParentPick.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butParentPick.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butParentPick.CornerRadius = 4F;
-			this.butParentPick.Location = new System.Drawing.Point(715, 309);
-			this.butParentPick.Name = "butParentPick";
-			this.butParentPick.Size = new System.Drawing.Size(23, 20);
-			this.butParentPick.TabIndex = 307;
-			this.butParentPick.Text = "...";
-			this.butParentPick.Click += new System.EventHandler(this.butParentPick_Click);
-			// 
-			// textEditorMain
-			// 
-			this.textEditorMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+			this.gridFiles.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.textEditorMain.HasSaveButton = true;
-			this.textEditorMain.Location = new System.Drawing.Point(193, 0);
-			this.textEditorMain.MainRtf = "{\\rtf1\\ansi\\ansicpg1252\\deff0\\deflang1033{\\fonttbl{\\f0\\fnil\\fcharset0 Microsoft S" +
-    "ans Serif;}}\r\n\\viewkind4\\uc1\\pard\\f0\\fs17\\par\r\n}\r\n";
-			this.textEditorMain.MainText = "";
-			this.textEditorMain.MinimumSize = new System.Drawing.Size(450, 120);
-			this.textEditorMain.Name = "textEditorMain";
-			this.textEditorMain.ReadOnly = false;
-			this.textEditorMain.Size = new System.Drawing.Size(575, 306);
-			this.textEditorMain.TabIndex = 260;
-			this.textEditorMain.SaveClick += new OpenDental.ODtextEditorSaveEventHandler(this.textEditor_SaveClick);
-			this.textEditorMain.OnTextEdited += new OpenDental.OdtextEditor.textChangedEventHandler(this.textEditor_OnTextEdited);
-			// 
-			// butActions
-			// 
-			this.butActions.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butActions.Autosize = true;
-			this.butActions.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butActions.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butActions.CornerRadius = 4F;
-			this.butActions.Image = global::OpenDental.Properties.Resources.arrowDownTriangle;
-			this.butActions.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.butActions.Location = new System.Drawing.Point(3, 3);
-			this.butActions.Name = "butActions";
-			this.butActions.Size = new System.Drawing.Size(95, 24);
-			this.butActions.TabIndex = 303;
-			this.butActions.Text = "Job Actions";
-			this.butActions.Click += new System.EventHandler(this.butActions_Click);
-			// 
-			// butParentRemove
-			// 
-			this.butParentRemove.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butParentRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butParentRemove.Autosize = true;
-			this.butParentRemove.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butParentRemove.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butParentRemove.CornerRadius = 4F;
-			this.butParentRemove.Image = global::OpenDental.Properties.Resources.deleteX;
-			this.butParentRemove.Location = new System.Drawing.Point(738, 309);
-			this.butParentRemove.Name = "butParentRemove";
-			this.butParentRemove.Size = new System.Drawing.Size(23, 20);
-			this.butParentRemove.TabIndex = 306;
-			this.butParentRemove.Click += new System.EventHandler(this.butParentRemove_Click);
-			// 
-			// butSave
-			// 
-			this.butSave.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butSave.Autosize = true;
-			this.butSave.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butSave.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butSave.CornerRadius = 4F;
-			this.butSave.Enabled = false;
-			this.butSave.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butSave.Location = new System.Drawing.Point(104, 3);
-			this.butSave.Name = "butSave";
-			this.butSave.Size = new System.Drawing.Size(83, 24);
-			this.butSave.TabIndex = 302;
-			this.butSave.Text = "Save Changes";
-			this.butSave.Visible = false;
-			this.butSave.Click += new System.EventHandler(this.butSave_Click);
-			// 
-			// textEstHours
-			// 
-			this.textEstHours.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textEstHours.Location = new System.Drawing.Point(260, 310);
-			this.textEstHours.MaxVal = 255;
-			this.textEstHours.MinVal = 0;
-			this.textEstHours.Name = "textEstHours";
-			this.textEstHours.Size = new System.Drawing.Size(46, 20);
-			this.textEstHours.TabIndex = 269;
-			this.textEstHours.TextChanged += new System.EventHandler(this.textEstHours_TextChanged);
-			// 
-			// textActualHours
-			// 
-			this.textActualHours.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.textActualHours.Location = new System.Drawing.Point(383, 310);
-			this.textActualHours.MaxVal = 255;
-			this.textActualHours.MinVal = 0;
-			this.textActualHours.Name = "textActualHours";
-			this.textActualHours.Size = new System.Drawing.Size(46, 20);
-			this.textActualHours.TabIndex = 270;
-			this.textActualHours.TextChanged += new System.EventHandler(this.textActualHours_TextChanged);
-			// 
-			// textEditorDocumentation
-			// 
-			this.textEditorDocumentation.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.textEditorDocumentation.HasSaveButton = true;
-			this.textEditorDocumentation.Location = new System.Drawing.Point(3, 3);
-			this.textEditorDocumentation.MainRtf = "{\\rtf1\\ansi\\ansicpg1252\\deff0\\deflang1033{\\fonttbl{\\f0\\fnil\\fcharset0 Microsoft S" +
-    "ans Serif;}}\r\n\\viewkind4\\uc1\\pard\\f0\\fs17\\par\r\n}\r\n";
-			this.textEditorDocumentation.MainText = "";
-			this.textEditorDocumentation.MinimumSize = new System.Drawing.Size(450, 120);
-			this.textEditorDocumentation.Name = "textEditorDocumentation";
-			this.textEditorDocumentation.ReadOnly = false;
-			this.textEditorDocumentation.Size = new System.Drawing.Size(754, 297);
-			this.textEditorDocumentation.TabIndex = 261;
-			this.textEditorDocumentation.SaveClick += new OpenDental.ODtextEditorSaveEventHandler(this.textEditor_SaveClick);
-			this.textEditorDocumentation.OnTextEdited += new OpenDental.OdtextEditor.textChangedEventHandler(this.textEditor_OnTextEdited);
+			this.gridFiles.HasAddButton = true;
+			this.gridFiles.HasMultilineHeaders = false;
+			this.gridFiles.HScrollVisible = false;
+			this.gridFiles.Location = new System.Drawing.Point(5, 503);
+			this.gridFiles.Name = "gridFiles";
+			this.gridFiles.ScrollValue = 0;
+			this.gridFiles.Size = new System.Drawing.Size(223, 91);
+			this.gridFiles.TabIndex = 260;
+			this.gridFiles.Title = "Files";
+			this.gridFiles.TranslationName = "";
+			this.gridFiles.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridFiles_CellDoubleClick);
+			this.gridFiles.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridFiles_CellClick);
+			this.gridFiles.TitleAddClick += new System.EventHandler(this.gridFiles_TitleAddClick);
 			// 
 			// UserControlJobEdit
 			// 
@@ -796,5 +816,6 @@
 		private System.Windows.Forms.Timer timerVersion;
 		private System.Windows.Forms.Label labelRelatedJobs;
 		private System.Windows.Forms.TreeView treeRelatedJobs;
+		private UI.ODGrid gridFiles;
 	}
 }

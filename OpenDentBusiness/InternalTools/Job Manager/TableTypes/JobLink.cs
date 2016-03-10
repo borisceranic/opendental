@@ -18,6 +18,8 @@ namespace OpenDentBusiness {
 		public long FKey;
 		///<summary>Type of table this links to and what role the objects on that table are.</summary>
 		public JobLinkType LinkType;
+		///<summary>Contains other information such as a unc path to a file.</summary>
+		public string Tag;
 
 		///<summary></summary>
 		public JobLink Copy() {
@@ -35,9 +37,12 @@ namespace OpenDentBusiness {
 		///<summary>3 -</summary>
 		QueryRequest,
 		///<summary>4 -</summary>
-		Watcher
+		Watcher,
+		///<summary>5 -</summary>
+		File
 	}
 
 }
-	
 
+
+// ALTER TABLE joblink ADD Tag varchar(255) NOT NULL

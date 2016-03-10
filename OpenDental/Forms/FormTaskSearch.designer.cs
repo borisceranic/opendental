@@ -28,15 +28,19 @@ namespace OpenDental{
 			this.comboPriority = new System.Windows.Forms.ComboBox();
 			this.label12 = new System.Windows.Forms.Label();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
+			this.butClearCompleted = new OpenDental.UI.Button();
 			this.dateCompletedTo = new System.Windows.Forms.DateTimePicker();
 			this.dateCompletedFrom = new System.Windows.Forms.DateTimePicker();
 			this.label6 = new System.Windows.Forms.Label();
 			this.label7 = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.butClearCreated = new OpenDental.UI.Button();
 			this.dateCreatedTo = new System.Windows.Forms.DateTimePicker();
 			this.dateCreatedFrom = new System.Windows.Forms.DateTimePicker();
 			this.label5 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
+			this.butUserPicker = new OpenDental.UI.Button();
+			this.butPatPicker = new OpenDental.UI.Button();
 			this.comboUsers = new System.Windows.Forms.ComboBox();
 			this.textPatNum = new System.Windows.Forms.TextBox();
 			this.label8 = new System.Windows.Forms.Label();
@@ -49,12 +53,9 @@ namespace OpenDental{
 			this.label1 = new System.Windows.Forms.Label();
 			this.checkLimit = new System.Windows.Forms.CheckBox();
 			this.gridTasks = new OpenDental.UI.ODGrid();
-			this.butClearCompleted = new OpenDental.UI.Button();
-			this.butClearCreated = new OpenDental.UI.Button();
-			this.butUserPicker = new OpenDental.UI.Button();
-			this.butPatPicker = new OpenDental.UI.Button();
 			this.butRefresh = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
+			this.butNewTask = new OpenDental.UI.Button();
 			this.groupBox2.SuspendLayout();
 			this.groupBox3.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -119,6 +120,21 @@ namespace OpenDental{
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Date Completed";
 			// 
+			// butClearCompleted
+			// 
+			this.butClearCompleted.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butClearCompleted.Autosize = true;
+			this.butClearCompleted.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butClearCompleted.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butClearCompleted.CornerRadius = 4F;
+			this.butClearCompleted.Location = new System.Drawing.Point(112, 58);
+			this.butClearCompleted.Name = "butClearCompleted";
+			this.butClearCompleted.Size = new System.Drawing.Size(56, 20);
+			this.butClearCompleted.TabIndex = 36;
+			this.butClearCompleted.Text = "Clear";
+			this.butClearCompleted.UseVisualStyleBackColor = true;
+			this.butClearCompleted.Click += new System.EventHandler(this.butClearCompleted_Click);
+			// 
 			// dateCompletedTo
 			// 
 			this.dateCompletedTo.CustomFormat = " ";
@@ -169,6 +185,21 @@ namespace OpenDental{
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Date Created";
 			// 
+			// butClearCreated
+			// 
+			this.butClearCreated.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butClearCreated.Autosize = true;
+			this.butClearCreated.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butClearCreated.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butClearCreated.CornerRadius = 4F;
+			this.butClearCreated.Location = new System.Drawing.Point(112, 58);
+			this.butClearCreated.Name = "butClearCreated";
+			this.butClearCreated.Size = new System.Drawing.Size(56, 20);
+			this.butClearCreated.TabIndex = 35;
+			this.butClearCreated.Text = "Clear";
+			this.butClearCreated.UseVisualStyleBackColor = true;
+			this.butClearCreated.Click += new System.EventHandler(this.butClearCreated_Click);
+			// 
 			// dateCreatedTo
 			// 
 			this.dateCreatedTo.CustomFormat = " ";
@@ -204,6 +235,36 @@ namespace OpenDental{
 			this.label2.Size = new System.Drawing.Size(32, 15);
 			this.label2.TabIndex = 0;
 			this.label2.Text = "From";
+			// 
+			// butUserPicker
+			// 
+			this.butUserPicker.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butUserPicker.Autosize = true;
+			this.butUserPicker.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butUserPicker.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butUserPicker.CornerRadius = 4F;
+			this.butUserPicker.Location = new System.Drawing.Point(182, 14);
+			this.butUserPicker.Name = "butUserPicker";
+			this.butUserPicker.Size = new System.Drawing.Size(20, 20);
+			this.butUserPicker.TabIndex = 30;
+			this.butUserPicker.Text = "...";
+			this.butUserPicker.UseVisualStyleBackColor = true;
+			this.butUserPicker.Click += new System.EventHandler(this.butUserPicker_Click);
+			// 
+			// butPatPicker
+			// 
+			this.butPatPicker.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPatPicker.Autosize = true;
+			this.butPatPicker.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPatPicker.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPatPicker.CornerRadius = 4F;
+			this.butPatPicker.Location = new System.Drawing.Point(182, 96);
+			this.butPatPicker.Name = "butPatPicker";
+			this.butPatPicker.Size = new System.Drawing.Size(20, 20);
+			this.butPatPicker.TabIndex = 29;
+			this.butPatPicker.Text = "...";
+			this.butPatPicker.UseVisualStyleBackColor = true;
+			this.butPatPicker.Click += new System.EventHandler(this.butPatPicker_Click);
 			// 
 			// comboUsers
 			// 
@@ -306,6 +367,7 @@ namespace OpenDental{
 			this.gridTasks.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridTasks.HasAddButton = false;
 			this.gridTasks.HasMultilineHeaders = false;
 			this.gridTasks.HScrollVisible = false;
 			this.gridTasks.Location = new System.Drawing.Point(12, 12);
@@ -319,66 +381,6 @@ namespace OpenDental{
 			this.gridTasks.Title = "Task Results";
 			this.gridTasks.TranslationName = "TableProg";
 			this.gridTasks.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridTasks_CellDoubleClick);
-			// 
-			// butClearCompleted
-			// 
-			this.butClearCompleted.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butClearCompleted.Autosize = true;
-			this.butClearCompleted.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butClearCompleted.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butClearCompleted.CornerRadius = 4F;
-			this.butClearCompleted.Location = new System.Drawing.Point(112, 58);
-			this.butClearCompleted.Name = "butClearCompleted";
-			this.butClearCompleted.Size = new System.Drawing.Size(56, 20);
-			this.butClearCompleted.TabIndex = 36;
-			this.butClearCompleted.Text = "Clear";
-			this.butClearCompleted.UseVisualStyleBackColor = true;
-			this.butClearCompleted.Click += new System.EventHandler(this.butClearCompleted_Click);
-			// 
-			// butClearCreated
-			// 
-			this.butClearCreated.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butClearCreated.Autosize = true;
-			this.butClearCreated.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butClearCreated.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butClearCreated.CornerRadius = 4F;
-			this.butClearCreated.Location = new System.Drawing.Point(112, 58);
-			this.butClearCreated.Name = "butClearCreated";
-			this.butClearCreated.Size = new System.Drawing.Size(56, 20);
-			this.butClearCreated.TabIndex = 35;
-			this.butClearCreated.Text = "Clear";
-			this.butClearCreated.UseVisualStyleBackColor = true;
-			this.butClearCreated.Click += new System.EventHandler(this.butClearCreated_Click);
-			// 
-			// butUserPicker
-			// 
-			this.butUserPicker.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butUserPicker.Autosize = true;
-			this.butUserPicker.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butUserPicker.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butUserPicker.CornerRadius = 4F;
-			this.butUserPicker.Location = new System.Drawing.Point(182, 14);
-			this.butUserPicker.Name = "butUserPicker";
-			this.butUserPicker.Size = new System.Drawing.Size(20, 20);
-			this.butUserPicker.TabIndex = 30;
-			this.butUserPicker.Text = "...";
-			this.butUserPicker.UseVisualStyleBackColor = true;
-			this.butUserPicker.Click += new System.EventHandler(this.butUserPicker_Click);
-			// 
-			// butPatPicker
-			// 
-			this.butPatPicker.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butPatPicker.Autosize = true;
-			this.butPatPicker.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butPatPicker.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butPatPicker.CornerRadius = 4F;
-			this.butPatPicker.Location = new System.Drawing.Point(182, 96);
-			this.butPatPicker.Name = "butPatPicker";
-			this.butPatPicker.Size = new System.Drawing.Size(20, 20);
-			this.butPatPicker.TabIndex = 29;
-			this.butPatPicker.Text = "...";
-			this.butPatPicker.UseVisualStyleBackColor = true;
-			this.butPatPicker.Click += new System.EventHandler(this.butPatPicker_Click);
 			// 
 			// butRefresh
 			// 
@@ -410,19 +412,33 @@ namespace OpenDental{
 			this.butClose.Text = "Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
+			// butNewTask
+			// 
+			this.butNewTask.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butNewTask.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butNewTask.Autosize = true;
+			this.butNewTask.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butNewTask.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butNewTask.CornerRadius = 4F;
+			this.butNewTask.Location = new System.Drawing.Point(722, 328);
+			this.butNewTask.Name = "butNewTask";
+			this.butNewTask.Size = new System.Drawing.Size(75, 24);
+			this.butNewTask.TabIndex = 196;
+			this.butNewTask.Text = "New Task";
+			this.butNewTask.Click += new System.EventHandler(this.butNewTask_Click);
+			// 
 			// FormTaskSearch
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(934, 696);
+			this.Controls.Add(this.butNewTask);
 			this.Controls.Add(this.checkLimit);
 			this.Controls.Add(this.groupBox2);
 			this.Controls.Add(this.butRefresh);
 			this.Controls.Add(this.gridTasks);
 			this.Controls.Add(this.butClose);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(100, 100);
 			this.Name = "FormTaskSearch";
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Task Search";
 			this.Load += new System.EventHandler(this.FormTaskSearch_Load);
 			this.groupBox2.ResumeLayout(false);
@@ -466,5 +482,6 @@ namespace OpenDental{
 		private System.Windows.Forms.DateTimePicker dateCreatedTo;
 		private UI.Button butClearCompleted;
 		private UI.Button butClearCreated;
+		private UI.Button butNewTask;
 	}
 }

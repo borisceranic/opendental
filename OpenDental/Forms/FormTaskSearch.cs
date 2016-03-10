@@ -199,7 +199,32 @@ namespace OpenDental {
 			dateCompletedFrom.Value=DateTime.UtcNow;
 			dateCompletedTo.Value=DateTime.UtcNow;
 			dateCompletedFrom.CustomFormat=" ";
-			dateCompletedTo.CustomFormat=" ";			
+			dateCompletedTo.CustomFormat=" ";
+		}
+
+		private void butNewTask_Click(object sender,EventArgs e) {
+			FormTaskListSelect FormTLS = new FormTaskListSelect(TaskObjectType.Patient);
+			FormTLS.ShowDialog();
+			if(FormTLS.DialogResult!=DialogResult.OK || FormTLS.SelectedTaskListNum==0) {
+				return;
+			}
+			Task task = new Task() { TaskListNum=-1 };//don't show it in any list yet.
+			Tasks.Insert(task);
+			Task taskOld = task.Copy();
+			task.UserNum=Security.CurUser.UserNum;
+			task.TaskListNum=FormTLS.SelectedTaskListNum;
+			FormTaskEdit FormTE = new FormTaskEdit(task,taskOld);
+			FormTE.IsNew=true;
+			FormTE.ShowDialog();//modal
+			if(FormTE.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			SelectedTaskNum=task.TaskNum;
+			if(this.TaskGoToEvent!=null) {
+				TaskGoToEvent(this,new CancelEventArgs());
+			}
+			DialogResult=DialogResult.OK;
+			Close();
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {

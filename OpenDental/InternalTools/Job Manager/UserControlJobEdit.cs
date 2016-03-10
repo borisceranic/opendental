@@ -150,6 +150,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 			FillGridTasks();
 			FillGridFeatuerReq();
 			FillGridBugs();
+			FillGridFiles();
 			FillGridNote();
 			FillGridReviews();
 			FillGridHistory();
@@ -310,6 +311,21 @@ namespace OpenDental.InternalTools.Job_Manager {
 				gridBugs.Rows.Add(row);
 			}
 			gridBugs.EndUpdate();
+		}
+
+		private void FillGridFiles() {
+			gridFiles.BeginUpdate();
+			gridFiles.Columns.Clear();
+			gridFiles.Columns.Add(new ODGridColumn(Lan.g(this,""),120));
+			gridFiles.Rows.Clear();
+			ODGridRow row;
+			foreach(JobLink link in _jobCur.ListJobLinks.FindAll(x => x.LinkType==JobLinkType.File)) {
+				row=new ODGridRow();
+				row.Cells.Add(link.Tag.Split('\\').Last());
+				row.Tag=link;
+				gridFiles.Rows.Add(row);
+			}
+			gridFiles.EndUpdate();
 		}
 
 		public void FillGridNote() {
@@ -1532,6 +1548,38 @@ namespace OpenDental.InternalTools.Job_Manager {
 			FillGridBugs();
 		}
 
+		private void gridFiles_TitleAddClick(object sender,EventArgs e) {
+			if(_isLoading) {
+				return;
+			}
+			if(_jobCur==null) {
+				return;//should never happen
+			}
+			//Form to find file.
+			OpenFileDialog formF = new OpenFileDialog();
+			formF.Multiselect=true;
+			if(formF.ShowDialog()!=DialogResult.OK) {
+				return;
+			}
+			foreach(string filename in formF.FileNames) {
+				JobLink jobLink = new JobLink();
+				jobLink.JobNum=_jobCur.JobNum;
+				jobLink.LinkType=JobLinkType.File;
+				jobLink.Tag=filename;
+				_jobCur.ListJobLinks.Add(jobLink);
+				if(!IsNew) {
+					JobLinks.Insert(jobLink);
+				}
+			}
+			if(!IsNew) {
+				Signalods.SetInvalid(InvalidType.Jobs,KeyType.Job,_jobCur.JobNum);
+			}
+			else {
+				IsChanged=true;
+			}
+			FillGridFiles();
+		}
+
 		private void gridReview_TitleAddClick(object sender,EventArgs e) {
 			if(_isLoading) {
 				return;
@@ -1936,6 +1984,56 @@ namespace OpenDental.InternalTools.Job_Manager {
 				});
 				menu.MenuItems.Add(new MenuItem(Bugs.GetOne(FKey).Description.Left(50)) { Enabled=false });
 				menu.Show(gridFeatureReq,gridFeatureReq.PointToClient(Cursor.Position));
+			}
+		}
+
+		private void gridFiles_CellClick(object sender,ODGridClickEventArgs e) {
+			if(_isLoading) {
+				return;
+			}
+			if(e.Button==MouseButtons.Right && (gridFiles.Rows[e.Row].Tag is JobLink)) {
+				ContextMenu menu = new ContextMenu();
+				JobLink link= (JobLink)gridFiles.Rows[e.Row].Tag;
+				menu.MenuItems.Add("Open File",(o,arg) => {
+					try { System.Diagnostics.Process.Start(link.Tag); }
+					catch(Exception ex) {
+						MessageBox.Show("Unable to open file.");
+						try { System.Diagnostics.Process.Start(link.Tag.Substring(0,link.Tag.LastIndexOf('\\'))); } catch(Exception exc) { }
+					}					
+				});
+				if(link.Tag.Contains("\\")) {
+					try {
+						string folder = link.Tag.Substring(0,link.Tag.LastIndexOf('\\'));
+						menu.MenuItems.Add("Open Folder",(o,arg) => { try { System.Diagnostics.Process.Start(folder); } catch(Exception ex) { } });
+					}
+					catch(Exception ex) { }
+				}
+				menu.MenuItems.Add("-");
+				menu.MenuItems.Add("Unlink File",(o,arg) => {
+					List<JobLink> listLinks = _jobCur.ListJobLinks.FindAll(x => x.LinkType==JobLinkType.File && x.Tag==link.Tag);
+					_jobCur.ListJobLinks.RemoveAll(x => x.LinkType==JobLinkType.File && x.Tag==link.Tag);
+					_jobOld.ListJobLinks.RemoveAll(x => x.LinkType==JobLinkType.File && x.Tag==link.Tag);
+					listLinks.Select(x => x.JobLinkNum).ToList().ForEach(JobLinks.Delete);
+					FillGridFiles();
+					Signalods.SetInvalid(InvalidType.Jobs,KeyType.Job,_jobCur.JobNum);
+				});
+				menu.MenuItems.Add(new MenuItem(link.Tag) { Enabled=false });//show file path in gray
+				menu.Show(gridFeatureReq,gridFeatureReq.PointToClient(Cursor.Position));
+			}
+		}
+
+		private void gridFiles_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			if(_isLoading) {
+				return;
+			}
+			if(!(gridFiles.Rows[e.Row].Tag is JobLink)) {
+				return;
+			}
+			try {
+				System.Diagnostics.Process.Start(((JobLink)gridFiles.Rows[e.Row].Tag).Tag);
+			}
+			catch(Exception ex) {
+				MessageBox.Show("Unable to open file.");
 			}
 		}
 
