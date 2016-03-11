@@ -4497,7 +4497,6 @@ namespace OpenDental{
 					}
 					System.Media.SoundPlayer soundplay = new SoundPlayer(Properties.Resources.notify);
 					soundplay.Play();
-					this.BringToFront();//don't know if this is doing anything.
 					FormTaskEdit FormT = new FormTaskEdit(tasksPopup[i],tasksPopup[i].Copy());
 					FormT.IsPopup=true;
 					FormT.Show();//non-modal
