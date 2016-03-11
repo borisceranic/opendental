@@ -4269,6 +4269,13 @@ namespace OpenDental {
 				}
 			}
 			//Validation------------------------------------------------------------------------------------------------------------------------------------------------------
+			try {
+				InternetExplorer IEControl=new InternetExplorer();
+			}
+			catch {
+				MsgBox.Show(this,"Internet Explorer not installed.");
+				return;
+			}
 			if(Security.CurUser.EmployeeNum==0 && Security.CurUser.ProvNum==0) {
 				MsgBox.Show(this,"This user must be associated with either a provider or an employee.  The security admin must make this change before this user can submit prescriptions.");
 				return;
@@ -4384,6 +4391,18 @@ namespace OpenDental {
 					return;
 				}
 			}
+			Employee emp=null;
+			if(Security.CurUser.EmployeeNum!=0) {
+				emp=Employees.GetEmp(Security.CurUser.EmployeeNum);
+				if(emp.LName=="") {//Checked in UI, but check here just in case this database was converted from another software.
+					MessageBox.Show(Lan.g(this,"Employee last name missing for user")+": "+Security.CurUser.UserName);
+					return;
+				}
+				if(emp.FName=="") {//Not validated in UI.
+					MessageBox.Show(Lan.g(this,"Employee first name missing for user")+": "+Security.CurUser.UserName);
+					return;
+				}
+			}
 			#region Provider Validation
 			Provider prov=null;
 			if(Security.CurUser.ProvNum!=0) {
@@ -4432,6 +4451,7 @@ namespace OpenDental {
 				MessageBox.Show(Lan.g(this,"Provider state where licensed invalid")+": "+prov.Abbr);
 				return;
 			}
+			bool isAccessAllowed=true;
 			UpdateErxAccess(npi);
 			ProviderErx provErx=ProviderErxs.GetOneForNpi(npi);
 			if(!PrefC.GetBool(PrefName.NewCropIsLegacy) && !provErx.IsIdentifyProofed) {
@@ -4450,25 +4470,13 @@ namespace OpenDental {
 							"https://universalid.verizon.com/uid/index.php/issuanceservice/registration/individual/41511098-65c2-4cfb-8ee5-6e021671a669/ZFR");
 					}
 				}
-				return;
+				isAccessAllowed=false;
 			}
 			if(!provErx.IsEnabled) {
 				MessageBox.Show(Lan.g(this,"Contact support to enable eRx for provider")+" "+prov.Abbr);
-				return;
+				isAccessAllowed=false;
 			}
 			#endregion Provider Validation
-			Employee emp=null;
-			if(Security.CurUser.EmployeeNum!=0) {
-				emp=Employees.GetEmp(Security.CurUser.EmployeeNum);
-				if(emp.LName=="") {//Checked in UI, but check here just in case this database was converted from another software.
-					MessageBox.Show(Lan.g(this,"Employee last name missing for user")+": "+Security.CurUser.UserName);
-					return;
-				}
-				if(emp.FName=="") {//Not validated in UI.
-					MessageBox.Show(Lan.g(this,"Employee first name missing for user")+": "+Security.CurUser.UserName);
-					return;
-				}
-			}
 			if(PatCur.Birthdate.Year<1880) {
 				MsgBox.Show(this,"Patient birthdate missing.");
 				return;
@@ -4479,14 +4487,6 @@ namespace OpenDental {
 			}
 			if(PatCur.Zip!="" && !Regex.IsMatch(PatCur.Zip,@"^[0-9]{5}\-?([0-9]{4})?$")) {//Blank, or #####, or #####-####, or #########
 				MsgBox.Show(this,"Patient zip invalid");
-				return;
-			}
-			InternetExplorer IEControl;
-			try {
-				IEControl=new InternetExplorer();
-			}
-			catch {
-				MsgBox.Show(this,"Internet Explorer not installed.");
 				return;
 			}
 			string clickThroughXml=ErxXml.BuildClickThroughXml(prov,emp,PatCur);
@@ -4508,7 +4508,14 @@ namespace OpenDental {
 			FormErx formErx=new FormErx();
 			formErx.PatCur=PatCur;
 			formErx.ClickThroughXml=clickThroughXml;
-			formErx.Show();//Non-modal so user can browse OD while writing prescription.  When form is closed, ErxBrowserClosed() is called below.			
+			if(isAccessAllowed) {
+				formErx.Show();//Non-modal so user can browse OD while writing prescription.  When form is closed, ErxBrowserClosed() is called below.
+			}
+			else {
+				//This is how we send the provider information to NewCrop without allowing the provider to use NewCrop.
+				//NewCrop requires the provider information on their server in order to complete Identity Proofing (IDP).
+				formErx.ComposeNewRx();
+			}
 			ErxLog erxLog=new ErxLog();
 			erxLog.PatNum=PatCur.PatNum;
 			erxLog.MsgText=clickThroughXml;
