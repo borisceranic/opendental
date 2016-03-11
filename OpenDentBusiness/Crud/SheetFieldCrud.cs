@@ -66,6 +66,7 @@ namespace OpenDentBusiness.Crud{
 				sheetField.ReportableName  = PIn.String(row["ReportableName"].ToString());
 				sheetField.TextAlign       = (System.Windows.Forms.HorizontalAlignment)PIn.Int(row["TextAlign"].ToString());
 				sheetField.ItemColor       = Color.FromArgb(PIn.Int(row["ItemColor"].ToString()));
+				sheetField.DateTimeSig     = PIn.DateT (row["DateTimeSig"].ToString());
 				retVal.Add(sheetField);
 			}
 			return retVal;
@@ -97,6 +98,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("ReportableName");
 			table.Columns.Add("TextAlign");
 			table.Columns.Add("ItemColor");
+			table.Columns.Add("DateTimeSig");
 			foreach(SheetField sheetField in listSheetFields) {
 				table.Rows.Add(new object[] {
 					POut.Long  (sheetField.SheetFieldNum),
@@ -119,6 +121,7 @@ namespace OpenDentBusiness.Crud{
 					            sheetField.ReportableName,
 					POut.Int   ((int)sheetField.TextAlign),
 					POut.Int   (sheetField.ItemColor.ToArgb()),
+					POut.DateT (sheetField.DateTimeSig),
 				});
 			}
 			return table;
@@ -159,7 +162,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="SheetFieldNum,";
 			}
-			command+="SheetNum,FieldType,FieldName,FieldValue,FontSize,FontName,FontIsBold,XPos,YPos,Width,Height,GrowthBehavior,RadioButtonValue,RadioButtonGroup,IsRequired,TabOrder,ReportableName,TextAlign,ItemColor) VALUES(";
+			command+="SheetNum,FieldType,FieldName,FieldValue,FontSize,FontName,FontIsBold,XPos,YPos,Width,Height,GrowthBehavior,RadioButtonValue,RadioButtonGroup,IsRequired,TabOrder,ReportableName,TextAlign,ItemColor,DateTimeSig) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(sheetField.SheetFieldNum)+",";
 			}
@@ -182,7 +185,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (sheetField.TabOrder)+","
 				+"'"+POut.String(sheetField.ReportableName)+"',"
 				+    POut.Int   ((int)sheetField.TextAlign)+","
-				+    POut.Int   (sheetField.ItemColor.ToArgb())+")";
+				+    POut.Int   (sheetField.ItemColor.ToArgb())+","
+				+    POut.DateT (sheetField.DateTimeSig)+")";
 			if(sheetField.FieldValue==null) {
 				sheetField.FieldValue="";
 			}
@@ -219,7 +223,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="SheetFieldNum,";
 			}
-			command+="SheetNum,FieldType,FieldName,FieldValue,FontSize,FontName,FontIsBold,XPos,YPos,Width,Height,GrowthBehavior,RadioButtonValue,RadioButtonGroup,IsRequired,TabOrder,ReportableName,TextAlign,ItemColor) VALUES(";
+			command+="SheetNum,FieldType,FieldName,FieldValue,FontSize,FontName,FontIsBold,XPos,YPos,Width,Height,GrowthBehavior,RadioButtonValue,RadioButtonGroup,IsRequired,TabOrder,ReportableName,TextAlign,ItemColor,DateTimeSig) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(sheetField.SheetFieldNum)+",";
 			}
@@ -242,7 +246,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (sheetField.TabOrder)+","
 				+"'"+POut.String(sheetField.ReportableName)+"',"
 				+    POut.Int   ((int)sheetField.TextAlign)+","
-				+    POut.Int   (sheetField.ItemColor.ToArgb())+")";
+				+    POut.Int   (sheetField.ItemColor.ToArgb())+","
+				+    POut.DateT (sheetField.DateTimeSig)+")";
 			if(sheetField.FieldValue==null) {
 				sheetField.FieldValue="";
 			}
@@ -277,7 +282,8 @@ namespace OpenDentBusiness.Crud{
 				+"TabOrder        =  "+POut.Int   (sheetField.TabOrder)+", "
 				+"ReportableName  = '"+POut.String(sheetField.ReportableName)+"', "
 				+"TextAlign       =  "+POut.Int   ((int)sheetField.TextAlign)+", "
-				+"ItemColor       =  "+POut.Int   (sheetField.ItemColor.ToArgb())+" "
+				+"ItemColor       =  "+POut.Int   (sheetField.ItemColor.ToArgb())+", "
+				+"DateTimeSig     =  "+POut.DateT (sheetField.DateTimeSig)+" "
 				+"WHERE SheetFieldNum = "+POut.Long(sheetField.SheetFieldNum);
 			if(sheetField.FieldValue==null) {
 				sheetField.FieldValue="";
@@ -365,6 +371,10 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="ItemColor = "+POut.Int(sheetField.ItemColor.ToArgb())+"";
 			}
+			if(sheetField.DateTimeSig != oldSheetField.DateTimeSig) {
+				if(command!=""){ command+=",";}
+				command+="DateTimeSig = "+POut.DateT(sheetField.DateTimeSig)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -436,6 +446,9 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			if(sheetField.ItemColor != oldSheetField.ItemColor) {
+				return true;
+			}
+			if(sheetField.DateTimeSig != oldSheetField.DateTimeSig) {
 				return true;
 			}
 			return false;

@@ -90,8 +90,19 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 					command="ALTER TABLE sheet MODIFY IsDeleted NOT NULL";
 					Db.NonQ(command);
+				}				
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE sheetfield ADD DateTimeSig datetime NOT NULL DEFAULT '0001-01-01 00:00:00'";
+					Db.NonQ(command);
 				}
-
+				else {//oracle
+					command="ALTER TABLE sheetfield ADD DateTimeSig date";
+					Db.NonQ(command);
+					command="UPDATE sheetfield SET DateTimeSig = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE DateTimeSig IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE sheetfield MODIFY DateTimeSig NOT NULL";
+					Db.NonQ(command);
+				}
 
 				command="UPDATE preference SET ValueString = '16.2.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);

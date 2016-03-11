@@ -73,7 +73,6 @@ namespace OpenDental {
 				butPDF.Visible=false;
 				butDelete.Visible=false;
 				butChangePat.Visible=false;
-				butRestore.Visible=false;
 				if(TerminalListenShut) {
 					timer1.Enabled=true;
 				}
@@ -102,7 +101,6 @@ namespace OpenDental {
 				butDelete.Visible=false;
 				butOK.Visible=false;
 				butChangePat.Visible=false;
-				butRestore.Visible=false;
 				checkErase.Visible=false;
 				butCancel.Text="Close";
 			}
@@ -124,7 +122,6 @@ namespace OpenDental {
 				butOK.Enabled=false;
 				butDelete.Enabled=false;
 				butChangePat.Enabled=false;
-				butRestore.Visible=false;
 				return;
 			}
 			if(SheetCur.IsDeleted && !IsStatement && !IsInTerminal) {
@@ -327,6 +324,25 @@ namespace OpenDental {
 				sigBox.TabIndex=field.TabOrder;
 				panelMain.Controls.Add(sigBox);
 				sigBox.BringToFront();
+				if(sigBox.IsValid && field.FieldValue.Length>0) {
+					//According to this form's load function the only pre-requisite for being a "signed" sheet and locking it is that it loads with an existing signature.
+					//Based on that if we get this far and there's actually a signature then it's "signed", but this only works with the first form load.
+					textbox=new RichTextBox();
+					textbox.BorderStyle=BorderStyle.None;
+					textbox.TabStop=false;
+					textbox.Location=new Point(field.XPos+1,field.YPos+field.Height-15);
+					textbox.Width=field.Width-2;
+					textbox.ScrollBars=RichTextBoxScrollBars.None;
+					textbox.SelectionAlignment=HorizontalAlignment.Left;
+					textbox.Text=Lan.g(this,"Signed")+": "+field.DateTimeSig.ToShortDateString()+" "+field.DateTimeSig.ToShortTimeString();
+					style=FontStyle.Regular;
+					//textbox.Font=new Font(field.FontName,field.FontSize,style);
+					textbox.Multiline=false;
+					textbox.Height=14;
+					textbox.ReadOnly=true;
+					panelMain.Controls.Add(textbox);
+					textbox.BringToFront();
+				}
 			}
 		}
 
@@ -881,6 +897,7 @@ namespace OpenDental {
 				SheetFields.GetFieldsAndParameters(SheetCur);
 				string keyData=Sheets.GetSignatureKey(SheetCur);
 				string signature=sigBox.GetSignature(keyData);
+				field.DateTimeSig=DateTime.MinValue;
 				if(signature!="") {
 					//This line of code is more readable, but uses ternary operator
 					//field.FieldValue=(sigBox.GetSigIsTopaz()?1:0)+signature;
@@ -889,6 +906,10 @@ namespace OpenDental {
 						field.FieldValue="1";
 					}
 					field.FieldValue+=signature;
+					if(sigBox.IsValid) {
+						//Save date of modified signature in the sheetfield here.
+						field.DateTimeSig=DateTime.Now;
+					}
 				}
 				listSheetFields.Add(field);
 			}

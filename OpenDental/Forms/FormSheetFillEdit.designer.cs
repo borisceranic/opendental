@@ -300,6 +300,7 @@ namespace OpenDental{
 			this.butRestore.TabStop = false;
 			this.butRestore.Text = "Restore";
 			this.butRestore.UseVisualStyleBackColor = true;
+			this.butRestore.Visible = false;
 			this.butRestore.Click += new System.EventHandler(this.butRestore_Click);
 			// 
 			// FormSheetFillEdit

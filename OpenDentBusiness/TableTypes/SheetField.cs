@@ -67,6 +67,9 @@ namespace OpenDentBusiness{
 		///<summary>Used to store the key to display signature box when printing.  Not stored in DB.</summary>
 		[CrudColumn(IsNotDbColumn=true)]
 		public string SigKey;
+		///<summary>DateTime that a sheet was signed.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
+		public DateTime DateTimeSig;
 
 		///<summary>Used only for serialization purposes</summary>
 		[XmlElement("ColorOverride",typeof(int))]
