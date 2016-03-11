@@ -438,7 +438,7 @@ namespace OpenDental {
 		}
 
 		private void butAssessed_Click(object sender,EventArgs e) {
-			if(comboTobaccoStatus.SelectedIndex<0 && comboTobaccoStatus.SelectedIndex>=_listTobaccoStatuses.Count) {
+			if(comboTobaccoStatus.SelectedIndex<0 || comboTobaccoStatus.SelectedIndex>=_listTobaccoStatuses.Count) {
 				MsgBox.Show(this,"You must select a tobacco status.");
 				return;
 			}
