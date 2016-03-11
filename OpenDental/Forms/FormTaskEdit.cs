@@ -70,7 +70,9 @@ namespace OpenDental {
 		private Label labelDoneAffectsAll;
 		///<summary>If the reply button is visible, this stores who to reply to.  It's determined when loading the form.</summary>
 		private long ReplyToUserNum;
-		///<summary>Gets set to true externally if this window popped up without user interaction.  It will behave slightly differently.  Specifically, the New checkbox will be unchecked so that if user clicks OK, the task will be marked as read.</summary>
+		///<summary>Gets set to true externally if this window popped up without user interaction.  It will behave slightly differently.  
+		///Specifically, the New checkbox will be unchecked so that if user clicks OK, the task will be marked as read.
+		///Also if IsPop is set to true, this window will not steal focus from other windows when poping up.</summary>
 		public bool IsPopup;
 		///<summary>When tracking status by user, this tracks whether it has changed.  This is so that if it has changed, a signal can be sent for a refresh of lists.</summary>
 		private bool StatusChanged;
@@ -106,6 +108,12 @@ namespace OpenDental {
 
 		///<summary>FK to tasklist.TaskListNum. </summary>
 		private const long _triageTaskListNum=1697;
+
+		///<summary>This is used to make the task window not steal focus when opening as a popup.</summary>
+		protected override bool ShowWithoutActivation
+		{
+			get { return IsPopup; }
+		}
 
 		///<summary>Task gets inserted ahead of time, then frequently altered before passing in here.  The taskOld that is passed in should be the task as it is in the database.  When saving, taskOld will be compared with db to make sure no changes.</summary>
 		public FormTaskEdit(Task taskCur,Task taskOld) {
