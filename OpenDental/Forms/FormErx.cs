@@ -66,9 +66,10 @@ namespace OpenDental {
 			ToolBarMain.Invalidate();
 		}
 
-		///<summary>Uses the public prov, emp and pat variables to build a new prescription and load it within browser control.
-		///Loads the compose tab in NewCrop's web interface.</summary>
-		private void ComposeNewRx() {
+		///<summary>Sends the ClickThroughXml to eRx and loads the result within the browser control.
+		///Loads the compose tab in NewCrop's web interface.  Can be called externally to send provider information to eRx
+		///without allowing the user to write any prescriptions.</summary>
+		public void ComposeNewRx() {
 			string xmlBase64=System.Web.HttpUtility.HtmlEncode(Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes(ClickThroughXml)));
 			xmlBase64=xmlBase64.Replace("+","%2B");//A common base 64 character which needs to be escaped within URLs.
 			xmlBase64=xmlBase64.Replace("/","%2F");//A common base 64 character which needs to be escaped within URLs.
