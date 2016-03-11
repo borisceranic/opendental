@@ -1431,9 +1431,9 @@ namespace OpenDental{
 			// 
 			// labelClinic
 			// 
-			this.labelClinic.Location = new System.Drawing.Point(-10, 219);
+			this.labelClinic.Location = new System.Drawing.Point(5, 219);
 			this.labelClinic.Name = "labelClinic";
-			this.labelClinic.Size = new System.Drawing.Size(114, 16);
+			this.labelClinic.Size = new System.Drawing.Size(99, 16);
 			this.labelClinic.TabIndex = 75;
 			this.labelClinic.Text = "Clinic";
 			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -2725,6 +2725,7 @@ namespace OpenDental{
 			this.signatureBoxWrapper.BackColor = System.Drawing.SystemColors.ControlDark;
 			this.signatureBoxWrapper.Location = new System.Drawing.Point(505, 325);
 			this.signatureBoxWrapper.Name = "signatureBoxWrapper";
+			this.signatureBoxWrapper.SignatureMode = OpenDental.UI.SignatureBoxWrapper.SigMode.Default;
 			this.signatureBoxWrapper.Size = new System.Drawing.Size(364, 81);
 			this.signatureBoxWrapper.TabIndex = 181;
 			this.signatureBoxWrapper.SignatureChanged += new System.EventHandler(this.signatureBoxWrapper_SignatureChanged);
@@ -2745,7 +2746,6 @@ namespace OpenDental{
 			// 
 			// FormProcEdit
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(962, 696);
 			this.Controls.Add(this.butChangeUser);
 			this.Controls.Add(this.signatureBoxWrapper);
@@ -2793,7 +2793,6 @@ namespace OpenDental{
 			this.MinimizeBox = false;
 			this.Name = "FormProcEdit";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Procedure Info";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormProcEdit_FormClosing);
 			this.Load += new System.EventHandler(this.FormProcInfo_Load);
