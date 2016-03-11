@@ -37,12 +37,11 @@ namespace OpenDental.Bridges{
 		//$$DFWIN$$ OPEN -n"LName, FName" -c"PatNum" -r -a
 		//option -r creates patient if not found, -a changes focus to Digora
 		public static void SendData(Program ProgramCur, Patient pat){
-			if(pat==null){
-				MessageBox.Show("No patient selected.");
+			if(pat==null) {
+				MsgBox.Show("Digora","No patient selected.");
 				return;
 			}
 			List<ProgramProperty> ForProgram =ProgramProperties.GetForProgram(ProgramCur.ProgramNum);
-			//if(pat!=null){
 			string info="$$DFWIN$$ OPEN -n\""+Tidy(pat.LName)+", "+Tidy(pat.FName)+"\" -c\"";
 			ProgramProperty PPCur=ProgramProperties.GetCur(ForProgram, "Enter 0 to use PatientNum, or 1 to use ChartNum");;
 			if(PPCur.PropertyValue=="0"){
@@ -52,16 +51,14 @@ namespace OpenDental.Bridges{
 				info+=pat.ChartNumber;
 			}
 			info+="\" -r -a";
-			Clipboard.SetText(info,TextDataFormat.Text);
-			//}
-			/*else{
-				try{
-					Process.Start(ProgramCur.Path);//should start Apteryx without bringing up a pt.
-				}
-				catch{
-					MessageBox.Show(ProgramCur.Path+" is not available.");
-				}
-			}*/
+			try {
+				Clipboard.SetText(info,TextDataFormat.Text);
+			}
+			catch(Exception) {
+				//The clipboard will sometimes fail to SetText for many different reasons.  Often times another attempt will be successful.
+				MsgBox.Show("Digora","Error accessing the clipboard, please try again.");
+				return;
+			}
 		}
 
 		private static string Tidy(string str){
