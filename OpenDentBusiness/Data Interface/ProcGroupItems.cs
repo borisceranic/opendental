@@ -45,6 +45,19 @@ namespace OpenDentBusiness{
 			string command= "DELETE FROM procgroupitem WHERE ProcGroupItemNum = "+POut.Long(procGroupItemNum);
 			Db.NonQ(command);
 		}
+
+		///<summary>Returns a count of the number of completed procedures attached to a group note.  Takes the ProcNum of a group note.
+		///Used when deleting group notes to determine which permission to check.</summary>
+		public static int GetCountCompletedProcsForGroup(long groupNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetInt(MethodBase.GetCurrentMethod(),groupNum);
+			}
+			string command = "SELECT COUNT(*) FROM procgroupitem "
+				+"INNER JOIN procedurelog ON procedurelog.ProcNum=procgroupitem.ProcNum AND procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+" "
+				+"WHERE GroupNum = "+POut.Long(groupNum);
+			return PIn.Int(Db.GetCount(command));
+		}
+
 		/*
 		#region CachePattern
 		//This region can be eliminated if this is not a table type with cached data.
