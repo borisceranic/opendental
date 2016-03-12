@@ -447,7 +447,7 @@ namespace OpenDentBusiness{
 				case Permissions.ProcedureNote:
 					return Lans.g("enumPermissions","Procedure Note");
 				case Permissions.ProcDelete:
-					return Lans.g("enumPermissions","Delete Procedure");
+					return Lans.g("enumPermissions","TP Procedure Delete");
 				case Permissions.ProcComplEdit:
 					return Lans.g("enumPermissions","Edit Completed Procedure");
 				case Permissions.ProcEditShowFee:

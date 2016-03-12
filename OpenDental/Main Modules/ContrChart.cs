@@ -7954,14 +7954,29 @@ namespace OpenDental {
 						skippedC++;
 					}
 					else{
-						try{
-							DateTime dateEntryC=DateTime.MinValue;
-							if(row["dateEntryC"].ToString()!="") {
-								dateEntryC=DateTime.Parse(row["dateEntryC"].ToString());
+						try {
+							DateTime dateEntryC=PIn.DateT(row["dateEntryC"].ToString());
+							long codeNum = PIn.Long(row["CodeNum"].ToString());
+							if(ProcedureCodes.GetStringProcCode(codeNum)==ProcedureCodes.GroupProcCode) {//If a group note
+								//Check DB to see if attached to any completed procedures. This isn't pulled from datasetmain because we want to be 100% up to date.
+								//Note that if multiple rows were selected it might have already deleted some procedures, but we do not delete completed
+								//procedures in this loop.
+								if(ProcGroupItems.GetCountCompletedProcsForGroup(PIn.Long(row["ProcNum"].ToString()))==0) { //If not attached to completed procs
+									if(!Security.IsAuthorized(Permissions.ProcDelete,dateEntryC,true)) {
+										skippedSecurity++;
+										continue;
+									}
+								}
+								else {
+									skippedC++;
+									continue;
+								}
 							}
-							if(!Security.IsAuthorized(Permissions.ProcDelete,dateEntryC,true)) {
-								skippedSecurity++;
-								continue;
+							else {//Not a group note
+								if(!Security.IsAuthorized(Permissions.ProcDelete,dateEntryC,true)) {
+									skippedSecurity++;
+									continue;
+								}
 							}
 							Procedures.Delete(PIn.Long(row["ProcNum"].ToString()));//also deletes the claimprocs
 							SecurityLogs.MakeLogEntry(Permissions.ProcDelete,PatCur.PatNum,row["ProcCode"].ToString()+", "+PIn.Double(row["procFee"].ToString()).ToString("c"));

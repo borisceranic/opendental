@@ -87,6 +87,8 @@ namespace OpenDental{
 		private Userod _curUser=Security.CurUser;
 		///<summary>True if the user clicked the Change User button.</summary>
 		private bool _hasUserChanged;
+		///<summary>True if group note is attached to at least one completed proc.  Used for determining which permission to use.</summary>
+		private bool _attachedToCompletedProc;
 
 		public FormProcGroup() {
 			InitializeComponent();
@@ -772,9 +774,20 @@ namespace OpenDental{
 			else {
 				butInvalidate.Visible=false;
 				//because islocked overrides security:
-				if(!Security.IsAuthorized(Permissions.ProcComplEdit,GroupCur.DateEntryC)) {
-					butOK.Enabled=false;
-					butDelete.Enabled=false;
+				_attachedToCompletedProc=(ProcGroupItems.GetCountCompletedProcsForGroup(GroupCur.ProcNum)!=0);
+				if(_attachedToCompletedProc) {
+					//There is at least one completed procedure associated so use the ProcComplEdit perm.
+					//This is mainly to make sure that the global security lock date is considered.
+					if(!Security.IsAuthorized(Permissions.ProcComplEdit,GroupCur.DateEntryC)) {
+						butOK.Enabled=false;
+						butDelete.Enabled=false;
+					}
+				}
+				else {//If not attached to completed procs, use the ProcDelete perm.
+					if(!Security.IsAuthorized(Permissions.ProcDelete,GroupCur.DateEntryC)) {
+						butOK.Enabled=false;
+						butDelete.Enabled=false;
+					}
 				}
 			}
 			if(GroupCur.ProcStatus==ProcStat.D) {//an invalidated proc
@@ -1496,8 +1509,14 @@ namespace OpenDental{
 			}
 			//This log entry is similar to the log entry made when right-clicking in the Chart and using the delete option,
 			//except there is an extra : in the description for this log entry, so we programmers can know for sure where the entry was made from.
-			SecurityLogs.MakeLogEntry(Permissions.ProcDelete,PatCur.PatNum,
-				":"+ProcedureCodes.GetStringProcCode(GroupCur.CodeNum).ToString()+", "+GroupCur.ProcDate.ToShortDateString());
+			if(_attachedToCompletedProc) {
+				SecurityLogs.MakeLogEntry(Permissions.ProcComplEdit,PatCur.PatNum,
+					":"+ProcedureCodes.GetStringProcCode(GroupCur.CodeNum).ToString()+", "+GroupCur.ProcDate.ToShortDateString());
+			}
+			else {
+				SecurityLogs.MakeLogEntry(Permissions.ProcDelete,PatCur.PatNum,
+					":"+ProcedureCodes.GetStringProcCode(GroupCur.CodeNum).ToString()+", "+GroupCur.ProcDate.ToShortDateString());
+			}
 			DialogResult=DialogResult.OK;
 			IsOpen=false;
 		}		
