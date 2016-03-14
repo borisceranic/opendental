@@ -60,6 +60,7 @@ namespace OpenDentalGraph.Extensions {
 		}
 
 		public delegate string StringFromEnumArgs<T>(T item);
+		public delegate bool BoolFromEnumArgs<T>(T item);
 
 		public static void SetDataToEnums<T>(this ComboBox combo,bool includeAllAtTop,bool showValueIndDisplay=true,int min=-1,int max=-1,StringFromEnumArgs<T> getStringFromEnum=null) where T:struct, IConvertible {
 			//Make sure the IConvertibleType is actually an enum.
@@ -77,13 +78,13 @@ namespace OpenDentalGraph.Extensions {
 			List<T> list=Enum.GetValues(typeof(T)).Cast<T>().ToList();
 			SetDataToEnumsPrimitive<T>(combo,list,0,list.Count-1,getStringFromEnum);
 		}
-
-		public static void SetDataToEnumsPrimitive<T>(this ComboBox combo,int min=-1,int max=-1,StringFromEnumArgs<T> getStringFromEnum=null) where T:struct, IConvertible {
+		
+		public static void SetDataToEnumsPrimitive<T>(this ComboBox combo,int min=-1,int max=-1,StringFromEnumArgs<T> getStringFromEnum=null,BoolFromEnumArgs<T> includeEnumValue = null) where T:struct, IConvertible {
 			//Make sure the IConvertibleType is actually an enum.
 			if(!typeof(T).IsEnum) {
 				throw new Exception("T must be an Enum type");
 			}
-			SetDataToEnumsPrimitive<T>(combo,Enum.GetValues(typeof(T)).Cast<T>().ToList(),min,max,getStringFromEnum);
+			SetDataToEnumsPrimitive<T>(combo,Enum.GetValues(typeof(T)).Cast<T>().ToList(),min,max,getStringFromEnum,includeEnumValue);
 		}
 
 		public static T GetValue<T>(this ComboBox combo) {
@@ -116,7 +117,7 @@ namespace OpenDentalGraph.Extensions {
 			}
 		}
 
-		public static void SetDataToEnumsPrimitive<T>(this ComboBox combo,List<T> enumValues,int min=-1,int max=-1,StringFromEnumArgs<T> getStringFromEnum=null) where T:struct, IConvertible {
+		public static void SetDataToEnumsPrimitive<T>(this ComboBox combo,List<T> enumValues,int min=-1,int max=-1,StringFromEnumArgs<T> getStringFromEnum=null,BoolFromEnumArgs<T> includeEnumValue = null) where T:struct, IConvertible {
 			List<ComboItem<T>> listItems=new List<ComboItem<T>>();			
 			enumValues.ForEach(x => {
 				int val=Convert.ToInt32(x);
@@ -125,6 +126,11 @@ namespace OpenDentalGraph.Extensions {
 				}
 				if(max>=0 && val > max) {
 					return;
+				}
+				if(includeEnumValue!=null) {
+					if(!includeEnumValue(x)) {
+						return;
+					}
 				}
 				string display=x.ToString();
 				if(getStringFromEnum!=null) {
