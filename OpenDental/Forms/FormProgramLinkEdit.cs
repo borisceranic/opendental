@@ -49,6 +49,8 @@ namespace OpenDental{
 		private CheckBox checkHideButtons;
 		private string pathOverrideOld;
 		private bool _isLoading = false;
+		///<summary>Set to false if we do not want to allow assigning program link to toolbars.</summary>
+		public bool AllowToolbarChanges=true;
 
 		///<summary></summary>
 		public FormProgramLinkEdit(){
@@ -524,6 +526,10 @@ namespace OpenDental{
 			}
 			for(int i=0;i<itemsForProgram.Count;i++) {
 				listToolBars.SetSelected((int)itemsForProgram[i].ToolBar,true);
+			}
+			if(!AllowToolbarChanges) {//As we add more static bridges, we will need to enhance this to show/hide controls as needed.
+				listToolBars.ClearSelected();
+				listToolBars.Enabled=false;
 			}
 			if(itemsForProgram.Count>0){//the text on all buttons will be the same for now
 				textButtonText.Text=itemsForProgram[0].ButtonText;

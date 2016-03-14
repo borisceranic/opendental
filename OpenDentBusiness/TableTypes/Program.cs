@@ -98,6 +98,7 @@ namespace OpenDentBusiness{
 		Progeny,
 		PT,
 		PTupdate,
+		RapidCall,
 		RayMage,
 		Romexis,
 		Scanora,

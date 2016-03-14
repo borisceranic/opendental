@@ -226,6 +226,9 @@ namespace OpenDental{
 				return;
 			}
 			FormProgramLinkEdit FormPE=new FormProgramLinkEdit();
+			if(Programs.IsStatic(program)) {
+				FormPE.AllowToolbarChanges=false;
+			}
 			FormPE.ProgramCur=program;
 			FormPE.ShowDialog();
 			changed=true;

@@ -334,6 +334,7 @@ namespace OpenDental {
 			this.imageListMain.Images.SetKeyName(0, "Pat.gif");
 			this.imageListMain.Images.SetKeyName(1, "print.gif");
 			this.imageListMain.Images.SetKeyName(2, "apptLists.gif");
+			this.imageListMain.Images.SetKeyName(3, "DT Rapid Call.png");
 			// 
 			// Calendar2
 			// 
@@ -1951,6 +1952,9 @@ namespace OpenDental {
 			//ToolBarMain.Buttons.Add(button);
 			ToolBarMain.Buttons.Add(new ODToolBarButton("",2,Lan.g(this,"Appointment Lists"),"Lists"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton("",1,Lan.g(this,"Print Schedule"),"Print"));
+			if(!ProgramProperties.IsAdvertisingDisabled(ProgramName.RapidCall)) {
+				ToolBarMain.Buttons.Add(new ODToolBarButton("",3,Lan.g(this,"Rapid Call"),"RapidCall"));
+			}
 			ProgramL.LoadToolbar(ToolBarMain,ToolBarsAvail.ApptModule);
 			ToolBarMain.Invalidate();
 			Plugins.HookAddCode(this,"ContrAppt.LayoutToolBar_end",PatCur);
@@ -4377,6 +4381,14 @@ namespace OpenDental {
 						break;
 					case "Print":
 						OnPrint_Click();
+						break;
+					case "RapidCall":
+						try {
+							RapidCall.ShowPage();
+						}
+						catch(Exception ex) {
+							MessageBox.Show(ex.Message);
+						}
 						break;
 				}
 			}

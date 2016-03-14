@@ -2670,6 +2670,7 @@ namespace OpenDental{
 			refreshNeeded|=SetAdvertising(ProgramName.DentalIntel,doc);
 			refreshNeeded|=SetAdvertising(ProgramName.DentalTekSmartOfficePhone,doc);
 			refreshNeeded|=SetAdvertising(ProgramName.Podium,doc);
+			refreshNeeded|=SetAdvertising(ProgramName.RapidCall,doc);
 			if(refreshNeeded) {
 				Signalods.SetInvalid(InvalidType.Programs);
 			}

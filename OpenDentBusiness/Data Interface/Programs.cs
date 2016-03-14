@@ -171,6 +171,15 @@ namespace OpenDentBusiness{
 			return program.Path;
 		}
 
+		/// <summary>Returns true if input program is a static program. Static programs are ones we do not want the user to be able to modify in some way.</summary>
+		public bool IsStatic(Program prog) {
+			//Currently there is just one static program. As more are created they will need to be added to this check.
+			if(prog.ProgName == ProgramName.RapidCall.ToString()) {
+				return true;
+			}
+			return false;
+		}
+
 		///<summary>For each enabled bridge, if the bridge uses a file to transmit patient data to the other software, then we need to remove the files or clear the files when OD is exiting.
 		///Required for EHR 2014 module d.7 (as stated by proctor).</summary>
 		public static void ScrubExportedPatientData() {
