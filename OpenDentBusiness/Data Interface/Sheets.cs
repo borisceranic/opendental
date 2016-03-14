@@ -277,7 +277,8 @@ namespace OpenDentBusiness{
 			List<DataRow> rows=new List<DataRow>();
 			//sheet---------------------------------------------------------------------------------------
 			string command="SELECT DateTimeSheet,SheetNum,Description,ShowInTerminal "
-				+"FROM sheet WHERE PatNum ="+POut.Long(patNum)+" "
+				+"FROM sheet WHERE IsDeleted=0 "
+				+"AND PatNum ="+POut.Long(patNum)+" "
 				+"AND (SheetType="+POut.Long((int)SheetTypeEnum.PatientForm)+" OR SheetType="+POut.Long((int)SheetTypeEnum.MedicalHistory);
 			if(PrefC.GetBool(PrefName.PatientFormsShowConsent)) {
 				command+=" OR SheetType="+POut.Long((int)SheetTypeEnum.Consent);//Show consent forms if pref is true.
