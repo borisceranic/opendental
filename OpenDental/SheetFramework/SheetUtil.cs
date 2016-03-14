@@ -693,7 +693,7 @@ namespace OpenDental{
 					if(checkShowSubtotals &&
 						(i==treatPlan.ListProcTPs.Count-1 || treatPlan.ListProcTPs[i+1].Priority != treatPlan.ListProcTPs[i].Priority)) {
 						row=new TpRow();
-						row.Description="Subtotal";
+						row.Description=Lan.g("TableTP","Subtotal");
 						row.Fee=subfee;
 						row.PriIns=subpriIns;
 						row.SecIns=subsecIns;
@@ -718,7 +718,7 @@ namespace OpenDental{
 			#region Totals
 			if(checkShowTotals) {
 				row=new TpRow();
-				row.Description="Total";
+				row.Description=Lan.g("TableTP","Total");
 				row.Fee=totFee;
 				row.PriIns=totPriIns;
 				row.SecIns=totSecIns;
@@ -738,11 +738,15 @@ namespace OpenDental{
 				dRow["Code"]                   =tpRow.Code;
 				dRow["Sub"]                    =ProcedureCodes.IsValidCode(ProcedureCodes.GetProcCode(tpRow.Code).SubstitutionCode)?"X":"";
 				dRow["Description"]            =tpRow.Description;
-				dRow["Fee"]                    =tpRow.Fee.ToString("F");
-				dRow["Pri Ins"]                =tpRow.PriIns.ToString("F");
-				dRow["Sec Ins"]                =tpRow.SecIns.ToString("F");
-				dRow["Discount"]               =tpRow.Discount.ToString("F");
-				dRow["Pat"]                    =tpRow.Pat.ToString("F");
+				if(PrefC.GetBool(PrefName.TreatPlanItemized) 
+					|| tpRow.Description==Lan.g("TableTP","Subtotal") || tpRow.Description==Lan.g("TableTP","Total")) 
+				{
+					dRow["Fee"]                  =tpRow.Fee.ToString("F");
+					dRow["Pri Ins"]              =tpRow.PriIns.ToString("F");
+					dRow["Sec Ins"]              =tpRow.SecIns.ToString("F");
+					dRow["Discount"]             =tpRow.Discount.ToString("F");
+					dRow["Pat"]                  =tpRow.Pat.ToString("F");
+				}
 				dRow["Prognosis"]              =tpRow.Prognosis;
 				dRow["Dx"]                     =tpRow.Dx;
 				dRow["Abbr"]                   =tpRow.ProcAbbr;
