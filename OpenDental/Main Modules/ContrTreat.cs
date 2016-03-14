@@ -1210,7 +1210,7 @@ namespace OpenDental{
 			if(checkShowSubtotals.Checked &&
 			   (i==ProcTPSelectList.Length-1 || ProcTPSelectList[i+1].Priority!=ProcTPSelectList[i].Priority)) {
 				row=new TpRow();
-				row.Description="Subtotal";
+				row.Description=Lan.g("TableTP","Subtotal");
 				row.Fee=subfee;
 				row.PriIns=subpriIns;
 				row.SecIns=subsecIns;
@@ -1243,7 +1243,7 @@ namespace OpenDental{
 		}
 		if(checkShowTotals.Checked) {
 			row=new TpRow();
-			row.Description="Total";
+			row.Description=Lan.g("TableTP","Total");
 			row.Fee=totFee;
 			row.PriIns=totPriIns;
 			row.SecIns=totSecIns;
@@ -1537,8 +1537,8 @@ namespace OpenDental{
 							break;
 						case "Fee":
 							if(checkShowFees.Checked) {
-								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()=="Total"
-									|| RowsMain[i].Description.ToString()=="Subtotal") 
+								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()==Lan.g("TableTP","Total")
+									|| RowsMain[i].Description.ToString()==Lan.g("TableTP","Subtotal")) 
 								{
 									row.Cells.Add(RowsMain[i].Fee.ToString("F"));
 								}
@@ -1549,8 +1549,8 @@ namespace OpenDental{
 							break;
 						case "Pri Ins":
 							if(checkShowIns.Checked) {
-								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()=="Total"
-									|| RowsMain[i].Description.ToString()=="Subtotal") 
+								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()==Lan.g("TableTP","Total")
+									|| RowsMain[i].Description.ToString()==Lan.g("TableTP","Subtotal")) 
 								{
 									row.Cells.Add(RowsMain[i].PriIns.ToString("F"));
 								}
@@ -1561,8 +1561,8 @@ namespace OpenDental{
 							break;
 						case "Sec Ins":
 							if(checkShowIns.Checked) {
-								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()=="Total"
-									|| RowsMain[i].Description.ToString()=="Subtotal") 
+								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()==Lan.g("TableTP","Total")
+									|| RowsMain[i].Description.ToString()==Lan.g("TableTP","Subtotal")) 
 								{
 									row.Cells.Add(RowsMain[i].SecIns.ToString("F"));
 								}
@@ -1573,8 +1573,8 @@ namespace OpenDental{
 							break;
 						case "Discount":
 							if(checkShowDiscount.Checked) {
-								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()=="Total"
-									|| RowsMain[i].Description.ToString()=="Subtotal") 
+								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()==Lan.g("TableTP","Total")
+									|| RowsMain[i].Description.ToString()==Lan.g("TableTP","Subtotal"))
 								{
 									row.Cells.Add(RowsMain[i].Discount.ToString("F"));
 								}
@@ -1585,8 +1585,8 @@ namespace OpenDental{
 							break;
 						case "Pat":
 							if(checkShowIns.Checked || checkShowDiscount.Checked) {
-								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()=="Total"
-									|| RowsMain[i].Description.ToString()=="Subtotal") 
+								if(PrefC.GetBool(PrefName.TreatPlanItemized) || RowsMain[i].Description.ToString()==Lan.g("TableTP","Total")
+									|| RowsMain[i].Description.ToString()==Lan.g("TableTP","Subtotal")) 
 								{
 									row.Cells.Add(RowsMain[i].Pat.ToString("F"));
 								}
@@ -2412,7 +2412,7 @@ namespace OpenDental{
 			if(checkShowSubtotals.Checked &&
 			   (i==listProcForTP.Count-1 || listTreatPlanAttaches.FirstOrDefault(x => x.ProcNum==listProcForTP[i+1].ProcNum).Priority!=procTP.Priority)) {
 				row=new TpRow();
-				row.Description="Subtotal";
+				row.Description=Lan.g("TableTP","Subtotal");
 				row.Fee=subfee;
 				row.PriIns=subpriIns;
 				row.SecIns=subsecIns;
@@ -2447,7 +2447,7 @@ namespace OpenDental{
 		#region Totals
 		if(checkShowTotals.Checked) {
 			TpRow row=new TpRow();
-			row.Description="Total";
+			row.Description=Lan.g("TableTP","Total");
 			row.Fee=totFee;
 			row.PriIns=totPriIns;
 			row.SecIns=totSecIns;
