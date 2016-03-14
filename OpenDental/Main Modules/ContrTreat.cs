@@ -3392,10 +3392,17 @@ namespace OpenDental{
 				MsgBox.Show(this,"You can only send a preauth from a current TP, not a saved TP.");
 				return;
 			}
+			if(gridMain.SelectedIndices.All(x => gridMain.Rows[x].Tag==null)) {
+				MessageBox.Show(Lan.g(this,"Please select procedures first."));
+				return;
+			}
 			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canada
 				int numLabProcsUnselected=0;
 				List<int> selectedIndices=new List<int>(gridMain.SelectedIndices);
 				for(int i=0;i<selectedIndices.Count;i++) {
+					if(gridMain.Rows[gridMain.SelectedIndices[i]].Tag==null) {
+						continue;//subtotal row.
+					}
 					Procedure proc=(Procedures.GetOneProc(((ProcTP)gridMain.Rows[selectedIndices[i]].Tag).ProcNumOrig,false));
 					if(proc!=null) {
 						ProcedureCode procCode=ProcedureCodes.GetProcCodeFromDb(proc.CodeNum);
@@ -3425,10 +3432,6 @@ namespace OpenDental{
 						MsgBox.Show(this,"Only the first 7 procedures will be selected.  You will need to create another preauth for the remaining procedures.");
 					}
 				}
-			}
-			if(gridMain.SelectedIndices.All(x => gridMain.Rows[x].Tag==null)) {
-				MessageBox.Show(Lan.g(this,"Please select procedures first."));
-				return;
 			}
 			Claim ClaimCur=new Claim();
       FormInsPlanSelect FormIPS=new FormInsPlanSelect(PatCur.PatNum); 
