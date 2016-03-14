@@ -196,10 +196,10 @@ namespace OpenDental.InternalTools.Job_Manager {
 		private void FillTreeRelated() {
 			labelRelatedJobs.Visible=!IsNew;
 			treeRelatedJobs.Visible=!IsNew;
-			if(IsNew) {
+			treeRelatedJobs.Nodes.Clear();
+			if(IsNew || _treeNode==null) {
 				return;
 			}
-			treeRelatedJobs.Nodes.Clear();
 			//Color the current job grey
 			List<TreeNode> listNodes = new List<TreeNode>();
 			listNodes.Add(_treeNode);
@@ -937,6 +937,8 @@ namespace OpenDental.InternalTools.Job_Manager {
 				//This happens only when a change request is made. This process should be enhanced so that when an approver denies a change request, 
 				//the job is reverted to its previous version, instead of requiring the Expert to manually undo the changes and get the job re-approved.
 				_jobCur.PhaseCur=JobPhase.Definiton;
+				_jobCur.UserNumApproverJob=0;
+				_jobCur.UserNumApproverChange=0;
 			}
 			SaveJob(_jobCur);
 		}
