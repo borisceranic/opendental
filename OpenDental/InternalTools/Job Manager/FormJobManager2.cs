@@ -578,6 +578,9 @@ namespace OpenDental {
 
 		///<summary>Similar to GetNodeHeirarchy, but used to build tree to be passed to job control.</summary>
 		private TreeNode GetJobTree(Job job) {
+			if(job==null) {
+				return null;
+			}
 			List<Job> jobHeirarchy = new List<Job> { job };
 			for(int i = 0;i<jobHeirarchy.Count;i++) {
 				Job j = _listJobsAll.FirstOrDefault(x => x.JobNum==jobHeirarchy[i].ParentNum);
