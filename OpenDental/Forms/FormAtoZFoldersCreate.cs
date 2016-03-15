@@ -221,6 +221,7 @@ namespace OpenDental{
 			catch(Exception ex) {
 				Logger.openlog.LogMB("Failed to create A to Z folders: "+ex.ToString(),Logger.Severity.ERROR);
 			}
+			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Created AtoZ Folder");
 			DialogResult=DialogResult.OK;
 		}
 

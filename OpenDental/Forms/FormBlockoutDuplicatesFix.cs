@@ -16,6 +16,7 @@ namespace OpenDental {
 
 		private void FormBlockoutDuplicatesFix_Load(object sender,EventArgs e) {
 			FillLabels();
+			Cursor=Cursors.Default;
 		}
 
 		private void FillLabels() {
@@ -38,6 +39,7 @@ namespace OpenDental {
 			}
 			Cursor=Cursors.WaitCursor;
 			Schedules.ClearDuplicates();
+			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Clear duplicate blockouts.");
 			Cursor=Cursors.Default;
 			MsgBox.Show(this,"Done.");
 			FillLabels();

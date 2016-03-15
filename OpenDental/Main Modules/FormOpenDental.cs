@@ -6273,8 +6273,10 @@ namespace OpenDental{
 				return;
 			}
 			FormBlockoutDuplicatesFix form=new FormBlockoutDuplicatesFix();
+			Cursor=Cursors.WaitCursor;
 			form.ShowDialog();
-			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Clear duplicate blockouts.");
+			Cursor=Cursors.Default;
+			//Security log entries are made from within the form.
 		}
 
 		private void menuItemCreateAtoZFolders_Click(object sender,EventArgs e) {
@@ -6283,9 +6285,7 @@ namespace OpenDental{
 			}
 			FormAtoZFoldersCreate FormA=new FormAtoZFoldersCreate();
 			FormA.ShowDialog();
-			if(FormA.DialogResult==DialogResult.OK){
-				SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Created AtoZ Folder");
-			}
+			//Security log entries are made from within the form.
 		}
 
 		private void menuItemImportXML_Click(object sender,System.EventArgs e) {
@@ -6335,7 +6335,7 @@ namespace OpenDental{
 			}
 			FormSubscriberMove formSM=new FormSubscriberMove();
 			formSM.ShowDialog();
-			SecurityLogs.MakeLogEntry(Permissions.InsPlanChangeSubsc,0,"Subscriber Move");
+			//Security log entries are made from within the form.
 		}
 
 		private void menuItemProcLockTool_Click(object sender,EventArgs e) {
@@ -6370,7 +6370,7 @@ namespace OpenDental{
 			}
 			FormTelephone FormT=new FormTelephone();
 			FormT.ShowDialog();
-			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Telephone");
+			//Security log entries are made from within the form.
 		}
 
 		private void menuItemTestLatency_Click(object sender,EventArgs e) {

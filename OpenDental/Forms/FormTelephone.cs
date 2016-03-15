@@ -133,6 +133,7 @@ namespace OpenDental{
 			//refresh carriers:
 			DataValid.SetInvalid(InvalidType.Carriers);
 			MessageBox.Show(Lan.g(this,"Telephone numbers reformatted."));
+			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Telephone");
 		}
 			
 		
