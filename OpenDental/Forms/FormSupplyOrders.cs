@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 using OpenDental.UI;
 using System.Drawing.Printing;
+using System.Linq;
 
 namespace OpenDental {
 	public partial class FormSupplyOrders:Form {
@@ -85,7 +86,7 @@ namespace OpenDental {
 			
 			for(int i=0;i<FormSup.ListSelectedSupplies.Count;i++) {
 				//check for existing----			
-				if(itemExistsHelper(FormSup.ListSelectedSupplies[i])) {
+				if(tableOrderItems.Rows.OfType<DataRow>().Any(x => PIn.Long(x["SupplyNum"].ToString())==FormSup.ListSelectedSupplies[i].SupplyNum)) {
 					//MsgBox.Show(this,"Selected item already exists in currently selected order. Please edit quantity instead.");
 					continue;
 				}
@@ -98,16 +99,6 @@ namespace OpenDental {
 				SupplyOrderItems.Insert(orderitem);
 			}
 			FillGridOrderItem();
-		}
-
-		///<summary>Returns true if item exists in supply order.</summary>
-		private bool itemExistsHelper(Supply supply) {
-			for(int i=0;i<tableOrderItems.Rows.Count;i++) {
-				if((long)tableOrderItems.Rows[i]["SupplyNum"]==supply.SupplyNum) {
-					return true;
-				}
-			}
-			return false;
 		}
 
 		private void FillGridOrders() {
@@ -230,7 +221,7 @@ namespace OpenDental {
 
 		private void gridOrderItem_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			FormSupplyOrderItemEdit FormSOIE = new FormSupplyOrderItemEdit();
-			FormSOIE.ItemCur = SupplyOrderItems.CreateObject((long)tableOrderItems.Rows[e.Row]["SupplyOrderItemNum"]);
+			FormSOIE.ItemCur = SupplyOrderItems.CreateObject(PIn.Long(tableOrderItems.Rows[e.Row]["SupplyOrderItemNum"].ToString()));
 			FormSOIE.ListSupplier = Suppliers.CreateObjects();
 			FormSOIE.ShowDialog();
 			if(FormSOIE.DialogResult!=DialogResult.OK) {
