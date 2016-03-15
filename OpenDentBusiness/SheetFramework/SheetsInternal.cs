@@ -1769,8 +1769,8 @@ Fam Urgent Fin Note: [famFinUrgNote]"
 					new SheetFieldDef(SheetFieldType.OutputText,225,88,400,20,fontHeading) {FieldName="defaultHeading",TextAlign=HorizontalAlignment.Center,GrowthBehavior=GrowthBehaviorEnum.DownGlobal},
 					//Graphic---------------------------------------------------------------------------------------------------------------
 					new SheetFieldDef(SheetFieldType.Special,175,114,500,370) {FieldName="toothChart"}, 
-					new SheetFieldDef(SheetFieldType.StaticText,120,280,50,44,fontBody,"Your\r\nLeft") {TextAlign=HorizontalAlignment.Center},
-					new SheetFieldDef(SheetFieldType.StaticText,680,280,50,44,fontBody,"Your\r\nRight") {TextAlign=HorizontalAlignment.Center},
+					new SheetFieldDef(SheetFieldType.StaticText,120,280,50,44,fontBody,"Your\r\nRight") {TextAlign=HorizontalAlignment.Center},
+					new SheetFieldDef(SheetFieldType.StaticText,680,280,50,44,fontBody,"Your\r\nLeft") {TextAlign=HorizontalAlignment.Center},
 					new SheetFieldDef(SheetFieldType.Special,100,500,650,14) {FieldName="toothChartLegend"}, 
 					//Grids---------------------------------------------------------------------------------------------------------------
 					new SheetFieldDef(SheetFieldType.Grid,51,520,845,31,fontGrid) {FieldName="TreatPlanMain",GrowthBehavior=GrowthBehaviorEnum.DownGlobal}, 
