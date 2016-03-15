@@ -2996,8 +2996,8 @@ namespace OpenDental{
 
 		private void butPDF_Click(object sender,EventArgs e) {
 			//this will only happen for eCW HL7 interface users.
-			List<Procedure> procs=Procedures.GetProcsForSingle(AptCur.AptNum,false);
-			string duplicateProcs=ProcedureL.ProcsContainDuplicates(procs);
+			List<Procedure> listProcsForAppt=_listProcs.FindAll(x => x.AptNum==AptCur.AptNum);
+			string duplicateProcs=ProcedureL.ProcsContainDuplicates(listProcsForAppt);
 			if(duplicateProcs!="") {
 				MessageBox.Show(duplicateProcs);
 				return;
@@ -3025,7 +3025,7 @@ namespace OpenDental{
 #endif
 			}
 			else {
-				Bridges.ECW.SendHL7(AptCur.AptNum,AptCur.ProvNum,pat,pdfDataStr,"progressnotes",true);
+				Bridges.ECW.SendHL7(AptCur.AptNum,AptCur.ProvNum,pat,pdfDataStr,"progressnotes",true,null);//just pdf, passing null proc list
 			}
 			MsgBox.Show(this,"Notes PDF sent.");
 		}
@@ -3255,7 +3255,7 @@ namespace OpenDental{
 					HL7Msgs.Insert(hl7Msg);
 				}
 				else {
-					Bridges.ECW.SendHL7(AptCur.AptNum,AptCur.ProvNum,pat,pdfDataStr,"progressnotes",false);
+					Bridges.ECW.SendHL7(AptCur.AptNum,AptCur.ProvNum,pat,pdfDataStr,"progressnotes",false,listProcsForAppt);
 				}
 				CloseOD=true;
 				if(IsNew) {
