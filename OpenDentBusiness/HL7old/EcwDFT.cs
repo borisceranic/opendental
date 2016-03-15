@@ -15,13 +15,13 @@ namespace OpenDentBusiness.HL7 {
 		}
 
 		///<summary>Creates the Message object and fills it with data.</summary>
-		public void InitializeEcw(long aptNum,long provNum,Patient pat,string pdfDataAsBase64,string pdfDescription,bool justPDF){
+		public void InitializeEcw(long aptNum,long provNum,Patient pat,string pdfDataAsBase64,string pdfDescription,bool justPDF,List<Procedure> listProcs){
 			msg=new MessageHL7(MessageTypeHL7.DFT);
 			MSH();
 			EVN();
 			PID(pat);
 			PV1(aptNum,provNum);
-			FT1(aptNum,justPDF);
+			FT1(listProcs,justPDF);
 			DG1();
 			ZX1(pdfDataAsBase64,pdfDescription);
 		}
@@ -69,27 +69,26 @@ namespace OpenDentBusiness.HL7 {
 		}
 
 		///<summary>Financial transaction segment.</summary>
-		private void FT1(long aptNum,bool justPDF){
+		private void FT1(List<Procedure> listProcs,bool justPDF){
 			if(justPDF){
 				return;//FT1 segment is not necessary when sending only a PDF.
 			}
-			List<Procedure> procs=Procedures.GetProcsForSingle(aptNum,false);
 			ProcedureCode procCode;
-			for(int i=0;i<procs.Count;i++) {
+			for(int i=0;i<listProcs.Count;i++) {
 				seg=new SegmentHL7(SegmentNameHL7.FT1);
 				seg.SetField(0,"FT1");
 				seg.SetField(1,(i+1).ToString());
-				seg.SetField(4,procs[i].ProcDate.ToString("yyyyMMddHHmmss"));
-				seg.SetField(5,procs[i].ProcDate.ToString("yyyyMMddHHmmss"));
+				seg.SetField(4,listProcs[i].ProcDate.ToString("yyyyMMddHHmmss"));
+				seg.SetField(5,listProcs[i].ProcDate.ToString("yyyyMMddHHmmss"));
 				seg.SetField(6,"CG");
 				seg.SetField(10,"1.0");
 				seg.SetField(16,"");//location code and description???
-				seg.SetField(19,procs[i].DiagnosticCode);
-				Provider prov=Providers.GetProv(procs[i].ProvNum);
+				seg.SetField(19,listProcs[i].DiagnosticCode);
+				Provider prov=Providers.GetProv(listProcs[i].ProvNum);
 				seg.SetField(20,prov.EcwID,prov.LName,prov.FName,prov.MI);//performed by provider.
 				seg.SetField(21,prov.EcwID,prov.LName,prov.FName,prov.MI);//ordering provider.
-				seg.SetField(22,procs[i].ProcFee.ToString("F2"));
-				procCode=ProcedureCodes.GetProcCode(procs[i].CodeNum);
+				seg.SetField(22,listProcs[i].ProcFee.ToString("F2"));
+				procCode=ProcedureCodes.GetProcCode(listProcs[i].CodeNum);
 				if(procCode.ProcCode.Length>5 && procCode.ProcCode.StartsWith("D")) {
 					seg.SetField(25,procCode.ProcCode.Substring(0,5));//Remove suffix from all D codes.
 				}
@@ -97,17 +96,17 @@ namespace OpenDentBusiness.HL7 {
 					seg.SetField(25,procCode.ProcCode);
 				}
 				if(procCode.TreatArea==TreatmentArea.ToothRange){
-					seg.SetField(26,procs[i].ToothRange,"");
+					seg.SetField(26,listProcs[i].ToothRange,"");
 				}
 				else if(procCode.TreatArea==TreatmentArea.Surf){//probably not necessary
-					seg.SetField(26,Tooth.ToInternat(procs[i].ToothNum),Tooth.SurfTidyForClaims(procs[i].Surf,procs[i].ToothNum));
+					seg.SetField(26,Tooth.ToInternat(listProcs[i].ToothNum),Tooth.SurfTidyForClaims(listProcs[i].Surf,listProcs[i].ToothNum));
 				}
 				//this property will not exist if using Oracle, eCW will never use Oracle
 				else if(procCode.TreatArea==TreatmentArea.Quad && ProgramProperties.GetPropVal(Programs.GetProgramNum(ProgramName.eClinicalWorks),"IsQuadAsToothNum")=="1") {
-					seg.SetField(26,procs[i].Surf,"");
+					seg.SetField(26,listProcs[i].Surf,"");
 				}
 				else{
-					seg.SetField(26,Tooth.ToInternat(procs[i].ToothNum),procs[i].Surf);
+					seg.SetField(26,Tooth.ToInternat(listProcs[i].ToothNum),listProcs[i].Surf);
 				}
 				msg.Segments.Add(seg);
 			}

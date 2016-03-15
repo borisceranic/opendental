@@ -857,7 +857,7 @@ namespace UnitTests {
 					case HL7TestInterfaceEnum.EcwOldFull:
 					case HL7TestInterfaceEnum.EcwOldTight:
 						OpenDentBusiness.HL7.EcwDFT dft=new OpenDentBusiness.HL7.EcwDFT();
-						dft.InitializeEcw(aptNum,provNum,pat,"Test Message","treatment",false);
+						dft.InitializeEcw(aptNum,provNum,pat,"Test Message","treatment",false,procList);
 						msg=new MessageHL7(dft.GenerateMessage());
 						break;
 					case HL7TestInterfaceEnum.HL7DefEcwFull:
@@ -950,7 +950,7 @@ namespace UnitTests {
 					case HL7TestInterfaceEnum.EcwOldFull:
 					case HL7TestInterfaceEnum.EcwOldTight:
 						OpenDentBusiness.HL7.EcwDFT dft=new OpenDentBusiness.HL7.EcwDFT();
-						dft.InitializeEcw(aptNum,provNum,pat,"Test Message","treatment",false);
+						dft.InitializeEcw(aptNum,provNum,pat,"Test Message","treatment",false,procList);
 						msg=new MessageHL7(dft.GenerateMessage());
 						break;
 					case HL7TestInterfaceEnum.HL7DefEcwFull:
@@ -1061,7 +1061,7 @@ namespace UnitTests {
 					case HL7TestInterfaceEnum.EcwOldFull:
 					case HL7TestInterfaceEnum.EcwOldTight:
 						OpenDentBusiness.HL7.EcwDFT dft=new OpenDentBusiness.HL7.EcwDFT();
-						dft.InitializeEcw(apt.AptNum,prov.ProvNum,pat,"Test Message","treatment",false);
+						dft.InitializeEcw(apt.AptNum,prov.ProvNum,pat,"Test Message","treatment",false,procList);
 						msg=new MessageHL7(dft.GenerateMessage());
 						break;
 					case HL7TestInterfaceEnum.HL7DefEcwFull:
