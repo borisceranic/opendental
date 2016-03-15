@@ -4120,6 +4120,10 @@ namespace OpenDental{
 			}
 			ComputerPrefs.Update(ComputerPrefs.LocalComputer);
 		}
+
+		public static void S_DataValid_BecomeInvalid(OpenDental.ValidEventArgs e) {
+			_formOpenDentalS.DataValid_BecameInvalid(e);
+		}
 		
 		///<summary>This is called when any local data becomes outdated.  It's purpose is to tell the other computers to update certain local data.</summary>
 		private void DataValid_BecameInvalid(OpenDental.ValidEventArgs e){

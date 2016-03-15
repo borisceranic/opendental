@@ -1666,6 +1666,16 @@ namespace OpenDental {
 			if(IsNew) {
 				Tasks.Delete(TaskCur.TaskNum);
 			}
+			else if(NotesChanged) {//Note changed and dialogue result was not OK
+				//This should only ever be hit if the user clicked cancel or X.  Everything else will have dialogue result OK and exit above.
+				//Make a TaskHist entry to note that the task notes were changed.
+				TaskHist taskHist = new TaskHist(TaskOld);
+				taskHist.UserNumHist=Security.CurUser.UserNum;
+				taskHist.IsNoteChange=true;
+				TaskHists.Insert(taskHist);
+				//Notify users a task note change was made (sets new status)
+				DataValid.SetInvalidTask(TaskCur.TaskNum,true);//popup
+			}
 			//If a note was added to a Done task and the user hits cancel, the task status is set to Viewed because the note is still there and the task didn't move lists.
 			if(NotesChanged && TaskOld.TaskStatus==TaskStatusEnum.Done) {//notes changed on a task marked Done when the task was opened.
 				if(checkDone.Checked) {//Will only happen when the Done checkbox has been manually re-checked by the user.

@@ -165,21 +165,21 @@ namespace OpenDental{
 			for(int i=0;i<itypes.Length;i++){
 				itypeList.Add((int)itypes[i]);
 			}
-			OnBecameInvalid(new OpenDental.ValidEventArgs(DateTime.MinValue,itypeList,false,0));
+			FormOpenDental.S_DataValid_BecomeInvalid(new OpenDental.ValidEventArgs(DateTime.MinValue,itypeList,false,0));
 		}
 
 		///<summary>Triggers an event that causes a signal to be sent to all other computers telling them what kind of locally stored data needs to be updated.  Either supply a set of flags for the types, or supply a date if the appointment screen needs to be refreshed.  Yes, this does immediately refresh the local data, too, except Appointments.  The AllLocal override does all types except appointment date for the local computer only, such as when starting up.</summary>
 		public static void SetInvalid(DateTime date){
 			List<int> itypeList=new List<int>();
 			itypeList.Add((int)InvalidType.Date);
-			OnBecameInvalid(new OpenDental.ValidEventArgs(date,itypeList,false,0));
+			FormOpenDental.S_DataValid_BecomeInvalid(new OpenDental.ValidEventArgs(date,itypeList,false,0));
 		}
 
 		///<summary>Triggers an event that causes a signal to be sent to all other computers telling them what kind of locally stored data needs to be updated.  Either supply a set of flags for the types, or supply a date if the appointment screen needs to be refreshed.  Yes, this does immediately refresh the local data, too.  The AllLocal override does all types except appointment date for the local computer only, such as when starting up.</summary>
 		public static void SetInvalid(bool onlyLocal){
 			List<int> itypeList=new List<int>();
 			itypeList.Add((int)InvalidType.AllLocal);
-			OnBecameInvalid(new OpenDental.ValidEventArgs(DateTime.MinValue,itypeList,true,0));
+			FormOpenDental.S_DataValid_BecomeInvalid(new OpenDental.ValidEventArgs(DateTime.MinValue,itypeList,true,0));
 		}
 
 		public static void SetInvalidTask(long taskNum,bool isPopup) {
@@ -192,15 +192,16 @@ namespace OpenDental{
 			else{
 				itypeList.Add((int)InvalidType.Task);
 			}
-			OnBecameInvalid(new OpenDental.ValidEventArgs(DateTime.MinValue,itypeList,false,taskNum));
+			FormOpenDental.S_DataValid_BecomeInvalid(new OpenDental.ValidEventArgs(DateTime.MinValue,itypeList,false,taskNum));
+			//OnBecameInvalid(new OpenDental.ValidEventArgs(DateTime.MinValue,itypeList,false,taskNum));
 		}
 
-		///<summary></summary>
-		protected static void OnBecameInvalid(OpenDental.ValidEventArgs e){
-			if(BecameInvalid !=null){
-				BecameInvalid(e);
-			}
-		}
+		/////<summary></summary>
+		//protected static void OnBecameInvalid(OpenDental.ValidEventArgs e){
+		//	if(BecameInvalid !=null){
+		//		BecameInvalid(e);
+		//	}
+		//}
 
 	}
 
