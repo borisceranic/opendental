@@ -3249,7 +3249,7 @@ namespace OpenDental{
 					HL7Msgs.Insert(hl7Msg);
 				}
 				else {
-					Bridges.ECW.SendHL7(Bridges.ECW.AptNum,PatCur.PriProv,PatCur,pdfDataStr,"treatment",true);
+					Bridges.ECW.SendHL7(Bridges.ECW.AptNum,PatCur.PriProv,PatCur,pdfDataStr,"treatment",true,null);//just pdf, passing null proc list
 				}
 			}
 		}
