@@ -57,6 +57,7 @@ namespace OpenDentBusiness.Crud{
 				schedule.Status      = (OpenDentBusiness.SchedStatus)PIn.Int(row["Status"].ToString());
 				schedule.EmployeeNum = PIn.Long  (row["EmployeeNum"].ToString());
 				schedule.DateTStamp  = PIn.DateT (row["DateTStamp"].ToString());
+				schedule.ClinicNum   = PIn.Long  (row["ClinicNum"].ToString());
 				retVal.Add(schedule);
 			}
 			return retVal;
@@ -79,6 +80,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("Status");
 			table.Columns.Add("EmployeeNum");
 			table.Columns.Add("DateTStamp");
+			table.Columns.Add("ClinicNum");
 			foreach(Schedule schedule in listSchedules) {
 				table.Rows.Add(new object[] {
 					POut.Long  (schedule.ScheduleNum),
@@ -92,6 +94,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Int   ((int)schedule.Status),
 					POut.Long  (schedule.EmployeeNum),
 					POut.DateT (schedule.DateTStamp),
+					POut.Long  (schedule.ClinicNum),
 				});
 			}
 			return table;
@@ -132,7 +135,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ScheduleNum,";
 			}
-			command+="SchedDate,StartTime,StopTime,SchedType,ProvNum,BlockoutType,Note,Status,EmployeeNum) VALUES(";
+			command+="SchedDate,StartTime,StopTime,SchedType,ProvNum,BlockoutType,Note,Status,EmployeeNum,ClinicNum) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(schedule.ScheduleNum)+",";
 			}
@@ -145,8 +148,9 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (schedule.BlockoutType)+","
 				+"'"+POut.String(schedule.Note)+"',"
 				+    POut.Int   ((int)schedule.Status)+","
-				+    POut.Long  (schedule.EmployeeNum)+")";
+				+    POut.Long  (schedule.EmployeeNum)+","
 				//DateTStamp can only be set by MySQL
+				+    POut.Long  (schedule.ClinicNum)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -179,7 +183,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ScheduleNum,";
 			}
-			command+="SchedDate,StartTime,StopTime,SchedType,ProvNum,BlockoutType,Note,Status,EmployeeNum) VALUES(";
+			command+="SchedDate,StartTime,StopTime,SchedType,ProvNum,BlockoutType,Note,Status,EmployeeNum,ClinicNum) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(schedule.ScheduleNum)+",";
 			}
@@ -192,8 +196,9 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (schedule.BlockoutType)+","
 				+"'"+POut.String(schedule.Note)+"',"
 				+    POut.Int   ((int)schedule.Status)+","
-				+    POut.Long  (schedule.EmployeeNum)+")";
+				+    POut.Long  (schedule.EmployeeNum)+","
 				//DateTStamp can only be set by MySQL
+				+    POut.Long  (schedule.ClinicNum)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -214,8 +219,9 @@ namespace OpenDentBusiness.Crud{
 				+"BlockoutType=  "+POut.Long  (schedule.BlockoutType)+", "
 				+"Note        = '"+POut.String(schedule.Note)+"', "
 				+"Status      =  "+POut.Int   ((int)schedule.Status)+", "
-				+"EmployeeNum =  "+POut.Long  (schedule.EmployeeNum)+" "
+				+"EmployeeNum =  "+POut.Long  (schedule.EmployeeNum)+", "
 				//DateTStamp can only be set by MySQL
+				+"ClinicNum   =  "+POut.Long  (schedule.ClinicNum)+" "
 				+"WHERE ScheduleNum = "+POut.Long(schedule.ScheduleNum);
 			Db.NonQ(command);
 		}
@@ -260,6 +266,10 @@ namespace OpenDentBusiness.Crud{
 				command+="EmployeeNum = "+POut.Long(schedule.EmployeeNum)+"";
 			}
 			//DateTStamp can only be set by MySQL
+			if(schedule.ClinicNum != oldSchedule.ClinicNum) {
+				if(command!=""){ command+=",";}
+				command+="ClinicNum = "+POut.Long(schedule.ClinicNum)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -300,6 +310,9 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			//DateTStamp can only be set by MySQL
+			if(schedule.ClinicNum != oldSchedule.ClinicNum) {
+				return true;
+			}
 			return false;
 		}
 

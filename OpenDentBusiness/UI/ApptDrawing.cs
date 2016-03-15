@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
@@ -91,73 +92,42 @@ namespace OpenDentBusiness.UI {
 			//one giant rectangle for everything closed
 			g.FillRectangle(closedBrush,TimeWidth,0,ColWidth*ColCount+ProvWidth*ProvCount,ApptSheetHeight);
 			//then, loop through each day and operatory
-			bool isHoliday;
 			int startHour=startTime.Hour;
-			int stopHour=stopTime.Hour;
-			if(stopHour==0) {
-				stopHour=24;
-			}
 			if(IsWeeklyView) {
-				for(int d=0;d<NumOfWeekDaysToDisplay;d++) {
-					isHoliday=false;
-					for(int i=0;i<SchedListPeriod.Count;i++) {
-						if(SchedListPeriod[i].SchedType!=ScheduleType.Practice) {
-							continue;
-						}
-						if(SchedListPeriod[i].Status!=SchedStatus.Holiday) {
-							continue;
-						}
-						if((int)SchedListPeriod[i].SchedDate.DayOfWeek!=d+1) {
-							continue;
-						}
-						isHoliday=true;
-						break;
-					}
-					if(isHoliday) {
+				for(int d=0;d<NumOfWeekDaysToDisplay;d++) {//for each day of the week displayed
+					//if any schedule for this day is type practice and status holiday and not assigned to specific ops (so either clinics are not enabled
+					//or the holiday applies to all ops for the clinic), color all of the op columns in the view for this day with the holiday brush
+					if(SchedListPeriod.FindAll(x => x.SchedType==ScheduleType.Practice && x.Status==SchedStatus.Holiday) //find all holidays
+						.Any(x => (int)x.SchedDate.DayOfWeek==d+1 //for this day of the week
+							&& (x.ClinicNum==0 || (PrefC.HasClinicsEnabled && x.ClinicNum==Clinics.ClinicNum)))) //and either practice or for this clinic
+					{
 						g.FillRectangle(holidayBrush,TimeWidth+1+d*ColDayWidth,0,ColDayWidth,ApptSheetHeight);
 					}
-					//this is a workaround because we start on Monday:
-					DayOfWeek dayofweek;//When d==0 we want it to be monday(1).  When d==6 we want it to be sunday(0)
-					if(d==6) {
-						dayofweek=(DayOfWeek)(0);
-					}
-					else {
-						dayofweek=(DayOfWeek)(d+1);
-					}
-					for(int i=0;i<ColCount;i++) {
-						schedsForOp=Schedules.GetSchedsForOp(SchedListPeriod,dayofweek,VisOps[i]);//OperatoryC.ListShort[ApptViewItemL.VisOps[j]]);
-						for(int j=0;j<schedsForOp.Count;j++) {
-							stopHour=stopTime.Hour;//Reset stopHour every time.
-							if(stopHour==0) {
-								stopHour=24;
-							}
+					//DayOfWeek enum goes from Sunday to Saturday 0-6, OD goes Monday to Sunday 0-6
+					DayOfWeek dayofweek=(DayOfWeek)((d+1)%7);//when d==0, dayofweek=monday (or (DayOfWeek)1).  when d==6 we want dayofweek=sunday (or (DayOfWeek)0)
+					for(int i=0;i<ColCount;i++) {//for each operatory visible for this view and day
+						schedsForOp=Schedules.GetSchedsForOp(SchedListPeriod,dayofweek,VisOps[i]);
+						//for each schedule assigned to this op
+						foreach(Schedule schedCur in schedsForOp.Where(x => x.SchedType==ScheduleType.Provider)) {
 							g.FillRectangle(openBrush
 								,TimeWidth+1+d*ColDayWidth+(float)i*ColAptWidth
-								,(schedsForOp[j].StartTime.Hours-startHour)*LineH*RowsPerHr+(int)schedsForOp[j].StartTime.Minutes*LineH/MinPerRow//6RowsPerHr 10MinPerRow
+								,(schedCur.StartTime.Hours-startHour)*LineH*RowsPerHr+(int)schedCur.StartTime.Minutes*LineH/MinPerRow//RowsPerHr=6, MinPerRow=10
 								,ColAptWidth
-								,(schedsForOp[j].StopTime-schedsForOp[j].StartTime).Hours*LineH*RowsPerHr//6
-								+(schedsForOp[j].StopTime-schedsForOp[j].StartTime).Minutes*LineH/MinPerRow);//10
+								,(schedCur.StopTime-schedCur.StartTime).Hours*LineH*RowsPerHr+(schedCur.StopTime-schedCur.StartTime).Minutes*LineH/MinPerRow);
 						}
 					}
 				}
 			}
 			else {//only one day showing
-				isHoliday=false;
-				//Schedule[] schedForType;
-				for(int i=0;i<SchedListPeriod.Count;i++) {
-					if(SchedListPeriod[i].SchedType!=ScheduleType.Practice) {
-						continue;
-					}
-					if(SchedListPeriod[i].Status!=SchedStatus.Holiday) {
-						continue;
-					}
-					isHoliday=true;
-					break;
-				}
-				if(isHoliday) {
+				//if any schedule for the period is type practice and status holiday and either ClinicNum is 0 (HQ clinic or clinics not enabled) or clinics
+				//are enabled and the schedule.ClinicNum is the currently selected clinic
+				//SchedListPeriod contains scheds for only one day, not for a week
+				if(SchedListPeriod.FindAll(x => x.SchedType==ScheduleType.Practice && x.Status==SchedStatus.Holiday) //find all holidays
+					.Any(x => x.ClinicNum==0 || (PrefC.HasClinicsEnabled && x.ClinicNum==Clinics.ClinicNum)))//for the practice or clinic
+				{
 					g.FillRectangle(holidayBrush,TimeWidth+1,0,ColWidth*ColCount+ProvWidth*ProvCount,ApptSheetHeight);
 				}
-				for(int i=0;i<colsPerPage;i++) {
+				for(int i=0;i<colsPerPage;i++) {//ops per page in day view
 					if(i==ApptDrawing.VisOps.Count) {
 						break;
 					}
@@ -165,50 +135,33 @@ namespace OpenDentBusiness.UI {
 					if(k>=ApptDrawing.VisOps.Count) {
 						break;
 					}
-					schedsForOp=Schedules.GetSchedsForOp(SchedListPeriod,VisOps[k]);//OperatoryC.ListShort[ApptViewItemL.VisOps[j]]);
-					for(int j=0;j<schedsForOp.Count;j++) {
-						stopHour=stopTime.Hour;//Reset stopHour every time.
-						if(stopHour==0) {
-							stopHour=24;
-						}
-						if(schedsForOp[j].StartTime.Hours>=stopHour) {
+					schedsForOp=Schedules.GetSchedsForOp(SchedListPeriod,VisOps[k]);
+					foreach(Schedule schedCur in schedsForOp) {
+						if(schedCur.StartTime.Hours>=24 || (stopTime.Hour!=0 && schedCur.StartTime.Hours>=stopTime.Hour)) {
 							continue;
-						}
-						if(schedsForOp[j].StopTime.Hours<=stopHour) {
-							stopHour=schedsForOp[j].StopTime.Hours;
 						}
 						g.FillRectangle(openBrush
 							,TimeWidth+ProvWidth*ProvCount+i*ColWidth
-							,(schedsForOp[j].StartTime.Hours-startHour)*LineH*RowsPerHr+(int)schedsForOp[j].StartTime.Minutes*LineH/MinPerRow//6RowsPerHr 10MinPerRow
+							,(schedCur.StartTime.Hours-startHour)*LineH*RowsPerHr+(int)schedCur.StartTime.Minutes*LineH/MinPerRow//6RowsPerHr 10MinPerRow
 							,ColWidth
-							,(schedsForOp[j].StopTime-schedsForOp[j].StartTime).Hours*LineH*RowsPerHr//6
-							+(schedsForOp[j].StopTime-schedsForOp[j].StartTime).Minutes*LineH/MinPerRow);//10
+							,(schedCur.StopTime-schedCur.StartTime).Hours*LineH*RowsPerHr//6
+								+(schedCur.StopTime-schedCur.StartTime).Minutes*LineH/MinPerRow);//10
 					}
 					//now, fill up to 2 timebars along the left side of each rectangle.
-					for(int j=0;j<schedsForOp.Count;j++) {
-						if(schedsForOp[j].Ops.Count==0) {//if this schedule is not assigned to specific ops, skip
+					foreach(Schedule schedCur in schedsForOp) {
+						if(schedCur.Ops.Count==0) {//if this schedule is not assigned to specific ops, skip
 							continue;
 						}
-						stopHour=stopTime.Hour;//Reset stopHour every time.
-						if(stopHour==0) {
-							stopHour=24;
+						float provWidthAdj=0f;//use to adjust for primary and secondary provider bars in op
+						if(Providers.GetIsSec(schedCur.ProvNum)) {
+							provWidthAdj=ProvWidth;//drawing secondary prov bar so shift right
 						}
-						if(!Providers.GetIsSec(schedsForOp[j].ProvNum)) {//if the provider is a dentist
-							g.FillRectangle(new SolidBrush(Providers.GetColor(schedsForOp[j].ProvNum))
-								,TimeWidth+ProvWidth*ProvCount+i*ColWidth
-								,(schedsForOp[j].StartTime.Hours-startHour)*LineH*RowsPerHr+(int)schedsForOp[j].StartTime.Minutes*LineH/MinPerRow//6RowsPerHr 10MinPerRow
-								,ProvWidth
-								,(schedsForOp[j].StopTime-schedsForOp[j].StartTime).Hours*LineH*RowsPerHr//6
-								+(schedsForOp[j].StopTime-schedsForOp[j].StartTime).Minutes*LineH/MinPerRow);//10
-						}
-						else {//hygienist
-							g.FillRectangle(new SolidBrush(Providers.GetColor(schedsForOp[j].ProvNum))
-								,TimeWidth+ProvWidth*ProvCount+i*ColWidth+ProvWidth
-								,(schedsForOp[j].StartTime.Hours-startHour)*LineH*RowsPerHr+(int)schedsForOp[j].StartTime.Minutes*LineH/MinPerRow//6RowsPerHr 10MinPerRow
-								,ProvWidth
-								,(schedsForOp[j].StopTime-schedsForOp[j].StartTime).Hours*LineH*RowsPerHr//6
-								+(schedsForOp[j].StopTime-schedsForOp[j].StartTime).Minutes*LineH/MinPerRow);//10
-						}
+						g.FillRectangle(new SolidBrush(Providers.GetColor(schedCur.ProvNum))
+							,TimeWidth+ProvWidth*ProvCount+i*ColWidth+provWidthAdj
+							,(schedCur.StartTime.Hours-startHour)*LineH*RowsPerHr+(int)schedCur.StartTime.Minutes*LineH/MinPerRow//6RowsPerHr 10MinPerRow
+							,ProvWidth
+							,(schedCur.StopTime-schedCur.StartTime).Hours*LineH*RowsPerHr//6
+								+(schedCur.StopTime-schedCur.StartTime).Minutes*LineH/MinPerRow);//10
 					}
 				}
 			}

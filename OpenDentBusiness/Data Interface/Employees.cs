@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Reflection;
 
 namespace OpenDentBusiness{
@@ -243,64 +244,42 @@ namespace OpenDentBusiness{
 		///<summary>Gets all the employees for a specific clinicNum, according to their associated user.  Pass in a clinicNum of 0 to get the list of unassigned or "all" employees (depending on isAll flag).  In addition to setting clinicNum to 0, set isAll true to get a list of all employees or false to get a list of employees that are not associated to any clinics.  Always gets the list of employees from the cache which is sorted by FName, LastName.</summary>
 		public static List<Employee> GetEmpsForClinic(long clinicNum,bool isAll) {
 			//No need to check RemotingRole; no call to db.
-			if(clinicNum==0 && isAll) {//Simply return all employees.
-				return Employees.GetListShort();
-			}
 			List<Employee> listEmpsShort=Employees.GetListShort();
+			if(clinicNum==0 && isAll) {//Simply return all employees.
+				return listEmpsShort;
+			}
 			List<Employee> listEmpsWithClinic=new List<Employee>();
-			List<long> listEmpNumsWithClinic=new List<long>();
 			List<Employee> listEmpsUnassigned=new List<Employee>();
-			List<long> listEmpNumsUnassigned=new List<long>();
-			for(int i=0;i<listEmpsShort.Count;i++) {
-				List<Userod> listUsers=Userods.GetUsersByEmployeeNum(listEmpsShort[i].EmployeeNum);
+			Dictionary<long,List<UserClinic>> dictUserClinics=new Dictionary<long, List<UserClinic>>();
+			foreach(Employee empCur in listEmpsShort) {
+				List<Userod> listUsers=Userods.GetUsersByEmployeeNum(empCur.EmployeeNum);
 				if(listUsers.Count==0) {
-					if(listEmpNumsUnassigned.Contains(listEmpsShort[i].EmployeeNum)) {
-						continue;//Employee already added to the results.
-					}
-					listEmpNumsUnassigned.Add(listEmpsShort[i].EmployeeNum);
-					listEmpsUnassigned.Add(listEmpsShort[i]);
+					listEmpsUnassigned.Add(empCur);
 					continue;
 				}
-				//At this point we know there is at least one Userod associated to this employee.
-				for(int j=0;j<listUsers.Count;j++) {
-					//Check if the user is associated to a clinic
-					if(listUsers[j].ClinicNum==0) {//Unassigned
-						if(listEmpNumsUnassigned.Contains(listEmpsShort[i].EmployeeNum)) {
-							continue;//Employee already added to the results.
-						}
-						listEmpNumsUnassigned.Add(listEmpsShort[i].EmployeeNum);
-						listEmpsUnassigned.Add(listEmpsShort[i]);
+				foreach(Userod userCur in listUsers) {//At this point we know there is at least one Userod associated to this employee.
+					if(userCur.ClinicNum==0) {//User's default clinic is HQ
+						listEmpsUnassigned.Add(empCur);
 						continue;
 					}
-					//User is associated to a clinic.  Make sure it matches the clinicNum passed in before adding them to the list of results.
-					List<UserClinic> listUserClinics=UserClinics.GetForUser(listUsers[j].UserNum);
-					if(listUserClinics.Exists(x => x.ClinicNum==clinicNum)) {//This user has access to this clinic.  It may not be their default one.
-						if(listEmpNumsWithClinic.Contains(listEmpsShort[i].EmployeeNum)) {
-							continue;//Employee already added to the results.
-						}
-						listEmpNumsWithClinic.Add(listEmpsShort[i].EmployeeNum);
-						listEmpsWithClinic.Add(listEmpsShort[i]);
+					if(!dictUserClinics.ContainsKey(userCur.UserNum)) {//User is restricted to a clinic(s).  Compare to clinicNum
+						dictUserClinics[userCur.UserNum]=UserClinics.GetForUser(userCur.UserNum);//run only once per user
 					}
-					//If you have no UserClinics then you are unrestricted and should show up in all lists.
-					else if(listUserClinics.Count==0) {
-						if(!listEmpNumsUnassigned.Contains(listEmpsShort[i].EmployeeNum)) {
-							listEmpNumsUnassigned.Add(listEmpsShort[i].EmployeeNum);
-							listEmpsUnassigned.Add(listEmpsShort[i]);
-						}
-						if(!listEmpNumsWithClinic.Contains(listEmpsShort[i].EmployeeNum)) {
-							listEmpNumsWithClinic.Add(listEmpsShort[i].EmployeeNum);
-							listEmpsWithClinic.Add(listEmpsShort[i]);
-						}
+					if(dictUserClinics[userCur.UserNum].Count==0) {//unrestricted user, employee should show in all lists
+						listEmpsUnassigned.Add(empCur);
+						listEmpsWithClinic.Add(empCur);
+					}
+					else if(dictUserClinics[userCur.UserNum].Any(x => x.ClinicNum==clinicNum)) {//user restricted to this clinic
+						listEmpsWithClinic.Add(empCur);
 					}
 				}
 			}
-			//Returning the 'All' employee list was handled above.  We now only care about two scenarios.
-			//1 - Returning a list of 'unassigned' employees.  This is used for the 'Headquarters' clinic filter.
-			//2 - Returning a list of employees associated to the specific clinic passed in.
-			if(clinicNum==0 && !isAll) {
-				return listEmpsUnassigned;
+			//Returning the isAll employee list was handled above (all non-hidden emps, ListShort).
+			if(clinicNum==0) {//Return list of unassigned employees.  This is used for the 'Headquarters' clinic filter.
+				return listEmpsUnassigned.GroupBy(x => x.EmployeeNum).Select(x => x.First()).ToList();//select distinct emps
 			}
-			return listEmpsWithClinic;
+			//Return list of employees restricted to the specified clinic.
+			return listEmpsWithClinic.GroupBy(x => x.EmployeeNum).Select(x => x.First()).ToList();//select distinct emps
 		}
 
 		/// <summary> Returns -1 if employeeNum is not found.  0 if not hidden and 1 if hidden.</summary>		

@@ -9,20 +9,19 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.Drawing.Drawing2D;
-using System.Drawing.Design;
-using System.Drawing.Text;
+using System.Drawing.Imaging;
 using System.Drawing.Printing;
+using System.Drawing.Text;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
-using OpenDental.UI;
-using OpenDentBusiness;
-using OpenDentBusiness.UI;
-using OpenDentBusiness.HL7;
 using CodeBase;
 using OpenDental.Bridges;
+using OpenDental.UI;
+using OpenDentBusiness;
+using OpenDentBusiness.HL7;
+using OpenDentBusiness.UI;
 
 namespace OpenDental {
 
@@ -1119,6 +1118,7 @@ namespace OpenDental {
 			this.gridWaiting.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridWaiting.HasAddButton = false;
 			this.gridWaiting.HasMultilineHeaders = false;
 			this.gridWaiting.HScrollVisible = false;
 			this.gridWaiting.Location = new System.Drawing.Point(0, 0);
@@ -1146,6 +1146,7 @@ namespace OpenDental {
 			this.gridEmpSched.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridEmpSched.HasAddButton = false;
 			this.gridEmpSched.HasMultilineHeaders = false;
 			this.gridEmpSched.HScrollVisible = true;
 			this.gridEmpSched.Location = new System.Drawing.Point(0, 0);
@@ -1156,7 +1157,6 @@ namespace OpenDental {
 			this.gridEmpSched.TabIndex = 77;
 			this.gridEmpSched.Title = "Employee Schedules";
 			this.gridEmpSched.TranslationName = "TableApptEmpSched";
-			this.gridEmpSched.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridEmpSched_CellDoubleClick);
 			this.gridEmpSched.DoubleClick += new System.EventHandler(this.gridEmpSched_DoubleClick);
 			// 
 			// timerWaitingRoom
@@ -2264,7 +2264,7 @@ namespace OpenDental {
 			if(PrefC.GetBool(PrefName.WaitingRoomFilterByView)) {
 				//In order to filter the waiting room by appointment view, we need to always grab the operatories visible for TODAY.
 				//This way, regardless of what day the customer is looking at, the waiting room will only change when they change appointment views.
-				List<Schedule> listSchedulesForToday=Schedules.ConvertTableToList(Appointments.GetPeriodSchedule(DateTime.Now,DateTime.Now));
+				List<Schedule> listSchedulesForToday=Schedules.ConvertTableToList(Schedules.GetPeriodSchedule(DateTime.Now,DateTime.Now));
 				ApptView viewCur=null;
 				if(comboView.SelectedIndex>0) {
 					viewCur=_listApptViews[comboView.SelectedIndex-1];
@@ -2327,10 +2327,6 @@ namespace OpenDental {
 			gridWaiting.EndUpdate();
 		}
 
-		private void gridEmpSched_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-
-		}
-
 		private void gridEmpSched_DoubleClick(object sender,EventArgs e) {
 			if(ApptDrawing.IsWeeklyView) {
 				MsgBox.Show(this,"Not available in weekly view");
@@ -2339,15 +2335,8 @@ namespace OpenDental {
 			if(!Security.IsAuthorized(Permissions.Schedules)) {
 				return;
 			}
-			List<Provider> listProvs=ProviderC.GetListShort();
-			List<Employee> listEmps=Employees.GetListShort();
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics.
-				//For phase one we are only filtering employees, not providers.  Show all providers for now.
-				//listProvs=Providers.GetProvsByClinic(FormOpenDental.ClinicNum);
-				listEmps=Employees.GetEmpsForClinic(Clinics.ClinicNum);
-			}
-			//Get the providers and employees for the currently selected clinic.
-			FormScheduleDayEdit FormS=new FormScheduleDayEdit(AppointmentL.DateSelected,Clinics.ClinicNum);
+			FormScheduleDayEdit FormS=new FormScheduleDayEdit(AppointmentL.DateSelected,Clinics.ClinicNum,
+				(PrefC.HasClinicsEnabled && !Security.CurUser.ClinicIsRestricted),PrefC.HasClinicsEnabled);
 			FormS.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.Schedules,0,"");
 			SetWeeklyView(false);//to refresh

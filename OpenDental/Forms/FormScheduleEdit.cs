@@ -1,19 +1,17 @@
 using System;
-using System.Drawing;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Linq;
 using System.Windows.Forms;
 using OpenDentBusiness;
 
 namespace OpenDental{
-///<summary></summary>
+	///<summary></summary>
 	public class FormScheduleEdit : ODForm	{
 		private System.ComponentModel.Container components = null;
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
-		private System.Windows.Forms.Label label2;
-		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.Label labelStop;
+		private System.Windows.Forms.Label labelStart;
 		private OpenDental.ODtextBox textNote;
 		private System.Windows.Forms.Label label4;
 		private ComboBox comboStop;
@@ -21,9 +19,19 @@ namespace OpenDental{
 		private ListBox listOps;
 		private Label labelOps;
 		public Schedule SchedCur;
-		///<summary>Filters the list of operatories available to the clinic passed in.  Set to 0 to show all operatories.</summary>
+		///<summary>Filters the list of operatories available to the clinic passed in.  Set to 0 to show all operatories.  Also the clinic selected by
+		///default for holidays and provider notes.</summary>
 		public long ClinicNum;
+		private ComboBox comboClinic;
+		private Label labelClinic;
+		///<summary>List of clinics for the current user.  Used to set the clinic for holidays and provider notes.</summary>
+		private List<Clinic> _listClinics;
+		///<summary>All ops if clinics not enabled, otherwise all ops for ClinicNum.</summary>
 		private List<Operatory> _listOps;
+		///<summary>List of schedules for the day set from FormScheduleDayEdit filled with the filtered list of schedules for the day.
+		///Used to ensure there is only one holiday schedule item per day/clinic, since this list has not been synced to the db yet.</summary>
+		public List<Schedule> ListScheds;
+		private bool _isHolidayOrNote;
 
 		///<summary></summary>
 		public FormScheduleEdit(){
@@ -49,8 +57,8 @@ namespace OpenDental{
 		private void InitializeComponent()
 		{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormScheduleEdit));
-			this.label2 = new System.Windows.Forms.Label();
-			this.label1 = new System.Windows.Forms.Label();
+			this.labelStop = new System.Windows.Forms.Label();
+			this.labelStart = new System.Windows.Forms.Label();
 			this.textNote = new OpenDental.ODtextBox();
 			this.label4 = new System.Windows.Forms.Label();
 			this.comboStop = new System.Windows.Forms.ComboBox();
@@ -59,51 +67,54 @@ namespace OpenDental{
 			this.labelOps = new System.Windows.Forms.Label();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.comboClinic = new System.Windows.Forms.ComboBox();
+			this.labelClinic = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
-			// label2
+			// labelStop
 			// 
-			this.label2.Location = new System.Drawing.Point(27, 40);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(68, 16);
-			this.label2.TabIndex = 9;
-			this.label2.Text = "Stop Time";
-			this.label2.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelStop.Location = new System.Drawing.Point(6, 39);
+			this.labelStop.Name = "labelStop";
+			this.labelStop.Size = new System.Drawing.Size(89, 16);
+			this.labelStop.TabIndex = 9;
+			this.labelStop.Text = "Stop Time";
+			this.labelStop.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// label1
+			// labelStart
 			// 
-			this.label1.Location = new System.Drawing.Point(27, 14);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(68, 16);
-			this.label1.TabIndex = 7;
-			this.label1.Text = "Start Time";
-			this.label1.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.labelStart.Location = new System.Drawing.Point(6, 12);
+			this.labelStart.Name = "labelStart";
+			this.labelStart.Size = new System.Drawing.Size(89, 16);
+			this.labelStart.TabIndex = 7;
+			this.labelStart.Text = "Start Time";
+			this.labelStart.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textNote
 			// 
 			this.textNote.AcceptsTab = true;
 			this.textNote.DetectUrls = false;
-			this.textNote.Location = new System.Drawing.Point(97, 63);
+			this.textNote.Location = new System.Drawing.Point(97, 92);
 			this.textNote.Name = "textNote";
 			this.textNote.QuickPasteType = OpenDentBusiness.QuickPasteType.Schedule;
 			this.textNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textNote.Size = new System.Drawing.Size(220, 113);
+			this.textNote.SpellCheckIsEnabled = false;
 			this.textNote.TabIndex = 15;
 			this.textNote.Text = "";
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(31, 64);
+			this.label4.Location = new System.Drawing.Point(6, 93);
 			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(64, 16);
+			this.label4.Size = new System.Drawing.Size(89, 16);
 			this.label4.TabIndex = 16;
 			this.label4.Text = "Note";
-			this.label4.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// comboStop
 			// 
 			this.comboStop.FormattingEnabled = true;
-			this.comboStop.Location = new System.Drawing.Point(97, 37);
+			this.comboStop.Location = new System.Drawing.Point(97, 38);
 			this.comboStop.MaxDropDownItems = 48;
 			this.comboStop.Name = "comboStop";
 			this.comboStop.Size = new System.Drawing.Size(120, 21);
@@ -120,18 +131,19 @@ namespace OpenDental{
 			// 
 			// listOps
 			// 
-			this.listOps.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
+			this.listOps.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.listOps.IntegralHeight = false;
-			this.listOps.Location = new System.Drawing.Point(348, 26);
+			this.listOps.Location = new System.Drawing.Point(348, 31);
 			this.listOps.Name = "listOps";
 			this.listOps.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listOps.Size = new System.Drawing.Size(243, 357);
+			this.listOps.Size = new System.Drawing.Size(243, 352);
 			this.listOps.TabIndex = 27;
 			// 
 			// labelOps
 			// 
-			this.labelOps.Location = new System.Drawing.Point(345, 7);
+			this.labelOps.Location = new System.Drawing.Point(348, 12);
 			this.labelOps.Name = "labelOps";
 			this.labelOps.Size = new System.Drawing.Size(95, 16);
 			this.labelOps.TabIndex = 26;
@@ -146,7 +158,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(528, 393);
+			this.butCancel.Location = new System.Drawing.Point(516, 393);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 26);
 			this.butCancel.TabIndex = 14;
@@ -161,17 +173,38 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(440, 393);
+			this.butOK.Location = new System.Drawing.Point(428, 393);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 26);
 			this.butOK.TabIndex = 12;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// comboClinic
+			// 
+			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboClinic.Location = new System.Drawing.Point(97, 65);
+			this.comboClinic.MaxDropDownItems = 30;
+			this.comboClinic.Name = "comboClinic";
+			this.comboClinic.Size = new System.Drawing.Size(198, 21);
+			this.comboClinic.TabIndex = 94;
+			this.comboClinic.Visible = false;
+			// 
+			// labelClinic
+			// 
+			this.labelClinic.Location = new System.Drawing.Point(6, 66);
+			this.labelClinic.Name = "labelClinic";
+			this.labelClinic.Size = new System.Drawing.Size(89, 16);
+			this.labelClinic.TabIndex = 93;
+			this.labelClinic.Text = "Clinic";
+			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelClinic.Visible = false;
+			// 
 			// FormScheduleEdit
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(615, 431);
+			this.ClientSize = new System.Drawing.Size(603, 431);
+			this.Controls.Add(this.comboClinic);
+			this.Controls.Add(this.labelClinic);
 			this.Controls.Add(this.listOps);
 			this.Controls.Add(this.labelOps);
 			this.Controls.Add(this.comboStop);
@@ -180,15 +213,15 @@ namespace OpenDental{
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.label4);
-			this.Controls.Add(this.label2);
-			this.Controls.Add(this.label1);
+			this.Controls.Add(this.labelStop);
+			this.Controls.Add(this.labelStart);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
+			this.MinimumSize = new System.Drawing.Size(539, 254);
 			this.Name = "FormScheduleEdit";
 			this.ShowInTaskbar = false;
 			this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Schedule";
 			this.Load += new System.EventHandler(this.FormScheduleEdit_Load);
 			this.ResumeLayout(false);
@@ -197,6 +230,51 @@ namespace OpenDental{
 		#endregion
 
 		private void FormScheduleEdit_Load(object sender, System.EventArgs e) {
+			_isHolidayOrNote=(SchedCur.StartTime==TimeSpan.Zero && SchedCur.StopTime==TimeSpan.Zero);
+			if(PrefC.HasClinicsEnabled) {
+				if(ClinicNum==0) {
+					Text+=" - "+Lan.g(this,"Headquarters");
+				}
+				else {
+					string desc=Clinics.GetDesc(ClinicNum);
+					if(!string.IsNullOrWhiteSpace(desc)) {
+						Text+=" - "+desc;
+					}
+				}
+				//if clinics are enabled and this is a holiday or practice note, set visible and fill the clinic combobox and private list of clinics
+				if(_isHolidayOrNote) {
+					comboClinic.Visible=true;//only visible for holidays and practice notes and only if clinics are enabled
+					labelClinic.Visible=true;
+					_listClinics=Clinics.GetForUserod(Security.CurUser);
+					if(!Security.CurUser.ClinicIsRestricted) {
+						comboClinic.Items.Add(Lan.g(this,"Headquarters"));
+						if(SchedCur.ClinicNum==0) {//new sched and HQ selected or opened one from db for HQ
+							comboClinic.SelectedIndex=0;
+						}
+					}
+					foreach(Clinic clinicCur in _listClinics) {
+						comboClinic.Items.Add(clinicCur.Description);
+						if(clinicCur.ClinicNum==SchedCur.ClinicNum) {
+							comboClinic.SelectedIndex=comboClinic.Items.Count-1;
+						}
+					}
+					if(comboClinic.SelectedIndex<0) {//current sched's clinic not found or set to 0 and user is restricted, default to clinic sent in
+						comboClinic.SelectedIndex=_listClinics.FindIndex(x => x.ClinicNum==ClinicNum)+(Security.CurUser.ClinicIsRestricted?0:1);//add one for HQ if not restricted
+					}
+				}
+			}
+			textNote.Text=SchedCur.Note;
+			if(_isHolidayOrNote) {
+				comboStart.Visible=false;
+				labelStart.Visible=false;
+				comboStop.Visible=false;
+				labelStop.Visible=false;
+				listOps.Visible=false;
+				labelOps.Visible=false;
+				textNote.Select();
+				return;
+			}
+			//from here on, NOT a practice note or holiday
 			DateTime time;
 			for(int i=0;i<24;i++) {
 				time=DateTime.Today+TimeSpan.FromHours(7)+TimeSpan.FromMinutes(30*i);
@@ -204,60 +282,43 @@ namespace OpenDental{
 				comboStop.Items.Add(time.ToShortTimeString());
 			}
 			comboStart.Text=SchedCur.StartTime.ToShortTimeString();
-      comboStop.Text=SchedCur.StopTime.ToShortTimeString();
+			comboStop.Text=SchedCur.StopTime.ToShortTimeString();
 			listOps.Items.Add(Lan.g(this,"not specified"));
-			List<Operatory> listOpsShort=OperatoryC.GetListShort();
-			_listOps=new List<Operatory>();
-			for(int i=0;i<listOpsShort.Count;i++) {
-				if(!PrefC.GetBool(PrefName.EasyNoClinics) && ClinicNum!=0) {//Using clinics and a clinic filter was passed in.
-					if(listOpsShort[i].ClinicNum!=ClinicNum) {
-						continue;
-					}
-				}
-				listOps.Items.Add(listOpsShort[i].OpName);
-				_listOps.Add(listOpsShort[i]);
-				if(SchedCur.Ops.Contains(listOpsShort[i].OperatoryNum)) {
-					listOps.SetSelected(listOps.Items.Count-1,true);//Select the item that was just added.
-				}
+			//filter list if using clinics and if a clinic filter was passed in to only ops assigned to the specified clinic, otherwise all non-hidden ops
+			_listOps=OperatoryC.GetListShort();
+			if(PrefC.HasClinicsEnabled && ClinicNum>0) {
+				_listOps.RemoveAll(x => x.ClinicNum!=ClinicNum);
 			}
-			if(listOps.SelectedIndices.Count==0){
-				listOps.SetSelected(0,true);
+			foreach(Operatory opCur in _listOps) {
+				int curIndex=listOps.Items.Add(opCur.OpName);
+				//Select the item that was just added if the schedule's Ops contains the current OpNum.
+				listOps.SetSelected(curIndex,SchedCur.Ops.Contains(opCur.OperatoryNum));
 			}
-			textNote.Text=SchedCur.Note;
-			if(SchedCur.StartTime==TimeSpan.Zero 
-				&& SchedCur.StopTime==TimeSpan.Zero)
-			{ 
-				comboStop.Visible=false;
-				comboStart.Visible=false;
-				label1.Visible=false;
-				label2.Visible=false;
-				labelOps.Visible=false;
-				listOps.Visible=false;
-				textNote.Select();
-			}
-			else{
-				comboStart.Select();
-			}
+			listOps.SetSelected(0,listOps.SelectedIndices.Count==0);//select 'not specified' if no ops were selected in the loop
+			comboStart.Select();
 		}
 
-    private void butOK_Click(object sender, System.EventArgs e) { 
-			if(listOps.Visible){
-				if(listOps.SelectedIndices.Count>1 && listOps.SelectedIndices.Contains(0)){
-					MsgBox.Show(this,"Invalid selection of ops.");
-					return;
-				}
+		private void butOK_Click(object sender, System.EventArgs e) {
+			#region Validation
+			DateTime startDateT=DateTime.MinValue;
+			DateTime stopDateT=DateTime.MinValue;
+			if(!_isHolidayOrNote) {
 				if(listOps.SelectedIndices.Count==0){
 					MsgBox.Show(this,"Please select ops first.");
 					return;
 				}
-			}
-      if(comboStart.Visible){   
-			  try{
-					DateTime.Parse(comboStart.Text);
-					DateTime.Parse(comboStop.Text);
+				if(listOps.SelectedIndices.Count>1 && listOps.SelectedIndices.Contains(0)){
+					MsgBox.Show(this,"Invalid selection of ops.");
+					return;
 				}
-				catch{
+				startDateT=PIn.DateT(comboStart.Text);
+				stopDateT=PIn.DateT(comboStop.Text);
+				if(startDateT==DateTime.MinValue || stopDateT==DateTime.MinValue) {
 					MsgBox.Show(this,"Incorrect time format");
+					return;
+				}
+				if(startDateT>stopDateT) {
+					MsgBox.Show(this,"Stop time must be later than start time.");
 					return;
 				}
 			}
@@ -265,21 +326,45 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please enter a note first.");
 				return;
 			}
-			SchedCur.StartTime=DateTime.Parse(comboStart.Text).TimeOfDay;
-			SchedCur.StopTime=DateTime.Parse(comboStop.Text).TimeOfDay;
-      SchedCur.Note=textNote.Text;
-			SchedCur.Ops=new List<long>();
-			if(!listOps.SelectedIndices.Contains(0)){
-				for(int i=0;i<listOps.SelectedIndices.Count;i++){
-					SchedCur.Ops.Add(_listOps[listOps.SelectedIndices[i]-1].OperatoryNum);
+			long clinicNum=0;
+			if(_isHolidayOrNote && PrefC.HasClinicsEnabled) {
+				int indexCur=comboClinic.SelectedIndex;
+				if(!Security.CurUser.ClinicIsRestricted) {//user isn't restricted, -1 for HQ
+					indexCur--;
+				}
+				if(indexCur>-1) {//will be -1 if HQ is selected, leave clinicNum=0
+					clinicNum=_listClinics[indexCur].ClinicNum;
+				}
+				if(SchedCur.Status==SchedStatus.Holiday) {//duplicate holiday check
+					List<Schedule> listScheds=ListScheds.FindAll(x => x.SchedType==ScheduleType.Practice && x.Status==SchedStatus.Holiday);//scheds in local list
+					listScheds.AddRange(Schedules.GetAllForDateAndType(SchedCur.SchedDate,ScheduleType.Practice)
+						.FindAll(x => x.Status==SchedStatus.Holiday && listScheds.All(y => y.ScheduleNum!=x.ScheduleNum)));//add any in db that aren't in local list
+					listScheds.Remove(SchedCur);//remove the current schedule from the list if it's in there
+					if(listScheds.Any(x => x.ClinicNum==0 || x.ClinicNum==clinicNum)//already a holiday for HQ in db or duplicate holiday for a clinic
+						|| (clinicNum==0 && listScheds.Count>0))//OR trying to create a HQ holiday when a clinic already has one for this day
+					{
+						MsgBox.Show(this,"There is already a Holiday for the practice or selected clinic on this date.");
+						return;
+					}
 				}
 			}
+			#endregion Validation
+			#region Set Schedule Fields
+			SchedCur.StartTime=startDateT.TimeOfDay;
+			SchedCur.StopTime=stopDateT.TimeOfDay;
+      SchedCur.Note=textNote.Text;
+			SchedCur.Ops=new List<long>();
+			if(!listOps.SelectedIndices.Contains(0)) {
+				listOps.SelectedIndices.OfType<int>().ToList().ForEach(x => SchedCur.Ops.Add(_listOps[x-1].OperatoryNum));
+			}
+			SchedCur.ClinicNum=clinicNum;//0 if HQ selected or clinics not enabled or not a holiday or practice note
+			#endregion Set Schedule Fields
 			DialogResult=DialogResult.OK;		  
     }
 
 		private void butCancel_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
-		}   
+		}
 
 	}
 }

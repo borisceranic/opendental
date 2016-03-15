@@ -141,6 +141,22 @@ namespace OpenDentBusiness {
 					+"'0')";
 				Db.NonQ(command);
 				}//end RapidCall bridge
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE schedule ADD ClinicNum bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE schedule ADD INDEX (ClinicNum)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE schedule ADD ClinicNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE schedule SET ClinicNum = 0 WHERE ClinicNum IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE schedule MODIFY ClinicNum NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX schedule_ClinicNum ON schedule (ClinicNum)";
+					Db.NonQ(command);
+				}
 
 				command="UPDATE preference SET ValueString = '16.2.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);

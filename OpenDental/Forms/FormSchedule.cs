@@ -1,10 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Drawing.Printing;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
+using System.Linq;
 using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
@@ -39,12 +38,12 @@ namespace OpenDental{
 		private DateTime DateCopyStart;
 		private OpenDental.UI.Button butDelete;
 		private DateTime DateCopyEnd;
-		private CheckBox checkPractice;
+		private CheckBox checkPracticeNotes;
 		private ListBox listEmp;
 		private CheckBox checkReplace;
 		private GroupBox groupPaste;
 		///<summary>This tracks whether the provList or empList has been click on since the last refresh.  Forces user to refresh before deleting or pasting so that the list exactly matches the grid.</summary>
-		private bool ProvsChanged;
+		private bool _provsChanged;
 		private PrintDocument pd;
 		private bool headingPrinted;
 		private int pagesPrinted;
@@ -57,7 +56,10 @@ namespace OpenDental{
 		private TabControl tabControl1;
 		private TabPage tabPageProv;
 		private TabPage tabPageEmp;
+		private CheckBox checkClinicNotes;
 		private List<Employee> _listEmps;
+		private DataTable _tableScheds;
+		private bool _isResizing;
 
 		///<summary></summary>
 		public FormSchedule()
@@ -103,7 +105,7 @@ namespace OpenDental{
 			this.label3 = new System.Windows.Forms.Label();
 			this.label4 = new System.Windows.Forms.Label();
 			this.textRepeat = new System.Windows.Forms.TextBox();
-			this.checkPractice = new System.Windows.Forms.CheckBox();
+			this.checkPracticeNotes = new System.Windows.Forms.CheckBox();
 			this.listEmp = new System.Windows.Forms.ListBox();
 			this.checkReplace = new System.Windows.Forms.CheckBox();
 			this.groupPaste = new System.Windows.Forms.GroupBox();
@@ -114,12 +116,13 @@ namespace OpenDental{
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabPageProv = new System.Windows.Forms.TabPage();
 			this.tabPageEmp = new System.Windows.Forms.TabPage();
-			this.gridMain = new OpenDental.UI.ODGrid();
+			this.checkClinicNotes = new System.Windows.Forms.CheckBox();
 			this.butDelete = new OpenDental.UI.Button();
 			this.butPrint = new OpenDental.UI.Button();
 			this.textDateTo = new OpenDental.ValidDate();
 			this.textDateFrom = new OpenDental.ValidDate();
 			this.butRefresh = new OpenDental.UI.Button();
+			this.gridMain = new OpenDental.UI.ODGrid();
 			this.groupCopy.SuspendLayout();
 			this.groupPaste.SuspendLayout();
 			this.tabControl1.SuspendLayout();
@@ -129,18 +132,18 @@ namespace OpenDental{
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(102, 38);
+			this.label2.Location = new System.Drawing.Point(100, 38);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(85, 15);
+			this.label2.Size = new System.Drawing.Size(87, 15);
 			this.label2.TabIndex = 9;
 			this.label2.Text = "To Date";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(16, 38);
+			this.label1.Location = new System.Drawing.Point(10, 38);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(86, 15);
+			this.label1.Size = new System.Drawing.Size(87, 15);
 			this.label1.TabIndex = 7;
 			this.label1.Text = "From Date";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
@@ -150,16 +153,17 @@ namespace OpenDental{
 			this.listProv.Location = new System.Drawing.Point(0, 6);
 			this.listProv.Name = "listProv";
 			this.listProv.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listProv.Size = new System.Drawing.Size(191, 290);
+			this.listProv.Size = new System.Drawing.Size(191, 277);
 			this.listProv.TabIndex = 23;
 			this.listProv.Click += new System.EventHandler(this.listProv_Click);
 			this.listProv.SelectedIndexChanged += new System.EventHandler(this.listProv_SelectedIndexChanged);
 			// 
 			// checkWeekend
 			// 
-			this.checkWeekend.Location = new System.Drawing.Point(29, 436);
+			this.checkWeekend.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkWeekend.Location = new System.Drawing.Point(30, 435);
 			this.checkWeekend.Name = "checkWeekend";
-			this.checkWeekend.Size = new System.Drawing.Size(143, 18);
+			this.checkWeekend.Size = new System.Drawing.Size(143, 17);
 			this.checkWeekend.TabIndex = 24;
 			this.checkWeekend.Text = "Show Weekends";
 			this.checkWeekend.UseVisualStyleBackColor = true;
@@ -240,24 +244,25 @@ namespace OpenDental{
 			this.textRepeat.TabIndex = 31;
 			this.textRepeat.Text = "1";
 			// 
-			// checkPractice
+			// checkPracticeNotes
 			// 
-			this.checkPractice.Checked = true;
-			this.checkPractice.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.checkPractice.Location = new System.Drawing.Point(18, 74);
-			this.checkPractice.Name = "checkPractice";
-			this.checkPractice.Size = new System.Drawing.Size(169, 18);
-			this.checkPractice.TabIndex = 28;
-			this.checkPractice.Text = "Show Practice Notes";
-			this.checkPractice.UseVisualStyleBackColor = true;
-			this.checkPractice.Click += new System.EventHandler(this.checkPractice_Click);
+			this.checkPracticeNotes.Checked = true;
+			this.checkPracticeNotes.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.checkPracticeNotes.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkPracticeNotes.Location = new System.Drawing.Point(12, 74);
+			this.checkPracticeNotes.Name = "checkPracticeNotes";
+			this.checkPracticeNotes.Size = new System.Drawing.Size(189, 17);
+			this.checkPracticeNotes.TabIndex = 28;
+			this.checkPracticeNotes.Text = "Show Practice Holidays and Notes";
+			this.checkPracticeNotes.UseVisualStyleBackColor = true;
+			this.checkPracticeNotes.Click += new System.EventHandler(this.checkPracticeNotes_Click);
 			// 
 			// listEmp
 			// 
 			this.listEmp.Location = new System.Drawing.Point(0, 45);
 			this.listEmp.Name = "listEmp";
 			this.listEmp.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listEmp.Size = new System.Drawing.Size(191, 251);
+			this.listEmp.Size = new System.Drawing.Size(191, 238);
 			this.listEmp.TabIndex = 30;
 			this.listEmp.Click += new System.EventHandler(this.listEmp_Click);
 			this.listEmp.SelectedIndexChanged += new System.EventHandler(this.listEmp_SelectedIndexChanged);
@@ -338,10 +343,10 @@ namespace OpenDental{
 			// 
 			this.tabControl1.Controls.Add(this.tabPageProv);
 			this.tabControl1.Controls.Add(this.tabPageEmp);
-			this.tabControl1.Location = new System.Drawing.Point(1, 100);
+			this.tabControl1.Location = new System.Drawing.Point(1, 117);
 			this.tabControl1.Name = "tabControl1";
 			this.tabControl1.SelectedIndex = 0;
-			this.tabControl1.Size = new System.Drawing.Size(200, 325);
+			this.tabControl1.Size = new System.Drawing.Size(200, 312);
 			this.tabControl1.TabIndex = 36;
 			// 
 			// tabPageProv
@@ -350,7 +355,7 @@ namespace OpenDental{
 			this.tabPageProv.Location = new System.Drawing.Point(4, 22);
 			this.tabPageProv.Name = "tabPageProv";
 			this.tabPageProv.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPageProv.Size = new System.Drawing.Size(192, 299);
+			this.tabPageProv.Size = new System.Drawing.Size(192, 286);
 			this.tabPageProv.TabIndex = 0;
 			this.tabPageProv.Text = "Providers (0)";
 			this.tabPageProv.UseVisualStyleBackColor = true;
@@ -363,24 +368,23 @@ namespace OpenDental{
 			this.tabPageEmp.Location = new System.Drawing.Point(4, 22);
 			this.tabPageEmp.Name = "tabPageEmp";
 			this.tabPageEmp.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPageEmp.Size = new System.Drawing.Size(192, 299);
+			this.tabPageEmp.Size = new System.Drawing.Size(192, 286);
 			this.tabPageEmp.TabIndex = 1;
 			this.tabPageEmp.Text = "Employees (0)";
 			this.tabPageEmp.UseVisualStyleBackColor = true;
 			// 
-			// gridMain
+			// checkClinicNotes
 			// 
-			this.gridMain.HasMultilineHeaders = false;
-			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(207, 8);
-			this.gridMain.Name = "gridMain";
-			this.gridMain.ScrollValue = 0;
-			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.OneCell;
-			this.gridMain.Size = new System.Drawing.Size(761, 652);
-			this.gridMain.TabIndex = 0;
-			this.gridMain.Title = "Schedule";
-			this.gridMain.TranslationName = null;
-			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
+			this.checkClinicNotes.Checked = true;
+			this.checkClinicNotes.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.checkClinicNotes.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkClinicNotes.Location = new System.Drawing.Point(12, 94);
+			this.checkClinicNotes.Name = "checkClinicNotes";
+			this.checkClinicNotes.Size = new System.Drawing.Size(189, 17);
+			this.checkClinicNotes.TabIndex = 37;
+			this.checkClinicNotes.Text = "Show Clinic Holidays and Notes";
+			this.checkClinicNotes.UseVisualStyleBackColor = true;
+			this.checkClinicNotes.Click += new System.EventHandler(this.checkClinicNotes_Click);
 			// 
 			// butDelete
 			// 
@@ -401,6 +405,7 @@ namespace OpenDental{
 			// butPrint
 			// 
 			this.butPrint.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPrint.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butPrint.Autosize = true;
 			this.butPrint.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPrint.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -416,16 +421,16 @@ namespace OpenDental{
 			// 
 			// textDateTo
 			// 
-			this.textDateTo.Location = new System.Drawing.Point(105, 54);
+			this.textDateTo.Location = new System.Drawing.Point(102, 54);
 			this.textDateTo.Name = "textDateTo";
-			this.textDateTo.Size = new System.Drawing.Size(82, 20);
+			this.textDateTo.Size = new System.Drawing.Size(85, 20);
 			this.textDateTo.TabIndex = 10;
 			// 
 			// textDateFrom
 			// 
-			this.textDateFrom.Location = new System.Drawing.Point(18, 54);
+			this.textDateFrom.Location = new System.Drawing.Point(12, 54);
 			this.textDateFrom.Name = "textDateFrom";
-			this.textDateFrom.Size = new System.Drawing.Size(82, 20);
+			this.textDateFrom.Size = new System.Drawing.Size(85, 20);
 			this.textDateFrom.TabIndex = 8;
 			// 
 			// butRefresh
@@ -442,14 +447,32 @@ namespace OpenDental{
 			this.butRefresh.Text = "Refresh";
 			this.butRefresh.Click += new System.EventHandler(this.butRefresh_Click);
 			// 
+			// gridMain
+			// 
+			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasAddButton = false;
+			this.gridMain.HasMultilineHeaders = false;
+			this.gridMain.HScrollVisible = false;
+			this.gridMain.Location = new System.Drawing.Point(207, 8);
+			this.gridMain.Name = "gridMain";
+			this.gridMain.ScrollValue = 0;
+			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.OneCell;
+			this.gridMain.Size = new System.Drawing.Size(761, 652);
+			this.gridMain.TabIndex = 0;
+			this.gridMain.Title = "Schedule";
+			this.gridMain.TranslationName = null;
+			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
+			// 
 			// FormSchedule
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(974, 695);
+			this.Controls.Add(this.checkClinicNotes);
 			this.Controls.Add(this.tabControl1);
 			this.Controls.Add(this.groupCopy);
 			this.Controls.Add(this.groupPaste);
-			this.Controls.Add(this.checkPractice);
+			this.Controls.Add(this.checkPracticeNotes);
 			this.Controls.Add(this.butDelete);
 			this.Controls.Add(this.butPrint);
 			this.Controls.Add(this.textDateTo);
@@ -460,14 +483,16 @@ namespace OpenDental{
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.gridMain);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MaximizeBox = false;
 			this.MinimizeBox = false;
+			this.MinimumSize = new System.Drawing.Size(647, 727);
 			this.Name = "FormSchedule";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Schedule";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormSchedule_FormClosing);
 			this.Load += new System.EventHandler(this.FormSchedule_Load);
+			this.ResizeBegin += new System.EventHandler(this.FormSchedule_ResizeBegin);
+			this.ResizeEnd += new System.EventHandler(this.FormSchedule_ResizeEnd);
+			this.Resize += new System.EventHandler(this.FormSchedule_Resize);
 			this.groupCopy.ResumeLayout(false);
 			this.groupCopy.PerformLayout();
 			this.groupPaste.ResumeLayout(false);
@@ -488,19 +513,15 @@ namespace OpenDental{
 				groupCopy.Enabled=false;
 				groupPaste.Enabled=false;
 				if(PrefC.GetBool(PrefName.DistributorKey)) {//if this is OD HQ
-					checkPractice.Checked=false;
-					checkPractice.Enabled=false;
+					checkPracticeNotes.Checked=false;
+					checkPracticeNotes.Enabled=false;
 				}
 			}
 			DateTime dateFrom=new DateTime(DateTime.Today.Year,DateTime.Today.Month,1);
 			textDateFrom.Text=dateFrom.ToShortDateString();
 			textDateTo.Text=dateFrom.AddMonths(12).AddDays(-1).ToShortDateString();
-			//Get available clinics and then filter the employee list box by those clinics.
-			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
-				labelClinic.Visible=false;
-				comboClinic.Visible=false;
-			}
-			else {//clinics
+			if(PrefC.HasClinicsEnabled) {
+				//Get available clinics and then filter the employee list box by those clinics.
 				_listClinics=Clinics.GetForUserod(Security.CurUser);
 				comboClinic.Items.Clear();
 				if(!Security.CurUser.ClinicIsRestricted) {
@@ -514,59 +535,53 @@ namespace OpenDental{
 					}
 				}
 			}
+			else {//no clinics
+				labelClinic.Visible=false;
+				comboClinic.Visible=false;
+				checkClinicNotes.Visible=false;
+				checkClinicNotes.Checked=false;
+			}
 			FillEmployeesAndProviders();
 			FillGrid();
 		}
 
 		///<summary>Fills the employee box based on what clinic is selected.  Set selectAll to true to have all employees in the list box selected by default.</summary>
 		private void FillEmployeesAndProviders() {
-			listProv.Items.Clear();
-			//Do NOT filter providers by clinic yet.  This will be implemented in phase 2.
-			_listProvs=ProviderC.GetListShort();
-			for(int i=0;i<_listProvs.Count;i++) {
-				listProv.Items.Add(_listProvs[i].Abbr);
-				listProv.SetSelected(i,true);
+			tabPageEmp.Text=Lan.g(this,"Employees")+" (0)";
+			//tabPageProv.Text=Lan.g(this,"Providers")+" (0)";
+			if(PrefC.HasClinicsEnabled) {
+				long clinicNum=0;
+				if(Security.CurUser.ClinicIsRestricted) {
+					clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
+				}
+				else if(comboClinic.SelectedIndex>0) {
+					clinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;//Subtract 1, because Headquarters is the first option.
+				}
+				//clinicNum will be 0 for unrestricted users with HQ selected in which case this will get only emps/provs not assigned to a clinic
+				_listEmps=Employees.GetEmpsForClinic(clinicNum);
+				//_listProvs=Providers.GetProvsForClinic(clinicNum);//Do NOT filter providers by clinic yet.  This will be implemented in phase 2.
+				_listProvs=ProviderC.GetListShort();
 			}
-			listEmp.Items.Clear();
-			//Filter employees by the currently selected clinic.
-			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
+			else {//Not using clinics
 				_listEmps=Employees.GetListShort();
-				for(int i=0;i<_listEmps.Count;i++) {
-					listEmp.Items.Add(_listEmps[i].FName);
-					listEmp.SetSelected(i,true);
-				}
+				_listProvs=ProviderC.GetListShort();
 			}
-			else {//Using clinics.
-				//Psuedo code for filtering providers by clinics.  We are not going to filter the provider list until phase 2.
-				//_listProvs=new List<Provider>();
-				//if(comboClinic.SelectedIndex==0 && !Security.CurUser.ClinicIsRestricted) {
-				//	_listProvs=Providers.GetProvsByClinic(0);
-				//}
-				//else if(comboClinic.SelectedIndex==0 && Security.CurUser.ClinicIsRestricted) {
-				//	_listProvs=Providers.GetProvsByClinic(_listClinics[comboClinic.SelectedIndex].ClinicNum);
-				//}
-				//else {
-				//	_listProvs=Providers.GetProvsByClinic(_listClinics[comboClinic.SelectedIndex-1].ClinicNum);
-				//}
-				//Fill the employee list box.
-				_listEmps=new List<Employee>();
-				if(comboClinic.SelectedIndex==0 && !Security.CurUser.ClinicIsRestricted) {//Headquarters is selected.
-					_listEmps=Employees.GetEmpsForClinic(0);//Only get employees that are not assigned to a clinic.
-				}
-				else if(Security.CurUser.ClinicIsRestricted) {
-					_listEmps=Employees.GetEmpsForClinic(_listClinics[comboClinic.SelectedIndex].ClinicNum);
-				}
-				else {
-					_listEmps=Employees.GetEmpsForClinic(_listClinics[comboClinic.SelectedIndex-1].ClinicNum);//Subtract 1, because Headquarters is the first option.
-				}
-				for(int i=0;i<_listEmps.Count;i++) {
-					listEmp.Items.Add(_listEmps[i].FName);
-					listEmp.SetSelected(i,true);
+			listEmp.Items.Clear();//clearing the items from the list does not trigger the selected index changed event, reset manually
+			foreach(Employee empCur in _listEmps) {
+				listEmp.Items.Add(empCur.FName);
+				listEmp.SetSelected(listEmp.Items.Count-1,true);//select the item just added
+			}
+			//if the list has already been filled, no need to refill since we are not filtering by clinic, prevents an unnecessary flicker
+			//listProv.Items.Clear();//add this line when we start to filter provs by clinic and remove the if list is empty check
+			if(listProv.Items.Count==0) {
+				foreach(Provider provCur in _listProvs) {
+					listProv.Items.Add(provCur.Abbr);
+					listProv.SetSelected(listProv.Items.Count-1,true);//select the item just added
 				}
 			}
 		}
 
-		private void FillGrid(){
+		private void FillGrid(bool isFromDb=true){
 			DateCopyStart=DateTime.MinValue;
 			DateCopyEnd=DateTime.MinValue;
 			textClipboard.Text="";
@@ -576,7 +591,12 @@ namespace OpenDental{
 				//MsgBox.Show(this,"Please fix errors first.");
 				return;
 			}
-			ProvsChanged=false;
+			//Clear out the columns and rows for dynamic resizing of the grid to calculate column widths
+			gridMain.BeginUpdate();
+			gridMain.Columns.Clear();
+			gridMain.Rows.Clear();
+			gridMain.EndUpdate();
+			_provsChanged=false;
 			List<long> provNums=new List<long>();
 			for(int i=0;i<listProv.SelectedIndices.Count;i++){
 				provNums.Add(_listProvs[listProv.SelectedIndices[i]].ProvNum);
@@ -585,8 +605,19 @@ namespace OpenDental{
 			for(int i=0;i<listEmp.SelectedIndices.Count;i++){
 				empNums.Add(_listEmps[listEmp.SelectedIndices[i]].EmployeeNum);
 			}
-			DataTable table=Schedules.GetPeriod(PIn.Date(textDateFrom.Text),PIn.Date(textDateTo.Text),provNums,
-				empNums,checkPractice.Checked);
+			long clinicNum=0;
+			if(PrefC.HasClinicsEnabled) {
+				if(Security.CurUser.ClinicIsRestricted) {
+					clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
+				}
+				else if(comboClinic.SelectedIndex>0) {
+					clinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;//Subtract 1, because Headquarters is the first option.
+				}
+			}
+			if(isFromDb || this._tableScheds==null) {
+				_tableScheds=Schedules.GetPeriod(PIn.Date(textDateFrom.Text),PIn.Date(textDateTo.Text),provNums,empNums,checkPracticeNotes.Checked,
+					checkClinicNotes.Checked,clinicNum);
+			}
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			int colW;
@@ -617,18 +648,18 @@ namespace OpenDental{
 			}
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<table.Rows.Count;i++){
+			for(int i=0;i<_tableScheds.Rows.Count;i++){
 				row=new ODGridRow();
 				if(checkWeekend.Checked){
-					row.Cells.Add(table.Rows[i][0].ToString());
+					row.Cells.Add(_tableScheds.Rows[i][0].ToString());
 				}
-				row.Cells.Add(table.Rows[i][1].ToString());
-				row.Cells.Add(table.Rows[i][2].ToString());
-				row.Cells.Add(table.Rows[i][3].ToString());
-				row.Cells.Add(table.Rows[i][4].ToString());
-				row.Cells.Add(table.Rows[i][5].ToString());
+				row.Cells.Add(_tableScheds.Rows[i][1].ToString());
+				row.Cells.Add(_tableScheds.Rows[i][2].ToString());
+				row.Cells.Add(_tableScheds.Rows[i][3].ToString());
+				row.Cells.Add(_tableScheds.Rows[i][4].ToString());
+				row.Cells.Add(_tableScheds.Rows[i][5].ToString());
 				if(checkWeekend.Checked){
-					row.Cells.Add(table.Rows[i][6].ToString());
+					row.Cells.Add(_tableScheds.Rows[i][6].ToString());
 				}
 				gridMain.Rows.Add(row);
 			}
@@ -656,8 +687,12 @@ namespace OpenDental{
 		}
 
 		private void comboClinic_SelectionChangeCommitted(object sender,EventArgs e) {
-			tabPageProv.Text=Lan.g(this,"Providers")+" (0)";
+			//tabPageProv.Text=Lan.g(this,"Providers")+" (0)";
 			tabPageEmp.Text=Lan.g(this,"Employees")+" (0)";
+			comboClinic.Text=Lan.g(this,"Show Practice Notes");
+			if(!Security.CurUser.ClinicIsRestricted && comboClinic.SelectedIndex>0) {
+				comboClinic.Text=Lan.g(this,"Show Practice and Clinic Notes");
+			}
 			FillEmployeesAndProviders();
 			FillGrid();
 		}
@@ -673,10 +708,14 @@ namespace OpenDental{
 		}
 
 		private void checkWeekend_Click(object sender,EventArgs e) {
+			FillGrid(false);
+		}
+
+		private void checkPracticeNotes_Click(object sender,EventArgs e) {
 			FillGrid();
 		}
 
-		private void checkPractice_Click(object sender,EventArgs e) {
+		private void checkClinicNotes_Click(object sender,EventArgs e) {
 			FillGrid();
 		}
 
@@ -708,7 +747,7 @@ namespace OpenDental{
 			else if(comboClinic.SelectedIndex > 0) {
 				clinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;//Subtract 1, because Headquarters is the first option.
 			}
-			FormScheduleDayEdit FormS=new FormScheduleDayEdit(selectedDate,clinicNum);
+			FormScheduleDayEdit FormS=new FormScheduleDayEdit(selectedDate,clinicNum,checkPracticeNotes.Checked,checkClinicNotes.Checked);
 			FormS.ShowDialog();
 			if(FormS.DialogResult!=DialogResult.OK){
 				return;
@@ -724,11 +763,11 @@ namespace OpenDental{
 		}
 
 		private void listProv_Click(object sender,EventArgs e) {
-			ProvsChanged=true;
+			_provsChanged=true;
 		}
 
 		private void listEmp_Click(object sender,EventArgs e) {
-			ProvsChanged=true;
+			_provsChanged=true;
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {
@@ -742,7 +781,7 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please select a date first.");
 				return;
 			}
-			if(ProvsChanged) {
+			if(_provsChanged) {
 				MsgBox.Show(this,"Provider or Employee selection has been changed.  Please refresh first.");
 				return;
 			}
@@ -769,7 +808,16 @@ namespace OpenDental{
 			for(int i=0;i<listEmp.SelectedIndices.Count;i++) {
 				empNums.Add(_listEmps[listEmp.SelectedIndices[i]].EmployeeNum);
 			}
-			Schedules.Clear(dateSelectedStart,dateSelectedEnd,provNums,empNums,checkPractice.Checked);
+			long clinicNum=0;
+			if(PrefC.HasClinicsEnabled) {
+				if(Security.CurUser.ClinicIsRestricted) {
+					clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
+				}
+				else if(comboClinic.SelectedIndex>0) {
+					clinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;//Subtract 1, because Headquarters is the first option.
+				}
+			}
+			Schedules.Clear(dateSelectedStart,dateSelectedEnd,provNums,empNums,checkPracticeNotes.Checked,checkClinicNotes.Checked,clinicNum);
 			FillGrid();
 			changed=true;
 		}
@@ -833,7 +881,7 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please copy a selection to the clipboard first.");
 				return;
 			}
-			if(ProvsChanged){
+			if(_provsChanged){
 				MsgBox.Show(this,"Provider or Employee selection has been changed.  Please refresh first.");
 				return;
 			}
@@ -867,19 +915,22 @@ namespace OpenDental{
 				MsgBox.Show(this,"Not allowed to paste back onto the same date as is on the clipboard.");
 				return;
 			}
-			List<long> provNums=new List<long>();
-			for(int i=0;i<listProv.SelectedIndices.Count;i++) {
-				provNums.Add(_listProvs[listProv.SelectedIndices[i]].ProvNum);
-			}
-			List<long> empNums=new List<long>();
-			for(int i=0;i<listEmp.SelectedIndices.Count;i++) {
-				empNums.Add(_listEmps[listEmp.SelectedIndices[i]].EmployeeNum);
+			List<long> provNums=listProv.SelectedIndices.OfType<int>().Select(x => _listProvs[x].ProvNum).ToList();
+			List<long> empNums=listEmp.SelectedIndices.OfType<int>().Select(x => _listEmps[x].EmployeeNum).ToList();
+			long clinicNum=0;
+			if(PrefC.HasClinicsEnabled) {
+				if(Security.CurUser.ClinicIsRestricted) {
+					clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
+				}
+				else if(comboClinic.SelectedIndex>0) {
+					clinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;//Subtract 1, HQ is the first option.
+				}
 			}
 			if(checkReplace.Checked){
-				Schedules.Clear(dateSelectedStart,dateSelectedEnd,provNums,empNums,checkPractice.Checked);
+				Schedules.Clear(dateSelectedStart,dateSelectedEnd,provNums,empNums,checkPracticeNotes.Checked,checkClinicNotes.Checked,clinicNum);
 			}
-			List<Schedule> SchedList=Schedules.RefreshPeriod(DateCopyStart,DateCopyEnd,provNums,
-				empNums,checkPractice.Checked);
+			List<Schedule> SchedList=Schedules.RefreshPeriod(DateCopyStart,DateCopyEnd,provNums,empNums,checkPracticeNotes.Checked,
+				checkClinicNotes.Checked,clinicNum);
 			Schedule sched;
 			int weekDelta=0;
 			if(isWeek){
@@ -945,7 +996,7 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please copy a selection to the clipboard first.");
 				return;
 			}
-			if(ProvsChanged) {
+			if(_provsChanged) {
 				MsgBox.Show(this,"Provider or Employee selection has been changed.  Please refresh first.");
 				return;
 			}
@@ -986,8 +1037,17 @@ namespace OpenDental{
 			for(int i=0;i<listEmp.SelectedIndices.Count;i++) {
 				empNums.Add(_listEmps[listEmp.SelectedIndices[i]].EmployeeNum);
 			}
-			List<Schedule> SchedList=Schedules.RefreshPeriod(DateCopyStart,DateCopyEnd,provNums,
-				empNums,checkPractice.Checked);
+			long clinicNum=0;
+			if(PrefC.HasClinicsEnabled) {
+				if(Security.CurUser.ClinicIsRestricted) {
+					clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
+				}
+				else if(comboClinic.SelectedIndex>0) {
+					clinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;//Subtract 1, because Headquarters is the first option.
+				}
+			}
+			List<Schedule> SchedList=Schedules.RefreshPeriod(DateCopyStart,DateCopyEnd,provNums,empNums,checkPracticeNotes.Checked,
+				checkClinicNotes.Checked,clinicNum);
 			Schedule sched;
 			int weekDelta=0;
 			TimeSpan span;
@@ -1000,12 +1060,12 @@ namespace OpenDental{
 			for(int r=0;r<repeatCount;r++){//for example, user wants to repeat 3 times.
 				if(checkReplace.Checked) {
 					if(isWeek){
-						Schedules.Clear(dateSelectedStart.AddDays(r*7),dateSelectedEnd.AddDays(r*7),
-							provNums,empNums,checkPractice.Checked);
+						Schedules.Clear(dateSelectedStart.AddDays(r*7),dateSelectedEnd.AddDays(r*7),provNums,empNums,checkPracticeNotes.Checked,
+							checkClinicNotes.Checked,clinicNum);
 					}
 					else{
-						Schedules.Clear(dateSelectedStart.AddDays(dayDelta),dateSelectedEnd.AddDays(dayDelta),
-							provNums,empNums,checkPractice.Checked);
+						Schedules.Clear(dateSelectedStart.AddDays(dayDelta),dateSelectedEnd.AddDays(dayDelta),provNums,empNums,checkPracticeNotes.Checked,
+							checkClinicNotes.Checked,clinicNum);
 					}
 				}
 				for(int i=0;i<SchedList.Count;i++) {//For example, if 3 weeks for one provider, then about 30 loops.
@@ -1065,7 +1125,7 @@ namespace OpenDental{
 			}
 		}
 
-		private void pd_PrintPage(object sender,System.Drawing.Printing.PrintPageEventArgs e) {
+		private void pd_PrintPage(object sender,PrintPageEventArgs e) {
 			Rectangle bounds=e.MarginBounds;
 			//new Rectangle(50,40,800,1035);//Some printers can handle up to 1042
 			Graphics g=e.Graphics;
@@ -1095,6 +1155,25 @@ namespace OpenDental{
 				e.HasMorePages=false;
 			}
 			g.Dispose();
+		}
+
+		///<summary>Fires as resizing is happening.</summary>
+		private void FormSchedule_Resize(object sender,EventArgs e) {
+			if(_isResizing || WindowState==FormWindowState.Minimized) {
+				return;
+			}
+			FillGrid(false);
+		}
+
+		///<summary>Fires when manual resizing begins.</summary>
+		private void FormSchedule_ResizeBegin(object sender,EventArgs e) {
+			_isResizing=true;
+		}
+
+		///<summary>Fires when resizing is complete, except when changing window state. I.e. this is not fired when the window is maximized or minimized.</summary>
+		private void FormSchedule_ResizeEnd(object sender,EventArgs e) {
+			FillGrid(false);
+			_isResizing=false;
 		}
 
 		private void FormSchedule_FormClosing(object sender,FormClosingEventArgs e) {

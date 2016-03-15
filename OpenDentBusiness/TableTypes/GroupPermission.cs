@@ -255,7 +255,7 @@ namespace OpenDentBusiness{
 		InsPlanEdit,
 		///<summary>111 - Audit when an insurance subscriber is created.  The naming convention of this permission was decided upon by Nathan and Derek
 		///based on the following existing permissions: InsPlanChangeSubsc, InsPlanChangeCarrierName, InsPlanChangeAssign.
-		///Currently only used in X12 834 insurance plan import.<summary>
+		///Currently only used in X12 834 insurance plan import.</summary>
 		InsPlanCreateSub,
 		///<summary>112 - Audit when an insurance subscriber is edited.  The naming convention of this permission was decided upon by Nathan and Derek
 		///based on the following existing permissions: InsPlanChangeSubsc, InsPlanChangeCarrierName, InsPlanChangeAssign.

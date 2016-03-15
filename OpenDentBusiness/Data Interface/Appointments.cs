@@ -658,10 +658,10 @@ namespace OpenDentBusiness{
 			DataSet retVal=new DataSet();
 			DataTable tableAppt=GetPeriodApptsTable(dateStart,dateEnd,0,false);
 			retVal.Tables.Add(tableAppt);
-			retVal.Tables.Add(GetPeriodEmployeeSchedTable(dateStart,dateEnd,clinicNum));
+			retVal.Tables.Add(Schedules.GetPeriodEmployeeSchedTable(dateStart,dateEnd,clinicNum));
 			//retVal.Tables.Add(GetPeriodWaitingRoomTable(clinicNum));
 			retVal.Tables.Add(GetPeriodWaitingRoomTable());
-			retVal.Tables.Add(GetPeriodSchedule(dateStart,dateEnd));
+			retVal.Tables.Add(Schedules.GetPeriodSchedule(dateStart,dateEnd));
 			retVal.Tables.Add(GetApptFields(tableAppt));
 			retVal.Tables.Add(GetPatFields(tableAppt));
 			return retVal;
@@ -1328,71 +1328,7 @@ namespace OpenDentBusiness{
 		}
 
 		public static DataTable GetPeriodEmployeeSchedTable(DateTime dateStart,DateTime dateEnd) {
-			return GetPeriodEmployeeSchedTable(dateStart,dateEnd,0);
-		}
-
-		///<summary>Set clinicNum to 0 to return 'unassigned' clinics.  Otherwise, filters the data set on the clinic num passed in.</summary>
-		public static DataTable GetPeriodEmployeeSchedTable(DateTime dateStart,DateTime dateEnd,long clinicNum) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateStart,dateEnd,clinicNum);
-			}
-			DataConnection dcon=new DataConnection();
-			DataTable table=new DataTable("EmpSched");
-			DataRow row;
-			//columns that start with lowercase are altered for display rather than being raw data.
-			table.Columns.Add("empName");
-			table.Columns.Add("schedule");
-			table.Columns.Add("Note");
-			if(dateStart!=dateEnd) {
-				return table;
-			}
-			string clinicJoin="";
-			string clinicWhere="";
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics.
-				clinicJoin="LEFT JOIN userod ON employee.EmployeeNum=userod.EmployeeNum ";
-				if(clinicNum==0) {
-					clinicWhere="AND (userod.ClinicNum IS NULL OR userod.ClinicNum=0) ";
-				}
-				else {
-					clinicWhere="AND userod.ClinicNum="+POut.Long(clinicNum)+" ";
-				}
-			}
-			string command="SELECT StartTime,StopTime,FName,employee.EmployeeNum,Note,schedule.ScheduleNum "
-				+"FROM employee "
-				+"INNER JOIN schedule ON schedule.EmployeeNum=employee.EmployeeNum "
-				+clinicJoin
-				+"WHERE SchedType="+POut.Int((int)ScheduleType.Employee)+" "
-				+"AND SchedDate = "+POut.Date(dateStart)+" "
-				+"AND employee.IsHidden = 0 "
-				+clinicWhere;
-			if(DataConnection.DBtype==DatabaseType.MySql) {
-				command+="GROUP BY schedule.ScheduleNum ";
-			}
-			else {
-				command+="GROUP BY employee.EmployeeNum,StartTime,StopTime,FName,Note,schedule.ScheduleNum ";
-			}
-			command+="ORDER BY FName,StartTime";
-			DataTable raw=dcon.GetTable(command);
-			DateTime startTime;
-			DateTime stopTime;
-			for(int i=0;i<raw.Rows.Count;i++) {
-				row=table.NewRow();
-				if(i==0 || raw.Rows[i]["EmployeeNum"].ToString()!=raw.Rows[i-1]["EmployeeNum"].ToString()){
-					row["empName"]=raw.Rows[i]["FName"].ToString();
-				}
-				else{
-					row["empName"]="";
-				}
-				if(row["schedule"].ToString()!=""){
-					row["schedule"]+=",";
-				}
-				startTime=PIn.DateT(raw.Rows[i]["StartTime"].ToString());
-				stopTime=PIn.DateT(raw.Rows[i]["StopTime"].ToString());
-				row["schedule"]+=startTime.ToString("h:mm")+"-"+stopTime.ToString("h:mm");
-				row["Note"]=raw.Rows[i]["Note"].ToString();
-				table.Rows.Add(row);
-			}
-			return table;
+			return Schedules.GetPeriodEmployeeSchedTable(dateStart,dateEnd,0);
 		}
 
 		public static DataTable GetPeriodWaitingRoomTable() {
@@ -1452,56 +1388,6 @@ namespace OpenDentBusiness{
 				//}
 				//row["waitTime"]+=waitTime.Minutes.ToString()+"m";
 				row["OpNum"]=raw.Rows[i]["Op"].ToString();
-				table.Rows.Add(row);
-			}
-			return table;
-		}
-
-		public static DataTable GetPeriodSchedule(DateTime dateStart,DateTime dateEnd) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateStart,dateEnd);
-			}
-			DataTable table=new DataTable("Schedule");
-			table.Columns.Add("ScheduleNum");
-			table.Columns.Add("SchedDate");
-			table.Columns.Add("StartTime");
-			table.Columns.Add("StopTime");
-			table.Columns.Add("SchedType");
-			table.Columns.Add("ProvNum");
-			table.Columns.Add("BlockoutType");
-			table.Columns.Add("Note");
-			table.Columns.Add("Status");
-			table.Columns.Add("ops");
-			table.Columns.Add("EmployeeNum");
-			table.Columns.Add("DateTStamp");
-			string command="SELECT schedule.ScheduleNum,SchedDate,StartTime,StopTime,SchedType,ProvNum,BlockoutType,Note,Status,EmployeeNum,DateTStamp,"+DbHelper.GroupConcat("scheduleop.OperatoryNum")+" ops_ "
-				+"FROM schedule "
-				+"LEFT JOIN scheduleop ON schedule.ScheduleNum=scheduleop.ScheduleNum "
-				+"WHERE SchedDate >= "+POut.Date(dateStart)+" "
-				+"AND SchedDate <= "+POut.Date(dateEnd)+" ";
-			if(DataConnection.DBtype==DatabaseType.MySql) {
-				command+="GROUP BY schedule.ScheduleNum ";
-			}
-			else {//Oracle
-				command+="GROUP BY schedule.ScheduleNum,SchedDate,StartTime,StopTime,SchedType,ProvNum,BlockoutType,Note,Status,EmployeeNum,DateTStamp ";
-			}
-			command+="ORDER BY StartTime";
-			DataTable raw=Db.GetTable(command);
-			DataRow row;
-			for(int i=0;i<raw.Rows.Count;i++) {
-				row=table.NewRow();
-				row["ScheduleNum"]=raw.Rows[i]["ScheduleNum"].ToString();
-				row["SchedDate"]=POut.Date(PIn.Date(raw.Rows[i]["SchedDate"].ToString()),false);
-				row["StartTime"]=POut.Time(PIn.Time(raw.Rows[i]["StartTime"].ToString()),false);
-				row["StopTime"]=POut.Time(PIn.Time(raw.Rows[i]["StopTime"].ToString()),false);
-				row["SchedType"]=raw.Rows[i]["SchedType"].ToString();
-				row["ProvNum"]=raw.Rows[i]["ProvNum"].ToString();
-				row["BlockoutType"]=raw.Rows[i]["BlockoutType"].ToString();
-				row["Note"]=raw.Rows[i]["Note"].ToString();
-				row["Status"]=raw.Rows[i]["Status"].ToString();
-				row["ops"]=PIn.ByteArray(raw.Rows[i]["ops_"]);
-				row["EmployeeNum"]=raw.Rows[i]["EmployeeNum"].ToString();
-				row["DateTStamp"]=POut.Date(PIn.Date(raw.Rows[i]["DateTStamp"].ToString()),false);
 				table.Rows.Add(row);
 			}
 			return table;
