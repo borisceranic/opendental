@@ -847,6 +847,7 @@ namespace OpenDental{
 			string patFolder;
 			int skipped=0;
 			int skippedElect=0;
+			Dictionary<string,int> dictSkippedElect=new Dictionary<string,int>();//The error message is the key and the value is the skipped count.
 			int emailed=0;
 			int printed=0;
 			//FormEmailMessageEdit FormEME=new FormEmailMessageEdit();
@@ -963,6 +964,19 @@ namespace OpenDental{
 					long clinicNum=0;//If clinics are disabled, then all bills will go into the same "bucket"
 					if(PrefC.HasClinicsEnabled) {
 						clinicNum=fam.ListPats[0].ClinicNum;
+					}
+					List <string> listElectErrors=new List<string>();
+					if(PrefC.GetString(PrefName.BillingUseElectronic)=="1") {//EHG
+						listElectErrors=OpenDental.Bridges.EHG_statements.Validate(clinicNum);
+					}
+					if(listElectErrors.Count > 0) {
+						foreach(string errorElect in listElectErrors) {
+							if(!dictSkippedElect.ContainsKey(errorElect)) {
+								dictSkippedElect.Add(errorElect,0);
+							}
+							dictSkippedElect[errorElect]++;
+						}						
+						continue;//skip the current statement, since there are errors.
 					}
 					if(!dictEbills.ContainsKey(clinicNum)) {
 						dictEbills.Add(clinicNum,new List<EbillStatement>());
@@ -1118,6 +1132,9 @@ namespace OpenDental{
 			}
 			if(skippedElect>0) {
 				msg+=Lan.g(this,"Skipped due to missing or bad mailing address: ")+skippedElect.ToString()+"\r\n";
+			}
+			foreach(string errorElect in dictSkippedElect.Keys) {
+				msg+=Lan.g(this,"Skipped due to")+" "+errorElect+": "+dictSkippedElect[errorElect].ToString()+"\r\n";
 			}
 			msg+=Lan.g(this,"Printed: ")+printed.ToString()+"\r\n"
 				+Lan.g(this,"E-mailed: ")+emailed.ToString()+"\r\n"
