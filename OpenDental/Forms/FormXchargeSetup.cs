@@ -516,14 +516,10 @@ namespace OpenDental{
 				textPassword.UseSystemPasswordChar=true;
 			}
 			textPassword.Text=password;
-			//AuthKey
-			string authKey=ProgramProperties.GetPropValFromList(_listProgProps,"AuthKey",clinicNum);
-			if(authKey.Length>0) {
-				authKey=CodeBase.MiscUtils.Decrypt(authKey);//Decrypt the password because we will be encrypting it again on OK click.
-				//X-Charge does not show the Auth Key within their server set up.  We shall do the same.
-				textAuthKey.UseSystemPasswordChar=true;
-			}
-			textAuthKey.Text=authKey;
+			//AuthKey had previously been stored as obfuscated text (prior to 16.2). 
+			//The XWeb feature was not publicly available for any of these versions so it safe to remove that restriction.
+			//It was determined that storing in plain-text is good enough as the obfuscation wasn't really making the key any more secure.
+			textAuthKey.Text=ProgramProperties.GetPropValFromList(_listProgProps,"AuthKey",clinicNum);
 			//PaymentType ComboBox
 			string payTypeDefNum=ProgramProperties.GetPropValFromList(_listProgProps,"PaymentType",clinicNum);
 			comboPaymentType.Items.Clear();
@@ -558,11 +554,7 @@ namespace OpenDental{
 			string passwordEncrypted="";
 			if(textPassword.Text.Trim().Length>0) {
 				passwordEncrypted=CodeBase.MiscUtils.Encrypt(textPassword.Text.Trim());
-			}
-			string authKeyEncrypted="";
-			if(textAuthKey.Text.Trim().Length>0) {
-				authKeyEncrypted=CodeBase.MiscUtils.Encrypt(textAuthKey.Text.Trim());
-			}
+			}			
 			string payTypeCur="";
 			if(comboPaymentType.SelectedIndex>-1) {
 				payTypeCur=DefC.Short[(int)DefCat.PaymentTypes][comboPaymentType.SelectedIndex].DefNum.ToString();
@@ -578,7 +570,7 @@ namespace OpenDental{
 			_listProgProps.FindAll(x => x.ClinicNum==_listUserClinicNums[_indexClinicRevert] && x.PropertyDesc=="XWebID")
 				.ForEach(x => x.PropertyValue=textXWebID.Text.Trim());//always 1 item, null safe
 			_listProgProps.FindAll(x => x.ClinicNum==_listUserClinicNums[_indexClinicRevert] && x.PropertyDesc=="AuthKey")
-				.ForEach(x => x.PropertyValue=authKeyEncrypted);//always 1 item, null safe
+				.ForEach(x => x.PropertyValue=textAuthKey.Text.Trim());//always 1 item, null safe
 			_listProgProps.FindAll(x => x.ClinicNum==_listUserClinicNums[_indexClinicRevert] && x.PropertyDesc=="TerminalID")
 				.ForEach(x => x.PropertyValue=textTerminalID.Text.Trim());//always 1 item, null safe
 			_listProgProps.FindAll(x => x.ClinicNum==_listUserClinicNums[_indexClinicRevert] && x.PropertyDesc=="PaymentType")//payment type already validated
@@ -725,10 +717,6 @@ namespace OpenDental{
 			if(textPassword.Text.Trim().Length>0) {
 				passwordEncrypted=CodeBase.MiscUtils.Encrypt(textPassword.Text.Trim());
 			}
-			string authKeyEncrypted="";
-			if(textAuthKey.Text.Trim().Length>0) {
-				authKeyEncrypted=CodeBase.MiscUtils.Encrypt(textAuthKey.Text.Trim());
-			}
 			//for each distinct ClinicNum in the prog property list for X-Charge except HQ
 			foreach(long clinicNum in _listProgProps.Select(x => x.ClinicNum).Where(x => x>0).Distinct()) {
 				//Updates the PaymentType in both if checks, in case the other isn't met so the payment type will be synched if either condition is true.
@@ -754,7 +742,7 @@ namespace OpenDental{
 					_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="XWebID")
 						.ForEach(x => x.PropertyValue=textXWebID.Text.Trim());//always 1 item; null safe
 					_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="AuthKey")
-						.ForEach(x => x.PropertyValue=authKeyEncrypted);//always 1 item; null safe
+						.ForEach(x => x.PropertyValue=textAuthKey.Text.Trim());//always 1 item; null safe
 					_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="TerminalID")
 						.ForEach(x => x.PropertyValue=textTerminalID.Text.Trim());//always 1 item; null safe
 				}
@@ -848,11 +836,7 @@ namespace OpenDental{
 			string passwordEncrypted="";
 			if(textPassword.Text.Trim().Length>0) {
 				passwordEncrypted=CodeBase.MiscUtils.Encrypt(textPassword.Text.Trim());
-			}
-			string authKeyEncrypted="";
-			if(textAuthKey.Text.Trim().Length>0) {
-				authKeyEncrypted=CodeBase.MiscUtils.Encrypt(textAuthKey.Text.Trim());
-			}
+			}			
 			string payTypeCur="";
 			if(comboPaymentType.SelectedIndex>-1) {
 				payTypeCur=DefC.Short[(int)DefCat.PaymentTypes][comboPaymentType.SelectedIndex].DefNum.ToString();
@@ -869,7 +853,7 @@ namespace OpenDental{
 			_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="XWebID")
 				.ForEach(x => x.PropertyValue=textXWebID.Text.Trim());//always 1 item, null safe
 			_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="AuthKey")
-				.ForEach(x => x.PropertyValue=authKeyEncrypted);//always 1 item, null safe
+				.ForEach(x => x.PropertyValue=textAuthKey.Text.Trim());//always 1 item, null safe
 			_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="TerminalID")
 				.ForEach(x => x.PropertyValue=textTerminalID.Text.Trim());//always 1 item, null safe
 			_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="PaymentType")
