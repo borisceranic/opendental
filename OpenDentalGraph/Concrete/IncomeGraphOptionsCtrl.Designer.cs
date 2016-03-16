@@ -33,10 +33,9 @@
 			// 
 			this.groupBox2.Controls.Add(this.checkIncludeInsuranceClaimPayments);
 			this.groupBox2.Controls.Add(this.checkIncludePaySplits);
-			this.groupBox2.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.groupBox2.Location = new System.Drawing.Point(0, 0);
 			this.groupBox2.Name = "groupBox2";
-			this.groupBox2.Size = new System.Drawing.Size(285, 40);
+			this.groupBox2.Size = new System.Drawing.Size(214, 56);
 			this.groupBox2.TabIndex = 8;
 			this.groupBox2.TabStop = false;
 			this.groupBox2.Text = "Included Income Sources";
@@ -46,9 +45,9 @@
 			this.checkIncludeInsuranceClaimPayments.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkIncludeInsuranceClaimPayments.Checked = true;
 			this.checkIncludeInsuranceClaimPayments.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.checkIncludeInsuranceClaimPayments.Location = new System.Drawing.Point(99, 13);
+			this.checkIncludeInsuranceClaimPayments.Location = new System.Drawing.Point(6, 35);
 			this.checkIncludeInsuranceClaimPayments.Name = "checkIncludeInsuranceClaimPayments";
-			this.checkIncludeInsuranceClaimPayments.Size = new System.Drawing.Size(168, 24);
+			this.checkIncludeInsuranceClaimPayments.Size = new System.Drawing.Size(199, 18);
 			this.checkIncludeInsuranceClaimPayments.TabIndex = 3;
 			this.checkIncludeInsuranceClaimPayments.Text = "Insurance Claim Payments";
 			this.checkIncludeInsuranceClaimPayments.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -60,9 +59,9 @@
 			this.checkIncludePaySplits.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkIncludePaySplits.Checked = true;
 			this.checkIncludePaySplits.CheckState = System.Windows.Forms.CheckState.Checked;
-			this.checkIncludePaySplits.Location = new System.Drawing.Point(6, 13);
+			this.checkIncludePaySplits.Location = new System.Drawing.Point(6, 14);
 			this.checkIncludePaySplits.Name = "checkIncludePaySplits";
-			this.checkIncludePaySplits.Size = new System.Drawing.Size(87, 24);
+			this.checkIncludePaySplits.Size = new System.Drawing.Size(199, 20);
 			this.checkIncludePaySplits.TabIndex = 5;
 			this.checkIncludePaySplits.Text = "Pay Splits";
 			this.checkIncludePaySplits.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -75,7 +74,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.Controls.Add(this.groupBox2);
 			this.Name = "IncomeGraphOptionsCtrl";
-			this.Size = new System.Drawing.Size(285, 40);
+			this.Size = new System.Drawing.Size(226, 67);
 			this.groupBox2.ResumeLayout(false);
 			this.ResumeLayout(false);
 

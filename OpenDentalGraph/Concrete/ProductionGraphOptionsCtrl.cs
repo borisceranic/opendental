@@ -20,9 +20,13 @@ namespace OpenDentalGraph {
 		public bool IncludeWriteoffs {
 			get { return checkIncludeWriteoffs.Checked; }
 			set { checkIncludeWriteoffs.Checked=value; }
-		}		
+		}
 		public ProductionGraphOptionsCtrl() {
 			InitializeComponent();
+		}
+
+		public override int GetPanelHeight() {
+			return this.Height;
 		}
 
 		private void OnProductionGraphInputsChanged(object sender,EventArgs e) {

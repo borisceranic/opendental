@@ -5,9 +5,8 @@ using System.Data;
 namespace OpenDentalGraph.Cache {
 	public class DashboardCacheNewPatient:DashboardCacheWithQuery<NewPatient> {
 		protected override string GetCommand(DashboardFilter filter) {
-			//todo: this should use patient.DateFirstVisit instead. Much faster but this would require some development and a convert script.
 			return
-				"SELECT PatNum, MIN(ProcDate) FirstProc "
+				"SELECT PatNum, MIN(ProcDate) FirstProc, ClinicNum, ProvNum "
 				+"FROM procedurelog USE INDEX(indexPNPSCN) "
 				+"INNER JOIN procedurecode ON procedurecode.CodeNum = procedurelog.CodeNum "
 												+"AND procedurecode.ProcCode NOT IN ('D9986','D9987')"
@@ -21,6 +20,8 @@ namespace OpenDentalGraph.Cache {
 				Count=1, //Each row counts as 1.
 				Val=0, //there are no fees
 				SeriesName="All", //Only 1 series.
+				ProvNum=x.Field<long>("ProvNum"),
+				ClinicNum=x.Field<long>("ClinicNum"),
 			};
 		}
 
@@ -29,5 +30,5 @@ namespace OpenDentalGraph.Cache {
 		}
 	}
 
-	public class NewPatient:GraphQuantityOverTime.GraphPointBase { }
+	public class NewPatient:GraphQuantityOverTime.GraphDataPointClinic { }
 }

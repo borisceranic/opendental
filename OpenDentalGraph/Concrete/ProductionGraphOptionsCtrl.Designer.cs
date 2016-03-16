@@ -35,10 +35,9 @@
 			this.groupBox1.Controls.Add(this.checkIncludeAdjustments);
 			this.groupBox1.Controls.Add(this.checkIncludeCompletedProcs);
 			this.groupBox1.Controls.Add(this.checkIncludeWriteoffs);
-			this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.groupBox1.Location = new System.Drawing.Point(0, 0);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(298, 39);
+			this.groupBox1.Size = new System.Drawing.Size(300, 42);
 			this.groupBox1.TabIndex = 7;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Included Production Sources";
@@ -91,7 +90,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.Controls.Add(this.groupBox1);
 			this.Name = "ProductionGraphOptionsCtrl";
-			this.Size = new System.Drawing.Size(298, 39);
+			this.Size = new System.Drawing.Size(300, 42);
 			this.groupBox1.ResumeLayout(false);
 			this.ResumeLayout(false);
 

@@ -12,24 +12,25 @@ namespace OpenDentalGraph.Cache {
 			return
 				"SELECT procedurelog.ProcDate,procedurelog.ProvNum, "
 				+"SUM(procedurelog.ProcFee*(procedurelog.UnitQty+procedurelog.BaseUnits)) AS GrossProd, "
-				+"COUNT(procedurelog.ProcNum) AS ProcCount "
+				+"COUNT(procedurelog.ProcNum) AS ProcCount, ClinicNum "
 				+"FROM procedurelog "
 				+where
 				+"GROUP BY procedurelog.ProcDate,procedurelog.ProvNum ";
 		}
 
 		protected override CompletedProc GetInstanceFromDataRow(DataRow x) {
-			long provNum=x.Field<long>("ProvNum");
-			string seriesName=DashboardCache.Providers.GetProvName(provNum);
+			//long provNum=x.Field<long>("ProvNum");
+			//string seriesName=DashboardCache.Providers.GetProvName(provNum);
 			return new CompletedProc() {
-				ProvNum=provNum,
+				ProvNum=x.Field<long>("ProvNum"),
 				DateStamp=x.Field<DateTime>("ProcDate"),
 				Val=x.Field<double>("GrossProd"),
 				Count=x.Field<long>("ProcCount"),
-				SeriesName=seriesName,
+				//SeriesName=seriesName,
+				ClinicNum=x.Field<long>("ClinicNum"),
 			};
 		}
 	}
 
-	public class CompletedProc:GraphQuantityOverTime.GraphDataPointProv { }
+	public class CompletedProc:GraphQuantityOverTime.GraphDataPointClinic { }
 }

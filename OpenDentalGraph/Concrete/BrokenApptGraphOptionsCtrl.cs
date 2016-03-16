@@ -12,29 +12,8 @@ namespace OpenDentalGraph {
 	public partial class BrokenApptGraphOptionsCtrl:BaseGraphOptionsCtrl {
 
 		public List<Def> ListAdjTypes;
-		public enum Grouping { provider, clinic };
+		//public enum Grouping { provider, clinic };
 		public enum RunFor { appointment, procedure, adjustment };
-		public Grouping CurGrouping {
-			get {
-				if(radioGroupProvs.Checked) {
-					return Grouping.provider;
-				}
-				else{
-					return Grouping.clinic;
-				}
-			}
-			set {
-				switch(value) {
-					case Grouping.provider:
-						radioGroupProvs.Checked=true;
-						break;
-					case Grouping.clinic:
-						radioGroupClinics.Checked=true;
-						break;
-				}
-			}
-		}
-
 		public RunFor CurRunFor
 		{
 			get
@@ -86,7 +65,6 @@ namespace OpenDentalGraph {
 				}
 			}
 		}
-
 		
 		public BrokenApptGraphOptionsCtrl() {
 			InitializeComponent();
@@ -98,7 +76,7 @@ namespace OpenDentalGraph {
 			return this.Height;
 		}
 
-		private void radioRunForChanged(object sender,EventArgs e) {
+		private void OnBrokenApptGraphOptionsChanged(object sender,EventArgs e) {
 			if((sender is RadioButton) && !((RadioButton)sender).Checked) {
 				return;
 			}
@@ -107,13 +85,6 @@ namespace OpenDentalGraph {
 			}
 			else {
 				comboAdjType.Enabled=false;
-			}
-			OnBaseInputsChanged(sender,e);
-		}
-
-		private void radioGroupByChanged(object sender,EventArgs e) {
-			if((sender is RadioButton) && !((RadioButton)sender).Checked) {
-				return;
 			}
 			OnBaseInputsChanged(sender,e);
 		}

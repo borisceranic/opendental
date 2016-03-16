@@ -56,8 +56,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Required dlls\MySql.Data.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\Required dlls\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\OPEN DENTAL SUBVERSION\head\Required dlls\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -71,6 +72,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Base\GroupingOptionsCtrl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Base\GroupingOptionsCtrl.Designer.cs">
+      <DependentUpon>GroupingOptionsCtrl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Base\GraphIncome.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -185,6 +192,12 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Base\GroupingOptionsCtrl.resx">
+      <DependentUpon>GroupingOptionsCtrl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Base\BaseGraphOptionsCtrl.resx">
+      <DependentUpon>BaseGraphOptionsCtrl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Base\GraphIncome.resx">
       <DependentUpon>GraphIncome.cs</DependentUpon>
     </EmbeddedResource>

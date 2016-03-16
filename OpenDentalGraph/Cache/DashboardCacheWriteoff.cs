@@ -3,6 +3,7 @@ using OpenDentBusiness;
 using System.Data;
 
 namespace OpenDentalGraph.Cache {
+	///<summary>We use the same cache to track regular writeoffs and capitation writeoffs for efficiency.</summary>
 	public class DashboardCacheWriteoff:DashboardCacheWithQuery<Writeoff> {
 		protected override string GetCommand(DashboardFilter filter) {
 			string where="WHERE TRUE ";
@@ -10,7 +11,7 @@ namespace OpenDentalGraph.Cache {
 				where+="AND ProcDate BETWEEN "+POut.Date(filter.DateFrom)+" AND "+POut.Date(filter.DateTo)+" ";
 			}
 			return
-				"SELECT ProcDate,ProvNum,SUM(WriteOff) AS WriteOffs, IF(claimproc.Status="+(int)ClaimProcStatus.CapComplete+",'1','0') AS IsCap "
+				"SELECT ProcDate,ProvNum,SUM(WriteOff) AS WriteOffs, IF(claimproc.Status="+(int)ClaimProcStatus.CapComplete+",'1','0') AS IsCap, ClinicNum "
 				+"FROM claimproc "
 				+where
 				+"AND claimproc.Status IN ("
@@ -23,20 +24,22 @@ namespace OpenDentalGraph.Cache {
 		}
 
 		protected override Writeoff GetInstanceFromDataRow(DataRow x) {
-			long provNum=x.Field<long>("ProvNum");
-			string seriesName=DashboardCache.Providers.GetProvName(provNum);
+			//long provNum=x.Field<long>("ProvNum");
+			//string seriesName=DashboardCache.Providers.GetProvName(provNum);
 			return new Writeoff() {
-				ProvNum=provNum,
+				ProvNum=x.Field<long>("ProvNum"),
 				DateStamp=x.Field<DateTime>("ProcDate"),
 				Val=-x.Field<double>("WriteOffs"),
 				Count=0, //count procedures, not writeoffs.
-				SeriesName=seriesName,
+								 //SeriesName=seriesName,
+				ClinicNum=x.Field<long>("ClinicNum"),
 				IsCap=PIn.Bool(x.Field<string>("IsCap")),
+
 			};
 		}
 	}
 
-	public class Writeoff:GraphQuantityOverTime.GraphDataPointProv {
+	public class Writeoff:GraphQuantityOverTime.GraphDataPointClinic {
 		public bool IsCap;
 	}
 }

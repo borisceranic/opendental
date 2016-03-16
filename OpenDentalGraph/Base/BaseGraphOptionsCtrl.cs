@@ -21,7 +21,13 @@ namespace OpenDentalGraph {
 		}
 
 		public virtual int GetPanelHeight() {
-			return 37;
+			return 63;
+		}
+
+		public virtual bool HasGroupOptions {
+			get {
+				return true;
+			}
 		}
 	}
 }

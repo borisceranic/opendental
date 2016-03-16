@@ -136,7 +136,9 @@ namespace OpenDentalGraph {
 
 	}
 
-	///<summary>Wraps JSON serialization.</summary>
+	///<summary>Wraps JSON serialization. Any class that extends this class should NEVER change variable names after being released. 
+	///The variable names are stored as plain-text json and neeed to remain back-compatible.
+	///Adding new fields is OK.</summary>
 	public class ODGraphSettingsAbs {
 		public static string Serialize(ODGraphSettingsAbs obj) {
 			return JsonConvert.SerializeObject(obj);

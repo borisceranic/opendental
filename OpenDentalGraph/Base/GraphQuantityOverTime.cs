@@ -726,11 +726,26 @@ namespace OpenDentalGraph {
 			_chartAreaDefault.AxisX.IntervalOffset=0;
 		}
 
+		///<summary>Removed the specified quantity type from the chart's comboQuantityType.</summary>
+		public void RemoveQuantityType(QuantityType qtyType) {
+			comboQuantityType.RemoveItem(qtyType);
+		}
+
+		///<summary>Adds a quantity type to the end of the chart's comboQuantityType.</summary>
+		public void AddQuantityType(QuantityType qtyType,string displayName) {
+			comboQuantityType.AddItem(qtyType,displayName);
+		}
+
+		///<summary>Inserts a quantity type into the chart's comboQuantityType at the specified index.</summary>
+		public void InsertQuantityType(QuantityType qtyType,string displayName,int index) {
+			comboQuantityType.InsertItem(qtyType,displayName,index);
+		}
+
 		private void SetGraphTitles() {
 			try {
 				chart1.Titles["ChartTitle"].Text=GraphTitle;
 				textChartTitle.Text=GraphTitle;
-				comboBreakdownBy.GetItem<BreakdownType>(BreakdownType.items).Display=LegendTitle.ToString()+"s";
+				comboBreakdownBy.UpdateDisplayName(BreakdownType.items,LegendTitle.ToString()+"s");
 			}
 			catch(Exception e) { }
 		}

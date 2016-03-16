@@ -29,10 +29,10 @@
 			this.label2 = new System.Windows.Forms.Label();
 			this.labelHelp = new System.Windows.Forms.Label();
 			this.listItems = new System.Windows.Forms.ListBox();
+			this.dashboardTabControl = new OpenDentalGraph.DashboardTabCtrl();
 			this.menuStrip = new System.Windows.Forms.MenuStrip();
 			this.setupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.refreshDataToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.dashboardTabControl = new OpenDentalGraph.DashboardTabCtrl();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
@@ -103,6 +103,18 @@
 			this.listItems.TabIndex = 0;
 			this.listItems.MouseDown += new System.Windows.Forms.MouseEventHandler(this.listItems_MouseDown);
 			// 
+			// dashboardTabControl
+			// 
+			this.dashboardTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.dashboardTabControl.HasUnsavedChanges = false;
+			this.dashboardTabControl.IsEditMode = false;
+			this.dashboardTabControl.Location = new System.Drawing.Point(2, 2);
+			this.dashboardTabControl.Name = "dashboardTabControl";
+			this.dashboardTabControl.Size = new System.Drawing.Size(914, 491);
+			this.dashboardTabControl.TabIndex = 3;
+			// 
 			// menuStrip
 			// 
 			this.menuStrip.Dock = System.Windows.Forms.DockStyle.None;
@@ -128,18 +140,6 @@
 			this.refreshDataToolStripMenuItem.Size = new System.Drawing.Size(85, 20);
 			this.refreshDataToolStripMenuItem.Text = "Refresh Data";
 			this.refreshDataToolStripMenuItem.Click += new System.EventHandler(this.refreshDataToolStripMenuItem_Click);
-			// 
-			// dashboardTabControl
-			// 
-			this.dashboardTabControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.dashboardTabControl.HasUnsavedChanges = false;
-			this.dashboardTabControl.IsEditMode = false;
-			this.dashboardTabControl.Location = new System.Drawing.Point(2, 2);
-			this.dashboardTabControl.Name = "dashboardTabControl";
-			this.dashboardTabControl.Size = new System.Drawing.Size(914, 491);
-			this.dashboardTabControl.TabIndex = 3;
 			// 
 			// FormDashboardEditTab
 			// 

@@ -24,6 +24,10 @@ namespace OpenDentalGraph {
 			InitializeComponent();
 		}
 
+		public override int GetPanelHeight() {
+			return this.Height;
+		}
+
 		private void OnIncomeGraphInputsChanged(object sender,EventArgs e) {
 			OnBaseInputsChanged(sender,e);
 		}

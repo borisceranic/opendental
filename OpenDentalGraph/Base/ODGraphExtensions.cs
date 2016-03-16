@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -143,11 +144,52 @@ namespace OpenDentalGraph.Extensions {
 			//if(combo.SelectedItem!=null && (combo.SelectedItem is ComboItemIntValue)) {
 			//	selIdx=listItems.FindIndex(x => x.Value==((ComboItemIntValue)combo.SelectedItem).Value);
 			//}
+			BindingList<ComboItem<T>> binder=new BindingList<ComboItem<T>>(listItems);
+			combo.DataSource=binder;
 			combo.ValueMember="Value";
 			combo.DisplayMember="Display";
-			combo.DataSource=listItems;
+			//combo.DataSource=listItems;
 			if(selIdx>=0) {
 				combo.SelectedIndex=selIdx;
+			}
+		}
+
+		///<summary>Updates the display name of the passed in comboBox and EnumValue to the specified display name.</summary>
+		public static void UpdateDisplayName<T>(this ComboBox combo,T atValue,string newDisplayName) where T : struct, IConvertible {
+			combo.GetItem<T>(atValue).Display=newDisplayName;
+			((BindingList<ComboItem<T>>)combo.DataSource).ResetBindings();
+		}
+
+		///<summary>Removes the specified quantity type from the list bound to comboQuantityType.  Does nothing if the specified item doesn't exist.</summary>
+		public static void RemoveItem<T>(this ComboBox combo,T atValue) where T : struct, IConvertible {
+			((BindingList<ComboItem<T>>)combo.DataSource).Remove(combo.GetItem<T>(atValue));
+			((BindingList<ComboItem<T>>)combo.DataSource).ResetBindings();
+		}
+
+		///<summary>Adds a quantity type to the end of the list bound to comboQuantityType.  
+		///Checks to see if the item already exists first and does nothing if it does.</summary>
+		public static void AddItem<T>(this ComboBox combo,T displayValue,string displayName) where T : struct, IConvertible {
+			if(combo.GetItem<T>(displayValue)!=null) {
+				combo.UpdateDisplayName(displayValue,displayName);
+				return;
+			}
+			((BindingList<ComboItem<T>>)combo.DataSource).Add(new ComboItem<T>() { Display=displayName,Value=displayValue });
+			((BindingList<ComboItem<T>>)combo.DataSource).ResetBindings();
+		}
+
+		///<summary>Inserts a quantity type into the chart's comboQuantityType at the specified location.
+		///Checks to see if the item already exists first and does nothing if it does.  Calls AddItem() if the specified index is out of bounds.</summary>
+		public static void InsertItem<T>(this ComboBox combo,T displayValue,string displayName,int index) where T : struct, IConvertible {
+			if(combo.GetItem<T>(displayValue)!=null) {
+				combo.UpdateDisplayName(displayValue,displayName);
+				return;
+			}
+			try {
+				((BindingList<ComboItem<T>>)combo.DataSource).Insert(index,new ComboItem<T>() { Display=displayName,Value=displayValue });
+				((BindingList<ComboItem<T>>)combo.DataSource).ResetBindings();
+			}
+			catch {
+				combo.AddItem(displayValue,displayName);
 			}
 		}
 

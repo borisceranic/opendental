@@ -55,9 +55,9 @@
 			this.textChartTitle = new System.Windows.Forms.TextBox();
 			this.label8 = new System.Windows.Forms.Label();
 			this.splitContainerChart = new System.Windows.Forms.SplitContainer();
+			this.chartLegend1 = new OpenDentalGraph.Legend();
 			this.panelChart = new System.Windows.Forms.Panel();
 			this.pictureBoxLoading = new System.Windows.Forms.PictureBox();
-			this.chartLegend1 = new OpenDentalGraph.Legend();
 			((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
 			this.groupBoxBreakdown.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.numericTop)).BeginInit();
@@ -207,7 +207,7 @@
 			// radBreakdownNone
 			// 
 			this.radBreakdownNone.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.radBreakdownNone.Location = new System.Drawing.Point(-2, 68);
+			this.radBreakdownNone.Location = new System.Drawing.Point(4, 68);
 			this.radBreakdownNone.Name = "radBreakdownNone";
 			this.radBreakdownNone.Size = new System.Drawing.Size(53, 17);
 			this.radBreakdownNone.TabIndex = 2;
@@ -220,7 +220,7 @@
 			// 
 			this.comboBreakdownBy.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboBreakdownBy.FormattingEnabled = true;
-			this.comboBreakdownBy.Location = new System.Drawing.Point(128, 40);
+			this.comboBreakdownBy.Location = new System.Drawing.Point(129, 40);
 			this.comboBreakdownBy.Name = "comboBreakdownBy";
 			this.comboBreakdownBy.Size = new System.Drawing.Size(117, 21);
 			this.comboBreakdownBy.TabIndex = 3;
@@ -228,7 +228,7 @@
 			// 
 			// numericTop
 			// 
-			this.numericTop.Location = new System.Drawing.Point(66, 41);
+			this.numericTop.Location = new System.Drawing.Point(68, 41);
 			this.numericTop.Minimum = new decimal(new int[] {
             1,
             0,
@@ -247,7 +247,7 @@
 			// radBreakdownAll
 			// 
 			this.radBreakdownAll.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.radBreakdownAll.Location = new System.Drawing.Point(9, 20);
+			this.radBreakdownAll.Location = new System.Drawing.Point(15, 20);
 			this.radBreakdownAll.Name = "radBreakdownAll";
 			this.radBreakdownAll.Size = new System.Drawing.Size(42, 17);
 			this.radBreakdownAll.TabIndex = 0;
@@ -260,7 +260,7 @@
 			// 
 			this.radBreakdownTop.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.radBreakdownTop.Checked = true;
-			this.radBreakdownTop.Location = new System.Drawing.Point(6, 43);
+			this.radBreakdownTop.Location = new System.Drawing.Point(12, 43);
 			this.radBreakdownTop.Name = "radBreakdownTop";
 			this.radBreakdownTop.Size = new System.Drawing.Size(45, 17);
 			this.radBreakdownTop.TabIndex = 1;
@@ -451,6 +451,18 @@
 			this.splitContainerChart.SplitterWidth = 1;
 			this.splitContainerChart.TabIndex = 3;
 			// 
+			// chartLegend1
+			// 
+			this.chartLegend1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.chartLegend1.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.chartLegend1.LegendDock = OpenDentalGraph.Enumerations.LegendDockType.Left;
+			this.chartLegend1.Location = new System.Drawing.Point(0, 0);
+			this.chartLegend1.Margin = new System.Windows.Forms.Padding(0);
+			this.chartLegend1.Name = "chartLegend1";
+			this.chartLegend1.PaddingPx = 3F;
+			this.chartLegend1.Size = new System.Drawing.Size(110, 302);
+			this.chartLegend1.TabIndex = 1;
+			// 
 			// panelChart
 			// 
 			this.panelChart.Controls.Add(this.chart1);
@@ -471,18 +483,6 @@
 			this.pictureBoxLoading.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
 			this.pictureBoxLoading.TabIndex = 3;
 			this.pictureBoxLoading.TabStop = false;
-			// 
-			// chartLegend1
-			// 
-			this.chartLegend1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.chartLegend1.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.chartLegend1.LegendDock = OpenDentalGraph.Enumerations.LegendDockType.Left;
-			this.chartLegend1.Location = new System.Drawing.Point(0, 0);
-			this.chartLegend1.Margin = new System.Windows.Forms.Padding(0);
-			this.chartLegend1.Name = "chartLegend1";
-			this.chartLegend1.PaddingPx = 3F;
-			this.chartLegend1.Size = new System.Drawing.Size(110, 302);
-			this.chartLegend1.TabIndex = 1;
 			// 
 			// GraphQuantityOverTime
 			// 
