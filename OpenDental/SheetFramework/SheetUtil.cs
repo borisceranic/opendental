@@ -736,7 +736,15 @@ namespace OpenDental{
 				dRow["Tth"]                    =tpRow.Tth;
 				dRow["Surf"]                   =tpRow.Surf;
 				dRow["Code"]                   =tpRow.Code;
-				dRow["Sub"]                    =ProcedureCodes.IsValidCode(ProcedureCodes.GetProcCode(tpRow.Code).SubstitutionCode)?"X":"";
+				//If any patient insplan allows subst codes (if !plan.CodeSubstNone) and the code has a valid substitution code, then indicate the substitution.
+				//If it is not a valid substitution code or if none of the plans allow substitutions, leave the it blank.
+				string subCode=ProcedureCodes.GetProcCode(tpRow.Code).SubstitutionCode;
+				if(!ProcedureCodes.IsValidCode(subCode)) {
+					dRow["Sub"]="";
+				}
+				else { 
+					dRow["Sub"]=insPlanList.Any(x=>!x.CodeSubstNone)?"X":"";//confusing double degative here; If any plan allows substitution, show X
+				}
 				dRow["Description"]            =tpRow.Description;
 				if(PrefC.GetBool(PrefName.TreatPlanItemized) 
 					|| tpRow.Description==Lan.g("TableTP","Subtotal") || tpRow.Description==Lan.g("TableTP","Total")) 

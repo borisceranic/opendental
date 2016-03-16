@@ -1348,12 +1348,14 @@ namespace OpenDental{
 							}
 							break;
 						case "Sub":
+							//If any patient insplan allows subst codes (if !plan.CodeSubstNone) and the code has a valid substitution code, then indicate the substitution.
+							//If it is not a valid substitution code or if none of the plans allow substitutions, leave the cell blank.
 							string subCode=ProcedureCodes.GetProcCode(RowsMain[i].Code).SubstitutionCode;
-							if(ProcedureCodes.IsValidCode(subCode)) {
-								row.Cells.Add("X");
-							}
-							else {
+							if(!ProcedureCodes.IsValidCode(subCode)) {
 								row.Cells.Add("");
+							}
+							else { 
+								row.Cells.Add(InsPlanList.Any(x=>!x.CodeSubstNone)?"X":"");//confusing double degative here; If any plan allows substitution, show X
 							}
 							break;
 						case "Description":
@@ -1519,12 +1521,14 @@ namespace OpenDental{
 							}
 							break;
 						case "Sub":
+							//If any patient insplan allows subst codes (if !plan.CodeSubstNone) and the code has a valid substitution code, then indicate the substitution.
+							//If it is not a valid substitution code or if none of the plans allow substitutions, leave the cell blank.
 							string subCode=ProcedureCodes.GetProcCode(RowsMain[i].Code).SubstitutionCode;
-							if(ProcedureCodes.IsValidCode(subCode)) {
-								row.Cells.Add("X");
-							}
-							else {
+							if(!ProcedureCodes.IsValidCode(subCode)) {
 								row.Cells.Add("");
+							}
+							else { 
+								row.Cells.Add(InsPlanList.Any(x=>!x.CodeSubstNone)?"X":"");//confusing double degative here; If any plan allows substitution, show X
 							}
 							break;
 						case "Description":
