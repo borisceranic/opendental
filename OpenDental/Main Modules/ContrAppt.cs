@@ -3733,7 +3733,9 @@ namespace OpenDental {
 		///<summary>Does a hit test to determine if over an appointment.  Fills the bubble with data and then positions it.</summary>
 		private void InfoBubbleDraw(Point p) {
 			//remember where to draw for hover effect
-			if(PrefC.GetBool(PrefName.AppointmentBubblesDisabled)) {
+			if((comboView.SelectedIndex==0 && PrefC.GetBool(PrefName.AppointmentBubblesDisabled))
+					|| (comboView.SelectedIndex>0 && _listApptViews[comboView.SelectedIndex-1].IsApptBubblesDisabled))
+			{
 				infoBubble.Visible=false;
 				timerInfoBubble.Enabled=false;
 				return;

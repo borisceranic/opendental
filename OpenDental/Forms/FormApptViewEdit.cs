@@ -75,6 +75,8 @@ namespace OpenDental{
 		private TextBox textScrollTime;
 		private Label labelStartTime;
 		private CheckBox checkDynamicScroll;
+		private CheckBox checkApptBubblesDisabled;
+
 		///<summary>This is a list of all operatories available to add to this view based on AssignedClinicNum and the clinic the ops are assigned to.  If the clinics show feature is turned off (EasyNoClinics=true) or if the view is not assigned to a clinic, all unhidden ops will be available.  If an op is not assigned to a clinic, it will only be available to add to views also not assigned to a clinic.  If the view is assigned to a clinic, ops assigned to the same clinic will be available to add to the view.</summary>
 		private List<long> _listOpNums;
 
@@ -149,6 +151,7 @@ namespace OpenDental{
 			this.textScrollTime = new System.Windows.Forms.TextBox();
 			this.labelStartTime = new System.Windows.Forms.Label();
 			this.checkDynamicScroll = new System.Windows.Forms.CheckBox();
+			this.checkApptBubblesDisabled = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.SuspendLayout();
@@ -203,9 +206,9 @@ namespace OpenDental{
 			// 
 			// labelOps
 			// 
-			this.labelOps.Location = new System.Drawing.Point(32, 120);
+			this.labelOps.Location = new System.Drawing.Point(32, 123);
 			this.labelOps.Name = "labelOps";
-			this.labelOps.Size = new System.Drawing.Size(246, 18);
+			this.labelOps.Size = new System.Drawing.Size(182, 16);
 			this.labelOps.TabIndex = 39;
 			this.labelOps.Text = "View Operatories";
 			this.labelOps.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
@@ -237,7 +240,7 @@ namespace OpenDental{
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(5, 14);
+			this.label3.Location = new System.Drawing.Point(7, 4);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(217, 20);
 			this.label3.TabIndex = 43;
@@ -246,7 +249,7 @@ namespace OpenDental{
 			// 
 			// textDescription
 			// 
-			this.textDescription.Location = new System.Drawing.Point(222, 14);
+			this.textDescription.Location = new System.Drawing.Point(224, 4);
 			this.textDescription.Name = "textDescription";
 			this.textDescription.Size = new System.Drawing.Size(160, 20);
 			this.textDescription.TabIndex = 44;
@@ -315,16 +318,16 @@ namespace OpenDental{
 			// 
 			// label6
 			// 
-			this.label6.Location = new System.Drawing.Point(5, 36);
+			this.label6.Location = new System.Drawing.Point(7, 25);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(217, 20);
 			this.label6.TabIndex = 54;
-			this.label6.Text = "Rows Per Time Increment (usually 1)";
+			this.label6.Text = "Rows per time increment (usually 1)";
 			this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textRowsPerIncr
 			// 
-			this.textRowsPerIncr.Location = new System.Drawing.Point(222, 36);
+			this.textRowsPerIncr.Location = new System.Drawing.Point(224, 25);
 			this.textRowsPerIncr.Name = "textRowsPerIncr";
 			this.textRowsPerIncr.Size = new System.Drawing.Size(56, 20);
 			this.textRowsPerIncr.TabIndex = 55;
@@ -334,11 +337,11 @@ namespace OpenDental{
 			// 
 			this.checkOnlyScheduledProvs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.checkOnlyScheduledProvs.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkOnlyScheduledProvs.Location = new System.Drawing.Point(6, 15);
+			this.checkOnlyScheduledProvs.Location = new System.Drawing.Point(11, 17);
 			this.checkOnlyScheduledProvs.Name = "checkOnlyScheduledProvs";
-			this.checkOnlyScheduledProvs.Size = new System.Drawing.Size(274, 17);
+			this.checkOnlyScheduledProvs.Size = new System.Drawing.Size(238, 20);
 			this.checkOnlyScheduledProvs.TabIndex = 56;
-			this.checkOnlyScheduledProvs.Text = "Only show operatories for scheduled providers";
+			this.checkOnlyScheduledProvs.Text = "Only show ops for scheduled provs";
 			this.checkOnlyScheduledProvs.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkOnlyScheduledProvs.UseVisualStyleBackColor = true;
 			this.checkOnlyScheduledProvs.Click += new System.EventHandler(this.checkOnlyScheduledProvs_Click);
@@ -346,7 +349,7 @@ namespace OpenDental{
 			// textBeforeTime
 			// 
 			this.textBeforeTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textBeforeTime.Location = new System.Drawing.Point(265, 33);
+			this.textBeforeTime.Location = new System.Drawing.Point(234, 38);
 			this.textBeforeTime.Name = "textBeforeTime";
 			this.textBeforeTime.Size = new System.Drawing.Size(56, 20);
 			this.textBeforeTime.TabIndex = 57;
@@ -360,7 +363,7 @@ namespace OpenDental{
 			this.groupBox1.Controls.Add(this.checkOnlyScheduledProvs);
 			this.groupBox1.Location = new System.Drawing.Point(430, 12);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(397, 86);
+			this.groupBox1.Size = new System.Drawing.Size(397, 93);
 			this.groupBox1.TabIndex = 58;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Display Filter";
@@ -368,9 +371,9 @@ namespace OpenDental{
 			// labelAfterTime
 			// 
 			this.labelAfterTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.labelAfterTime.Location = new System.Drawing.Point(77, 55);
+			this.labelAfterTime.Location = new System.Drawing.Point(11, 62);
 			this.labelAfterTime.Name = "labelAfterTime";
-			this.labelAfterTime.Size = new System.Drawing.Size(187, 17);
+			this.labelAfterTime.Size = new System.Drawing.Size(222, 17);
 			this.labelAfterTime.TabIndex = 60;
 			this.labelAfterTime.Text = "Only if after time";
 			this.labelAfterTime.TextAlign = System.Drawing.ContentAlignment.BottomRight;
@@ -378,7 +381,7 @@ namespace OpenDental{
 			// textAfterTime
 			// 
 			this.textAfterTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.textAfterTime.Location = new System.Drawing.Point(265, 55);
+			this.textAfterTime.Location = new System.Drawing.Point(234, 62);
 			this.textAfterTime.Name = "textAfterTime";
 			this.textAfterTime.Size = new System.Drawing.Size(56, 20);
 			this.textAfterTime.TabIndex = 59;
@@ -386,9 +389,9 @@ namespace OpenDental{
 			// labelBeforeTime
 			// 
 			this.labelBeforeTime.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.labelBeforeTime.Location = new System.Drawing.Point(77, 33);
+			this.labelBeforeTime.Location = new System.Drawing.Point(11, 38);
 			this.labelBeforeTime.Name = "labelBeforeTime";
-			this.labelBeforeTime.Size = new System.Drawing.Size(187, 17);
+			this.labelBeforeTime.Size = new System.Drawing.Size(222, 17);
 			this.labelBeforeTime.TabIndex = 58;
 			this.labelBeforeTime.Text = "Only if before time";
 			this.labelBeforeTime.TextAlign = System.Drawing.ContentAlignment.BottomRight;
@@ -448,6 +451,7 @@ namespace OpenDental{
 			// 
 			// gridLR
 			// 
+			this.gridLR.HasAddButton = false;
 			this.gridLR.HasMultilineHeaders = false;
 			this.gridLR.HScrollVisible = false;
 			this.gridLR.Location = new System.Drawing.Point(192, 317);
@@ -462,6 +466,7 @@ namespace OpenDental{
 			// 
 			// gridUR
 			// 
+			this.gridUR.HasAddButton = false;
 			this.gridUR.HasMultilineHeaders = false;
 			this.gridUR.HScrollVisible = false;
 			this.gridUR.Location = new System.Drawing.Point(192, 18);
@@ -476,6 +481,7 @@ namespace OpenDental{
 			// 
 			// gridMain
 			// 
+			this.gridMain.HasAddButton = false;
 			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(11, 18);
@@ -500,6 +506,7 @@ namespace OpenDental{
 			// 
 			// gridAvailable
 			// 
+			this.gridAvailable.HasAddButton = false;
 			this.gridAvailable.HasMultilineHeaders = false;
 			this.gridAvailable.HScrollVisible = false;
 			this.gridAvailable.Location = new System.Drawing.Point(207, 140);
@@ -513,6 +520,7 @@ namespace OpenDental{
 			// 
 			// gridApptFieldDefs
 			// 
+			this.gridApptFieldDefs.HasAddButton = false;
 			this.gridApptFieldDefs.HasMultilineHeaders = false;
 			this.gridApptFieldDefs.HScrollVisible = false;
 			this.gridApptFieldDefs.Location = new System.Drawing.Point(207, 398);
@@ -526,6 +534,7 @@ namespace OpenDental{
 			// 
 			// gridPatFieldDefs
 			// 
+			this.gridPatFieldDefs.HasAddButton = false;
 			this.gridPatFieldDefs.HasMultilineHeaders = false;
 			this.gridPatFieldDefs.HScrollVisible = false;
 			this.gridPatFieldDefs.Location = new System.Drawing.Point(207, 507);
@@ -540,7 +549,7 @@ namespace OpenDental{
 			// comboClinic
 			// 
 			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboClinic.Location = new System.Drawing.Point(222, 97);
+			this.comboClinic.Location = new System.Drawing.Point(222, 104);
 			this.comboClinic.MaxDropDownItems = 30;
 			this.comboClinic.Name = "comboClinic";
 			this.comboClinic.Size = new System.Drawing.Size(160, 21);
@@ -549,7 +558,7 @@ namespace OpenDental{
 			// 
 			// labelClinic
 			// 
-			this.labelClinic.Location = new System.Drawing.Point(5, 97);
+			this.labelClinic.Location = new System.Drawing.Point(5, 104);
 			this.labelClinic.Name = "labelClinic";
 			this.labelClinic.Size = new System.Drawing.Size(217, 20);
 			this.labelClinic.TabIndex = 132;
@@ -558,38 +567,50 @@ namespace OpenDental{
 			// 
 			// textScrollTime
 			// 
-			this.textScrollTime.Location = new System.Drawing.Point(222, 75);
+			this.textScrollTime.Location = new System.Drawing.Point(224, 46);
 			this.textScrollTime.Name = "textScrollTime";
-			this.textScrollTime.Size = new System.Drawing.Size(80, 20);
+			this.textScrollTime.Size = new System.Drawing.Size(56, 20);
 			this.textScrollTime.TabIndex = 134;
 			// 
 			// labelStartTime
 			// 
-			this.labelStartTime.Location = new System.Drawing.Point(5, 75);
+			this.labelStartTime.Location = new System.Drawing.Point(7, 46);
 			this.labelStartTime.Name = "labelStartTime";
 			this.labelStartTime.Size = new System.Drawing.Size(217, 20);
 			this.labelStartTime.TabIndex = 135;
-			this.labelStartTime.Text = "View Start Time on Load";
+			this.labelStartTime.Text = "View start time on load";
 			this.labelStartTime.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// checkDynamicScroll
 			// 
 			this.checkDynamicScroll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.checkDynamicScroll.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkDynamicScroll.Location = new System.Drawing.Point(6, 58);
+			this.checkDynamicScroll.Location = new System.Drawing.Point(8, 69);
 			this.checkDynamicScroll.Name = "checkDynamicScroll";
 			this.checkDynamicScroll.Size = new System.Drawing.Size(230, 17);
 			this.checkDynamicScroll.TabIndex = 61;
-			this.checkDynamicScroll.Text = "Dynamic start time based on schedule\r\n\r\n";
+			this.checkDynamicScroll.Text = "Dynamic start time based on schedule";
 			this.checkDynamicScroll.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkDynamicScroll.UseVisualStyleBackColor = true;
+			// 
+			// checkApptBubblesDisabled
+			// 
+			this.checkApptBubblesDisabled.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.checkApptBubblesDisabled.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkApptBubblesDisabled.Location = new System.Drawing.Point(8, 86);
+			this.checkApptBubblesDisabled.Name = "checkApptBubblesDisabled";
+			this.checkApptBubblesDisabled.Size = new System.Drawing.Size(230, 17);
+			this.checkApptBubblesDisabled.TabIndex = 136;
+			this.checkApptBubblesDisabled.Text = "Disable appointment bubbles";
+			this.checkApptBubblesDisabled.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkApptBubblesDisabled.UseVisualStyleBackColor = true;
 			// 
 			// FormApptViewEdit
 			// 
 			this.AcceptButton = this.butOK;
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
 			this.ClientSize = new System.Drawing.Size(852, 695);
+			this.Controls.Add(this.checkApptBubblesDisabled);
 			this.Controls.Add(this.checkDynamicScroll);
 			this.Controls.Add(this.labelStartTime);
 			this.Controls.Add(this.textScrollTime);
@@ -618,7 +639,6 @@ namespace OpenDental{
 			this.MinimizeBox = false;
 			this.Name = "FormApptViewEdit";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Appointment View Edit";
 			this.Closing += new System.ComponentModel.CancelEventHandler(this.FormApptViewEdit_Closing);
 			this.Load += new System.EventHandler(this.FormApptViewEdit_Load);
@@ -730,6 +750,7 @@ namespace OpenDental{
 			}
 			checkDynamicScroll.Checked=ApptViewCur.IsScrollStartDynamic;
 			textScrollTime.Text=ApptViewCur.ApptTimeScrollStart.ToStringHmm();
+			checkApptBubblesDisabled.Checked=ApptViewCur.IsApptBubblesDisabled;
 			FillElements();
 		}
 
@@ -1343,6 +1364,7 @@ namespace OpenDental{
 			ApptViewCur.OnlySchedAfterTime=timeAfter.TimeOfDay;
 			ApptViewCur.IsScrollStartDynamic=checkDynamicScroll.Checked;
 			ApptViewCur.ApptTimeScrollStart=timeScroll.TimeOfDay;
+			ApptViewCur.IsApptBubblesDisabled=checkApptBubblesDisabled.Checked;
 			ApptViewCur.ClinicNum=0;//Default is all clinics
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				//_listUserClinicNums will contain only a 0 if the clinics show feature is disabled.

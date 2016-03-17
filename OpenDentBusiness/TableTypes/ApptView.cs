@@ -35,6 +35,8 @@ namespace OpenDentBusiness{
 		public TimeSpan ApptTimeScrollStart;
 		///<summary>If set to true, the appointment view scrolls to the first scheduled operatory start time or the first scheduled appointment.</summary>
 		public bool IsScrollStartDynamic;
+		///<summary>If set to true, the appointment view will not show appointment bubbles.</summary>
+		public bool IsApptBubblesDisabled;
 
 		///<summary>Returns a copy of this ApptView.</summary>
 		public ApptView Copy() {

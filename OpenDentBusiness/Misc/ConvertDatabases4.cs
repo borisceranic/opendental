@@ -157,6 +157,22 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX schedule_ClinicNum ON schedule (ClinicNum)";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE apptview ADD IsApptBubblesDisabled tinyint NOT NULL";
+					Db.NonQ(command);
+					command="UPDATE apptview SET IsApptBubblesDisabled=(SELECT ValueString FROM preference WHERE PrefName='AppointmentBubblesDisabled')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE apptview ADD IsApptBubblesDisabled number(3)";
+					Db.NonQ(command);
+					command="UPDATE apptview SET IsApptBubblesDisabled = 0 WHERE IsApptBubblesDisabled IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE apptview MODIFY IsApptBubblesDisabled NOT NULL";
+					Db.NonQ(command);
+					command="UPDATE apptview SET IsApptBubblesDisabled=(SELECT ValueString FROM preference WHERE PrefName='AppointmentBubblesDisabled')";
+					Db.NonQ(command);
+				}
 
 				command="UPDATE preference SET ValueString = '16.2.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);

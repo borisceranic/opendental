@@ -46,18 +46,19 @@ namespace OpenDentBusiness.Crud{
 			ApptView apptView;
 			foreach(DataRow row in table.Rows) {
 				apptView=new ApptView();
-				apptView.ApptViewNum         = PIn.Long  (row["ApptViewNum"].ToString());
-				apptView.Description         = PIn.String(row["Description"].ToString());
-				apptView.ItemOrder           = PIn.Int   (row["ItemOrder"].ToString());
-				apptView.RowsPerIncr         = PIn.Byte  (row["RowsPerIncr"].ToString());
-				apptView.OnlyScheduledProvs  = PIn.Bool  (row["OnlyScheduledProvs"].ToString());
-				apptView.OnlySchedBeforeTime = PIn.Time(row["OnlySchedBeforeTime"].ToString());
-				apptView.OnlySchedAfterTime  = PIn.Time(row["OnlySchedAfterTime"].ToString());
-				apptView.StackBehavUR        = (OpenDentBusiness.ApptViewStackBehavior)PIn.Int(row["StackBehavUR"].ToString());
-				apptView.StackBehavLR        = (OpenDentBusiness.ApptViewStackBehavior)PIn.Int(row["StackBehavLR"].ToString());
-				apptView.ClinicNum           = PIn.Long  (row["ClinicNum"].ToString());
-				apptView.ApptTimeScrollStart = PIn.Time(row["ApptTimeScrollStart"].ToString());
-				apptView.IsScrollStartDynamic= PIn.Bool  (row["IsScrollStartDynamic"].ToString());
+				apptView.ApptViewNum          = PIn.Long  (row["ApptViewNum"].ToString());
+				apptView.Description          = PIn.String(row["Description"].ToString());
+				apptView.ItemOrder            = PIn.Int   (row["ItemOrder"].ToString());
+				apptView.RowsPerIncr          = PIn.Byte  (row["RowsPerIncr"].ToString());
+				apptView.OnlyScheduledProvs   = PIn.Bool  (row["OnlyScheduledProvs"].ToString());
+				apptView.OnlySchedBeforeTime  = PIn.Time(row["OnlySchedBeforeTime"].ToString());
+				apptView.OnlySchedAfterTime   = PIn.Time(row["OnlySchedAfterTime"].ToString());
+				apptView.StackBehavUR         = (OpenDentBusiness.ApptViewStackBehavior)PIn.Int(row["StackBehavUR"].ToString());
+				apptView.StackBehavLR         = (OpenDentBusiness.ApptViewStackBehavior)PIn.Int(row["StackBehavLR"].ToString());
+				apptView.ClinicNum            = PIn.Long  (row["ClinicNum"].ToString());
+				apptView.ApptTimeScrollStart  = PIn.Time(row["ApptTimeScrollStart"].ToString());
+				apptView.IsScrollStartDynamic = PIn.Bool  (row["IsScrollStartDynamic"].ToString());
+				apptView.IsApptBubblesDisabled= PIn.Bool  (row["IsApptBubblesDisabled"].ToString());
 				retVal.Add(apptView);
 			}
 			return retVal;
@@ -81,6 +82,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("ClinicNum");
 			table.Columns.Add("ApptTimeScrollStart");
 			table.Columns.Add("IsScrollStartDynamic");
+			table.Columns.Add("IsApptBubblesDisabled");
 			foreach(ApptView apptView in listApptViews) {
 				table.Rows.Add(new object[] {
 					POut.Long  (apptView.ApptViewNum),
@@ -95,6 +97,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (apptView.ClinicNum),
 					POut.Time  (apptView.ApptTimeScrollStart),
 					POut.Bool  (apptView.IsScrollStartDynamic),
+					POut.Bool  (apptView.IsApptBubblesDisabled),
 				});
 			}
 			return table;
@@ -135,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ApptViewNum,";
 			}
-			command+="Description,ItemOrder,RowsPerIncr,OnlyScheduledProvs,OnlySchedBeforeTime,OnlySchedAfterTime,StackBehavUR,StackBehavLR,ClinicNum,ApptTimeScrollStart,IsScrollStartDynamic) VALUES(";
+			command+="Description,ItemOrder,RowsPerIncr,OnlyScheduledProvs,OnlySchedBeforeTime,OnlySchedAfterTime,StackBehavUR,StackBehavLR,ClinicNum,ApptTimeScrollStart,IsScrollStartDynamic,IsApptBubblesDisabled) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(apptView.ApptViewNum)+",";
 			}
@@ -150,7 +153,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)apptView.StackBehavLR)+","
 				+    POut.Long  (apptView.ClinicNum)+","
 				+    POut.Time  (apptView.ApptTimeScrollStart)+","
-				+    POut.Bool  (apptView.IsScrollStartDynamic)+")";
+				+    POut.Bool  (apptView.IsScrollStartDynamic)+","
+				+    POut.Bool  (apptView.IsApptBubblesDisabled)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -183,7 +187,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ApptViewNum,";
 			}
-			command+="Description,ItemOrder,RowsPerIncr,OnlyScheduledProvs,OnlySchedBeforeTime,OnlySchedAfterTime,StackBehavUR,StackBehavLR,ClinicNum,ApptTimeScrollStart,IsScrollStartDynamic) VALUES(";
+			command+="Description,ItemOrder,RowsPerIncr,OnlyScheduledProvs,OnlySchedBeforeTime,OnlySchedAfterTime,StackBehavUR,StackBehavLR,ClinicNum,ApptTimeScrollStart,IsScrollStartDynamic,IsApptBubblesDisabled) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(apptView.ApptViewNum)+",";
 			}
@@ -198,7 +202,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)apptView.StackBehavLR)+","
 				+    POut.Long  (apptView.ClinicNum)+","
 				+    POut.Time  (apptView.ApptTimeScrollStart)+","
-				+    POut.Bool  (apptView.IsScrollStartDynamic)+")";
+				+    POut.Bool  (apptView.IsScrollStartDynamic)+","
+				+    POut.Bool  (apptView.IsApptBubblesDisabled)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -211,17 +216,18 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one ApptView in the database.</summary>
 		public static void Update(ApptView apptView){
 			string command="UPDATE apptview SET "
-				+"Description         = '"+POut.String(apptView.Description)+"', "
-				+"ItemOrder           =  "+POut.Int   (apptView.ItemOrder)+", "
-				+"RowsPerIncr         =  "+POut.Byte  (apptView.RowsPerIncr)+", "
-				+"OnlyScheduledProvs  =  "+POut.Bool  (apptView.OnlyScheduledProvs)+", "
-				+"OnlySchedBeforeTime =  "+POut.Time  (apptView.OnlySchedBeforeTime)+", "
-				+"OnlySchedAfterTime  =  "+POut.Time  (apptView.OnlySchedAfterTime)+", "
-				+"StackBehavUR        =  "+POut.Int   ((int)apptView.StackBehavUR)+", "
-				+"StackBehavLR        =  "+POut.Int   ((int)apptView.StackBehavLR)+", "
-				+"ClinicNum           =  "+POut.Long  (apptView.ClinicNum)+", "
-				+"ApptTimeScrollStart =  "+POut.Time  (apptView.ApptTimeScrollStart)+", "
-				+"IsScrollStartDynamic=  "+POut.Bool  (apptView.IsScrollStartDynamic)+" "
+				+"Description          = '"+POut.String(apptView.Description)+"', "
+				+"ItemOrder            =  "+POut.Int   (apptView.ItemOrder)+", "
+				+"RowsPerIncr          =  "+POut.Byte  (apptView.RowsPerIncr)+", "
+				+"OnlyScheduledProvs   =  "+POut.Bool  (apptView.OnlyScheduledProvs)+", "
+				+"OnlySchedBeforeTime  =  "+POut.Time  (apptView.OnlySchedBeforeTime)+", "
+				+"OnlySchedAfterTime   =  "+POut.Time  (apptView.OnlySchedAfterTime)+", "
+				+"StackBehavUR         =  "+POut.Int   ((int)apptView.StackBehavUR)+", "
+				+"StackBehavLR         =  "+POut.Int   ((int)apptView.StackBehavLR)+", "
+				+"ClinicNum            =  "+POut.Long  (apptView.ClinicNum)+", "
+				+"ApptTimeScrollStart  =  "+POut.Time  (apptView.ApptTimeScrollStart)+", "
+				+"IsScrollStartDynamic =  "+POut.Bool  (apptView.IsScrollStartDynamic)+", "
+				+"IsApptBubblesDisabled=  "+POut.Bool  (apptView.IsApptBubblesDisabled)+" "
 				+"WHERE ApptViewNum = "+POut.Long(apptView.ApptViewNum);
 			Db.NonQ(command);
 		}
@@ -273,6 +279,10 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="IsScrollStartDynamic = "+POut.Bool(apptView.IsScrollStartDynamic)+"";
 			}
+			if(apptView.IsApptBubblesDisabled != oldApptView.IsApptBubblesDisabled) {
+				if(command!=""){ command+=",";}
+				command+="IsApptBubblesDisabled = "+POut.Bool(apptView.IsApptBubblesDisabled)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -316,6 +326,9 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			if(apptView.IsScrollStartDynamic != oldApptView.IsScrollStartDynamic) {
+				return true;
+			}
+			if(apptView.IsApptBubblesDisabled != oldApptView.IsApptBubblesDisabled) {
 				return true;
 			}
 			return false;
