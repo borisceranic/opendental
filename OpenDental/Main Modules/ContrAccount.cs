@@ -3890,7 +3890,12 @@ namespace OpenDental {
 
 		private void menuItemInvoice_Click(object sender,EventArgs e) {
 			DataTable table=DataSetMain.Tables["account"];
-			if(gridAccount.SelectedIndices.Length==0) {
+			Dictionary<string,List<long>> dictSuperFamItems=new Dictionary<string,List<long>>();
+			Patient guarantor=Patients.GetPat(PatCur.Guarantor);
+			Patient superHead=Patients.GetPat(PatCur.SuperFamily);
+			if(gridAccount.SelectedIndices.Length==0 
+				&& (!PrefC.GetBool(PrefName.ShowFeatureSuperfamilies) || !guarantor.HasSuperBilling || !superHead.HasSuperBilling)) 
+			{
 				//autoselect procedures and adjustments
 				for(int i=0;i<table.Rows.Count;i++) {//loop through every line showing on screen
 					if(table.Rows[i]["ProcNum"].ToString()=="0" && table.Rows[i]["AdjNum"].ToString()=="0") {
@@ -3923,6 +3928,16 @@ namespace OpenDental {
 					MsgBox.Show(this,"Please select procedures or adjustments first.");
 					return;
 				}
+			}
+			else if(gridAccount.SelectedIndices.Length==0 
+				&& (PrefC.GetBool(PrefName.ShowFeatureSuperfamilies) && guarantor.HasSuperBilling && superHead.HasSuperBilling)) 
+			{
+				//No selections and superbilling is enabled for this family.  Show a window to select and attach procs to this statement for the superfamily.
+				FormInvoiceItemSelect FormIIS=new FormInvoiceItemSelect(PatCur.SuperFamily);
+				if(FormIIS.ShowDialog()==DialogResult.Cancel) {
+					return;
+				}
+				dictSuperFamItems=FormIIS.DictSelectedItems;
 			}
 			for(int i=0;i<gridAccount.SelectedIndices.Length;i++) {
 				if(table.Rows[gridAccount.SelectedIndices[i]]["ProcNum"].ToString()=="0" 
@@ -3974,14 +3989,11 @@ namespace OpenDental {
 			stmt.DateRangeTo=DateTimeOD.Today;
 			stmt.Note=PrefC.GetString(PrefName.BillingDefaultsInvoiceNote);
 			stmt.NoteBold="";
-			Patient guarantor = null;
-			if(PatCur!=null) {
-				guarantor = Patients.GetPat(PatCur.Guarantor);
-			}
-			if(guarantor!=null) {
-				stmt.IsBalValid=true;
-				stmt.BalTotal=guarantor.BalTotal;
-				stmt.InsEst=guarantor.InsEst;
+			stmt.IsBalValid=true;
+			stmt.BalTotal=guarantor.BalTotal;
+			stmt.InsEst=guarantor.InsEst;
+			if(dictSuperFamItems.Count > 0) {
+				stmt.SuperFamily=PatCur.SuperFamily;
 			}
 			Statements.Insert(stmt);
 			stmt.IsNew=true;
@@ -3997,6 +4009,23 @@ namespace OpenDental {
 					Adjustment adj=Adjustments.GetOne(PIn.Long(table.Rows[gridAccount.SelectedIndices[i]]["AdjNum"].ToString()));
 					adj.StatementNum=stmt.StatementNum;
 					Adjustments.Update(adj);
+				}
+			}
+			foreach(KeyValuePair<string,List<long>> entry in dictSuperFamItems) {//Should really only have two keys, Proc and Adj
+				if(entry.Key=="Proc") {//Procedure key, loop through all procedures
+					foreach(long priKey in entry.Value) {
+						Procedure newProc=Procedures.GetOneProc(priKey,false);
+						Procedure oldProc=newProc.Copy();
+						newProc.StatementNum=stmt.StatementNum;
+						Procedures.Update(newProc,oldProc);
+					}
+				}
+				else {//Adjustment key, loop through all adjustments
+					foreach(long priKey in entry.Value) {
+						Adjustment adj=Adjustments.GetOne(priKey);
+						adj.StatementNum=stmt.StatementNum;
+						Adjustments.Update(adj);
+					}
 				}
 			}
 			//All printing and emailing will be done from within the form:

@@ -409,6 +409,12 @@
     <Compile Include="Forms Reports\FormRpBrokenAppointments.Designer.cs">
       <DependentUpon>FormRpBrokenAppointments.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormInvoiceItemSelect.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormInvoiceItemSelect.designer.cs">
+      <DependentUpon>FormInvoiceItemSelect.cs</DependentUpon>
+    </Compile>
     <Compile Include="InternalTools\Job Manager\FormEmailJobTemplateEdit.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -4049,6 +4055,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms Reports\FormRpBrokenAppointments.resx">
       <DependentUpon>FormRpBrokenAppointments.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormInvoiceItemSelect.resx">
+      <DependentUpon>FormInvoiceItemSelect.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="InternalTools\Job Manager\FormEmailJobTemplateEdit.resx">
       <DependentUpon>FormEmailJobTemplateEdit.cs</DependentUpon>

@@ -2556,6 +2556,32 @@ FROM insplan";
 			return PIn.Int(Db.GetCount(command));
 		}
 
+		///<summary>Gets all procedures and adjustments for a superfamily, ordered by datetime.</summary>
+		public static DataTable GetSuperFamProcAdjusts(long superFamily) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),superFamily);
+			}
+			List<long> listPatNums=Patients.GetBySuperFamily(superFamily).Select(x => x.PatNum).ToList();
+			string command="SELECT * FROM ("
+				+"SELECT procedurelog.ProcNum AS 'PriKey', procedurelog.ProcDate AS 'Date', procedurelog.PatNum AS 'PatNum', procedurelog.ProvNum AS 'Prov' "
+					+",procedurelog.ProcFee AS 'Amount', procedurelog.CodeNum AS 'Code', procedurelog.ToothNum AS 'Tooth', '' AS 'AdjType'"
+					+", "+DbHelper.Concat("patient.LName","', '","patient.FName")+" AS 'PatName'"
+				+"FROM procedurelog "
+				+"INNER JOIN patient ON procedurelog.PatNum=patient.PatNum "
+				+"WHERE procedurelog.PatNum IN ("+string.Join(",",listPatNums)+") "
+				+"AND StatementNum=0 " 
+			+"UNION ALL "
+				+"SELECT adjustment.AdjNum AS 'PriKey', adjustment.AdjDate AS 'Date', adjustment.PatNum AS 'PatNum', adjustment.ProvNum AS 'Prov'"
+					+", adjustment.AdjAmt AS 'Amount', '' AS 'Code', '' AS 'Tooth', adjustment.AdjType AS 'AdjType'"
+					+", "+DbHelper.Concat("patient.LName","', '","patient.FName")+" AS 'PatName'"
+				+"FROM adjustment "
+				+"INNER JOIN patient ON adjustment.PatNum=patient.PatNum "
+				+"WHERE adjustment.PatNum IN ("+string.Join(",",listPatNums)+") "
+				+"AND StatementNum=0 "
+			+") procadj ORDER BY procadj.Date DESC";
+			return Db.GetTable(command);
+		}
+
 		///<summary>Returns a list of patients belonging to the SuperFamily</summary>
 		public static List<Patient> GetBySuperFamily(long SuperFamilyNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

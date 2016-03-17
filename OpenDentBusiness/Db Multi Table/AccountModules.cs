@@ -544,9 +544,16 @@ namespace OpenDentBusiness {
 				return Meth.GetDS(MethodBase.GetCurrentMethod(),superFam,fromDate,toDate,statementNum,showProcBreakdown,showPayNotes,isInvoice,showAdjNotes
 					,isForStatementPrinting);
 			}
-			List<Patient> listFamilyGuarantors=Patients.GetSuperFamilyGuarantors(superFam);
 			DataSet retVal=new DataSet();
-			foreach(Patient guarantor in listFamilyGuarantors) {
+			List<Patient> listSuperFamilyGuars=new List<Patient>();
+			if(isInvoice) {
+				//Just add the super family head to the list of patients to include for the super statement.
+				listSuperFamilyGuars.Add(Patients.GetPat(superFam));
+			}
+			else {//Regular super family statement.
+				listSuperFamilyGuars=Patients.GetSuperFamilyGuarantors(superFam);
+			}			
+			foreach(Patient guarantor in listSuperFamilyGuars) {
 				if(!guarantor.HasSuperBilling) {
 					continue;
 				}
@@ -562,7 +569,25 @@ namespace OpenDentBusiness {
 			}
 			//Sort rows in table by cloning table, sorting rows, then re-adding table to DataSet.
 			List<DataRow> listRows=retVal.Tables["account"].Rows.Cast<DataRow>().ToList();
+			//Sort the data rows first by PatNum then by date.
+			//This will potentially change the order of rows to where the balance column does not make sense.
+			//Recalculate balances after the sort runs.
 			listRows.Sort(RowComparer);
+			decimal bal=0;
+			foreach(DataRow row in listRows) {
+				bal+=(decimal)row["chargesDouble"];
+				bal-=(decimal)row["creditsDouble"];
+				row["balanceDouble"]=bal;
+				if(row["ClaimPaymentNum"].ToString()=="0" && row["ClaimNum"].ToString()!="0"){//claims
+					row["balance"]="";
+				}
+				else if(row["StatementNum"].ToString()!="0"){
+
+				}
+				else{
+					row["balance"]=bal.ToString("n");
+				}
+			}
 			DataTable accountSorted=retVal.Tables["account"].Clone();//Easy way to copy the columns.
 			listRows.ForEach(x=>accountSorted.Rows.Add(x.ItemArray));
 			retVal.Tables.Remove(retVal.Tables["account"]);
