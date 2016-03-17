@@ -16,6 +16,7 @@ namespace OpenDental {
 		private int _colPatCountIndex;
 		private int _colPlanCountIndex;
 		private int _colErrorIndex;
+		private X12object _x834selected=null;
 		public FormEtrans834Preview FormE834P=null;
 
 		public FormEtrans834Import() {
@@ -105,6 +106,8 @@ namespace OpenDental {
 			ShowStatus("Loading...");
 			Application.DoEvents();
 			const int previewLimitCount=40;
+			int selectedIndex=-1;
+			_x834selected=null;
 			for(int i=0;i<gridInsPlanFiles.Rows.Count;i++) {
 				UI.ODGridRow row=gridInsPlanFiles.Rows[i];
 				if(i < previewLimitCount) {
@@ -113,32 +116,27 @@ namespace OpenDental {
 				string filePath=(string)row.Tag;
 				ShowStatus(Lan.g(this,"Parsing file")+" "+Path.GetFileName(filePath));
 				string messageText=File.ReadAllText(filePath);
-				if(!X12object.IsX12(messageText)) {
+				X12object xobj=X12object.ToX12object(messageText);
+				if(xobj==null) {
 					row.Cells[_colErrorIndex].Text="Is not in X12 format.";
 					continue;
 				}
 				try {
-					X12object xobj=new X12object(messageText);
 					if(!X834.Is834(xobj)) {
 						row.Cells[_colErrorIndex].Text="Is in X12 format, but is not an 834 document.";
 						continue;
 					}
-					X834 x834=new X834(messageText);
-					x834.FilePath=filePath;
-					row.Tag=x834;
-					row.Cells[_colDateIndex].Text=x834.DateInterchange.ToString();
-					int memberCount=0;
-					int planCount=0;
-					for(int j=0;j<x834.ListTransactions.Count;j++) {
-						Hx834_Tran tran=x834.ListTransactions[j];
-						memberCount+=tran.ListMembers.Count;
-						for(int k=0;k<tran.ListMembers.Count;k++) {
-							planCount+=tran.ListMembers[k].ListHealthCoverage.Count;
-						}
-					}
+					xobj.FilePath=filePath;
+					row.Cells[_colDateIndex].Text=xobj.DateInterchange.ToString();
+					int memberCount=xobj.GetSegmentCountById("INS");
+					int planCount=xobj.GetSegmentCountById("HD");
 					row.Cells[_colPatCountIndex].Text=memberCount.ToString();
 					row.Cells[_colPlanCountIndex].Text=planCount.ToString();
 					row.Cells[_colErrorIndex].Text="";
+					if(_x834selected==null || _x834selected.DateInterchange > xobj.DateInterchange) {
+						selectedIndex=i;
+						_x834selected=xobj;
+					}
 				}
 				catch(ApplicationException aex) {
 					row.Cells[_colErrorIndex].Text=aex.Message;
@@ -151,8 +149,10 @@ namespace OpenDental {
 					Application.DoEvents();
 				}
 			}
+			//These 834 files are large and take a lot of memory when parsed into objects.
+			//Run garbage collection to prevent OD from taking up too much memory at one time.
+			GC.Collect();
 			gridInsPlanFiles.BeginUpdate();
-			int selectedIndex=GetNext834Index();
 			if(selectedIndex >= 0) {
 				gridInsPlanFiles.Rows[selectedIndex].ColorBackG=Color.LightYellow;
 			}
@@ -160,21 +160,6 @@ namespace OpenDental {
 			ShowStatus("");
 			Cursor=Cursors.Default;
 			Application.DoEvents();
-		}
-
-		private int GetNext834Index() {
-			//Select the oldest file which does not have an error.
-			int selectedIndex=-1;
-			for(int i=0;i<gridInsPlanFiles.Rows.Count;i++) {
-				if(gridInsPlanFiles.Rows[i].Cells[_colErrorIndex].Text!="") {//File Error
-					continue;
-				}
-				X834 x834=(X834)gridInsPlanFiles.Rows[i].Tag;
-				if(selectedIndex==-1 || ((X834)gridInsPlanFiles.Rows[selectedIndex].Tag).DateInterchange > x834.DateInterchange) {
-					selectedIndex=i;
-				}
-			}
-			return selectedIndex;
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
@@ -186,13 +171,11 @@ namespace OpenDental {
 				return;
 			}
 			Prefs.UpdateString(PrefName.Ins834ImportPath,textImportPath.Text);
-			int x834Index=GetNext834Index();
-			if(x834Index==-1) {
+			if(_x834selected==null) {
 				MsgBox.Show(this,"No files to import.");
 				return;
 			}
-			X834 x834=(X834)gridInsPlanFiles.Rows[x834Index].Tag;
-			FormE834P=new FormEtrans834Preview(x834);
+			FormE834P=new FormEtrans834Preview(new X834(_x834selected));
 			FormE834P.Show();
 			DialogResult=DialogResult.OK;
 			Close();

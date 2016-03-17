@@ -8,8 +8,6 @@ namespace OpenDentBusiness {
 	///<summary>X12 834 Benefit Enrollment and Maintenance.  This transaction is used to push insurance plan information to pseudo clearinghouses.</summary>
 	public class X834:X12object {
 
-		///<summary>External reference to the file corresponding to this 834.</summary>
-		public string FilePath;
 		///<summary>All segments within the current transaction set (ST) of the 834 report.</summary>
     private List<X12Segment> _listSegments;
 		///<summary>The current segment within _listSegments.</summary>
@@ -43,7 +41,7 @@ namespace OpenDentBusiness {
 
 		#endregion Static Globals
 
-		public X834(string messageText):base(messageText) {
+		public X834(X12object x12other):base(x12other) {
 			ReadMessage();
 		}
 
