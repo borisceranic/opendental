@@ -10,6 +10,8 @@ namespace OpenDentBusiness
 {
 	///<summary>Encapsulates one entire X12 Interchange object, including multiple functional groups and transaction sets. It does not care what type of transactions are contained.  It just stores them.  It does not inherit either.  It is up to other classes to use this as needed.</summary>
 	public class X12object{
+		///<summary>External reference to the file corresponding to this X12 object.</summary>
+		public string FilePath;
 		///<summary>The date and time this X12 object was created by the sender.  Relative to sender's time zone.</summary>
 		public DateTime DateInterchange;
 		///<summary>usually *,:,and ~</summary>
@@ -20,25 +22,41 @@ namespace OpenDentBusiness
 		public List<X12Segment> Segments;
 
 		public static bool IsX12(string messageText){
-			if(messageText==null || messageText.Length<106){
-				return false;
+			if(ToX12object(messageText)!=null) {
+				return true;
+			}
+			return false;
+		}
+
+		///<summary>Returns null if the messageText is not X12 or if messageText could not be parsed.</summary>
+		public static X12object ToX12object(string messageText){
+			if(messageText==null || messageText.Length<106){//Minimum length of 106, because the segment separator is at index 105.
+				return null;
 			}
 			if(messageText.Substring(0,3)!="ISA"){
-				return false;
+				return null;
 			}
 			try {
 				//Denti-cal sends us 835s, but they also send us "EOB" reports which start with "ISA" and look similar to X12 but are NOT X12.
-				new X12object(messageText);//Only an X12 object if we can parse it.  Denti-cal "EOB" reports fail this test, as they should.
+				return new X12object(messageText);//Only an X12 object if we can parse it.  Denti-cal "EOB" reports fail this test, as they should.
 			}
 			catch {
-				return false;
 			}
-			return true;
+			return null;
 		}
 
 		///<summary>This override is never explicitly used.</summary>
 		protected X12object(){
 
+		}
+
+		///<summary>The new X12object will point to the same data as the x12other.  This is for efficiency and to save memory.  Be careful.</summary>
+		public X12object(X12object x12other) {
+			FilePath=x12other.FilePath;
+			DateInterchange=x12other.DateInterchange;
+			Separators=x12other.Separators;
+			FunctGroups=x12other.FunctGroups;
+			Segments=x12other.Segments;
 		}
 
 		///<summary>Takes raw text and converts it into an X12Object.</summary>
@@ -223,6 +241,16 @@ namespace OpenDentBusiness
 				return seg;
 			}
 			return null;
+		}
+
+		public int GetSegmentCountById(string segmentId) {
+			int count=0;
+			for(int i=0;i<Segments.Count;i++) {
+				if(Segments[i].SegmentID==segmentId) {
+					count++;
+				}
+			}
+			return count;
 		}
 
 		///<summary>Removes the specified segments and recreates the raw X12 from the remaining segments.

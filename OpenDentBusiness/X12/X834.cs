@@ -8,8 +8,6 @@ namespace OpenDentBusiness {
 	///<summary>X12 834 Benefit Enrollment and Maintenance.  This transaction is used to push insurance plan information to pseudo clearinghouses.</summary>
 	public class X834:X12object {
 
-		///<summary>External reference to the file corresponding to this 834.</summary>
-		public string FilePath;
 		///<summary>All segments within the current transaction set (ST) of the 834 report.</summary>
     private List<X12Segment> _listSegments;
 		///<summary>The current segment within _listSegments.</summary>
@@ -43,7 +41,7 @@ namespace OpenDentBusiness {
 
 		#endregion Static Globals
 
-		public X834(string messageText):base(messageText) {
+		public X834(X12object x12other):base(x12other) {
 			ReadMessage();
 		}
 
@@ -1692,6 +1690,7 @@ namespace OpenDentBusiness {
 		///<summary>The insurance plan group number.  Specified at member level in format.</summary>
 		public string GroupNum;
 
+		///<summary>Converts the code in MemberLevelDetail.MaintenanceTypeCode to a human readable string.</summary>
 		public string GetPatMaintTypeDescript() {
 			if(MemberLevelDetail==null) {
 				return "";
@@ -1869,7 +1868,7 @@ namespace OpenDentBusiness {
 		public X12_N1 SponsorName;
 		///<summary>Loop 1000B N1</summary>
 		public X12_N1 Payer;
-		///<summary>Loop 1000C N1 and Loop 1100C ACT</summary>
+		///<summary>Loop 1000C N1 and Loop 1100C ACT.</summary>
 		public List<Hx834_Broker> ListBrokers=new List<Hx834_Broker>();
 		///<summary>Loop 2000</summary>
 		public List<Hx834_Member> ListMembers=new List<Hx834_Member>();

@@ -114,6 +114,7 @@ namespace OpenDental{
 			this.textImportPath.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
 			this.textImportPath.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textImportPath.Size = new System.Drawing.Size(836, 20);
+			this.textImportPath.SpellCheckIsEnabled = false;
 			this.textImportPath.TabIndex = 4;
 			this.textImportPath.Text = "";
 			// 
