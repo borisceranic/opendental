@@ -34,7 +34,7 @@ namespace xCrudGenerator {
 		private void Form1_Load(object sender,EventArgs e) {
 			crudDir=@"..\..\..\OpenDentBusiness\Crud";
 			crudmDir=@"..\..\..\OpenDentBusiness\Mobile\Crud";
-			convertDbFile=@"..\..\..\OpenDentBusiness\Misc\ConvertDatabases3.cs";
+			convertDbFile=@"..\..\..\OpenDentBusiness\Misc\ConvertDatabases4.cs";
 			convertDbFilem=@"..\..\..\OpenDentBusiness\Mobile\ConvertDatabasem.cs";
 			if(!Directory.Exists(crudDir)) {
 				MessageBox.Show(crudDir+" is an invalid path.");
