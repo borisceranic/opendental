@@ -383,7 +383,11 @@ namespace OpenDental {
 
 		///<summary>Saves the the currently edited Wikipage as a draft. This method is copied from Save_Click with a few modifications.</summary>
 		private void SaveDraft_Click() {
-				if(!ValidateWikiPage(true)) {
+			if(WikiPageCur.IsNew) {
+				MsgBox.Show(this,"You may not save a new Wiki page as a draft.  Save the Wiki page, then create a draft.");
+				return;
+			}
+			if(!ValidateWikiPage(true)) {
 				return;
 			}
       if(_isInvalidPreview) {
