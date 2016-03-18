@@ -109,6 +109,8 @@ namespace CentralManager {
 					node.Nodes.Add(node2);
 				node2=SetNode(Permissions.AppointmentEdit);
 					node.Nodes.Add(node2);
+				node2=SetNode(Permissions.AppointmentCompleteEdit);
+					node.Nodes.Add(node2);
 				node2=SetNode(Permissions.EcwAppointmentRevise);
 					node.Nodes.Add(node2);
 				treePermissions.Nodes.Add(node);
