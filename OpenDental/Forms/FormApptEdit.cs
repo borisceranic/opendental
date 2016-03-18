@@ -129,6 +129,8 @@ namespace OpenDental{
 		private LabCase _labCur;
 		///<summary>A list of appointments for this patient that are either scheduled or planned.</summary>
 		private List<Appointment> _listAppointments;
+		///<summary>Stale deep copy of _listAppointments to use with sync.</summary>
+		private List<Appointment> _listAppointmentsOld;
 		private bool _isPlanned;
 		private DataTable _tableFields;
 		private DataTable _tableComms;
@@ -1192,6 +1194,7 @@ namespace OpenDental{
 		private void FormApptEdit_Load(object sender, System.EventArgs e){
 			tbTime.CellClicked += new OpenDental.ContrTable.CellEventHandler(tbTime_CellClicked);
 			_listAppointments=Appointments.GetListForPat(AptCur.PatNum);
+			_listAppointmentsOld=_listAppointments.Select(x => x.Clone()).ToList();
 			for(int i=0;i<_listAppointments.Count;i++) {
 				if(_listAppointments[i].AptNum==AptCur.AptNum) {
 					AptCur=_listAppointments[i];//Changing the variable pointer so all changes are done on the element in the list.
@@ -3591,7 +3594,7 @@ namespace OpenDental{
 				Procedures.Sync(_listProcs,AptCur);
 			}
 			//Sync detaches any attached procedures within Appointments.Delete() but doesn't create any ApptComm items.
-			Appointments.Sync(_listAppointments,AptCur.PatNum);
+			Appointments.Sync(_listAppointments,_listAppointmentsOld,AptCur.PatNum);
 			//Synch the recalls for this patient.  This is necessary in case the date of the appointment has change or has been deleted entirely.
 			Recalls.Synch(AptCur.PatNum);
 			Recalls.SynchScheduledApptFull(AptCur.PatNum);

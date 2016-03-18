@@ -2499,16 +2499,15 @@ namespace OpenDentBusiness{
 
 		///<summary>Inserts, updates, or deletes db rows to match listNew.  No need to pass in userNum, it's set before remoting role check and passed to
 		///the server if necessary.  Doesn't create ApptComm items, but will delete them.  If you use Sync, you must create new Apptcomm items.</summary>
-		public static void Sync(List<Appointment> listNew,long patNum,long userNum=0) {
+		public static void Sync(List<Appointment> listNew,List<Appointment> listOld,long patNum,long userNum=0) {
 			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
 				userNum=Security.CurUser.UserNum;
 			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,patNum,userNum);
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,listOld,patNum,userNum);
 				return;
 			}
-			List<Appointment> listDB=Appointments.GetListForPat(patNum);
-			Crud.AppointmentCrud.Sync(listNew,listDB,userNum);
+			Crud.AppointmentCrud.Sync(listNew,listOld,userNum);
 		}
 
 		///<summary>Zeros securitylog FKey column for rows that are using the matching aptNum as FKey and are related to Appointment.
