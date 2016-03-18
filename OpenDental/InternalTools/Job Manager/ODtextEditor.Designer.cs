@@ -46,15 +46,18 @@
 			this.panel4 = new System.Windows.Forms.Panel();
 			this.panel5 = new System.Windows.Forms.Panel();
 			this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
-			this.textDescription = new System.Windows.Forms.RichTextBox();
 			this.panel2 = new System.Windows.Forms.Panel();
 			this.butSpellCheck = new System.Windows.Forms.Button();
+			this.textDescription = new System.Windows.Forms.RichTextBox();
+			this.panel6 = new System.Windows.Forms.Panel();
+			this.butClearFormatting = new System.Windows.Forms.Button();
 			this.panel1.SuspendLayout();
 			this.panel3.SuspendLayout();
 			this.panel4.SuspendLayout();
 			this.panel5.SuspendLayout();
 			this.flowLayoutPanel1.SuspendLayout();
 			this.panel2.SuspendLayout();
+			this.panel6.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// comboFontSize
@@ -341,26 +344,12 @@
 			this.flowLayoutPanel1.Controls.Add(this.panel3);
 			this.flowLayoutPanel1.Controls.Add(this.panel1);
 			this.flowLayoutPanel1.Controls.Add(this.panel2);
+			this.flowLayoutPanel1.Controls.Add(this.panel6);
 			this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Top;
 			this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 0);
 			this.flowLayoutPanel1.Name = "flowLayoutPanel1";
 			this.flowLayoutPanel1.Size = new System.Drawing.Size(855, 27);
 			this.flowLayoutPanel1.TabIndex = 195;
-			// 
-			// textDescription
-			// 
-			this.textDescription.AcceptsTab = true;
-			this.textDescription.BackColor = System.Drawing.SystemColors.Window;
-			this.textDescription.DetectUrls = false;
-			this.textDescription.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.textDescription.HideSelection = false;
-			this.textDescription.Location = new System.Drawing.Point(0, 27);
-			this.textDescription.Name = "textDescription";
-			this.textDescription.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textDescription.Size = new System.Drawing.Size(855, 496);
-			this.textDescription.TabIndex = 169;
-			this.textDescription.Text = "";
-			this.textDescription.TextChanged += new System.EventHandler(this.textDescription_TextChanged);
 			// 
 			// panel2
 			// 
@@ -384,6 +373,43 @@
 			this.butSpellCheck.Text = "Spell Check";
 			this.butSpellCheck.Click += new System.EventHandler(this.butSpellCheck_Click);
 			// 
+			// textDescription
+			// 
+			this.textDescription.AcceptsTab = true;
+			this.textDescription.BackColor = System.Drawing.SystemColors.Window;
+			this.textDescription.DetectUrls = false;
+			this.textDescription.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.textDescription.HideSelection = false;
+			this.textDescription.Location = new System.Drawing.Point(0, 27);
+			this.textDescription.Name = "textDescription";
+			this.textDescription.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
+			this.textDescription.Size = new System.Drawing.Size(855, 496);
+			this.textDescription.TabIndex = 169;
+			this.textDescription.Text = "";
+			this.textDescription.TextChanged += new System.EventHandler(this.textDescription_TextChanged);
+			// 
+			// panel6
+			// 
+			this.panel6.AutoSize = true;
+			this.panel6.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.panel6.Controls.Add(this.butClearFormatting);
+			this.panel6.Location = new System.Drawing.Point(614, 0);
+			this.panel6.Margin = new System.Windows.Forms.Padding(0);
+			this.panel6.Name = "panel6";
+			this.panel6.Size = new System.Drawing.Size(96, 27);
+			this.panel6.TabIndex = 195;
+			// 
+			// butClearFormatting
+			// 
+			this.butClearFormatting.AutoSize = true;
+			this.butClearFormatting.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+			this.butClearFormatting.Location = new System.Drawing.Point(0, 0);
+			this.butClearFormatting.Name = "butClearFormatting";
+			this.butClearFormatting.Size = new System.Drawing.Size(93, 24);
+			this.butClearFormatting.TabIndex = 170;
+			this.butClearFormatting.Text = "Clear Formatting";
+			this.butClearFormatting.Click += new System.EventHandler(this.butClearFormatting_Click);
+			// 
 			// OdtextEditor
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -401,6 +427,8 @@
 			this.flowLayoutPanel1.PerformLayout();
 			this.panel2.ResumeLayout(false);
 			this.panel2.PerformLayout();
+			this.panel6.ResumeLayout(false);
+			this.panel6.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -434,5 +462,7 @@
 		private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
 		private System.Windows.Forms.Panel panel2;
 		private System.Windows.Forms.Button butSpellCheck;
+		private System.Windows.Forms.Panel panel6;
+		private System.Windows.Forms.Button butClearFormatting;
 	}
 }
