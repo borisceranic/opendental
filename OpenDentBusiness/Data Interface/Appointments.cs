@@ -2401,13 +2401,12 @@ namespace OpenDentBusiness{
 
 		///<summary>Inserts, updates, or deletes database rows to match supplied list.  It doesn't create any ApptComm items, but it will delete ApptComm items.
 		///If you use Sync, you need to create new Apptcomm items.</summary>
-		public static void Sync(List<Appointment> listNew,long patNum) {
+		public static void Sync(List<Appointment> listNew,List<Appointment> listOld,long patNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,patNum);
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,listOld,patNum);
 				return;
 			}
-			List<Appointment> listDB=Appointments.GetListForPat(patNum);
-			Crud.AppointmentCrud.Sync(listNew,listDB);
+			Crud.AppointmentCrud.Sync(listNew,listOld);
 		}
 
 		///<summary>Zeros securitylog FKey column for rows that are using the matching aptNum as FKey and are related to Appointment.
