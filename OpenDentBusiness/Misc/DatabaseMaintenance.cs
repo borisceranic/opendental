@@ -3760,6 +3760,48 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod(HasBreakDown = true)]
+		public static string PaySplitAttachedToDeletedProc(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log = "";
+			command="SELECT CONCAT(pat.LName,' ',pat.FName) AS 'PatientName', payment.PatNum, payment.PayDate, payment.PayAmt, "
+				+"paysplit.ProcDate, procedurecode.AbbrDesc, CONCAT(splitpat.FName,' ',splitpat.LName) AS 'SplitPatientName', paysplit.SplitAmt "
+				+"FROM paysplit "
+				+"INNER JOIN payment ON payment.PayNum=paysplit.PayNum "
+				+"INNER JOIN procedurelog ON paysplit.ProcNum=procedurelog.ProcNum AND procedurelog.ProcStatus="+POut.Int((int)ProcStat.D)+" "
+				+"INNER JOIN procedurecode ON procedurelog.CodeNum=procedurecode.CodeNum "
+				+"INNER JOIN patient pat ON pat.PatNum=payment.PatNum "
+				+"INNER JOIN patient splitpat ON splitpat.PatNum=paysplit.PatNum "
+				+"ORDER BY pat.LName, pat.FName, payment.PayDate, paysplit.ProcDate, procedurecode.AbbrDesc";
+			table=Db.GetTable(command);
+			if(table.Rows.Count==0 && !verbose) {
+				return log;
+			}
+			//There is something to report OR the user has verbose mode on.   
+			log+=Lans.g("FormDatabaseMaintenance","Paysplits attached to deleted procedures")+": "+table.Rows.Count;
+			if(isCheck && table.Rows.Count!=0) {//Only the fix should show the entire list of items.
+				log+="\r\n   "+Lans.g("FormDatabaseMaintenance","Manual fix needed.  Double click to see a break down.")+"\r\n";
+			}
+			else if(table.Rows.Count>0) {//Running the fix and there are items to show.
+				log+=", "+Lans.g("FormDatabaseMaintenance","including")+":\r\n";
+				for(int i = 0;i<table.Rows.Count;i++) {
+					log+="   "+Lans.g("FormDatabaseMaintenance","Payment")+": #"+table.Rows[i]["PatNum"].ToString();
+					log+=" "+table.Rows[i]["PatientName"].ToString();
+					log+=" "+PIn.DateT(table.Rows[i]["PayDate"].ToString()).ToShortDateString();
+					log+=" "+PIn.Double(table.Rows[i]["PayAmt"].ToString()).ToString("c");
+					log+="\r\n      "+Lans.g("FormDatabaseMaintenance","Split")+": "+PIn.DateT(table.Rows[i]["ProcDate"].ToString()).ToShortDateString();
+					log+=" "+table.Rows[i]["SplitPatientName"].ToString();
+					log+=" "+table.Rows[i]["AbbrDesc"].ToString();
+					log+=" "+PIn.Double(table.Rows[i]["SplitAmt"].ToString()).ToString("c");
+					log+="\r\n";
+				}
+				log+="   "+Lans.g("FormDatabaseMaintenance","They need to be fixed manually.")+"\r\n";
+			}
+			return log;
+		}
+
 		[DbmMethod]
 		public static string PaySplitAttachedToPayPlan(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
