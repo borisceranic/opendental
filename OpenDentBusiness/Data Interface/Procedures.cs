@@ -111,6 +111,11 @@ namespace OpenDentBusiness {
 			if(Db.GetCount(command)!="0") {
 				throw new Exception(Lans.g("Procedures","Not allowed to delete a procedure with referrals attached."));
 			}
+			//Test to see if any paysplits are attached to this proc
+			command="SELECT COUNT(*) FROM paysplit WHERE ProcNum="+POut.Long(procNum);
+			if(Db.GetCount(command)!="0") {
+				throw new Exception(Lans.g("Procedures","Not allowed to delete a procedure that is attached to a patient payment."));
+			}
 		}
 
 		///<summary>If not allowed to delete, then it throws an exception, so surround it with a try catch.  Also deletes any claimProcs and adjustments.  This does not actually delete the procedure, but just changes the status to deleted.</summary>
