@@ -118,6 +118,8 @@ namespace OpenDental {
       butHighlight.Enabled=isEnabled;
       butHighlightSelect.Enabled=isEnabled;
       butSave.Enabled=isEnabled;
+			butSpellCheck.Enabled=isEnabled;
+			butClearFormatting.Enabled=isEnabled;
     }
 
 		private void HoverColorEnter(object sender,EventArgs e) {
@@ -258,6 +260,18 @@ namespace OpenDental {
 				return;
 			}
 			textDescription.Rtf=FormSC.TextRtf;
+		}
+
+		private void butClearFormatting_Click(object sender,EventArgs e) {
+			try {
+				textDescription.SelectionFont=new Font((string)comboFontType.SelectedItem,(int)comboFontSize.SelectedItem);
+				textDescription.SelectionBullet=false;
+				textDescription.SelectionColor=Color.Black;
+				textDescription.SelectionBackColor=Color.Transparent;
+			}
+			catch {
+
+			}
 		}
 	}
 
