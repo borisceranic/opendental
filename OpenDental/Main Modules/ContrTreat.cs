@@ -1354,8 +1354,34 @@ namespace OpenDental{
 							if(!ProcedureCodes.IsValidCode(subCode)) {
 								row.Cells.Add("");
 							}
-							else { 
-								row.Cells.Add(InsPlanList.Any(x=>!x.CodeSubstNone)?"X":"");//confusing double degative here; If any plan allows substitution, show X
+							else {
+								//The lists gotten at the beginning of ContrTreat are not patient specific with the exception of the PatPlanList.
+								//Get all patient-specific InsSubs
+								List<InsSub> listPatInsSubs=new List<InsSub>();
+								foreach(PatPlan plan in PatPlanList) {
+									if(SubList.Exists(x => x.InsSubNum==plan.InsSubNum)) {
+										listPatInsSubs.Add(SubList.Find(x => x.InsSubNum==plan.InsSubNum));
+									}
+								}
+								//Get all patient-specific InsPlans
+								List<InsPlan> listPatInsPlans=new List<InsPlan>();
+								foreach(InsSub sub in listPatInsSubs) {
+									if(InsPlanList.Exists(x => x.PlanNum==sub.PlanNum)) {
+										listPatInsPlans.Add(InsPlanList.Find(x => x.PlanNum==sub.PlanNum));
+									}
+								}
+								//Now we have a list of patient-specific insplans.  Look through them to see if any allow substitutions.
+								bool isFound=false;
+								foreach(InsPlan plan in listPatInsPlans) {
+									if(!plan.CodeSubstNone) {
+										row.Cells.Add("X");//They allow substitutions.
+										isFound=true;
+										break;
+									}
+								}
+								if(!isFound) {
+									row.Cells.Add("");//They don't allow substitutions.
+								}
 							}
 							break;
 						case "Description":
@@ -1528,7 +1554,33 @@ namespace OpenDental{
 								row.Cells.Add("");
 							}
 							else { 
-								row.Cells.Add(InsPlanList.Any(x=>!x.CodeSubstNone)?"X":"");//confusing double degative here; If any plan allows substitution, show X
+								//The lists gotten at the beginning of ContrTreat are not patient specific with the exception of the PatPlanList.
+								//Get all patient-specific InsSubs
+								List<InsSub> listPatInsSubs=new List<InsSub>();
+								foreach(PatPlan plan in PatPlanList) {
+									if(SubList.Exists(x => x.InsSubNum==plan.InsSubNum)) {
+										listPatInsSubs.Add(SubList.Find(x => x.InsSubNum==plan.InsSubNum));
+									}
+								}
+								//Get all patient-specific InsPlans
+								List<InsPlan> listPatInsPlans=new List<InsPlan>();
+								foreach(InsSub sub in listPatInsSubs) {
+									if(InsPlanList.Exists(x => x.PlanNum==sub.PlanNum)) {
+										listPatInsPlans.Add(InsPlanList.Find(x => x.PlanNum==sub.PlanNum));
+									}
+								}
+								//Now we have a list of patient-specific insplans.  Look through them to see if any allow substitutions.
+								bool isFound=false;
+								foreach(InsPlan plan in listPatInsPlans) {
+									if(!plan.CodeSubstNone) {
+										row.Cells.Add("X");//They allow substitutions.
+										isFound=true;
+										break;
+									}
+								}
+								if(!isFound) {
+									row.Cells.Add("");//They don't allow substitutions.
+								}
 							}
 							break;
 						case "Description":
