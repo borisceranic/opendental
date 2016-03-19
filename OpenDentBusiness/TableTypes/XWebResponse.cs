@@ -5,7 +5,7 @@ namespace OpenDentBusiness {
 	///<summary>Received as XML output from XWeb gateway. Not all fields are available for all method calls. This is a combination of all possible output fields. 
 	///The fields that are available are dependent on which method was called and the given result.
 	///HPF (XWeb Hosted Payment Form) Payments and HPF CC Alias creations will each enter a row in this table. That row will be monitored by the eConnector and updated when the XWebResponseCode changes from Pending.
-	/// -- 1) Create the row and indicated HPF/OTK.
+	/// -- 1) Create the row and indicate the HPF/OTK.
 	/// -- 2) Poll the OTK (one-time key) until an XWebResponseCode is available. Update the row with information about the transaction.
 	///DTG (XWeb Direct To Gateway) Will enter 1 row in this table. 
 	/// -- 1) Make the DTG payment using a pre-authorized CC alias. Create row with information about the transaction.
@@ -28,8 +28,7 @@ namespace OpenDentBusiness {
 		///<summary>Timestamp at which this row was created. Auto generated on insert.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateTEntry)]
 		public DateTime DateTEntry;
-		///<summary>Timestamp at which this row was last updated. Will be updated once, when XWebResponseCode changes from Pending. Auto generated on insert/update.</summary>
-		[CrudColumn(SpecialType=CrudSpecialColType.TimeStamp)]
+		///<summary>Timestamp at which this row was last updated. Will be updated each time the OTK status is polled and one final time when XWebResponseCode changes from Pending.</summary>
 		public DateTime DateTUpdate;
 		///<summary>Inidicates which phase of the XWeb process this transaction is in. See class summary for details.</summary>
 		public XWebTransactionStatus TransactionStatus;
@@ -90,6 +89,38 @@ namespace OpenDentBusiness {
 		public double BatchAmount;
 		///<summary>The expiration date of the credit card that was referenced in this transaction. DateTime representation of ExpDate. Initialized by XWebInputAbs.CreateGatewayResponse().</summary>
 		public DateTime AccountExpirationDate;
+		///<summary>Debug information regarding this response. Can only be set by XWebResponses.ProcessOutstandingTransactions().</summary>
+		public string DebugError;
+
+		///<summary>Returned from XWeb Gateway as an int. Helper method to convert to enum.</summary>
+		public static XWebResponseCodes ConvertResponseCode(int responseCode) {
+			if(Enum.IsDefined(typeof(XWebResponseCodes),responseCode)) {
+				return (XWebResponseCodes)responseCode;
+			}
+			return XWebResponseCodes.Undefined;
+		}
+
+		///<summary>Returned from XWeb Gateway as a string. Helper method to convert to DateTime. Format is yyMM from XWeb gateway</summary>
+		public static DateTime ConvertExpDate(string expDate) {
+			try {
+				return new DateTime(int.Parse(expDate.Substring(0,2)),int.Parse(expDate.Substring(2,2)),1);
+			}
+			catch {
+				return DateTime.Today.AddMonths(-1);
+			}
+		}
+
+		///<summary>These fields should exists from instance to instance for the same OTK.</summary>
+		public void SetPersistentFields(long patNum,long provNum,long clinicNum,string otk,string hpfUrl,DateTime hpfExpiration,string debugError,long xWebResponseNum=0) {
+			PatNum=patNum;
+			ProvNum=provNum;
+			ClinicNum=clinicNum;
+			OTK=otk;
+			HpfUrl=hpfUrl;
+			HpfExpiration=hpfExpiration;
+			DebugError=debugError;
+			XWebResponseNum=xWebResponseNum;
+		}
 	}
 
 	///<summary>OTK POLL statuses that provide a real-time check on the HPF transaction and will immediately return a response indicating an Approval, HPF timeout, or another termination event has occurred. 
@@ -105,8 +136,6 @@ namespace OpenDentBusiness {
 		AliasSuccess = 005,
 		///<summary>007</summary>
 		PartialApproval = 007,
-		///<summary>012</summary>
-		CheckSubmitted = 012,
 		///<summary>101 - Expired Without Approval.  Hosted Form timed out without Approval, OTK was never launched, or Invalid OTK</summary>
 		ExpiredWithoutApproval = 101,
 		///<summary>102 - Pending (neither of the above events has occurred yet)</summary>
@@ -115,9 +144,11 @@ namespace OpenDentBusiness {
 
 	///<summary>Track which phase of the XWebResponse a given transaction is currently in. This will be used by the eConnector when monitoring and processing XWeb payments.</summary>
 	public enum XWebTransactionStatus {
+		HpfMonitoringError,
 		HpfPending,
 		HpfExpired,
 		HpfCompletePaymentApproved,
+		HpfCompletePaymentApprovedPartial,
 		HpfCompleteAliasCreated,
 		DtgPaymentApproved,
 	};
