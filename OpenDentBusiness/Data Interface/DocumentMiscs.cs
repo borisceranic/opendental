@@ -43,6 +43,22 @@ namespace OpenDentBusiness{
 			Db.NonQ(command,paramRawBase64);
 		}
 
+		///<summary>Appends the passed in rawBase64 string to the RawBase64 column in the db for the Update Files document row.
+		///This method is used instead of AppendRawBase64ForDoc() because a large customer was having the following issue:
+		///The "Recopy" button was returning successfully but the RawBase64 column of the UpdateFiles row was actually empty.
+		///Jason and Derek came to the conclusion that this could only happen if the PK was incorrectly returned after inserting the UpdateFiles row.
+		///Therefore, this method will ignore the PK and instead will update all UpdateFiles rows (should only be one).</summary>
+		public static void AppendRawBase64ForUpdateFiles(string rawBase64) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),rawBase64);
+				return;
+			}
+			string command="UPDATE documentmisc SET RawBase64=CONCAT(RawBase64,"+DbHelper.ParamChar+"paramRawBase64) "
+				+"WHERE DocMiscType="+POut.Int((int)DocumentMiscType.UpdateFiles);
+			OdSqlParameter paramRawBase64=new OdSqlParameter("paramRawBase64",OdDbType.Text,rawBase64);
+			Db.NonQ(command,paramRawBase64);
+		}
+
 		/*
 		Only pull out the methods below as you need them.  Otherwise, leave them commented out.
 

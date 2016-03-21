@@ -51,78 +51,43 @@ namespace OpenDental {
 				odThreadRecopy.Name="RecopyProgressThread";
 				odThreadRecopy.Start(true);
 			}
-			string folderUpdate="";
+			#region Delete Old UpdateFiles Folders
+			string folderTempUpdateFiles=ODFileUtils.CombinePaths(GetTempFolderPath(),"UpdateFiles");
+			string folderAtoZUpdateFiles="";
 			if(PrefC.AtoZfolderUsed && hasAtoZ) {
-				folderUpdate=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),"UpdateFiles");
+				folderAtoZUpdateFiles=ODFileUtils.CombinePaths(ImageStore.GetPreferredAtoZpath(),"UpdateFiles");
 			}
-			else {
-				folderUpdate=ODFileUtils.CombinePaths(GetTempFolderPath(),"UpdateFiles");
-			}
-			if(Directory.Exists(folderUpdate)) {
-				try {
-					ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Removing old update files...")));
-					Directory.Delete(folderUpdate,true);
-				}
-				catch {
-					ODEvent.Fire(new ODEventArgs("RecopyProgress","DEFCON 1"));
-					if(isSilent) {
-						FormOpenDental.ExitCode=301;//UpdateFiles folder cannot be deleted (Warning)
-						Application.Exit();
-						return false;
-					}
-					MessageBox.Show(Lan.g("Prefs","Please delete this folder and then re-open the program")+": "+folderUpdate);
-					return false;
-				}
-				//wait a bit so that CreateDirectory won't malfunction.
-				DateTime now=DateTime.Now;
-				while(Directory.Exists(folderUpdate) && DateTime.Now < now.AddSeconds(10)) {//up to 10 seconds
-					Application.DoEvents();
-				}
-				if(Directory.Exists(folderUpdate)) {
-					ODEvent.Fire(new ODEventArgs("RecopyProgress","DEFCON 1"));
-					if(isSilent) {
-						FormOpenDental.ExitCode=301;//UpdateFiles folder cannot be deleted (Warning)
-						Application.Exit();
-						return false;
-					}
-					MessageBox.Show(Lan.g("Prefs","Please delete this folder and then re-open the program")+": "+folderUpdate);
-					return false;
-				}
-			}
-			//Copy the installation directory files to the UpdateFiles share or a temp dir that we just created which we will zip up and insert into the db.
-			//When PrefC.AtoZfolderUsed is true and we're upgrading from a version prior to 15.3.10, this copy that we are about to make allows backwards 
-			//compatibility for versions of OD that do not look at the database for their UpdateFiles.
-			try {
-				ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Backing up new update files...")));
-				Directory.CreateDirectory(folderUpdate);
-				DirectoryInfo dirInfo=new DirectoryInfo(Application.StartupPath);
-				FileInfo[] appfiles=dirInfo.GetFiles();
-				for(int i=0;i<appfiles.Length;i++) {
-					if(appfiles[i].Name=="FreeDentalConfig.xml") {
-						continue;//skip this one.
-					}
-					if(appfiles[i].Name=="OpenDentalServerConfig.xml") {
-						continue;//skip also
-					}
-					if(appfiles[i].Name.StartsWith("openlog")) {
-						continue;//these can be big and are irrelevant
-					}
-					if(appfiles[i].Name.Contains("__")) {//double underscore
-						continue;//So that plugin dlls can purposely skip the file copy.
-					}
-					//include UpdateFileCopier
-					File.Copy(appfiles[i].FullName,ODFileUtils.CombinePaths(folderUpdate,appfiles[i].Name));
-				}
-				//Create a simple manifest file so that we know what version the files are for.
-				File.WriteAllText(ODFileUtils.CombinePaths(folderUpdate,"Manifest.txt"),versionCurrent.ToString(3));
-			}
-			catch(Exception) {
+			ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Removing old update files...")));
+			//Try to delete the UpdateFiles folder from both the AtoZ share and the local TEMP dir.
+			if(!DeleteFolder(folderAtoZUpdateFiles) | !DeleteFolder(folderTempUpdateFiles)) {//Logical OR to prevent short curcuit.
 				ODEvent.Fire(new ODEventArgs("RecopyProgress","DEFCON 1"));
-				MessageBox.Show(Lan.g("Prefs","Failed copying the update files to the following directory")+":\r\n"
-					+folderUpdate+"\r\n"+"\r\n"
-					+Lan.g("Prefs","This could be due to a lack of permissions to create the above folder or the files in the installation directory are still in use."));
+				if(isSilent) {
+					FormOpenDental.ExitCode=301;//UpdateFiles folder cannot be deleted (Warning)
+					Application.Exit();
+					return false;
+				}
+				MsgBox.Show("Prefs","Unable to delete old UpdateFiles folder.  Go manually delete the UpdateFiles folder then retry.");
 				return false;
 			}
+			#endregion
+			#region Copy Current Installation Directory To UpdateFiles Folders
+			ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Backing up new update files...")));
+			//Copy the installation directory files to the UpdateFiles share and a TEMP dir that we just created which we will zip up and insert into the db.
+			//When PrefC.AtoZfolderUsed is true and we're upgrading from a version prior to 15.3.10, this copy that we are about to make allows backwards 
+			//compatibility for versions of OD that do not look at the database for their UpdateFiles.
+			if(!CopyInstallFilesToPath(folderAtoZUpdateFiles,versionCurrent) | !CopyInstallFilesToPath(folderTempUpdateFiles,versionCurrent)) {
+				ODEvent.Fire(new ODEventArgs("RecopyProgress","DEFCON 1"));
+				if(isSilent) {
+					FormOpenDental.ExitCode=302;//Installation files could not be copied.
+					Application.Exit();
+					return false;
+				}
+				MsgBox.Show("Prefs","Failed to copy the current installations files on this computer.\r\n"
+					+"This could be due to a lack of permissions, or file(s) in the installation directory are still in use.");
+				return false;
+			}
+			#endregion
+			#region Get Current MySQL max_allowed_packet Setting
 			//Starting in v15.3, we always insert the UpdateFiles into the database.
 			int maxAllowedPacket=0;
 			int defaultMaxAllowedPacketSize=41943040;//40MB
@@ -151,12 +116,14 @@ namespace OpenDental {
 			if(maxAllowedPacket==0) {
 				maxAllowedPacket=defaultMaxAllowedPacketSize;
 			}
+			#endregion
 			using(ZipFile zipFile=new ZipFile())
 			using(MemoryStream memStream=new MemoryStream()) {
 				try {
+					#region Compress New Update Files
 					ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Compressing new update files...")));
 					try {
-						zipFile.AddDirectory(folderUpdate);
+						zipFile.AddDirectory(folderTempUpdateFiles);
 						zipFile.Save(memStream);
 					}
 					catch(Exception ex) {
@@ -177,6 +144,8 @@ namespace OpenDental {
 						EventLog.WriteEntry("OpenDental","Error converting UpdateFiles to Base64:\r\n"+ex.Message,EventLogEntryType.Error);
 						throw ex;
 					}
+					#endregion
+					#region Break Up New Update Files
 					//Now we need to break up the Base64 string into payloads that are small enough to send to MySQL.
 					//Each character in Base64 represents 6 bits.  Therefore, 4 chars are used to represent 3 bytes
 					//However, MySQL doesn't know that we are sending over a Base64 string so lets assume 1 char = 1 byte.
@@ -185,7 +154,7 @@ namespace OpenDental {
 					List<string> listRawBase64s=new List<string>();
 					string strBase64=strBuilder.ToString();
 					ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Creating new update file payloads...")));
-					try { 
+					try {
 						for(int i=0;i<strBase64.Length;i+=charsPerPayload) {
 							listRawBase64s.Add(strBase64.Substring(i,Math.Min(charsPerPayload,strBase64.Length-i)));
 						}
@@ -194,13 +163,15 @@ namespace OpenDental {
 						EventLog.WriteEntry("OpenDental","Error creating UpdateFile payloads:\r\n"+ex.Message,EventLogEntryType.Error);
 						throw ex;
 					}
+					#endregion
+					#region Insert New Update Files Into Db
 					//Now we have a list of Base64 strings each of which are guaranteed to successfully send to MySQL under the max_packet_allowed limitation.
 					//Clear and prep the current UpdateFiles row in the documentmisc table for the updated binaries.
 					long docNum=DocumentMiscs.SetUpdateFilesZip();
 					ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Inserting new update files into database...")));
 					try {
 						foreach(string rawBase64 in listRawBase64s) {
-							DocumentMiscs.AppendRawBase64ForDoc(rawBase64,docNum);
+							DocumentMiscs.AppendRawBase64ForUpdateFiles(rawBase64);
 						}
 					}
 					catch(Exception ex) {
@@ -213,9 +184,15 @@ namespace OpenDental {
 							+"\r\n  listRawBase64s.Count: "+listRawBase64s.Count,EventLogEntryType.Error);
 						throw ex;
 					}
+					#endregion
 				}
 				catch(Exception) {
 					ODEvent.Fire(new ODEventArgs("RecopyProgress","DEFCON 1"));
+					if(isSilent) {
+						FormOpenDental.ExitCode=303;//Failed inserting update files into the database.
+						Application.Exit();
+						return false;
+					}
 					string errorStr=Lan.g("Prefs","Failed inserting update files into the database."
 						+"\r\nPlease call us or have your IT admin increase the max_allowed_packet to 40MB in the my.ini file.");
 					try {
@@ -237,8 +214,71 @@ namespace OpenDental {
 					return false;
 				}
 				ODEvent.Fire(new ODEventArgs("RecopyProgress","DEFCON 1"));
-				return true;
+				return true;//Inserting a compressed version of the files in the current installation directory into the database was successful.
 			}
+		}
+
+		///<summary>Creates the directory passed in and copies the files in the current installation directory to the specified folder path.
+		///Creates a Manifest.txt file with the version information passed in.
+		///Returns false if anything goes wrong.  Returns true if copy was successful or if the folder path passed in is null or blank.</summary>
+		private static bool CopyInstallFilesToPath(string folderPath,Version versionCurrent) {
+			if(string.IsNullOrEmpty(folderPath)) {
+				return true;//Some customers will not be using the AtoZ folder which will pass in blank.
+			}
+			try {
+				Directory.CreateDirectory(folderPath);
+				DirectoryInfo dirInfo=new DirectoryInfo(Application.StartupPath);
+				FileInfo[] appfiles=dirInfo.GetFiles();
+				for(int i = 0;i<appfiles.Length;i++) {
+					if(appfiles[i].Name=="FreeDentalConfig.xml") {
+						continue;//skip this one.
+					}
+					if(appfiles[i].Name=="OpenDentalServerConfig.xml") {
+						continue;//skip also
+					}
+					if(appfiles[i].Name.StartsWith("openlog")) {
+						continue;//these can be big and are irrelevant
+					}
+					if(appfiles[i].Name.Contains("__")) {//double underscore
+						continue;//So that plugin dlls can purposely skip the file copy.
+					}
+					//include UpdateFileCopier
+					File.Copy(appfiles[i].FullName,ODFileUtils.CombinePaths(folderPath,appfiles[i].Name));
+				}
+				//Create a simple manifest file so that we know what version the files are for.
+				File.WriteAllText(ODFileUtils.CombinePaths(folderPath,"Manifest.txt"),versionCurrent.ToString(3));
+			}
+			catch(Exception) {
+				return false;
+			}
+			return true;
+		}
+
+		///<summary>Recursively deletes all folders and files in the provided folder path.
+		///Waits up to 10 seconds for the delete command to finish.  Returns false if anything goes wrong.</summary>
+		private static bool DeleteFolder(string folderPath) {
+			if(string.IsNullOrEmpty(folderPath)) {
+				return true;//Nothing to delete.
+			}
+			if(!Directory.Exists(folderPath)) {
+				return true;//Already deleted
+			}
+			//The directory we want to delete is present so try and recursively delete it and all its content.
+			try {
+				Directory.Delete(folderPath,true);
+			}
+			catch {
+				return false;//Something went wrong, typically a permission issue or files are still in use.
+			}
+			//The delete seems to have been successful, wait up to 10 seconds so that CreateDirectory won't malfunction.
+			DateTime dateTimeWait=DateTime.Now.AddSeconds(10);
+			while(Directory.Exists(folderPath) && DateTime.Now < dateTimeWait) {
+				Application.DoEvents();
+			}
+			if(Directory.Exists(folderPath)) {//Dir is still present after 10 seconds of waiting for the delete to complete.
+				return false;
+			}
+			return true;//Dir deleted successfully.
 		}
 
 		private static void ShowRecopyProgress(ODThread odThread) {
