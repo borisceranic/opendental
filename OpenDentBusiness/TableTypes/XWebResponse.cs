@@ -43,6 +43,7 @@ namespace OpenDentBusiness {
 		///The status of the OTK can be polled to determine if the end user has completed the HPF or if it has expired.</summary>
 		public string OTK;
 		///<summary>This URL will be generated as a result of the OTK. The URL can be browsed in an IFRAME to create a secure portal between a browser and the XWeb server.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
 		public string HpfUrl;
 		///<summary>Timestamp at which this HPF will expire. The end user will only be able to access the HPF before it has expired. This expiration is set explicitly when creating the HPF.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
@@ -90,6 +91,7 @@ namespace OpenDentBusiness {
 		///<summary>The expiration date of the credit card that was referenced in this transaction. DateTime representation of ExpDate. Initialized by XWebInputAbs.CreateGatewayResponse().</summary>
 		public DateTime AccountExpirationDate;
 		///<summary>Debug information regarding this response. Can only be set by XWebResponses.ProcessOutstandingTransactions().</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
 		public string DebugError;
 
 		///<summary>Returned from XWeb Gateway as an int. Helper method to convert to enum.</summary>

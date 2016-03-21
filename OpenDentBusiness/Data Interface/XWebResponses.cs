@@ -16,14 +16,11 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Gets all XWebResponses where TransactionStatus==XWebTransactionStatus.HpfPending from the db.</summary>
-		public static List<XWebResponse> GetPendingHPFs(DateTime notNewerThan) {
+		public static List<XWebResponse> GetPendingHPFs() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<XWebResponse>>(MethodBase.GetCurrentMethod());
 			}
-			return Crud.XWebResponseCrud.SelectMany("SELECT * FROM xwebresponse "
-				+"WHERE "
-				+"TransactionStatus = "+POut.Int((int)XWebTransactionStatus.HpfPending)
-				+"AND DateTUpdate = <"+POut.DateT(notNewerThan));
+			return Crud.XWebResponseCrud.SelectMany("SELECT * FROM xwebresponse WHERE TransactionStatus = "+POut.Int((int)XWebTransactionStatus.HpfPending));
 		}
 
 		//If this table type will exist as cached data, uncomment the CachePattern region below and edit.

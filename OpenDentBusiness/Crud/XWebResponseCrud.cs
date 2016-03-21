@@ -52,7 +52,7 @@ namespace OpenDentBusiness.Crud{
 				xWebResponse.ClinicNum            = PIn.Long  (row["ClinicNum"].ToString());
 				xWebResponse.PaymentWebNum        = PIn.Long  (row["PaymentWebNum"].ToString());
 				xWebResponse.DateTEntry           = PIn.DateT (row["DateTEntry"].ToString());
-				xWebResponse.DateTUpdate          = PIn.DateT (row["DateTUpdate"].ToString());
+				xWebResponse.DateTUpdate          = PIn.Date  (row["DateTUpdate"].ToString());
 				xWebResponse.TransactionStatus    = (OpenDentBusiness.XWebTransactionStatus)PIn.Int(row["TransactionStatus"].ToString());
 				xWebResponse.ResponseCode         = PIn.Int   (row["ResponseCode"].ToString());
 				string xWebResponseCode=row["XWebResponseCode"].ToString();
@@ -86,6 +86,7 @@ namespace OpenDentBusiness.Crud{
 				xWebResponse.BatchNum             = PIn.Int   (row["BatchNum"].ToString());
 				xWebResponse.BatchAmount          = PIn.Double(row["BatchAmount"].ToString());
 				xWebResponse.AccountExpirationDate= PIn.Date  (row["AccountExpirationDate"].ToString());
+				xWebResponse.DebugError           = PIn.String(row["DebugError"].ToString());
 				retVal.Add(xWebResponse);
 			}
 			return retVal;
@@ -128,6 +129,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("BatchNum");
 			table.Columns.Add("BatchAmount");
 			table.Columns.Add("AccountExpirationDate");
+			table.Columns.Add("DebugError");
 			foreach(XWebResponse xWebResponse in listXWebResponses) {
 				table.Rows.Add(new object[] {
 					POut.Long  (xWebResponse.XWebResponseNum),
@@ -136,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (xWebResponse.ClinicNum),
 					POut.Long  (xWebResponse.PaymentWebNum),
 					POut.DateT (xWebResponse.DateTEntry),
-					POut.DateT (xWebResponse.DateTUpdate),
+					POut.Date  (xWebResponse.DateTUpdate),
 					POut.Int   ((int)xWebResponse.TransactionStatus),
 					POut.Int   (xWebResponse.ResponseCode),
 					POut.Int   ((int)xWebResponse.XWebResponseCode),
@@ -161,6 +163,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Int   (xWebResponse.BatchNum),
 					POut.Double(xWebResponse.BatchAmount),
 					POut.Date  (xWebResponse.AccountExpirationDate),
+					            xWebResponse.DebugError,
 				});
 			}
 			return table;
@@ -201,7 +204,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="XWebResponseNum,";
 			}
-			command+="PatNum,ProvNum,ClinicNum,PaymentWebNum,DateTEntry,TransactionStatus,ResponseCode,XWebResponseCode,ResponseDescription,OTK,HpfUrl,HpfExpiration,TransactionID,TransactionType,Alias,CardType,CardBrand,CardBrandShort,MaskedAcctNum,Amount,ApprovalCode,CardCodeResponse,ReceiptID,ExpDate,EntryMethod,ProcessorResponse,BatchNum,BatchAmount,AccountExpirationDate) VALUES(";
+			command+="PatNum,ProvNum,ClinicNum,PaymentWebNum,DateTEntry,DateTUpdate,TransactionStatus,ResponseCode,XWebResponseCode,ResponseDescription,OTK,HpfUrl,HpfExpiration,TransactionID,TransactionType,Alias,CardType,CardBrand,CardBrandShort,MaskedAcctNum,Amount,ApprovalCode,CardCodeResponse,ReceiptID,ExpDate,EntryMethod,ProcessorResponse,BatchNum,BatchAmount,AccountExpirationDate,DebugError) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(xWebResponse.XWebResponseNum)+",";
 			}
@@ -211,13 +214,13 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (xWebResponse.ClinicNum)+","
 				+    POut.Long  (xWebResponse.PaymentWebNum)+","
 				+    DbHelper.Now()+","
-				//DateTUpdate can only be set by MySQL
+				+    POut.Date  (xWebResponse.DateTUpdate)+","
 				+    POut.Int   ((int)xWebResponse.TransactionStatus)+","
 				+    POut.Int   (xWebResponse.ResponseCode)+","
 				+"'"+POut.String(xWebResponse.XWebResponseCode.ToString())+"',"
 				+"'"+POut.String(xWebResponse.ResponseDescription)+"',"
 				+"'"+POut.String(xWebResponse.OTK)+"',"
-				+"'"+POut.String(xWebResponse.HpfUrl)+"',"
+				+    DbHelper.ParamChar+"paramHpfUrl,"
 				+    POut.DateT (xWebResponse.HpfExpiration)+","
 				+"'"+POut.String(xWebResponse.TransactionID)+"',"
 				+"'"+POut.String(xWebResponse.TransactionType)+"',"
@@ -235,12 +238,21 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(xWebResponse.ProcessorResponse)+"',"
 				+    POut.Int   (xWebResponse.BatchNum)+","
 				+"'"+POut.Double(xWebResponse.BatchAmount)+"',"
-				+    POut.Date  (xWebResponse.AccountExpirationDate)+")";
+				+    POut.Date  (xWebResponse.AccountExpirationDate)+","
+				+    DbHelper.ParamChar+"paramDebugError)";
+			if(xWebResponse.HpfUrl==null) {
+				xWebResponse.HpfUrl="";
+			}
+			OdSqlParameter paramHpfUrl=new OdSqlParameter("paramHpfUrl",OdDbType.Text,xWebResponse.HpfUrl);
+			if(xWebResponse.DebugError==null) {
+				xWebResponse.DebugError="";
+			}
+			OdSqlParameter paramDebugError=new OdSqlParameter("paramDebugError",OdDbType.Text,xWebResponse.DebugError);
 			if(useExistingPK || PrefC.RandomKeys) {
-				Db.NonQ(command);
+				Db.NonQ(command,paramHpfUrl,paramDebugError);
 			}
 			else {
-				xWebResponse.XWebResponseNum=Db.NonQ(command,true);
+				xWebResponse.XWebResponseNum=Db.NonQ(command,true,paramHpfUrl,paramDebugError);
 			}
 			return xWebResponse.XWebResponseNum;
 		}
@@ -268,7 +280,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="XWebResponseNum,";
 			}
-			command+="PatNum,ProvNum,ClinicNum,PaymentWebNum,DateTEntry,TransactionStatus,ResponseCode,XWebResponseCode,ResponseDescription,OTK,HpfUrl,HpfExpiration,TransactionID,TransactionType,Alias,CardType,CardBrand,CardBrandShort,MaskedAcctNum,Amount,ApprovalCode,CardCodeResponse,ReceiptID,ExpDate,EntryMethod,ProcessorResponse,BatchNum,BatchAmount,AccountExpirationDate) VALUES(";
+			command+="PatNum,ProvNum,ClinicNum,PaymentWebNum,DateTEntry,DateTUpdate,TransactionStatus,ResponseCode,XWebResponseCode,ResponseDescription,OTK,HpfUrl,HpfExpiration,TransactionID,TransactionType,Alias,CardType,CardBrand,CardBrandShort,MaskedAcctNum,Amount,ApprovalCode,CardCodeResponse,ReceiptID,ExpDate,EntryMethod,ProcessorResponse,BatchNum,BatchAmount,AccountExpirationDate,DebugError) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(xWebResponse.XWebResponseNum)+",";
 			}
@@ -278,13 +290,13 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (xWebResponse.ClinicNum)+","
 				+    POut.Long  (xWebResponse.PaymentWebNum)+","
 				+    DbHelper.Now()+","
-				//DateTUpdate can only be set by MySQL
+				+    POut.Date  (xWebResponse.DateTUpdate)+","
 				+    POut.Int   ((int)xWebResponse.TransactionStatus)+","
 				+    POut.Int   (xWebResponse.ResponseCode)+","
 				+"'"+POut.String(xWebResponse.XWebResponseCode.ToString())+"',"
 				+"'"+POut.String(xWebResponse.ResponseDescription)+"',"
 				+"'"+POut.String(xWebResponse.OTK)+"',"
-				+"'"+POut.String(xWebResponse.HpfUrl)+"',"
+				+    DbHelper.ParamChar+"paramHpfUrl,"
 				+    POut.DateT (xWebResponse.HpfExpiration)+","
 				+"'"+POut.String(xWebResponse.TransactionID)+"',"
 				+"'"+POut.String(xWebResponse.TransactionType)+"',"
@@ -302,12 +314,21 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(xWebResponse.ProcessorResponse)+"',"
 				+    POut.Int   (xWebResponse.BatchNum)+","
 				+"'"+POut.Double(xWebResponse.BatchAmount)+"',"
-				+    POut.Date  (xWebResponse.AccountExpirationDate)+")";
+				+    POut.Date  (xWebResponse.AccountExpirationDate)+","
+				+    DbHelper.ParamChar+"paramDebugError)";
+			if(xWebResponse.HpfUrl==null) {
+				xWebResponse.HpfUrl="";
+			}
+			OdSqlParameter paramHpfUrl=new OdSqlParameter("paramHpfUrl",OdDbType.Text,xWebResponse.HpfUrl);
+			if(xWebResponse.DebugError==null) {
+				xWebResponse.DebugError="";
+			}
+			OdSqlParameter paramDebugError=new OdSqlParameter("paramDebugError",OdDbType.Text,xWebResponse.DebugError);
 			if(useExistingPK || isRandomKeys) {
-				Db.NonQ(command);
+				Db.NonQ(command,paramHpfUrl,paramDebugError);
 			}
 			else {
-				xWebResponse.XWebResponseNum=Db.NonQ(command,true);
+				xWebResponse.XWebResponseNum=Db.NonQ(command,true,paramHpfUrl,paramDebugError);
 			}
 			return xWebResponse.XWebResponseNum;
 		}
@@ -320,13 +341,13 @@ namespace OpenDentBusiness.Crud{
 				+"ClinicNum            =  "+POut.Long  (xWebResponse.ClinicNum)+", "
 				+"PaymentWebNum        =  "+POut.Long  (xWebResponse.PaymentWebNum)+", "
 				//DateTEntry not allowed to change
-				//DateTUpdate can only be set by MySQL
+				+"DateTUpdate          =  "+POut.Date  (xWebResponse.DateTUpdate)+", "
 				+"TransactionStatus    =  "+POut.Int   ((int)xWebResponse.TransactionStatus)+", "
 				+"ResponseCode         =  "+POut.Int   (xWebResponse.ResponseCode)+", "
 				+"XWebResponseCode     = '"+POut.String(xWebResponse.XWebResponseCode.ToString())+"', "
 				+"ResponseDescription  = '"+POut.String(xWebResponse.ResponseDescription)+"', "
 				+"OTK                  = '"+POut.String(xWebResponse.OTK)+"', "
-				+"HpfUrl               = '"+POut.String(xWebResponse.HpfUrl)+"', "
+				+"HpfUrl               =  "+DbHelper.ParamChar+"paramHpfUrl, "
 				+"HpfExpiration        =  "+POut.DateT (xWebResponse.HpfExpiration)+", "
 				+"TransactionID        = '"+POut.String(xWebResponse.TransactionID)+"', "
 				+"TransactionType      = '"+POut.String(xWebResponse.TransactionType)+"', "
@@ -344,9 +365,18 @@ namespace OpenDentBusiness.Crud{
 				+"ProcessorResponse    = '"+POut.String(xWebResponse.ProcessorResponse)+"', "
 				+"BatchNum             =  "+POut.Int   (xWebResponse.BatchNum)+", "
 				+"BatchAmount          = '"+POut.Double(xWebResponse.BatchAmount)+"', "
-				+"AccountExpirationDate=  "+POut.Date  (xWebResponse.AccountExpirationDate)+" "
+				+"AccountExpirationDate=  "+POut.Date  (xWebResponse.AccountExpirationDate)+", "
+				+"DebugError           =  "+DbHelper.ParamChar+"paramDebugError "
 				+"WHERE XWebResponseNum = "+POut.Long(xWebResponse.XWebResponseNum);
-			Db.NonQ(command);
+			if(xWebResponse.HpfUrl==null) {
+				xWebResponse.HpfUrl="";
+			}
+			OdSqlParameter paramHpfUrl=new OdSqlParameter("paramHpfUrl",OdDbType.Text,xWebResponse.HpfUrl);
+			if(xWebResponse.DebugError==null) {
+				xWebResponse.DebugError="";
+			}
+			OdSqlParameter paramDebugError=new OdSqlParameter("paramDebugError",OdDbType.Text,xWebResponse.DebugError);
+			Db.NonQ(command,paramHpfUrl,paramDebugError);
 		}
 
 		///<summary>Updates one XWebResponse in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
@@ -369,7 +399,10 @@ namespace OpenDentBusiness.Crud{
 				command+="PaymentWebNum = "+POut.Long(xWebResponse.PaymentWebNum)+"";
 			}
 			//DateTEntry not allowed to change
-			//DateTUpdate can only be set by MySQL
+			if(xWebResponse.DateTUpdate.Date != oldXWebResponse.DateTUpdate.Date) {
+				if(command!=""){ command+=",";}
+				command+="DateTUpdate = "+POut.Date(xWebResponse.DateTUpdate)+"";
+			}
 			if(xWebResponse.TransactionStatus != oldXWebResponse.TransactionStatus) {
 				if(command!=""){ command+=",";}
 				command+="TransactionStatus = "+POut.Int   ((int)xWebResponse.TransactionStatus)+"";
@@ -392,7 +425,7 @@ namespace OpenDentBusiness.Crud{
 			}
 			if(xWebResponse.HpfUrl != oldXWebResponse.HpfUrl) {
 				if(command!=""){ command+=",";}
-				command+="HpfUrl = '"+POut.String(xWebResponse.HpfUrl)+"'";
+				command+="HpfUrl = "+DbHelper.ParamChar+"paramHpfUrl";
 			}
 			if(xWebResponse.HpfExpiration != oldXWebResponse.HpfExpiration) {
 				if(command!=""){ command+=",";}
@@ -466,12 +499,24 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="AccountExpirationDate = "+POut.Date(xWebResponse.AccountExpirationDate)+"";
 			}
+			if(xWebResponse.DebugError != oldXWebResponse.DebugError) {
+				if(command!=""){ command+=",";}
+				command+="DebugError = "+DbHelper.ParamChar+"paramDebugError";
+			}
 			if(command==""){
 				return false;
 			}
+			if(xWebResponse.HpfUrl==null) {
+				xWebResponse.HpfUrl="";
+			}
+			OdSqlParameter paramHpfUrl=new OdSqlParameter("paramHpfUrl",OdDbType.Text,xWebResponse.HpfUrl);
+			if(xWebResponse.DebugError==null) {
+				xWebResponse.DebugError="";
+			}
+			OdSqlParameter paramDebugError=new OdSqlParameter("paramDebugError",OdDbType.Text,xWebResponse.DebugError);
 			command="UPDATE xwebresponse SET "+command
 				+" WHERE XWebResponseNum = "+POut.Long(xWebResponse.XWebResponseNum);
-			Db.NonQ(command);
+			Db.NonQ(command,paramHpfUrl,paramDebugError);
 			return true;
 		}
 
@@ -491,7 +536,9 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			//DateTEntry not allowed to change
-			//DateTUpdate can only be set by MySQL
+			if(xWebResponse.DateTUpdate.Date != oldXWebResponse.DateTUpdate.Date) {
+				return true;
+			}
 			if(xWebResponse.TransactionStatus != oldXWebResponse.TransactionStatus) {
 				return true;
 			}
@@ -562,6 +609,9 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			if(xWebResponse.AccountExpirationDate.Date != oldXWebResponse.AccountExpirationDate.Date) {
+				return true;
+			}
+			if(xWebResponse.DebugError != oldXWebResponse.DebugError) {
 				return true;
 			}
 			return false;
