@@ -6,8 +6,8 @@ using System.Windows.Forms;
 
 namespace CentralManager {
 	public partial class FormCentralConnections:Form {
-		///<summary>Initially blank or should be filled with connections that should be filtered out of the list of available conns.
-		///When OK is clicked, this list will contain all filtered connections along with selected connections.</summary>
+		///<summary>Initially blank or should be filled with connection copies.
+		///When OK is clicked, this list will contain all selected connections.</summary>
 		public List<CentralConnection> ListConns;
 		///<summary>A filtered list of connections.  Gets refilled every time FillGrid is called.</summary>
 		private List<CentralConnection> _listConnsDisplay;
@@ -52,14 +52,7 @@ namespace CentralManager {
 			ODGridRow row;
 			List<int> listIdxSelect=new List<int>();
 			for(int i=0;i<_listConnsDisplay.Count;i++) {
-				bool isFound=false;
-				for(int j=0;j<ListConns.Count;j++) {
-					if(_listConnsDisplay[i].CentralConnectionNum==ListConns[j].CentralConnectionNum) {
-						isFound=true;
-						break;
-					}
-				}
-				if(isFound) {
+				if(ListConns.Exists(x => x.CentralConnectionNum==_listConnsDisplay[i].CentralConnectionNum)) {
 					listIdxSelect.Add(i);
 				}
 				row=new ODGridRow();
@@ -100,12 +93,15 @@ namespace CentralManager {
 			conn.IsNew=true;
 			FormCentralConnectionEdit FormCCS=new FormCentralConnectionEdit();
 			FormCCS.CentralConnectionCur=conn;
-			FormCCS.ShowDialog();//Will insert conn on OK.
+			if(FormCCS.ShowDialog()==DialogResult.OK) {//Will insert conn on OK.
+				ListConns.Add(FormCCS.CentralConnectionCur);
+			}
 			FillGrid();//Refreshing the grid will show any new connections added.
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
 			//Add any selected connections to ListConns so that forms outside know which connections to add.
+			ListConns.Clear();
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
 				CentralConnection conn=(CentralConnection)gridMain.Rows[gridMain.SelectedIndices[i]].Tag;
 				ListConns.Add(conn);
