@@ -92,7 +92,9 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
 				return Meth.GetObject<int>(MethodBase.GetCurrentMethod(),groupNum);
 			}
-			string command="SELECT COUNT(*) FROM conngroupattach WHERE ConnectionGroupNum="+POut.Long(groupNum);
+			string command="SELECT COUNT(*) FROM conngroupattach INNER JOIN centralconnection "
+				+"ON conngroupattach.CentralConnectionNum=centralconnection.CentralConnectionNum "
+				+"WHERE ConnectionGroupNum="+POut.Long(groupNum);
 			return PIn.Int(Db.GetCount(command));
 		}
 

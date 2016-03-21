@@ -66,10 +66,18 @@ namespace CentralManager {
 
 		private void butAdd_Click(object sender,EventArgs e) {
 			FormCentralConnections FormCC=new FormCentralConnections();
-			FormCC.ListConns=_listConnsCur;
+			foreach(CentralConnection conn in _listConns) {
+				FormCC.ListConns.Add(conn.Copy());//Add a copy of each CentralConnection to the FormCC's ListConns for display purposes.
+			}
 			FormCC.LabelText.Text=Lans.g(this,"Select connections then click OK to add them to the currently edited group.");
 			FormCC.Text=Lans.g(this,"Group Connections");
-			FormCC.ShowDialog();
+			if(FormCC.ShowDialog()==DialogResult.OK) {
+				foreach(CentralConnection conn in FormCC.ListConns) {
+					if(!_listConnsCur.Exists(x => x.CentralConnectionNum==conn.CentralConnectionNum)) {
+						_listConnsCur.Add(conn);//Add any newly selected connections to the displayed list in this window, avoiding duplicates.
+					}
+				}
+			}
 			FillGrid();
 		}
 

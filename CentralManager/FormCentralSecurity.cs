@@ -493,45 +493,51 @@ namespace CentralManager {
 			FormCentralConnections FormCC=new FormCentralConnections();
 			FormCC.LabelText.Text=Lans.g("CentralSecurity","Sync will create or update the Central Management users, passwords, and user groups to all selected databases.");
 			FormCC.Text=Lans.g("CentralSecurity","Sync Security");
-			FormCC.ListConns=ListConns;
-			FormCC.ShowDialog();
-			if(FormCC.DialogResult==DialogResult.OK) {
-				ListConns=FormCC.ListConns;
+			foreach(CentralConnection conn in ListConns) { 
+				FormCC.ListConns.Add(conn.Copy());
+			}
+			List<CentralConnection> listSelectedConns=new List<CentralConnection>();
+			if(FormCC.ShowDialog()==DialogResult.OK) {
+				listSelectedConns=FormCC.ListConns;
 			}
 			else {
 				return;
 			}
-			CentralSyncHelper.SyncAll(ListConns);
+			CentralSyncHelper.SyncAll(listSelectedConns);
 		}
 
 		private void butSyncUsers_Click(object sender,EventArgs e) {
 			FormCentralConnections FormCC=new FormCentralConnections();
 			FormCC.LabelText.Text=Lans.g("CentralSecurity","Sync will create or update the Central Management users, passwords, and user groups to all selected databases.");
 			FormCC.Text=Lans.g("CentralSecurity","Sync Security");
-			FormCC.ListConns=ListConns;
-			FormCC.ShowDialog();
-			if(FormCC.DialogResult==DialogResult.OK) {
-				ListConns=FormCC.ListConns;
+			foreach(CentralConnection conn in FormCC.ListConns) { 
+				FormCC.ListConns.Add(conn.Copy());
+			}
+			List<CentralConnection> listSelectedConns=new List<CentralConnection>();
+			if(FormCC.ShowDialog()==DialogResult.OK) {
+				listSelectedConns=FormCC.ListConns;
 			}
 			else {
 				return;
 			}
-			CentralSyncHelper.SyncUsers(ListConns);
+			CentralSyncHelper.SyncUsers(listSelectedConns);
 		}
 
 		private void butSyncLocks_Click(object sender,EventArgs e) {
 			FormCentralConnections FormCC=new FormCentralConnections();
 			FormCC.LabelText.Text=Lans.g("CentralSecurity","Sync will create or update the Central Management users, passwords, and user groups to all selected databases.");
 			FormCC.Text=Lans.g("CentralSecurity","Sync Security");
-			FormCC.ListConns=ListConns;
-			FormCC.ShowDialog();
-			if(FormCC.DialogResult==DialogResult.OK) {
-				ListConns=FormCC.ListConns;
+			foreach(CentralConnection conn in FormCC.ListConns) { 
+				FormCC.ListConns.Add(conn.Copy());
+			}
+			List<CentralConnection> listSelectedConns=new List<CentralConnection>();
+			if(FormCC.ShowDialog()==DialogResult.OK) {
+				listSelectedConns=FormCC.ListConns;
 			}
 			else {
 				return;
 			}
-			CentralSyncHelper.SyncLocks(ListConns);
+			CentralSyncHelper.SyncLocks(listSelectedConns);
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {

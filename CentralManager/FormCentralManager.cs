@@ -20,6 +20,7 @@ using System.Threading;
 namespace CentralManager {
 	public partial class FormCentralManager:Form {
 		public static byte[] EncryptionKey;
+		///<summary>A full list of connections.</summary>
 		private List<CentralConnection> _listConns;
 		private List<ConnectionGroup> _listConnectionGroups;
 		private string _progVersion;
@@ -191,27 +192,28 @@ namespace CentralManager {
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			if(_listConns[e.Row].ConnectionStatus=="OFFLINE") {
+			CentralConnection conn=(CentralConnection)gridMain.Rows[e.Row].Tag;
+			if(conn.ConnectionStatus=="OFFLINE") {
 				MsgBox.Show(this,"Server Offline.  Fix connection and check status again to connect.");
 				return;
 			}
-			if(_listConns[e.Row].ConnectionStatus!="OK") {
+			if(conn.ConnectionStatus!="OK") {
 				MsgBox.Show(this,"Version mismatch.  Either update your program or update the remote server's program and check status again to connect.");
 				return;
 			}
 			string args="";
-			if(_listConns[e.Row].DatabaseName!="") {
+			if(conn.DatabaseName!="") {
 				//ServerName=localhost DatabaseName=opendental MySqlUser=root MySqlPassword=
-				args+="ServerName=\""+_listConns[e.Row].ServerName+"\" "
-					+"DatabaseName=\""+_listConns[e.Row].DatabaseName+"\" "
-					+"MySqlUser=\""+_listConns[e.Row].MySqlUser+"\" ";
-				if(_listConns[e.Row].MySqlPassword!="") {
-					args+="MySqlPassword=\""+CentralConnections.Decrypt(_listConns[e.Row].MySqlPassword,EncryptionKey)+"\" ";
+				args+="ServerName=\""+conn.ServerName+"\" "
+					+"DatabaseName=\""+conn.DatabaseName+"\" "
+					+"MySqlUser=\""+conn.MySqlUser+"\" ";
+				if(conn.MySqlPassword!="") {
+					args+="MySqlPassword=\""+CentralConnections.Decrypt(conn.MySqlPassword,EncryptionKey)+"\" ";
 				}
 			}
-			else if(_listConns[e.Row].ServiceURI!="") {
-				args+="WebServiceUri=\""+_listConns[e.Row].ServiceURI+"\" ";//Command line args expects WebServiceUri explicitly. Case sensitive.
-				if(_listConns[e.Row].WebServiceIsEcw){
+			else if(conn.ServiceURI!="") {
+				args+="WebServiceUri=\""+conn.ServiceURI+"\" ";//Command line args expects WebServiceUri explicitly. Case sensitive.
+				if(conn.WebServiceIsEcw){
 					args+="WebServiceIsEcw=True ";
 				}
 			}
@@ -244,11 +246,15 @@ namespace CentralManager {
 
 		private void menuConnSetup_Click(object sender,EventArgs e) {
 			FormCentralConnections FormCC=new FormCentralConnections();
-			FormCC.ListConns=_listConns;
+			foreach(CentralConnection conn in _listConns) {
+				FormCC.ListConns.Add(conn.Copy());
+			}
 			FormCC.LabelText.Text=Lans.g("FormCentralConnections","Double click an existing connection to edit or click the 'Add' button to add a new connection.");
 			FormCC.Text=Lans.g("FormCentralConnections","Connection Setup");
-			FormCC.ShowDialog();
-			FillGrid();
+			if(FormCC.ShowDialog()==DialogResult.OK) {
+				_listConns=CentralConnections.GetConnections();
+				FillGrid();
+			}
 		}
 
 		private void menuGroups_Click(object sender,EventArgs e) {
@@ -280,11 +286,12 @@ namespace CentralManager {
 
 		private void menuItemSecurity_Click(object sender,EventArgs e) {
 			FormCentralSecurity FormCUS=new FormCentralSecurity();
-			for(int i=0;i<gridMain.SelectedIndices.Length;i++){
-				FormCUS.ListConns.Add((CentralConnection)gridMain.Rows[gridMain.SelectedIndices[i]].Tag);
+			foreach(CentralConnection conn in _listConns) {
+				FormCUS.ListConns.Add(conn.Copy());
 			}
 			FormCUS.ShowDialog();
-			GetConfigAndConnect();
+			_listConns=CentralConnections.GetConnections();//List may have changed when syncing security settings.
+			FillGrid();
 		}
 
 		#endregion
@@ -344,8 +351,9 @@ namespace CentralManager {
 			}
 			FormCentralConnectionEdit FormCCE=new FormCentralConnectionEdit();
 			FormCCE.CentralConnectionCur=(CentralConnection)gridMain.Rows[gridMain.SelectedIndices[0]].Tag;//No support for editing multiple.
-			FormCCE.ShowDialog();
-			_listConns=CentralConnections.GetConnections();
+			if(FormCCE.ShowDialog()==DialogResult.OK) {
+				_listConns=CentralConnections.GetConnections();
+			}
 			FillGrid();
 		}
 
