@@ -118,6 +118,11 @@ namespace OpenDental {
 			}
 			catch(Exception) {
 				ODEvent.Fire(new ODEventArgs("RecopyProgress","DEFCON 1"));
+				if(isSilent) {
+					FormOpenDental.ExitCode=302;//Installation files could not be copied.
+					Application.Exit();
+					return false;
+				}
 				MessageBox.Show(Lan.g("Prefs","Failed copying the update files to the following directory")+":\r\n"
 					+folderUpdate+"\r\n"+"\r\n"
 					+Lan.g("Prefs","This could be due to a lack of permissions to create the above folder or the files in the installation directory are still in use."));
@@ -200,7 +205,7 @@ namespace OpenDental {
 					ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Inserting new update files into database...")));
 					try {
 						foreach(string rawBase64 in listRawBase64s) {
-							DocumentMiscs.AppendRawBase64ForDoc(rawBase64,docNum);
+							DocumentMiscs.AppendRawBase64ForUpdateFiles(rawBase64);
 						}
 					}
 					catch(Exception ex) {
@@ -216,6 +221,11 @@ namespace OpenDental {
 				}
 				catch(Exception) {
 					ODEvent.Fire(new ODEventArgs("RecopyProgress","DEFCON 1"));
+					if(isSilent) {
+						FormOpenDental.ExitCode=303;//Failed inserting update files into the database.
+						Application.Exit();
+						return false;
+					}
 					string errorStr=Lan.g("Prefs","Failed inserting update files into the database."
 						+"\r\nPlease call us or have your IT admin increase the max_allowed_packet to 40MB in the my.ini file.");
 					try {
