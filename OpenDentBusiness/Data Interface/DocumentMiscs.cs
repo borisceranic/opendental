@@ -38,7 +38,8 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),rawBase64,docMiscNum);
 				return;
 			}
-			string command="UPDATE documentmisc SET RawBase64=CONCAT(RawBase64,"+DbHelper.ParamChar+"paramRawBase64) WHERE DocMiscNum="+POut.Long(docMiscNum);
+			string command="UPDATE documentmisc SET RawBase64=CONCAT("+DbHelper.IfNull("RawBase64","")+","+DbHelper.ParamChar+"paramRawBase64) "
+				+"WHERE DocMiscNum="+POut.Long(docMiscNum);
 			OdSqlParameter paramRawBase64=new OdSqlParameter("paramRawBase64",OdDbType.Text,rawBase64);
 			Db.NonQ(command,paramRawBase64);
 		}
@@ -53,7 +54,7 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),rawBase64);
 				return;
 			}
-			string command="UPDATE documentmisc SET RawBase64=CONCAT(RawBase64,"+DbHelper.ParamChar+"paramRawBase64) "
+			string command="UPDATE documentmisc SET RawBase64=CONCAT("+DbHelper.IfNull("RawBase64","")+","+DbHelper.ParamChar+"paramRawBase64) "
 				+"WHERE DocMiscType="+POut.Int((int)DocumentMiscType.UpdateFiles);
 			OdSqlParameter paramRawBase64=new OdSqlParameter("paramRawBase64",OdDbType.Text,rawBase64);
 			Db.NonQ(command,paramRawBase64);
