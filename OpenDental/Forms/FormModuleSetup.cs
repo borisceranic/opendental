@@ -2519,19 +2519,23 @@ namespace OpenDental{
 				return;
 			}
 			if(comboBrokenApptAdjType.SelectedIndex==-1){
-				MsgBox.Show(this,"Please enter an adjustment type for broken appointments.");
+				MsgBox.Show(this,"The selected Broken Appointment adjustment type in Appointment Module Preferences is hidden. Choose an adjustment type "+
+					"that is not hidden in order to proceed.");
 				return;
 			}
 			if(comboFinanceChargeAdjType.SelectedIndex==-1) {
-				MsgBox.Show(this,"Please enter an adjustment type for finance charges.");
+				MsgBox.Show(this,"The selected Finance Charge adjustment type in Account Module Preferences is hidden. Choose an adjustment type that is "
+					+"not hidden in order to proceed.");
 				return;
 			}
 			if(comboBillingChargeAdjType.SelectedIndex==-1) {
-				MsgBox.Show(this,"Please enter an adjustment type for billing charges.");
+				MsgBox.Show(this,"The selected Billing Charge adjustment type in Account Module Preferences is hidden. Choose an adjustment type that is "
+					+"not hidden in order to proceed.");
 				return;
 			}
 			if(comboProcDiscountType.SelectedIndex==-1) {
-				MsgBox.Show(this,"Please enter an adjustment type for procedure discounts.");
+				MsgBox.Show(this,"The selected Procedure Discount adjustment type in Treatment Plan Module Preferences is hidden. Choose an adjustment "
+					+"type that is not hidden in order to proceed.");
 				return;
 			}
 			if(textStatementsCalcDueDate.errorProvider1.GetError(textStatementsCalcDueDate)!=""
