@@ -230,7 +230,12 @@ namespace OpenDentBusiness {
 				string cellText=nodeListX[0].InnerText.Replace(@"\|","&#124;");
 				string[] cells=cellText.Split('|');
 				for(int x=0;x<cells.Length;x++) {//loop x cells
-					row[x]=cells[x].Replace("&#124;","|").Replace("#92;","\\");
+					string colUnescaped=cells[x].Replace("&#124;","|").Replace("#92;","\\");
+					//Check the type of the current column to make sure we do not try and set a DateTime column to empty string (throws exception).
+					if(table.Columns[x].DataType==typeof(DateTime) && string.IsNullOrEmpty(colUnescaped)) {
+						colUnescaped=PIn.DateT(colUnescaped).ToString();//PIn.DateT handles empty strings and turns them into DateTime.MinValue
+					}
+					row[x]=colUnescaped;
 				}
 				table.Rows.Add(row);
 			}
