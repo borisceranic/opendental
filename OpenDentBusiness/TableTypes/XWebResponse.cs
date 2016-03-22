@@ -29,6 +29,7 @@ namespace OpenDentBusiness {
 		[CrudColumn(SpecialType=CrudSpecialColType.DateTEntry)]
 		public DateTime DateTEntry;
 		///<summary>Timestamp at which this row was last updated. Will be updated each time the OTK status is polled and one final time when XWebResponseCode changes from Pending.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.DateT)]
 		public DateTime DateTUpdate;
 		///<summary>Inidicates which phase of the XWeb process this transaction is in. See class summary for details.</summary>
 		public XWebTransactionStatus TransactionStatus;
@@ -105,23 +106,28 @@ namespace OpenDentBusiness {
 		///<summary>Returned from XWeb Gateway as a string. Helper method to convert to DateTime. Format is yyMM from XWeb gateway</summary>
 		public static DateTime ConvertExpDate(string expDate) {
 			try {
-				return new DateTime(int.Parse(expDate.Substring(0,2)),int.Parse(expDate.Substring(2,2)),1);
+				//Add 2000 to the year.				
+				DateTime ret=new DateTime(2000+int.Parse(expDate.Substring(2,2)),int.Parse(expDate.Substring(0,2)),1);
+				//Last day of the month.
+				return ret.AddMonths(1).AddDays(-1);
 			}
 			catch {
-				return DateTime.Today.AddMonths(-1);
+				return new DateTime(1880,1,1);
 			}
 		}
 
-		///<summary>These fields should exists from instance to instance for the same OTK.</summary>
-		public void SetPersistentFields(long patNum,long provNum,long clinicNum,string otk,string hpfUrl,DateTime hpfExpiration,string debugError,long xWebResponseNum=0) {
+		///<summary>These fields should persist from instance to instance for the same OTK.</summary>
+		public void SetPersistentFields(long xWebResponseNum,string transactionType,long patNum,long provNum,long clinicNum,double amount,string otk,string hpfUrl,DateTime hpfExpiration,string debugError) {
+			XWebResponseNum=xWebResponseNum;
+			TransactionType=transactionType;
 			PatNum=patNum;
 			ProvNum=provNum;
 			ClinicNum=clinicNum;
+			Amount=amount;
 			OTK=otk;
 			HpfUrl=hpfUrl;
 			HpfExpiration=hpfExpiration;
 			DebugError=debugError;
-			XWebResponseNum=xWebResponseNum;
 		}
 	}
 

@@ -52,7 +52,7 @@ namespace OpenDentBusiness.Crud{
 				xWebResponse.ClinicNum            = PIn.Long  (row["ClinicNum"].ToString());
 				xWebResponse.PaymentWebNum        = PIn.Long  (row["PaymentWebNum"].ToString());
 				xWebResponse.DateTEntry           = PIn.DateT (row["DateTEntry"].ToString());
-				xWebResponse.DateTUpdate          = PIn.Date  (row["DateTUpdate"].ToString());
+				xWebResponse.DateTUpdate          = PIn.DateT (row["DateTUpdate"].ToString());
 				xWebResponse.TransactionStatus    = (OpenDentBusiness.XWebTransactionStatus)PIn.Int(row["TransactionStatus"].ToString());
 				xWebResponse.ResponseCode         = PIn.Int   (row["ResponseCode"].ToString());
 				string xWebResponseCode=row["XWebResponseCode"].ToString();
@@ -138,7 +138,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (xWebResponse.ClinicNum),
 					POut.Long  (xWebResponse.PaymentWebNum),
 					POut.DateT (xWebResponse.DateTEntry),
-					POut.Date  (xWebResponse.DateTUpdate),
+					POut.DateT (xWebResponse.DateTUpdate),
 					POut.Int   ((int)xWebResponse.TransactionStatus),
 					POut.Int   (xWebResponse.ResponseCode),
 					POut.Int   ((int)xWebResponse.XWebResponseCode),
@@ -214,7 +214,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (xWebResponse.ClinicNum)+","
 				+    POut.Long  (xWebResponse.PaymentWebNum)+","
 				+    DbHelper.Now()+","
-				+    POut.Date  (xWebResponse.DateTUpdate)+","
+				+    POut.DateT (xWebResponse.DateTUpdate)+","
 				+    POut.Int   ((int)xWebResponse.TransactionStatus)+","
 				+    POut.Int   (xWebResponse.ResponseCode)+","
 				+"'"+POut.String(xWebResponse.XWebResponseCode.ToString())+"',"
@@ -290,7 +290,7 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (xWebResponse.ClinicNum)+","
 				+    POut.Long  (xWebResponse.PaymentWebNum)+","
 				+    DbHelper.Now()+","
-				+    POut.Date  (xWebResponse.DateTUpdate)+","
+				+    POut.DateT (xWebResponse.DateTUpdate)+","
 				+    POut.Int   ((int)xWebResponse.TransactionStatus)+","
 				+    POut.Int   (xWebResponse.ResponseCode)+","
 				+"'"+POut.String(xWebResponse.XWebResponseCode.ToString())+"',"
@@ -341,7 +341,7 @@ namespace OpenDentBusiness.Crud{
 				+"ClinicNum            =  "+POut.Long  (xWebResponse.ClinicNum)+", "
 				+"PaymentWebNum        =  "+POut.Long  (xWebResponse.PaymentWebNum)+", "
 				//DateTEntry not allowed to change
-				+"DateTUpdate          =  "+POut.Date  (xWebResponse.DateTUpdate)+", "
+				+"DateTUpdate          =  "+POut.DateT (xWebResponse.DateTUpdate)+", "
 				+"TransactionStatus    =  "+POut.Int   ((int)xWebResponse.TransactionStatus)+", "
 				+"ResponseCode         =  "+POut.Int   (xWebResponse.ResponseCode)+", "
 				+"XWebResponseCode     = '"+POut.String(xWebResponse.XWebResponseCode.ToString())+"', "
@@ -399,9 +399,9 @@ namespace OpenDentBusiness.Crud{
 				command+="PaymentWebNum = "+POut.Long(xWebResponse.PaymentWebNum)+"";
 			}
 			//DateTEntry not allowed to change
-			if(xWebResponse.DateTUpdate.Date != oldXWebResponse.DateTUpdate.Date) {
+			if(xWebResponse.DateTUpdate != oldXWebResponse.DateTUpdate) {
 				if(command!=""){ command+=",";}
-				command+="DateTUpdate = "+POut.Date(xWebResponse.DateTUpdate)+"";
+				command+="DateTUpdate = "+POut.DateT(xWebResponse.DateTUpdate)+"";
 			}
 			if(xWebResponse.TransactionStatus != oldXWebResponse.TransactionStatus) {
 				if(command!=""){ command+=",";}
@@ -536,7 +536,7 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			//DateTEntry not allowed to change
-			if(xWebResponse.DateTUpdate.Date != oldXWebResponse.DateTUpdate.Date) {
+			if(xWebResponse.DateTUpdate != oldXWebResponse.DateTUpdate) {
 				return true;
 			}
 			if(xWebResponse.TransactionStatus != oldXWebResponse.TransactionStatus) {
