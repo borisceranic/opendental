@@ -373,6 +373,8 @@ namespace OpenDentBusiness{
 			//Replaces spaces and punctation with wildcards because users should be able to type the following example and match certain addresses:
 			//Search term: "4145 S Court St" should match "4145 S. Court St." in the database.
 			string strAddress=Regex.Replace(POut.String(address), @"[°\-.,:;_""'/\\)(#\s&]","%");
+			char[] arrayRegKeyChars=regKey.Where(x => char.IsLetterOrDigit(x)).ToArray();
+			string strRegKey=new string(arrayRegKeyChars);
 			if(DataConnection.DBtype==DatabaseType.MySql) {
 				if(PrefC.IsODHQ) {
 					//Search both Address and Address2 for HQ
@@ -389,7 +391,7 @@ namespace OpenDentBusiness{
 					+(chartnumber.Length>0?"AND patient.ChartNumber LIKE '"+POut.String(chartnumber)+"%' ":"")//LIKE is case insensitive in mysql.
 					+(email.Length>0?"AND patient.Email LIKE '%"+POut.String(email)+"%' ":"")//LIKE is case insensitive in mysql.
 					+(country.Length>0?"AND patient.Country LIKE '%"+POut.String(country)+"%' ":"")//LIKE is case insensitive in mysql.
-					+(regKey.Length>0?"AND registrationkey.RegKey LIKE '%"+POut.String(regKey)+"%' ":"");//LIKE is case insensitive in mysql.
+					+(regKey.Length>0?"AND registrationkey.RegKey LIKE '%"+POut.String(strRegKey)+"%' ":"");//LIKE is case insensitive in mysql.
 			}
 			else {//oracle
 				command+=(address.Length>0 ? "AND LOWER(patient.Address) LIKE '%"+strAddress.ToLower()+"%' " : "")//case matters in a like statement in oracle.
@@ -400,7 +402,7 @@ namespace OpenDentBusiness{
 					+(chartnumber.Length>0?"AND LOWER(patient.ChartNumber) LIKE '"+POut.String(chartnumber).ToLower()+"%' ":"")//case matters in a like statement in oracle.
 					+(email.Length>0?"AND LOWER(patient.Email) LIKE '%"+POut.String(email).ToLower()+"%' ":"")//case matters in a like statement in oracle.
 					+(country.Length>0?"AND LOWER(patient.Country) LIKE '%"+POut.String(country).ToLower()+"%' ":"")//case matters in a like statement in oracle.
-					+(regKey.Length>0?"AND LOWER(registrationkey.RegKey) LIKE '%"+POut.String(regKey).ToLower()+"%' ":"");//case matters in a like statement in oracle.
+					+(regKey.Length>0?"AND LOWER(registrationkey.RegKey) LIKE '%"+POut.String(strRegKey).ToLower()+"%' ":"");//case matters in a like statement in oracle.
 			}
 			if(birthdate.Year>1880 && birthdate.Year<2100){
 				command+="AND patient.Birthdate ="+POut.Date(birthdate)+" ";
