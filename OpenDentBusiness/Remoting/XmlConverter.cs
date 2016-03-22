@@ -434,9 +434,15 @@ namespace OpenDentBusiness {
 			XmlNodeList nodeListY=doc.SelectSingleNode("//Cells").ChildNodes;
 			foreach(XmlNode node in nodeListY) {//loop y rows
 				DataRow row=table.NewRow();
-				int colIdx=0;
-				node.ChildNodes[0].InnerText.Split('|').ToList()//Break up the XML node which is columns delimited by pipes.
-					.ForEach(x => row[colIdx++]=XmlStringUnescape(x));//Set the cell to the unescaped string value.
+				List<string> listCols=node.ChildNodes[0].InnerText.Split('|').ToList();//Break up the XML node which is columns delimited by pipes.
+				for(int i=0;i<listCols.Count;i++) {
+					string colUnescaped=XmlStringUnescape(listCols[i]);
+					//Check the type of the current column to make sure we do not try and set a DateTime column to empty string (throws exception).
+					if(table.Columns[i].DataType==typeof(DateTime) && string.IsNullOrEmpty(colUnescaped)) {
+						colUnescaped=PIn.DateT(colUnescaped).ToString();//PIn.DateT handles empty strings and turns them into DateTime.MinValue
+					}
+					row[i]=colUnescaped;
+				}
 				table.Rows.Add(row);
 			}
 			return table;
@@ -509,7 +515,7 @@ namespace OpenDentBusiness {
 			}
 			//Loop through every character possible.  
 			for(int i=0;i<XmlEscapeStrings.Length;i++) {
-				//Check once every 1000 characters to see if we've completely cleaned myString.
+				//Check once every 255 characters to see if we've completely cleaned myString.
 				if(i%255==0 && !Regex.IsMatch(myString,@"&#[0-9]+;")) {
 					break;//There is nothing else to clean so stop looking.
 				}
