@@ -32,8 +32,8 @@ namespace OpenDental.Eclaims{
 		///<summary>Called once for each claim to be created.  For claims with a lot of procedures, this may actually create multiple claims.</summary>
 		public static bool CreateClaim(long patNum,long claimNum,int batchNum) {
 			//this can be eliminated later after error checking complete:
-				FormCFI=new FormClaimFormItemEdit();
-				FormCFI.FillFieldNames();
+			FormCFI=new FormClaimFormItemEdit();
+			FormCFI.FillFieldNames();
 			items=new ClaimFormItem[241];//0 is not used 
 			Fill(1,"IsPreAuth");
 			Fill(2,"IsStandardClaim");
@@ -134,13 +134,13 @@ namespace OpenDental.Eclaims{
 			Fill(97,"IsNotAccident");
 			Fill(98,"");//description of accident
 			Fill(99,"TreatingDentistNPI");//Individual NPI
-			Fill(100,"");//''
+			Fill(100,"");//Attachment ID
 			Fill(101,"BillingDentistNPI");//Group NPI
-			Fill(102,"");//''
-			Fill(103,"");//''
-			Fill(104,"");//''
-			Fill(105,"");//''
-			Fill(106,"");//''
+			Fill(102,"");//Specail Tesia Remarks field Import Field gets moved to 232 on outbound
+			Fill(103,"");//4th Carrier Address Line
+			Fill(104,"");//4th Billing Address Line
+			Fill(105,"");//4th Subscriber Address Line
+			Fill(106,"");//4th Patient Address Line
 			//proc 1
 			Fill(107,"P1Date","MM/dd/yyyy");
 			Fill(108,"P1ToothNumber");
@@ -223,48 +223,48 @@ namespace OpenDental.Eclaims{
 			Fill(177,"");//patient pays
 			Fill(178,"");//Work injury.  Only x is accepted.
 			Fill(179,"P1Area");
-			Fill(180,"");
+			Fill(180,"");//Tooth System 1- Will accept any text string
 			Fill(181,"P2Area");
-			Fill(182,"");
+			Fill(182,"");//Tooth System 2- Will accept any text string
 			Fill(183,"P3Area");
-			Fill(184,"");
+			Fill(184,"");//Tooth System 3- Will accept any text string
 			Fill(185,"P4Area");
-			Fill(186,"");
+			Fill(186,"");//Tooth System 4- Will accept any text string
 			Fill(187,"P5Area");
-			Fill(188,"");
+			Fill(188,"");//Tooth System 5- Will accept any text string
 			Fill(189,"P6Area");
-			Fill(190,"");
+			Fill(190,"");//Tooth System 6- Will accept any text string
 			Fill(191,"P7Area");
-			Fill(192,"");
+			Fill(192,"");//Tooth System 7- Will accept any text string
 			Fill(193,"P8Area");
-			Fill(194,"");
-			Fill(195,"");
+			Fill(194,"");//Tooth System 8- Will accept any text string
+			Fill(195,"P9Date","MM/dd/yyyy");
 			Fill(196,"P9Area");
-			Fill(197,"");
-			Fill(198,"");
-			Fill(199,"");
-			Fill(200,"");
-			Fill(201,"");
-			Fill(202,"");
-			Fill(203,"");
+			Fill(197,"");//Tooth System 9- Will accept any text string
+			Fill(198,"P9ToothNumber");
+			Fill(199,"P9Surface");
+			Fill(200,"P9Code");
+			Fill(201,"P9Description");
+			Fill(202,"P9Fee");
+			Fill(203,"P10Date","MM/dd/yyyy");
 			Fill(204,"P10Area");
-			Fill(205,"");
-			Fill(206,"");
-			Fill(207,"");
-			Fill(208,"");
-			Fill(209,"");
-			Fill(210,"");
-			Fill(211,"");
-			Fill(212,"");
-			Fill(213,"");
-			Fill(214,"");
-			Fill(215,"");
+			Fill(205,"");//Tooth System 10- Will accept any text string
+			Fill(206,"P10ToothNumber");
+			Fill(207,"P10Surface");
+			Fill(208,"P10Code");
+			Fill(209,"P10Description");
+			Fill(210,"P10Fee");
+			Fill(211,"");//Treating/Rending Provider ID- Will accept any text string
+			Fill(212,"");//COB Relationship To Subscriber (Self) - Only 'X' will be accepted
+			Fill(213,"");//COB Relationship To Subscriber (Spouse) - Only 'X' will be accepted
+			Fill(214,"");//COB Relationship To Subscriber (Child) - Only 'X' will be accepted
+			Fill(215,"");//COB Relationship To Subscriber (Other) - Only 'X' will be accepted
 			Fill(216,"OtherInsCarrierName");//COB insurance company name
 			Fill(217,"OtherInsAddress");//COB address
 			Fill(218,"OtherInsCity");//COB ins City
 			Fill(219,"OtherInsST");//COB ins State
 			Fill(220,"OtherInsZip");//COB Zip
-			Fill(221,"");
+			Fill(221,"");//Accident ST - Only 2 character state abbreviation.
 			Fill(222,"");
 			Fill(223,"");
 			Fill(224,"");
@@ -273,10 +273,10 @@ namespace OpenDental.Eclaims{
 			Fill(227,"");
 			Fill(228,"");
 			Fill(229,"");
-			Fill(230,"Remarks");
+			Fill(230,"Remarks");//Remarks (Such as NEA numbers etc.) - Will accept any text string
 			Fill(231,"");
-			Fill(232,"");
-			Fill(233,"");
+			Fill(232,"");//Excellus Additional Info Field 
+			Fill(233,"");//COB Primary Payment Date- Expecting MM/DD/YYYY
 			Fill(234,"TreatingDentistSignature");//Treating Dentist Signature - Will accept any text string
 			Fill(235,"TreatingDentistLicense");//Treating License # - Will accept any text string
 			Fill(236,"TreatingDentistSigDate");//Date Signed - Expecting MM/DD/YYYY

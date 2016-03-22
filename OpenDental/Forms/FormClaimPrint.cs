@@ -436,7 +436,7 @@ namespace OpenDental{
 		///<summary>Called from Bridges.Renaissance, this takes the supplied ClaimFormItems.ListForForm, and generates an array of strings that will get saved into a text file.  First dimension of array is the pages. Second dimension is the lines in the page.</summary>
 		public string[][] FillRenaissance() {
 			//IsRenaissance=true;
-			int procLimit=8;
+			int procLimit=10;
 			FillDisplayStrings(true);//claimprocs is filled in FillDisplayStrings
 														//, so this is just a little extra work
 			totalPages=(int)Math.Ceiling((double)ListClaimProcs.Count/(double)procLimit);
