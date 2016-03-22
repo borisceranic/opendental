@@ -1488,9 +1488,16 @@ namespace OpenDentBusiness {
 					}
 					ClaimProcs.ComputeBaseEst(claimProcs[i],proc,PlanCur,patplan.PatPlanNum,
 						benefitList,histList,loopList,patPlans,paidOtherInsEstTotal,paidOtherInsBaseEst,patientAge,writeOffEstOtherIns);
-					paidOtherInsEstTotal+=claimProcs[i].InsEstTotal;
-					paidOtherInsBaseEst+=claimProcs[i].BaseEst;
-					writeOffEstOtherIns+=ClaimProcs.GetWriteOffEstimate(claimProcs[i]);
+					if(claimProcs[i].Status==ClaimProcStatus.Received || claimProcs[i].Status==ClaimProcStatus.Supplemental) {
+						paidOtherInsEstTotal+=claimProcs[i].InsPayAmt;
+						paidOtherInsBaseEst+=claimProcs[i].InsPayAmt;
+						writeOffEstOtherIns+=claimProcs[i].WriteOff;
+					}
+					else {
+						paidOtherInsEstTotal+=claimProcs[i].InsEstTotal;
+						paidOtherInsBaseEst+=claimProcs[i].BaseEst;
+						writeOffEstOtherIns+=ClaimProcs.GetWriteOffEstimate(claimProcs[i]);
+					}
 				}
 				else if(patplan.Ordinal==2){
 					if(ordinal!=2) {
@@ -1498,9 +1505,16 @@ namespace OpenDentBusiness {
 					}
 					ClaimProcs.ComputeBaseEst(claimProcs[i],proc,PlanCur,patplan.PatPlanNum,
 						benefitList,histList,loopList,patPlans,paidOtherInsEstTotal,paidOtherInsBaseEst,patientAge,writeOffEstOtherIns);
-					paidOtherInsEstTotal+=claimProcs[i].InsEstTotal;
-					paidOtherInsBaseEst+=claimProcs[i].BaseEst;
-					writeOffEstOtherIns+=ClaimProcs.GetWriteOffEstimate(claimProcs[i]);
+					if(claimProcs[i].Status==ClaimProcStatus.Received || claimProcs[i].Status==ClaimProcStatus.Supplemental) {
+						paidOtherInsEstTotal+=claimProcs[i].InsPayAmt;
+						paidOtherInsBaseEst+=claimProcs[i].InsPayAmt;
+						writeOffEstOtherIns+=claimProcs[i].WriteOff;
+					}
+					else {
+						paidOtherInsEstTotal+=claimProcs[i].InsEstTotal;
+						paidOtherInsBaseEst+=claimProcs[i].BaseEst;
+						writeOffEstOtherIns+=ClaimProcs.GetWriteOffEstimate(claimProcs[i]);
+					}
 				}
 				else if(patplan.Ordinal==3) {
 					if(ordinal!=3) {
@@ -1508,9 +1522,16 @@ namespace OpenDentBusiness {
 					}
 					ClaimProcs.ComputeBaseEst(claimProcs[i],proc,PlanCur,patplan.PatPlanNum,
 						benefitList,histList,loopList,patPlans,paidOtherInsEstTotal,paidOtherInsBaseEst,patientAge,writeOffEstOtherIns);
-					paidOtherInsEstTotal+=claimProcs[i].InsEstTotal;
-					paidOtherInsBaseEst+=claimProcs[i].BaseEst;
-					writeOffEstOtherIns+=ClaimProcs.GetWriteOffEstimate(claimProcs[i]);
+					if(claimProcs[i].Status==ClaimProcStatus.Received || claimProcs[i].Status==ClaimProcStatus.Supplemental) {
+						paidOtherInsEstTotal+=claimProcs[i].InsPayAmt;
+						paidOtherInsBaseEst+=claimProcs[i].InsPayAmt;
+						writeOffEstOtherIns+=claimProcs[i].WriteOff;
+					}
+					else {
+						paidOtherInsEstTotal+=claimProcs[i].InsEstTotal;
+						paidOtherInsBaseEst+=claimProcs[i].BaseEst;
+						writeOffEstOtherIns+=ClaimProcs.GetWriteOffEstimate(claimProcs[i]);
+					}
 				}
 				else{//patplan.Ordinal is 4 or greater.  Estimate won't be accurate if more than 4 insurances.
 					if(ordinal!=4) {
