@@ -119,7 +119,8 @@ namespace OpenDental
 		private List<ClaimProcHist> HistList;
 		private List<ClaimProcHist> LoopList;
 		private List<PatPlan> PatPlanList;
-		///<summary>This value is obtained by a query when this window first opens.  It only includes estimates, not actual payments or pending payments.  Will be 0 if this is a primary estimate.</summary>
+		///<summary>This value is obtained by a query when this window first opens.  It includes estimates if the other claims are not received and 
+		///includes the payment amount if the other claims are received.  Will be 0 if this is a primary estimate.</summary>
 		private double PaidOtherInsTotal;
 		private ValidDouble textWriteOffEstOverride;
 		private ValidDouble textWriteOffEst;
