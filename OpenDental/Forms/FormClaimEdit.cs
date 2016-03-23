@@ -83,7 +83,7 @@ namespace OpenDental{
 		private OpenDental.UI.Button butOtherNone;
 		private OpenDental.UI.Button butOtherCovChange;
 		//private double DedAdjPerc;
-		private List<ClaimProc> ClaimProcsForClaim;
+		private List<ClaimProc> _listClaimProcsForClaim;
 		///<summary>All claimprocs for the patient. Used to calculate remaining benefits, etc.</summary>
 		private List<ClaimProc> ClaimProcList;
 		private OpenDental.ODtextBox textNote;
@@ -4618,46 +4618,46 @@ namespace OpenDental{
 			ODGridRow row;
 			Procedure ProcCur;
 			List<ProcedureCode> listProcCodes=ProcedureCodeC.GetListLong();
-			ClaimProcsForClaim=ClaimProcs.RefreshForClaim(ClaimCur.ClaimNum);
-			for(int i=0;i<ClaimProcsForClaim.Count;i++){
+			_listClaimProcsForClaim=ClaimProcs.RefreshForClaim(ClaimCur.ClaimNum);
+			for(int i=0;i<_listClaimProcsForClaim.Count;i++){
 				row=new ODGridRow();
-				if(ClaimProcsForClaim[i].LineNumber==0){
+				if(_listClaimProcsForClaim[i].LineNumber==0){
 					row.Cells.Add("");
 				}
 				else{
-					row.Cells.Add(ClaimProcsForClaim[i].LineNumber.ToString());
+					row.Cells.Add(_listClaimProcsForClaim[i].LineNumber.ToString());
 				}
-				string date=ClaimProcsForClaim[i].ProcDate.ToShortDateString();
-				if(ClaimProcsForClaim[i].ProcNum==0) {//Total payment
+				string date=_listClaimProcsForClaim[i].ProcDate.ToShortDateString();
+				if(_listClaimProcsForClaim[i].ProcNum==0) {//Total payment
 					//We want to always show the "Payment Date" instead of the procedure date for total payments because they are not associated to procedures.
-					date=ClaimProcsForClaim[i].DateCP.ToShortDateString();
+					date=_listClaimProcsForClaim[i].DateCP.ToShortDateString();
 				}
 				//Check if there was insurance payment amount entered but no claim payment (insurance check / not finalized). 
-				if(ClaimProcsForClaim[i].InsPayAmt > 0 && ClaimProcsForClaim[i].ClaimPaymentNum==0) {
+				if(_listClaimProcsForClaim[i].InsPayAmt > 0 && _listClaimProcsForClaim[i].ClaimPaymentNum==0) {
 					//Many users will just enter payment via clicking 'By Procedure' or 'Total' which does not "finalize" claim payments.
 					//Instead of showing a "payment date" for insurance payments, we are going to make it visually obvious that the payments have not been finalized yet.
 					date=Lan.g(this,"Not Final");//"Not Finalized" is too long.
 				}
 				row.Cells.Add(date);
-				row.Cells.Add(Providers.GetAbbr(((ClaimProc)ClaimProcsForClaim[i]).ProvNum));
-				if(ClaimProcsForClaim[i].ProcNum==0) {
+				row.Cells.Add(Providers.GetAbbr(((ClaimProc)_listClaimProcsForClaim[i]).ProvNum));
+				if(_listClaimProcsForClaim[i].ProcNum==0) {
 					row.Cells.Add("");//code
 					if(!Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 						row.Cells.Add("");//tooth
 					}
-					if(ClaimProcsForClaim[i].Status==ClaimProcStatus.NotReceived)
+					if(_listClaimProcsForClaim[i].Status==ClaimProcStatus.NotReceived)
 						row.Cells.Add(Lan.g(this,"Estimate"));
 					else
 						row.Cells.Add(Lan.g(this,"Total Payment"));
 				}
 				else {
 					//claimProcsForClaim list already handles ProcNum=0 above
-					ProcCur=Procedures.GetProcFromList(ProcList,ClaimProcsForClaim[i].ProcNum);
-					row.Cells.Add(ClaimProcsForClaim[i].CodeSent);
+					ProcCur=Procedures.GetProcFromList(ProcList,_listClaimProcsForClaim[i].ProcNum);
+					row.Cells.Add(_listClaimProcsForClaim[i].CodeSent);
 					if(!Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 						row.Cells.Add(Tooth.ToInternat(ProcCur.ToothNum));
 					}
-					ProcedureCode procCodeSent=ProcedureCodes.GetProcCode(ClaimProcsForClaim[i].CodeSent);
+					ProcedureCode procCodeSent=ProcedureCodes.GetProcCode(_listClaimProcsForClaim[i].CodeSent);
 					row.Cells.Add(procCodeSent.Descript);
 					if(IsNew) {
 						ProcedureCode procCodeCur=ProcedureCodes.GetProcCode(ProcCur.CodeNum,listProcCodes);
@@ -4671,11 +4671,11 @@ namespace OpenDental{
 						textNote.Text=ClaimCur.ClaimNote;
 					}
 				}
-				row.Cells.Add(ClaimProcsForClaim[i].FeeBilled.ToString("F"));
-				decimal claimProcInsEst=(decimal)ClaimProcsForClaim[i].InsPayEst;
+				row.Cells.Add(_listClaimProcsForClaim[i].FeeBilled.ToString("F"));
+				decimal claimProcInsEst=(decimal)_listClaimProcsForClaim[i].InsPayEst;
 				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 					decimal labFeesForProc=0;
-					List<Procedure> labFeeProcs=Procedures.GetCanadianLabFees(ClaimProcsForClaim[i].ProcNum,ProcList);
+					List<Procedure> labFeeProcs=Procedures.GetCanadianLabFees(_listClaimProcsForClaim[i].ProcNum,ProcList);
 					for(int j=0;j<labFeeProcs.Count;j++) {
 						labFeesForProc+=(decimal)labFeeProcs[j].ProcFee;
 						List <ClaimProc> claimProcsForLab=ClaimProcs.GetForProc(ClaimProcList,labFeeProcs[j].ProcNum);
@@ -4689,11 +4689,11 @@ namespace OpenDental{
 					row.Cells.Add(labFeesForProc.ToString("F"));
 					labFees+=labFeesForProc;
 				}
-				row.Cells.Add(ClaimProcsForClaim[i].DedApplied.ToString("F"));
+				row.Cells.Add(_listClaimProcsForClaim[i].DedApplied.ToString("F"));
 				row.Cells.Add(claimProcInsEst.ToString("F"));
-				row.Cells.Add(ClaimProcsForClaim[i].InsPayAmt.ToString("F"));
-				row.Cells.Add(ClaimProcsForClaim[i].WriteOff.ToString("F"));
-				switch(ClaimProcsForClaim[i].Status){
+				row.Cells.Add(_listClaimProcsForClaim[i].InsPayAmt.ToString("F"));
+				row.Cells.Add(_listClaimProcsForClaim[i].WriteOff.ToString("F"));
+				switch(_listClaimProcsForClaim[i].Status){
 					case ClaimProcStatus.Received:
 						row.Cells.Add(Lan.g("TableClaimProc","Recd"));
 						break;
@@ -4728,26 +4728,26 @@ namespace OpenDental{
 						row.Cells.Add("");
 						break;
 				}
-				if(ClaimProcsForClaim[i].ClaimPaymentNum>0){
+				if(_listClaimProcsForClaim[i].ClaimPaymentNum>0){
 					row.Cells.Add("X");
 				}
 				else{
 					row.Cells.Add("");
 				}
-				if(ClaimProcsForClaim[i].ClaimPaymentTracking!=0) {
-					row.Cells.Add(DefC.GetDef(DefCat.ClaimPaymentTracking,ClaimProcsForClaim[i].ClaimPaymentTracking).ItemName);//EOB Code
+				if(_listClaimProcsForClaim[i].ClaimPaymentTracking!=0) {
+					row.Cells.Add(DefC.GetDef(DefCat.ClaimPaymentTracking,_listClaimProcsForClaim[i].ClaimPaymentTracking).ItemName);//EOB Code
 				}
 				else {
 					row.Cells.Add("");
 				}
-				row.Cells.Add(ClaimProcsForClaim[i].Remarks);
-				claimFee+=ClaimProcsForClaim[i].FeeBilled;
-				dedApplied+=ClaimProcsForClaim[i].DedApplied;
-				insPayEst+=ClaimProcsForClaim[i].InsPayEst;
-				insPayAmt+=ClaimProcsForClaim[i].InsPayAmt;
+				row.Cells.Add(_listClaimProcsForClaim[i].Remarks);
+				claimFee+=_listClaimProcsForClaim[i].FeeBilled;
+				dedApplied+=_listClaimProcsForClaim[i].DedApplied;
+				insPayEst+=_listClaimProcsForClaim[i].InsPayEst;
+				insPayAmt+=_listClaimProcsForClaim[i].InsPayAmt;
 				//if(ClaimProcsForClaim[i].Status==ClaimProcStatus.Received
 				//	|| ClaimProcsForClaim[i].Status==ClaimProcStatus.Supplemental) {
-					writeOff+=ClaimProcsForClaim[i].WriteOff;
+					writeOff+=_listClaimProcsForClaim[i].WriteOff;
 				//}
 				gridProc.Rows.Add(row);
 			}
@@ -4840,7 +4840,7 @@ namespace OpenDental{
 					return;
 				}
 			}
-			ClaimProc claimProcCur=ClaimProcsForClaim[e.Row];
+			ClaimProc claimProcCur=_listClaimProcsForClaim[e.Row];
 			if(!CheckRecalcEstimates(claimProcCur)) {
 				return;
 			}
@@ -4908,8 +4908,8 @@ namespace OpenDental{
 			if(e.Row>tablePayments.Rows.Count-1){
 				return;//prevents crash after deleting a check?
 			}
-			for(int i=0;i<ClaimProcsForClaim.Count;i++){
-				if(ClaimProcsForClaim[i].ClaimPaymentNum.ToString()==tablePayments.Rows[e.Row]["ClaimPaymentNum"].ToString())
+			for(int i=0;i<_listClaimProcsForClaim.Count;i++){
+				if(_listClaimProcsForClaim[i].ClaimPaymentNum.ToString()==tablePayments.Rows[e.Row]["ClaimPaymentNum"].ToString())
 					gridProc.SetSelected(i,true);
 				else
 					gridProc.SetSelected(i,false);
@@ -4974,16 +4974,16 @@ namespace OpenDental{
 			}
 			Double dedEst=0;
 			Double payEst=0;
-			for(int i=0;i<ClaimProcsForClaim.Count;i++){
-				if(ClaimProcsForClaim[i].Status!=ClaimProcStatus.NotReceived){
+			for(int i=0;i<_listClaimProcsForClaim.Count;i++){
+				if(_listClaimProcsForClaim[i].Status!=ClaimProcStatus.NotReceived){
 					continue;
 				}
-				if(ClaimProcsForClaim[i].ProcNum==0){
+				if(_listClaimProcsForClaim[i].ProcNum==0){
 					continue;//also ignore non-procedures.
 				}
 				//ClaimProcs.Cur=ClaimProcs.ForClaim[i];
-				dedEst+=ClaimProcsForClaim[i].DedApplied;
-				payEst+=ClaimProcsForClaim[i].InsPayEst;
+				dedEst+=_listClaimProcsForClaim[i].DedApplied;
+				payEst+=_listClaimProcsForClaim[i].InsPayEst;
 			}
 			ClaimProc ClaimProcCur=new ClaimProc();
 			//ClaimProcs.Cur.ProcNum 
@@ -5028,18 +5028,18 @@ namespace OpenDental{
 				ClaimProcs.Delete(ClaimProcCur);
 			}
 			else{
-				for(int i=0;i<ClaimProcsForClaim.Count;i++){
-					if(ClaimProcsForClaim[i].Status!=ClaimProcStatus.NotReceived){
+				for(int i=0;i<_listClaimProcsForClaim.Count;i++){
+					if(_listClaimProcsForClaim[i].Status!=ClaimProcStatus.NotReceived){
 						continue;
 					}
 					//ClaimProcs.Cur=ClaimProcs.ForClaim[i];
-					ClaimProcsForClaim[i].Status=ClaimProcStatus.Received;
-					if(ClaimProcsForClaim[i].DedApplied>0){
-						ClaimProcsForClaim[i].InsPayEst+=ClaimProcsForClaim[i].DedApplied;
-						ClaimProcsForClaim[i].DedApplied=0;//because ded will show as part of payment now.
+					_listClaimProcsForClaim[i].Status=ClaimProcStatus.Received;
+					if(_listClaimProcsForClaim[i].DedApplied>0){
+						_listClaimProcsForClaim[i].InsPayEst+=_listClaimProcsForClaim[i].DedApplied;
+						_listClaimProcsForClaim[i].DedApplied=0;//because ded will show as part of payment now.
 					}
-					ClaimProcsForClaim[i].DateEntry=DateTime.Now;//the date is was switched to rec'd
-					ClaimProcs.Update(ClaimProcsForClaim[i]);
+					_listClaimProcsForClaim[i].DateEntry=DateTime.Now;//the date is was switched to rec'd
+					ClaimProcs.Update(_listClaimProcsForClaim[i]);
 				}
 			}
 			comboClaimStatus.SelectedIndex=5;//Received
@@ -5058,18 +5058,18 @@ namespace OpenDental{
 			//it will enter edit mode if it can only find received procs not attached to payments yet.
 			if(gridProc.SelectedIndices.Length==0){
 				//first, autoselect rows if not received:
-				for(int i=0;i<ClaimProcsForClaim.Count;i++){
-					if(ClaimProcsForClaim[i].Status==ClaimProcStatus.NotReceived
-						&& ClaimProcsForClaim[i].ProcNum>0){//and is procedure
+				for(int i=0;i<_listClaimProcsForClaim.Count;i++){
+					if(_listClaimProcsForClaim[i].Status==ClaimProcStatus.NotReceived
+						&& _listClaimProcsForClaim[i].ProcNum>0){//and is procedure
 						gridProc.SetSelected(i,true);
 					}
 				}
 			}
 			if(gridProc.SelectedIndices.Length==0){
 				//then, autoselect rows if not paid on:
-				for(int i=0;i<ClaimProcsForClaim.Count;i++){
-					if(ClaimProcsForClaim[i].ClaimPaymentNum==0
-						&& ClaimProcsForClaim[i].ProcNum>0){//and is procedure
+				for(int i=0;i<_listClaimProcsForClaim.Count;i++){
+					if(_listClaimProcsForClaim[i].ClaimPaymentNum==0
+						&& _listClaimProcsForClaim[i].ProcNum>0){//and is procedure
 						gridProc.SetSelected(i,true);
 					}
 				}
@@ -5081,7 +5081,7 @@ namespace OpenDental{
 			}
 			bool allAreProcs=true;
 			for(int i=0;i<gridProc.SelectedIndices.Length;i++){
-				if(ClaimProcsForClaim[gridProc.SelectedIndices[i]].ProcNum==0)
+				if(_listClaimProcsForClaim[gridProc.SelectedIndices[i]].ProcNum==0)
 					allAreProcs=false;
 			}
 			if(!allAreProcs){
@@ -5089,15 +5089,15 @@ namespace OpenDental{
 				return;
 			}
 			for(int i=0;i<gridProc.SelectedIndices.Length;i++) {
-				if(ClaimProcsForClaim[gridProc.SelectedIndices[i]].ClaimPaymentNum!=0) {//if attached to a check
+				if(_listClaimProcsForClaim[gridProc.SelectedIndices[i]].ClaimPaymentNum!=0) {//if attached to a check
 					MessageBox.Show(Lan.g(this,"Procedures that are attached to checks cannot be included."));
 					return;
 				}
 			}
 			for(int i=0;i<gridProc.SelectedIndices.Length;i++) {
-				if(ClaimProcsForClaim[gridProc.SelectedIndices[i]].Status==ClaimProcStatus.Received
-					|| ClaimProcsForClaim[gridProc.SelectedIndices[i]].Status==ClaimProcStatus.Supplemental
-					|| ClaimProcsForClaim[gridProc.SelectedIndices[i]].Status==ClaimProcStatus.CapComplete) 
+				if(_listClaimProcsForClaim[gridProc.SelectedIndices[i]].Status==ClaimProcStatus.Received
+					|| _listClaimProcsForClaim[gridProc.SelectedIndices[i]].Status==ClaimProcStatus.Supplemental
+					|| _listClaimProcsForClaim[gridProc.SelectedIndices[i]].Status==ClaimProcStatus.CapComplete) 
 				{
 					MessageBox.Show(Lan.g(this,"Procedures that are already received cannot be included."));
 					//This expanded security prevents making changes to historical entries of zero with a writeoff.
@@ -5108,7 +5108,7 @@ namespace OpenDental{
 			for(int i=0;i<gridProc.SelectedIndices.Length;i++) {
 				//copy selected claimprocs to temporary array for editing.
 				//no changes to the database will be made within that form.
-				cpList.Add(ClaimProcsForClaim[gridProc.SelectedIndices[i]].Copy());
+				cpList.Add(_listClaimProcsForClaim[gridProc.SelectedIndices[i]].Copy());
 				if(ClaimCur.ClaimType=="PreAuth"){
 					cpList[i].Status=ClaimProcStatus.Preauth;
 				}
@@ -5187,7 +5187,7 @@ namespace OpenDental{
 			}
 			bool allAreRecd=true;
 			for(int i=0;i<gridProc.SelectedIndices.Length;i++){
-				if(ClaimProcsForClaim[gridProc.SelectedIndices[i]].Status!=ClaimProcStatus.Received)
+				if(_listClaimProcsForClaim[gridProc.SelectedIndices[i]].Status!=ClaimProcStatus.Received)
 					allAreRecd=false;
 			}
 			if(!allAreRecd){
@@ -5196,7 +5196,7 @@ namespace OpenDental{
 			} 
 			List<ClaimProc> cpList=new List<ClaimProc>();
 			for(int i=0;i<gridProc.SelectedIndices.Length;i++){
-				ClaimProc ClaimProcCur=ClaimProcsForClaim[gridProc.SelectedIndices[i]];
+				ClaimProc ClaimProcCur=_listClaimProcsForClaim[gridProc.SelectedIndices[i]];
 				ClaimProcCur.FeeBilled=0;
 				ClaimProcCur.ClaimPaymentNum=0;//no payment attached
 				//claimprocnum will be overwritten
@@ -5238,15 +5238,30 @@ namespace OpenDental{
 				MessageBox.Show(Lan.g(this,"Please highlight procedures first."));
 				return;
 			}
+			List<long> listSelectedProcNums=new List<long>();
 			for(int i=0;i<gridProc.SelectedIndices.Length;i++){
-				if(ClaimProcsForClaim[gridProc.SelectedIndices[i]].ProcNum==0){
+				if(_listClaimProcsForClaim[gridProc.SelectedIndices[i]].ProcNum==0){
 					MessageBox.Show(Lan.g(this,"Only procedures can be selected."));
 					return;
 				}
-				if(ClaimProcsForClaim[gridProc.SelectedIndices[i]].InsPayAmt!=0){
+				if(_listClaimProcsForClaim[gridProc.SelectedIndices[i]].InsPayAmt!=0){
 					MessageBox.Show(Lan.g(this,"All selected procedures must have zero insurance payment amounts."));
 					return;
 				}
+				listSelectedProcNums.Add(_listClaimProcsForClaim[gridProc.SelectedIndices[i]].ProcNum);
+			}
+			//Make sure that there is at least one procedure left on the claim before splitting.
+			//The claim would become orphaned if we allow users to split off all procedures on the claim and DBM would be required to run to clean up.
+			bool hasProcLeft=false;
+			foreach(ClaimProc claimProc in _listClaimProcsForClaim) {
+				if(!listSelectedProcNums.Contains(claimProc.ProcNum)) {
+					hasProcLeft=true;
+					break;
+				}
+			}
+			if(!hasProcLeft) {//All procedures are selected for the split...
+				MsgBox.Show(this,"At least one procedure needs to remain on this claim in order to split it.");
+				return;
 			}
 			Claim newClaim=ClaimCur.Copy();
 			newClaim.ClaimFee=0;
@@ -5269,7 +5284,7 @@ namespace OpenDental{
 			newClaim.ClaimIdentifier=newClaim.PatNum.ToString()+"/"+newClaim.ClaimNum.ToString();
 			//Now this claim has been duplicated, except it has a new ClaimNum and new totals.  There are no attached claimprocs yet.
 			for(int i=0;i<gridProc.SelectedIndices.Length;i++){
-				ClaimProc claimProc=ClaimProcsForClaim[gridProc.SelectedIndices[i]];
+				ClaimProc claimProc=_listClaimProcsForClaim[gridProc.SelectedIndices[i]];
 				claimProc.ClaimNum=newClaim.ClaimNum;
 				claimProc.PayPlanNum=0;//detach from payplan if previously attached, claimprocs from two claims cannot be attached to the same payplan
 				ClaimProcs.Update(claimProc);//moves it to the new claim
@@ -5351,15 +5366,15 @@ namespace OpenDental{
 			UpdateClaim();
 			bool existsReceived=false;
 			bool isSupplemental=false;
-			for(int i=0;i<ClaimProcsForClaim.Count;i++) {
-				if((ClaimProcsForClaim[i].Status==ClaimProcStatus.Received
-					|| ClaimProcsForClaim[i].Status==ClaimProcStatus.Supplemental)
-					&& ClaimProcsForClaim[i].InsPayAmt!=0) 
+			for(int i=0;i<_listClaimProcsForClaim.Count;i++) {
+				if((_listClaimProcsForClaim[i].Status==ClaimProcStatus.Received
+					|| _listClaimProcsForClaim[i].Status==ClaimProcStatus.Supplemental)
+					&& _listClaimProcsForClaim[i].InsPayAmt!=0) 
 				{
 					existsReceived=true;
 				}
 				//Supplemental, has an insurance payment amount entered, and is not attached to a check yet, therefore it will be attached to the check below.
-				if(ClaimProcsForClaim[i].Status==ClaimProcStatus.Supplemental && ClaimProcsForClaim[i].InsPayAmt!=0 && ClaimProcsForClaim[i].ClaimPaymentNum==0) {
+				if(_listClaimProcsForClaim[i].Status==ClaimProcStatus.Supplemental && _listClaimProcsForClaim[i].InsPayAmt!=0 && _listClaimProcsForClaim[i].ClaimPaymentNum==0) {
 					isSupplemental=true;
 				}
 			}
@@ -5925,8 +5940,8 @@ namespace OpenDental{
 			}
 			UpdateClaim();
 			bool paymentIsAttached=false;
-			for(int i=0;i<ClaimProcsForClaim.Count;i++){
-				if(ClaimProcsForClaim[i].ClaimPaymentNum>0){
+			for(int i=0;i<_listClaimProcsForClaim.Count;i++){
+				if(_listClaimProcsForClaim[i].ClaimPaymentNum>0){
 					paymentIsAttached=true;
 				}
 			}
@@ -5951,38 +5966,38 @@ namespace OpenDental{
 			Procedure proc;
 			if(ClaimCur.ClaimType=="PreAuth"//all preauth claimprocs are just duplicates
 				|| ClaimCur.ClaimType=="Cap"){//all cap claimprocs are just duplicates
-				for(int i=0;i<ClaimProcsForClaim.Count;i++){
+				for(int i=0;i<_listClaimProcsForClaim.Count;i++){
 					//ClaimProcs.Cur=ClaimProcs.ForClaim[i];
-					ClaimProcs.Delete(ClaimProcsForClaim[i]);
+					ClaimProcs.Delete(_listClaimProcsForClaim[i]);
 				}
 			}
 			else{//all other claim types use original estimate claimproc.
 				List<Benefit> benList=Benefits.Refresh(PatPlanList,SubList);
 				InsPlan plan=InsPlans.GetPlan(ClaimCur.PlanNum,PlanList);
-				for(int i=0;i<ClaimProcsForClaim.Count;i++){
+				for(int i=0;i<_listClaimProcsForClaim.Count;i++){
 					//ClaimProcs.Cur=ClaimProcs.ForClaim[i];
-					if(ClaimProcsForClaim[i].Status==ClaimProcStatus.Supplemental//supplementals are duplicate
-						|| ClaimProcsForClaim[i].ProcNum==0)//total payments get deleted
+					if(_listClaimProcsForClaim[i].Status==ClaimProcStatus.Supplemental//supplementals are duplicate
+						|| _listClaimProcsForClaim[i].ProcNum==0)//total payments get deleted
 					{
-						ClaimProcs.Delete(ClaimProcsForClaim[i]);
+						ClaimProcs.Delete(_listClaimProcsForClaim[i]);
 						continue;
 					}
 					//so only changed back to estimate if attached to a proc
-					ClaimProcsForClaim[i].Status=ClaimProcStatus.Estimate;
-					ClaimProcsForClaim[i].ClaimNum=0;
+					_listClaimProcsForClaim[i].Status=ClaimProcStatus.Estimate;
+					_listClaimProcsForClaim[i].ClaimNum=0;
 					//already handled the case where claimproc.ProcNum=0 for payments etc. above
-					proc=Procedures.GetProcFromList(ProcList,ClaimProcsForClaim[i].ProcNum);
+					proc=Procedures.GetProcFromList(ProcList,_listClaimProcsForClaim[i].ProcNum);
 					//We're not going to bother to also get paidOtherInsBaseEst:
-					double paidOtherInsTotal=ClaimProcs.GetPaidOtherInsTotal(ClaimProcsForClaim[i],PatPlanList);
-					double writeOffOtherIns=ClaimProcs.GetWriteOffOtherIns(ClaimProcsForClaim[i],PatPlanList);
+					double paidOtherInsTotal=ClaimProcs.GetPaidOtherInsTotal(_listClaimProcsForClaim[i],PatPlanList);
+					double writeOffOtherIns=ClaimProcs.GetWriteOffOtherIns(_listClaimProcsForClaim[i],PatPlanList);
 					if(ClaimCur.ClaimType=="P" && PatPlanList.Count>0){
-						ClaimProcs.ComputeBaseEst(ClaimProcsForClaim[i],proc,plan,PatPlanList[0].PatPlanNum,benList,null,null,PatPlanList,0,0,PatCur.Age,0);
+						ClaimProcs.ComputeBaseEst(_listClaimProcsForClaim[i],proc,plan,PatPlanList[0].PatPlanNum,benList,null,null,PatPlanList,0,0,PatCur.Age,0);
 					}
 					else if(ClaimCur.ClaimType=="S" && PatPlanList.Count>1){
-						ClaimProcs.ComputeBaseEst(ClaimProcsForClaim[i],proc,plan,PatPlanList[1].PatPlanNum,benList,null,null,PatPlanList,paidOtherInsTotal,paidOtherInsTotal,PatCur.Age,writeOffOtherIns);
+						ClaimProcs.ComputeBaseEst(_listClaimProcsForClaim[i],proc,plan,PatPlanList[1].PatPlanNum,benList,null,null,PatPlanList,paidOtherInsTotal,paidOtherInsTotal,PatCur.Age,writeOffOtherIns);
 					}
-					ClaimProcsForClaim[i].InsPayEst=0;
-					ClaimProcs.Update(ClaimProcsForClaim[i]);
+					_listClaimProcsForClaim[i].InsPayEst=0;
+					ClaimProcs.Update(_listClaimProcsForClaim[i]);
 				}
 			}
       Claims.Delete(ClaimCur);
@@ -5999,8 +6014,8 @@ namespace OpenDental{
 			//if status is received, all claimprocs must also be received.
 			if(comboClaimStatus.SelectedIndex==5){
 				bool allReceived=true;
-				for(int i=0;i<ClaimProcsForClaim.Count;i++){
-					if(((ClaimProc)ClaimProcsForClaim[i]).Status==ClaimProcStatus.NotReceived){
+				for(int i=0;i<_listClaimProcsForClaim.Count;i++){
+					if(((ClaimProc)_listClaimProcsForClaim[i]).Status==ClaimProcStatus.NotReceived){
 						allReceived=false;
 					}
 				}
@@ -6008,25 +6023,25 @@ namespace OpenDental{
 					if(!MsgBox.Show(this,true,"All items will be marked received.  Continue?")){
 						return;
 					}
-					for(int i=0;i<ClaimProcsForClaim.Count;i++){
-						if(ClaimProcsForClaim[i].Status==ClaimProcStatus.NotReceived){
+					for(int i=0;i<_listClaimProcsForClaim.Count;i++){
+						if(_listClaimProcsForClaim[i].Status==ClaimProcStatus.NotReceived){
 							//ClaimProcs.Cur=(ClaimProc)ClaimProcs.ForClaim[i];
-							ClaimProcsForClaim[i].Status=ClaimProcStatus.Received;
+							_listClaimProcsForClaim[i].Status=ClaimProcStatus.Received;
 							//We set the DateCP to Today's date when the user presses the buttons By Total, By Proc or Supplemental.
 							//When there is a no payment claim, the user might simply change the claim status to received and press OK instead of entering payments the normal way, since there is no check.
 							//Logically, we are changing claimproc status to received, and the claimproc will now be treated as a payment in the reports.
 							//If we did not update DateCP, then DateCP for a zero payment claim would still be the procedure treatment planned date as much as a year ago, so the claimproc writeoffs (if present) would be accidentally back dated.
-							ClaimProcsForClaim[i].DateCP=DateTimeOD.Today;
-							ClaimProcsForClaim[i].DateEntry=DateTime.Now;//date it was set rec'd
-							ClaimProcs.Update(ClaimProcsForClaim[i]);
+							_listClaimProcsForClaim[i].DateCP=DateTimeOD.Today;
+							_listClaimProcsForClaim[i].DateEntry=DateTime.Now;//date it was set rec'd
+							ClaimProcs.Update(_listClaimProcsForClaim[i]);
 						}
 					}
 				}
 			}
 			else{//claim is any status except received
 				bool anyReceived=false;
-				for(int i=0;i<ClaimProcsForClaim.Count;i++){
-					if(((ClaimProc)ClaimProcsForClaim[i]).Status==ClaimProcStatus.Received){
+				for(int i=0;i<_listClaimProcsForClaim.Count;i++){
+					if(((ClaimProc)_listClaimProcsForClaim[i]).Status==ClaimProcStatus.Received){
 						anyReceived=true;
 					}
 				}
@@ -6109,10 +6124,10 @@ namespace OpenDental{
 			}
 			if(ClaimCur.ClaimType=="PreAuth"){
 				bool preauthChanged=false;
-				for(int i=0;i<ClaimProcsForClaim.Count;i++){
-					if(ClaimProcsForClaim[i].Status!=ClaimProcStatus.Preauth){
-						ClaimProcsForClaim[i].Status=ClaimProcStatus.Preauth;
-						ClaimProcs.Update(ClaimProcsForClaim[i]);
+				for(int i=0;i<_listClaimProcsForClaim.Count;i++){
+					if(_listClaimProcsForClaim[i].Status!=ClaimProcStatus.Preauth){
+						_listClaimProcsForClaim[i].Status=ClaimProcStatus.Preauth;
+						ClaimProcs.Update(_listClaimProcsForClaim[i]);
 						preauthChanged=true;
 					}
 				}
@@ -6571,8 +6586,8 @@ namespace OpenDental{
 					ClaimCondCodeLogs.Update(ClaimCondCodeLogCur);
 				}
 			}
-			for(int i=0;i<ClaimProcsForClaim.Count;i++) {
-				Procedure proc=Procedures.GetProcFromList(ProcList,ClaimProcsForClaim[i].ProcNum);
+			for(int i=0;i<_listClaimProcsForClaim.Count;i++) {
+				Procedure proc=Procedures.GetProcFromList(ProcList,_listClaimProcsForClaim[i].ProcNum);
 				if(proc.ProcNum==0) {
 					continue;//ignores payments, etc
 				}
@@ -6627,21 +6642,21 @@ namespace OpenDental{
 			//Estimate - When the claimprocs are attached to a claim, their status is changed from Estimate to NotReceived or to PreAuth.
 			//CapComplete - Never attached to a claim, because the status is changed to CapClaim when attached to a claim.
 			//CapEstimate - Never attached to a claim, because the status is changed to CapComplete, then to CapClaim when attached to the claim.
-			for(int i=0;i<ClaimProcsForClaim.Count;i++) {
-				if(ClaimProcsForClaim[i].Status==ClaimProcStatus.CapClaim 
-					|| ClaimProcsForClaim[i].Status==ClaimProcStatus.Preauth) 
+			for(int i=0;i<_listClaimProcsForClaim.Count;i++) {
+				if(_listClaimProcsForClaim[i].Status==ClaimProcStatus.CapClaim 
+					|| _listClaimProcsForClaim[i].Status==ClaimProcStatus.Preauth) 
 				{
-					ClaimProcs.Delete(ClaimProcsForClaim[i]);
+					ClaimProcs.Delete(_listClaimProcsForClaim[i]);
 				}
 				else {//All other claimprocs need to be detached from the claim.
-					if(ClaimProcsForClaim[i].Status==ClaimProcStatus.NotReceived
-						|| ClaimProcsForClaim[i].Status==ClaimProcStatus.Received)//Can only happen if a user manually changed the claimproc status.
+					if(_listClaimProcsForClaim[i].Status==ClaimProcStatus.NotReceived
+						|| _listClaimProcsForClaim[i].Status==ClaimProcStatus.Received)//Can only happen if a user manually changed the claimproc status.
 					{
-						ClaimProcsForClaim[i].Status=ClaimProcStatus.Estimate;//Force it back to estimate so that it can be attached to a new claim.
-						ClaimProcsForClaim[i].InsPayEst=0;
+						_listClaimProcsForClaim[i].Status=ClaimProcStatus.Estimate;//Force it back to estimate so that it can be attached to a new claim.
+						_listClaimProcsForClaim[i].InsPayEst=0;
 					}
-					ClaimProcsForClaim[i].ClaimNum=0;
-					ClaimProcs.Update(ClaimProcsForClaim[i]);
+					_listClaimProcsForClaim[i].ClaimNum=0;
+					ClaimProcs.Update(_listClaimProcsForClaim[i]);
 				}
 			}
 			Claims.Delete(ClaimCur);//does not do any validation.  Also deletes the claimcanadian.
