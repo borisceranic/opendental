@@ -105,41 +105,41 @@ namespace OpenDentBusiness {
 				}
 				//Insert RapidCall bridge-----------------------------------------------------------------
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-				command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
-					+") VALUES("
-					+"'RapidCall', "
-					+"'Rapid Call from www.dentaltek.com', "
-					+"'0', "
-					+"'"+POut.String(@"C:\DentalTek\CallTray\CallTray.exe")+"', "
-					+"'"+POut.String(@"/DeepLink=RapidCall")+"', "//leave blank if none
-					+"'')";
-				long programNum=Db.NonQ(command,true);
-				command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
-					+") VALUES("
-					+"'"+POut.Long(programNum)+"', "
-					+"'Disable Advertising', "
-					+"'0')";
-				Db.NonQ(command);
+					command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+						+") VALUES("
+						+"'RapidCall', "
+						+"'Rapid Call from www.dentaltek.com', "
+						+"'0', "
+						+"'"+POut.String(@"C:\DentalTek\CallTray\CallTray.exe")+"', "
+						+"'"+POut.String(@"/DeepLink=RapidCall")+"', "//leave blank if none
+						+"'')";
+					long programNum=Db.NonQ(command,true);
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"'"+POut.Long(programNum)+"', "
+						+"'Disable Advertising', "
+						+"'0')";
+					Db.NonQ(command);
 				}
 				else {//oracle
-				command="INSERT INTO program (ProgramNum,ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
-					+") VALUES("
-					+"(SELECT MAX(ProgramNum)+1 FROM program),"
-					+"'RapidCall', "
-					+"'Rapid Call from www.dentaltek.com', "
-					+"'0', "
-					+"'"+POut.String(@"C:\DentalTek\CallTray\CallTray.exe")+"', "
-					+"'"+POut.String(@"/DeepLink=RapidCall")+"', "//leave blank if none
-					+"'')";
-				long programNum=Db.NonQ(command,true);
-				command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ClinicNum"
-					+") VALUES("
-					+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
-					+"'"+POut.Long(programNum)+"', "
-					+"'Disable Advertising', "
-					+"'0', "
-					+"'0')";
-				Db.NonQ(command);
+					command="INSERT INTO program (ProgramNum,ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+						+") VALUES("
+						+"(SELECT MAX(ProgramNum)+1 FROM program),"
+						+"'RapidCall', "
+						+"'Rapid Call from www.dentaltek.com', "
+						+"'0', "
+						+"'"+POut.String(@"C:\DentalTek\CallTray\CallTray.exe")+"', "
+						+"'"+POut.String(@"/DeepLink=RapidCall")+"', "//leave blank if none
+						+"'')";
+					long programNum=Db.NonQ(command,true);
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ClinicNum"
+						+") VALUES("
+						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+						+"'"+POut.Long(programNum)+"', "
+						+"'Disable Advertising', "
+						+"'0', "
+						+"'0')";
+					Db.NonQ(command);
 				}//end RapidCall bridge
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE schedule ADD ClinicNum bigint NOT NULL";
@@ -171,6 +171,18 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE apptview MODIFY IsApptBubblesDisabled NOT NULL";
 					Db.NonQ(command);
 					command="UPDATE apptview SET IsApptBubblesDisabled=(SELECT ValueString FROM preference WHERE PrefName='AppointmentBubblesDisabled')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE dunning ADD DaysInAdvance int NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE dunning ADD DaysInAdvance number(11)";
+					Db.NonQ(command);
+					command="UPDATE dunning SET DaysInAdvance = 0 WHERE DaysInAdvance IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE dunning MODIFY DaysInAdvance NOT NULL";
 					Db.NonQ(command);
 				}
 

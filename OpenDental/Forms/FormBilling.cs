@@ -17,6 +17,7 @@ using PdfSharp;
 using PdfSharp.Pdf;
 using PdfSharp.Pdf.IO;
 using PdfSharp.Pdf.Printing;
+using System.Linq;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -558,26 +559,15 @@ namespace OpenDental{
 				return;
 			}
 			int scrollPos=gridBill.ScrollValue;
-			List<long> selectedKeys=new List<long>();
-			for(int i=0;i<gridBill.SelectedIndices.Length;i++){
-				selectedKeys.Add(PIn.Long(table.Rows[gridBill.SelectedIndices[i]]["StatementNum"].ToString()));
-			}
-			DateTime dateFrom=DateTime.MinValue;
+			List<long> selectedKeys=gridBill.SelectedIndices.OfType<int>().Select(x => PIn.Long(table.Rows[x]["StatementNum"].ToString())).ToList();
+			DateTime dateFrom=PIn.Date(textDateStart.Text);
 			DateTime dateTo=new DateTime(2200,1,1);
-			if(textDateStart.Text!=""){
-				dateFrom=PIn.Date(textDateStart.Text);
-			}
 			if(textDateEnd.Text!=""){
 				dateTo=PIn.Date(textDateEnd.Text);
 			}
-			List<long> clinicNums=new List<long>();
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics.
-				if(comboClinic.SelectedIndex>0) {
-					clinicNums.Add(ListClinics[comboClinic.SelectedIndex-1].ClinicNum);
-				}
-				else {//User has selected 'All', so add 0 and any clinics that the user has access to.
-					//An empty list indicates to Statements.GetBilling() to get bills for all clinics.
-				}
+			List<long> clinicNums=new List<long>();//an empty list indicates to Statements.GetBilling to run for all clinics
+			if(PrefC.HasClinicsEnabled && comboClinic.SelectedIndex>0) {
+				clinicNums.Add(ListClinics[comboClinic.SelectedIndex-1].ClinicNum);
 			}
 			table=Statements.GetBilling(radioSent.Checked,comboOrder.SelectedIndex,dateFrom,dateTo,clinicNums);
 			gridBill.BeginUpdate();
@@ -609,28 +599,26 @@ namespace OpenDental{
 				gridBill.Columns.Add(col);
 			}
 			gridBill.Rows.Clear();
-			OpenDental.UI.ODGridRow row;
-			for(int i=0;i<table.Rows.Count;i++){
-				row=new OpenDental.UI.ODGridRow();
-				row.Cells.Add(table.Rows[i]["name"].ToString());
-				row.Cells.Add(table.Rows[i]["billingType"].ToString());
-				row.Cells.Add(table.Rows[i]["mode"].ToString());
-				row.Cells.Add(table.Rows[i]["lastStatement"].ToString());
-				row.Cells.Add(table.Rows[i]["balTotal"].ToString());
-				row.Cells.Add(table.Rows[i]["insEst"].ToString());
+			ODGridRow row;
+			foreach(DataRow rowCur in table.Rows) {
+				row=new ODGridRow();
+				row.Cells.Add(rowCur["name"].ToString());
+				row.Cells.Add(rowCur["billingType"].ToString());
+				row.Cells.Add(rowCur["mode"].ToString());
+				row.Cells.Add(rowCur["lastStatement"].ToString());
+				row.Cells.Add(rowCur["balTotal"].ToString());
+				row.Cells.Add(rowCur["insEst"].ToString());
 				if(PrefC.GetBool(PrefName.BalancesDontSubtractIns)) {
 					row.Cells.Add("");
 				}
 				else {
-					row.Cells.Add(table.Rows[i]["amountDue"].ToString());
+					row.Cells.Add(rowCur["amountDue"].ToString());
 				}
-				row.Cells.Add(table.Rows[i]["payPlanDue"].ToString());
-				if(PrefC.HasSuperStatementsEnabled) {
-					if(PIn.Long(table.Rows[i]["SuperFamily"].ToString())!=0) {
-						row.Cells.Add("X");
-					}
+				row.Cells.Add(rowCur["payPlanDue"].ToString());
+				if(PrefC.HasSuperStatementsEnabled && rowCur["SuperFamily"].ToString()!="0") {
+					row.Cells.Add("X");
 				}
-				row.Tag=PIn.Long(table.Rows[i]["StatementNum"].ToString());
+				row.Tag=PIn.Long(rowCur["StatementNum"].ToString());
 				gridBill.Rows.Add(row);
 			}
 			gridBill.EndUpdate();
@@ -640,9 +628,7 @@ namespace OpenDental{
 			}
 			else {
 				for(int i=0;i<gridBill.Rows.Count;i++) {
-					if(selectedKeys.Contains((long)gridBill.Rows[i].Tag)) {
-						gridBill.SetSelected(i,true);
-					}
+					gridBill.SetSelected(i,selectedKeys.Contains((long)gridBill.Rows[i].Tag));
 				}
 			}
 			gridBill.ScrollValue=scrollPos;

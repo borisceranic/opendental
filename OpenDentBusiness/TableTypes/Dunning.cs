@@ -25,6 +25,9 @@ namespace OpenDentBusiness{
 //TODO: This column may need to be changed to the TextIsClobNote attribute to remove more than 50 consecutive new line characters.
 		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)] 
 		public string EmailBody;
+		///<summary>The number of days before an account reaches AgeAccount to include this dunning message on statements.
+		///Example: If DaysInAdvance=3 and AgeAccount=90, an account that is 87 days old when bills are generated will include this message.</summary>
+		public int DaysInAdvance;
 
 
 		///<summary>Returns a copy of this Dunning.</summary>

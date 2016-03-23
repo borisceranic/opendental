@@ -46,14 +46,15 @@ namespace OpenDentBusiness.Crud{
 			Dunning dunning;
 			foreach(DataRow row in table.Rows) {
 				dunning=new Dunning();
-				dunning.DunningNum  = PIn.Long  (row["DunningNum"].ToString());
-				dunning.DunMessage  = PIn.String(row["DunMessage"].ToString());
-				dunning.BillingType = PIn.Long  (row["BillingType"].ToString());
-				dunning.AgeAccount  = PIn.Byte  (row["AgeAccount"].ToString());
-				dunning.InsIsPending= (OpenDentBusiness.YN)PIn.Int(row["InsIsPending"].ToString());
-				dunning.MessageBold = PIn.String(row["MessageBold"].ToString());
-				dunning.EmailSubject= PIn.String(row["EmailSubject"].ToString());
-				dunning.EmailBody   = PIn.String(row["EmailBody"].ToString());
+				dunning.DunningNum   = PIn.Long  (row["DunningNum"].ToString());
+				dunning.DunMessage   = PIn.String(row["DunMessage"].ToString());
+				dunning.BillingType  = PIn.Long  (row["BillingType"].ToString());
+				dunning.AgeAccount   = PIn.Byte  (row["AgeAccount"].ToString());
+				dunning.InsIsPending = (OpenDentBusiness.YN)PIn.Int(row["InsIsPending"].ToString());
+				dunning.MessageBold  = PIn.String(row["MessageBold"].ToString());
+				dunning.EmailSubject = PIn.String(row["EmailSubject"].ToString());
+				dunning.EmailBody    = PIn.String(row["EmailBody"].ToString());
+				dunning.DaysInAdvance= PIn.Int   (row["DaysInAdvance"].ToString());
 				retVal.Add(dunning);
 			}
 			return retVal;
@@ -73,6 +74,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("MessageBold");
 			table.Columns.Add("EmailSubject");
 			table.Columns.Add("EmailBody");
+			table.Columns.Add("DaysInAdvance");
 			foreach(Dunning dunning in listDunnings) {
 				table.Rows.Add(new object[] {
 					POut.Long  (dunning.DunningNum),
@@ -83,6 +85,7 @@ namespace OpenDentBusiness.Crud{
 					            dunning.MessageBold,
 					            dunning.EmailSubject,
 					            dunning.EmailBody,
+					POut.Int   (dunning.DaysInAdvance),
 				});
 			}
 			return table;
@@ -123,7 +126,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="DunningNum,";
 			}
-			command+="DunMessage,BillingType,AgeAccount,InsIsPending,MessageBold,EmailSubject,EmailBody) VALUES(";
+			command+="DunMessage,BillingType,AgeAccount,InsIsPending,MessageBold,EmailSubject,EmailBody,DaysInAdvance) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(dunning.DunningNum)+",";
 			}
@@ -134,7 +137,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)dunning.InsIsPending)+","
 				+"'"+POut.String(dunning.MessageBold)+"',"
 				+"'"+POut.String(dunning.EmailSubject)+"',"
-				+    DbHelper.ParamChar+"paramEmailBody)";
+				+    DbHelper.ParamChar+"paramEmailBody,"
+				+    POut.Int   (dunning.DaysInAdvance)+")";
 			if(dunning.EmailBody==null) {
 				dunning.EmailBody="";
 			}
@@ -171,7 +175,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="DunningNum,";
 			}
-			command+="DunMessage,BillingType,AgeAccount,InsIsPending,MessageBold,EmailSubject,EmailBody) VALUES(";
+			command+="DunMessage,BillingType,AgeAccount,InsIsPending,MessageBold,EmailSubject,EmailBody,DaysInAdvance) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(dunning.DunningNum)+",";
 			}
@@ -182,7 +186,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)dunning.InsIsPending)+","
 				+"'"+POut.String(dunning.MessageBold)+"',"
 				+"'"+POut.String(dunning.EmailSubject)+"',"
-				+    DbHelper.ParamChar+"paramEmailBody)";
+				+    DbHelper.ParamChar+"paramEmailBody,"
+				+    POut.Int   (dunning.DaysInAdvance)+")";
 			if(dunning.EmailBody==null) {
 				dunning.EmailBody="";
 			}
@@ -199,13 +204,14 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one Dunning in the database.</summary>
 		public static void Update(Dunning dunning){
 			string command="UPDATE dunning SET "
-				+"DunMessage  = '"+POut.String(dunning.DunMessage)+"', "
-				+"BillingType =  "+POut.Long  (dunning.BillingType)+", "
-				+"AgeAccount  =  "+POut.Byte  (dunning.AgeAccount)+", "
-				+"InsIsPending=  "+POut.Int   ((int)dunning.InsIsPending)+", "
-				+"MessageBold = '"+POut.String(dunning.MessageBold)+"', "
-				+"EmailSubject= '"+POut.String(dunning.EmailSubject)+"', "
-				+"EmailBody   =  "+DbHelper.ParamChar+"paramEmailBody "
+				+"DunMessage   = '"+POut.String(dunning.DunMessage)+"', "
+				+"BillingType  =  "+POut.Long  (dunning.BillingType)+", "
+				+"AgeAccount   =  "+POut.Byte  (dunning.AgeAccount)+", "
+				+"InsIsPending =  "+POut.Int   ((int)dunning.InsIsPending)+", "
+				+"MessageBold  = '"+POut.String(dunning.MessageBold)+"', "
+				+"EmailSubject = '"+POut.String(dunning.EmailSubject)+"', "
+				+"EmailBody    =  "+DbHelper.ParamChar+"paramEmailBody, "
+				+"DaysInAdvance=  "+POut.Int   (dunning.DaysInAdvance)+" "
 				+"WHERE DunningNum = "+POut.Long(dunning.DunningNum);
 			if(dunning.EmailBody==null) {
 				dunning.EmailBody="";
@@ -245,6 +251,10 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="EmailBody = "+DbHelper.ParamChar+"paramEmailBody";
 			}
+			if(dunning.DaysInAdvance != oldDunning.DaysInAdvance) {
+				if(command!=""){ command+=",";}
+				command+="DaysInAdvance = "+POut.Int(dunning.DaysInAdvance)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -280,6 +290,9 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			if(dunning.EmailBody != oldDunning.EmailBody) {
+				return true;
+			}
+			if(dunning.DaysInAdvance != oldDunning.DaysInAdvance) {
 				return true;
 			}
 			return false;

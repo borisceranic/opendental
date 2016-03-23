@@ -53,7 +53,7 @@ namespace OpenDental{
 		private CheckBox checkExcludeIfProcs;
 		private Label labelClinic;
 		private ComboBox comboClinic;
-		private Dunning[] dunningList;
+		private List<Dunning> _listDunnings;
 		public long ClinicNum;
 		private CheckBox checkSuperFam;
 
@@ -675,23 +675,24 @@ namespace OpenDental{
 			textExcludeLessThan.Text=PrefC.GetString(PrefName.BillingExcludeLessThan);
 			checkIgnoreInPerson.Checked=PrefC.GetBool(PrefName.BillingIgnoreInPerson);
 			listBillType.Items.Add(Lan.g(this,"(all)"));
-			for(int i=0;i<DefC.Short[(int)DefCat.BillingTypes].Length;i++){
-				listBillType.Items.Add(DefC.Short[(int)DefCat.BillingTypes][i].ItemName);
-			}
-			string[] selectedBillTypes=PrefC.GetString(PrefName.BillingSelectBillingTypes).Split(',');//might be blank
-			for(int i=0;i<selectedBillTypes.Length;i++){
+			listBillType.Items.AddRange(DefC.Short[(int)DefCat.BillingTypes].Select(x => x.ItemName).ToArray());
+			string[] selectedBillTypes=PrefC.GetString(PrefName.BillingSelectBillingTypes).Split(new char[] { ',' },StringSplitOptions.RemoveEmptyEntries);
+			foreach(string billTypeDefNum in selectedBillTypes) {
 				try{
-					int order=DefC.GetOrder(DefCat.BillingTypes,Convert.ToInt32(selectedBillTypes[i]));
-					if(order!=-1){
-						listBillType.SetSelected(order+1,true);
+					int order=DefC.GetOrder(DefCat.BillingTypes,Convert.ToInt64(billTypeDefNum));
+					if(order==-1) {
+						continue;
 					}
+					listBillType.SetSelected(order+1,true);
 				}
-				catch{}
+				catch(Exception ex) {//cannot convert string to int, just continue
+					continue;
+				}
 			}
 			if(listBillType.SelectedIndices.Count==0){
 				listBillType.SelectedIndex=0;
 			}
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Using clinics.
+			if(PrefC.HasClinicsEnabled) {
 				labelSaveDefaults.Text="("+Lan.g(this,"except the date at the top and clinic at the bottom")+")";
 				labelClinic.Visible=true;
 				comboClinic.Visible=true;
@@ -714,12 +715,6 @@ namespace OpenDental{
 			SetDefaults();
 		}
 
-		//private void butAll_Click(object sender, System.EventArgs e) {
-		//	for(int i=0;i<listBillType.Items.Count;i++){
-		//		listBillType.SetSelected(i,true);
-		//	}
-		//}
-
 		private void butSaveDefault_Click(object sender, System.EventArgs e) {
 			if( textExcludeLessThan.errorProvider1.GetError(textExcludeLessThan)!=""
 				|| textLastStatement.errorProvider1.GetError(textLastStatement)!=""
@@ -733,29 +728,12 @@ namespace OpenDental{
 				return;
 			}
 			string selectedBillingTypes="";//indicates all.
-			for(int i=0;i<listBillType.SelectedIndices.Count;i++){//will always be at least 1
-				if(listBillType.SelectedIndices[i]==0){//all
-					//it ignores any other selections.
-					selectedBillingTypes="";
-					break;
-				}
-				if(i>0){
-					selectedBillingTypes+=",";
-				}
-				selectedBillingTypes+=DefC.Short[(int)DefCat.BillingTypes][listBillType.SelectedIndices[i]-1].DefNum.ToString();
+			if(listBillType.SelectedIndices.Count>0 && !listBillType.SelectedIndices.Contains(0)) {
+				selectedBillingTypes=string.Join(",",listBillType.SelectedIndices.OfType<int>().Select(x => DefC.Short[(int)DefCat.BillingTypes][x-1].DefNum));
 			}
 			string ageOfAccount="";
-			if(comboAge.SelectedIndex==0){
-				ageOfAccount="";//the default
-			}
-			else if(comboAge.SelectedIndex==1){
-				ageOfAccount="30";
-			}
-			else if(comboAge.SelectedIndex==2){
-				ageOfAccount="60";
-			}
-			else if(comboAge.SelectedIndex==3){
-				ageOfAccount="90";
+			if(new[] { 1,2,3 }.Contains(comboAge.SelectedIndex)) {
+				ageOfAccount=(30*comboAge.SelectedIndex).ToString();//ageOfAccount is 30, 60, or 90
 			}
 			if(Prefs.UpdateBool(PrefName.BillingIncludeChanged,checkIncludeChanged.Checked)
 				| Prefs.UpdateString(PrefName.BillingSelectBillingTypes,selectedBillingTypes)
@@ -773,7 +751,7 @@ namespace OpenDental{
 		}
 
 		private void FillDunning(){
-			dunningList=Dunnings.Refresh();
+			_listDunnings=Dunnings.Refresh();
 			gridDun.BeginUpdate();
 			gridDun.Columns.Clear();
 			ODGridColumn col=new ODGridColumn("Billing Type",80);
@@ -789,38 +767,33 @@ namespace OpenDental{
 			col=new ODGridColumn("Email",30, HorizontalAlignment.Center);
 			gridDun.Columns.Add(col);
 			gridDun.Rows.Clear();
-			OpenDental.UI.ODGridRow row;
-			//string text;
-			OpenDental.UI.ODGridCell cell;
-			for(int i=0;i<dunningList.Length;i++){
-				row=new OpenDental.UI.ODGridRow();
-				if(dunningList[i].BillingType==0){
+			ODGridRow row;
+			foreach(Dunning dunnCur in _listDunnings) {
+				row=new ODGridRow();
+				if(dunnCur.BillingType==0){
 					row.Cells.Add(Lan.g(this,"all"));
 				}
 				else{
-					row.Cells.Add(DefC.GetName(DefCat.BillingTypes,dunningList[i].BillingType));
+					row.Cells.Add(DefC.GetName(DefCat.BillingTypes,dunnCur.BillingType));
 				}
-				if(dunningList[i].AgeAccount==0){
+				if(dunnCur.AgeAccount==0){
 					row.Cells.Add(Lan.g(this,"any"));
 				}
 				else{
-					row.Cells.Add(Lan.g(this,"Over ")+dunningList[i].AgeAccount.ToString());
+					row.Cells.Add(Lan.g(this,"Over ")+dunnCur.AgeAccount.ToString());
 				}
-				if(dunningList[i].InsIsPending==YN.Unknown){
-					row.Cells.Add(Lan.g(this,"any"));
-				}
-				else if(dunningList[i].InsIsPending==YN.Yes){
+				if(dunnCur.InsIsPending==YN.Yes) {
 					row.Cells.Add(Lan.g(this,"Y"));
 				}
-				else if(dunningList[i].InsIsPending==YN.No){
+				else if(dunnCur.InsIsPending==YN.No) {
 					row.Cells.Add(Lan.g(this,"N"));
 				}
-				row.Cells.Add(dunningList[i].DunMessage);
-				cell=new ODGridCell(dunningList[i].MessageBold);
-				cell.Bold=YN.Yes;
-				cell.ColorText=Color.DarkRed;
-				row.Cells.Add(cell);
-				if(dunningList[i].EmailBody!="" || dunningList[i].EmailSubject!="") {
+				else {//YN.Unknown
+					row.Cells.Add(Lan.g(this,"any"));
+				}
+				row.Cells.Add(dunnCur.DunMessage);
+				row.Cells.Add(new ODGridCell(dunnCur.MessageBold) { Bold=YN.Yes,ColorText=Color.DarkRed });
+				if(dunnCur.EmailBody!="" || dunnCur.EmailSubject!="") {
 					row.Cells.Add("X");
 				}
 				else {
@@ -832,7 +805,7 @@ namespace OpenDental{
 		}
 
 		private void gridDun_CellDoubleClick(object sender, OpenDental.UI.ODGridClickEventArgs e) {
-			FormDunningEdit formD=new FormDunningEdit(dunningList[e.Row]);
+			FormDunningEdit formD=new FormDunningEdit(_listDunnings[e.Row]);
 			formD.ShowDialog();
 			FillDunning();
 		}
@@ -908,7 +881,9 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please fix data entry errors first.");
 				return;
 			}
+			Cursor=Cursors.WaitCursor;
 			Ledgers.RunAging();
+			Cursor=Cursors.Default;
 			if(PrefC.GetBool(PrefName.AgingCalculatedMonthlyInsteadOfDaily) && PrefC.GetDate(PrefName.DateLastAging) < DateTime.Today.AddDays(-15)) {
 				MsgBox.Show(this,"Last aging date seems old, so you will now be given a chance to update it.  The billing process will continue whether or not aging gets updated.");
 				FormAging FormA=new FormAging();
@@ -1005,26 +980,25 @@ namespace OpenDental{
 				}
 				agingList.AddRange(listSuperAgings);
 			}
-			DateTime dateRangeFrom=DateTime.MinValue;
-			DateTime dateRangeTo=DateTimeOD.Today;//Needed for payplan accuracy.//new DateTime(2200,1,1);
-			if(textDateStart.Text!=""){
-				dateRangeFrom=PIn.Date(textDateStart.Text);
-			}
-			if(textDateEnd.Text!=""){
-				dateRangeTo=PIn.Date(textDateEnd.Text);
-			}
 			if(agingList.Count==0){
 				Cursor=Cursors.Default;
 				MsgBox.Show(this,"List of created bills is empty.");
 				return;
 			}
-			//if(agingList!=null){
+			DateTime dateRangeFrom=PIn.Date(textDateStart.Text);
+			DateTime dateRangeTo=DateTimeOD.Today;//Needed for payplan accuracy.//new DateTime(2200,1,1);
+			if(textDateEnd.Text!=""){
+				dateRangeTo=PIn.Date(textDateEnd.Text);
+			}
 			Statement stmt;
-			int ageAccount=0;
-			YN insIsPending=YN.Unknown;
 			Dunning dunning;
-			Dunning[] dunList=Dunnings.Refresh();
-			for(int i=0;i<agingList.Count;i++){
+			List<Dunning> dunList=Dunnings.Refresh();
+			DateTime dateAsOf=DateTime.Today;//used to determine when the balance on this date began
+			if(PrefC.GetBool(PrefName.AgingCalculatedMonthlyInsteadOfDaily)) {//if aging calculated monthly, use the last aging date instead of today
+				dateAsOf=PrefC.GetDate(PrefName.DateLastAging);
+			}
+			DataTable tableBalAge=Ledgers.GetDateBalanceBegan(agingList.Select(x => x.PatNum).ToList(),dateAsOf);
+			foreach(PatAging patAgeCur in agingList) {
 				stmt=new Statement();
 				stmt.DateRangeFrom=dateRangeFrom;
 				stmt.DateRangeTo=dateRangeTo;
@@ -1043,64 +1017,47 @@ namespace OpenDental{
 				else {
 					stmt.Mode_=StatementMode.Mail;
 				}
-				if(DefC.GetDef(DefCat.BillingTypes,agingList[i].BillingType).ItemValue=="E"){
+				if(DefC.GetDef(DefCat.BillingTypes,patAgeCur.BillingType).ItemValue=="E") {
 					stmt.Mode_=StatementMode.Email;
 				}
-				InstallmentPlan installPlan=InstallmentPlans.GetOneForFam(agingList[i].PatNum);
-				if(installPlan==null) {
-					stmt.Note=textNote.Text;
+				InstallmentPlan installPlan=InstallmentPlans.GetOneForFam(patAgeCur.PatNum);
+				stmt.Note=textNote.Text;
+				if(installPlan!=null) {
+					stmt.Note=textNote.Text.Replace("[InstallmentPlanTerms]","Installment Plan\r\n"
+						+"Date First Payment: "+installPlan.DateFirstPayment.ToShortDateString()+"\r\n"
+						+"Monthly Payment: "+installPlan.MonthlyPayment.ToString("c")+"\r\n"
+						+"APR: "+(installPlan.APR/100).ToString("P")+"\r\n"
+						+"Note: "+installPlan.Note);
 				}
-				else {
-					stmt.Note=textNote.Text.Replace("[InstallmentPlanTerms]",
-						"Installment Plan\r\n"
-					+"Date First Payment: "+installPlan.DateFirstPayment.ToShortDateString()+"\r\n"
-					+"Monthly Payment: "+installPlan.MonthlyPayment.ToString("c")+"\r\n"
-					+"APR: "+(installPlan.APR/(float)100).ToString("P")+"\r\n"
-					+"Note: "+installPlan.Note);
-				}
-				stmt.NoteBold="";
 				//appointment reminders are not handled here since it would be too slow.
-				//set dunning messages here
-				if(agingList[i].BalOver90>0){
-					ageAccount=90;
-				}
-				else if(agingList[i].Bal_61_90>0){
-					ageAccount=60;
-				}
-				else if(agingList[i].Bal_31_60>0){
-					ageAccount=30;
-				}
-				else{
-					ageAccount=0;
-				}
-				if(agingList[i].InsEst>0){
-					insIsPending=YN.Yes;
-				}
-				else{
-					insIsPending=YN.No;
-				}
-				dunning=Dunnings.GetDunning(dunList,agingList[i].BillingType,ageAccount,insIsPending);
+				//dateBalBegan is first transaction date that resulted in a positive balance after the last time they had a bal <=0
+				DateTime dateBalBegan=tableBalAge.Rows.OfType<DataRow>()
+					.Where(x => x["PatNum"].ToString()==patAgeCur.PatNum.ToString())
+					.Select(x => PIn.Date(x["DateAccountAge"].ToString()))
+					.DefaultIfEmpty(DateTime.MinValue).FirstOrDefault();
+				//ageAccount is number of days between the day the account first started to have a positive bal and the asOf date
+				int ageAccount=(dateAsOf-dateBalBegan).Days;
+				dunning=dunList.LastOrDefault(x => (x.BillingType==0 || x.BillingType==patAgeCur.BillingType) //same billing type
+					&& ageAccount>=x.AgeAccount-x.DaysInAdvance //old enough to qualify for this dunning message, taking into account DaysInAdvance
+					&& (x.InsIsPending==YN.Unknown || x.InsIsPending==(patAgeCur.InsEst>0?YN.Yes:YN.No)));//dunning msg ins pending=unkown or matches this acct
 				if(dunning!=null){
 					if(stmt.Note!=""){
 						stmt.Note+="\r\n\r\n";//leave one empty line
 					}
 					stmt.Note+=dunning.DunMessage;
-					//if(stmt.Note!=""){//there will never be anything in NoteBold already
-					//	stmt.Note+="\r\n\r\n";//leave one empty line
-					//}
-					stmt.NoteBold+=dunning.MessageBold;
+					stmt.NoteBold=dunning.MessageBold;
 					stmt.EmailSubject=dunning.EmailSubject;					
 					stmt.EmailBody=dunning.EmailBody;
 				}
-				stmt.PatNum=agingList[i].PatNum;
+				stmt.PatNum=patAgeCur.PatNum;
 				stmt.SinglePatient=false;
 				//If this bill is for the superhead and has superbill enabled, it's a superbill.  Flag it as such.
-				if(agingList[i].HasSuperBilling && agingList[i].PatNum==agingList[i].SuperFamily && checkSuperFam.Checked) {
-					stmt.SuperFamily=agingList[i].SuperFamily;
+				if(patAgeCur.HasSuperBilling && patAgeCur.PatNum==patAgeCur.SuperFamily && checkSuperFam.Checked) {
+					stmt.SuperFamily=patAgeCur.SuperFamily;
 				}
 				stmt.IsBalValid=true;
-				stmt.BalTotal=agingList[i].BalTotal;
-				stmt.InsEst=agingList[i].InsEst;
+				stmt.BalTotal=patAgeCur.BalTotal;
+				stmt.InsEst=patAgeCur.InsEst;
 				Statements.Insert(stmt);
 			}
 			DialogResult=DialogResult.OK;

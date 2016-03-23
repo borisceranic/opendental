@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using OpenDentBusiness;
@@ -447,6 +449,97 @@ namespace OpenDentBusiness{
 				command="DROP TABLE IF EXISTS "+tempAgingTableName+", "+tempOdAgingTransTableName;
 				Db.NonQ(command);
 			}
+		}
+
+		///<summary>Gets the earliest date of any portion of the current balance for the family.
+		///Returns a data table with two columns: PatNum and DateAccountAge.</summary>
+		public static DataTable GetDateBalanceBegan(List<long> listGuarantors,DateTime dateAsOf) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),listGuarantors,dateAsOf);
+			}
+			DataTable retval=new DataTable();
+			retval.Columns.Add("PatNum");
+			retval.Columns.Add("DateAccountAge");
+			List<long> listPatNumsAll=Patients.GetAllFamilyPatNums(listGuarantors);
+			if(listPatNumsAll.Count<1) {
+				return retval;
+			}
+			string patNumStr=string.Join(",",listPatNumsAll);
+			string command="SELECT patient.Guarantor AS PatNum,TranDate,SUM(CASE WHEN TranAmount>0 THEN TranAmount ELSE 0 END) AS ChargeForDate,"
+				+"SUM(CASE WHEN TranAmount<0 THEN -TranAmount ELSE 0 END) AS PayForDate "
+				+"FROM ("
+					//Get the completed procedure dates and charges for the fam
+					+"SELECT PatNum,ProcDate AS TranDate,ProcFee*(UnitQty+BaseUnits) AS TranAmount "
+					+"FROM procedurelog "
+					+"WHERE PatNum IN ("+patNumStr+") "
+					+"AND ProcStatus="+POut.Int((int)ProcStat.C)+" "
+					+"AND "+DbHelper.DtimeToDate("ProcDate")+"<="+POut.Date(dateAsOf)+" "
+					+"UNION ALL "
+					//Paysplits for the fam
+					+"SELECT PatNum,DatePay AS TranDate,-SplitAmt AS TranAmount "
+					+"FROM paysplit "
+					+"WHERE PatNum IN ("+patNumStr+") "
+					+"AND PayPlanNum=0 "//Only splits not attached to payment plans
+					+"AND "+DbHelper.DtimeToDate("DatePay")+"<="+POut.Date(dateAsOf)+" "
+					+"UNION ALL "
+					//Get the adjustment dates and amounts for the fam
+					+"SELECT PatNum,AdjDate AS TranDate,AdjAmt AS TranAmount "
+					+"FROM adjustment "
+					+"WHERE PatNum IN ("+patNumStr+") "
+					+"AND "+DbHelper.DtimeToDate("AdjDate")+"<="+POut.Date(dateAsOf)+" "
+					+"UNION ALL "
+					//Claim payments for the fam
+					+"SELECT PatNum,DateCp AS TranDate,-InsPayAmt-Writeoff AS TranAmount "
+					+"FROM claimproc "
+					+"WHERE PatNum IN ("+patNumStr+") "
+					+"AND STATUS IN("+POut.Int((int)ClaimProcStatus.Received)
+						+","+POut.Int((int)ClaimProcStatus.Supplemental)
+						+","+POut.Int((int)ClaimProcStatus.CapClaim)
+						+","+POut.Int((int)ClaimProcStatus.CapComplete)+") "
+					+"AND PayPlanNum=0 "//Only ins payments not attached to payment plans
+					+"AND "+DbHelper.DtimeToDate("DateCp")+"<="+POut.Date(dateAsOf)+" "
+					+"UNION ALL "
+					//Payment plan principal for the fam
+					+"SELECT PatNum,PayPlanDate AS TranDate,-CompletedAmt AS TranAmount "
+					+"FROM payplan "
+					+"WHERE PatNum IN ("+patNumStr+") "
+					+"AND "+DbHelper.DtimeToDate("PayPlanDate")+"<="+POut.Date(dateAsOf)
+				+") RawPatTrans "
+				+"INNER JOIN patient ON patient.PatNum=RawPatTrans.PatNum "
+				+"GROUP BY patient.Guarantor,TranDate "
+				+"ORDER BY patient.Guarantor,TranDate";
+			DataTable table=Db.GetTable(command);
+			if(table.Rows.Count<1) {
+				return retval;
+			}
+			double runTot=0;
+			long patNumCur;
+			//Create a dictionary that tells a story about the transactions and their dates for each family.
+			Dictionary<long,Dictionary<DateTime,double>> dictPatDateBal=new Dictionary<long,Dictionary<DateTime,double>>();
+			foreach(DataRow rowCur in table.Rows) {
+				patNumCur=PIn.Long(rowCur["PatNum"].ToString());
+				if(dictPatDateBal.Keys.Count==0 || patNumCur!=dictPatDateBal.Keys.Last()) {
+					runTot=0;
+					dictPatDateBal[patNumCur]=new Dictionary<DateTime,double>();
+				}
+				runTot+=PIn.Double(rowCur["ChargeForDate"].ToString())-PIn.Double(rowCur["PayForDate"].ToString());
+				dictPatDateBal[patNumCur][PIn.Date(rowCur["TranDate"].ToString())]=runTot;
+			}
+			DataRow row;
+			DateTime dateLastZero;
+			Dictionary<DateTime,double> dictDateBal;
+			//Find the earliest date where the family had a balance since the last time they "didn't" have a balance.
+			foreach(long patNum in listGuarantors) {
+				dictDateBal=dictPatDateBal[patNum];
+				row=retval.NewRow();
+				row["PatNum"]=POut.Long(patNum);
+				//last date the guar's account had a zero or negative bal.  If the account has never been <=0, DateTime.MinValue
+				dateLastZero=dictDateBal.Where(x => x.Value<=0).Select(x => x.Key).DefaultIfEmpty(DateTime.MinValue).Max();
+				//earliest date acct was pos after dateLastZero, could be DateTime.MinValue if there has not been a balance after the last time it was <=0
+				row["DateAccountAge"]=dictDateBal.Where(x => x.Key>dateLastZero && x.Value>0).Select(x => x.Key).DefaultIfEmpty(DateTime.MinValue).Min();
+				retval.Rows.Add(row);
+			}
+			return retval;
 		}
 	}
 

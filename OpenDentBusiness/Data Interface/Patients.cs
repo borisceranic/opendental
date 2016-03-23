@@ -135,6 +135,22 @@ namespace OpenDentBusiness{
 			return pat;
 		}
 
+		///<summary>Gets all of the PatNums for the family members of the PatNums passed in.  Returns a distinct list of PatNums.</summary>
+		public static List<long> GetAllFamilyPatNums(List<long> listPatNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<long>>(MethodBase.GetCurrentMethod(),listPatNums);
+			}
+			if(listPatNums==null || listPatNums.Count<1) {
+				return new List<long>();
+			}
+			string command="SELECT patient.PatNum FROM patient "
+				+"INNER JOIN ("
+					+"SELECT DISTINCT Guarantor FROM patient WHERE PatNum IN ("+string.Join(",",listPatNums)+")"
+					+") guarnums ON guarnums.Guarantor=patient.Guarantor "
+				+"WHERE patient.PatStatus!="+POut.Int((int)PatientStatus.Deleted);
+			return Db.GetListLong(command);
+		}
+
 		public static List<Patient> GetChangedSince(DateTime changedSince) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Patient>>(MethodBase.GetCurrentMethod(),changedSince);
