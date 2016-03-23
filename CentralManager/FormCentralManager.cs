@@ -381,20 +381,25 @@ namespace CentralManager {
 
 		private void ConnectAndVerify(ODThread odThread) {
 			CentralConnection connection=(CentralConnection)odThread.Parameters[0];
-			string progVersion=(string)odThread.Parameters[1];
-			if(!CentralConnectionHelper.UpdateCentralConnection(connection,false)) {
+			try {
+				string progVersion=(string)odThread.Parameters[1];
+				if(!CentralConnectionHelper.UpdateCentralConnection(connection,false)) {
+					odThread.Tag=new object[] { connection,"OFFLINE" };//Can't connect
+					return;
+				}
+				string progVersionRemote=PrefC.GetStringNoCache(PrefName.ProgramVersion);
+				string err="";
+				if(progVersionRemote!=progVersion) {
+					err=progVersionRemote;
+				}
+				else {
+					err="OK";
+				}
+				odThread.Tag=new object[] { connection,err };
+			}
+			catch(Exception ex) {
 				odThread.Tag=new object[] { connection,"OFFLINE" };//Can't connect
-				return;
 			}
-			string progVersionRemote=PrefC.GetStringNoCache(PrefName.ProgramVersion);
-			string err="";
-			if(progVersionRemote!=progVersion) {
-				err=progVersionRemote;
-			}
-			else {
-				err="OK";
-			}
-			odThread.Tag=new object[] { connection,err };
 		}
 
 		private void butRefresh_Click(object sender,EventArgs e) {
