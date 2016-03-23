@@ -5174,6 +5174,7 @@ namespace OpenDental{
 				MessageBox.Show(Lan.g(this,"Please highlight procedures first."));
 				return;
 			}
+			List<long> listSelectedProcNums=new List<long>();
 			for(int i=0;i<gridProc.SelectedIndices.Length;i++){
 				if(ClaimProcsForClaim[gridProc.SelectedIndices[i]].ProcNum==0){
 					MessageBox.Show(Lan.g(this,"Only procedures can be selected."));
@@ -5183,6 +5184,20 @@ namespace OpenDental{
 					MessageBox.Show(Lan.g(this,"All selected procedures must have zero insurance payment amounts."));
 					return;
 				}
+				listSelectedProcNums.Add(ClaimProcsForClaim[gridProc.SelectedIndices[i]].ProcNum);
+			}
+			//Make sure that there is at least one procedure left on the claim before splitting.
+			//The claim would become orphaned if we allow users to split off all procedures on the claim and DBM would be required to run to clean up.
+			bool hasProcLeft=false;
+			foreach(ClaimProc claimProc in ClaimProcsForClaim) {
+				if(!listSelectedProcNums.Contains(claimProc.ProcNum)) {
+					hasProcLeft=true;
+					break;
+				}
+			}
+			if(!hasProcLeft) {//All procedures are selected for the split...
+				MsgBox.Show(this,"At least one procedure needs to remain on this claim in order to split it.");
+				return;
 			}
 			Claim newClaim=ClaimCur.Copy();
 			newClaim.ClaimFee=0;
