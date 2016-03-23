@@ -1,15 +1,16 @@
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using CodeBase;
 using OpenDentBusiness;
-using System.Text.RegularExpressions;
 
 namespace OpenDental{
 	///<summary></summary>
@@ -1599,23 +1600,17 @@ namespace OpenDental{
 				if(textDate.Text=="") {
 					return;
 				}
-				bool allNums=true;
-				for(int i=0;i<textDate.Text.Length;i++) {
-					if(!Char.IsNumber(textDate.Text,i)) {
-						allNums=false;
-					}
-				}
 				if(CultureInfo.CurrentCulture.TwoLetterISOLanguageName=="en") {
-					if(allNums) {
+					if(textDate.Text.All(x => char.IsNumber(x))) {
 						if(textDate.Text.Length==6) {
 							textDate.Text=textDate.Text.Substring(0,2)+"/"+textDate.Text.Substring(2,2)+"/"+textDate.Text.Substring(4,2);
 						}
-						else if(Text.Length==8) {
+						else if(textDate.Text.Length==8) {
 							textDate.Text=textDate.Text.Substring(0,2)+"/"+textDate.Text.Substring(2,2)+"/"+textDate.Text.Substring(4,4);
 						}
 					}
 				}
-				if(DateTime.Parse(Text).Year>1880) {
+				if(DateTime.Parse(textDate.Text).Year>1880) {
 					textDate.Text=DateTime.Parse(textDate.Text).ToString("d");
 				}
 			}
@@ -1627,23 +1622,17 @@ namespace OpenDental{
 				if(textDateStart.Text=="") {
 					return;
 				}
-				bool allNums=true;
-				for(int i=0;i<textDateStart.Text.Length;i++) {
-					if(!Char.IsNumber(textDateStart.Text,i)) {
-						allNums=false;
-					}
-				}
 				if(CultureInfo.CurrentCulture.TwoLetterISOLanguageName=="en") {
-					if(allNums) {
+					if(textDateStart.Text.All(x => char.IsNumber(x))) {
 						if(textDateStart.Text.Length==6) {
 							textDateStart.Text=textDateStart.Text.Substring(0,2)+"/"+textDateStart.Text.Substring(2,2)+"/"+textDateStart.Text.Substring(4,2);
 						}
-						else if(Text.Length==8) {
+						else if(textDateStart.Text.Length==8) {
 							textDateStart.Text=textDateStart.Text.Substring(0,2)+"/"+textDateStart.Text.Substring(2,2)+"/"+textDateStart.Text.Substring(4,4);
 						}
 					}
 				}
-				if(DateTime.Parse(Text).Year>1880) {
+				if(DateTime.Parse(textDateStart.Text).Year>1880) {
 					textDateStart.Text=DateTime.Parse(textDateStart.Text).ToString("d");
 				}
 			}
@@ -1655,23 +1644,17 @@ namespace OpenDental{
 				if(textDateEnd.Text=="") {
 					return;
 				}
-				bool allNums=true;
-				for(int i=0;i<textDateEnd.Text.Length;i++) {
-					if(!Char.IsNumber(textDateEnd.Text,i)) {
-						allNums=false;
-					}
-				}
 				if(CultureInfo.CurrentCulture.TwoLetterISOLanguageName=="en") {
-					if(allNums) {
+					if(textDateEnd.Text.All(x => char.IsNumber(x))) {
 						if(textDateEnd.Text.Length==6) {
 							textDateEnd.Text=textDateEnd.Text.Substring(0,2)+"/"+textDateEnd.Text.Substring(2,2)+"/"+textDateEnd.Text.Substring(4,2);
 						}
-						else if(Text.Length==8) {
+						else if(textDateEnd.Text.Length==8) {
 							textDateEnd.Text=textDateEnd.Text.Substring(0,2)+"/"+textDateEnd.Text.Substring(2,2)+"/"+textDateEnd.Text.Substring(4,4);
 						}
 					}
 				}
-				if(DateTime.Parse(Text).Year>1880) {
+				if(DateTime.Parse(textDateEnd.Text).Year>1880) {
 					textDateEnd.Text=DateTime.Parse(textDateEnd.Text).ToString("d");
 				}
 			}
