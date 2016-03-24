@@ -346,12 +346,14 @@ namespace CentralManager {
 		}
 
 		private void butAdd_Click(object sender,EventArgs e) {
+			CentralConnections.Sync(_listConns);
 			CentralConnection conn=new CentralConnection();
 			conn.IsNew=true;
 			FormCentralConnectionEdit FormCCS=new FormCentralConnectionEdit();
 			FormCCS.CentralConnectionCur=conn;
-			FormCCS.ShowDialog();//Will insert conn on OK.
-			_listConns=CentralConnections.GetConnections();
+			if(FormCCS.ShowDialog()==DialogResult.OK) {//Will insert conn on OK.
+				_listConns=CentralConnections.GetConnections();
+			}
 			FillGrid();
 		}
 
@@ -360,6 +362,7 @@ namespace CentralManager {
 				MsgBox.Show(this,"Please select a connection to edit first.");
 				return;
 			}
+			CentralConnections.Sync(_listConns);
 			FormCentralConnectionEdit FormCCE=new FormCentralConnectionEdit();
 			FormCCE.CentralConnectionCur=(CentralConnection)gridMain.Rows[gridMain.SelectedIndices[0]].Tag;//No support for editing multiple.
 			if(FormCCE.ShowDialog()==DialogResult.OK) {
