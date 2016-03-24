@@ -3378,6 +3378,31 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		//NOTE: 03/24/2016 Issue with DateTimeDeceased for a patient where the the DB value was "·,'*-0--,) 14:25:37" for customer 3202. 
+		//Per Nathan if this occurs again we need to make a DBM to fix this.
+		//[DbmMethod]
+		//public static string PatientInvalidDateTimeDeceased(bool verbose,bool isCheck) {
+		//	if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+		//		return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+		//	}
+		//	string log="";
+		//	if(isCheck) {
+		//		command="";
+		//		int numFound=PIn.Int(Db.GetCount(command));
+		//		if(numFound>0||verbose) {
+		//			log+=Lans.g("FormDatabaseMaintenance",": ")+numFound.ToString()+"\r\n";
+		//		}
+		//	}
+		//	else {//fix
+		//		command="";
+		//		long numberFixed=Db.NonQ(command);
+		//		if(numberFixed>0||verbose) {
+		//			log+=Lans.g("FormDatabaseMaintenance",": ")+numberFixed.ToString()+"\r\n";
+		//		}
+		//	}
+		//	return log;
+		//}
+
 		[DbmMethod(HasBreakDown=true)]
 		public static string PatientsNoClinicSet(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
