@@ -269,6 +269,8 @@ namespace OpenDentBusiness{
 		///Derek based on the following existing permissions: InsPlanChangeSubsc, InsPlanChangeCarrierName, InsPlanChangeAssign.
 		///Currently only used in X12 834 insurance plan import.</summary>
 		InsPlanDropPat,
+		///<summary>115 - Allows users to be assigned Insurance Verifications.</summary>
+		InsPlanVerifyList,
 	}
 
 	

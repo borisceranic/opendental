@@ -198,6 +198,8 @@ namespace OpenDental{
 		private Label label34;
 		private CheckBox checkDontVerify;
 		private InsSub _subOld;
+		private string _insPlanLastVerified;
+		private string _patPlanLastVerified;
 		//<summary>This is a field that is accessed only by clicking on the button because there's not room for it otherwise.  This variable should be treated just as if it was a visible textBox.</summary>
 		//private string BenefitNotes;
 
@@ -2067,6 +2069,8 @@ namespace OpenDental{
 			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				checkCodeSubst.Visible=false;
 			}
+			_insPlanLastVerified=textDateLastVerifiedBenefits.Text;
+			_patPlanLastVerified=textDateLastVerifiedPatPlan.Text;
 			Cursor=Cursors.Default;
 		}
 
@@ -4109,9 +4113,11 @@ namespace OpenDental{
 		///<summary>Used from butGetElectronic_Click and from butOK_Click.  Returns false if unable to complete.  Also fills SubCur if not null.</summary>
 		private bool FillPlanCurFromForm(){
 			if(textDateEffect.errorProvider1.GetError(textDateEffect)!=""
-				||textDateTerm.errorProvider1.GetError(textDateTerm)!=""
-				||textDentaide.errorProvider1.GetError(textDentaide)!=""
-				) {
+				|| textDateTerm.errorProvider1.GetError(textDateTerm)!=""
+				|| textDentaide.errorProvider1.GetError(textDentaide)!=""
+				|| textDateLastVerifiedBenefits.errorProvider1.GetError(textDateLastVerifiedBenefits)!="" 
+				|| textDateLastVerifiedPatPlan.errorProvider1.GetError(textDateLastVerifiedPatPlan)!="")
+			{
 				MsgBox.Show(this,"Please fix data entry errors first.");
 				return false;
 			}
@@ -4314,16 +4320,10 @@ namespace OpenDental{
 		}
 		
 		private void butVerifyPatPlan_Click(object sender,EventArgs e) {
-			InsVerify insVerify=InsVerifies.GetOneByFKey(PatPlanCur.PatPlanNum,VerifyTypes.PatientEnrollment);
-			insVerify.DateLastVerified=DateTime.Today;
-			InsVerifyHists.InsertFromInsVerify(insVerify);
 			textDateLastVerifiedPatPlan.Text=DateTime.Today.ToShortDateString();
 		}
 
 		private void butVerifyBenefits_Click(object sender,EventArgs e) {
-			InsVerify insVerify=InsVerifies.GetOneByFKey(PlanCur.PlanNum,VerifyTypes.InsuranceBenefit);
-			insVerify.DateLastVerified=DateTime.Today;
-			InsVerifyHists.InsertFromInsVerify(insVerify);
 			textDateLastVerifiedBenefits.Text=DateTime.Today.ToShortDateString();
 		}
 
@@ -4378,6 +4378,11 @@ namespace OpenDental{
 				PatPlanCur.Relationship=(Relat)comboRelationship.SelectedIndex;
 				PatPlanCur.PatID=textPatID.Text;
 				PatPlans.Update(PatPlanCur);
+				if(textDateLastVerifiedPatPlan.Text!=_patPlanLastVerified) {
+					InsVerify insVerify=InsVerifies.GetOneByFKey(PatPlanCur.PatPlanNum,VerifyTypes.PatientEnrollment);
+					insVerify.DateLastVerified=PIn.Date(textDateLastVerifiedPatPlan.Text);
+					InsVerifyHists.InsertFromInsVerify(insVerify);
+				}
 			}
 			//InsPlan-----------------------------------------------------------------------------------------
 			if(_subCur==null) {//editing from big list.  No subscriber.  'pick from list' button not visible, making logic easier.
@@ -4534,6 +4539,11 @@ namespace OpenDental{
 						}
 					}
 				}
+			}
+			if(textDateLastVerifiedBenefits.Text!=_insPlanLastVerified) {
+				InsVerify insVerify=InsVerifies.GetOneByFKey(PlanCur.PlanNum,VerifyTypes.InsuranceBenefit);
+				insVerify.DateLastVerified=PIn.Date(textDateLastVerifiedBenefits.Text);
+				InsVerifyHists.InsertFromInsVerify(insVerify);
 			}
 			//PatPlanCur.InsSubNum is already set before opening this window.  There is no possible way to change it from within this window.  Even if PlanNum changes, it's still the same inssub.  And even if inssub.Subscriber changes, it's still the same inssub.  So no change to PatPlanCur.InsSubNum is ever require from within this window.
 			//Synch benefits-----------------------------------------------------------------------------------------------

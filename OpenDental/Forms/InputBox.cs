@@ -15,6 +15,7 @@ namespace OpenDental{
 		///<summary></summary>
 		public TextBox textResult;
 		public ComboBox comboSelection;
+		public bool IsMultiline;
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
@@ -134,7 +135,7 @@ namespace OpenDental{
 			// InputBox
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(430, 145);
+			this.ClientSize = new System.Drawing.Size(453, 145);
 			this.Controls.Add(this.comboSelection);
 			this.Controls.Add(this.textResult);
 			this.Controls.Add(this.labelPrompt);
@@ -153,6 +154,16 @@ namespace OpenDental{
 
 		}
 		#endregion
+		
+		private void InputBox_Load(object sender,EventArgs e) {
+			if(IsMultiline) {
+				comboSelection.Visible=false;
+				this.Size=new Size(this.Size.Width,270);
+				textResult.Multiline=true;
+				textResult.ScrollBars=ScrollBars.Vertical;
+				textResult.Size=new Size(textResult.Size.Width,100);
+			}
+		}
 
 		public void setTitle(string title) {
 			this.Text=title;
@@ -164,10 +175,6 @@ namespace OpenDental{
 
 		private void butCancel_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
-		}
-
-		private void InputBox_Load(object sender,EventArgs e) {
-			
 		}
 
 

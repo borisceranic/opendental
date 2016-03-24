@@ -12,7 +12,7 @@ using CodeBase;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("16.1.6.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("16.1.13.0");//This value must be changed when a new conversion is to be triggered.
 
 		#region Helper Functions
 
@@ -11824,10 +11824,10 @@ namespace OpenDentBusiness {
 				}
 				else {//oracle
 					command="INSERT INTO definition (DefNum,Category,ItemName,ItemOrder,ItemValue) "
-						+"VALUES ((SELECT MAX(DefNum)+1 FROM definition),38,'Default',0,'')";
+						+"VALUES ((SELECT MAX(DefNum)+1 FROM definition),38,'Unverified',0,'')";
 					unverifiedDefNum=Db.NonQ(command,true);
 					command="INSERT INTO definition (DefNum,Category,ItemName,ItemOrder,ItemValue) "
-						+"VALUES ((SELECT MAX(DefNum)+1 FROM definition),38,'Provider',1,'')";
+						+"VALUES ((SELECT MAX(DefNum)+1 FROM definition),38,'Verified',1,'')";
 					Db.NonQ(command);
 				}
 				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.1 - insverify / insplans"));//No translation in convert script.
@@ -13373,6 +13373,55 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				command="UPDATE preference SET ValueString='16.1.6.0' WHERE PrefName='DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			To16_1_13();
+		}
+
+		private static void To16_1_13() {
+			if(FromVersion<new Version("16.1.13.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.13.0"));//No translation in convert script.
+				string command="";
+				command="SELECT DefNum FROM definition WHERE ItemName='Unverified'";
+				string unverifiedDefNum=Db.GetScalar(command);
+				command="SELECT DefNum FROM definition WHERE ItemName='Verified'";
+				string verifiedDefNum=Db.GetScalar(command);
+				command="UPDATE insverify SET DefNum='0' WHERE DefNum="+unverifiedDefNum+" OR DefNum="+verifiedDefNum;
+				Db.NonQ(command);
+				command="UPDATE insverifyhist SET DefNum='0' WHERE DefNum="+unverifiedDefNum+" OR DefNum="+verifiedDefNum;
+				Db.NonQ(command);
+				command="DELETE FROM definition WHERE DefNum="+unverifiedDefNum;
+				Db.NonQ(command);
+				command="DELETE FROM definition WHERE DefNum="+verifiedDefNum;
+				Db.NonQ(command);
+				//Add 2 new definitions for the Insurance Verification Status definition category.
+				if(DataConnection.DBtype==DatabaseType.MySql) { //38 is DefCat.InsuranceVerificationStatus
+					command="INSERT INTO definition (Category,ItemName,ItemOrder,ItemValue) VALUES (38,'Attempted',0,'')";
+					Db.NonQ(command);
+					command="INSERT INTO definition (Category,ItemName,ItemOrder,ItemValue) VALUES (38,'See Notes',1,'')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO definition (DefNum,Category,ItemName,ItemOrder,ItemValue) "
+						+"VALUES ((SELECT MAX(DefNum)+1 FROM definition),38,'Attempted',0,'')";
+					Db.NonQ(command);
+					command="INSERT INTO definition (DefNum,Category,ItemName,ItemOrder,ItemValue) "
+						+"VALUES ((SELECT MAX(DefNum)+1 FROM definition),38,'See Notes',1,'')";
+					Db.NonQ(command);
+				}
+				//Add InsPlanVerifyList permission to everyone------------------------------------------------------
+				command="SELECT DISTINCT UserGroupNum FROM grouppermission";
+				DataTable table=Db.GetTable(command);
+				long groupNum;
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+				   foreach(DataRow row in table.Rows) {
+					  groupNum=PIn.Long(row["UserGroupNum"].ToString());
+					  command="INSERT INTO grouppermission (UserGroupNum,PermType) "
+						 +"VALUES("+POut.Long(groupNum)+",115)";//115 - InsPlanVerifyList
+					  Db.NonQ(command);
+				   }
+				}
+				command="UPDATE preference SET ValueString='16.1.13.0' WHERE PrefName='DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			//To16_2_0();

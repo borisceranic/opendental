@@ -28,12 +28,14 @@ namespace OpenDental{
 			this.label23 = new System.Windows.Forms.Label();
 			this.label4 = new System.Windows.Forms.Label();
 			this.groupBox3 = new System.Windows.Forms.GroupBox();
+			this.butRefresh = new OpenDental.UI.Button();
+			this.comboVerifyUser = new System.Windows.Forms.ComboBox();
+			this.label3 = new System.Windows.Forms.Label();
 			this.comboVerifyClinics = new System.Windows.Forms.ComboBox();
 			this.labelClinic = new System.Windows.Forms.Label();
 			this.comboFilterVerifyStatus = new System.Windows.Forms.ComboBox();
 			this.label15 = new System.Windows.Forms.Label();
 			this.textVerifyCarrier = new System.Windows.Forms.TextBox();
-			this.textVerifyUser = new System.Windows.Forms.TextBox();
 			this.label6 = new System.Windows.Forms.Label();
 			this.comboVerifyRegions = new System.Windows.Forms.ComboBox();
 			this.labelRegion = new System.Windows.Forms.Label();
@@ -68,35 +70,34 @@ namespace OpenDental{
 			this.textAssignUser = new System.Windows.Forms.TextBox();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.textInsVerifyNote = new System.Windows.Forms.TextBox();
-			this.comboSetVerifyStatus = new System.Windows.Forms.ComboBox();
 			this.label19 = new System.Windows.Forms.Label();
-			this.label16 = new System.Windows.Forms.Label();
 			this.butAssignUserPick = new OpenDental.UI.Button();
 			this.timerRefresh = new System.Windows.Forms.Timer(this.components);
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
-			this.tabPage1 = new System.Windows.Forms.TabPage();
-			this.textInsVerifyReadOnlyNote = new System.Windows.Forms.TextBox();
+			this.tabVerify = new System.Windows.Forms.TabPage();
+			this.comboSetVerifyStatus = new System.Windows.Forms.ComboBox();
 			this.butVerify = new OpenDental.UI.Button();
+			this.label16 = new System.Windows.Forms.Label();
+			this.textInsVerifyReadOnlyNote = new System.Windows.Forms.TextBox();
 			this.label20 = new System.Windows.Forms.Label();
-			this.tabPage2 = new System.Windows.Forms.TabPage();
+			this.tabAssign = new System.Windows.Forms.TabPage();
 			this.gridAssign = new OpenDental.UI.ODGrid();
 			this.butAssignUser = new OpenDental.UI.Button();
 			this._menuRightClick = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.butClose = new OpenDental.UI.Button();
-			this.label3 = new System.Windows.Forms.Label();
 			this.groupBox3.SuspendLayout();
 			this.groupBox4.SuspendLayout();
 			this.groupBox5.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.tabControl1.SuspendLayout();
-			this.tabPage1.SuspendLayout();
-			this.tabPage2.SuspendLayout();
+			this.tabVerify.SuspendLayout();
+			this.tabAssign.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// label23
 			// 
-			this.label23.Location = new System.Drawing.Point(9, 15);
+			this.label23.Location = new System.Drawing.Point(9, 11);
 			this.label23.Name = "label23";
 			this.label23.Size = new System.Drawing.Size(261, 20);
 			this.label23.TabIndex = 77;
@@ -105,7 +106,7 @@ namespace OpenDental{
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(9, 65);
+			this.label4.Location = new System.Drawing.Point(9, 55);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(261, 20);
 			this.label4.TabIndex = 88;
@@ -114,13 +115,14 @@ namespace OpenDental{
 			// 
 			// groupBox3
 			// 
+			this.groupBox3.Controls.Add(this.butRefresh);
+			this.groupBox3.Controls.Add(this.comboVerifyUser);
 			this.groupBox3.Controls.Add(this.label3);
 			this.groupBox3.Controls.Add(this.comboVerifyClinics);
 			this.groupBox3.Controls.Add(this.labelClinic);
 			this.groupBox3.Controls.Add(this.comboFilterVerifyStatus);
 			this.groupBox3.Controls.Add(this.label15);
 			this.groupBox3.Controls.Add(this.textVerifyCarrier);
-			this.groupBox3.Controls.Add(this.textVerifyUser);
 			this.groupBox3.Controls.Add(this.label6);
 			this.groupBox3.Controls.Add(this.comboVerifyRegions);
 			this.groupBox3.Controls.Add(this.labelRegion);
@@ -131,17 +133,50 @@ namespace OpenDental{
 			this.groupBox3.Controls.Add(this.textAppointmentScheduledDays);
 			this.groupBox3.Controls.Add(this.textPatientEnrollmentDays);
 			this.groupBox3.Controls.Add(this.textInsBenefitEligibilityDays);
-			this.groupBox3.Location = new System.Drawing.Point(12, 4);
+			this.groupBox3.Location = new System.Drawing.Point(3, 4);
 			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(961, 92);
+			this.groupBox3.Size = new System.Drawing.Size(969, 82);
 			this.groupBox3.TabIndex = 90;
 			this.groupBox3.TabStop = false;
 			this.groupBox3.Text = "Verification Filters";
 			// 
+			// butRefresh
+			// 
+			this.butRefresh.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butRefresh.Autosize = true;
+			this.butRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butRefresh.CornerRadius = 4F;
+			this.butRefresh.Location = new System.Drawing.Point(810, 55);
+			this.butRefresh.Name = "butRefresh";
+			this.butRefresh.Size = new System.Drawing.Size(75, 24);
+			this.butRefresh.TabIndex = 232;
+			this.butRefresh.Text = "Refresh";
+			this.butRefresh.UseVisualStyleBackColor = true;
+			this.butRefresh.Click += new System.EventHandler(this.butRefresh_Click);
+			// 
+			// comboVerifyUser
+			// 
+			this.comboVerifyUser.FormattingEnabled = true;
+			this.comboVerifyUser.Location = new System.Drawing.Point(733, 10);
+			this.comboVerifyUser.Name = "comboVerifyUser";
+			this.comboVerifyUser.Size = new System.Drawing.Size(124, 21);
+			this.comboVerifyUser.TabIndex = 231;
+			this.comboVerifyUser.SelectionChangeCommitted += new System.EventHandler(this.comboVerifyUser_SelectionChangeCommitted);
+			// 
+			// label3
+			// 
+			this.label3.Location = new System.Drawing.Point(19, 32);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(250, 20);
+			this.label3.TabIndex = 230;
+			this.label3.Text = "Plan benefits haven\'t been verified in";
+			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// comboVerifyClinics
 			// 
 			this.comboVerifyClinics.FormattingEnabled = true;
-			this.comboVerifyClinics.Location = new System.Drawing.Point(451, 64);
+			this.comboVerifyClinics.Location = new System.Drawing.Point(451, 56);
 			this.comboVerifyClinics.Name = "comboVerifyClinics";
 			this.comboVerifyClinics.Size = new System.Drawing.Size(150, 21);
 			this.comboVerifyClinics.TabIndex = 229;
@@ -149,7 +184,7 @@ namespace OpenDental{
 			// 
 			// labelClinic
 			// 
-			this.labelClinic.Location = new System.Drawing.Point(373, 64);
+			this.labelClinic.Location = new System.Drawing.Point(373, 56);
 			this.labelClinic.Name = "labelClinic";
 			this.labelClinic.Size = new System.Drawing.Size(75, 20);
 			this.labelClinic.TabIndex = 228;
@@ -159,7 +194,7 @@ namespace OpenDental{
 			// comboFilterVerifyStatus
 			// 
 			this.comboFilterVerifyStatus.FormattingEnabled = true;
-			this.comboFilterVerifyStatus.Location = new System.Drawing.Point(733, 40);
+			this.comboFilterVerifyStatus.Location = new System.Drawing.Point(733, 33);
 			this.comboFilterVerifyStatus.Name = "comboFilterVerifyStatus";
 			this.comboFilterVerifyStatus.Size = new System.Drawing.Size(152, 21);
 			this.comboFilterVerifyStatus.TabIndex = 227;
@@ -167,7 +202,7 @@ namespace OpenDental{
 			// 
 			// label15
 			// 
-			this.label15.Location = new System.Drawing.Point(607, 40);
+			this.label15.Location = new System.Drawing.Point(607, 34);
 			this.label15.Name = "label15";
 			this.label15.Size = new System.Drawing.Size(120, 20);
 			this.label15.TabIndex = 226;
@@ -176,23 +211,15 @@ namespace OpenDental{
 			// 
 			// textVerifyCarrier
 			// 
-			this.textVerifyCarrier.Location = new System.Drawing.Point(451, 15);
+			this.textVerifyCarrier.Location = new System.Drawing.Point(451, 11);
 			this.textVerifyCarrier.Name = "textVerifyCarrier";
 			this.textVerifyCarrier.Size = new System.Drawing.Size(150, 20);
 			this.textVerifyCarrier.TabIndex = 225;
 			this.textVerifyCarrier.TextChanged += new System.EventHandler(this.textVerifyCarrier_TextChanged);
 			// 
-			// textVerifyUser
-			// 
-			this.textVerifyUser.Location = new System.Drawing.Point(733, 15);
-			this.textVerifyUser.Name = "textVerifyUser";
-			this.textVerifyUser.ReadOnly = true;
-			this.textVerifyUser.Size = new System.Drawing.Size(125, 20);
-			this.textVerifyUser.TabIndex = 224;
-			// 
 			// label6
 			// 
-			this.label6.Location = new System.Drawing.Point(373, 15);
+			this.label6.Location = new System.Drawing.Point(373, 11);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(75, 20);
 			this.label6.TabIndex = 223;
@@ -202,7 +229,7 @@ namespace OpenDental{
 			// comboVerifyRegions
 			// 
 			this.comboVerifyRegions.FormattingEnabled = true;
-			this.comboVerifyRegions.Location = new System.Drawing.Point(451, 39);
+			this.comboVerifyRegions.Location = new System.Drawing.Point(451, 33);
 			this.comboVerifyRegions.Name = "comboVerifyRegions";
 			this.comboVerifyRegions.Size = new System.Drawing.Size(150, 21);
 			this.comboVerifyRegions.TabIndex = 222;
@@ -210,7 +237,7 @@ namespace OpenDental{
 			// 
 			// labelRegion
 			// 
-			this.labelRegion.Location = new System.Drawing.Point(373, 39);
+			this.labelRegion.Location = new System.Drawing.Point(373, 33);
 			this.labelRegion.Name = "labelRegion";
 			this.labelRegion.Size = new System.Drawing.Size(75, 20);
 			this.labelRegion.TabIndex = 221;
@@ -219,7 +246,7 @@ namespace OpenDental{
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(607, 15);
+			this.label2.Location = new System.Drawing.Point(607, 11);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(120, 20);
 			this.label2.TabIndex = 220;
@@ -234,16 +261,16 @@ namespace OpenDental{
 			this.butVerifyUserPick.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butVerifyUserPick.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butVerifyUserPick.CornerRadius = 4F;
-			this.butVerifyUserPick.Location = new System.Drawing.Point(859, 14);
+			this.butVerifyUserPick.Location = new System.Drawing.Point(858, 10);
 			this.butVerifyUserPick.Name = "butVerifyUserPick";
-			this.butVerifyUserPick.Size = new System.Drawing.Size(27, 23);
+			this.butVerifyUserPick.Size = new System.Drawing.Size(27, 20);
 			this.butVerifyUserPick.TabIndex = 219;
 			this.butVerifyUserPick.Text = "...";
 			this.butVerifyUserPick.Click += new System.EventHandler(this.butVerifyUserPick_Click);
 			// 
 			// textAppointmentScheduledDays
 			// 
-			this.textAppointmentScheduledDays.Location = new System.Drawing.Point(272, 15);
+			this.textAppointmentScheduledDays.Location = new System.Drawing.Point(272, 11);
 			this.textAppointmentScheduledDays.MaxVal = 255;
 			this.textAppointmentScheduledDays.MinVal = 0;
 			this.textAppointmentScheduledDays.Name = "textAppointmentScheduledDays";
@@ -254,7 +281,7 @@ namespace OpenDental{
 			// 
 			// textPatientEnrollmentDays
 			// 
-			this.textPatientEnrollmentDays.Location = new System.Drawing.Point(272, 65);
+			this.textPatientEnrollmentDays.Location = new System.Drawing.Point(272, 55);
 			this.textPatientEnrollmentDays.MaxVal = 255;
 			this.textPatientEnrollmentDays.MinVal = 0;
 			this.textPatientEnrollmentDays.Name = "textPatientEnrollmentDays";
@@ -265,7 +292,7 @@ namespace OpenDental{
 			// 
 			// textInsBenefitEligibilityDays
 			// 
-			this.textInsBenefitEligibilityDays.Location = new System.Drawing.Point(272, 40);
+			this.textInsBenefitEligibilityDays.Location = new System.Drawing.Point(272, 33);
 			this.textInsBenefitEligibilityDays.MaxVal = 255;
 			this.textInsBenefitEligibilityDays.MinVal = 0;
 			this.textInsBenefitEligibilityDays.Name = "textInsBenefitEligibilityDays";
@@ -286,14 +313,14 @@ namespace OpenDental{
 			this.groupBox4.Controls.Add(this.label7);
 			this.groupBox4.Location = new System.Drawing.Point(483, 349);
 			this.groupBox4.Name = "groupBox4";
-			this.groupBox4.Size = new System.Drawing.Size(232, 136);
+			this.groupBox4.Size = new System.Drawing.Size(232, 126);
 			this.groupBox4.TabIndex = 91;
 			this.groupBox4.TabStop = false;
 			this.groupBox4.Text = "Subscriber";
 			// 
 			// textSubscriberID
 			// 
-			this.textSubscriberID.Location = new System.Drawing.Point(111, 88);
+			this.textSubscriberID.Location = new System.Drawing.Point(111, 79);
 			this.textSubscriberID.Name = "textSubscriberID";
 			this.textSubscriberID.ReadOnly = true;
 			this.textSubscriberID.Size = new System.Drawing.Size(116, 20);
@@ -301,7 +328,7 @@ namespace OpenDental{
 			// 
 			// textSubscriberSSN
 			// 
-			this.textSubscriberSSN.Location = new System.Drawing.Point(111, 63);
+			this.textSubscriberSSN.Location = new System.Drawing.Point(111, 57);
 			this.textSubscriberSSN.Name = "textSubscriberSSN";
 			this.textSubscriberSSN.ReadOnly = true;
 			this.textSubscriberSSN.Size = new System.Drawing.Size(116, 20);
@@ -309,7 +336,7 @@ namespace OpenDental{
 			// 
 			// textSubscriberBirthdate
 			// 
-			this.textSubscriberBirthdate.Location = new System.Drawing.Point(111, 38);
+			this.textSubscriberBirthdate.Location = new System.Drawing.Point(111, 35);
 			this.textSubscriberBirthdate.Name = "textSubscriberBirthdate";
 			this.textSubscriberBirthdate.ReadOnly = true;
 			this.textSubscriberBirthdate.Size = new System.Drawing.Size(116, 20);
@@ -325,7 +352,7 @@ namespace OpenDental{
 			// 
 			// label10
 			// 
-			this.label10.Location = new System.Drawing.Point(6, 88);
+			this.label10.Location = new System.Drawing.Point(6, 79);
 			this.label10.Name = "label10";
 			this.label10.Size = new System.Drawing.Size(99, 20);
 			this.label10.TabIndex = 98;
@@ -334,7 +361,7 @@ namespace OpenDental{
 			// 
 			// label9
 			// 
-			this.label9.Location = new System.Drawing.Point(6, 63);
+			this.label9.Location = new System.Drawing.Point(6, 57);
 			this.label9.Name = "label9";
 			this.label9.Size = new System.Drawing.Size(99, 20);
 			this.label9.TabIndex = 97;
@@ -343,7 +370,7 @@ namespace OpenDental{
 			// 
 			// label8
 			// 
-			this.label8.Location = new System.Drawing.Point(6, 38);
+			this.label8.Location = new System.Drawing.Point(6, 35);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(99, 20);
 			this.label8.TabIndex = 96;
@@ -375,23 +402,24 @@ namespace OpenDental{
 			this.groupBox5.Controls.Add(this.label14);
 			this.groupBox5.Location = new System.Drawing.Point(3, 349);
 			this.groupBox5.Name = "groupBox5";
-			this.groupBox5.Size = new System.Drawing.Size(480, 136);
+			this.groupBox5.Size = new System.Drawing.Size(480, 126);
 			this.groupBox5.TabIndex = 99;
 			this.groupBox5.TabStop = false;
 			this.groupBox5.Text = "Insurance Plan";
 			// 
 			// textInsPlanNote
 			// 
-			this.textInsPlanNote.Location = new System.Drawing.Point(328, 11);
+			this.textInsPlanNote.Location = new System.Drawing.Point(249, 33);
 			this.textInsPlanNote.Multiline = true;
 			this.textInsPlanNote.Name = "textInsPlanNote";
 			this.textInsPlanNote.ReadOnly = true;
-			this.textInsPlanNote.Size = new System.Drawing.Size(146, 120);
+			this.textInsPlanNote.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+			this.textInsPlanNote.Size = new System.Drawing.Size(225, 86);
 			this.textInsPlanNote.TabIndex = 221;
 			// 
 			// textCarrierPhoneNumber
 			// 
-			this.textCarrierPhoneNumber.Location = new System.Drawing.Point(127, 36);
+			this.textCarrierPhoneNumber.Location = new System.Drawing.Point(127, 33);
 			this.textCarrierPhoneNumber.Name = "textCarrierPhoneNumber";
 			this.textCarrierPhoneNumber.ReadOnly = true;
 			this.textCarrierPhoneNumber.Size = new System.Drawing.Size(116, 20);
@@ -399,7 +427,7 @@ namespace OpenDental{
 			// 
 			// textInsPlanGroupNumber
 			// 
-			this.textInsPlanGroupNumber.Location = new System.Drawing.Point(127, 111);
+			this.textInsPlanGroupNumber.Location = new System.Drawing.Point(127, 99);
 			this.textInsPlanGroupNumber.Name = "textInsPlanGroupNumber";
 			this.textInsPlanGroupNumber.ReadOnly = true;
 			this.textInsPlanGroupNumber.Size = new System.Drawing.Size(116, 20);
@@ -407,7 +435,7 @@ namespace OpenDental{
 			// 
 			// textInsPlanGroupName
 			// 
-			this.textInsPlanGroupName.Location = new System.Drawing.Point(127, 86);
+			this.textInsPlanGroupName.Location = new System.Drawing.Point(127, 77);
 			this.textInsPlanGroupName.Name = "textInsPlanGroupName";
 			this.textInsPlanGroupName.ReadOnly = true;
 			this.textInsPlanGroupName.Size = new System.Drawing.Size(116, 20);
@@ -415,7 +443,7 @@ namespace OpenDental{
 			// 
 			// textInsPlanEmployer
 			// 
-			this.textInsPlanEmployer.Location = new System.Drawing.Point(127, 61);
+			this.textInsPlanEmployer.Location = new System.Drawing.Point(127, 55);
 			this.textInsPlanEmployer.Name = "textInsPlanEmployer";
 			this.textInsPlanEmployer.ReadOnly = true;
 			this.textInsPlanEmployer.Size = new System.Drawing.Size(116, 20);
@@ -431,16 +459,16 @@ namespace OpenDental{
 			// 
 			// label17
 			// 
-			this.label17.Location = new System.Drawing.Point(248, 10);
+			this.label17.Location = new System.Drawing.Point(249, 11);
 			this.label17.Name = "label17";
-			this.label17.Size = new System.Drawing.Size(74, 20);
+			this.label17.Size = new System.Drawing.Size(225, 20);
 			this.label17.TabIndex = 104;
-			this.label17.Text = "Plan Note:";
-			this.label17.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.label17.Text = "Plan Note";
+			this.label17.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// label18
 			// 
-			this.label18.Location = new System.Drawing.Point(8, 36);
+			this.label18.Location = new System.Drawing.Point(8, 33);
 			this.label18.Name = "label18";
 			this.label18.Size = new System.Drawing.Size(113, 20);
 			this.label18.TabIndex = 99;
@@ -449,7 +477,7 @@ namespace OpenDental{
 			// 
 			// label11
 			// 
-			this.label11.Location = new System.Drawing.Point(8, 111);
+			this.label11.Location = new System.Drawing.Point(8, 99);
 			this.label11.Name = "label11";
 			this.label11.Size = new System.Drawing.Size(113, 20);
 			this.label11.TabIndex = 98;
@@ -458,7 +486,7 @@ namespace OpenDental{
 			// 
 			// label12
 			// 
-			this.label12.Location = new System.Drawing.Point(8, 86);
+			this.label12.Location = new System.Drawing.Point(8, 77);
 			this.label12.Name = "label12";
 			this.label12.Size = new System.Drawing.Size(113, 20);
 			this.label12.TabIndex = 97;
@@ -467,7 +495,7 @@ namespace OpenDental{
 			// 
 			// label13
 			// 
-			this.label13.Location = new System.Drawing.Point(8, 61);
+			this.label13.Location = new System.Drawing.Point(8, 55);
 			this.label13.Name = "label13";
 			this.label13.Size = new System.Drawing.Size(113, 20);
 			this.label13.TabIndex = 96;
@@ -503,15 +531,13 @@ namespace OpenDental{
 			// groupBox1
 			// 
 			this.groupBox1.Controls.Add(this.textInsVerifyNote);
-			this.groupBox1.Controls.Add(this.comboSetVerifyStatus);
 			this.groupBox1.Controls.Add(this.label19);
-			this.groupBox1.Controls.Add(this.label16);
 			this.groupBox1.Controls.Add(this.textAssignUser);
 			this.groupBox1.Controls.Add(this.label1);
 			this.groupBox1.Controls.Add(this.butAssignUserPick);
 			this.groupBox1.Location = new System.Drawing.Point(3, 349);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(950, 136);
+			this.groupBox1.Size = new System.Drawing.Size(950, 134);
 			this.groupBox1.TabIndex = 82;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Assign Verification";
@@ -524,15 +550,6 @@ namespace OpenDental{
 			this.textInsVerifyNote.Size = new System.Drawing.Size(193, 107);
 			this.textInsVerifyNote.TabIndex = 223;
 			// 
-			// comboSetVerifyStatus
-			// 
-			this.comboSetVerifyStatus.FormattingEnabled = true;
-			this.comboSetVerifyStatus.Location = new System.Drawing.Point(109, 46);
-			this.comboSetVerifyStatus.Name = "comboSetVerifyStatus";
-			this.comboSetVerifyStatus.Size = new System.Drawing.Size(193, 21);
-			this.comboSetVerifyStatus.TabIndex = 222;
-			this.comboSetVerifyStatus.SelectionChangeCommitted += new System.EventHandler(this.comboSetVerifyStatus_SelectionChangeCommitted);
-			// 
 			// label19
 			// 
 			this.label19.Location = new System.Drawing.Point(310, 16);
@@ -542,15 +559,6 @@ namespace OpenDental{
 			this.label19.Text = "Note:";
 			this.label19.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// label16
-			// 
-			this.label16.Location = new System.Drawing.Point(3, 47);
-			this.label16.Name = "label16";
-			this.label16.Size = new System.Drawing.Size(100, 20);
-			this.label16.TabIndex = 221;
-			this.label16.Text = "Verify Status:";
-			this.label16.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
 			// butAssignUserPick
 			// 
 			this.butAssignUserPick.AdjustImageLocation = new System.Drawing.Point(0, 0);
@@ -558,9 +566,9 @@ namespace OpenDental{
 			this.butAssignUserPick.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAssignUserPick.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAssignUserPick.CornerRadius = 4F;
-			this.butAssignUserPick.Location = new System.Drawing.Point(275, 17);
+			this.butAssignUserPick.Location = new System.Drawing.Point(275, 18);
 			this.butAssignUserPick.Name = "butAssignUserPick";
-			this.butAssignUserPick.Size = new System.Drawing.Size(27, 23);
+			this.butAssignUserPick.Size = new System.Drawing.Size(27, 20);
 			this.butAssignUserPick.TabIndex = 85;
 			this.butAssignUserPick.Text = "...";
 			this.butAssignUserPick.Click += new System.EventHandler(this.butAssignUserPick_Click);
@@ -583,43 +591,47 @@ namespace OpenDental{
 			this.gridMain.TabIndex = 4;
 			this.gridMain.Title = "Insurance Verify List";
 			this.gridMain.TranslationName = "TableInsVerify";
+			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			this.gridMain.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellClick);
 			this.gridMain.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gridMain_MouseUp);
 			// 
 			// tabControl1
 			// 
-			this.tabControl1.Controls.Add(this.tabPage1);
-			this.tabControl1.Controls.Add(this.tabPage2);
-			this.tabControl1.Location = new System.Drawing.Point(12, 95);
+			this.tabControl1.Controls.Add(this.tabVerify);
+			this.tabControl1.Controls.Add(this.tabAssign);
+			this.tabControl1.Location = new System.Drawing.Point(3, 87);
 			this.tabControl1.Name = "tabControl1";
 			this.tabControl1.SelectedIndex = 0;
-			this.tabControl1.Size = new System.Drawing.Size(965, 544);
+			this.tabControl1.Size = new System.Drawing.Size(971, 541);
 			this.tabControl1.TabIndex = 101;
+			this.tabControl1.Selected += new System.Windows.Forms.TabControlEventHandler(this.tabControl1_Selected);
 			// 
-			// tabPage1
+			// tabVerify
 			// 
-			this.tabPage1.BackColor = System.Drawing.Color.Transparent;
-			this.tabPage1.Controls.Add(this.textInsVerifyReadOnlyNote);
-			this.tabPage1.Controls.Add(this.butVerify);
-			this.tabPage1.Controls.Add(this.label20);
-			this.tabPage1.Controls.Add(this.gridMain);
-			this.tabPage1.Controls.Add(this.groupBox4);
-			this.tabPage1.Controls.Add(this.groupBox5);
-			this.tabPage1.Location = new System.Drawing.Point(4, 22);
-			this.tabPage1.Name = "tabPage1";
-			this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage1.Size = new System.Drawing.Size(957, 518);
-			this.tabPage1.TabIndex = 0;
-			this.tabPage1.Text = "Verification List";
+			this.tabVerify.BackColor = System.Drawing.Color.Transparent;
+			this.tabVerify.Controls.Add(this.comboSetVerifyStatus);
+			this.tabVerify.Controls.Add(this.butVerify);
+			this.tabVerify.Controls.Add(this.label16);
+			this.tabVerify.Controls.Add(this.textInsVerifyReadOnlyNote);
+			this.tabVerify.Controls.Add(this.label20);
+			this.tabVerify.Controls.Add(this.gridMain);
+			this.tabVerify.Controls.Add(this.groupBox4);
+			this.tabVerify.Controls.Add(this.groupBox5);
+			this.tabVerify.Location = new System.Drawing.Point(4, 22);
+			this.tabVerify.Name = "tabVerify";
+			this.tabVerify.Padding = new System.Windows.Forms.Padding(3);
+			this.tabVerify.Size = new System.Drawing.Size(963, 515);
+			this.tabVerify.TabIndex = 0;
+			this.tabVerify.Text = "Verification List";
 			// 
-			// textInsVerifyReadOnlyNote
+			// comboSetVerifyStatus
 			// 
-			this.textInsVerifyReadOnlyNote.Location = new System.Drawing.Point(807, 359);
-			this.textInsVerifyReadOnlyNote.Multiline = true;
-			this.textInsVerifyReadOnlyNote.Name = "textInsVerifyReadOnlyNote";
-			this.textInsVerifyReadOnlyNote.ReadOnly = true;
-			this.textInsVerifyReadOnlyNote.Size = new System.Drawing.Size(146, 126);
-			this.textInsVerifyReadOnlyNote.TabIndex = 225;
+			this.comboSetVerifyStatus.FormattingEnabled = true;
+			this.comboSetVerifyStatus.Location = new System.Drawing.Point(801, 359);
+			this.comboSetVerifyStatus.Name = "comboSetVerifyStatus";
+			this.comboSetVerifyStatus.Size = new System.Drawing.Size(152, 21);
+			this.comboSetVerifyStatus.TabIndex = 227;
+			this.comboSetVerifyStatus.SelectionChangeCommitted += new System.EventHandler(this.comboSetVerifyStatus_SelectionChangeCommitted);
 			// 
 			// butVerify
 			// 
@@ -628,35 +640,54 @@ namespace OpenDental{
 			this.butVerify.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butVerify.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butVerify.CornerRadius = 4F;
-			this.butVerify.Location = new System.Drawing.Point(441, 489);
+			this.butVerify.Location = new System.Drawing.Point(435, 486);
 			this.butVerify.Name = "butVerify";
-			this.butVerify.Size = new System.Drawing.Size(75, 24);
+			this.butVerify.Size = new System.Drawing.Size(93, 24);
 			this.butVerify.TabIndex = 100;
-			this.butVerify.Text = "Verify";
+			this.butVerify.Text = "Mark Verified";
 			this.butVerify.UseVisualStyleBackColor = true;
 			this.butVerify.Click += new System.EventHandler(this.butVerify_Click);
 			// 
+			// label16
+			// 
+			this.label16.Location = new System.Drawing.Point(717, 360);
+			this.label16.Name = "label16";
+			this.label16.Size = new System.Drawing.Size(83, 20);
+			this.label16.TabIndex = 226;
+			this.label16.Text = "Verify Status";
+			this.label16.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textInsVerifyReadOnlyNote
+			// 
+			this.textInsVerifyReadOnlyNote.Location = new System.Drawing.Point(801, 382);
+			this.textInsVerifyReadOnlyNote.Multiline = true;
+			this.textInsVerifyReadOnlyNote.Name = "textInsVerifyReadOnlyNote";
+			this.textInsVerifyReadOnlyNote.ReadOnly = true;
+			this.textInsVerifyReadOnlyNote.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+			this.textInsVerifyReadOnlyNote.Size = new System.Drawing.Size(152, 84);
+			this.textInsVerifyReadOnlyNote.TabIndex = 225;
+			// 
 			// label20
 			// 
-			this.label20.Location = new System.Drawing.Point(720, 361);
+			this.label20.Location = new System.Drawing.Point(716, 384);
 			this.label20.Name = "label20";
 			this.label20.Size = new System.Drawing.Size(83, 20);
 			this.label20.TabIndex = 224;
-			this.label20.Text = "Verify Note:";
+			this.label20.Text = "Status Note";
 			this.label20.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
-			// tabPage2
+			// tabAssign
 			// 
-			this.tabPage2.BackColor = System.Drawing.Color.Transparent;
-			this.tabPage2.Controls.Add(this.gridAssign);
-			this.tabPage2.Controls.Add(this.groupBox1);
-			this.tabPage2.Controls.Add(this.butAssignUser);
-			this.tabPage2.Location = new System.Drawing.Point(4, 22);
-			this.tabPage2.Name = "tabPage2";
-			this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPage2.Size = new System.Drawing.Size(957, 518);
-			this.tabPage2.TabIndex = 1;
-			this.tabPage2.Text = "Assignment List";
+			this.tabAssign.BackColor = System.Drawing.Color.Transparent;
+			this.tabAssign.Controls.Add(this.gridAssign);
+			this.tabAssign.Controls.Add(this.groupBox1);
+			this.tabAssign.Controls.Add(this.butAssignUser);
+			this.tabAssign.Location = new System.Drawing.Point(4, 22);
+			this.tabAssign.Name = "tabAssign";
+			this.tabAssign.Padding = new System.Windows.Forms.Padding(3);
+			this.tabAssign.Size = new System.Drawing.Size(963, 515);
+			this.tabAssign.TabIndex = 1;
+			this.tabAssign.Text = "Assign Verification";
 			// 
 			// gridAssign
 			// 
@@ -667,11 +698,11 @@ namespace OpenDental{
 			this.gridAssign.Location = new System.Drawing.Point(3, 3);
 			this.gridAssign.Name = "gridAssign";
 			this.gridAssign.ScrollValue = 0;
+			this.gridAssign.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
 			this.gridAssign.Size = new System.Drawing.Size(950, 343);
 			this.gridAssign.TabIndex = 5;
 			this.gridAssign.Title = "Insurance Verification Assignment List";
 			this.gridAssign.TranslationName = "TableInsVerifyAssign";
-			this.gridAssign.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridAssign_CellClick);
 			this.gridAssign.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gridAssign_MouseUp);
 			// 
 			// butAssignUser
@@ -681,7 +712,7 @@ namespace OpenDental{
 			this.butAssignUser.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAssignUser.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAssignUser.CornerRadius = 4F;
-			this.butAssignUser.Location = new System.Drawing.Point(441, 489);
+			this.butAssignUser.Location = new System.Drawing.Point(441, 486);
 			this.butAssignUser.Name = "butAssignUser";
 			this.butAssignUser.Size = new System.Drawing.Size(75, 24);
 			this.butAssignUser.TabIndex = 81;
@@ -702,33 +733,23 @@ namespace OpenDental{
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(887, 652);
+			this.butClose.Location = new System.Drawing.Point(887, 631);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 24);
 			this.butClose.TabIndex = 2;
 			this.butClose.Text = "&Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
-			// label3
-			// 
-			this.label3.Location = new System.Drawing.Point(19, 39);
-			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(250, 20);
-			this.label3.TabIndex = 230;
-			this.label3.Text = "Plan benefits haven\'t been verified in";
-			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
 			// FormInsVerificationList
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(974, 687);
+			this.ClientSize = new System.Drawing.Size(974, 658);
 			this.Controls.Add(this.tabControl1);
 			this.Controls.Add(this.groupBox3);
 			this.Controls.Add(this.butClose);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(990, 726);
+			this.MinimumSize = new System.Drawing.Size(990, 697);
 			this.Name = "FormInsVerificationList";
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Insurance Verification List";
 			this.Load += new System.EventHandler(this.FormInsVerificationList_Load);
 			this.groupBox3.ResumeLayout(false);
@@ -740,9 +761,9 @@ namespace OpenDental{
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();
 			this.tabControl1.ResumeLayout(false);
-			this.tabPage1.ResumeLayout(false);
-			this.tabPage1.PerformLayout();
-			this.tabPage2.ResumeLayout(false);
+			this.tabVerify.ResumeLayout(false);
+			this.tabVerify.PerformLayout();
+			this.tabAssign.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
@@ -783,14 +804,11 @@ namespace OpenDental{
         private System.Windows.Forms.Label label1;
         private UI.Button butAssignUserPick;
         private UI.Button butAssignUser;
-        private System.Windows.Forms.ComboBox comboSetVerifyStatus;
-        private System.Windows.Forms.Label label16;
         private UI.Button butVerifyUserPick;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label labelRegion;
 		private System.Windows.Forms.ComboBox comboVerifyRegions;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.TextBox textVerifyUser;
         private System.Windows.Forms.TextBox textVerifyCarrier;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.ComboBox comboFilterVerifyStatus;
@@ -799,8 +817,8 @@ namespace OpenDental{
 		private System.Windows.Forms.TextBox textInsVerifyNote;
 		private System.Windows.Forms.Label label19;
 		private System.Windows.Forms.TabControl tabControl1;
-		private System.Windows.Forms.TabPage tabPage1;
-		private System.Windows.Forms.TabPage tabPage2;
+		private System.Windows.Forms.TabPage tabVerify;
+		private System.Windows.Forms.TabPage tabAssign;
 		private UI.ODGrid gridAssign;
 		private System.Windows.Forms.TextBox textInsVerifyReadOnlyNote;
 		private System.Windows.Forms.Label label20;
@@ -808,5 +826,9 @@ namespace OpenDental{
 		private System.Windows.Forms.ComboBox comboVerifyClinics;
 		private System.Windows.Forms.Label labelClinic;
 		private System.Windows.Forms.Label label3;
+		private System.Windows.Forms.ComboBox comboVerifyUser;
+		private System.Windows.Forms.Label label16;
+		private System.Windows.Forms.ComboBox comboSetVerifyStatus;
+		private UI.Button butRefresh;
 	}
 }
