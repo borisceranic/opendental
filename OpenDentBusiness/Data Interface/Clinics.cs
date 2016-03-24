@@ -332,6 +332,12 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 			Crud.ClinicCrud.Delete(clinic.ClinicNum);
 		}
+		
+		///<summary>Returns a list of clinicNums with the specified region's DefNum.</summary>
+		public static List<long> GetListByRegion(long regionDefNum) {
+			List<Clinic> listClinicsForRegion=GetList().ToList().FindAll(x => x.Region==regionDefNum);
+			return listClinicsForRegion.Select(x => x.ClinicNum).Distinct().ToList();
+		}
 
 		///<summary>Returns null if clinic not found.  Pulls from cache.</summary>
 		public static Clinic GetClinic(long clinicNum) {

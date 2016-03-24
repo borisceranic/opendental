@@ -305,6 +305,7 @@ namespace OpenDentBusiness{
 				//case Permissions.InsPlanEditSub:
 				//case Permissions.InsPlanAddPat:
 				//case Permissions.InsPlanDropPat:
+				case Permissions.InsPlanVerifyList:
 				return false;//Does not have audit Trail if uncommented.
 			}
 			return true;
@@ -420,6 +421,8 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Insurance Plan Edit");
 				case Permissions.InsPlanEditSub:
 					return Lans.g("enumPermissions","Insurance Plan Edit Subscriber");
+				case Permissions.InsPlanVerifyList:
+					return Lans.g("enumPermissions","Insurance Plan Verification List");
 				case Permissions.ManageModule:
 					return Lans.g("enumPermissions","Manage Module");
 				case Permissions.MedicationMerge:

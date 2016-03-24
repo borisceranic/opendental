@@ -156,7 +156,7 @@ namespace OpenDentBusiness {
 		///<summary>Returns all users that are associated to the permission passed in.  Returns empty list if no matches found.</summary>
 		public static List<Userod> GetUsersByPermission(Permissions permission,bool showHidden) {
 			//No need to check RemotingRole; no call to db.
-			List<Userod> listAllUsers=new List<Userod>();UserodC.GetListShort();
+			List<Userod> listAllUsers=new List<Userod>();
 			if(showHidden) {
 				listAllUsers=UserodC.GetListt();
 			}
@@ -193,8 +193,36 @@ namespace OpenDentBusiness {
 			//No need to check RemotingRole; no call to db.
 			return UserodC.GetListShort().FindAll(x => x.ProvNum==provNum);
 		}
+		
+		///<summary>Returns all users selectable for the insurance verification list.  
+		///Pass in an empty list to not filter by clinic.  
+		///Set isAssigning to false to return only users who have an insurance already assigned.</summary>
+		public static List<Userod> GetUsersForVerifyList(List<long> listClinicNums,bool isAssigning) {
+			//No need to check RemotingRole; no explicit call to db.
+			List<long> listUserNumsInInsVerify=InsVerifies.GetAll().Select(x => x.UserNum).Distinct().ToList();
+			List<long> listUserNumsInClinic=new List<long>();
+			if(listClinicNums.Count>0) {
+				List<UserClinic> listUserClinics=new List<UserClinic>();
+				for(int i=0;i<listClinicNums.Count;i++) {
+					listUserNumsInClinic.AddRange(UserClinics.GetForClinic(listClinicNums[i]).Select(y => y.UserNum).Distinct().ToList());
+				}
+				listUserNumsInClinic=listUserNumsInClinic.Distinct().ToList();//Remove duplicates that could possibly be in the list.
+				if(listUserNumsInClinic.Count>0) {
+					listUserNumsInInsVerify=listUserNumsInInsVerify.FindAll(x => listUserNumsInClinic.Contains(x));
+				}
+			}
+			List<Userod> listUsersWithPerm=GetUsersByPermission(Permissions.InsPlanVerifyList,false);
+			if(isAssigning) {
+				if(listClinicNums.Count==0) {
+					return listUsersWithPerm;//Return unfiltered list of users with permission
+				}
+				//Don't limit user list to already assigned insurance verifications.
+				return listUsersWithPerm.FindAll(x => listUserNumsInClinic.Contains(x.UserNum));//Return users with permission, limited by their clinics
+			}
+			return listUsersWithPerm.FindAll(x => listUserNumsInInsVerify.Contains(x.UserNum));//Return users limited by permission, clinic, and having an insurance already assigned.
+		}
 
-		///<summary>This handles situations where we have a usernum, but not a user.  And it handles usernum of zero.  Pass in a list of users to save making a deep copy of the userod cache if you are going to be calling this method repeatedly.  js Must maintain 2 overloads instead of optional parameter for my dll.</summary>
+ 		///<summary>This handles situations where we have a usernum, but not a user.  And it handles usernum of zero.  Pass in a list of users to save making a deep copy of the userod cache if you are going to be calling this method repeatedly.  js Must maintain 2 overloads instead of optional parameter for my dll.</summary>
 		public static string GetName(long userNum) {
 			return GetName(userNum,null);
 		}
