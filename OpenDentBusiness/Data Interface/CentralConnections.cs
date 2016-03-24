@@ -71,6 +71,14 @@ namespace OpenDentBusiness{
       Crud.CentralConnectionCrud.Sync(listNew,listDB);
 		}
 
+		public static void Sync(List<CentralConnection> listNew,List<CentralConnection> listOld) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,listOld);
+				return;
+			}
+			Crud.CentralConnectionCrud.Sync(listNew,listOld);
+		}
+
 		///<summary>Encrypts signature text and returns a base 64 string so that it can go directly into the database.</summary>
 		public static string Encrypt(string str,byte[] key){
 			//No need to check RemotingRole; no call to db.
