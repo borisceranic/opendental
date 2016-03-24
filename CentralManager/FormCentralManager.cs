@@ -361,6 +361,9 @@ namespace CentralManager {
 			Cursor=Cursors.WaitCursor;
 			for(int i=0;i<gridMain.Rows.Count;i++) {
 				CentralConnection conn=(CentralConnection)gridMain.Rows[i].Tag;
+				if(conn.DatabaseName=="" && conn.ServerName=="" && conn.ServiceURI=="") {
+					continue;
+				}
 				ODThread odThread=new ODThread(ConnectAndVerify,new object[] { conn,_progVersion });
 				odThread.GroupName="Verify";
 				odThread.Start();
