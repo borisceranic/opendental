@@ -5160,6 +5160,9 @@ namespace OpenDental{
 				formPhoneTiles.BringToFront();
 			}
 			else {
+				if(formPhoneTiles.WindowState==FormWindowState.Minimized) {
+					formPhoneTiles.WindowState=FormWindowState.Normal;
+				}
 				formPhoneTiles.Show();
 				formPhoneTiles.BringToFront();
 			}
@@ -5168,13 +5171,14 @@ namespace OpenDental{
 		private void butMapPhones_Click(object sender,EventArgs e) {
 			if(formMapHQ==null || formMapHQ.IsDisposed) {
 				formMapHQ=new FormMapHQ();
-				formMapHQ.Show();
-				formMapHQ.BringToFront();
 			}
 			else {
-				formMapHQ.Show();
-				formMapHQ.BringToFront();
+				if(formMapHQ.WindowState==FormWindowState.Minimized) {
+					formMapHQ.WindowState=FormWindowState.Normal;
+				}
 			}
+			formMapHQ.Show();
+			formMapHQ.BringToFront();
 		}
 
 		private void butTriage_Click(object sender,EventArgs e) {
