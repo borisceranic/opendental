@@ -70,7 +70,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (deletedObject.DeletedObjectNum),
 					POut.Long  (deletedObject.ObjectNum),
 					POut.Int   ((int)deletedObject.ObjectType),
-					POut.DateT (deletedObject.DateTStamp),
+					POut.DateT (deletedObject.DateTStamp,false),
 				});
 			}
 			return table;

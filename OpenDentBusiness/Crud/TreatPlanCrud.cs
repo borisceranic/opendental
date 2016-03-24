@@ -87,7 +87,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (treatPlan.TreatPlanNum),
 					POut.Long  (treatPlan.PatNum),
-					POut.Date  (treatPlan.DateTP),
+					POut.DateT (treatPlan.DateTP,false),
 					            treatPlan.Heading,
 					            treatPlan.Note,
 					            treatPlan.Signature,
@@ -96,8 +96,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (treatPlan.DocNum),
 					POut.Int   ((int)treatPlan.TPStatus),
 					POut.Long  (treatPlan.SecUserNumEntry),
-					POut.Date  (treatPlan.SecDateEntry),
-					POut.DateT (treatPlan.SecDateTEdit),
+					POut.DateT (treatPlan.SecDateEntry,false),
+					POut.DateT (treatPlan.SecDateTEdit,false),
 				});
 			}
 			return table;

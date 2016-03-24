@@ -93,8 +93,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (fee.ClinicNum),
 					POut.Long  (fee.ProvNum),
 					POut.Long  (fee.SecUserNumEntry),
-					POut.Date  (fee.SecDateEntry),
-					POut.DateT (fee.SecDateTEdit),
+					POut.DateT (fee.SecDateEntry,false),
+					POut.DateT (fee.SecDateTEdit,false),
 				});
 			}
 			return table;

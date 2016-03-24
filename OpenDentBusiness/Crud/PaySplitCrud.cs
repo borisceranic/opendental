@@ -94,19 +94,19 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (paySplit.SplitNum),
 					POut.Double(paySplit.SplitAmt),
 					POut.Long  (paySplit.PatNum),
-					POut.Date  (paySplit.ProcDate),
+					POut.DateT (paySplit.ProcDate,false),
 					POut.Long  (paySplit.PayNum),
 					POut.Bool  (paySplit.IsDiscount),
 					POut.Byte  (paySplit.DiscountType),
 					POut.Long  (paySplit.ProvNum),
 					POut.Long  (paySplit.PayPlanNum),
-					POut.Date  (paySplit.DatePay),
+					POut.DateT (paySplit.DatePay,false),
 					POut.Long  (paySplit.ProcNum),
-					POut.Date  (paySplit.DateEntry),
+					POut.DateT (paySplit.DateEntry,false),
 					POut.Long  (paySplit.UnearnedType),
 					POut.Long  (paySplit.ClinicNum),
 					POut.Long  (paySplit.SecUserNumEntry),
-					POut.DateT (paySplit.SecDateTEdit),
+					POut.DateT (paySplit.SecDateTEdit,false),
 				});
 			}
 			return table;

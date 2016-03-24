@@ -81,9 +81,9 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (labResult.LabResultNum),
 					POut.Long  (labResult.LabPanelNum),
-					POut.DateT (labResult.DateTimeTest),
+					POut.DateT (labResult.DateTimeTest,false),
 					            labResult.TestName,
-					POut.DateT (labResult.DateTStamp),
+					POut.DateT (labResult.DateTStamp,false),
 					            labResult.TestID,
 					            labResult.ObsValue,
 					            labResult.ObsUnits,

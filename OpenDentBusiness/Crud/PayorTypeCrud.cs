@@ -71,7 +71,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (payorType.PayorTypeNum),
 					POut.Long  (payorType.PatNum),
-					POut.Date  (payorType.DateStart),
+					POut.DateT (payorType.DateStart,false),
 					            payorType.SopCode,
 					            payorType.Note,
 				});

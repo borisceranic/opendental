@@ -75,7 +75,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (reconcile.AccountNum),
 					POut.Double(reconcile.StartingBal),
 					POut.Double(reconcile.EndingBal),
-					POut.Date  (reconcile.DateReconcile),
+					POut.DateT (reconcile.DateReconcile,false),
 					POut.Bool  (reconcile.IsLocked),
 				});
 			}

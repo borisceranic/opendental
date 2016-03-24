@@ -80,7 +80,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (mount.MountNum),
 					POut.Long  (mount.PatNum),
 					POut.Long  (mount.DocCategory),
-					POut.Date  (mount.DateCreated),
+					POut.DateT (mount.DateCreated,false),
 					            mount.Description,
 					            mount.Note,
 					POut.Int   ((int)mount.ImgType),

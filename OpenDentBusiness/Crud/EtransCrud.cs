@@ -104,7 +104,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(Etrans etrans in listEtranss) {
 				table.Rows.Add(new object[] {
 					POut.Long  (etrans.EtransNum),
-					POut.DateT (etrans.DateTimeTrans),
+					POut.DateT (etrans.DateTimeTrans,false),
 					POut.Long  (etrans.ClearingHouseNum),
 					POut.Int   ((int)etrans.Etype),
 					POut.Long  (etrans.ClaimNum),

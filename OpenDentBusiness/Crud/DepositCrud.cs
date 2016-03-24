@@ -70,7 +70,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(Deposit deposit in listDeposits) {
 				table.Rows.Add(new object[] {
 					POut.Long  (deposit.DepositNum),
-					POut.Date  (deposit.DateDeposit),
+					POut.DateT (deposit.DateDeposit,false),
 					            deposit.BankAccountInfo,
 					POut.Double(deposit.Amount),
 					            deposit.Memo,

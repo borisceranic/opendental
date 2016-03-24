@@ -79,7 +79,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Double(claimSnapshot.Writeoff),
 					POut.Double(claimSnapshot.InsPayEst),
 					POut.Double(claimSnapshot.Fee),
-					POut.DateT (claimSnapshot.DateTEntry),
+					POut.DateT (claimSnapshot.DateTEntry,false),
 				});
 			}
 			return table;

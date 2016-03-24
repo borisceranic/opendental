@@ -73,7 +73,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (medLabSpecimen.MedLabNum),
 					            medLabSpecimen.SpecimenID,
 					            medLabSpecimen.SpecimenDescript,
-					POut.DateT (medLabSpecimen.DateTimeCollected),
+					POut.DateT (medLabSpecimen.DateTimeCollected,false),
 				});
 			}
 			return table;

@@ -85,7 +85,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (jobEvent.JobEventNum),
 					POut.Long  (jobEvent.JobNum),
 					POut.Long  (jobEvent.UserNumEvent),
-					POut.DateT (jobEvent.DateTimeEntry),
+					POut.DateT (jobEvent.DateTimeEntry,false),
 					POut.Int   ((int)jobEvent.JobStatus),
 					            jobEvent.Description,
 					            jobEvent.MainRTF,

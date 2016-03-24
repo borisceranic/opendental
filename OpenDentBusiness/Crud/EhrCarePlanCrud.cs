@@ -73,7 +73,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (ehrCarePlan.PatNum),
 					            ehrCarePlan.SnomedEducation,
 					            ehrCarePlan.Instructions,
-					POut.Date  (ehrCarePlan.DatePlanned),
+					POut.DateT (ehrCarePlan.DatePlanned,false),
 				});
 			}
 			return table;

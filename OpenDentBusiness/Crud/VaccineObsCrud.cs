@@ -87,7 +87,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Int   ((int)vaccineObs.ValCodeSystem),
 					POut.Long  (vaccineObs.VaccineObsNumGroup),
 					            vaccineObs.UcumCode,
-					POut.Date  (vaccineObs.DateObs),
+					POut.DateT (vaccineObs.DateObs,false),
 					            vaccineObs.MethodCode,
 				});
 			}

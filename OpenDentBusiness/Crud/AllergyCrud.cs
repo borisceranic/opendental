@@ -80,8 +80,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (allergy.PatNum),
 					            allergy.Reaction,
 					POut.Bool  (allergy.StatusIsActive),
-					POut.DateT (allergy.DateTStamp),
-					POut.Date  (allergy.DateAdverseReaction),
+					POut.DateT (allergy.DateTStamp,false),
+					POut.DateT (allergy.DateAdverseReaction,false),
 					            allergy.SnomedReaction,
 				});
 			}

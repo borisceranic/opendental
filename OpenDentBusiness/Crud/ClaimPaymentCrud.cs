@@ -90,7 +90,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(ClaimPayment claimPayment in listClaimPayments) {
 				table.Rows.Add(new object[] {
 					POut.Long  (claimPayment.ClaimPaymentNum),
-					POut.Date  (claimPayment.CheckDate),
+					POut.DateT (claimPayment.CheckDate,false),
 					POut.Double(claimPayment.CheckAmt),
 					            claimPayment.CheckNum,
 					            claimPayment.BankBranch,
@@ -98,12 +98,12 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (claimPayment.ClinicNum),
 					POut.Long  (claimPayment.DepositNum),
 					            claimPayment.CarrierName,
-					POut.Date  (claimPayment.DateIssued),
+					POut.DateT (claimPayment.DateIssued,false),
 					POut.Bool  (claimPayment.IsPartial),
 					POut.Long  (claimPayment.PayType),
 					POut.Long  (claimPayment.SecUserNumEntry),
-					POut.Date  (claimPayment.SecDateEntry),
-					POut.DateT (claimPayment.SecDateTEdit),
+					POut.DateT (claimPayment.SecDateEntry,false),
+					POut.DateT (claimPayment.SecDateTEdit,false),
 				});
 			}
 			return table;

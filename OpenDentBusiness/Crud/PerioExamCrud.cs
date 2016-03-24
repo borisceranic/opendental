@@ -69,7 +69,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (perioExam.PerioExamNum),
 					POut.Long  (perioExam.PatNum),
-					POut.Date  (perioExam.ExamDate),
+					POut.DateT (perioExam.ExamDate,false),
 					POut.Long  (perioExam.ProvNum),
 				});
 			}

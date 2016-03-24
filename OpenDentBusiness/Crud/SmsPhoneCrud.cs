@@ -76,8 +76,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (smsPhone.SmsPhoneNum),
 					POut.Long  (smsPhone.ClinicNum),
 					            smsPhone.PhoneNumber,
-					POut.DateT (smsPhone.DateTimeActive),
-					POut.DateT (smsPhone.DateTimeInactive),
+					POut.DateT (smsPhone.DateTimeActive,false),
+					POut.DateT (smsPhone.DateTimeInactive,false),
 					            smsPhone.InactiveCode,
 					            smsPhone.CountryCode,
 				});

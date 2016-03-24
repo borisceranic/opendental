@@ -75,7 +75,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (wikiPageHist.UserNum),
 					            wikiPageHist.PageTitle,
 					            wikiPageHist.PageContent,
-					POut.DateT (wikiPageHist.DateTimeSaved),
+					POut.DateT (wikiPageHist.DateTimeSaved,false),
 					POut.Bool  (wikiPageHist.IsDeleted),
 				});
 			}

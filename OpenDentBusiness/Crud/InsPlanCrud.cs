@@ -155,8 +155,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Int   ((int)insPlan.CobRule),
 					            insPlan.SopCode,
 					POut.Long  (insPlan.SecUserNumEntry),
-					POut.Date  (insPlan.SecDateEntry),
-					POut.DateT (insPlan.SecDateTEdit),
+					POut.DateT (insPlan.SecDateEntry,false),
+					POut.DateT (insPlan.SecDateTEdit,false),
 					POut.Bool  (insPlan.HideFromVerifyList),
 				});
 			}

@@ -88,7 +88,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (payPlan.PayPlanNum),
 					POut.Long  (payPlan.PatNum),
 					POut.Long  (payPlan.Guarantor),
-					POut.Date  (payPlan.PayPlanDate),
+					POut.DateT (payPlan.PayPlanDate,false),
 					POut.Double(payPlan.APR),
 					            payPlan.Note,
 					POut.Long  (payPlan.PlanNum),

@@ -75,8 +75,8 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (installmentPlan.InstallmentPlanNum),
 					POut.Long  (installmentPlan.PatNum),
-					POut.Date  (installmentPlan.DateAgreement),
-					POut.Date  (installmentPlan.DateFirstPayment),
+					POut.DateT (installmentPlan.DateAgreement,false),
+					POut.DateT (installmentPlan.DateFirstPayment,false),
 					POut.Double(installmentPlan.MonthlyPayment),
 					POut.Float (installmentPlan.APR),
 					            installmentPlan.Note,

@@ -84,7 +84,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (evaluation.StudentNum),
 					POut.Long  (evaluation.SchoolCourseNum),
 					            evaluation.EvalTitle,
-					POut.Date  (evaluation.DateEval),
+					POut.DateT (evaluation.DateEval,false),
 					POut.Long  (evaluation.GradingScaleNum),
 					            evaluation.OverallGradeShowing,
 					POut.Float (evaluation.OverallGradeNumber),

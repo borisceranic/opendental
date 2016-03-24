@@ -68,9 +68,9 @@ namespace OpenDentBusiness.Crud{
 			foreach(PayPeriod payPeriod in listPayPeriods) {
 				table.Rows.Add(new object[] {
 					POut.Long  (payPeriod.PayPeriodNum),
-					POut.Date  (payPeriod.DateStart),
-					POut.Date  (payPeriod.DateStop),
-					POut.Date  (payPeriod.DatePaycheck),
+					POut.DateT (payPeriod.DateStart,false),
+					POut.DateT (payPeriod.DateStop,false),
+					POut.DateT (payPeriod.DatePaycheck,false),
 				});
 			}
 			return table;

@@ -85,7 +85,7 @@ namespace OpenDentBusiness.Crud{
 					            ehrNotPerformed.CodeValueReason,
 					            ehrNotPerformed.CodeSystemReason,
 					            ehrNotPerformed.Note,
-					POut.Date  (ehrNotPerformed.DateEntry),
+					POut.DateT (ehrNotPerformed.DateEntry,false),
 				});
 			}
 			return table;

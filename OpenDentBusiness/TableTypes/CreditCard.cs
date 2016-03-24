@@ -40,9 +40,11 @@ namespace OpenDentBusiness {
 		public DateTime PayConnectTokenExp;
 		///<summary>What procedures will go on this card as a recurring charge.  Comma delimited list of ProcCodes.</summary>
 		public string Procedures;
-		///<summary>Indicates which application made this credit card and token. PatientPortal will only use PatientPortal sourced rows. Likewise 
-		///OD Proper will only use ODProper rows.</summary>
+		///<summary>Enum:CreditCardSource. Indicates which application made this credit card and token.</summary>
 		public CreditCardSource CCSource;
+		///<summary>FK to clinic.ClinicNum. The clinic where this card was added. Each clinic could have a different AuthKey and different
+		///AuthKeys could generate overlapping tokens.</summary>
+		public long ClinicNum;
 
 
 		///<summary></summary>
@@ -52,9 +54,13 @@ namespace OpenDentBusiness {
 	}
 
 	public enum CreditCardSource {
-		/// <summary>0</summary>
-		ODProper,
-		/// <summary>1</summary>
-		PatientPortal
+		///<summary>0 - Storing the actual credit card number. Not recommended.</summary>
+		None,
+		///<summary>1 - Local installation of X-Charge</summary>
+		XServer,
+		///<summary>2 - Credit card created via X-Web (an eService)</summary>
+		XWeb,
+		///<summary>3 - PayConnect web service (from within OD).</summary>
+		PayConnect
 	}
 }

@@ -85,7 +85,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (reqStudent.AptNum),
 					POut.Long  (reqStudent.PatNum),
 					POut.Long  (reqStudent.InstructorNum),
-					POut.Date  (reqStudent.DateCompleted),
+					POut.DateT (reqStudent.DateCompleted,false),
 				});
 			}
 			return table;

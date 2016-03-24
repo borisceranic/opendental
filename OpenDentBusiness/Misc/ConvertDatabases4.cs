@@ -71,6 +71,10 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE creditcard MODIFY CCSource NOT NULL";
 					Db.NonQ(command);
 				}
+				command="UPDATE creditcard SET CCSource = 1 WHERE XChargeToken != ''";//CreditCardSource.XServer
+				Db.NonQ(command);
+				command="UPDATE creditcard SET CCSource = 3 WHERE PayConnectToken != ''";//CreditCardSource.PayConnect
+				Db.NonQ(command);
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference (PrefName,ValueString) VALUES('TextingDefaultClinicNum','0')";
 					Db.NonQ(command);
@@ -105,41 +109,41 @@ namespace OpenDentBusiness {
 				}
 				//Insert RapidCall bridge-----------------------------------------------------------------
 				if(DataConnection.DBtype==DatabaseType.MySql) {
-					command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
-						+") VALUES("
-						+"'RapidCall', "
-						+"'Rapid Call from www.dentaltek.com', "
-						+"'0', "
-						+"'"+POut.String(@"C:\DentalTek\CallTray\CallTray.exe")+"', "
-						+"'"+POut.String(@"/DeepLink=RapidCall")+"', "//leave blank if none
-						+"'')";
-					long programNum=Db.NonQ(command,true);
-					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
-						+") VALUES("
-						+"'"+POut.Long(programNum)+"', "
-						+"'Disable Advertising', "
-						+"'0')";
-					Db.NonQ(command);
+				command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+					+") VALUES("
+					+"'RapidCall', "
+					+"'Rapid Call from www.dentaltek.com', "
+					+"'0', "
+					+"'"+POut.String(@"C:\DentalTek\CallTray\CallTray.exe")+"', "
+					+"'"+POut.String(@"/DeepLink=RapidCall")+"', "//leave blank if none
+					+"'')";
+				long programNum=Db.NonQ(command,true);
+				command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+					+") VALUES("
+					+"'"+POut.Long(programNum)+"', "
+					+"'Disable Advertising', "
+					+"'0')";
+				Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO program (ProgramNum,ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
-						+") VALUES("
-						+"(SELECT MAX(ProgramNum)+1 FROM program),"
-						+"'RapidCall', "
-						+"'Rapid Call from www.dentaltek.com', "
-						+"'0', "
-						+"'"+POut.String(@"C:\DentalTek\CallTray\CallTray.exe")+"', "
-						+"'"+POut.String(@"/DeepLink=RapidCall")+"', "//leave blank if none
-						+"'')";
-					long programNum=Db.NonQ(command,true);
-					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ClinicNum"
-						+") VALUES("
-						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
-						+"'"+POut.Long(programNum)+"', "
-						+"'Disable Advertising', "
-						+"'0', "
-						+"'0')";
-					Db.NonQ(command);
+				command="INSERT INTO program (ProgramNum,ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+					+") VALUES("
+					+"(SELECT MAX(ProgramNum)+1 FROM program),"
+					+"'RapidCall', "
+					+"'Rapid Call from www.dentaltek.com', "
+					+"'0', "
+					+"'"+POut.String(@"C:\DentalTek\CallTray\CallTray.exe")+"', "
+					+"'"+POut.String(@"/DeepLink=RapidCall")+"', "//leave blank if none
+					+"'')";
+				long programNum=Db.NonQ(command,true);
+				command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ClinicNum"
+					+") VALUES("
+					+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+					+"'"+POut.Long(programNum)+"', "
+					+"'Disable Advertising', "
+					+"'0', "
+					+"'0')";
+				Db.NonQ(command);
 				}//end RapidCall bridge
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE schedule ADD ClinicNum bigint NOT NULL";
@@ -173,6 +177,23 @@ namespace OpenDentBusiness {
 					command="UPDATE apptview SET IsApptBubblesDisabled=(SELECT ValueString FROM preference WHERE PrefName='AppointmentBubblesDisabled')";
 					Db.NonQ(command);
 				}
+				
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE creditcard ADD ClinicNum bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE creditcard ADD INDEX (ClinicNum)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE creditcard ADD ClinicNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE creditcard SET ClinicNum = 0 WHERE ClinicNum IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE creditcard MODIFY ClinicNum NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX creditcard_ClinicNum ON creditcard (ClinicNum)";
+					Db.NonQ(command);
+				}				
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE dunning ADD DaysInAdvance int NOT NULL";
 					Db.NonQ(command);

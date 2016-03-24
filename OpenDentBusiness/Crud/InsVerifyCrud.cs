@@ -76,12 +76,12 @@ namespace OpenDentBusiness.Crud{
 			foreach(InsVerify insVerify in listInsVerifys) {
 				table.Rows.Add(new object[] {
 					POut.Long  (insVerify.InsVerifyNum),
-					POut.Date  (insVerify.DateLastVerified),
+					POut.DateT (insVerify.DateLastVerified,false),
 					POut.Long  (insVerify.UserNum),
 					POut.Int   ((int)insVerify.VerifyType),
 					POut.Long  (insVerify.FKey),
 					POut.Long  (insVerify.DefNum),
-					POut.Date  (insVerify.DateLastAssigned),
+					POut.DateT (insVerify.DateLastAssigned,false),
 					            insVerify.Note,
 				});
 			}

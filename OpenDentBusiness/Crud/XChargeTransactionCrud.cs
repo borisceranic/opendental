@@ -103,7 +103,7 @@ namespace OpenDentBusiness.Crud{
 					            xChargeTransaction.BatchNum,
 					            xChargeTransaction.ItemNum,
 					            xChargeTransaction.ApprCode,
-					POut.DateT (xChargeTransaction.TransactionDateTime),
+					POut.DateT (xChargeTransaction.TransactionDateTime,false),
 				});
 			}
 			return table;

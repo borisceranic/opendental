@@ -77,7 +77,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Int   ((int)hL7Msg.HL7Status),
 					            hL7Msg.MsgText,
 					POut.Long  (hL7Msg.AptNum),
-					POut.DateT (hL7Msg.DateTStamp),
+					POut.DateT (hL7Msg.DateTStamp,false),
 					POut.Long  (hL7Msg.PatNum),
 					            hL7Msg.Note,
 				});

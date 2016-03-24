@@ -105,7 +105,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Float (vitalsign.Weight),
 					POut.Int   (vitalsign.BpSystolic),
 					POut.Int   (vitalsign.BpDiastolic),
-					POut.Date  (vitalsign.DateTaken),
+					POut.DateT (vitalsign.DateTaken,false),
 					POut.Bool  (vitalsign.HasFollowupPlan),
 					POut.Bool  (vitalsign.IsIneligible),
 					            vitalsign.Documentation,

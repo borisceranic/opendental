@@ -77,7 +77,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (screenGroup.ScreenGroupNum),
 					            screenGroup.Description,
-					POut.Date  (screenGroup.SGDate),
+					POut.DateT (screenGroup.SGDate,false),
 					            screenGroup.ProvName,
 					POut.Long  (screenGroup.ProvNum),
 					POut.Int   ((int)screenGroup.PlaceService),

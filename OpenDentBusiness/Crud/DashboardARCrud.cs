@@ -68,7 +68,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(DashboardAR dashboardAR in listDashboardARs) {
 				table.Rows.Add(new object[] {
 					POut.Long  (dashboardAR.DashboardARNum),
-					POut.Date  (dashboardAR.DateCalc),
+					POut.DateT (dashboardAR.DateCalc,false),
 					POut.Double(dashboardAR.BalTotal),
 					POut.Double(dashboardAR.InsEst),
 				});

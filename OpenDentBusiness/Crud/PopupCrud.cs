@@ -83,7 +83,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Bool  (popup.IsDisabled),
 					POut.Int   ((int)popup.PopupLevel),
 					POut.Long  (popup.UserNum),
-					POut.DateT (popup.DateTimeEntry),
+					POut.DateT (popup.DateTimeEntry,false),
 					POut.Bool  (popup.IsArchived),
 					POut.Long  (popup.PopupNumArchive),
 				});

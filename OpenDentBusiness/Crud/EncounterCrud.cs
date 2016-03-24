@@ -79,7 +79,7 @@ namespace OpenDentBusiness.Crud{
 					            encounter.CodeValue,
 					            encounter.CodeSystem,
 					            encounter.Note,
-					POut.Date  (encounter.DateEncounter),
+					POut.DateT (encounter.DateEncounter,false),
 				});
 			}
 			return table;

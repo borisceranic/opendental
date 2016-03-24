@@ -70,7 +70,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(DocumentMisc documentMisc in listDocumentMiscs) {
 				table.Rows.Add(new object[] {
 					POut.Long  (documentMisc.DocMiscNum),
-					POut.Date  (documentMisc.DateCreated),
+					POut.DateT (documentMisc.DateCreated,false),
 					            documentMisc.FileName,
 					POut.Int   ((int)documentMisc.DocMiscType),
 					            documentMisc.RawBase64,

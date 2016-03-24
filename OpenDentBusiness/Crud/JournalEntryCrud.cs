@@ -82,7 +82,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (journalEntry.JournalEntryNum),
 					POut.Long  (journalEntry.TransactionNum),
 					POut.Long  (journalEntry.AccountNum),
-					POut.Date  (journalEntry.DateDisplayed),
+					POut.DateT (journalEntry.DateDisplayed,false),
 					POut.Double(journalEntry.DebitAmt),
 					POut.Double(journalEntry.CreditAmt),
 					            journalEntry.Memo,

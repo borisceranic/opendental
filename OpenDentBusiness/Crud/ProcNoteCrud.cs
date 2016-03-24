@@ -78,7 +78,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (procNote.ProcNoteNum),
 					POut.Long  (procNote.PatNum),
 					POut.Long  (procNote.ProcNum),
-					POut.DateT (procNote.EntryDateTime),
+					POut.DateT (procNote.EntryDateTime,false),
 					POut.Long  (procNote.UserNum),
 					            procNote.Note,
 					POut.Bool  (procNote.SigIsTopaz),

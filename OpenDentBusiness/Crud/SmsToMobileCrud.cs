@@ -107,8 +107,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Float (smsToMobile.MsgChargeUSD),
 					POut.Long  (smsToMobile.ClinicNum),
 					            smsToMobile.CustErrorText,
-					POut.DateT (smsToMobile.DateTimeSent),
-					POut.DateT (smsToMobile.DateTimeTerminated),
+					POut.DateT (smsToMobile.DateTimeSent,false),
+					POut.DateT (smsToMobile.DateTimeTerminated,false),
 					POut.Bool  (smsToMobile.IsHidden),
 				});
 			}

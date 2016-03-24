@@ -120,8 +120,8 @@ namespace OpenDentBusiness.Crud{
 					            procTP.Dx,
 					            procTP.ProcAbbr,
 					POut.Long  (procTP.SecUserNumEntry),
-					POut.Date  (procTP.SecDateEntry),
-					POut.DateT (procTP.SecDateTEdit),
+					POut.DateT (procTP.SecDateEntry,false),
+					POut.DateT (procTP.SecDateTEdit,false),
 				});
 			}
 			return table;

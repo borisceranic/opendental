@@ -67,7 +67,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (formPat.FormPatNum),
 					POut.Long  (formPat.PatNum),
-					POut.DateT (formPat.FormDateTime),
+					POut.DateT (formPat.FormDateTime,false),
 				});
 			}
 			return table;

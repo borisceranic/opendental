@@ -141,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 					            clinic.Fax,
 					POut.Long  (clinic.EmailAddressNum),
 					POut.Long  (clinic.DefaultProv),
-					POut.DateT (clinic.SmsContractDate),
+					POut.DateT (clinic.SmsContractDate,false),
 					POut.Double(clinic.SmsMonthlyLimit),
 					POut.Bool  (clinic.IsMedicalOnly),
 					POut.Bool  (clinic.UseBillAddrOnClaims),
