@@ -22,6 +22,8 @@ namespace CentralManager {
 		public static byte[] EncryptionKey;
 		///<summary>A full list of connections.</summary>
 		private List<CentralConnection> _listConns;
+		///<summary>A list used to sync against so multiple users' changes won't get overwritten.</summary>
+		private List<CentralConnection> _listConnsOld;
 		private List<ConnectionGroup> _listConnectionGroups;
 		private string _progVersion;
 
@@ -64,6 +66,10 @@ namespace CentralManager {
 			_listConns=CentralConnections.GetConnections();
 			if(_listConns==null) {
 				_listConns=new List<CentralConnection>(); //They don't have any connections set up yet.
+			}
+			_listConnsOld=new List<CentralConnection>();
+			foreach(CentralConnection conn in _listConns) {
+				_listConnsOld.Add(conn.Copy());
 			}
 			_progVersion=PrefC.GetString(PrefName.ProgramVersion);
 			labelVersion.Text="Version: "+_progVersion;
@@ -346,13 +352,17 @@ namespace CentralManager {
 		}
 
 		private void butAdd_Click(object sender,EventArgs e) {
-			CentralConnections.Sync(_listConns);
+			CentralConnections.Sync(_listConns,_listConnsOld);
 			CentralConnection conn=new CentralConnection();
 			conn.IsNew=true;
 			FormCentralConnectionEdit FormCCS=new FormCentralConnectionEdit();
 			FormCCS.CentralConnectionCur=conn;
 			if(FormCCS.ShowDialog()==DialogResult.OK) {//Will insert conn on OK.
 				_listConns=CentralConnections.GetConnections();
+				_listConnsOld.Clear();
+				foreach(CentralConnection centralConn in _listConns) {
+					_listConnsOld.Add(centralConn.Copy());
+				}
 			}
 			FillGrid();
 		}
@@ -362,11 +372,15 @@ namespace CentralManager {
 				MsgBox.Show(this,"Please select a connection to edit first.");
 				return;
 			}
-			CentralConnections.Sync(_listConns);
+			CentralConnections.Sync(_listConns,_listConnsOld);
 			FormCentralConnectionEdit FormCCE=new FormCentralConnectionEdit();
 			FormCCE.CentralConnectionCur=(CentralConnection)gridMain.Rows[gridMain.SelectedIndices[0]].Tag;//No support for editing multiple.
 			if(FormCCE.ShowDialog()==DialogResult.OK) {
 				_listConns=CentralConnections.GetConnections();
+				_listConnsOld.Clear();
+				foreach(CentralConnection centralConn in _listConns) {
+					_listConnsOld.Add(centralConn.Copy());
+				}
 			}
 			FillGrid();
 		}
@@ -561,7 +575,7 @@ namespace CentralManager {
 		private void FormCentralManager_FormClosing(object sender,FormClosingEventArgs e) {
 			ODThread.QuitSyncAllOdThreads();
 			if(_listConns!=null) {
-				CentralConnections.Sync(_listConns);
+				CentralConnections.Sync(_listConns,_listConnsOld);
 			}
 		}
 
