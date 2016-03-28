@@ -2947,6 +2947,8 @@ namespace OpenDental {
 			if(DefC.Short[(int)DefCat.PaymentTypes].Length>0){
 				PaymentCur.PayType=DefC.Short[(int)DefCat.PaymentTypes][0].DefNum;
 			}
+			PaymentCur.PaymentSource=CreditCardSource.None;
+			PaymentCur.ProcessStatus=ProcessStat.OfficeProcessed;
 			Payments.Insert(PaymentCur);
 			FormPayment FormPayment2=new FormPayment(PatCur,FamCur,PaymentCur);
 			FormPayment2.IsNew=true;

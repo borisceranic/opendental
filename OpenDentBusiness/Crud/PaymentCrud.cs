@@ -62,6 +62,8 @@ namespace OpenDentBusiness.Crud{
 				payment.IsRecurringCC  = PIn.Bool  (row["IsRecurringCC"].ToString());
 				payment.SecUserNumEntry= PIn.Long  (row["SecUserNumEntry"].ToString());
 				payment.SecDateTEdit   = PIn.DateT (row["SecDateTEdit"].ToString());
+				payment.PaymentSource  = (OpenDentBusiness.CreditCardSource)PIn.Int(row["PaymentSource"].ToString());
+				payment.ProcessStatus  = (OpenDentBusiness.ProcessStat)PIn.Int(row["ProcessStatus"].ToString());
 				retVal.Add(payment);
 			}
 			return retVal;
@@ -89,11 +91,13 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("IsRecurringCC");
 			table.Columns.Add("SecUserNumEntry");
 			table.Columns.Add("SecDateTEdit");
+			table.Columns.Add("PaymentSource");
+			table.Columns.Add("ProcessStatus");
 			foreach(Payment payment in listPayments) {
 				table.Rows.Add(new object[] {
 					POut.Long  (payment.PayNum),
 					POut.Long  (payment.PayType),
-					POut.Date  (payment.PayDate),
+					POut.DateT (payment.PayDate,false),
 					POut.Double(payment.PayAmt),
 					            payment.CheckNum,
 					            payment.BankBranch,
@@ -101,12 +105,14 @@ namespace OpenDentBusiness.Crud{
 					POut.Bool  (payment.IsSplit),
 					POut.Long  (payment.PatNum),
 					POut.Long  (payment.ClinicNum),
-					POut.Date  (payment.DateEntry),
+					POut.DateT (payment.DateEntry,false),
 					POut.Long  (payment.DepositNum),
 					            payment.Receipt,
 					POut.Bool  (payment.IsRecurringCC),
 					POut.Long  (payment.SecUserNumEntry),
-					POut.DateT (payment.SecDateTEdit),
+					POut.DateT (payment.SecDateTEdit,false),
+					POut.Int   ((int)payment.PaymentSource),
+					POut.Int   ((int)payment.ProcessStatus),
 				});
 			}
 			return table;
@@ -147,7 +153,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="PayNum,";
 			}
-			command+="PayType,PayDate,PayAmt,CheckNum,BankBranch,PayNote,IsSplit,PatNum,ClinicNum,DateEntry,DepositNum,Receipt,IsRecurringCC,SecUserNumEntry) VALUES(";
+			command+="PayType,PayDate,PayAmt,CheckNum,BankBranch,PayNote,IsSplit,PatNum,ClinicNum,DateEntry,DepositNum,Receipt,IsRecurringCC,SecUserNumEntry,PaymentSource,ProcessStatus) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(payment.PayNum)+",";
 			}
@@ -165,8 +171,10 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (payment.DepositNum)+","
 				+    DbHelper.ParamChar+"paramReceipt,"
 				+    POut.Bool  (payment.IsRecurringCC)+","
-				+    POut.Long  (payment.SecUserNumEntry)+")";
+				+    POut.Long  (payment.SecUserNumEntry)+","
 				//SecDateTEdit can only be set by MySQL
+				+    POut.Int   ((int)payment.PaymentSource)+","
+				+    POut.Int   ((int)payment.ProcessStatus)+")";
 			if(payment.Receipt==null) {
 				payment.Receipt="";
 			}
@@ -203,7 +211,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="PayNum,";
 			}
-			command+="PayType,PayDate,PayAmt,CheckNum,BankBranch,PayNote,IsSplit,PatNum,ClinicNum,DateEntry,DepositNum,Receipt,IsRecurringCC,SecUserNumEntry) VALUES(";
+			command+="PayType,PayDate,PayAmt,CheckNum,BankBranch,PayNote,IsSplit,PatNum,ClinicNum,DateEntry,DepositNum,Receipt,IsRecurringCC,SecUserNumEntry,PaymentSource,ProcessStatus) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(payment.PayNum)+",";
 			}
@@ -221,8 +229,10 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (payment.DepositNum)+","
 				+    DbHelper.ParamChar+"paramReceipt,"
 				+    POut.Bool  (payment.IsRecurringCC)+","
-				+    POut.Long  (payment.SecUserNumEntry)+")";
+				+    POut.Long  (payment.SecUserNumEntry)+","
 				//SecDateTEdit can only be set by MySQL
+				+    POut.Int   ((int)payment.PaymentSource)+","
+				+    POut.Int   ((int)payment.ProcessStatus)+")";
 			if(payment.Receipt==null) {
 				payment.Receipt="";
 			}
@@ -251,9 +261,11 @@ namespace OpenDentBusiness.Crud{
 				//DateEntry not allowed to change
 				//DepositNum excluded from update
 				+"Receipt        =  "+DbHelper.ParamChar+"paramReceipt, "
-				+"IsRecurringCC  =  "+POut.Bool  (payment.IsRecurringCC)+" "
+				+"IsRecurringCC  =  "+POut.Bool  (payment.IsRecurringCC)+", "
 				//SecUserNumEntry excluded from update
 				//SecDateTEdit can only be set by MySQL
+				+"PaymentSource  =  "+POut.Int   ((int)payment.PaymentSource)+", "
+				+"ProcessStatus  =  "+POut.Int   ((int)payment.ProcessStatus)+" "
 				+"WHERE PayNum = "+POut.Long(payment.PayNum);
 			if(payment.Receipt==null) {
 				payment.Receipt="";
@@ -313,6 +325,14 @@ namespace OpenDentBusiness.Crud{
 			}
 			//SecUserNumEntry excluded from update
 			//SecDateTEdit can only be set by MySQL
+			if(payment.PaymentSource != oldPayment.PaymentSource) {
+				if(command!=""){ command+=",";}
+				command+="PaymentSource = "+POut.Int   ((int)payment.PaymentSource)+"";
+			}
+			if(payment.ProcessStatus != oldPayment.ProcessStatus) {
+				if(command!=""){ command+=",";}
+				command+="ProcessStatus = "+POut.Int   ((int)payment.ProcessStatus)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -366,6 +386,12 @@ namespace OpenDentBusiness.Crud{
 			}
 			//SecUserNumEntry excluded from update
 			//SecDateTEdit can only be set by MySQL
+			if(payment.PaymentSource != oldPayment.PaymentSource) {
+				return true;
+			}
+			if(payment.ProcessStatus != oldPayment.ProcessStatus) {
+				return true;
+			}
 			return false;
 		}
 

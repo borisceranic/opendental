@@ -47,12 +47,26 @@ namespace OpenDentBusiness{
 		///updates.  Not user editable with the UI.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.TimeStamp)]
 		public DateTime SecDateTEdit;
+		///<summary>Enum:CreditCardSource. Indicates the origin of the payment if the payment came from a credit card. Will be 'None' if this payment 
+		///did not use a credit card.</summary>
+		public CreditCardSource PaymentSource;
+		///<summary>Enum:ProcessStat. Flags whether a payment came from online and needs to be processed.</summary>
+		public ProcessStat ProcessStatus;
 
 		public Payment Clone() {
 			return (Payment)this.MemberwiseClone();
 		}
 		
 
+	}
+
+	public enum ProcessStat {
+			/// <summary>0 - Payment made within the OD program.</summary>
+			OfficeProcessed,
+			/// <summary>1 - Payment made from the Patient Portal and has been processed within OD.</summary>
+			OnlineProcessed,
+			/// <summary>2 - Payment made from the Patient Portal and needs to be processed within OD.</summary>
+			OnlinePending
 	}
 
 	

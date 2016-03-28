@@ -3988,6 +3988,8 @@ namespace OpenDentBusiness {
 						payment.PayNote="Dummy payment. Original payment entry missing from the database.";
 						payment.PayNum=PIn.Long(table.Rows[i]["PayNum"].ToString());
 						payment.SecUserNumEntry=userNum;
+						payment.PaymentSource=CreditCardSource.None;
+						payment.ProcessStatus=ProcessStat.OfficeProcessed;
 						Payments.Insert(payment,true);
 					}
 					log+=Lans.g("FormDatabaseMaintenance","Paysplits found with invalid PayNum fixed: ")+table.Rows.Count+"\r\n";

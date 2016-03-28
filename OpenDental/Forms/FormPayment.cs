@@ -1379,6 +1379,8 @@ namespace OpenDental {
 			if(FormXT.DialogResult!=DialogResult.OK) {
 				return;
 			}
+			_paymentCur.PaymentSource=CreditCardSource.XServer;
+			_paymentCur.ProcessStatus=ProcessStat.OfficeProcessed;
 			int tranType=FormXT.TransactionType;
 			decimal cashAmt=FormXT.CashBackAmount;
 			string cashBack=cashAmt.ToString("F2");
@@ -1648,6 +1650,8 @@ namespace OpenDental {
 					if(_printReceipt && receipt!="") {
 						PrintReceipt(receipt);
 					}
+					voidPayment.PaymentSource=CreditCardSource.XServer;
+					voidPayment.ProcessStatus=ProcessStat.OfficeProcessed;
 					voidPayment.PayNum=Payments.Insert(voidPayment);
 					foreach(PaySplit splitCur in _listPaySplits) {//Modify the paysplits for the original transaction to work for the void transaction
 						PaySplit split=splitCur.Copy();
@@ -1826,6 +1830,8 @@ namespace OpenDental {
 			if(_printReceipt && receipt!="") {
 				PrintReceipt(receipt);
 			}
+			voidPayment.PaymentSource=CreditCardSource.XServer;
+			voidPayment.ProcessStatus=ProcessStat.OfficeProcessed;
 			voidPayment.PayNum=Payments.Insert(voidPayment);
 			for(int i=0;i<_listPaySplits.Count;i++) {//Modify the paysplits for the original transaction to work for the void transaction
 				PaySplit split=_listPaySplits[i].Copy();
@@ -2051,6 +2057,8 @@ namespace OpenDental {
 							voidPayment.PayAmt*=-1;//the negation of the original amount
 							voidPayment.PayNote=resultNote;
 							voidPayment.Receipt=FormP.ReceiptStr;
+							voidPayment.PaymentSource=CreditCardSource.PayConnect;
+							voidPayment.ProcessStatus=ProcessStat.OfficeProcessed;
 							voidPayment.PayNum=Payments.Insert(voidPayment);
 							foreach(PaySplit splitCur in _listPaySplits) {//Modify the paysplits for the original transaction to work for the void transaction
 								PaySplit split=splitCur.Copy();
@@ -2072,6 +2080,8 @@ namespace OpenDental {
 				textNote.Select(textNote.Text.Length-1,0);
 				textNote.ScrollToCaret();//Scroll to the end of the text box to see the newest notes.
 				_paymentOld.PayNote=textNote.Text;
+				_paymentOld.PaymentSource=CreditCardSource.PayConnect;
+				_paymentOld.ProcessStatus=ProcessStat.OfficeProcessed;
 				Payments.Update(_paymentOld,true);
 			}
 			if(_paymentCur.Receipt!="") {
@@ -2110,6 +2120,8 @@ namespace OpenDental {
 					+Lan.g(this,"Amount")+": "+voidPayment.PayAmt+Environment.NewLine
 					+Lan.g(this,"Auth Code")+": "+response.AuthCode+Environment.NewLine
 					+Lan.g(this,"Ref Number")+": "+response.RefNumber;
+				voidPayment.PaymentSource=CreditCardSource.PayConnect;
+				voidPayment.ProcessStatus=ProcessStat.OfficeProcessed;
 				voidPayment.PayNum=Payments.Insert(voidPayment);
 				for(int i=0;i<_listPaySplits.Count;i++) {//Modify the paysplits for the original transaction to work for the void transaction
 					PaySplit split=_listPaySplits[i].Copy();

@@ -5437,6 +5437,8 @@ namespace OpenDental{
 			PaymentCur.ClinicNum=PatCur.ClinicNum;
 			PaymentCur.PayType=0;//txfr
 			PaymentCur.DateEntry=DateTimeOD.Today;//So that it will show properly in the new window.
+			PaymentCur.PaymentSource=CreditCardSource.None;
+			PaymentCur.ProcessStatus=ProcessStat.OfficeProcessed;
 			Payments.Insert(PaymentCur);
 			FormPayment Formp=new FormPayment(PatCur,FamCur,PaymentCur);
 			Formp.IsNew=true;
