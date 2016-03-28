@@ -11,6 +11,7 @@ using System.Drawing;
 using System.Data;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -3162,11 +3163,29 @@ namespace OpenDental {
 			}
 			DataTable table=DataSetMain.Tables["account"];
 			Procedure proc;
-			List<Procedure> listProcs=new List<Procedure>();
-			for(int i=0;i<gridAccount.SelectedIndices.Length;i++) {
-				proc=Procedures.GetProcFromList(procsForPat,PIn.Long(table.Rows[gridAccount.SelectedIndices[i]]["ProcNum"].ToString()));
-				listProcs.Add(proc);
-			} 
+			//Order the selected procedures in the same order that they show in the TP module for the following reasons:
+			//1) Maintains the same procedure order on preauths and claims (required for Denti-Cal).
+			//2) Estimates calculations are affected by procedure order, especially when the patient is near their annual max.
+			//	Maintaining the same procedure order on the claim as in the TP module ensures that estimates are calculated the same way in both places.
+			//To mimic the TP module sorting, we must first get the selected proceures in the order which they are found in the database, then sort
+			//by the relevant columns.
+			List<Procedure> listSelectedProcs=new List<Procedure>();
+			for(int i=0;i<procsForPat.Count;i++) {
+				proc=procsForPat[i];
+				for(int j=0;j<gridAccount.SelectedIndices.Length;j++) {
+					long procNum=PIn.Long(table.Rows[gridAccount.SelectedIndices[j]]["ProcNum"].ToString());
+					if(proc.ProcNum==procNum) {
+						listSelectedProcs.Add(proc);
+						break;
+					}
+				}
+			}
+			//This sorting algorithm mimics the sorting found in ContrTreat.LoadActiveTP().
+			List<Procedure> listProcs=listSelectedProcs
+				.OrderBy(x => x.PriorityOrder<0)
+				.ThenBy(x => x.PriorityOrder)
+				.ThenBy(x => Tooth.ToInt(x.ToothNum))
+				.ThenBy(x=>x.ProcDate).ToList();
 			if((claimType=="P" || claimType=="S") && Procedures.GetUniqueDiagnosticCodes(listProcs,false).Count>4) {
 				MsgBox.Show(this,"Claim has more than 4 unique diagnosis codes.  Create multiple claims instead.");
 				return new Claim();
@@ -3175,25 +3194,25 @@ namespace OpenDental {
 				MsgBox.Show(this,"Claim has more than 12 unique diagnosis codes.  Create multiple claims instead.");
 				return new Claim();
 			}
-			for(int i=0;i<gridAccount.SelectedIndices.Length;i++){
-				proc=Procedures.GetProcFromList(procsForPat,PIn.Long(table.Rows[gridAccount.SelectedIndices[i]]["ProcNum"].ToString()));
+			for(int i=0;i<listProcs.Count;i++){
+				proc=listProcs[i];
 				if(Procedures.NoBillIns(proc,ClaimProcList,PlanCur.PlanNum)){
 					MsgBox.Show(this,"Not allowed to send procedures to insurance that are marked 'Do not bill to ins'.");
 					return new Claim();
 				}
 			}
-			for(int i=0;i<gridAccount.SelectedIndices.Length;i++){
-				proc=Procedures.GetProcFromList(procsForPat,PIn.Long(table.Rows[gridAccount.SelectedIndices[i]]["ProcNum"].ToString()));
+			for(int i=0;i<listProcs.Count;i++){
+				proc=listProcs[i];
 				if(Procedures.IsAlreadyAttachedToClaim(proc,ClaimProcList,SubCur.InsSubNum)){
 					MsgBox.Show(this,"Not allowed to send a procedure to the same insurance company twice.");
 					return new Claim();
 				}
 			}
-			proc=Procedures.GetProcFromList(procsForPat,PIn.Long(table.Rows[gridAccount.SelectedIndices[0]]["ProcNum"].ToString()));
+			proc=listProcs[0];
 			long clinicNum=proc.ClinicNum;
 			PlaceOfService placeService=proc.PlaceService;
-			for(int i=1;i<gridAccount.SelectedIndices.Length;i++){//skips 0
-				proc=Procedures.GetProcFromList(procsForPat,PIn.Long(table.Rows[gridAccount.SelectedIndices[i]]["ProcNum"].ToString()));
+			for(int i=1;i<listProcs.Count;i++){//skips 0
+				proc=listProcs[i];
 				if(clinicNum!=proc.ClinicNum){
 					MsgBox.Show(this,"All procedures do not have the same clinic.");
 					return new Claim();
@@ -3203,18 +3222,16 @@ namespace OpenDental {
 					return new Claim();
 				}
 			}
-			ClaimProc[] claimProcs=new ClaimProc[gridAccount.SelectedIndices.Length];//1:1 with selectedIndices
-			long procNum;
-			for(int i=0;i<gridAccount.SelectedIndices.Length;i++){//loop through selected procs
+			ClaimProc[] claimProcs=new ClaimProc[listProcs.Count];//1:1 with listProcs
+			for(int i=0;i<listProcs.Count;i++){//loop through selected procs
 				//and try to find an estimate that can be used
-				procNum=PIn.Long(table.Rows[gridAccount.SelectedIndices[i]]["ProcNum"].ToString());
-				claimProcs[i]=Procedures.GetClaimProcEstimate(procNum,ClaimProcList,PlanCur,SubCur.InsSubNum);
+				claimProcs[i]=Procedures.GetClaimProcEstimate(listProcs[i].ProcNum,ClaimProcList,PlanCur,SubCur.InsSubNum);
 			}
 			for(int i=0;i<claimProcs.Length;i++){//loop through each claimProc
 				//and create any missing estimates. This handles claims to 3rd and 4th ins co's.
 				if(claimProcs[i]==null){
 					claimProcs[i]=new ClaimProc();
-					proc=Procedures.GetProcFromList(procsForPat,PIn.Long(table.Rows[gridAccount.SelectedIndices[i]]["ProcNum"].ToString()));//1:1
+					proc=listProcs[i];//1:1
 					ClaimProcs.CreateEst(claimProcs[i],proc,PlanCur,SubCur);
 				}
 			}
@@ -3294,9 +3311,9 @@ namespace OpenDental {
 			if(PlanCur.PlanType=="c"){//if capitation
 				ClaimCur.ClaimType="Cap";
 			}
-			ClaimCur.ProvTreat=Procedures.GetProcFromList(procsForPat,PIn.Long(table.Rows[gridAccount.SelectedIndices[0]]["ProcNum"].ToString())).ProvNum;
-			for(int i=0;i<gridAccount.SelectedIndices.Length;i++){
-				proc=Procedures.GetProcFromList(procsForPat,PIn.Long(table.Rows[gridAccount.SelectedIndices[i]]["ProcNum"].ToString()));
+			ClaimCur.ProvTreat=listProcs[0].ProvNum;
+			for(int i=0;i<listProcs.Count;i++){
+				proc=listProcs[i];
 				if(!Providers.GetIsSec(proc.ProvNum)){//if not a hygienist
 					ClaimCur.ProvTreat=proc.ProvNum;
 				}
@@ -3327,7 +3344,7 @@ namespace OpenDental {
 			//attach procedures
 			//for(int i=0;i<tbAccount.SelectedIndices.Length;i++){
 			for(int i=0;i<claimProcs.Length;i++){
-				proc=Procedures.GetProcFromList(procsForPat,PIn.Long(table.Rows[gridAccount.SelectedIndices[i]]["ProcNum"].ToString()));//1:1
+				proc=listProcs[i];//1:1
 				//ClaimProc ClaimProcCur=new ClaimProc();
 				//ClaimProcCur.ProcNum=ProcCur.ProcNum;
 				claimProcs[i].ClaimNum=ClaimCur.ClaimNum;
@@ -3365,7 +3382,6 @@ namespace OpenDental {
 				}
 			}//for claimProc
 			List <ClaimProc> listClaimProcs=new List<ClaimProc>(claimProcs);
-			listClaimProcs.Sort(ClaimProc.Compare);
 			for(int i=0;i<listClaimProcs.Count;i++) {
 				listClaimProcs[i].LineNumber=(byte)(i+1);
 				ClaimProcs.Update(listClaimProcs[i]);

@@ -2284,6 +2284,7 @@ namespace OpenDental{
 
 	private List<ProcTP> LoadActiveTP(ref TreatPlan treatPlan) {
 		List<TreatPlanAttach> listTreatPlanAttaches=TreatPlanAttaches.GetAllForTreatPlan(treatPlan.TreatPlanNum);
+		//If the sorting logic changes here, then also update the sorting logic in ContrAccount.CreateClaim() to match.
 		List<Procedure> listProcForTP=Procedures.GetManyProc(listTreatPlanAttaches.Select(x=>x.ProcNum).ToList(),false)
 			.OrderBy(x => DefC.GetOrder(DefCat.TxPriorities,listTreatPlanAttaches.FirstOrDefault(y => y.ProcNum==x.ProcNum).Priority)<0)
 			.ThenBy(x => DefC.GetOrder(DefCat.TxPriorities,listTreatPlanAttaches.FirstOrDefault(y => y.ProcNum==x.ProcNum).Priority))
@@ -3585,7 +3586,6 @@ namespace OpenDental{
 				listClaimProcs.Add(ClaimProcCur);
 				//ProcCur.Update(ProcOld);
 			}
-			listClaimProcs.Sort(ClaimProc.Compare);
 			for(int i=0;i<listClaimProcs.Count;i++) {
 				listClaimProcs[i].LineNumber=(byte)(i+1);
 				ClaimProcs.Insert(listClaimProcs[i]);
