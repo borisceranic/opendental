@@ -464,6 +464,8 @@ namespace OpenDental {
 					DateTime.DaysInMonth(_response.PaymentToken.Expiration.year,_response.PaymentToken.Expiration.month));
 			}
 			if(_creditCardCur.IsNew) {
+				_creditCardCur.CCSource=CreditCardSource.PayConnect;
+				_creditCardCur.ClinicNum=_paymentCur.ClinicNum;
 				CreditCards.Insert(_creditCardCur);
 			}
 			else {

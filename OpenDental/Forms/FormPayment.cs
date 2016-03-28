@@ -1388,7 +1388,7 @@ namespace OpenDental {
 				//Have credit card on file
 				if(!string.IsNullOrEmpty(cc.XChargeToken)) {//Recurring charge
 					hasXToken=true;
-					if(CreditCards.IsDuplicateXChargeToken(cc.XChargeToken)) {
+					if(CreditCards.GetTokenCount(cc.XChargeToken,CreditCardSource.XServer)!=1) {
 						MsgBox.Show(this,"This card shares a token with another card. Delete it from the Credit Card Manage window and re-add it.");
 						return;
 					}
@@ -1561,6 +1561,7 @@ namespace OpenDental {
 						List<string> listDefaultProcs=PrefC.GetString(PrefName.DefaultCCProcs).Split(',').ToList();
 						listDefaultProcs.RemoveAll(x => CreditCards.ProcLinkedToCard(_patCur.PatNum,x,cc.CreditCardNum));
 						cc.Procedures=string.Join(",",listDefaultProcs);
+						cc.CCSource=CreditCardSource.XServer;
 						CreditCards.Update(cc);
 					}
 					if(newCard) {
@@ -1576,6 +1577,8 @@ namespace OpenDental {
 							List<string> listDefaultProcs=PrefC.GetString(PrefName.DefaultCCProcs).Split(',').ToList();
 							listDefaultProcs.RemoveAll(x => CreditCards.ProcLinkedToCard(_patCur.PatNum,x,0));
 							cc.Procedures=string.Join(",",listDefaultProcs);
+							cc.CCSource=CreditCardSource.XServer;
+							cc.ClinicNum=_paymentCur.ClinicNum;
 							CreditCards.Insert(cc);
 						}
 						else if(string.IsNullOrEmpty(xChargeToken)) {//Shouldn't happen again but leaving just in case.

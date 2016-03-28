@@ -305,6 +305,8 @@ namespace OpenDental {
 			if(CreditCardCur.IsNew) {
 				List<CreditCard> itemOrderCount=CreditCards.Refresh(PatCur.PatNum);
 				CreditCardCur.ItemOrder=itemOrderCount.Count;
+				CreditCardCur.CCSource=CreditCardSource.None;
+				CreditCardCur.ClinicNum=Clinics.ClinicNum;
 				CreditCards.Insert(CreditCardCur);
 			}
 			else {

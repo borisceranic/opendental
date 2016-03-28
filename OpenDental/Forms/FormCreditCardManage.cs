@@ -160,6 +160,8 @@ namespace OpenDental {
 									}
 								}
 								creditCardCur.Procedures=String.Join(",",listDefaultProcs);
+								creditCardCur.CCSource=CreditCardSource.XServer;
+								creditCardCur.ClinicNum=Clinics.ClinicNum;
 								CreditCards.Insert(creditCardCur);
 							}
 						}

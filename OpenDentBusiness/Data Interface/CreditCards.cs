@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -8,25 +9,26 @@ namespace OpenDentBusiness{
 	///<summary></summary>
 	public class CreditCards{
 
-		///<summary>If patNum==0 then does not filter on PatNum; otherwise filters on PatNum.</summary>
+		///<summary>If patNum==0 then does not filter on PatNum; otherwise filters on PatNum. Only includes credit cards whose source is Open Dental
+		///proper.</summary>
 		public static List<CreditCard> Refresh(long patNum){
-			//No remoting role check.
+			//No need to check RemotingRole; no call to db.
 			return RefreshBySource(patNum,new List<CreditCardSource>() { CreditCardSource.None,CreditCardSource.PayConnect,CreditCardSource.XServer });
 		}
 
 		///<summary>Get all credit cards by a given list of CreditCardSource(s). Optionally filter by a given patNum.</summary>
-		public static List<CreditCard> RefreshBySource(long patNum,List<CreditCardSource> listCreditCardSource) {
+		public static List<CreditCard> RefreshBySource(long patNum,List<CreditCardSource> listSources) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<CreditCard>>(MethodBase.GetCurrentMethod(),patNum,listCreditCardSource);
+				return Meth.GetObject<List<CreditCard>>(MethodBase.GetCurrentMethod(),patNum,listSources);
 			}
-			//todo: chris.
-			//string command="SELECT * FROM creditcard WHERE PatNum = "+POut.Long(patNum)+" "
-			//	+"AND CCSource != "+(int)CreditCardSource.XWeb+" ORDER BY ItemOrder DESC";//Not created from the Patient Portal
-			//return Crud.CreditCardCrud.SelectMany(command);
-			string command=""; // "SELECT * FROM creditcard WHERE CCSource = "+POut.Int((int)ccSource);
+			if(listSources.Count==0) {
+				return new List<CreditCard>();
+			}
+			string command="SELECT * FROM creditcard WHERE CCSource IN ("+string.Join(",",listSources.Select(x=>POut.Int((int)x)))+") ";
 			if(patNum!=0) { //Add the PatNum criteria.
-				command+=" AND PatNum = "+POut.Long(patNum);
+				command+="AND PatNum="+POut.Long(patNum)+" ";
 			}
+			command+="ORDER BY ItemOrder DESC";
 			return Crud.CreditCardCrud.SelectMany(command);
 		}
 
@@ -294,68 +296,44 @@ namespace OpenDentBusiness{
 			}
 		}
 
-		//todo: these need to be overloaded to optionally take in a list of CreditCardSource(s)
+		///<summary>Returns number of times token is in use.  Token was duplicated once and caused the wrong card to be charged.</summary>
+		public static int GetTokenCount(string token,List<CreditCardSource> listSources) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetInt(MethodBase.GetCurrentMethod(),token,listSources);
+			}
+			if(listSources.Count==0) {
+				return 0;
+			}
+			string command="SELECT COUNT(*) FROM creditcard WHERE CCSource IN ("+string.Join(",",listSources.Select(x=>POut.Int((int)x)))+") AND (0 ";
+			if(listSources.Contains(CreditCardSource.PayConnect)) {
+				command+="OR PayConnectToken='"+POut.String(token)+"' ";
+			}
+			if(listSources.Contains(CreditCardSource.XServer) || listSources.Contains(CreditCardSource.XWeb)) {
+				command+="OR XChargeToken='"+POut.String(token)+"' ";
+			}
+			command+=")";
+			return PIn.Int(Db.GetCount(command));
+		}
 
 		///<summary>Returns number of times token is in use.  Token was duplicated once and caused the wrong card to be charged.</summary>
-		public static int GetXChargeTokenCount(string token,CreditCardSource ccSource = CreditCardSource.XServer) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetInt(MethodBase.GetCurrentMethod(),token,ccSource);
-			}
-			string command="SELECT COUNT(*) FROM creditcard WHERE XChargeToken='"+POut.String(token)+"'"
-				+" AND CCSource = "+POut.Int((int)ccSource);
-			return PIn.Int(Db.GetCount(command));
+		public static int GetTokenCount(string token,CreditCardSource ccSource) {
+			//No need to check RemotingRole; no call to db.
+			return GetTokenCount(token,new List<CreditCardSource>() { ccSource });
 		}
 
 		///<summary>Checks if token already exists in db.</summary>
-		public static bool XChargeTokenExists(string token,CreditCardSource ccSource = CreditCardSource.XServer) {
-			//No remoting role check necessary.
-			return GetXChargeTokenCount(token,ccSource)>=1;
-		}
+		public static bool TokenExists(string token,CreditCardSource ccSource) {
+			//No need to check RemotingRole; no call to db.
+			return GetTokenCount(token,ccSource) >= 1;
+		}		
 
-		///<summary>Returns number of times token is in use.  Token was duplicated once and caused the wrong card to be charged.</summary>
-		public static int GetPayConnectTokenCount(string token) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetInt(MethodBase.GetCurrentMethod(),token);
-			}
-			string command="SELECT COUNT(*) FROM creditcard WHERE PayConnectToken='"+POut.String(token)+"'";
-			return PIn.Int(Db.GetCount(command));
-		}
-
-
-
-
-		///<summary>Checks if token is in use.  This happened once and can cause the wrong card to be charged.</summary>
-		public static bool IsDuplicateXChargeToken(string token) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){
-				return Meth.GetBool(MethodBase.GetCurrentMethod(),token);
-			}
-			string command="SELECT COUNT(*) FROM creditcard WHERE XChargeToken='"+POut.String(token)+"' "
-				+"AND CCSource="+(int)CreditCardSource.XServer;//Local installation of XCharge
-			if(Db.GetCount(command)=="1") {
-				return false;
-			}
-			return true;
-		}
-
-		///<summary>Checks if token is in use.  This happened once and can cause the wrong card to be charged.</summary>
-		public static bool IsDuplicatePayConnectToken(string token) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetBool(MethodBase.GetCurrentMethod(),token);
-			}
-			string command="SELECT COUNT(*) FROM creditcard WHERE PayConnectToken='"+POut.String(token)+"'";
-			if(Db.GetCount(command)=="1") {
-				return false;
-			}
-			return true;
-		}
-
-		///<summary>Gets every credit card in the db with an X-Charge token that was created from the local installation XCharge.</summary>
-		public static List<CreditCard> GetCardsWithXChargeTokens() {
+		///<summary>Gets every credit card in the db with an X-Charge token that was created from the specified source.</summary>
+		public static List<CreditCard> GetCardsWithXChargeTokens(CreditCardSource ccSource=CreditCardSource.XServer) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<CreditCard>>(MethodBase.GetCurrentMethod());
 			}
 			string command="SELECT * FROM creditcard WHERE XChargeToken!=\"\" "
-				+"AND CCSource="+(int)CreditCardSource.XServer;//Local installation of XCharge;
+				+"AND CCSource="+POut.Int((int)ccSource);
 			return Crud.CreditCardCrud.SelectMany(command);
 		}
 

@@ -374,8 +374,7 @@ namespace OpenDental {
 			List<long> listClinicNumsBadCredentials=new List<long>();
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
 				if(table.Rows[gridMain.SelectedIndices[i]]["XChargeToken"].ToString()!="" &&
-					CreditCards.IsDuplicateXChargeToken(table.Rows[gridMain.SelectedIndices[i]]["XChargeToken"].ToString()))
-				{
+					CreditCards.GetTokenCount(table.Rows[gridMain.SelectedIndices[i]]["XChargeToken"].ToString(),CreditCardSource.XServer)!=1) {
 					_failed++;
 					labelFailed.Text=Lan.g(this,"Failed=")+_failed;
 					MessageBox.Show(Lan.g(this,"A duplicate token was found, the card cannot be charged for customer")+": "+table.Rows[i]["PatName"].ToString());
@@ -530,7 +529,7 @@ namespace OpenDental {
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
 				bool isPayConnectToken=true;
 				string tokenOrCCMasked=table.Rows[gridMain.SelectedIndices[i]]["PayConnectToken"].ToString();
-				if(tokenOrCCMasked!="" && CreditCards.IsDuplicatePayConnectToken(tokenOrCCMasked)) {
+				if(tokenOrCCMasked!="" && CreditCards.GetTokenCount(tokenOrCCMasked,CreditCardSource.PayConnect)!=1) {
 					MessageBox.Show(Lan.g(this,"A duplicate token was found, the card cannot be charged for customer: ")+table.Rows[i]["PatName"].ToString());
 					continue;
 				}
@@ -654,6 +653,15 @@ namespace OpenDental {
 			double payPlanDue=PIn.Double(table.Rows[gridMain.SelectedIndices[indexCur]]["PayPlanDue"].ToString());
 			paymentCur.PayNote=note;
 			paymentCur.IsRecurringCC=true;
+			if(_progCur.ProgName==ProgramName.Xcharge.ToString()) {
+				paymentCur.PaymentSource=CreditCardSource.XServer;
+			}
+			else if(_progCur.ProgName==ProgramName.PayConnect.ToString()) {
+				paymentCur.PaymentSource=CreditCardSource.PayConnect;
+			}
+			else {
+				paymentCur.PaymentSource=CreditCardSource.None;
+			}
 			Payments.Insert(paymentCur);
 			long provNumPayPlan=PIn.Long(table.Rows[gridMain.SelectedIndices[indexCur]]["ProvNum"].ToString());//for payment plans only
 			//Regular payments need to apply to the provider that the family owes the most money to.
