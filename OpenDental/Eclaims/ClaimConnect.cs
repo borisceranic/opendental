@@ -357,6 +357,7 @@ namespace OpenDental.Eclaims
 					}
 				} while(response.Status.code==0 && response.ClaimPaymentAdvice!=null && response.ClaimPaymentAdvice.AdditionalEraExists);
 				if(response.Status.code!=0) {//!=Approved
+					//If the following error message changes, then also see if FormClaimReports.RetrieveReports() needs to change as well.
 					ErrorMessage="Era request unsuccessful."
 						+"\r\nError message received directly from Claim Connect: "+response.Status.code
 						+"\r\n\r\n"+response.Status.description;
