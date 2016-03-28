@@ -362,8 +362,11 @@ namespace CentralManager {
 
 		private void butRefreshConns_Click(object sender,EventArgs e) {
 			Cursor=Cursors.WaitCursor;
-			for(int i=0;i<gridMain.Rows.Count;i++) {
-				CentralConnection conn=(CentralConnection)gridMain.Rows[i].Tag;
+			if(gridMain.SelectedIndices.Length==0) {
+				gridMain.SetSelected(true);
+			}
+			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+				CentralConnection conn=(CentralConnection)gridMain.Rows[gridMain.SelectedIndices[i]].Tag;
 				if(conn.DatabaseName=="" && conn.ServerName=="" && conn.ServiceURI=="") {
 					continue;
 				}
