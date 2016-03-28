@@ -193,7 +193,31 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 					command=@"CREATE INDEX creditcard_ClinicNum ON creditcard (ClinicNum)";
 					Db.NonQ(command);
-				}				
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE payment ADD PaymentSource tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE payment ADD PaymentSource number(3)";
+					Db.NonQ(command);
+					command="UPDATE payment SET PaymentSource = 0 WHERE PaymentSource IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE payment MODIFY PaymentSource NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE payment ADD ProcessStatus tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE payment ADD ProcessStatus number(3)";
+					Db.NonQ(command);
+					command="UPDATE payment SET ProcessStatus = 0 WHERE ProcessStatus IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE payment MODIFY ProcessStatus NOT NULL";
+					Db.NonQ(command);
+				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE dunning ADD DaysInAdvance int NOT NULL";
 					Db.NonQ(command);
