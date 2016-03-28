@@ -106,10 +106,8 @@ namespace OpenDentBusiness {
 		///<summary>Returned from XWeb Gateway as a string. Helper method to convert to DateTime. Format is yyMM from XWeb gateway</summary>
 		public static DateTime ConvertExpDate(string expDate) {
 			try {
-				//Add 2000 to the year.				
-				DateTime ret=new DateTime(2000+int.Parse(expDate.Substring(2,2)),int.Parse(expDate.Substring(0,2)),1);
-				//Last day of the month.
-				return ret.AddMonths(1).AddDays(-1);
+				//Add 2000 to the year and expire on first of month.				
+				return new DateTime(2000+int.Parse(expDate.Substring(2,2)),int.Parse(expDate.Substring(0,2)),1);
 			}
 			catch {
 				return new DateTime(1880,1,1);
