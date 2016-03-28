@@ -154,29 +154,6 @@ namespace OpenDentBusiness{
 			return true;
 		}
 
-		///<summary>Compares primarily by CodeSent.  When sorting using this function, the result will be sorted by CodeSent, then by other fields.
-		///This function was created to fulfill request #88, "Claim procedures ordered by procedure code on claim".
-		///Additionally, Denti-Cal requires the procedures to be in the same order on a preauth as they are on the corresponding claim.</summary>
-		public static int Compare(ClaimProc claimProc1,ClaimProc claimProc2) {
-			int retVal=claimProc1.CodeSent.CompareTo(claimProc2.CodeSent);
-			if(retVal!=0) {
-				return retVal;
-			}
-			if(claimProc1.ProcDate < claimProc2.ProcDate) {//A few offices submit dental claims with procedures spanning over multiple days.
-				return -1;
-			}
-			else if(claimProc1.ProcDate > claimProc2.ProcDate) {
-				return 1;
-			}
-			if(claimProc1.FeeBilled < claimProc2.FeeBilled) {//Fee Billed might only matter for a few codes, such as D0999 or D2999.
-				return -1;
-			}
-			else if(claimProc1.FeeBilled > claimProc2.FeeBilled) {
-				return 1;
-			}
-			return 0;
-		}
-
 		public override string ToString() {
 			return Status.ToString()+ProcDate.ToShortDateString()+" est:"+InsEstTotal.ToString()+" ded:"+DedEst.ToString();
 		}
