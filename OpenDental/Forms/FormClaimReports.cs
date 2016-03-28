@@ -244,6 +244,9 @@ namespace OpenDental{
 			}
 			else if(clearinghouseClin.CommBridge==EclaimsCommBridge.ClaimConnect){
 				if(!ClaimConnect.Retrieve(clearinghouseClin)) {
+					if(isAutomaticMode && ClaimConnect.ErrorMessage.Contains(": 150\r\n")) {//Error message 150 "Service Not Contracted"
+						return "";//Pretend that there is no error when loading FormClaimsSend for those customers who do not pay for ERA service.
+					}
 					return Lan.g("FormClaimReports","Error retrieving.")+"\r\n"+ClaimConnect.ErrorMessage;
 				}
 			}
