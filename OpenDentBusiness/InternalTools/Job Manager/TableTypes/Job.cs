@@ -86,8 +86,8 @@ namespace OpenDentBusiness {
 		[CrudColumn(IsNotDbColumn=true)]
 		public List<JobQuote> ListJobQuotes=new List<JobQuote>();
 		///<summary>Not a data column.</summary>
-		[CrudColumn(IsNotDbColumn=true)]
-		public List<JobEvent> ListJobEvents=new List<JobEvent>();
+		[CrudColumn(IsNotDbColumn = true)]
+		public List<JobLog> ListJobLogs = new List<JobLog>();
 
 		public Job() {
 			JobVersion="";
@@ -103,7 +103,7 @@ namespace OpenDentBusiness {
 			job.ListJobNotes=this.ListJobNotes.Select(x => x.Copy()).ToList();
 			job.ListJobReviews=this.ListJobReviews.Select(x => x.Copy()).ToList();
 			job.ListJobQuotes=this.ListJobQuotes.Select(x => x.Copy()).ToList();
-			job.ListJobEvents=this.ListJobEvents.Select(x => x.Copy()).ToList();
+			job.ListJobLogs=this.ListJobLogs.Select(x => x.Copy()).ToList();
 			return job;
 		}
 

@@ -619,12 +619,6 @@
     <Compile Include="InternalTools\Job Manager\ODtextEditor.Designer.cs">
       <DependentUpon>ODtextEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="InternalTools\Job Manager\FormJobHistoryView.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="InternalTools\Job Manager\FormJobHistoryView.designer.cs">
-      <DependentUpon>FormJobHistoryView.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\FormProcBroken.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -4168,9 +4162,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="InternalTools\Job Manager\ODtextEditor.resx">
       <DependentUpon>ODtextEditor.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="InternalTools\Job Manager\FormJobHistoryView.resx">
-      <DependentUpon>FormJobHistoryView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormProcBroken.resx">
       <DependentUpon>FormProcBroken.cs</DependentUpon>

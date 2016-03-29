@@ -25,6 +25,7 @@
 		private void InitializeComponent() {
 			this.components = new System.ComponentModel.Container();
 			this.groupLinks = new System.Windows.Forms.GroupBox();
+			this.gridFiles = new OpenDental.UI.ODGrid();
 			this.gridBugs = new OpenDental.UI.ODGrid();
 			this.gridFeatureReq = new OpenDental.UI.ODGrid();
 			this.gridTasks = new OpenDental.UI.ODGrid();
@@ -72,7 +73,7 @@
 			this.gridHistory = new OpenDental.UI.ODGrid();
 			this.timerTitle = new System.Windows.Forms.Timer(this.components);
 			this.timerVersion = new System.Windows.Forms.Timer(this.components);
-			this.gridFiles = new OpenDental.UI.ODGrid();
+			this.checkShowHistoryText = new System.Windows.Forms.CheckBox();
 			this.groupLinks.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer2)).BeginInit();
 			this.splitContainer2.Panel1.SuspendLayout();
@@ -102,6 +103,24 @@
 			this.groupLinks.TabStop = false;
 			this.groupLinks.Text = "Links";
 			this.groupLinks.Resize += new System.EventHandler(this.groupLinks_Resize);
+			// 
+			// gridFiles
+			// 
+			this.gridFiles.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridFiles.HasAddButton = true;
+			this.gridFiles.HasMultilineHeaders = false;
+			this.gridFiles.HScrollVisible = false;
+			this.gridFiles.Location = new System.Drawing.Point(5, 503);
+			this.gridFiles.Name = "gridFiles";
+			this.gridFiles.ScrollValue = 0;
+			this.gridFiles.Size = new System.Drawing.Size(223, 91);
+			this.gridFiles.TabIndex = 260;
+			this.gridFiles.Title = "Files";
+			this.gridFiles.TranslationName = "";
+			this.gridFiles.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridFiles_CellDoubleClick);
+			this.gridFiles.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridFiles_CellClick);
+			this.gridFiles.TitleAddClick += new System.EventHandler(this.gridFiles_TitleAddClick);
 			// 
 			// gridBugs
 			// 
@@ -674,6 +693,7 @@
 			// tabHistory
 			// 
 			this.tabHistory.BackColor = System.Drawing.SystemColors.Control;
+			this.tabHistory.Controls.Add(this.checkShowHistoryText);
 			this.tabHistory.Controls.Add(this.gridHistory);
 			this.tabHistory.Location = new System.Drawing.Point(4, 22);
 			this.tabHistory.Name = "tabHistory";
@@ -684,14 +704,16 @@
 			// 
 			// gridHistory
 			// 
-			this.gridHistory.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.gridHistory.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridHistory.HasAddButton = false;
 			this.gridHistory.HasMultilineHeaders = false;
 			this.gridHistory.HScrollVisible = false;
-			this.gridHistory.Location = new System.Drawing.Point(3, 3);
+			this.gridHistory.Location = new System.Drawing.Point(3, 22);
 			this.gridHistory.Name = "gridHistory";
 			this.gridHistory.ScrollValue = 0;
-			this.gridHistory.Size = new System.Drawing.Size(754, 297);
+			this.gridHistory.Size = new System.Drawing.Size(754, 278);
 			this.gridHistory.TabIndex = 19;
 			this.gridHistory.TabStop = false;
 			this.gridHistory.Title = "History Events";
@@ -708,23 +730,15 @@
 			this.timerVersion.Interval = 3000;
 			this.timerVersion.Tick += new System.EventHandler(this.timerVersion_Tick);
 			// 
-			// gridFiles
+			// checkShowHistoryText
 			// 
-			this.gridFiles.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridFiles.HasAddButton = true;
-			this.gridFiles.HasMultilineHeaders = false;
-			this.gridFiles.HScrollVisible = false;
-			this.gridFiles.Location = new System.Drawing.Point(5, 503);
-			this.gridFiles.Name = "gridFiles";
-			this.gridFiles.ScrollValue = 0;
-			this.gridFiles.Size = new System.Drawing.Size(223, 91);
-			this.gridFiles.TabIndex = 260;
-			this.gridFiles.Title = "Files";
-			this.gridFiles.TranslationName = "";
-			this.gridFiles.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridFiles_CellDoubleClick);
-			this.gridFiles.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridFiles_CellClick);
-			this.gridFiles.TitleAddClick += new System.EventHandler(this.gridFiles_TitleAddClick);
+			this.checkShowHistoryText.Location = new System.Drawing.Point(6, 2);
+			this.checkShowHistoryText.Name = "checkShowHistoryText";
+			this.checkShowHistoryText.Size = new System.Drawing.Size(268, 20);
+			this.checkShowHistoryText.TabIndex = 245;
+			this.checkShowHistoryText.Text = "Show Full Job Descriptions";
+			this.checkShowHistoryText.UseVisualStyleBackColor = true;
+			this.checkShowHistoryText.CheckedChanged += new System.EventHandler(this.checkShowHistoryText_CheckedChanged);
 			// 
 			// UserControlJobEdit
 			// 
@@ -817,5 +831,6 @@
 		private System.Windows.Forms.Label labelRelatedJobs;
 		private System.Windows.Forms.TreeView treeRelatedJobs;
 		private UI.ODGrid gridFiles;
+		private System.Windows.Forms.CheckBox checkShowHistoryText;
 	}
 }

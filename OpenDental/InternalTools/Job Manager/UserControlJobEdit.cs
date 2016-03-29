@@ -52,8 +52,6 @@ namespace OpenDental.InternalTools.Job_Manager {
 			}
 		}
 
-		private bool IsChangeRequest { get; set; }
-
 		public bool IsOverride {
 			get {return _isOverride;}
 			set {
@@ -90,7 +88,6 @@ namespace OpenDental.InternalTools.Job_Manager {
 			_isLoading=true;
 			this.Enabled=false;//disable control while it is filled.
 			_isOverride=false;
-			IsChangeRequest=false;
 			IsChanged=false;
 			_treeNode=treeNode;
 			if(job==null) {
@@ -380,32 +377,45 @@ namespace OpenDental.InternalTools.Job_Manager {
 		}
 
 		private void FillGridHistory() {
-			long selectedEventNum=0;
-			if(gridHistory.GetSelectedIndex()!=-1) {
-				selectedEventNum=(long)gridHistory.Rows[gridHistory.GetSelectedIndex()].Tag;
-			}
 			gridHistory.BeginUpdate();
 			gridHistory.Columns.Clear();
 			gridHistory.Columns.Add(new ODGridColumn("Date",140));
-			gridHistory.Columns.Add(new ODGridColumn("Owner",100));
-			gridHistory.Columns.Add(new ODGridColumn("Status",100));
+			gridHistory.Columns.Add(new ODGridColumn("User Change",90) { TextAlign=HorizontalAlignment.Center });
+			gridHistory.Columns.Add(new ODGridColumn("Expert",90) { TextAlign=HorizontalAlignment.Center });
+			gridHistory.Columns.Add(new ODGridColumn("Engineer",90) { TextAlign=HorizontalAlignment.Center });
+			gridHistory.Columns.Add(new ODGridColumn("RTF",35) { TextAlign=HorizontalAlignment.Center });//shows X if this row has a copy of job description text.
+			gridHistory.Columns.Add(new ODGridColumn("Description",300));
 			gridHistory.Rows.Clear();
+			gridHistory.NoteSpanStart=1;
+			gridHistory.NoteSpanStop=4;
 			ODGridRow row;
-			foreach(JobEvent jobEvent in _jobCur.ListJobEvents) {
+			RichTextBox rtb = new RichTextBox();
+			foreach(JobLog jobLog in _jobCur.ListJobLogs.OrderBy(x=>x.DateTimeEntry)) {
 				row=new ODGridRow();
-				row.Cells.Add(jobEvent.DateTimeEntry.ToShortDateString()+" "+jobEvent.DateTimeEntry.ToShortTimeString());
-				row.Cells.Add(Userods.GetName(jobEvent.UserNumEvent));
-				row.Cells.Add(Enum.GetName(typeof(JobPhase),(int)jobEvent.JobStatus));
-				row.Tag=jobEvent.JobEventNum;
+				row.Cells.Add(jobLog.DateTimeEntry.ToShortDateString()+" "+jobLog.DateTimeEntry.ToShortTimeString());
+				row.Cells.Add(Userods.GetName(jobLog.UserNumChanged));
+				row.Cells.Add(Userods.GetName(jobLog.UserNumExpert));
+				row.Cells.Add(Userods.GetName(jobLog.UserNumEngineer));
+				rtb.Clear();
+				try {
+					rtb.Rtf=jobLog.MainRTF;
+				}
+				catch {
+					//fail silently
+				}
+				if(checkShowHistoryText.Checked && !string.IsNullOrWhiteSpace(rtb.Text)) {
+					row.Note=rtb.Text;
+				}
+				row.Cells.Add(string.IsNullOrWhiteSpace(rtb.Text) ? "" : "X");
+				row.Cells.Add(jobLog.Description);
+				if(checkShowHistoryText.Checked && gridHistory.Rows.Count%2==1) {
+					row.ColorBackG=Color.FromArgb(245,251,255);//light blue every other row.
+				}
+				row.Tag=jobLog;
 				gridHistory.Rows.Add(row);
 			}
+			rtb.Dispose();
 			gridHistory.EndUpdate();
-			for(int i=0;i<gridHistory.Rows.Count;i++) {
-				if((long)gridHistory.Rows[i].Tag==selectedEventNum) {
-					gridHistory.SetSelected(i,true);
-					break;
-				}
-			}
 		}
 
 		///<summary>Based on job status, category, and user role, this will enable or disable various controls.</summary>
@@ -478,8 +488,9 @@ namespace OpenDental.InternalTools.Job_Manager {
 						&& (!JobPermissions.IsAuthorized(JobPerm.Writeup,true)
 							|| (JobPermissions.IsAuthorized(JobPerm.Writeup,true) && _jobCur.UserNumExpert!=Security.CurUser.UserNum && _jobCur.UserNumExpert!=0))
 						&& (!JobPermissions.IsAuthorized(JobPerm.Engineer,true)
-							|| (JobPermissions.IsAuthorized(JobPerm.Engineer,true) && _jobCur.UserNumEngineer!=Security.CurUser.UserNum && _jobCur.UserNumEngineer!=0))) {
-						break;
+							|| (JobPermissions.IsAuthorized(JobPerm.Engineer,true) && _jobCur.UserNumEngineer!=Security.CurUser.UserNum && _jobCur.UserNumEngineer!=0))) 
+					{
+						break;//only the expert or engineer can edit the job description.
 					}
 					if(_jobCur.IsApprovalNeeded && !JobPermissions.IsAuthorized(JobPerm.Approval,true)) {//job needs approval and you are not authorized.
 						break;
@@ -497,7 +508,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 					butParentPick.Visible=true;
 					butParentRemove.Visible=true;
 					//gridCustomerQuotes.HasAddButton=true;//Quote permission only
-					//textEditorMain.ReadOnly=false; //Using Change Request action allows editing of jobs in development.
+					textEditorMain.ReadOnly=false; //Using Change Request action allows editing of jobs in development.
 					break;
 				case JobPhase.Documentation:
 					if(!JobPermissions.IsAuthorized(JobPerm.Documentation,true)) {
@@ -565,9 +576,6 @@ namespace OpenDental.InternalTools.Job_Manager {
 				textEditorMain.ReadOnly=true;
 				textEditorMain.Enabled=false;
 				textEditorDocumentation.Enabled=false;
-			}
-			if(IsChangeRequest) {
-				textEditorMain.ReadOnly=false;
 			}
 			if(_isOverride) {//Enable everything and make everything visible
 				textTitle.ReadOnly=false;
@@ -664,12 +672,12 @@ namespace OpenDental.InternalTools.Job_Manager {
 							actionMenu.MenuItems.Add(new MenuItem("Request Review",actionMenu_RequestReviewClick) { Enabled=true });
 						}
 						bool isExpert =JobPermissions.IsAuthorized(JobPerm.Writeup,true) && (_jobCur.UserNumExpert==0 || _jobCur.UserNumExpert==Security.CurUser.UserNum);
-						actionMenu.MenuItems.Add(new MenuItem("Change Request",actionMenu_RequestChangeApprovalClick) { Enabled=isExpert });//delayed save, after user can make edits.
+						actionMenu.MenuItems.Add(new MenuItem("Request Approval",actionMenu_RequestChangeApprovalClick) { Enabled=isExpert });//delayed save, after user can make edits.
 						bool isEngineer = JobPermissions.IsAuthorized(JobPerm.Engineer,true) && (_jobCur.UserNumEngineer==Security.CurUser.UserNum);
 						perm=(isExpert || isEngineer) && _jobCur.UserNumEngineer>0 && _jobCur.ListJobReviews.Count>0 && _jobCur.ListJobReviews.All(x => x.ReviewStatus==JobReviewStatus.Done);
 						actionMenu.MenuItems.Add(new MenuItem("Mark as Implemented",actionMenu_ImplementedClick) { Enabled=perm });//not until the engineer set, and reviews completed
 						if(JobPermissions.IsAuthorized(JobPerm.Approval,true)) {
-							actionMenu.MenuItems.Add(new MenuItem("Unapprove Concept",actionMenu_UnapproveJobClick) { Enabled=true });//x
+							actionMenu.MenuItems.Add(new MenuItem("Unapprove Job",actionMenu_UnapproveJobClick) { Enabled=true });//x
 						}
 					}
 					else {
@@ -921,12 +929,13 @@ namespace OpenDental.InternalTools.Job_Manager {
 		}
 
 		private void actionMenu_RequestChangeApprovalClick(object sender,EventArgs e) {
+			if(!ValidateJob(_jobCur)) {
+				return;
+			}
 			IsChanged=true;
-			IsChangeRequest=true;
 			_jobOld.UserNumApproverChange=0;//in case it was previously set.
-			_jobOld.IsApprovalNeeded=true;
-			textEditorMain.ReadOnly=false;
-			//Do not save here, allow edits.
+			_jobCur.IsApprovalNeeded=true;
+			SaveJob(_jobCur);
 		}
 		#endregion
 		#region Approval Options
@@ -1102,13 +1111,13 @@ namespace OpenDental.InternalTools.Job_Manager {
 			_jobCur.ListJobNotes  =jobMerge.ListJobNotes;
 			_jobCur.ListJobQuotes =jobMerge.ListJobQuotes;
 			_jobCur.ListJobReviews=jobMerge.ListJobReviews;
-			_jobCur.ListJobEvents =jobMerge.ListJobEvents;
+			_jobCur.ListJobLogs   =jobMerge.ListJobLogs;
 			//Update Old lists too
 			_jobOld.ListJobLinks  =jobMerge.ListJobLinks.Select(x=>x.Copy()).ToList();
 			_jobOld.ListJobNotes  =jobMerge.ListJobNotes.Select(x => x.Copy()).ToList();
 			_jobOld.ListJobQuotes =jobMerge.ListJobQuotes.Select(x => x.Copy()).ToList();
 			_jobOld.ListJobReviews=jobMerge.ListJobReviews.Select(x => x.Copy()).ToList();
-			_jobOld.ListJobEvents =jobMerge.ListJobEvents.Select(x => x.Copy()).ToList();
+			_jobOld.ListJobLogs   =jobMerge.ListJobLogs.Select(x => x.Copy()).ToList();
 			//JOB ROLE USER NUMS
 			_jobCur.UserNumApproverChange=jobMerge.UserNumApproverChange;
 			_jobCur.UserNumApproverConcept=jobMerge.UserNumApproverConcept;
@@ -1297,7 +1306,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 			SaveJob(_jobCur);
 		}
 
-		///<summary>Job must have all in memory fields filled. Eg. Job.ListJobLinks, Job.ListJobNotes, etc.</summary>
+		///<summary>Job must have all in memory fields filled. Eg. Job.ListJobLinks, Job.ListJobNotes, etc. Also makes some of the JobLog entries.</summary>
 		private void SaveJob(Job job) {
 			_isLoading=true;
 			//Validation must happen before this is called.
@@ -1305,9 +1314,6 @@ namespace OpenDental.InternalTools.Job_Manager {
 			job.Documentation=textEditorDocumentation.MainRtf;
 			job.HoursActual=PIn.Int(textActualHours.Text);
 			job.HoursEstimate=PIn.Int(textEstHours.Text);
-			if(IsChangeRequest) {
-				job.IsApprovalNeeded=true;
-			}
 			//job.Priority=(JobPriority)comboPriority.SelectedIndex;
 			//job.JobStatus=(JobStat)comboStatus.SelectedIndex;
 			//job.Category=(JobCategory)comboCategory.SelectedIndex;
@@ -1331,26 +1337,7 @@ namespace OpenDental.InternalTools.Job_Manager {
 			JobNotes.Sync(job.ListJobNotes,job.JobNum);
 			JobReviews.Sync(job.ListJobReviews,job.JobNum);
 			JobQuotes.Sync(job.ListJobQuotes,job.JobNum);
-			//JobEvents.Sync();//do not sync
-			if(job.UserNumEngineer!=_jobOld.UserNumEngineer || job.PhaseCur!=_jobOld.PhaseCur || job.Description!=_jobOld.Description) {
-				JobEvent jobEventCur=new JobEvent();
-				//Must do text manipulation inside the RichTextbox to preserve RTF Formatting.
-				try {
-					textEditorMain.MainRtf=_jobOld.Description;
-				}
-				catch {
-					textEditorMain.MainText=_jobOld.Description;
-				}
-				if(_isOverride) {
-					textEditorMain.MainText=textEditorMain.MainText.Insert(0,"THIS JOB WAS MANUALLY OVERRIDDEN BY "+Security.CurUser.UserName+":\r\n");
-				}
-				jobEventCur.Description=textEditorMain.MainRtf;
-				jobEventCur.JobNum=_jobOld.JobNum;
-				jobEventCur.JobStatus=_jobOld.PhaseCur;
-				jobEventCur.UserNumEvent=Security.CurUser.UserNum;
-				JobEvents.Insert(jobEventCur);
-				job.ListJobEvents.Add(JobEvents.GetOne(jobEventCur.JobEventNum));//to get correct time stamp
-			}
+			MakeLogEntry(job,_jobOld);
 			Signalods.SetInvalid(InvalidType.Jobs,KeyType.Job,job.JobNum);
 			LoadJob(job,_treeNode);//Tree view may become out of date if viewing a job for an extended period of time.
 			if(SaveClick!=null) {
@@ -1768,9 +1755,6 @@ namespace OpenDental.InternalTools.Job_Manager {
 				Job job = Jobs.GetOne(_jobCur.JobNum);
 				job.Description=textEditorMain.MainRtf;
 				job.Documentation=textEditorDocumentation.MainRtf;
-				if(IsChangeRequest) {
-					job.IsApprovalNeeded=true;
-				}
 				job.UserNumCheckout=0;
 				Jobs.Update(job);
 				IsChanged=false;
@@ -1842,8 +1826,15 @@ namespace OpenDental.InternalTools.Job_Manager {
 		}
 
 		private void gridHistory_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			FormJobHistoryView FormJHV=new FormJobHistoryView((long)gridHistory.Rows[e.Row].Tag);
-			FormJHV.ShowDialog();
+			if(string.IsNullOrWhiteSpace(gridHistory.Rows[e.Row].Cells[4].Text) //because JobLog.MainRTF is not an empty string when it is blank.
+				|| !(gridHistory.Rows[e.Row].Tag is JobLog)) 
+			{
+				return;
+			}
+			JobLog jobLog = (JobLog)gridHistory.Rows[e.Row].Tag;
+			FormSpellChecker FormSC = new FormSpellChecker();
+			FormSC.SetText(jobLog.MainRTF);
+			FormSC.ShowDialog();
 		}
 
 		private void gridNotes_CellDoubleClick(object sender,ODGridClickEventArgs e) {
@@ -2037,6 +2028,20 @@ namespace OpenDental.InternalTools.Job_Manager {
 			catch(Exception ex) {
 				MessageBox.Show("Unable to open file.");
 			}
+		}
+
+		private void checkShowHistoryText_CheckedChanged(object sender,EventArgs e) {
+			FillGridHistory();
+		}
+
+		///<summary>Adds error checking to the input parameters for JobLogs.MakeLogEntry also inserts joblog into the UI and _jobCur.ListJobLog if returned.</summary>
+		private void MakeLogEntry(Job jobNew,Job jobOld) {
+			JobLog jobLog = JobLogs.MakeLogEntry(jobNew,jobOld);
+			if(jobLog==null) {
+				return;
+			}
+			_jobCur.ListJobLogs.Add(jobLog);
+			FillGridHistory();
 		}
 
 	}//end class
