@@ -80,12 +80,12 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (taskList.TaskListNum),
 					            taskList.Descript,
 					POut.Long  (taskList.Parent),
-					POut.Date  (taskList.DateTL),
+					POut.DateT (taskList.DateTL,false),
 					POut.Bool  (taskList.IsRepeating),
 					POut.Int   ((int)taskList.DateType),
 					POut.Long  (taskList.FromNum),
 					POut.Int   ((int)taskList.ObjectType),
-					POut.DateT (taskList.DateTimeEntry),
+					POut.DateT (taskList.DateTimeEntry,false),
 				});
 			}
 			return table;

@@ -84,8 +84,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Bool  (feeSched.IsHidden),
 					POut.Bool  (feeSched.IsGlobal),
 					POut.Long  (feeSched.SecUserNumEntry),
-					POut.Date  (feeSched.SecDateEntry),
-					POut.DateT (feeSched.SecDateTEdit),
+					POut.DateT (feeSched.SecDateEntry,false),
+					POut.DateT (feeSched.SecDateTEdit,false),
 				});
 			}
 			return table;

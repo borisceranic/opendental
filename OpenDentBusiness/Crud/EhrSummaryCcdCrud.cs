@@ -71,7 +71,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (ehrSummaryCcd.EhrSummaryCcdNum),
 					POut.Long  (ehrSummaryCcd.PatNum),
-					POut.Date  (ehrSummaryCcd.DateSummary),
+					POut.DateT (ehrSummaryCcd.DateSummary,false),
 					            ehrSummaryCcd.ContentSummary,
 					POut.Long  (ehrSummaryCcd.EmailAttachNum),
 				});

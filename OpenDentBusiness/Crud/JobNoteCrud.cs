@@ -72,7 +72,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (jobNote.JobNoteNum),
 					POut.Long  (jobNote.JobNum),
 					POut.Long  (jobNote.UserNum),
-					POut.DateT (jobNote.DateTimeNote),
+					POut.DateT (jobNote.DateTimeNote,false),
 					            jobNote.Note,
 				});
 			}

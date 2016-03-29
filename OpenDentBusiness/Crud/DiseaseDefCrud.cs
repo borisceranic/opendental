@@ -79,7 +79,7 @@ namespace OpenDentBusiness.Crud{
 					            diseaseDef.DiseaseName,
 					POut.Int   (diseaseDef.ItemOrder),
 					POut.Bool  (diseaseDef.IsHidden),
-					POut.DateT (diseaseDef.DateTStamp),
+					POut.DateT (diseaseDef.DateTStamp,false),
 					            diseaseDef.ICD9Code,
 					            diseaseDef.SnomedCode,
 					            diseaseDef.Icd10Code,

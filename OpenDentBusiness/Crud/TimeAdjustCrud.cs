@@ -75,7 +75,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (timeAdjust.TimeAdjustNum),
 					POut.Long  (timeAdjust.EmployeeNum),
-					POut.DateT (timeAdjust.TimeEntry),
+					POut.DateT (timeAdjust.TimeEntry,false),
 					POut.Time  (timeAdjust.RegHours),
 					POut.Time  (timeAdjust.OTimeHours),
 					            timeAdjust.Note,

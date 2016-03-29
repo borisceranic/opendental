@@ -133,7 +133,7 @@ namespace OpenDentBusiness.Crud{
 					            medLabResult.ReferenceRange,
 					POut.Int   ((int)medLabResult.AbnormalFlag),
 					POut.Int   ((int)medLabResult.ResultStatus),
-					POut.DateT (medLabResult.DateTimeObs),
+					POut.DateT (medLabResult.DateTimeObs,false),
 					            medLabResult.FacilityID,
 					POut.Long  (medLabResult.DocNum),
 					            medLabResult.Note,

@@ -89,7 +89,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (commlog.CommlogNum),
 					POut.Long  (commlog.PatNum),
-					POut.DateT (commlog.CommDateTime),
+					POut.DateT (commlog.CommDateTime,false),
 					POut.Long  (commlog.CommType),
 					            commlog.Note,
 					POut.Int   ((int)commlog.Mode_),
@@ -97,8 +97,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (commlog.UserNum),
 					            commlog.Signature,
 					POut.Bool  (commlog.SigIsTopaz),
-					POut.DateT (commlog.DateTStamp),
-					POut.DateT (commlog.DateTimeEnd),
+					POut.DateT (commlog.DateTStamp,false),
+					POut.DateT (commlog.DateTimeEnd,false),
 					POut.Int   ((int)commlog.CommSource),
 					POut.Long  (commlog.ProgramNum),
 				});

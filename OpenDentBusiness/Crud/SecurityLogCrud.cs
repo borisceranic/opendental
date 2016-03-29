@@ -82,7 +82,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (securityLog.SecurityLogNum),
 					POut.Int   ((int)securityLog.PermType),
 					POut.Long  (securityLog.UserNum),
-					POut.DateT (securityLog.LogDateTime),
+					POut.DateT (securityLog.LogDateTime,false),
 					            securityLog.LogText,
 					POut.Long  (securityLog.PatNum),
 					            securityLog.CompName,

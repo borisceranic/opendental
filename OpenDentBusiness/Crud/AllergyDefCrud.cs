@@ -76,7 +76,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (allergyDef.AllergyDefNum),
 					            allergyDef.Description,
 					POut.Bool  (allergyDef.IsHidden),
-					POut.DateT (allergyDef.DateTStamp),
+					POut.DateT (allergyDef.DateTStamp,false),
 					POut.Int   ((int)allergyDef.SnomedType),
 					POut.Long  (allergyDef.MedicationNum),
 					            allergyDef.UniiCode,

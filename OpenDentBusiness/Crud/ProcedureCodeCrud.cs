@@ -144,7 +144,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Int   (procedureCode.BaseUnits),
 					            procedureCode.SubstitutionCode,
 					POut.Int   ((int)procedureCode.SubstOnlyIf),
-					POut.DateT (procedureCode.DateTStamp),
+					POut.DateT (procedureCode.DateTStamp,false),
 					POut.Bool  (procedureCode.IsMultiVisit),
 					            procedureCode.DrugNDC,
 					            procedureCode.RevenueCodeDefault,

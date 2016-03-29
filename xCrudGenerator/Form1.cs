@@ -335,15 +335,7 @@ using System.Drawing;"+rn);
 				strb.Append(rn+t5);
 				//Fields are not guaranteed to be in any particular order.
 				specialType=CrudGenHelper.GetSpecialType(field);
-				if(specialType==CrudSpecialColType.DateT
-					|| specialType==CrudSpecialColType.TimeStamp
-					|| specialType==CrudSpecialColType.DateTEntry
-					|| specialType==CrudSpecialColType.DateTEntryEditable) 
-				{
-					//specialTypes.DateEntry and DateEntryEditable is handled fine by the normal DateTime (date) below.
-					strb.Append("POut.DateT (");
-				}
-				else if(specialType==CrudSpecialColType.TimeSpanNeg) {
+				if(specialType==CrudSpecialColType.TimeSpanNeg) {
 					strb.Append("POut.Time  (");
 				}
 				else if(field.FieldType.IsEnum) {
@@ -361,8 +353,8 @@ using System.Drawing;"+rn);
 						case "Byte":
 							strb.Append("POut.Byte  (");
 							break;
-						case "DateTime"://This ONLY handles date, not dateT which is a special type.
-							strb.Append("POut.Date  (");
+						case "DateTime":
+							strb.Append("POut.DateT (");
 							break;
 						case "Double":
 							strb.Append("POut.Double(");
@@ -388,6 +380,7 @@ using System.Drawing;"+rn);
 				strb.Append(classLowerCase+"."+field.Name
 					+(field.FieldType.Name=="Color" ? ".ToArgb()" : "")
 					+(field.FieldType.Name=="Interval" ? ".ToInt()" : "")
+					+(field.FieldType.Name=="DateTime" ? ",false" : "")
 					+(field.FieldType.Name=="String" ? "" : ")")
 					+",");
 			}

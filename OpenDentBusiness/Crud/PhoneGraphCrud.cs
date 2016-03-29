@@ -70,7 +70,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (phoneGraph.PhoneGraphNum),
 					POut.Long  (phoneGraph.EmployeeNum),
 					POut.Bool  (phoneGraph.IsGraphed),
-					POut.Date  (phoneGraph.DateEntry),
+					POut.DateT (phoneGraph.DateEntry,false),
 				});
 			}
 			return table;

@@ -93,7 +93,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (payment.PayNum),
 					POut.Long  (payment.PayType),
-					POut.Date  (payment.PayDate),
+					POut.DateT (payment.PayDate,false),
 					POut.Double(payment.PayAmt),
 					            payment.CheckNum,
 					            payment.BankBranch,
@@ -101,12 +101,12 @@ namespace OpenDentBusiness.Crud{
 					POut.Bool  (payment.IsSplit),
 					POut.Long  (payment.PatNum),
 					POut.Long  (payment.ClinicNum),
-					POut.Date  (payment.DateEntry),
+					POut.DateT (payment.DateEntry,false),
 					POut.Long  (payment.DepositNum),
 					            payment.Receipt,
 					POut.Bool  (payment.IsRecurringCC),
 					POut.Long  (payment.SecUserNumEntry),
-					POut.DateT (payment.SecDateTEdit),
+					POut.DateT (payment.SecDateTEdit,false),
 				});
 			}
 			return table;

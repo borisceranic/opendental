@@ -83,10 +83,10 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (disease.PatNum),
 					POut.Long  (disease.DiseaseDefNum),
 					            disease.PatNote,
-					POut.DateT (disease.DateTStamp),
+					POut.DateT (disease.DateTStamp,false),
 					POut.Int   ((int)disease.ProbStatus),
-					POut.Date  (disease.DateStart),
-					POut.Date  (disease.DateStop),
+					POut.DateT (disease.DateStart,false),
+					POut.DateT (disease.DateStop,false),
 					            disease.SnomedProblemType,
 					POut.Int   ((int)disease.FunctionStatus),
 				});

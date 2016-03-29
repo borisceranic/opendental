@@ -76,7 +76,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (medicalOrder.MedicalOrderNum),
 					POut.Int   ((int)medicalOrder.MedOrderType),
 					POut.Long  (medicalOrder.PatNum),
-					POut.DateT (medicalOrder.DateTimeOrder),
+					POut.DateT (medicalOrder.DateTimeOrder,false),
 					            medicalOrder.Description,
 					POut.Bool  (medicalOrder.IsDiscontinued),
 					POut.Long  (medicalOrder.ProvNum),

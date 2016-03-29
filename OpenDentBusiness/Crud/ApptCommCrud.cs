@@ -70,7 +70,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (apptComm.ApptCommNum),
 					POut.Long  (apptComm.ApptNum),
 					POut.Int   ((int)apptComm.ApptCommType),
-					POut.DateT (apptComm.DateTimeSend),
+					POut.DateT (apptComm.DateTimeSend,false),
 				});
 			}
 			return table;

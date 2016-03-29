@@ -72,7 +72,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (erxLog.ErxLogNum),
 					POut.Long  (erxLog.PatNum),
 					            erxLog.MsgText,
-					POut.DateT (erxLog.DateTStamp),
+					POut.DateT (erxLog.DateTStamp,false),
 					POut.Long  (erxLog.ProvNum),
 				});
 			}

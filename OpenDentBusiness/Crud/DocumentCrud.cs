@@ -107,7 +107,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (document.DocNum),
 					            document.Description,
-					POut.DateT (document.DateCreated),
+					POut.DateT (document.DateCreated,false),
 					POut.Long  (document.DocCategory),
 					POut.Long  (document.PatNum),
 					            document.FileName,
@@ -125,7 +125,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Int   (document.WindowingMin),
 					POut.Int   (document.WindowingMax),
 					POut.Long  (document.MountItemNum),
-					POut.DateT (document.DateTStamp),
+					POut.DateT (document.DateTStamp,false),
 					            document.RawBase64,
 					            document.Thumbnail,
 				});

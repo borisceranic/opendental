@@ -148,19 +148,19 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (job.UserNumCheckout),
 					POut.Long  (job.UserNumInfo),
 					POut.Long  (job.ParentNum),
-					POut.DateT (job.DateTimeCustContact),
+					POut.DateT (job.DateTimeCustContact,false),
 					POut.Int   ((int)job.Priority),
 					POut.Int   ((int)job.Category),
 					            job.JobVersion,
 					POut.Int   (job.HoursEstimate),
 					POut.Int   (job.HoursActual),
-					POut.DateT (job.DateTimeEntry),
+					POut.DateT (job.DateTimeEntry,false),
 					            job.Description,
 					            job.Documentation,
 					            job.Title,
 					POut.Int   ((int)job.PhaseCur),
 					POut.Bool  (job.IsApprovalNeeded),
-					POut.DateT (job.AckDateTime),
+					POut.DateT (job.AckDateTime,false),
 				});
 			}
 			return table;

@@ -83,7 +83,7 @@ namespace OpenDentBusiness.Crud{
 					            intervention.CodeValue,
 					            intervention.CodeSystem,
 					            intervention.Note,
-					POut.Date  (intervention.DateEntry),
+					POut.DateT (intervention.DateEntry,false),
 					POut.Int   ((int)intervention.CodeSet),
 					POut.Bool  (intervention.IsPatDeclined),
 				});

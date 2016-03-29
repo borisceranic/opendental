@@ -158,7 +158,7 @@ namespace OpenDentBusiness.Crud{
 					            claimProc.Remarks,
 					POut.Long  (claimProc.ClaimPaymentNum),
 					POut.Long  (claimProc.PlanNum),
-					POut.Date  (claimProc.DateCP),
+					POut.DateT (claimProc.DateCP,false),
 					POut.Double(claimProc.WriteOff),
 					            claimProc.CodeSent,
 					POut.Double(claimProc.AllowedOverride),
@@ -169,8 +169,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Double(claimProc.PaidOtherIns),
 					POut.Double(claimProc.BaseEst),
 					POut.Double(claimProc.CopayOverride),
-					POut.Date  (claimProc.ProcDate),
-					POut.Date  (claimProc.DateEntry),
+					POut.DateT (claimProc.ProcDate,false),
+					POut.DateT (claimProc.DateEntry,false),
 					POut.Byte  (claimProc.LineNumber),
 					POut.Double(claimProc.DedEst),
 					POut.Double(claimProc.DedEstOverride),
@@ -186,8 +186,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (claimProc.PayPlanNum),
 					POut.Long  (claimProc.ClaimPaymentTracking),
 					POut.Long  (claimProc.SecUserNumEntry),
-					POut.Date  (claimProc.SecDateEntry),
-					POut.DateT (claimProc.SecDateTEdit),
+					POut.DateT (claimProc.SecDateEntry,false),
+					POut.DateT (claimProc.SecDateTEdit,false),
 				});
 			}
 			return table;

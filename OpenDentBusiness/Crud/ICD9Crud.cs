@@ -70,7 +70,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (iCD9.ICD9Num),
 					            iCD9.ICD9Code,
 					            iCD9.Description,
-					POut.DateT (iCD9.DateTStamp),
+					POut.DateT (iCD9.DateTStamp,false),
 				});
 			}
 			return table;

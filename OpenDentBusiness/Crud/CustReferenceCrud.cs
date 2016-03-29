@@ -71,7 +71,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (custReference.CustReferenceNum),
 					POut.Long  (custReference.PatNum),
-					POut.Date  (custReference.DateMostRecent),
+					POut.DateT (custReference.DateMostRecent,false),
 					            custReference.Note,
 					POut.Bool  (custReference.IsBadRef),
 				});

@@ -71,7 +71,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (orthoChart.OrthoChartNum),
 					POut.Long  (orthoChart.PatNum),
-					POut.Date  (orthoChart.DateService),
+					POut.DateT (orthoChart.DateService,false),
 					            orthoChart.FieldName,
 					            orthoChart.FieldValue,
 				});

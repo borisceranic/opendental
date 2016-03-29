@@ -83,7 +83,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (labPanel.PatNum),
 					            labPanel.RawMessage,
 					            labPanel.LabNameAddress,
-					POut.DateT (labPanel.DateTStamp),
+					POut.DateT (labPanel.DateTStamp,false),
 					            labPanel.SpecimenCondition,
 					            labPanel.SpecimenSource,
 					            labPanel.ServiceId,

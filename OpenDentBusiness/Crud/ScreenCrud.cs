@@ -107,7 +107,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Int   ((int)screen.EarlyChildCaries),
 					POut.Int   ((int)screen.ExistingSealants),
 					POut.Int   ((int)screen.MissingAllTeeth),
-					POut.Date  (screen.Birthdate),
+					POut.DateT (screen.Birthdate,false),
 					POut.Long  (screen.ScreenGroupNum),
 					POut.Int   (screen.ScreenGroupOrder),
 					            screen.Comments,

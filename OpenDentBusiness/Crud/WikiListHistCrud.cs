@@ -76,7 +76,7 @@ namespace OpenDentBusiness.Crud{
 					            wikiListHist.ListName,
 					            wikiListHist.ListHeaders,
 					            wikiListHist.ListContent,
-					POut.DateT (wikiListHist.DateTimeSaved),
+					POut.DateT (wikiListHist.DateTimeSaved,false),
 				});
 			}
 			return table;

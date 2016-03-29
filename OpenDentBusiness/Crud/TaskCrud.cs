@@ -89,7 +89,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (task.TaskNum),
 					POut.Long  (task.TaskListNum),
-					POut.Date  (task.DateTask),
+					POut.DateT (task.DateTask,false),
 					POut.Long  (task.KeyNum),
 					            task.Descript,
 					POut.Int   ((int)task.TaskStatus),
@@ -97,9 +97,9 @@ namespace OpenDentBusiness.Crud{
 					POut.Int   ((int)task.DateType),
 					POut.Long  (task.FromNum),
 					POut.Int   ((int)task.ObjectType),
-					POut.DateT (task.DateTimeEntry),
+					POut.DateT (task.DateTimeEntry,false),
 					POut.Long  (task.UserNum),
-					POut.DateT (task.DateTimeFinished),
+					POut.DateT (task.DateTimeFinished,false),
 					POut.Long  (task.PriorityDefNum),
 				});
 			}

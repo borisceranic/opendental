@@ -71,7 +71,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (supplyOrder.SupplyOrderNum),
 					POut.Long  (supplyOrder.SupplierNum),
-					POut.Date  (supplyOrder.DatePlaced),
+					POut.DateT (supplyOrder.DatePlaced,false),
 					            supplyOrder.Note,
 					POut.Double(supplyOrder.AmountTotal),
 				});

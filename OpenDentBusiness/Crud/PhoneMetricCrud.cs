@@ -70,7 +70,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(PhoneMetric phoneMetric in listPhoneMetrics) {
 				table.Rows.Add(new object[] {
 					POut.Long  (phoneMetric.PhoneMetricNum),
-					POut.DateT (phoneMetric.DateTimeEntry),
+					POut.DateT (phoneMetric.DateTimeEntry,false),
 					POut.Int   (phoneMetric.VoiceMails),
 					POut.Int   (phoneMetric.Triages),
 					POut.Int   (phoneMetric.MinutesBehind),

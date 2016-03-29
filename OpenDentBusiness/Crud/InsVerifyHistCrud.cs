@@ -79,12 +79,12 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (insVerifyHist.InsVerifyHistNum),
 					POut.Long  (insVerifyHist.InsVerifyNum),
-					POut.Date  (insVerifyHist.DateLastVerified),
+					POut.DateT (insVerifyHist.DateLastVerified,false),
 					POut.Long  (insVerifyHist.UserNum),
 					POut.Int   ((int)insVerifyHist.VerifyType),
 					POut.Long  (insVerifyHist.FKey),
 					POut.Long  (insVerifyHist.DefNum),
-					POut.Date  (insVerifyHist.DateLastAssigned),
+					POut.DateT (insVerifyHist.DateLastAssigned,false),
 					            insVerifyHist.Note,
 				});
 			}

@@ -70,7 +70,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(GroupPermission groupPermission in listGroupPermissions) {
 				table.Rows.Add(new object[] {
 					POut.Long  (groupPermission.GroupPermNum),
-					POut.Date  (groupPermission.NewerDate),
+					POut.DateT (groupPermission.NewerDate,false),
 					POut.Int   (groupPermission.NewerDays),
 					POut.Long  (groupPermission.UserGroupNum),
 					POut.Int   ((int)groupPermission.PermType),

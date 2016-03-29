@@ -78,8 +78,8 @@ namespace OpenDentBusiness.Crud{
 					            patField.FieldName,
 					            patField.FieldValue,
 					POut.Long  (patField.SecUserNumEntry),
-					POut.Date  (patField.SecDateEntry),
-					POut.DateT (patField.SecDateTEdit),
+					POut.DateT (patField.SecDateEntry,false),
+					POut.DateT (patField.SecDateTEdit,false),
 				});
 			}
 			return table;

@@ -89,18 +89,18 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (recall.RecallNum),
 					POut.Long  (recall.PatNum),
-					POut.Date  (recall.DateDueCalc),
-					POut.Date  (recall.DateDue),
-					POut.Date  (recall.DatePrevious),
+					POut.DateT (recall.DateDueCalc,false),
+					POut.DateT (recall.DateDue,false),
+					POut.DateT (recall.DatePrevious,false),
 					POut.Int   (recall.RecallInterval.ToInt()),
 					POut.Long  (recall.RecallStatus),
 					            recall.Note,
 					POut.Bool  (recall.IsDisabled),
-					POut.DateT (recall.DateTStamp),
+					POut.DateT (recall.DateTStamp,false),
 					POut.Long  (recall.RecallTypeNum),
 					POut.Double(recall.DisableUntilBalance),
-					POut.Date  (recall.DisableUntilDate),
-					POut.Date  (recall.DateScheduled),
+					POut.DateT (recall.DisableUntilDate,false),
+					POut.DateT (recall.DateScheduled,false),
 				});
 			}
 			return table;

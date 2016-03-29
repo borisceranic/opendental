@@ -89,9 +89,9 @@ namespace OpenDentBusiness.Crud{
 					            ehrAmendment.SourceName,
 					            ehrAmendment.FileName,
 					            ehrAmendment.RawBase64,
-					POut.DateT (ehrAmendment.DateTRequest),
-					POut.DateT (ehrAmendment.DateTAcceptDeny),
-					POut.DateT (ehrAmendment.DateTAppend),
+					POut.DateT (ehrAmendment.DateTRequest,false),
+					POut.DateT (ehrAmendment.DateTAcceptDeny,false),
+					POut.DateT (ehrAmendment.DateTAppend,false),
 				});
 			}
 			return table;

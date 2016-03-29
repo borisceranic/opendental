@@ -75,7 +75,7 @@ namespace OpenDentBusiness.Crud{
 					            medication.MedName,
 					POut.Long  (medication.GenericNum),
 					            medication.Notes,
-					POut.DateT (medication.DateTStamp),
+					POut.DateT (medication.DateTStamp,false),
 					POut.Long  (medication.RxCui),
 				});
 			}

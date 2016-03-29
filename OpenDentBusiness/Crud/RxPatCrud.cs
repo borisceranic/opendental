@@ -95,7 +95,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (rxPat.RxNum),
 					POut.Long  (rxPat.PatNum),
-					POut.Date  (rxPat.RxDate),
+					POut.DateT (rxPat.RxDate,false),
 					            rxPat.Drug,
 					            rxPat.Sig,
 					            rxPat.Disp,
@@ -104,7 +104,7 @@ namespace OpenDentBusiness.Crud{
 					            rxPat.Notes,
 					POut.Long  (rxPat.PharmacyNum),
 					POut.Bool  (rxPat.IsControlled),
-					POut.DateT (rxPat.DateTStamp),
+					POut.DateT (rxPat.DateTStamp,false),
 					POut.Int   ((int)rxPat.SendStatus),
 					POut.Long  (rxPat.RxCui),
 					            rxPat.DosageCode,

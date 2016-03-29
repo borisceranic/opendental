@@ -80,7 +80,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(EhrMeasureEvent ehrMeasureEvent in listEhrMeasureEvents) {
 				table.Rows.Add(new object[] {
 					POut.Long  (ehrMeasureEvent.EhrMeasureEventNum),
-					POut.DateT (ehrMeasureEvent.DateTEvent),
+					POut.DateT (ehrMeasureEvent.DateTEvent,false),
 					POut.Int   ((int)ehrMeasureEvent.EventType),
 					POut.Long  (ehrMeasureEvent.PatNum),
 					            ehrMeasureEvent.MoreInfo,

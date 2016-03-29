@@ -67,7 +67,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (computer.ComputerNum),
 					            computer.CompName,
-					POut.DateT (computer.LastHeartBeat),
+					POut.DateT (computer.LastHeartBeat,false),
 				});
 			}
 			return table;

@@ -87,13 +87,13 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (refAttach.ReferralNum),
 					POut.Long  (refAttach.PatNum),
 					POut.Int   (refAttach.ItemOrder),
-					POut.Date  (refAttach.RefDate),
+					POut.DateT (refAttach.RefDate,false),
 					POut.Bool  (refAttach.IsFrom),
 					POut.Int   ((int)refAttach.RefToStatus),
 					            refAttach.Note,
 					POut.Bool  (refAttach.IsTransitionOfCare),
 					POut.Long  (refAttach.ProcNum),
-					POut.Date  (refAttach.DateProcComplete),
+					POut.DateT (refAttach.DateProcComplete,false),
 					POut.Long  (refAttach.ProvNum),
 				});
 			}

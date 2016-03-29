@@ -94,7 +94,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (smsFromMobile.ClinicNum),
 					POut.Long  (smsFromMobile.CommlogNum),
 					            smsFromMobile.MsgText,
-					POut.DateT (smsFromMobile.DateTimeReceived),
+					POut.DateT (smsFromMobile.DateTimeReceived,false),
 					            smsFromMobile.SmsPhoneNumber,
 					            smsFromMobile.MobilePhoneNumber,
 					POut.Int   (smsFromMobile.MsgPart),

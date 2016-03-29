@@ -70,7 +70,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(Transaction transaction in listTransactions) {
 				table.Rows.Add(new object[] {
 					POut.Long  (transaction.TransactionNum),
-					POut.DateT (transaction.DateTimeEntry),
+					POut.DateT (transaction.DateTimeEntry,false),
 					POut.Long  (transaction.UserNum),
 					POut.Long  (transaction.DepositNum),
 					POut.Long  (transaction.PayNum),

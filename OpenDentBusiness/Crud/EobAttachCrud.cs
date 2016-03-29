@@ -71,7 +71,7 @@ namespace OpenDentBusiness.Crud{
 				table.Rows.Add(new object[] {
 					POut.Long  (eobAttach.EobAttachNum),
 					POut.Long  (eobAttach.ClaimPaymentNum),
-					POut.DateT (eobAttach.DateTCreated),
+					POut.DateT (eobAttach.DateTCreated,false),
 					            eobAttach.FileName,
 					            eobAttach.RawBase64,
 				});

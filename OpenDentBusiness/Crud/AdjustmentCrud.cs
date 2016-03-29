@@ -88,19 +88,19 @@ namespace OpenDentBusiness.Crud{
 			foreach(Adjustment adjustment in listAdjustments) {
 				table.Rows.Add(new object[] {
 					POut.Long  (adjustment.AdjNum),
-					POut.Date  (adjustment.AdjDate),
+					POut.DateT (adjustment.AdjDate,false),
 					POut.Double(adjustment.AdjAmt),
 					POut.Long  (adjustment.PatNum),
 					POut.Long  (adjustment.AdjType),
 					POut.Long  (adjustment.ProvNum),
 					            adjustment.AdjNote,
-					POut.Date  (adjustment.ProcDate),
+					POut.DateT (adjustment.ProcDate,false),
 					POut.Long  (adjustment.ProcNum),
-					POut.Date  (adjustment.DateEntry),
+					POut.DateT (adjustment.DateEntry,false),
 					POut.Long  (adjustment.ClinicNum),
 					POut.Long  (adjustment.StatementNum),
 					POut.Long  (adjustment.SecUserNumEntry),
-					POut.DateT (adjustment.SecDateTEdit),
+					POut.DateT (adjustment.SecDateTEdit,false),
 				});
 			}
 			return table;

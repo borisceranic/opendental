@@ -82,7 +82,7 @@ namespace OpenDentBusiness.Crud{
 			foreach(Schedule schedule in listSchedules) {
 				table.Rows.Add(new object[] {
 					POut.Long  (schedule.ScheduleNum),
-					POut.Date  (schedule.SchedDate),
+					POut.DateT (schedule.SchedDate,false),
 					POut.Time  (schedule.StartTime),
 					POut.Time  (schedule.StopTime),
 					POut.Int   ((int)schedule.SchedType),
@@ -91,7 +91,7 @@ namespace OpenDentBusiness.Crud{
 					            schedule.Note,
 					POut.Int   ((int)schedule.Status),
 					POut.Long  (schedule.EmployeeNum),
-					POut.DateT (schedule.DateTStamp),
+					POut.DateT (schedule.DateTStamp,false),
 				});
 			}
 			return table;
