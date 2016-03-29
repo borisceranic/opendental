@@ -44,5 +44,3 @@ namespace OpenDentBusiness {
 
 }
 
-
-// ALTER TABLE joblink ADD Tag varchar(255) NOT NULL

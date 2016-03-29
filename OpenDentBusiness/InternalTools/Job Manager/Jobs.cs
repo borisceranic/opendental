@@ -58,7 +58,7 @@ namespace OpenDentBusiness {
 			//JobReviews.DeleteForJob(jobNum);//do not delete, blocked above
 			//JobQuotes.DeleteForJob(jobNum);//do not delete, blocked above
 			JobLinks.DeleteForJob(jobNum);
-			JobEvents.DeleteForJob(jobNum);
+			JobLogs.DeleteForJob(jobNum);
 			JobNotes.DeleteForJob(jobNum);
 			Crud.JobCrud.Delete(jobNum); //Finally, delete the job itself.
 		}
@@ -98,7 +98,7 @@ namespace OpenDentBusiness {
 			Dictionary<long,List<JobNote>> listJobNotesAll=JobNotes.GetJobNotesForJobs(jobNums).GroupBy(x => x.JobNum).ToDictionary(x => x.Key,x => x.ToList());
 			Dictionary<long,List<JobReview>> listJobReviewsAll=JobReviews.GetJobReviewsForJobs(jobNums).GroupBy(x => x.JobNum).ToDictionary(x => x.Key,x => x.ToList());
 			Dictionary<long,List<JobQuote>> listJobQuotesAll=JobQuotes.GetJobQuotesForJobs(jobNums).GroupBy(x => x.JobNum).ToDictionary(x => x.Key,x => x.ToList());
-			Dictionary<long,List<JobEvent>> listJobEventsAll=JobEvents.GetJobEventsForJobs(jobNums).GroupBy(x => x.JobNum).ToDictionary(x => x.Key,x => x.ToList());
+			Dictionary<long,List<JobLog>> listJobLogsAll = JobLogs.GetJobLogsForJobs(jobNums).GroupBy(x => x.JobNum).ToDictionary(x => x.Key,x => x.ToList());
 			for(int i=0;i<listJobsAll.Count;i++) {
 				Job job=listJobsAll[i];
 				if(!listJobLinksAll.TryGetValue(job.JobNum,out job.ListJobLinks)) {
@@ -113,8 +113,8 @@ namespace OpenDentBusiness {
 				if(!listJobQuotesAll.TryGetValue(job.JobNum,out job.ListJobQuotes)) {
 					job.ListJobQuotes=new List<JobQuote>();//empty list if not found
 				}
-				if(!listJobEventsAll.TryGetValue(job.JobNum,out job.ListJobEvents)) {
-					job.ListJobEvents=new List<JobEvent>();//empty list if not found
+				if(!listJobLogsAll.TryGetValue(job.JobNum,out job.ListJobLogs)) {
+					job.ListJobLogs=new List<JobLog>();//empty list if not found
 				}
 			}
 		}
@@ -224,6 +224,7 @@ namespace OpenDentBusiness {
 			return Db.GetTable(command);
 		}
 
+
 		public class JobEmail {
 			public Patient Pat;
 			public string EmailAddress;
@@ -234,7 +235,7 @@ namespace OpenDentBusiness {
 			public bool IsTask;
 			public bool IsFeatureReq;
 			public bool IsSend;
-			///<summary>UI field to display send, errors.</summary>
+			///<summary>UI field to display send errors.</summary>
 			public string StatusMsg;
 		}
 
@@ -242,88 +243,3 @@ namespace OpenDentBusiness {
 	}
 }
 
-/*Convert script to convert the customer DB 
-#15.4... ot 16.1
-ALTER TABLE job ADD UserNumConcept BIGINT NOT NULL;
-ALTER TABLE job ADD UserNumExpert BIGINT NOT NULL;
-ALTER TABLE job ADD UserNumEngineer BIGINT NOT NULL;
-ALTER TABLE job ADD UserNumApproverConcept BIGINT NOT NULL;
-ALTER TABLE job ADD UserNumApproverJob BIGINT NOT NULL;
-ALTER TABLE job ADD UserNumApproverChange BIGINT NOT NULL;
-ALTER TABLE job ADD UserNumDocumenter BIGINT NOT NULL;
-ALTER TABLE job ADD UserNumCustContact BIGINT NOT NULL;
-ALTER TABLE job ADD UserNumCheckout BIGINT NOT NULL;
-ALTER TABLE job ADD UserNumInfo BIGINT NOT NULL;
-ALTER TABLE job ADD DateTimeCustContact DATETIME NOT NULL DEFAULT '0001-01-01';
-
-ALTER TABLE job ADD Documentation TEXT NOT NULL;
-# ALTER TABLE job DROP COLUMN Documentaion;
-
-ALTER TABLE job ADD IsApprovalNeeded TINYINT NOT NULL;
-ALTER TABLE job ADD AckDateTime DATETIME NOT NULL DEFAULT '0001-01-01';
-
-
-UPDATE job SET IsApprovalNeeded = 1 WHERE jobstatus IN('NeedsConceptApproval','NeedsJobApproval');
-
-UPDATE job SET UserNumExpert = ExpertNum;
-UPDATE job SET jobstatus = 'Concept', UserNumConcept = OwnerNum WHERE jobstatus = 'Concept';
-UPDATE job SET jobstatus = 'Concept'                                WHERE jobstatus = 'NeedsConceptApproval';
-
-UPDATE job SET jobstatus = 'Definiton', UserNumApproverConcept = 9 WHERE jobstatus = 'ConceptApproved';
-UPDATE job SET jobstatus = 'Definiton', UserNumApproverConcept = 9 WHERE jobstatus = 'CurrentlyWriting';
-UPDATE job SET jobstatus = 'Definiton', UserNumApproverConcept = 9 WHERE jobstatus = 'NeedsJobApproval';
-UPDATE job SET jobstatus = 'Definiton', UserNumApproverConcept = 9 WHERE jobstatus = 'NeedsJobClarification';
-
-UPDATE job SET jobstatus = 'Development', UserNumApproverConcept = 9, UserNumApproverJob = 9, UserNumEngineer = OwnerNum WHERE jobstatus = 'JobApproved';
-UPDATE job SET jobstatus = 'Development', UserNumApproverConcept = 9, UserNumApproverJob = 9, UserNumEngineer = OwnerNum WHERE jobstatus = 'Assigned';
-UPDATE job SET jobstatus = 'Development', UserNumApproverConcept = 9, UserNumApproverJob = 9, UserNumEngineer = OwnerNum WHERE jobstatus = 'CurrentlyWorkingOn';
-UPDATE job SET jobstatus = 'Development', UserNumApproverConcept = 9, UserNumApproverJob = 9, UserNumEngineer = OwnerNum WHERE jobstatus = 'ReadyForReview';
-UPDATE job SET jobstatus = 'Development', UserNumApproverConcept = 9, UserNumApproverJob = 9, UserNumEngineer = OwnerNum WHERE jobstatus = 'ReadyToAssign';
-UPDATE job SET jobstatus = 'Development', UserNumApproverConcept = 9, UserNumApproverJob = 9, UserNumEngineer = OwnerNum, Priority = 'OnHold' WHERE jobstatus = 'OnHoldExpert';
-UPDATE job SET jobstatus = 'Development', UserNumApproverConcept = 9, UserNumApproverJob = 9, UserNumEngineer = OwnerNum, Priority = 'OnHold' WHERE jobstatus = 'OnHoldEngineer';
-
-UPDATE job SET jobstatus = 'Documentation', UserNumDocumenter = OwnerNum WHERE jobstatus = 'ReadyToBeDocumented';
-UPDATE job SET jobstatus = 'Documentation', UserNumInfo = OwnerNum WHERE jobstatus = 'NeedsDocumentationClarification';
-
-UPDATE job SET jobstatus = 'Complete'      WHERE jobstatus = 'Complete';
-UPDATE job SET jobstatus = 'Complete'      WHERE jobstatus = 'NotifyCustomer';
-
-UPDATE job SET jobstatus = 'Cancelled'     WHERE jobstatus = 'Rescinded';
-UPDATE job SET jobstatus = 'Cancelled'     WHERE jobstatus = 'Deleted';
-
-ALTER TABLE job CHANGE JobStatus PhaseCur varchar(255) NOT NULL;
-
-
-ALTER TABLE job DROP COLUMN expertNum;
-ALTER TABLE job DROP COLUMN ownerNum;
-
-ALTER TABLE jobevent CHANGE OwnerNum UserNumEvent BIGINT NOT NULL;
-ALTER TABLE jobevent ADD COLUMN MainRTF TEXT NOT NULL;
-
-DELETE FROM joblink WHERE linktype IN(5,3); -- already converted to FKeys on Quote and Review tables.
-UPDATE joblink SET LinkType = LinkType-1 WHERE LinkType>5; -- Deleted link type Quote = 5
-UPDATE joblink SET LinkType = LinkType-1 WHERE LinkType>3; -- Deleted link type Review = 3
-
-DROP TABLE IF EXISTS jobnotifycust;
-CREATE TABLE jobnotifycust(
-		JobNotifyCustNum BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-		JobNum BIGINT NOT NULL,
-		PatNum BIGINT NOT NULL,
-		UserNumNotifier BIGINT NOT NULL,
-		Description VARCHAR(255) NOT NULL,
-		SecDateTEntry     DATETIME NOT NULL DEFAULT '0001-01-01',
-		DateTimeContacted DATETIME NOT NULL DEFAULT '0001-01-01'
-	) DEFAULT CHARSET = utf8;
-
-
-
-
-
-
-# TODO drop extra columns.
-# SELECT * FROM job;
-
-
-
-
-*/

@@ -300,8 +300,8 @@
     <Compile Include="Crud\InterventionCrud.cs" />
     <Compile Include="Crud\JobControlCrud.cs" />
     <Compile Include="Crud\JobCrud.cs" />
-    <Compile Include="Crud\JobEventCrud.cs" />
     <Compile Include="Crud\JobLinkCrud.cs" />
+    <Compile Include="Crud\JobLogCrud.cs" />
     <Compile Include="Crud\JobNoteCrud.cs" />
     <Compile Include="Crud\JobPermissionCrud.cs" />
     <Compile Include="Crud\JobProjectCrud.cs" />
@@ -433,6 +433,7 @@
     <Compile Include="Data Interface\EmailAutographs.cs" />
     <Compile Include="Data Interface\InsVerifies.cs" />
     <Compile Include="Data Interface\InsVerifyHists.cs" />
+    <Compile Include="Data Interface\JobLogs.cs" />
     <Compile Include="Data Interface\TreatPlanAttaches.cs" />
     <Compile Include="Data Interface\UpdateHistories.cs" />
     <Compile Include="Data Interface\UserOdPrefs.cs" />
@@ -559,13 +560,12 @@
     <Compile Include="Data Interface\TaskHists.cs" />
     <Compile Include="InternalTools\IntegratedTexting\TableTypes\SmsBilling.cs" />
     <Compile Include="InternalTools\Job Manager\JobControls.cs" />
-    <Compile Include="InternalTools\Job Manager\JobEvents.cs" />
     <Compile Include="InternalTools\Job Manager\TableTypes\Bug.cs" />
     <Compile Include="InternalTools\Job Manager\TableTypes\JobCustContact.cs" />
+    <Compile Include="InternalTools\Job Manager\TableTypes\JobLog.cs" />
     <Compile Include="InternalTools\Job Manager\TableTypes\JobQuote.cs" />
     <Compile Include="InternalTools\Job Manager\TableTypes\JobPermission.cs" />
     <Compile Include="InternalTools\Job Manager\TableTypes\JobControl.cs" />
-    <Compile Include="InternalTools\Job Manager\TableTypes\JobEvent.cs" />
     <Compile Include="InternalTools\Job Manager\TableTypes\JobLink.cs" />
     <Compile Include="InternalTools\Job Manager\JobLinks.cs" />
     <Compile Include="InternalTools\Job Manager\JobProjects.cs" />
