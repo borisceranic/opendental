@@ -13387,6 +13387,7 @@ namespace OpenDentBusiness {
 			To16_1_13();
 		}
 
+		///<summary>Oracle compatible: 03/30/2016</summary>
 		private static void To16_1_13() {
 			if(FromVersion<new Version("16.1.13.0")) {
 				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.13.0"));//No translation in convert script.
