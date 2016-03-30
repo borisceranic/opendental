@@ -4,6 +4,9 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 using OpenDentBusiness.WebBridges;
 using OpenDental.Bridges;
+using System.Data.Common;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace OpenDental {
 	/// <summary>
@@ -11,9 +14,9 @@ namespace OpenDental {
 	/// </summary>
 	public class FormReportsMore:ODForm {
 		private OpenDental.UI.Button butClose;
-		private Label label1;
-		private Label label2;
-		private Label label3;
+		private Label labelPublicHealth;
+		private Label labelLists;
+		private Label labelMonthly;
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
@@ -23,9 +26,9 @@ namespace OpenDental {
 		private OpenDental.UI.Button butUserQuery;
 		private OpenDental.UI.Button butPW;
 		private OpenDental.UI.ListBoxClickable listProdInc;
-		private Label label4;
+		private Label labelProdInc;
 		private OpenDental.UI.ListBoxClickable listDaily;
-		private Label label5;
+		private Label labelDaily;
 		private Label label6;
 		private OpenDental.UI.Button butLaserLabels;
 		private OpenDental.UI.ListBoxClickable listArizonaPrimaryCare;
@@ -42,6 +45,12 @@ namespace OpenDental {
 		private GroupBox groupBusiness;
 		///<summary>After this form closes, this value is checked to see if any non-modal dialog boxes are needed.</summary>
 		public ReportModalSelection RpModalSelection;
+		private List<DisplayReport> _listProdInc;
+		private List<DisplayReport> _listMonthly;
+		private List<DisplayReport> _listDaily;
+		private List<DisplayReport> _listList;
+		private List<DisplayReport> _listPublicHealth;
+		private List<DisplayReport> _listArizonaPrimary;
 
 		///<summary></summary>
 		public FormReportsMore() {
@@ -71,16 +80,18 @@ namespace OpenDental {
 		/// </summary>
 		private void InitializeComponent() {
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormReportsMore));
-			this.label1 = new System.Windows.Forms.Label();
-			this.label2 = new System.Windows.Forms.Label();
-			this.label3 = new System.Windows.Forms.Label();
-			this.label4 = new System.Windows.Forms.Label();
-			this.label5 = new System.Windows.Forms.Label();
-			this.label6 = new System.Windows.Forms.Label();
+			this.groupBusiness = new System.Windows.Forms.GroupBox();
+			this.groupPatientReviews = new System.Windows.Forms.GroupBox();
 			this.labelArizonaPrimaryCare = new System.Windows.Forms.Label();
+			this.label6 = new System.Windows.Forms.Label();
+			this.labelDaily = new System.Windows.Forms.Label();
+			this.labelProdInc = new System.Windows.Forms.Label();
+			this.labelMonthly = new System.Windows.Forms.Label();
+			this.labelLists = new System.Windows.Forms.Label();
+			this.labelPublicHealth = new System.Windows.Forms.Label();
 			this.menuMain = new System.Windows.Forms.MenuStrip();
 			this.setupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.groupPatientReviews = new System.Windows.Forms.GroupBox();
+			this.pictureDentalIntel = new OpenDental.UI.ODPictureBox();
 			this.picturePodium = new OpenDental.UI.ODPictureBox();
 			this.butPatExport = new OpenDental.UI.Button();
 			this.butPatList = new OpenDental.UI.Button();
@@ -95,66 +106,30 @@ namespace OpenDental {
 			this.listLists = new OpenDental.UI.ListBoxClickable();
 			this.listMonthly = new OpenDental.UI.ListBoxClickable();
 			this.butClose = new OpenDental.UI.Button();
-			this.pictureDentalIntel = new OpenDental.UI.ODPictureBox();
-			this.groupBusiness = new System.Windows.Forms.GroupBox();
-			this.menuMain.SuspendLayout();
-			this.groupPatientReviews.SuspendLayout();
 			this.groupBusiness.SuspendLayout();
+			this.groupPatientReviews.SuspendLayout();
+			this.menuMain.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// label1
+			// groupBusiness
 			// 
-			this.label1.Location = new System.Drawing.Point(291, 304);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(118, 18);
-			this.label1.TabIndex = 2;
-			this.label1.Text = "Public Health";
-			this.label1.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			this.groupBusiness.Controls.Add(this.pictureDentalIntel);
+			this.groupBusiness.Location = new System.Drawing.Point(532, 87);
+			this.groupBusiness.Name = "groupBusiness";
+			this.groupBusiness.Size = new System.Drawing.Size(113, 53);
+			this.groupBusiness.TabIndex = 28;
+			this.groupBusiness.TabStop = false;
+			this.groupBusiness.Text = "Business Analytics";
 			// 
-			// label2
+			// groupPatientReviews
 			// 
-			this.label2.Location = new System.Drawing.Point(291, 66);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(118, 18);
-			this.label2.TabIndex = 4;
-			this.label2.Text = "Lists";
-			this.label2.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-			// 
-			// label3
-			// 
-			this.label3.Location = new System.Drawing.Point(9, 299);
-			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(118, 18);
-			this.label3.TabIndex = 6;
-			this.label3.Text = "Monthly";
-			this.label3.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-			// 
-			// label4
-			// 
-			this.label4.Location = new System.Drawing.Point(9, 66);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(207, 18);
-			this.label4.TabIndex = 13;
-			this.label4.Text = "Production and Income";
-			this.label4.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-			// 
-			// label5
-			// 
-			this.label5.Location = new System.Drawing.Point(9, 182);
-			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(118, 18);
-			this.label5.TabIndex = 15;
-			this.label5.Text = "Daily";
-			this.label5.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-			// 
-			// label6
-			// 
-			this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.label6.Location = new System.Drawing.Point(9, 506);
-			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(479, 100);
-			this.label6.TabIndex = 17;
-			this.label6.Text = resources.GetString("label6.Text");
+			this.groupPatientReviews.Controls.Add(this.picturePodium);
+			this.groupPatientReviews.Location = new System.Drawing.Point(532, 146);
+			this.groupPatientReviews.Name = "groupPatientReviews";
+			this.groupPatientReviews.Size = new System.Drawing.Size(113, 54);
+			this.groupPatientReviews.TabIndex = 26;
+			this.groupPatientReviews.TabStop = false;
+			this.groupPatientReviews.Text = "Patient Reviews";
 			// 
 			// labelArizonaPrimaryCare
 			// 
@@ -165,6 +140,60 @@ namespace OpenDental {
 			this.labelArizonaPrimaryCare.TabIndex = 20;
 			this.labelArizonaPrimaryCare.Text = "Arizona Primary Care";
 			this.labelArizonaPrimaryCare.Visible = false;
+			// 
+			// label6
+			// 
+			this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.label6.Location = new System.Drawing.Point(9, 506);
+			this.label6.Name = "label6";
+			this.label6.Size = new System.Drawing.Size(479, 100);
+			this.label6.TabIndex = 17;
+			this.label6.Text = resources.GetString("label6.Text");
+			// 
+			// labelDaily
+			// 
+			this.labelDaily.Location = new System.Drawing.Point(9, 182);
+			this.labelDaily.Name = "labelDaily";
+			this.labelDaily.Size = new System.Drawing.Size(118, 18);
+			this.labelDaily.TabIndex = 15;
+			this.labelDaily.Text = "Daily";
+			this.labelDaily.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
+			// labelProdInc
+			// 
+			this.labelProdInc.Location = new System.Drawing.Point(9, 66);
+			this.labelProdInc.Name = "labelProdInc";
+			this.labelProdInc.Size = new System.Drawing.Size(207, 18);
+			this.labelProdInc.TabIndex = 13;
+			this.labelProdInc.Text = "Production and Income";
+			this.labelProdInc.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
+			// labelMonthly
+			// 
+			this.labelMonthly.Location = new System.Drawing.Point(9, 299);
+			this.labelMonthly.Name = "labelMonthly";
+			this.labelMonthly.Size = new System.Drawing.Size(118, 18);
+			this.labelMonthly.TabIndex = 6;
+			this.labelMonthly.Text = "Monthly";
+			this.labelMonthly.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
+			// labelLists
+			// 
+			this.labelLists.Location = new System.Drawing.Point(291, 66);
+			this.labelLists.Name = "labelLists";
+			this.labelLists.Size = new System.Drawing.Size(118, 18);
+			this.labelLists.TabIndex = 4;
+			this.labelLists.Text = "Lists";
+			this.labelLists.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
+			// labelPublicHealth
+			// 
+			this.labelPublicHealth.Location = new System.Drawing.Point(291, 304);
+			this.labelPublicHealth.Name = "labelPublicHealth";
+			this.labelPublicHealth.Size = new System.Drawing.Size(118, 18);
+			this.labelPublicHealth.TabIndex = 2;
+			this.labelPublicHealth.Text = "Public Health";
+			this.labelPublicHealth.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// menuMain
 			// 
@@ -182,15 +211,16 @@ namespace OpenDental {
 			this.setupToolStripMenuItem.Text = "Setup";
 			this.setupToolStripMenuItem.Click += new System.EventHandler(this.setupToolStripMenuItem_Click);
 			// 
-			// groupPatientReviews
+			// pictureDentalIntel
 			// 
-			this.groupPatientReviews.Controls.Add(this.picturePodium);
-			this.groupPatientReviews.Location = new System.Drawing.Point(532, 146);
-			this.groupPatientReviews.Name = "groupPatientReviews";
-			this.groupPatientReviews.Size = new System.Drawing.Size(113, 54);
-			this.groupPatientReviews.TabIndex = 26;
-			this.groupPatientReviews.TabStop = false;
-			this.groupPatientReviews.Text = "Patient Reviews";
+			this.pictureDentalIntel.HasBorder = false;
+			this.pictureDentalIntel.Image = global::OpenDental.Properties.Resources.DI_Button_100x24;
+			this.pictureDentalIntel.Location = new System.Drawing.Point(8, 19);
+			this.pictureDentalIntel.Name = "pictureDentalIntel";
+			this.pictureDentalIntel.Size = new System.Drawing.Size(95, 24);
+			this.pictureDentalIntel.TabIndex = 0;
+			this.pictureDentalIntel.TextNullImage = null;
+			this.pictureDentalIntel.Click += new System.EventHandler(this.pictureDentalIntel_Click);
 			// 
 			// picturePodium
 			// 
@@ -379,30 +409,8 @@ namespace OpenDental {
 			this.butClose.Text = "Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
-			// pictureDentalIntel
-			// 
-			this.pictureDentalIntel.HasBorder = false;
-			this.pictureDentalIntel.Image = global::OpenDental.Properties.Resources.DI_Button_100x24;
-			this.pictureDentalIntel.Location = new System.Drawing.Point(8, 19);
-			this.pictureDentalIntel.Name = "pictureDentalIntel";
-			this.pictureDentalIntel.Size = new System.Drawing.Size(95, 24);
-			this.pictureDentalIntel.TabIndex = 0;
-			this.pictureDentalIntel.TextNullImage = null;
-			this.pictureDentalIntel.Click += new System.EventHandler(this.pictureDentalIntel_Click);
-			// 
-			// groupBusiness
-			// 
-			this.groupBusiness.Controls.Add(this.pictureDentalIntel);
-			this.groupBusiness.Location = new System.Drawing.Point(532, 87);
-			this.groupBusiness.Name = "groupBusiness";
-			this.groupBusiness.Size = new System.Drawing.Size(113, 53);
-			this.groupBusiness.TabIndex = 28;
-			this.groupBusiness.TabStop = false;
-			this.groupBusiness.Text = "Business Analytics";
-			// 
 			// FormReportsMore
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(680, 612);
 			this.Controls.Add(this.groupBusiness);
 			this.Controls.Add(this.groupPatientReviews);
@@ -414,17 +422,17 @@ namespace OpenDental {
 			this.Controls.Add(this.butLaserLabels);
 			this.Controls.Add(this.label6);
 			this.Controls.Add(this.listDaily);
-			this.Controls.Add(this.label5);
+			this.Controls.Add(this.labelDaily);
 			this.Controls.Add(this.listProdInc);
-			this.Controls.Add(this.label4);
+			this.Controls.Add(this.labelProdInc);
 			this.Controls.Add(this.butPW);
 			this.Controls.Add(this.butUserQuery);
 			this.Controls.Add(this.listPublicHealth);
 			this.Controls.Add(this.listLists);
 			this.Controls.Add(this.listMonthly);
-			this.Controls.Add(this.label3);
-			this.Controls.Add(this.label2);
-			this.Controls.Add(this.label1);
+			this.Controls.Add(this.labelMonthly);
+			this.Controls.Add(this.labelLists);
+			this.Controls.Add(this.labelPublicHealth);
 			this.Controls.Add(this.butClose);
 			this.Controls.Add(this.menuMain);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -433,13 +441,12 @@ namespace OpenDental {
 			this.MinimizeBox = false;
 			this.Name = "FormReportsMore";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Reports";
 			this.Load += new System.EventHandler(this.FormReportsMore_Load);
+			this.groupBusiness.ResumeLayout(false);
+			this.groupPatientReviews.ResumeLayout(false);
 			this.menuMain.ResumeLayout(false);
 			this.menuMain.PerformLayout();
-			this.groupPatientReviews.ResumeLayout(false);
-			this.groupBusiness.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -449,63 +456,10 @@ namespace OpenDental {
 		private void FormReportsMore_Load(object sender,EventArgs e) {
 			Plugins.HookAddCode(this,"FormReportsMore.FormReportsMore_Load_beginning");
 			butPW.Visible=Programs.IsEnabled(ProgramName.PracticeWebReports);
-			//hiding fefature for 13.3
+			//hiding feature for 13.3
 			//butPatList.Visible=PrefC.GetBool(PrefName.ShowFeatureEhr);
 			butPatExport.Visible=PrefC.GetBool(PrefName.ShowFeatureEhr);
-			listProdInc.Items.AddRange(new string[] {
-				Lan.g(this,"Today"),
-				Lan.g(this,"Yesterday"),
-				Lan.g(this,"This Month"),
-				Lan.g(this,"Last Month"),
-				Lan.g(this,"This Year"),
-				Lan.g(this,"More Options")
-			});
-			listDaily.Items.AddRange(new string[] {
-				Lan.g(this,"Adjustments"),
-				Lan.g(this,"Payments"),
-				Lan.g(this,"Procedures"),
-				Lan.g(this,"Writeoffs"),
-				Lan.g(this,"Incomplete Procedure Notes"),
-				Lan.g(this,"Routing Slips")
-			});
-			listMonthly.Items.AddRange(new string[] {
-				Lan.g(this,"Aging of A/R"),
-				Lan.g(this,"Claims Not Sent"),
-				Lan.g(this,"Capitation Utilization"),
-				Lan.g(this,"Finance Charge Report"),
-				Lan.g(this,"Outstanding Insurance Claims"),
-				Lan.g(this,"Procedures Not Billed to Insurance"),
-				Lan.g(this,"PPO Writeoffs"),
-				Lan.g(this,"Payment Plans"),
-				Lan.g(this,"Receivable Breakdown"),
-				Lan.g(this,"Unearned Income"),
-				Lan.g(this,"Insurance Overpaid"),
-			});
-			listLists.Items.AddRange(new string[] {
-				Lan.g(this,"Active Patients"),
-				Lan.g(this,"Appointments"),
-				Lan.g(this,"Birthdays"),
-				Lan.g(this,"Broken Appointments"),
-				Lan.g(this,"Insurance Plans"),
-				Lan.g(this,"New Patients"),
-				Lan.g(this,"Patients - Raw"),
-				Lan.g(this,"Patients Notes"),
-				Lan.g(this,"Prescriptions"),
-				Lan.g(this,"Procedure Codes"),
-				Lan.g(this,"Referrals - Raw"),
-				Lan.g(this,"Referral Analysis"),
-				Lan.g(this,"Referred Proc Tracking"),
-				Lan.g(this,"Treatment Finder")
-				//Lan.g(this,"Treatment Plan Manager")//js too buggy
-			});
-			listPublicHealth.Items.AddRange(new string[] {
-				Lan.g(this,"Raw Screening Data"),
-				Lan.g(this,"Raw Population Data")
-			});
-			listArizonaPrimaryCare.Items.AddRange(new string[] {
-				Lan.g(this,"Eligibility File"),
-				Lan.g(this,"Encounter File")
-			});
+			FillLists();
 			//Arizona primary care list and label must only be visible when the Arizona primary
 			//care option is checked in the miscellaneous options.
 			if(UsingArizonaPrimaryCare()) {
@@ -523,6 +477,84 @@ namespace OpenDental {
 			}
 			if(ProgramProperties.IsAdvertisingDisabled(ProgramName.DentalIntel)) {
 				groupBusiness.Visible=false;
+			}
+		}
+
+		///<summary>Takes all non-hidden display reports and displays them in their various listboxes.  
+		///Hides listboxes that have no display reports.</summary>
+		private void FillLists() {
+			_listProdInc=DisplayReports.GetForCategory(DisplayReportCategory.ProdInc,false);
+			_listMonthly=DisplayReports.GetForCategory(DisplayReportCategory.Monthly,false);
+			_listDaily=DisplayReports.GetForCategory(DisplayReportCategory.Daily,false);
+			_listList=DisplayReports.GetForCategory(DisplayReportCategory.Lists,false);
+			_listPublicHealth=DisplayReports.GetForCategory(DisplayReportCategory.PublicHealth,false);
+			_listArizonaPrimary=DisplayReports.GetForCategory(DisplayReportCategory.ArizonaPrimaryCare,false);
+			//add the items to the list boxes and set the list box heights. (positions too?)
+			listProdInc.Items.Clear();
+			listDaily.Items.Clear();
+			listMonthly.Items.Clear();
+			listLists.Items.Clear();
+			listPublicHealth.Items.Clear();
+			listArizonaPrimaryCare.Items.Clear();
+			listProdInc.Items.AddRange(_listProdInc.Select(x => x.Description).ToArray());
+			if(_listProdInc.Count==0) {
+				listProdInc.Visible=false;
+				labelProdInc.Visible=false;
+			}
+			else {
+				listProdInc.Visible=true;
+				labelProdInc.Visible=true;
+				listProdInc.Height=(_listProdInc.Count+1) * listProdInc.ItemHeight;
+			}
+			listDaily.Items.AddRange(_listDaily.Select(x => x.Description).ToArray());
+			if(_listDaily.Count==0) {
+				listDaily.Visible=false;
+				labelDaily.Visible=false;
+			}
+			else {
+				listDaily.Visible=true;
+				labelDaily.Visible=true;
+				listDaily.Height=(_listDaily.Count+1) * listDaily.ItemHeight;
+			}
+			listMonthly.Items.AddRange(_listMonthly.Select(x => x.Description).ToArray());
+			if(_listMonthly.Count==0) {
+				listMonthly.Visible=false;
+				labelMonthly.Visible=false;
+			}
+			else {
+				listMonthly.Visible=true;
+				labelMonthly.Visible=true;
+				listMonthly.Height=(_listMonthly.Count+1) * listMonthly.ItemHeight;
+			}
+			listLists.Items.AddRange(_listList.Select(x => x.Description).ToArray());
+			if(_listList.Count==0) {
+				listLists.Visible=false;
+				labelLists.Visible=false;
+			}
+			else {
+				listLists.Visible=true;
+				labelLists.Visible=true;
+				listLists.Height=(_listList.Count+1) * listLists.ItemHeight;
+			}
+			listPublicHealth.Items.AddRange(_listPublicHealth.Select(x => x.Description).ToArray());
+			if(_listPublicHealth.Count==0) {
+				listPublicHealth.Visible=false;
+				labelPublicHealth.Visible=false;
+			}
+			else {
+				listPublicHealth.Visible=true;
+				labelPublicHealth.Visible=true;
+				listPublicHealth.Height=(_listPublicHealth.Count+1) * listPublicHealth.ItemHeight;
+			}
+			listArizonaPrimaryCare.Items.AddRange(_listArizonaPrimary.Select(x => x.Description).ToArray());
+			if(_listArizonaPrimary.Count==0) {
+				listArizonaPrimaryCare.Visible=false;
+				labelArizonaPrimaryCare.Visible=false;
+			}
+			else {
+				listArizonaPrimaryCare.Visible=true;
+				labelArizonaPrimaryCare.Visible=true;
+				listArizonaPrimaryCare.Height=(_listArizonaPrimary.Count+1) * listArizonaPrimaryCare.ItemHeight;
 			}
 		}
 
@@ -586,13 +618,14 @@ namespace OpenDental {
 				return;
 			}
 			FormRpProdInc FormPI=new FormRpProdInc();
-			switch(selected) {
-				case 0://Today
+			string internalName=_listProdInc[selected].InternalName;
+			switch(internalName) {
+				case "ODToday"://Today
 					FormPI.DailyMonthlyAnnual="Daily";
 					FormPI.DateStart=DateTime.Today;
 					FormPI.DateEnd=DateTime.Today;
 					break;
-				case 1://Yesterday
+				case "ODYesterday"://Yesterday
 					FormPI.DailyMonthlyAnnual="Daily";
 					if(DateTime.Today.DayOfWeek==DayOfWeek.Monday) {
 						FormPI.DateStart=DateTime.Today.AddDays(-3);
@@ -603,22 +636,23 @@ namespace OpenDental {
 						FormPI.DateEnd=DateTime.Today.AddDays(-1);
 					}
 					break;
-				case 2://This Month
+				case "ODThisMonth"://This Month
 					FormPI.DailyMonthlyAnnual="Monthly";
 					FormPI.DateStart=new DateTime(DateTime.Today.Year,DateTime.Today.Month,1);
 					FormPI.DateEnd=new DateTime(DateTime.Today.AddMonths(1).Year,DateTime.Today.AddMonths(1).Month,1).AddDays(-1);
 					break;
-				case 3://Last Month
+				case "ODLastMonth"://Last Month
 					FormPI.DailyMonthlyAnnual="Monthly";
 					FormPI.DateStart=new DateTime(DateTime.Today.AddMonths(-1).Year,DateTime.Today.AddMonths(-1).Month,1);
 					FormPI.DateEnd=new DateTime(DateTime.Today.Year,DateTime.Today.Month,1).AddDays(-1);
 					break;
-				case 4://This Year
+				case "ODThisYear"://This Year
 					FormPI.DailyMonthlyAnnual="Annual";
 					FormPI.DateStart=new DateTime(DateTime.Today.Year,1,1);
 					FormPI.DateEnd=new DateTime(DateTime.Today.Year,12,31);
 					break;
-				case 5://More Options
+				case "ODMoreOptions"://More Options
+				default:
 					//do nothing
 					break;
 			}
@@ -631,33 +665,34 @@ namespace OpenDental {
 			if(selected==-1) {
 				return;
 			}
-			switch(selected) {
-				case 0://Adjustments
+			string internalName=_listDaily[selected].InternalName;
+			switch(internalName) {
+				case "ODAdjustments"://Adjustments
 					FormRpAdjSheet FormAdjSheet=new FormRpAdjSheet();
 					FormAdjSheet.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Adjustments");
 					break;
-				case 1://Payments
+				case "ODPayments"://Payments
 					FormRpPaySheet FormPaySheet=new FormRpPaySheet();
 					FormPaySheet.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Daily Payments");
 					break;
-				case 2://Procedures
+				case "ODProcedures"://Procedures
 					FormRpProcSheet FormProcSheet=new FormRpProcSheet();
 					FormProcSheet.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Daily Procedures");
 					break;
-				case 3://Writeoffs
+				case "ODWriteoffs"://Writeoffs
 					FormRpWriteoffSheet FormW=new FormRpWriteoffSheet();
 					FormW.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Daily Writeoffs");
 					break;
-				case 4://Incomplete Procedure Notes
+				case "ODIncompleteProcNotes"://Incomplete Procedure Notes
 					FormRpProcNote FormPN=new FormRpProcNote();
 					FormPN.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Daily Procedure Notes");
 					break;
-				case 5://Routing Slips
+				case "ODRoutingSlips"://Routing Slips
 					FormRpRouting FormR=new FormRpRouting();
 					FormR.ShowDialog();
 					break;
@@ -669,8 +704,9 @@ namespace OpenDental {
 			if(selected==-1) {
 				return;
 			}
-			switch(selected) {
-				case 0://Aging of Accounts Receivable Report
+			string internalName=_listMonthly[selected].InternalName;
+			switch(internalName) {
+				case "ODAgingAR"://Aging of Accounts Receivable Report
 					if(!Security.IsAuthorized(Permissions.ReportProdInc)) {
 						return;
 					}
@@ -678,42 +714,42 @@ namespace OpenDental {
 					FormA.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Aging of A/R");
 					break;
-				case 1://Claims Not Sent
+				case "ODClaimsNotSent"://Claims Not Sent
 					FormRpClaimNotSent FormClaim=new FormRpClaimNotSent();
 					FormClaim.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Claims Not Sent");
 					break;
-				case 2://Capitation Utilization
+				case "ODCapitation"://Capitation Utilization
 					FormRpCapitation FormC=new FormRpCapitation();
 					FormC.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Capitation");
 					break;
-				case 3://Finance Charge Report
+				case "ODFinanceCharge"://Finance Charge Report
 					FormRpFinanceCharge FormRpFinance=new FormRpFinanceCharge();
 					FormRpFinance.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Finance Charges");
 					break;
-				case 4://Outstanding Insurance Claims
+				case "ODOutstandingInsClaims"://Outstanding Insurance Claims
 					RpModalSelection=ReportModalSelection.OutstandingIns;
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Outstanding Insurance Claims");
 					Close();
 					break;
-				case 5://Procedures Not Billed to Insurance
+				case "ODProcsNotBilled"://Procedures Not Billed to Insurance
 					FormRpProcNotBilledIns FormProc=new FormRpProcNotBilledIns();
 					FormProc.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Procedures not billed to insurance.");
 					break;
-				case 6://PPO Writeoffs
+				case "ODPPOWriteoffs"://PPO Writeoffs
 					FormRpPPOwriteoffs FormPPO=new FormRpPPOwriteoffs();
 					FormPPO.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"PPO Writeoffs.");
 					break;
-				case 7://Payment Plans
+				case "ODPaymentPlans"://Payment Plans
 					FormRpPayPlans FormPP=new FormRpPayPlans();
 					FormPP.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Payment Plans.");
 					break;
-				case 8://Receivable Breakdown
+				case "ODReceivablesBreakdown"://Receivable Breakdown
 					if(!Security.IsAuthorized(Permissions.ReportProdInc)) {
 						return;
 					}
@@ -721,12 +757,12 @@ namespace OpenDental {
 					FormRcv.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Receivable Breakdown.");
 					break;
-				case 9://Unearned Income
+				case "ODUnearnedIncome"://Unearned Income
 					FormRpUnearnedIncome FormU=new FormRpUnearnedIncome();
 					FormU.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Unearned Income.");
 					break;
-				case 10://Insurance Overpaid
+				case "ODInsuranceOverpaid"://Insurance Overpaid
 					FormRpInsOverpaid FormI=new FormRpInsOverpaid();
 					FormI.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Insurance Overpaid.");
@@ -739,38 +775,39 @@ namespace OpenDental {
 			if(selected==-1) {
 				return;
 			}
-			switch(selected) {
-				case 0://Active Patients
+			string internalName=_listList[selected].InternalName;
+			switch(internalName) {
+				case "ODActivePatients"://Active Patients
 					FormRpActivePatients FormAP=new FormRpActivePatients();
 					FormAP.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Active Patients");
 					break;
-				case 1://Appointments
+				case "ODAppointments"://Appointments
 					FormRpAppointments FormA=new FormRpAppointments();
 					FormA.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Appointments");
 					break;
-				case 2://Birthdays
+				case "ODBirthdays"://Birthdays
 					FormRpBirthday FormB=new FormRpBirthday();
 					FormB.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Birthdays");
 					break;
-				case 3://Broken Appointments
+				case "ODBrokenAppointments"://Broken Appointments
 					FormRpBrokenAppointments FormBroken=new FormRpBrokenAppointments();
 					FormBroken.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Broken Appointments");
 					break;
-				case 4://Insurance Plans
+				case "ODInsurancePlans"://Insurance Plans
 					FormRpInsCo FormInsCo=new FormRpInsCo();
 					FormInsCo.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Insurance Plans");
 					break;
-				case 5://New Patients
+				case "ODNewPatients"://New Patients
 					FormRpNewPatients FormNewPats=new FormRpNewPatients();
 					FormNewPats.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"New Patients");
 					break;
-				case 6://Patients - Raw
+				case "ODPatientsRaw"://Patients - Raw
 					if(!Security.IsAuthorized(Permissions.UserQuery)) {
 						return;
 					}
@@ -778,7 +815,7 @@ namespace OpenDental {
 					FormPatients.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Patients - Raw");
 					break;
-				case 7://Patient Notes
+				case "ODPatientNotes"://Patient Notes
 					if(!Security.IsAuthorized(Permissions.UserQuery)) {
 						return;
 					}
@@ -786,17 +823,17 @@ namespace OpenDental {
 					FormPN.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Patient Notes");
 					break;
-				case 8://Prescriptions
+				case "ODPrescriptions"://Prescriptions
 					FormRpPrescriptions FormPrescript=new FormRpPrescriptions();
 					FormPrescript.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Rx");
 					break;
-				case 9://Procedure Codes
+				case "ODProcedureCodes"://Procedure Codes
 					FormRpProcCodes FormProcCodes=new FormRpProcCodes();
 					FormProcCodes.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Procedure Codes");
 					break;
-				case 10://Referrals - Raw
+				case "ODReferralsRaw"://Referrals - Raw
 					if(!Security.IsAuthorized(Permissions.UserQuery)) {
 						return;
 					}
@@ -804,18 +841,18 @@ namespace OpenDental {
 					FormReferral.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Referrals - Raw");
 					break;
-				case 11://Referral Analysis
+				case "ODReferralAnalysis"://Referral Analysis
 					FormRpReferralAnalysis FormRA=new FormRpReferralAnalysis();
 					FormRA.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Referral Analysis");
 					break;
-				case 12://Referred Proc Tracking
+				case "ODReferredProcTracking"://Referred Proc Tracking
 					FormReferralProcTrack FormRP=new FormReferralProcTrack();
 					FormRP.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"ReferredProcTracking");
 					Close();
 					break;
-				case 13://Treatment Finder
+				case "ODTreatmentFinder"://Treatment Finder
 					RpModalSelection=ReportModalSelection.TreatmentFinder;
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Treatment Finder");
 					Close();
@@ -833,8 +870,9 @@ namespace OpenDental {
 			if(selected==-1) {
 				return;
 			}
-			switch(selected) {
-				case 0://Raw Screening Data
+			string internalName=_listPublicHealth[selected].InternalName;
+			switch(internalName) {
+				case "ODRawScreeningData"://Raw Screening Data
 					if(!Security.IsAuthorized(Permissions.UserQuery)) {
 						return;
 					}
@@ -842,7 +880,7 @@ namespace OpenDental {
 					FormPH.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"PH Raw Screening");
 					break;
-				case 1://Raw Population Data
+				case "ODRawPopulationData"://Raw Population Data
 					if(!Security.IsAuthorized(Permissions.UserQuery)) {
 						return;
 					}
@@ -859,13 +897,14 @@ namespace OpenDental {
 			if(selected==-1) {
 				return;
 			}
-			switch(selected) {
-				case 0://Elegibility File
+			string internalName = _listArizonaPrimary[selected].InternalName;
+			switch(internalName) {
+				case "ODEligibilityFile"://Eligibility File
 					FormRpArizonaPrimaryCareEligibility frapce=new FormRpArizonaPrimaryCareEligibility();
 					frapce.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Arizona Primary Care Eligibility");
 					break;
-				case 1://Encounter File
+				case "ODEncounterFile"://Encounter File
 					FormRpArizonaPrimaryCareEncounter frapcn=new FormRpArizonaPrimaryCareEncounter();
 					frapcn.ShowDialog();
 					SecurityLogs.MakeLogEntry(Permissions.Reports,0,"Arizona Primary Care Encounter");
@@ -890,7 +929,9 @@ namespace OpenDental {
 
 		private void setupToolStripMenuItem_Click(object sender,EventArgs e) {
 			FormReportSetup formRS = new FormReportSetup();
-			formRS.ShowDialog();
+			if(formRS.ShowDialog()==DialogResult.OK) {
+				FillLists();
+			}
 		}
 
 		private void butPatList_Click(object sender,EventArgs e) {

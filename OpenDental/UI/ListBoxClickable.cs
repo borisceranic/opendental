@@ -62,7 +62,7 @@ namespace OpenDental.UI {
 				brush=new SolidBrush(Color.Firebrick);
 			}
 			Font font=new Font(e.Font,FontStyle.Underline);
-			if(e.Index<=this.Items.Count-1){//prevents index of 0 from attempting to draw in designer.
+			if(e.Index!=-1 && e.Index<=this.Items.Count-1){//prevents index of 0 from attempting to draw in designer.
 				e.Graphics.DrawString(this.Items[e.Index].ToString(),font,brush,e.Bounds);
 			}
 		}

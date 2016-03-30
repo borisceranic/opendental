@@ -189,6 +189,7 @@
     <Compile Include="Crud\ConnGroupAttachCrud.cs" />
     <Compile Include="Crud\DashboardCellCrud.cs" />
     <Compile Include="Crud\DashboardLayoutCrud.cs" />
+    <Compile Include="Crud\DisplayReportCrud.cs" />
     <Compile Include="Crud\DispSupplyCrud.cs" />
     <Compile Include="Crud\EbillCrud.cs" />
     <Compile Include="Crud\EhrAptObsCrud.cs" />
@@ -435,6 +436,7 @@
     <Compile Include="Data Interface\ClaimSnapshots.cs" />
     <Compile Include="Data Interface\DashboardCells.cs" />
     <Compile Include="Data Interface\DashboardLayouts.cs" />
+    <Compile Include="Data Interface\DisplayReports.cs" />
     <Compile Include="Data Interface\Ebills.cs" />
     <Compile Include="Data Interface\EmailAutographs.cs" />
     <Compile Include="Data Interface\HL7ProcAttaches.cs" />
@@ -1007,6 +1009,7 @@
     <Compile Include="Reports\RpProcSheet.cs" />
     <Compile Include="Reports\RpProdInc.cs" />
     <Compile Include="Reports\RpRouting.cs" />
+    <Compile Include="TableTypes\DisplayReport.cs" />
     <Compile Include="TableTypes\UpdateHistory.cs" />
     <Compile Include="TableTypes\ApptComm.cs" />
     <Compile Include="TableTypes\CDSPermission.cs" />

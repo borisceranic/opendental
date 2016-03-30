@@ -2778,6 +2778,8 @@ namespace OpenDental.UI {
 				ScrollToIndex(selectedCell.Y);//Scrolling up
 			}
 			editBox=new TextBox();
+			//If the cell's color is set manually, that color will also show up for this EditBox.
+			editBox.BackColor=rows[selectedCell.Y].ColorBackG;
 			//The problem is that it ignores the height.
 			editBox.Multiline=true;
 			editBox.Font=new Font(FontFamily.GenericSansSerif,cellFontSize);

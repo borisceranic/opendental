@@ -229,6 +229,134 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE dunning MODIFY DaysInAdvance NOT NULL";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS displayreport";
+					Db.NonQ(command);
+					command=@"CREATE TABLE displayreport (
+						DisplayReportNum bigint NOT NULL auto_increment PRIMARY KEY,
+						InternalName varchar(255) NOT NULL,
+						ItemOrder int NOT NULL,
+						Description varchar(255) NOT NULL,
+						Category tinyint NOT NULL,
+						IsHidden tinyint NOT NULL
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE displayreport'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE displayreport (
+						DisplayReportNum number(20) NOT NULL,
+						InternalName varchar2(255),
+						ItemOrder number(11) NOT NULL,
+						Description varchar2(255),
+						Category number(3) NOT NULL,
+						IsHidden number(3) NOT NULL,
+						CONSTRAINT displayreport_DisplayReportNum PRIMARY KEY (DisplayReportNum)
+						)";
+					Db.NonQ(command);
+				}
+				//default display reports.
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command=@"
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODToday',0,'Today',0,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODYesterday',1,'Yesterday',0,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODThisMonth',2,'This Month',0,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODLastMonth',3,'Last Month',0,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODThisYear',4,'This Year',0,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODMoreOptions',5,'More Options',0,0);
+
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODAdjustments',0,'Adjustments',1,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODPayments',1,'Payments',1,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODProcedures',2,'Procedures',1,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODWriteoffs',3,'Writeoffs',1,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODIncompleteProcNotes',4,'Incomplete Procedure Notes',1,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODRoutingSlips',5,'Routing Slips',1,0);
+
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODAgingAR',0,'Aging of A/R',2,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODClaimsNotSent',1,'Claims Not Sent',2,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODCapitation',2,'Capitation Utilization',2,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODFinanceCharge',3,'Finance Charge Report',2,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODOutstandingInsClaims',4,'Outstanding Insurance Claims',2,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODProcsNotBilled',5,'Procedures Not Billed to Insurance',2,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODPPOWriteoffs',6,'PPO Writeoffs',2,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODPaymentPlans',7,'Payment Plans',2,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODReceivablesBreakdown',8,'Receivables Breakdown',2,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODUnearnedIncome',9,'Unearned Income',2,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODInsuranceOverpaid',10,'Insurance Overpaid',2,0);
+
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODActivePatients',0,'Active Patients',3,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODAppointments',1,'Appointments',3,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODBirthdays',2,'Birthdays',3,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODBrokenAppointments',3,'BrokenAppointments',3,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODInsurancePlans',4,'Insurance Plans',3,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODNewPatients',5,'New Patients',3,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODPatientsRaw',6,'Patients - Raw',3,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODPatientNotes',7,'Patient Notes',3,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODPrescriptions',8,'Prescriptions',3,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODProcedureCodes',9,'Procedure Codes',3,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODReferralsRaw',10,'Referrals - Raw',3,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODReferralAnalysis',11,'Referral Analysis',3,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODReferredProcTracking',12,'Referred Proc Tracking',3,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODTreatmentFinder',13,'Treatment Finder',3,0);
+
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODRawScreeningData',0,'Raw Screening Data',4,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODRawPopulationData',1,'Raw Population Data',4,0);
+
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODEligibilityFile',0,'Eligibility File',5,0);
+					INSERT INTO displayreport(InternalName,ItemOrder,Description,Category,IsHidden) VALUES('ODEncounterFile',1,'Encounter File',5,0);";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command=@"
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODToday',0,'Today',0,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODYesterday',1,'Yesterday',0,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODThisMonth',2,'This Month',0,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODLastMonth',3,'Last Month',0,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODThisYear',4,'This Year',0,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODMoreOptions',5,'More Options',0,0);
+
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODAdjustments',0,'Adjustments',1,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODPayments',1,'Payments',1,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODProcedures',2,'Procedures',1,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODWriteoffs',3,'Writeoffs',1,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODIncompleteProcNotes',4,'Incomplete Procedure Notes',1,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODRoutingSlips',5,'Routing Slips',1,0);
+
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODAgingAR',0,'Aging of A/R',2,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODClaimsNotSent',1,'Claims Not Sent',2,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODCapitation',2,'Capitation Utilization',2,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODFinanceCharge',3,'Finance Charge Report',2,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODOutstandingInsClaims',4,'Outstanding Insurance Claims',2,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODProcsNotBilled',5,'Procedures Not Billed to Insurance',2,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODPPOWriteoffs',6,'PPO Writeoffs',2,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODPaymentPlans',7,'Payment Plans',2,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODReceivablesBreakdown',8,'Receivables Breakdown',2,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODUnearnedIncome',9,'Unearned Income',2,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODInsuranceOverpaid',10,'Insurance Overpaid',2,0);
+
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODActivePatients',0,'Active Patients',3,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODAppointments',1,'Appointments',3,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODBirthdays',2,'Birthdays',3,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODBrokenAppointments',3,'BrokenAppointments',3,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODInsurancePlans',4,'Insurance Plans',3,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODNewPatients',5,'New Patients',3,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODPatientsRaw',6,'Patients - Raw',3,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODPatientNotes',7,'Patient Notes',3,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODPrescriptions',8,'Prescriptions',3,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODProcedureCodes',9,'Procedure Codes',3,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODReferralsRaw',10,'Referrals - Raw',3,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODReferralAnalysis',11,'Referral Analysis',3,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODReferredProcTracking',12,'Referred Proc Tracking',3,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODTreatmentFinder',13,'Treatment Finder',3,0);
+
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODRawScreeningData',0,'Raw Screening Data',4,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODRawPopulationData',1,'Raw Population Data',4,0);
+
+					INSERT INTO displayreport(DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODEligibilityFile',0,'Eligibility File',5,0);
+					INSERT INTO displayreport(DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODEncounterFile',1,'Encounter File',5,0);";
+					Db.NonQ(command);
+				}
 
 				command="UPDATE preference SET ValueString = '16.2.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
