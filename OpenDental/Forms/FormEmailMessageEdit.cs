@@ -629,7 +629,7 @@ namespace OpenDental{
 				return;
 			}
 			if(emailPreview.BodyText!="" || emailPreview.Subject!="" || emailPreview.HasAttachments){
-				if(MessageBox.Show(Lan.g(this,"Replace exising e-mail text with text from the template?  Existing attachments will not be deleted.")
+				if(MessageBox.Show(Lan.g(this,"Replace existing e-mail text with text from the template?  Existing attachments will not be deleted.")
 					,"",MessageBoxButtons.OKCancel)!=DialogResult.OK){
 					return;
 				}
