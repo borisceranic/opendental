@@ -871,7 +871,7 @@ namespace OpenDentBusiness{
 			}
 			else {//Unencrypted
 				//First check to see if attachments have already been digested for this email.
-				List<EmailAttach> listEmailAttaches=EmailAttaches.GetForEmail(emailMessageNum);
+				List<EmailAttach> listEmailAttaches=EmailAttaches.GetForEmail(emailMessageNum); //will return an empty list if emailmessagenum == 0
 				bool parseAttachments=true;//Always parse attachments from the strRawEmail unless we've already parsed them before.
 				if(listEmailAttaches.Count > 0) {
 					//Attachments have already been parsed so do not waste time re-parsing.
