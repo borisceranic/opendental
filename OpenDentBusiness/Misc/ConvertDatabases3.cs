@@ -11500,12 +11500,13 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else if(programNum>0){//oracle
-					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ClinicNum"
 						+") VALUES("
 						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
 						+"'"+POut.Long(programNum)+"', "
 						+"'Disable Advertising', "
-						+"'0')";
+						+"'0', "
+						+"0)";
 					Db.NonQ(command);
 				}
 				//DentalIntel Advertising block----------------------------------------------------------------------
@@ -11524,12 +11525,13 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else if(programNum>0) {//oracle
-					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ClinicNum"
 						+") VALUES("
 						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
 						+"'"+POut.Long(programNum)+"', "
 						+"'Disable Advertising', "
-						+"'0')";
+						+"'0', "
+						+"0)";
 					Db.NonQ(command);
 				}
 				//DentalTekSmartOfficePhone Advertising block----------------------------------------------------------------------
@@ -11548,12 +11550,13 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else if(programNum>0) {//oracle
-					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ClinicNum"
 						+") VALUES("
 						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
 						+"'"+POut.Long(programNum)+"', "
 						+"'Disable Advertising', "
-						+"'0')";
+						+"'0', "
+						+"0)";
 					Db.NonQ(command);
 				}
 				//CentralDataStorage Advertising block----------------------------------------------------------------------
@@ -11586,12 +11589,13 @@ namespace OpenDentBusiness {
 						+"'', "
 						+"'')";
 					programNum = Db.NonQ(command,true);
-					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ClinicNum"
 						+") VALUES("
 						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
 						+"'"+POut.Long(programNum)+"', "
 						+"'Disable Advertising', "
-						+"'0')";
+						+"'0', "
+						+"0)";
 					Db.NonQ(command);
 				}//end CentralDataStorage bridge
 				command="UPDATE preference SET ValueString = '15.4.29.0' WHERE PrefName = 'DataBaseVersion'";
@@ -11600,6 +11604,7 @@ namespace OpenDentBusiness {
 			To15_4_32();
 		}
 
+		///<summary>Oracle compatible: 03/30/2016</summary>
 		private static void To15_4_32() {
 			if(FromVersion<new Version("15.4.32.0")) {
 				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 15.4.32.0"));//No translation in convert script.
