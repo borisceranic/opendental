@@ -175,6 +175,8 @@ namespace OpenDental {
 		private MenuItem menuItemRepeatWebSched;
 		private ContextMenu contextMenuQuickProcs;
 		private TextBox textQuickProcs;
+		private ContextMenu contextMenuPayment;
+		private MenuItem menuItemPay;
 		private List<DisplayField> _patInfoDisplayFields;
 		#endregion UserVariables
 
@@ -322,6 +324,8 @@ namespace OpenDental {
 			this.ToolBarMain = new OpenDental.UI.ODToolBar();
 			this.contextMenuQuickProcs = new System.Windows.Forms.ContextMenu();
 			this.textQuickProcs = new System.Windows.Forms.TextBox();
+			this.contextMenuPayment = new System.Windows.Forms.ContextMenu();
+			this.menuItemPay = new System.Windows.Forms.MenuItem();
 			this.panelProgNotes.SuspendLayout();
 			this.groupBox7.SuspendLayout();
 			this.groupBox6.SuspendLayout();
@@ -705,6 +709,7 @@ namespace OpenDental {
 			// 
 			// gridProg
 			// 
+			this.gridProg.HasAddButton = false;
 			this.gridProg.HasMultilineHeaders = false;
 			this.gridProg.HScrollVisible = true;
 			this.gridProg.Location = new System.Drawing.Point(3, 0);
@@ -1050,6 +1055,7 @@ namespace OpenDental {
 			this.textUrgFinNote.QuickPasteType = OpenDentBusiness.QuickPasteType.FinancialNotes;
 			this.textUrgFinNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textUrgFinNote.Size = new System.Drawing.Size(178, 77);
+			this.textUrgFinNote.SpellCheckIsEnabled = false;
 			this.textUrgFinNote.TabIndex = 11;
 			this.textUrgFinNote.Text = "";
 			this.textUrgFinNote.TextChanged += new System.EventHandler(this.textUrgFinNote_TextChanged);
@@ -1057,6 +1063,7 @@ namespace OpenDental {
 			// 
 			// gridAcctPat
 			// 
+			this.gridAcctPat.HasAddButton = false;
 			this.gridAcctPat.HasMultilineHeaders = false;
 			this.gridAcctPat.HScrollVisible = false;
 			this.gridAcctPat.Location = new System.Drawing.Point(0, 135);
@@ -1078,6 +1085,7 @@ namespace OpenDental {
 			this.textFinNotes.QuickPasteType = OpenDentBusiness.QuickPasteType.FinancialNotes;
 			this.textFinNotes.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textFinNotes.Size = new System.Drawing.Size(178, 134);
+			this.textFinNotes.SpellCheckIsEnabled = false;
 			this.textFinNotes.TabIndex = 70;
 			this.textFinNotes.Text = "";
 			this.textFinNotes.TextChanged += new System.EventHandler(this.textFinNotes_TextChanged);
@@ -1550,6 +1558,7 @@ namespace OpenDental {
 			// 
 			// gridPayPlan
 			// 
+			this.gridPayPlan.HasAddButton = false;
 			this.gridPayPlan.HasMultilineHeaders = false;
 			this.gridPayPlan.HScrollVisible = false;
 			this.gridPayPlan.Location = new System.Drawing.Point(0, 144);
@@ -1563,6 +1572,7 @@ namespace OpenDental {
 			// 
 			// gridRepeat
 			// 
+			this.gridRepeat.HasAddButton = false;
 			this.gridRepeat.HasMultilineHeaders = false;
 			this.gridRepeat.HScrollVisible = false;
 			this.gridRepeat.Location = new System.Drawing.Point(0, 63);
@@ -1576,6 +1586,7 @@ namespace OpenDental {
 			// 
 			// gridAccount
 			// 
+			this.gridAccount.HasAddButton = false;
 			this.gridAccount.HasMultilineHeaders = false;
 			this.gridAccount.HScrollVisible = true;
 			this.gridAccount.Location = new System.Drawing.Point(0, 243);
@@ -1591,6 +1602,7 @@ namespace OpenDental {
 			// 
 			// gridComm
 			// 
+			this.gridComm.HasAddButton = false;
 			this.gridComm.HasMultilineHeaders = false;
 			this.gridComm.HScrollVisible = false;
 			this.gridComm.Location = new System.Drawing.Point(0, 440);
@@ -1604,6 +1616,7 @@ namespace OpenDental {
 			// 
 			// gridPatInfo
 			// 
+			this.gridPatInfo.HasAddButton = false;
 			this.gridPatInfo.HasMultilineHeaders = false;
 			this.gridPatInfo.HScrollVisible = false;
 			this.gridPatInfo.Location = new System.Drawing.Point(751, 526);
@@ -1626,13 +1639,24 @@ namespace OpenDental {
 			this.ToolBarMain.TabIndex = 47;
 			this.ToolBarMain.ButtonClick += new OpenDental.UI.ODToolBarButtonClickEventHandler(this.ToolBarMain_ButtonClick);
 			// 
-			// textQuickCharge
+			// textQuickProcs
 			// 
 			this.textQuickProcs.Location = new System.Drawing.Point(17, 3);
-			this.textQuickProcs.Name = "textQuickCharge";
+			this.textQuickProcs.Name = "textQuickProcs";
 			this.textQuickProcs.Size = new System.Drawing.Size(100, 20);
 			this.textQuickProcs.TabIndex = 220;
 			this.textQuickProcs.Visible = false;
+			// 
+			// contextMenuPayment
+			// 
+			this.contextMenuPayment.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.menuItemPay});
+			// 
+			// menuItemPay
+			// 
+			this.menuItemPay.Index = 0;
+			this.menuItemPay.Text = "Allocate Unearned";
+			this.menuItemPay.Click += new System.EventHandler(this.menuItemPrePay_Click);
 			// 
 			// ContrAccount
 			// 
@@ -1753,8 +1777,8 @@ namespace OpenDental {
 			ToolBarMain.Buttons.Clear();
 			ODToolBarButton button;
 			button=new ODToolBarButton(Lan.g(this,"Payment"),1,"","Payment");
-			//button.Style=ODToolBarButtonStyle.DropDownButton;
-			//button.DropDownMenu=contextMenuPayment;
+			button.Style=ODToolBarButtonStyle.DropDownButton;
+			button.DropDownMenu=contextMenuPayment;
 			ToolBarMain.Buttons.Add(button);
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Adjustment"),2,"","Adjustment"));
 			button=new ODToolBarButton(Lan.g(this,"New Claim"),3,"","Insurance");
@@ -2176,10 +2200,7 @@ namespace OpenDental {
 				labelUnearnedAmt.Text="";
 				for(int i=0;i<tableMisc.Rows.Count;i++){
 					if(tableMisc.Rows[i]["descript"].ToString()=="unearnedIncome") {
-						decimal unearned=PIn.Decimal(tableMisc.Rows[i]["value"].ToString());
-						if(unearned!=0) {
-							labelUnearnedAmt.Text=unearned.ToString("F");
-						}
+						labelUnearnedAmt.Text=PaySplits.GetUnearnedForFam(FamCur).ToString("F");
 					}
 				}
 				//labelInsLeft.Text=Lan.g(this,"Ins Left");
@@ -2934,7 +2955,7 @@ namespace OpenDental {
 			}
 		}
 
-		private void toolBarButPay_Click() {
+		private void toolBarButPay_Click(bool isPrePay=false) {
 			Payment PaymentCur=new Payment();
 			PaymentCur.PayDate=DateTimeOD.Today;
 			PaymentCur.PatNum=PatCur.PatNum;
@@ -2951,9 +2972,30 @@ namespace OpenDental {
 			PaymentCur.PaymentSource=CreditCardSource.None;
 			PaymentCur.ProcessStatus=ProcessStat.OfficeProcessed;
 			Payments.Insert(PaymentCur);
-			FormPayment FormPayment2=new FormPayment(PatCur,FamCur,PaymentCur);
-			FormPayment2.IsNew=true;
-			FormPayment2.ShowDialog();
+			FormPayment FormP=new FormPayment(PatCur,FamCur,PaymentCur);
+			FormP.IsNew=true;
+			if(isPrePay && PIn.Double(labelUnearnedAmt.Text)!=0) {
+				List<Procedure> listProcs=new List<Procedure>();
+				if(gridAccount.SelectedIndices.Length>0) {
+					DataTable table=DataSetMain.Tables["account"];
+					for(int i=0;i<gridAccount.SelectedIndices.Length;i++){
+						if(table.Rows[gridAccount.SelectedIndices[i]]["ProcNum"].ToString()!="0") {
+							//Add each selected proc to the list
+							listProcs.Add(Procedures.GetOneProc(PIn.Long(table.Rows[gridAccount.SelectedIndices[i]]["ProcNum"].ToString()),false));
+						}
+					}
+				}
+				else { 
+					FormProcSelect FormPS=new FormProcSelect(PatCur.PatNum);
+					if(FormPS.ShowDialog()!=DialogResult.OK) {
+						return;
+					}
+					listProcs=FormPS.ListSelectedProcs;
+				}
+				FormP.UnearnedAmt=PIn.Double(labelUnearnedAmt.Text);
+				FormP.ListProcs=listProcs;
+			}
+			FormP.ShowDialog();
 			ModuleSelected(PatCur.PatNum);
 		}
 
@@ -4531,6 +4573,10 @@ namespace OpenDental {
 				ModuleSelected(PatCur.PatNum);
 			}
 			textQuickProcs.Text="";
+		}
+
+		private void menuItemPrePay_Click(object sender,EventArgs e) {
+			toolBarButPay_Click(true);
 		}
 
 		private void menuItemQuickProcs_Click(object sender,EventArgs e) {

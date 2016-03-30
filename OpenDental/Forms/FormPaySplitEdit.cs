@@ -38,8 +38,8 @@ namespace OpenDental
 		private System.Windows.Forms.CheckBox checkPatOtherFam;
 		private System.Windows.Forms.GroupBox groupPatient;
 		private System.Windows.Forms.GroupBox groupProcedure;
-		private OpenDental.UI.Button butAttach;
-		private OpenDental.UI.Button butDetach;
+		private OpenDental.UI.Button butAttachProc;
+		private OpenDental.UI.Button butDetachProc;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.Label label4;
@@ -85,6 +85,22 @@ namespace OpenDental
 		private Label labelClinic;
 		private double ProcPaidHere;
 		private decimal _remainAmt;
+		private GroupBox groupBox1;
+		private UI.Button butDetachPrepay;
+		private UI.Button butAttachPrepay;
+		private TextBox textPrePayType;
+		private Label label18;
+		private TextBox textPrePayDate;
+		private Label label14;
+		private Label textPrePaidRemain;
+		private Label label22;
+		private TextBox textPrePaidHere;
+		private Label label20;
+		private TextBox textPrePayAmt;
+		private Label label19;
+		private TextBox textPrePaidElsewhere;
+		private Label label21;
+
 		///<summary>Local cache of all of the clinic nums the current user has permission to access at the time the form loads.  Filled at the same time
 		///as comboClinic and is used to set paysplit.ClinicNum when saving.</summary>
 		private List<long> _listUserClinicNums;
@@ -146,8 +162,8 @@ namespace OpenDental
 			this.label4 = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
-			this.butDetach = new OpenDental.UI.Button();
-			this.butAttach = new OpenDental.UI.Button();
+			this.butDetachProc = new OpenDental.UI.Button();
+			this.butAttachProc = new OpenDental.UI.Button();
 			this.label15 = new System.Windows.Forms.Label();
 			this.label17 = new System.Windows.Forms.Label();
 			this.textDateEntry = new OpenDental.ValidDate();
@@ -163,8 +179,24 @@ namespace OpenDental
 			this.butPickProv = new OpenDental.UI.Button();
 			this.comboClinic = new System.Windows.Forms.ComboBox();
 			this.labelClinic = new System.Windows.Forms.Label();
+			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.textPrePaidElsewhere = new System.Windows.Forms.TextBox();
+			this.label21 = new System.Windows.Forms.Label();
+			this.textPrePaidRemain = new System.Windows.Forms.Label();
+			this.label22 = new System.Windows.Forms.Label();
+			this.textPrePaidHere = new System.Windows.Forms.TextBox();
+			this.label20 = new System.Windows.Forms.Label();
+			this.textPrePayAmt = new System.Windows.Forms.TextBox();
+			this.label19 = new System.Windows.Forms.Label();
+			this.textPrePayType = new System.Windows.Forms.TextBox();
+			this.label18 = new System.Windows.Forms.Label();
+			this.textPrePayDate = new System.Windows.Forms.TextBox();
+			this.label14 = new System.Windows.Forms.Label();
+			this.butDetachPrepay = new OpenDental.UI.Button();
+			this.butAttachPrepay = new OpenDental.UI.Button();
 			this.groupPatient.SuspendLayout();
 			this.groupProcedure.SuspendLayout();
+			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// labelRemainder
@@ -205,7 +237,7 @@ namespace OpenDental
 			// checkPayPlan
 			// 
 			this.checkPayPlan.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkPayPlan.Location = new System.Drawing.Point(255, 497);
+			this.checkPayPlan.Location = new System.Drawing.Point(257, 511);
 			this.checkPayPlan.Name = "checkPayPlan";
 			this.checkPayPlan.Size = new System.Drawing.Size(198, 18);
 			this.checkPayPlan.TabIndex = 20;
@@ -287,19 +319,19 @@ namespace OpenDental
 			this.groupProcedure.Controls.Add(this.label4);
 			this.groupProcedure.Controls.Add(this.label3);
 			this.groupProcedure.Controls.Add(this.label2);
-			this.groupProcedure.Controls.Add(this.butDetach);
-			this.groupProcedure.Controls.Add(this.butAttach);
+			this.groupProcedure.Controls.Add(this.butDetachProc);
+			this.groupProcedure.Controls.Add(this.butAttachProc);
 			this.groupProcedure.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupProcedure.Location = new System.Drawing.Point(130, 228);
+			this.groupProcedure.Location = new System.Drawing.Point(130, 199);
 			this.groupProcedure.Name = "groupProcedure";
-			this.groupProcedure.Size = new System.Drawing.Size(615, 225);
+			this.groupProcedure.Size = new System.Drawing.Size(615, 192);
 			this.groupProcedure.TabIndex = 113;
 			this.groupProcedure.TabStop = false;
 			this.groupProcedure.Text = "Procedure";
 			// 
 			// textProcWriteoff
 			// 
-			this.textProcWriteoff.Location = new System.Drawing.Point(477, 48);
+			this.textProcWriteoff.Location = new System.Drawing.Point(513, 39);
 			this.textProcWriteoff.Name = "textProcWriteoff";
 			this.textProcWriteoff.ReadOnly = true;
 			this.textProcWriteoff.Size = new System.Drawing.Size(76, 20);
@@ -309,7 +341,7 @@ namespace OpenDental
 			// 
 			// label16
 			// 
-			this.label16.Location = new System.Drawing.Point(369, 50);
+			this.label16.Location = new System.Drawing.Point(405, 41);
 			this.label16.Name = "label16";
 			this.label16.Size = new System.Drawing.Size(104, 16);
 			this.label16.TabIndex = 49;
@@ -360,7 +392,7 @@ namespace OpenDental
 			// labelProcRemain
 			// 
 			this.labelProcRemain.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.labelProcRemain.Location = new System.Drawing.Point(478, 175);
+			this.labelProcRemain.Location = new System.Drawing.Point(514, 166);
 			this.labelProcRemain.Name = "labelProcRemain";
 			this.labelProcRemain.Size = new System.Drawing.Size(73, 18);
 			this.labelProcRemain.TabIndex = 41;
@@ -369,7 +401,7 @@ namespace OpenDental
 			// 
 			// textProcPaidHere
 			// 
-			this.textProcPaidHere.Location = new System.Drawing.Point(477, 148);
+			this.textProcPaidHere.Location = new System.Drawing.Point(513, 139);
 			this.textProcPaidHere.Name = "textProcPaidHere";
 			this.textProcPaidHere.ReadOnly = true;
 			this.textProcPaidHere.Size = new System.Drawing.Size(76, 20);
@@ -379,7 +411,7 @@ namespace OpenDental
 			// 
 			// textProcPrevPaid
 			// 
-			this.textProcPrevPaid.Location = new System.Drawing.Point(477, 128);
+			this.textProcPrevPaid.Location = new System.Drawing.Point(513, 119);
 			this.textProcPrevPaid.Name = "textProcPrevPaid";
 			this.textProcPrevPaid.ReadOnly = true;
 			this.textProcPrevPaid.Size = new System.Drawing.Size(76, 20);
@@ -389,7 +421,7 @@ namespace OpenDental
 			// 
 			// textProcAdj
 			// 
-			this.textProcAdj.Location = new System.Drawing.Point(477, 108);
+			this.textProcAdj.Location = new System.Drawing.Point(513, 99);
 			this.textProcAdj.Name = "textProcAdj";
 			this.textProcAdj.ReadOnly = true;
 			this.textProcAdj.Size = new System.Drawing.Size(76, 20);
@@ -399,7 +431,7 @@ namespace OpenDental
 			// 
 			// textProcInsEst
 			// 
-			this.textProcInsEst.Location = new System.Drawing.Point(477, 88);
+			this.textProcInsEst.Location = new System.Drawing.Point(513, 79);
 			this.textProcInsEst.Name = "textProcInsEst";
 			this.textProcInsEst.ReadOnly = true;
 			this.textProcInsEst.Size = new System.Drawing.Size(76, 20);
@@ -409,7 +441,7 @@ namespace OpenDental
 			// 
 			// textProcInsPaid
 			// 
-			this.textProcInsPaid.Location = new System.Drawing.Point(477, 68);
+			this.textProcInsPaid.Location = new System.Drawing.Point(513, 59);
 			this.textProcInsPaid.Name = "textProcInsPaid";
 			this.textProcInsPaid.ReadOnly = true;
 			this.textProcInsPaid.Size = new System.Drawing.Size(76, 20);
@@ -419,7 +451,7 @@ namespace OpenDental
 			// 
 			// textProcFee
 			// 
-			this.textProcFee.Location = new System.Drawing.Point(477, 28);
+			this.textProcFee.Location = new System.Drawing.Point(513, 19);
 			this.textProcFee.Name = "textProcFee";
 			this.textProcFee.ReadOnly = true;
 			this.textProcFee.Size = new System.Drawing.Size(76, 20);
@@ -429,7 +461,7 @@ namespace OpenDental
 			// 
 			// label13
 			// 
-			this.label13.Location = new System.Drawing.Point(369, 150);
+			this.label13.Location = new System.Drawing.Point(405, 141);
 			this.label13.Name = "label13";
 			this.label13.Size = new System.Drawing.Size(104, 16);
 			this.label13.TabIndex = 34;
@@ -438,7 +470,7 @@ namespace OpenDental
 			// 
 			// label12
 			// 
-			this.label12.Location = new System.Drawing.Point(369, 176);
+			this.label12.Location = new System.Drawing.Point(405, 167);
 			this.label12.Name = "label12";
 			this.label12.Size = new System.Drawing.Size(104, 16);
 			this.label12.TabIndex = 33;
@@ -447,7 +479,7 @@ namespace OpenDental
 			// 
 			// label11
 			// 
-			this.label11.Location = new System.Drawing.Point(346, 130);
+			this.label11.Location = new System.Drawing.Point(382, 121);
 			this.label11.Name = "label11";
 			this.label11.Size = new System.Drawing.Size(127, 16);
 			this.label11.TabIndex = 32;
@@ -456,7 +488,7 @@ namespace OpenDental
 			// 
 			// label10
 			// 
-			this.label10.Location = new System.Drawing.Point(369, 110);
+			this.label10.Location = new System.Drawing.Point(405, 101);
 			this.label10.Name = "label10";
 			this.label10.Size = new System.Drawing.Size(104, 16);
 			this.label10.TabIndex = 31;
@@ -465,7 +497,7 @@ namespace OpenDental
 			// 
 			// label9
 			// 
-			this.label9.Location = new System.Drawing.Point(369, 90);
+			this.label9.Location = new System.Drawing.Point(405, 81);
 			this.label9.Name = "label9";
 			this.label9.Size = new System.Drawing.Size(104, 16);
 			this.label9.TabIndex = 30;
@@ -474,7 +506,7 @@ namespace OpenDental
 			// 
 			// label8
 			// 
-			this.label8.Location = new System.Drawing.Point(369, 70);
+			this.label8.Location = new System.Drawing.Point(405, 61);
 			this.label8.Name = "label8";
 			this.label8.Size = new System.Drawing.Size(104, 16);
 			this.label8.TabIndex = 29;
@@ -483,7 +515,7 @@ namespace OpenDental
 			// 
 			// label6
 			// 
-			this.label6.Location = new System.Drawing.Point(369, 30);
+			this.label6.Location = new System.Drawing.Point(405, 21);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(104, 16);
 			this.label6.TabIndex = 28;
@@ -514,36 +546,36 @@ namespace OpenDental
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(104, 16);
 			this.label2.TabIndex = 25;
-			this.label2.Text = "Procedure Date";
+			this.label2.Text = "Date";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// butDetach
+			// butDetachProc
 			// 
-			this.butDetach.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butDetach.Autosize = true;
-			this.butDetach.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butDetach.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butDetach.CornerRadius = 4F;
-			this.butDetach.Location = new System.Drawing.Point(99, 21);
-			this.butDetach.Name = "butDetach";
-			this.butDetach.Size = new System.Drawing.Size(75, 24);
-			this.butDetach.TabIndex = 9;
-			this.butDetach.Text = "Detach";
-			this.butDetach.Click += new System.EventHandler(this.butDetach_Click);
+			this.butDetachProc.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butDetachProc.Autosize = true;
+			this.butDetachProc.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butDetachProc.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butDetachProc.CornerRadius = 4F;
+			this.butDetachProc.Location = new System.Drawing.Point(99, 21);
+			this.butDetachProc.Name = "butDetachProc";
+			this.butDetachProc.Size = new System.Drawing.Size(75, 24);
+			this.butDetachProc.TabIndex = 9;
+			this.butDetachProc.Text = "Detach";
+			this.butDetachProc.Click += new System.EventHandler(this.butDetachProc_Click);
 			// 
-			// butAttach
+			// butAttachProc
 			// 
-			this.butAttach.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAttach.Autosize = true;
-			this.butAttach.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butAttach.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butAttach.CornerRadius = 4F;
-			this.butAttach.Location = new System.Drawing.Point(12, 21);
-			this.butAttach.Name = "butAttach";
-			this.butAttach.Size = new System.Drawing.Size(75, 24);
-			this.butAttach.TabIndex = 8;
-			this.butAttach.Text = "Attach";
-			this.butAttach.Click += new System.EventHandler(this.butAttach_Click);
+			this.butAttachProc.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAttachProc.Autosize = true;
+			this.butAttachProc.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAttachProc.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAttachProc.CornerRadius = 4F;
+			this.butAttachProc.Location = new System.Drawing.Point(12, 21);
+			this.butAttachProc.Name = "butAttachProc";
+			this.butAttachProc.Size = new System.Drawing.Size(75, 24);
+			this.butAttachProc.TabIndex = 8;
+			this.butAttachProc.Text = "Attach";
+			this.butAttachProc.Click += new System.EventHandler(this.butAttachProc_Click);
 			// 
 			// label15
 			// 
@@ -596,7 +628,7 @@ namespace OpenDental
 			this.butDelete.CornerRadius = 4F;
 			this.butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
 			this.butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDelete.Location = new System.Drawing.Point(48, 496);
+			this.butDelete.Location = new System.Drawing.Point(15, 505);
 			this.butDelete.Name = "butDelete";
 			this.butDelete.Size = new System.Drawing.Size(85, 24);
 			this.butDelete.TabIndex = 21;
@@ -636,7 +668,7 @@ namespace OpenDental
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(606, 496);
+			this.butOK.Location = new System.Drawing.Point(589, 504);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 5;
@@ -651,7 +683,7 @@ namespace OpenDental
 			this.ButCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.ButCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.ButCancel.CornerRadius = 4F;
-			this.ButCancel.Location = new System.Drawing.Point(699, 496);
+			this.ButCancel.Location = new System.Drawing.Point(670, 505);
 			this.ButCancel.Name = "ButCancel";
 			this.ButCancel.Size = new System.Drawing.Size(75, 24);
 			this.ButCancel.TabIndex = 6;
@@ -660,11 +692,13 @@ namespace OpenDental
 			// 
 			// comboUnearnedTypes
 			// 
+			this.comboUnearnedTypes.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboUnearnedTypes.FormattingEnabled = true;
 			this.comboUnearnedTypes.Location = new System.Drawing.Point(129, 118);
 			this.comboUnearnedTypes.Name = "comboUnearnedTypes";
 			this.comboUnearnedTypes.Size = new System.Drawing.Size(165, 21);
 			this.comboUnearnedTypes.TabIndex = 117;
+			this.comboUnearnedTypes.SelectionChangeCommitted += new System.EventHandler(this.comboUnearnedTypes_SelectionChangeCommitted);
 			// 
 			// comboProvider
 			// 
@@ -674,6 +708,7 @@ namespace OpenDental
 			this.comboProvider.Name = "comboProvider";
 			this.comboProvider.Size = new System.Drawing.Size(145, 21);
 			this.comboProvider.TabIndex = 118;
+			this.comboProvider.SelectionChangeCommitted += new System.EventHandler(this.comboProvider_SelectionChangeCommitted);
 			// 
 			// butPickProv
 			// 
@@ -707,10 +742,167 @@ namespace OpenDental
 			this.labelClinic.Text = "Clinic";
 			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
+			// groupBox1
+			// 
+			this.groupBox1.Controls.Add(this.textPrePaidElsewhere);
+			this.groupBox1.Controls.Add(this.label21);
+			this.groupBox1.Controls.Add(this.textPrePaidRemain);
+			this.groupBox1.Controls.Add(this.label22);
+			this.groupBox1.Controls.Add(this.textPrePaidHere);
+			this.groupBox1.Controls.Add(this.label20);
+			this.groupBox1.Controls.Add(this.textPrePayAmt);
+			this.groupBox1.Controls.Add(this.label19);
+			this.groupBox1.Controls.Add(this.textPrePayType);
+			this.groupBox1.Controls.Add(this.label18);
+			this.groupBox1.Controls.Add(this.textPrePayDate);
+			this.groupBox1.Controls.Add(this.label14);
+			this.groupBox1.Controls.Add(this.butDetachPrepay);
+			this.groupBox1.Controls.Add(this.butAttachPrepay);
+			this.groupBox1.Location = new System.Drawing.Point(129, 398);
+			this.groupBox1.Name = "groupBox1";
+			this.groupBox1.Size = new System.Drawing.Size(616, 101);
+			this.groupBox1.TabIndex = 161;
+			this.groupBox1.TabStop = false;
+			this.groupBox1.Text = "Prepayment";
+			// 
+			// textPrePaidElsewhere
+			// 
+			this.textPrePaidElsewhere.Location = new System.Drawing.Point(514, 51);
+			this.textPrePaidElsewhere.Name = "textPrePaidElsewhere";
+			this.textPrePaidElsewhere.ReadOnly = true;
+			this.textPrePaidElsewhere.Size = new System.Drawing.Size(76, 20);
+			this.textPrePaidElsewhere.TabIndex = 56;
+			this.textPrePaidElsewhere.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
+			// label21
+			// 
+			this.label21.Location = new System.Drawing.Point(318, 53);
+			this.label21.Name = "label21";
+			this.label21.Size = new System.Drawing.Size(192, 16);
+			this.label21.TabIndex = 55;
+			this.label21.Text = "- Used Elsewhere";
+			this.label21.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textPrePaidRemain
+			// 
+			this.textPrePaidRemain.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.textPrePaidRemain.Location = new System.Drawing.Point(515, 72);
+			this.textPrePaidRemain.Name = "textPrePaidRemain";
+			this.textPrePaidRemain.Size = new System.Drawing.Size(73, 18);
+			this.textPrePaidRemain.TabIndex = 52;
+			this.textPrePaidRemain.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// label22
+			// 
+			this.label22.Location = new System.Drawing.Point(318, 73);
+			this.label22.Name = "label22";
+			this.label22.Size = new System.Drawing.Size(192, 16);
+			this.label22.TabIndex = 51;
+			this.label22.Text = "= Remaining";
+			this.label22.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textPrePaidHere
+			// 
+			this.textPrePaidHere.Location = new System.Drawing.Point(514, 33);
+			this.textPrePaidHere.Name = "textPrePaidHere";
+			this.textPrePaidHere.ReadOnly = true;
+			this.textPrePaidHere.Size = new System.Drawing.Size(76, 20);
+			this.textPrePaidHere.TabIndex = 52;
+			this.textPrePaidHere.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
+			// label20
+			// 
+			this.label20.Location = new System.Drawing.Point(318, 35);
+			this.label20.Name = "label20";
+			this.label20.Size = new System.Drawing.Size(192, 16);
+			this.label20.TabIndex = 51;
+			this.label20.Text = "- Used Here";
+			this.label20.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textPrePayAmt
+			// 
+			this.textPrePayAmt.Location = new System.Drawing.Point(514, 13);
+			this.textPrePayAmt.Name = "textPrePayAmt";
+			this.textPrePayAmt.ReadOnly = true;
+			this.textPrePayAmt.Size = new System.Drawing.Size(76, 20);
+			this.textPrePayAmt.TabIndex = 52;
+			this.textPrePayAmt.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+			// 
+			// label19
+			// 
+			this.label19.Location = new System.Drawing.Point(318, 15);
+			this.label19.Name = "label19";
+			this.label19.Size = new System.Drawing.Size(192, 16);
+			this.label19.TabIndex = 51;
+			this.label19.Text = "Prepayment Amount";
+			this.label19.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textPrePayType
+			// 
+			this.textPrePayType.Location = new System.Drawing.Point(116, 70);
+			this.textPrePayType.Name = "textPrePayType";
+			this.textPrePayType.ReadOnly = true;
+			this.textPrePayType.Size = new System.Drawing.Size(155, 20);
+			this.textPrePayType.TabIndex = 54;
+			// 
+			// label18
+			// 
+			this.label18.Location = new System.Drawing.Point(9, 72);
+			this.label18.Name = "label18";
+			this.label18.Size = new System.Drawing.Size(104, 16);
+			this.label18.TabIndex = 53;
+			this.label18.Text = "Payment Type";
+			this.label18.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// textPrePayDate
+			// 
+			this.textPrePayDate.Location = new System.Drawing.Point(116, 49);
+			this.textPrePayDate.Name = "textPrePayDate";
+			this.textPrePayDate.ReadOnly = true;
+			this.textPrePayDate.Size = new System.Drawing.Size(76, 20);
+			this.textPrePayDate.TabIndex = 52;
+			// 
+			// label14
+			// 
+			this.label14.Location = new System.Drawing.Point(9, 51);
+			this.label14.Name = "label14";
+			this.label14.Size = new System.Drawing.Size(104, 16);
+			this.label14.TabIndex = 51;
+			this.label14.Text = "Date";
+			this.label14.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// butDetachPrepay
+			// 
+			this.butDetachPrepay.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butDetachPrepay.Autosize = true;
+			this.butDetachPrepay.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butDetachPrepay.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butDetachPrepay.CornerRadius = 4F;
+			this.butDetachPrepay.Location = new System.Drawing.Point(100, 19);
+			this.butDetachPrepay.Name = "butDetachPrepay";
+			this.butDetachPrepay.Size = new System.Drawing.Size(75, 24);
+			this.butDetachPrepay.TabIndex = 52;
+			this.butDetachPrepay.Text = "Detach";
+			this.butDetachPrepay.Click += new System.EventHandler(this.butDetachPrepay_Click);
+			// 
+			// butAttachPrepay
+			// 
+			this.butAttachPrepay.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAttachPrepay.Autosize = true;
+			this.butAttachPrepay.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAttachPrepay.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAttachPrepay.CornerRadius = 4F;
+			this.butAttachPrepay.Location = new System.Drawing.Point(12, 19);
+			this.butAttachPrepay.Name = "butAttachPrepay";
+			this.butAttachPrepay.Size = new System.Drawing.Size(75, 24);
+			this.butAttachPrepay.TabIndex = 51;
+			this.butAttachPrepay.Text = "Attach";
+			this.butAttachPrepay.Click += new System.EventHandler(this.butAttachPrepay_Click);
+			// 
 			// FormPaySplitEdit
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(801, 541);
+			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.comboClinic);
 			this.Controls.Add(this.labelClinic);
 			this.Controls.Add(this.butPickProv);
@@ -740,13 +932,14 @@ namespace OpenDental
 			this.MinimizeBox = false;
 			this.Name = "FormPaySplitEdit";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Payment Split";
 			this.Load += new System.EventHandler(this.FormPaySplitEdit_Load);
 			this.groupPatient.ResumeLayout(false);
 			this.groupPatient.PerformLayout();
 			this.groupProcedure.ResumeLayout(false);
 			this.groupProcedure.PerformLayout();
+			this.groupBox1.ResumeLayout(false);
+			this.groupBox1.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -754,14 +947,11 @@ namespace OpenDental
 		#endregion
 
 		private void FormPaySplitEdit_Load(object sender, System.EventArgs e) {
-			if(PaySplitCur==null) {
-				MessageBox.Show("Split cannot be null.");//just for debugging
-			}
 			textDateEntry.Text=PaySplitCur.DateEntry.ToShortDateString();
 			textDatePay.Text=PaySplitCur.DatePay.ToShortDateString();
 			textProcDate.Text=PaySplitCur.ProcDate.ToShortDateString();
 			textAmount.Text=PaySplitCur.SplitAmt.ToString("F");
-			comboUnearnedTypes.Items.Add(Lan.g(this,"none"));
+			comboUnearnedTypes.Items.Add(Lan.g(this,"None"));
 			comboUnearnedTypes.SelectedIndex=0;
 			for(int i=0;i<DefC.Short[(int)DefCat.PaySplitUnearnedType].Length;i++) {
 				comboUnearnedTypes.Items.Add(DefC.Short[(int)DefCat.PaySplitUnearnedType][i].ItemName);
@@ -769,17 +959,28 @@ namespace OpenDental
 					comboUnearnedTypes.SelectedIndex=i+1;
 				}
 			}
+			comboProvider.Items.Add(Lan.g(this,"None"));
 			for(int i=0;i<ProviderC.ListShort.Count;i++){
 				comboProvider.Items.Add(ProviderC.ListShort[i].Abbr);
 				if(ProviderC.ListShort[i].ProvNum==PaySplitCur.ProvNum) {
-					comboProvider.SelectedIndex=i;
+					comboProvider.SelectedIndex=i+1;
 				}
+			}
+			//Unearned "payments" should not be associated to specific providers because those providers have not done anything to earn that donation.
+			if(comboUnearnedTypes.SelectedIndex!=0) {
+				comboProvider.SelectedIndex=0;//None
+				comboProvider.Enabled=false;
+				butPickProv.Enabled=false;
+			}
+			else if(comboProvider.SelectedIndex!=0) {
+				comboUnearnedTypes.SelectedIndex=0;
+				comboUnearnedTypes.Enabled=false;
 			}
 			_listUserClinicNums=new List<long>();
 			if(PrefC.HasClinicsEnabled) {
 				List<Clinic> listClinics=Clinics.GetForUserod(Security.CurUser);
 				comboClinic.Items.Clear();
-				comboClinic.Items.Add(Lan.g(this,"none"));
+				comboClinic.Items.Add(Lan.g(this,"None"));
 				_listUserClinicNums.Add(0);//this way both lists have the same number of items in it
 				comboClinic.SelectedIndex=0;
 				for(int i=0;i<listClinics.Count;i++) {
@@ -806,6 +1007,13 @@ namespace OpenDental
 			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				textProcTooth.Visible=false;
 				labelProcTooth.Visible=false;
+			}
+			if(PaySplitCur.PrepaymentNum!=0) {
+				FillPrepayment();
+			}
+			if(PaySplitCur.ProcNum!=0) {
+				butAttachPrepay.Enabled=false;
+				butDetachPrepay.Enabled=false;
 			}
 			FillPatient();
 			FillProcedure();
@@ -946,6 +1154,32 @@ namespace OpenDental
 			//butDetach.Enabled=true;
 		}
 
+		private void FillPrepayment() {
+			textPrePayDate.Text="";
+			textPrePayType.Text="";
+			textPrePayAmt.Text="";
+			textPrePaidHere.Text="";
+			textPrePaidRemain.Text="";
+			textPrePaidElsewhere.Text="";
+			if(PaySplitCur.PrepaymentNum!=0) {
+				PaySplit prepayment=PaySplits.GetOne(PaySplitCur.PrepaymentNum);
+				textPrePayDate.Text=prepayment.DatePay.ToShortDateString();
+				textPrePayType.Text=DefC.GetName(DefCat.PaySplitUnearnedType,prepayment.UnearnedType);
+				List<PaySplit> listPaySplits=PaySplits.GetSplitsForPrepay(new List<PaySplit>() { prepayment });
+				decimal paySplitTotal=0;//Will include the current paysplit we are viewing.
+				foreach(PaySplit split in listPaySplits) {
+					paySplitTotal-=(decimal)split.SplitAmt;
+				}
+				textPrePayAmt.Text=prepayment.SplitAmt.ToString("F");
+				textPrePaidHere.Text=(0-PaySplitCur.SplitAmt).ToString("F");
+				//Add the negative SplitAmt of the currently viewed paysplit to the total so that we can show the amount from other paysplits.
+				textPrePaidElsewhere.Text=(paySplitTotal+(decimal)PaySplitCur.SplitAmt).ToString("F");
+				textPrePaidRemain.Text=((decimal)prepayment.SplitAmt-paySplitTotal).ToString("F");
+				butAttachProc.Enabled=false;
+				butDetachProc.Enabled=false;
+			}
+		}
+
 		///<summary>Does not alter any of the proc amounts except PaidHere and Remaining.</summary>
 		private void ComputeProcTotals() {
 			ProcPaidHere=0;
@@ -972,24 +1206,51 @@ namespace OpenDental
 
 		private void textAmount_Validating(object sender, System.ComponentModel.CancelEventArgs e) {
 			//can not use textAmount_TextChanged without redesigning the validDouble control
+			if(textPrePayAmt.Text!="") {
+				return;
+			}
 			ComputeProcTotals();
 		}
 
-		private void butAttach_Click(object sender, System.EventArgs e) {
+		private void butAttachProc_Click(object sender, System.EventArgs e) {
 			FormProcSelect FormPS=new FormProcSelect(PaySplitCur.PatNum);
 			FormPS.ShowDialog();
 			if(FormPS.DialogResult!=DialogResult.OK){
 				return;
 			}
-
-			PaySplitCur.ProcNum=FormPS.SelectedProcNum;
+			butAttachPrepay.Enabled=false;
+			butDetachPrepay.Enabled=false;
+			PaySplitCur.ProcNum=FormPS.ListSelectedProcs[0].ProcNum;
 			FillProcedure();
 			textProcDate.Text=ProcCur.ProcDate.ToShortDateString();
 		}
 
-		private void butDetach_Click(object sender, System.EventArgs e) {
+		private void butDetachProc_Click(object sender, System.EventArgs e) {
+			butAttachPrepay.Enabled=true;
+			butDetachPrepay.Enabled=true;
 			PaySplitCur.ProcNum=0;
 			FillProcedure();
+		}
+
+		private void butAttachPrepay_Click(object sender,EventArgs e) {
+			FormPaySplitSelect FormPSS=new FormPaySplitSelect(PaySplitCur.PatNum);
+			FormPSS.IsPrePay=true;
+			FormPSS.SplitCur=PaySplitCur.SplitNum;
+			if(FormPSS.ShowDialog()!=DialogResult.OK) {
+				return;
+			}			
+			butAttachProc.Enabled=false;
+			butDetachProc.Enabled=false;
+			//For now there can only be one selected paysplit from the window.
+			PaySplitCur.PrepaymentNum=FormPSS.ListSelectedSplits[0].SplitNum;
+			FillPrepayment();
+		}
+
+		private void butDetachPrepay_Click(object sender,EventArgs e) {
+			butAttachProc.Enabled=true;
+			butDetachProc.Enabled=true;
+			PaySplitCur.PrepaymentNum=0;
+			FillPrepayment();
 		}
 
 		private void checkPayPlan_Click(object sender, System.EventArgs e) {
@@ -1022,6 +1283,31 @@ namespace OpenDental
 			}
 			else{//payPlan unchecked
 				PaySplitCur.PayPlanNum=0;
+			}
+		}
+
+		private void comboUnearnedTypes_SelectionChangeCommitted(object sender,EventArgs e) {
+			if(comboUnearnedTypes.SelectedIndex>0) {//If they use an unearned type the provnum must be zero.
+				comboProvider.SelectedIndex=0;
+				comboProvider.Enabled=false;
+				butPickProv.Enabled=false;
+				checkPayPlan.Checked=false;
+				checkPayPlan.Enabled=false;
+			}
+			else {
+				comboProvider.Enabled=true;
+				butPickProv.Enabled=true;
+				checkPayPlan.Enabled=true;
+			}
+		}
+
+		private void comboProvider_SelectionChangeCommitted(object sender,EventArgs e) {
+			if(comboProvider.SelectedIndex>0) {
+				comboUnearnedTypes.SelectedIndex=0;
+				comboUnearnedTypes.Enabled=false;
+			}
+			else {
+				comboUnearnedTypes.Enabled=true;
 			}
 		}
 
@@ -1080,14 +1366,22 @@ namespace OpenDental
 			PaySplitCur.DatePay=PIn.Date(textDatePay.Text);//gets overwritten anyway
 			PaySplitCur.ProcDate=procDate;
 			PaySplitCur.SplitAmt=amount;
-			if(comboProvider.SelectedIndex > -1) {//if none selected, we won't silently change
-				PaySplitCur.ProvNum=ProviderC.ListShort[comboProvider.SelectedIndex].ProvNum;
-			}
-			if(comboUnearnedTypes.SelectedIndex==0) {
+			//Provider and Unearned combos will be correct at this point, based on ProvNum or UnearnedType.
+			if(comboProvider.SelectedIndex > 0) {
+				PaySplitCur.ProvNum=ProviderC.ListShort[comboProvider.SelectedIndex-1].ProvNum;
 				PaySplitCur.UnearnedType=0;
 			}
 			else {
-				PaySplitCur.UnearnedType=DefC.Short[(int)DefCat.PaySplitUnearnedType][comboUnearnedTypes.SelectedIndex-1].DefNum;
+				if(comboUnearnedTypes.SelectedIndex==0 && !MsgBox.Show(this,MsgBoxButtons.YesNo,"Having a provider of \"None\" will mark this paysplit as a prepayment.  Continue?")) {
+					return;
+				}
+				PaySplitCur.ProvNum=0;//This means it's unallocated.
+				if(comboUnearnedTypes.SelectedIndex==0) {
+					PaySplitCur.UnearnedType=PrefC.GetLong(PrefName.PrepaymentUnearnedType);
+				}
+				else {
+					PaySplitCur.UnearnedType=DefC.Short[(int)DefCat.PaySplitUnearnedType][comboUnearnedTypes.SelectedIndex-1].DefNum;
+				}
 			}
 			if(PrefC.HasClinicsEnabled) {
 				//_listUserClinicNums contains all clinics the user has access to as well as ClinicNum 0 for 'none'
@@ -1108,25 +1402,5 @@ namespace OpenDental
 			}
 			DialogResult=DialogResult.Cancel;
 		}
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-
 	}
 }

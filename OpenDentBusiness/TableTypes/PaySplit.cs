@@ -45,6 +45,8 @@ namespace OpenDentBusiness{
 		///updates.  Not user editable with the UI.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.TimeStamp)]
 		public DateTime SecDateTEdit;
+		///<summary>FK to paysplit.SplitNum.  Can be 0.  Indicates that this paysplit is meant to counteract a prepayment paysplit.</summary>
+		public long PrepaymentNum;
 
 		///<summary>Returns a copy of this PaySplit.</summary>
 		public PaySplit Copy(){

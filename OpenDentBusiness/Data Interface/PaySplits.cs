@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Reflection;
 
 namespace OpenDentBusiness{
@@ -82,6 +83,15 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 		
+		///<summary>Gets one paysplit using the specified SplitNum.</summary>
+		public static PaySplit GetOne(long splitNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<PaySplit>(MethodBase.GetCurrentMethod(),splitNum);
+			}
+			string command="SELECT * FROM paysplit WHERE SplitNum="+POut.Long(splitNum);
+			return Crud.PaySplitCrud.SelectOne(command);
+		}
+
 		///<summary>Used from FormPayment to return the total payments for a procedure without requiring a supplied list.</summary>
 		public static string GetTotForProc(long procNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
@@ -237,6 +247,54 @@ namespace OpenDentBusiness{
 				}
 			}
 			return 0;
+		}
+
+		///<summary>Gets all paysplits that have are designated as prepayments for the patient's family.</summary>
+		public static List<PaySplit> GetPrepayForFam(Family fam) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<PaySplit>>(MethodBase.GetCurrentMethod(),fam);
+			}
+			List<long> listFamPatNums=fam.ListPats.Select(x => x.PatNum).Distinct().ToList();
+			string command="SELECT * FROM paysplit "
+				+"WHERE ProvNum=0 "
+				+"AND UnearnedType!=0 "
+				+"AND PrePaymentNum=0 "
+				+"AND PatNum IN ("+String.Join(",",listFamPatNums)+")";
+			return Crud.PaySplitCrud.SelectMany(command);
+		}
+
+		///<summary>Gets all paysplits that are attached to the prepayment paysplits specified.</summary>
+		public static List<PaySplit> GetSplitsForPrepay(List<PaySplit> listPrepaymentSplits) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<PaySplit>>(MethodBase.GetCurrentMethod(),listPrepaymentSplits);
+			}
+			if(listPrepaymentSplits==null || listPrepaymentSplits.Count < 1) {
+				return new List<PaySplit>();
+			}
+			List<long> listSplitNums=listPrepaymentSplits.Select(x => x.SplitNum).Distinct().ToList();
+			string command="SELECT * FROM paysplit WHERE PrePaymentNum IN ("+String.Join(",",listSplitNums)+")";
+			return Crud.PaySplitCrud.SelectMany(command);
+		}
+
+		///<summary>Returns the total amount of prepayments for the entire family.</summary>
+		public static decimal GetUnearnedForFam(Family fam) {
+			//No need to check RemotingRole; no call to db.
+			//Find all paysplits for this account with provnum=0
+			//Foreach paysplit find all other paysplits with paysplitnum == provnum0 paysplit
+			//Sum paysplit amounts, see if it covers provnum0 split.
+			//Any money left over sum and show as "Unallocated" aka unearned
+			decimal unearnedTotal=0;
+			List<PaySplit> listPrePayments=PaySplits.GetPrepayForFam(fam);
+			if(listPrePayments.Count>0) { 
+				foreach(PaySplit split in listPrePayments) {
+					unearnedTotal+=(decimal)split.SplitAmt;
+				}
+				List<PaySplit> listSplitsForPrePayment=PaySplits.GetSplitsForPrepay(listPrePayments);
+				foreach(PaySplit split in listSplitsForPrePayment) {
+					unearnedTotal+=(decimal)split.SplitAmt;//Splits for prepayments are generally negative.
+				}
+			}
+			return unearnedTotal;
 		}
 
 		///<summary>Used in FormPayment to sych database with changes user made to the paySplit list for a payment.  Must supply an old list for comparison.  Only the differences are saved.</summary>

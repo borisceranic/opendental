@@ -161,6 +161,9 @@ namespace OpenDental{
 		private CheckBox checkSuperFamSync;
 		private Label label27;
 		private ComboBox comboPaySplitManage;
+		private Label label28;
+		private ComboBox comboUnallocatedSplits;
+		private Def[] _arrayPaySplitUnearnedType;
 		private GroupBox groupBox3;
 
 		///<summary>Default constructor.  Opens the form with the Appts tab selected.</summary>
@@ -270,6 +273,8 @@ namespace OpenDental{
 			this.label15 = new System.Windows.Forms.Label();
 			this.comboCobRule = new System.Windows.Forms.ComboBox();
 			this.tabAccount = new System.Windows.Forms.TabPage();
+			this.label28 = new System.Windows.Forms.Label();
+			this.comboUnallocatedSplits = new System.Windows.Forms.ComboBox();
 			this.label27 = new System.Windows.Forms.Label();
 			this.comboPaySplitManage = new System.Windows.Forms.ComboBox();
 			this.checkPaymentsUsePatClin = new System.Windows.Forms.CheckBox();
@@ -1211,6 +1216,8 @@ namespace OpenDental{
 			// tabAccount
 			// 
 			this.tabAccount.BackColor = System.Drawing.SystemColors.Window;
+			this.tabAccount.Controls.Add(this.label28);
+			this.tabAccount.Controls.Add(this.comboUnallocatedSplits);
 			this.tabAccount.Controls.Add(this.label27);
 			this.tabAccount.Controls.Add(this.comboPaySplitManage);
 			this.tabAccount.Controls.Add(this.checkPaymentsUsePatClin);
@@ -1241,6 +1248,26 @@ namespace OpenDental{
 			this.tabAccount.TabIndex = 2;
 			this.tabAccount.Text = "Account";
 			// 
+			// label28
+			// 
+			this.label28.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.label28.Location = new System.Drawing.Point(28, 368);
+			this.label28.Name = "label28";
+			this.label28.Size = new System.Drawing.Size(247, 15);
+			this.label28.TabIndex = 222;
+			this.label28.Text = "Default unearned type for unallocated paysplits";
+			this.label28.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// comboUnallocatedSplits
+			// 
+			this.comboUnallocatedSplits.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboUnallocatedSplits.FormattingEnabled = true;
+			this.comboUnallocatedSplits.Location = new System.Drawing.Point(278, 365);
+			this.comboUnallocatedSplits.MaxDropDownItems = 30;
+			this.comboUnallocatedSplits.Name = "comboUnallocatedSplits";
+			this.comboUnallocatedSplits.Size = new System.Drawing.Size(163, 21);
+			this.comboUnallocatedSplits.TabIndex = 221;
+			// 
 			// label27
 			// 
 			this.label27.FlatStyle = System.Windows.Forms.FlatStyle.System;
@@ -1269,7 +1296,7 @@ namespace OpenDental{
 			this.checkPaymentsUsePatClin.Name = "checkPaymentsUsePatClin";
 			this.checkPaymentsUsePatClin.Size = new System.Drawing.Size(396, 17);
 			this.checkPaymentsUsePatClin.TabIndex = 210;
-			this.checkPaymentsUsePatClin.Text = "Payments Use Patient Clinic";
+			this.checkPaymentsUsePatClin.Text = "Patient Payments Use Patient Clinic";
 			this.checkPaymentsUsePatClin.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// checkRecurChargPriProv
@@ -2148,11 +2175,6 @@ namespace OpenDental{
 					comboProcDiscountType.SelectedIndex=i;
 				}
 			}
-			string[] paySplitEnumNames=Enum.GetNames(typeof(SplitManagerPromptType));
-			for(int i=0;i<paySplitEnumNames.Length;i++) {
-				comboPaySplitManage.Items.Add(paySplitEnumNames[i]);
-			}
-			comboPaySplitManage.SelectedIndex=PrefC.GetInt(PrefName.PaymentsPromptForAutoSplit);
 			//Check to see if any adjustment type preferences are hidden.
 			if(financeChargeAdjDefNum>0 && comboFinanceChargeAdjType.SelectedIndex==-1) {
 				comboFinanceChargeAdjType.Text=DefC.GetDef(DefCat.AdjTypes,financeChargeAdjDefNum).ItemName+" ("+Lan.g(this,"hidden")+")";
@@ -2249,6 +2271,19 @@ namespace OpenDental{
 			textInsWriteoffDescript.Text=PrefC.GetString(PrefName.InsWriteoffDescript);
 			checkRecurChargPriProv.Checked=PrefC.GetBool(PrefName.RecurringChargesUsePriProv);
 			checkPaymentsUsePatClin.Checked=PrefC.GetBool(PrefName.PaymentsUsePatientClinic);
+			string[] paySplitEnumNames=Enum.GetNames(typeof(SplitManagerPromptType));
+			for(int i=0;i<paySplitEnumNames.Length;i++) {
+				comboPaySplitManage.Items.Add(paySplitEnumNames[i]);
+			}
+			comboPaySplitManage.SelectedIndex=PrefC.GetInt(PrefName.PaymentsPromptForAutoSplit);
+			_arrayPaySplitUnearnedType=DefC.GetList(DefCat.PaySplitUnearnedType);
+			long defNum=PrefC.GetLong(PrefName.PrepaymentUnearnedType);
+			for(int i=0;i<_arrayPaySplitUnearnedType.Length;i++) {
+				comboUnallocatedSplits.Items.Add(_arrayPaySplitUnearnedType[i].ItemName);//fill combo
+				if(_arrayPaySplitUnearnedType[i].DefNum==defNum) {
+					comboUnallocatedSplits.SelectedIndex=i;
+				}
+			}
 			#endregion
 			#region TP Module
 			//TP module-----------------------------------------------------------------------
@@ -2644,6 +2679,7 @@ namespace OpenDental{
 				| Prefs.UpdateBool(PrefName.RecurringChargesUsePriProv,checkRecurChargPriProv.Checked)
 				| Prefs.UpdateString(PrefName.InsWriteoffDescript,textInsWriteoffDescript.Text)
 				| Prefs.UpdateBool(PrefName.PaymentsUsePatientClinic,checkPaymentsUsePatClin.Checked)
+				| Prefs.UpdateLong(PrefName.PrepaymentUnearnedType,_arrayPaySplitUnearnedType[comboUnallocatedSplits.SelectedIndex].DefNum)
 				#endregion
 				#region TP Module
 				| Prefs.UpdateString(PrefName.TreatmentPlanNote,textTreatNote.Text)

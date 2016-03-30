@@ -2291,6 +2291,31 @@ FROM insplan";
 			return retVal;
 		}
 
+		///<summary>LName, 'Preferred' FName M for the patnum passed in.  Uses the database.</summary>
+		public static string GetNameLF(long patNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),patNum);
+			}
+			Patient pat=Patients.GetPat(patNum);
+			string retVal="";
+			retVal+=pat.LName;
+			if(pat.FName!="" || pat.MiddleI!="" || pat.Preferred!="") {
+				retVal+=",";
+			}
+			if(pat.Preferred!="") {
+				retVal+=" '"+pat.Preferred+"'";
+			}
+			if(pat.FName!="") {
+				retVal=AddSpaceIfNeeded(retVal);
+				retVal+=pat.FName;
+			}
+			if(pat.MiddleI!="") {
+				retVal=AddSpaceIfNeeded(retVal);
+				retVal+=pat.MiddleI;
+			}
+			return retVal;
+		}
+
 		///<summary>LName, FName M</summary>
 		public static string GetNameLFnoPref(string LName,string FName,string MiddleI) {
 			return GetNameLF(LName,FName,"",MiddleI);

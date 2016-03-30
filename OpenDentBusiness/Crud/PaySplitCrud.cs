@@ -62,6 +62,7 @@ namespace OpenDentBusiness.Crud{
 				paySplit.ClinicNum      = PIn.Long  (row["ClinicNum"].ToString());
 				paySplit.SecUserNumEntry= PIn.Long  (row["SecUserNumEntry"].ToString());
 				paySplit.SecDateTEdit   = PIn.DateT (row["SecDateTEdit"].ToString());
+				paySplit.PrepaymentNum  = PIn.Long  (row["PrepaymentNum"].ToString());
 				retVal.Add(paySplit);
 			}
 			return retVal;
@@ -89,6 +90,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("ClinicNum");
 			table.Columns.Add("SecUserNumEntry");
 			table.Columns.Add("SecDateTEdit");
+			table.Columns.Add("PrepaymentNum");
 			foreach(PaySplit paySplit in listPaySplits) {
 				table.Rows.Add(new object[] {
 					POut.Long  (paySplit.SplitNum),
@@ -107,6 +109,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (paySplit.ClinicNum),
 					POut.Long  (paySplit.SecUserNumEntry),
 					POut.DateT (paySplit.SecDateTEdit,false),
+					POut.Long  (paySplit.PrepaymentNum),
 				});
 			}
 			return table;
@@ -147,7 +150,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="SplitNum,";
 			}
-			command+="SplitAmt,PatNum,ProcDate,PayNum,IsDiscount,DiscountType,ProvNum,PayPlanNum,DatePay,ProcNum,DateEntry,UnearnedType,ClinicNum,SecUserNumEntry) VALUES(";
+			command+="SplitAmt,PatNum,ProcDate,PayNum,IsDiscount,DiscountType,ProvNum,PayPlanNum,DatePay,ProcNum,DateEntry,UnearnedType,ClinicNum,SecUserNumEntry,PrepaymentNum) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(paySplit.SplitNum)+",";
 			}
@@ -165,8 +168,9 @@ namespace OpenDentBusiness.Crud{
 				+    DbHelper.Now()+","
 				+    POut.Long  (paySplit.UnearnedType)+","
 				+    POut.Long  (paySplit.ClinicNum)+","
-				+    POut.Long  (paySplit.SecUserNumEntry)+")";
+				+    POut.Long  (paySplit.SecUserNumEntry)+","
 				//SecDateTEdit can only be set by MySQL
+				+    POut.Long  (paySplit.PrepaymentNum)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -199,7 +203,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="SplitNum,";
 			}
-			command+="SplitAmt,PatNum,ProcDate,PayNum,IsDiscount,DiscountType,ProvNum,PayPlanNum,DatePay,ProcNum,DateEntry,UnearnedType,ClinicNum,SecUserNumEntry) VALUES(";
+			command+="SplitAmt,PatNum,ProcDate,PayNum,IsDiscount,DiscountType,ProvNum,PayPlanNum,DatePay,ProcNum,DateEntry,UnearnedType,ClinicNum,SecUserNumEntry,PrepaymentNum) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(paySplit.SplitNum)+",";
 			}
@@ -217,8 +221,9 @@ namespace OpenDentBusiness.Crud{
 				+    DbHelper.Now()+","
 				+    POut.Long  (paySplit.UnearnedType)+","
 				+    POut.Long  (paySplit.ClinicNum)+","
-				+    POut.Long  (paySplit.SecUserNumEntry)+")";
+				+    POut.Long  (paySplit.SecUserNumEntry)+","
 				//SecDateTEdit can only be set by MySQL
+				+    POut.Long  (paySplit.PrepaymentNum)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -243,9 +248,10 @@ namespace OpenDentBusiness.Crud{
 				+"ProcNum        =  "+POut.Long  (paySplit.ProcNum)+", "
 				//DateEntry not allowed to change
 				+"UnearnedType   =  "+POut.Long  (paySplit.UnearnedType)+", "
-				+"ClinicNum      =  "+POut.Long  (paySplit.ClinicNum)+" "
+				+"ClinicNum      =  "+POut.Long  (paySplit.ClinicNum)+", "
 				//SecUserNumEntry excluded from update
 				//SecDateTEdit can only be set by MySQL
+				+"PrepaymentNum  =  "+POut.Long  (paySplit.PrepaymentNum)+" "
 				+"WHERE SplitNum = "+POut.Long(paySplit.SplitNum);
 			Db.NonQ(command);
 		}
@@ -304,6 +310,10 @@ namespace OpenDentBusiness.Crud{
 			}
 			//SecUserNumEntry excluded from update
 			//SecDateTEdit can only be set by MySQL
+			if(paySplit.PrepaymentNum != oldPaySplit.PrepaymentNum) {
+				if(command!=""){ command+=",";}
+				command+="PrepaymentNum = "+POut.Long(paySplit.PrepaymentNum)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -355,6 +365,9 @@ namespace OpenDentBusiness.Crud{
 			}
 			//SecUserNumEntry excluded from update
 			//SecDateTEdit can only be set by MySQL
+			if(paySplit.PrepaymentNum != oldPaySplit.PrepaymentNum) {
+				return true;
+			}
 			return false;
 		}
 

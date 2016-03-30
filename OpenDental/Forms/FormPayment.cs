@@ -82,7 +82,7 @@ namespace OpenDental {
 		private CheckBox checkBalanceGroupByProv;
 		private UI.Button butSplitManage;
 		///<summary>Set this value to a PaySplitNum if you want one of the splits highlighted when opening this form.</summary>
-		public long InitialPaySplit;
+		public long InitialPaySplitNum;
 		private Patient _patCur;
 		private Family _famCur;
 		private Payment _paymentCur;
@@ -112,6 +112,11 @@ namespace OpenDental {
 		///as comboClinic and is used to set payment.ClinicNum when saving.</summary>
 		private List<long> _listUserClinicNums;
 		private bool _isCCDeclined;
+		///<summary>Set to a positive amount if there is an unearned amount for the patient and they want to use it.</summary>
+		public double UnearnedAmt;
+		private UI.Button butPrePay;
+		///<summary>Fill this list with procedures prior to loading that need to have paysplits created and attached.</summary>
+		public List<Procedure> ListProcs;
 
 		///<summary>PatCur and FamCur are not for the PatCur of the payment.  They are for the patient and family from which this window was accessed.</summary>
 		public FormPayment(Patient patCur,Family famCur,Payment paymentCur) {
@@ -195,6 +200,7 @@ namespace OpenDental {
 			this.butOK = new OpenDental.UI.Button();
 			this.butDeleteAll = new OpenDental.UI.Button();
 			this.butAdd = new OpenDental.UI.Button();
+			this.butPrePay = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -640,6 +646,7 @@ namespace OpenDental {
 			this.textNote.QuickPasteType = OpenDentBusiness.QuickPasteType.Payment;
 			this.textNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textNote.Size = new System.Drawing.Size(290, 80);
+			this.textNote.SpellCheckIsEnabled = false;
 			this.textNote.TabIndex = 3;
 			this.textNote.Text = "";
 			// 
@@ -649,7 +656,7 @@ namespace OpenDental {
 			this.textAmount.MaxVal = 100000000D;
 			this.textAmount.MinVal = -100000000D;
 			this.textAmount.Name = "textAmount";
-			this.textAmount.Size = new System.Drawing.Size(84, 20);
+			this.textAmount.Size = new System.Drawing.Size(100, 20);
 			this.textAmount.TabIndex = 0;
 			// 
 			// textDate
@@ -723,10 +730,25 @@ namespace OpenDental {
 			this.butAdd.Text = "&Add Split";
 			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
 			// 
+			// butPrePay
+			// 
+			this.butPrePay.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPrePay.Autosize = true;
+			this.butPrePay.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPrePay.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPrePay.CornerRadius = 4F;
+			this.butPrePay.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butPrePay.Location = new System.Drawing.Point(207, 90);
+			this.butPrePay.Name = "butPrePay";
+			this.butPrePay.Size = new System.Drawing.Size(92, 20);
+			this.butPrePay.TabIndex = 136;
+			this.butPrePay.Text = "Prepayment";
+			this.butPrePay.Click += new System.EventHandler(this.butPrePay_Click);
+			// 
 			// FormPayment
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(974, 562);
+			this.Controls.Add(this.butPrePay);
 			this.Controls.Add(this.butPrintReceipt);
 			this.Controls.Add(this.checkBalanceGroupByProv);
 			this.Controls.Add(this.butSplitManage);
@@ -781,7 +803,6 @@ namespace OpenDental {
 			this.MinimumSize = new System.Drawing.Size(988, 559);
 			this.Name = "FormPayment";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Payment";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormPayment_FormClosing);
 			this.Load += new System.EventHandler(this.FormPayment_Load);
@@ -883,10 +904,94 @@ namespace OpenDental {
 					}
 				}
 			}
+			if(IsNew && UnearnedAmt>0) {
+				List<PaySplit> listPrePaySplits=PaySplits.GetPrepayForFam(_famCur);
+				//Get all claimprocs for the proc
+				List<ClaimProc> listClaimProcs=ClaimProcs.GetForProcs(ListProcs.Select(x => x.ProcNum).Distinct().ToList());
+				foreach(Procedure proc in ListProcs) {//For each proc see how much of the Unearned we use per proc
+					//Calculate the amount remaining on the procedure so we can know how much of the remaining pre-payment amount we can use.
+					double patPortion=ClaimProcs.GetPatPortion(proc,listClaimProcs);
+					if(UnearnedAmt<=0) {//UnearnedAmt has all been used up, be nice and make splits for the remaining selected procedures.
+						PaySplit split=new PaySplit();
+						split.PatNum=_patCur.PatNum;
+						split.PayNum=_paymentCur.PayNum;
+						split.PrepaymentNum=0;
+						split.ProvNum=proc.ProvNum;
+						split.ClinicNum=proc.ClinicNum;
+						split.SplitAmt=patPortion;
+						split.DatePay=DateTime.Now;
+						split.ProcDate=DateTime.Now;
+						if(proc.ProcNum!=0) {
+							split.ProcNum=proc.ProcNum;
+						}
+						_listPaySplits.Add(split);
+						textAmount.Text=(PIn.Double(textAmount.Text)+patPortion).ToString("F");
+						continue;
+					}
+					foreach(PaySplit prePaySplit in listPrePaySplits) {
+						//First we need to decide how much of each pre-payment split we can use per proc.
+						decimal splitTotal=0;
+						List<PaySplit> listSplitsForPrePay=PaySplits.GetSplitsForPrepay(new List<PaySplit>() { prePaySplit });//Find all splits for the pre-payment.
+						foreach(PaySplit splitForPrePay in listSplitsForPrePay) {
+							splitTotal-=(decimal)splitForPrePay.SplitAmt;//Sum the amount of the pre-payment that's used. (balancing splits are negative usually)
+						}
+						if(splitTotal<(decimal)prePaySplit.SplitAmt) {//If the sum indicates there's pre-payment amount left over, let's use it.
+							double amtToUse=0;
+							if(UnearnedAmt<patPortion) {
+								amtToUse=UnearnedAmt;
+							}
+							else {
+								amtToUse=patPortion;
+							}
+							UnearnedAmt-=amtToUse;//Reflect the new unearned amount available for future proc use.
+							PaySplit split=new PaySplit();
+							split.PatNum=_patCur.PatNum;
+							split.PayNum=_paymentCur.PayNum;
+							split.PrepaymentNum=prePaySplit.SplitNum;
+							split.ProvNum=0;
+							split.SplitAmt=0-amtToUse;
+							split.UnearnedType=prePaySplit.UnearnedType;
+							split.DatePay=DateTime.Now;
+							split.ProcDate=DateTime.Now;
+							_listPaySplits.Add(split);
+							//Make a different paysplit attached to proc and prov they want to use it for.
+							split=new PaySplit();
+							split.PatNum=_patCur.PatNum;
+							split.PayNum=_paymentCur.PayNum;
+							split.PrepaymentNum=0;
+							split.ProvNum=proc.ProvNum;
+							split.ClinicNum=proc.ClinicNum;
+							split.SplitAmt=amtToUse;
+							split.DatePay=DateTime.Now;
+							split.ProcDate=DateTime.Now;
+							if(proc.ProcNum!=0) {
+								split.ProcNum=proc.ProcNum;
+							}
+							_listPaySplits.Add(split);
+							if(patPortion-amtToUse>0) {//The remaining UnearnedAmt didn't pay for the whole proc, let's be nice and make them a split for the difference.
+								split=new PaySplit();
+								split.PatNum=_patCur.PatNum;
+								split.PayNum=_paymentCur.PayNum;
+								split.PrepaymentNum=0;
+								split.ProvNum=proc.ProvNum;
+								split.ClinicNum=proc.ClinicNum;
+								split.SplitAmt=(patPortion-amtToUse);
+								split.DatePay=DateTime.Now;
+								split.ProcDate=DateTime.Now;
+								if(proc.ProcNum!=0) {
+									split.ProcNum=proc.ProcNum;
+								}
+								_listPaySplits.Add(split);
+								textAmount.Text=(PIn.Double(textAmount.Text)+(patPortion-amtToUse)).ToString("F");
+							}
+						}
+					}
+				}
+			}
 			FillMain();
-			if(InitialPaySplit!=0) {
+			if(InitialPaySplitNum!=0) {
 				for(int i=0;i<_listPaySplits.Count;i++) {
-					if(InitialPaySplit==_listPaySplits[i].SplitNum) {
+					if(InitialPaySplitNum==_listPaySplits[i].SplitNum) {
 						gridMain.SetSelected(i,true);
 					}
 				}
@@ -2255,6 +2360,33 @@ namespace OpenDental {
 
 		private void butPrintReceipt_Click(object sender,EventArgs e) {
 			PrintReceipt(_paymentCur.Receipt);
+		}
+
+		private void butPrePay_Click(object sender,EventArgs e) {
+			if(PIn.Double(textAmount.Text)==0) {
+				MsgBox.Show(this,"Amount must be greater than zero.");
+				return;
+			}
+			if(_listPaySplits.Count>0) {
+				if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"This will replace all Payment Splits with one split for the total amount.  Continue?")) {
+					return;
+				}
+			}
+			_listPaySplits.Clear();
+			PaySplit split=new PaySplit();
+			split.PatNum=_patCur.PatNum;
+			split.PayNum=_paymentCur.PayNum;
+			split.PrepaymentNum=0;
+			split.SplitAmt=PIn.Double(textAmount.Text);
+			split.DatePay=DateTime.Now;
+			split.ProcDate=_paymentCur.PayDate;
+			split.UnearnedType=PrefC.GetLong(PrefName.PrepaymentUnearnedType);
+			_listPaySplits.Add(split); 
+			FillMain();
+			if(!SavePaymentToDb()) {
+				return;
+			}
+			DialogResult=DialogResult.OK;
 		}
 
 		private bool SavePaymentToDb() {

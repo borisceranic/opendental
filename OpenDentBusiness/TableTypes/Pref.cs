@@ -475,6 +475,8 @@ namespace OpenDentBusiness {
 		///<summary>This is the default pregnancy code used for diagnosing pregnancy from FormVitalSignEdit2014 and is displayed/set in FormEhrSettings.  When the check box for BMI and BP not taken due to pregnancy Dx is selected, this code value will be inserted into the diseasedef table in the column identified by the PregnancyDefaultCodeSystem (i.e. diseasedef.SnomedCode, diseasedef.ICD9Code).  It will then be a FK in the diseasedef table to the associated code system table.</summary>
 		PregnancyDefaultCodeValue,
 		PregnancyDefaultCodeSystem,
+		///<summary>FK to definition.DefNum for PaySplitUnearnedType defcat (29)</summary>
+		PrepaymentUnearnedType,
 		///<summary>In Patient Edit and Add Family windows, the Primary Provider defaults to 'Select Provider' instead of the practice provider.</summary>
 		PriProvDefaultToSelectProv,
 		///<summary>FK to diseasedef.DiseaseDefNum</summary>

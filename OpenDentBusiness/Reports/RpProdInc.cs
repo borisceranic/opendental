@@ -15,7 +15,7 @@ namespace OpenDentBusiness {
 
 		#region Daily and Provider P&I Reports
 		///<summary>If not using clinics then supply an empty list of clinicNums.  Also used for the CEMT Provider P and I report.</summary>
-		public static DataSet GetDailyData(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics,bool hasBreakdown,bool hasClinicInfo) {
+		public static DataSet GetDailyData(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics,bool hasBreakdown,bool hasClinicInfo,bool showUnearned) {
 			//No need to check RemotingRole; no call to db.
 			if(listClinics.Count>0) {
 				_hasClinics=true;
@@ -23,7 +23,7 @@ namespace OpenDentBusiness {
       if(!hasClinicInfo) {
         _hasClinics=false;
       }
-			DataSet dataSet=GetDailyProdIncDataSet(dateFrom,dateTo,listProvs,listClinics,writeOffPay,hasAllProvs,hasAllClinics);
+			DataSet dataSet=GetDailyProdIncDataSet(dateFrom,dateTo,listProvs,listClinics,writeOffPay,hasAllProvs,hasAllClinics,showUnearned);
 			DataTable tableProduction=dataSet.Tables["tableProduction"];
 			DataTable tableAdj=dataSet.Tables["tableAdj"];
 			DataTable tableInsWriteoff=dataSet.Tables["tableInsWriteoff"];
@@ -167,11 +167,11 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary></summary>
-		public static DataSet GetProviderDataForClinics(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
+		public static DataSet GetProviderDataForClinics(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics,bool showUnearned) {
 			if(listClinics.Count>0) {
 				_hasClinics=true;
 			}
-			DataSet dataSet=GetDailyProdIncDataSet(dateFrom,dateTo,listProvs,listClinics,writeOffPay,hasAllProvs,hasAllClinics);
+			DataSet dataSet=GetDailyProdIncDataSet(dateFrom,dateTo,listProvs,listClinics,writeOffPay,hasAllProvs,hasAllClinics,showUnearned);
 			DataTable tableProduction=dataSet.Tables["tableProduction"];
 			DataTable tableAdj=dataSet.Tables["tableAdj"];
 			DataTable tableInsWriteoff=dataSet.Tables["tableInsWriteoff"];
@@ -361,13 +361,16 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>Returns a dataset that contains 5 tables used to generate the daily report.  If not using clinics then simply supply an empty list of clinicNums.  Also used for the CEMT Provider P and I report</summary>
-		public static DataSet GetDailyProdIncDataSet(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
+		public static DataSet GetDailyProdIncDataSet(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics,bool showUnearned) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetDS(MethodBase.GetCurrentMethod(),dateFrom,dateTo,listProvs,listClinics,writeOffPay,hasAllProvs,hasAllClinics);
+				return Meth.GetDS(MethodBase.GetCurrentMethod(),dateFrom,dateTo,listProvs,listClinics,writeOffPay,hasAllProvs,hasAllClinics,showUnearned);
 			}
 			List<long> listProvNums=new List<long>();
 			for(int i=0;i<listProvs.Count;i++) {
 				listProvNums.Add(listProvs[i].ProvNum);
+			}
+			if(!hasAllProvs && showUnearned) {
+				listProvNums.Add(0);//ProvNum=0 is unearned
 			}
 			List<long> listClinicNums=new List<long>();
 			for(int i=0;i<listClinics.Count;i++) {
@@ -554,12 +557,12 @@ namespace OpenDentBusiness {
 
 		#region Monthly P&I Report
 		///<summary>If not using clinics then supply an empty list of clinics.</summary>
-		public static DataSet GetMonthlyData(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
+		public static DataSet GetMonthlyData(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics,bool showUnearned) {
 			//No need to check RemotingRole; no call to db.
 			if(listClinics.Count>0) {
 				_hasClinics=true;
 			}
-			DataSet dataSet=GetMonthlyProdIncDataSet(dateFrom,dateTo,listProvs,listClinics,writeOffPay,hasAllProvs,hasAllClinics);
+			DataSet dataSet=GetMonthlyProdIncDataSet(dateFrom,dateTo,listProvs,listClinics,writeOffPay,hasAllProvs,hasAllClinics,showUnearned);
 			DataTable tableProduction=dataSet.Tables["tableProduction"];
 			DataTable tableAdj=dataSet.Tables["tableAdj"];
 			DataTable tableInsWriteoff=dataSet.Tables["tableInsWriteoff"];
@@ -798,13 +801,16 @@ namespace OpenDentBusiness {
 
 		///<summary>Returns a dataset that contains 5 tables used to generate the monthly report. If not using clinics then supply an empty list of clinics.
 		/// Does not work for Oracle (by chance not by design). Consider enhancing with DbHelper.Year(),DbHelper.Month(), DbHelper.Day() and enhancing the GroupBy Logic.</summary>
-		public static DataSet GetMonthlyProdIncDataSet(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
+		public static DataSet GetMonthlyProdIncDataSet(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics,bool showUnearned) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetDS(MethodBase.GetCurrentMethod(),dateFrom,dateTo,listProvs,listClinics,writeOffPay,hasAllProvs,hasAllClinics);
+				return Meth.GetDS(MethodBase.GetCurrentMethod(),dateFrom,dateTo,listProvs,listClinics,writeOffPay,hasAllProvs,hasAllClinics,showUnearned);
 			}
 			List<long> listClinicNums=new List<long>();
 			for(int i=0;i<listClinics.Count;i++) {
 				listClinicNums.Add(listClinics[i].ClinicNum);
+			}
+			if(!hasAllProvs && showUnearned) {
+				listClinicNums.Add(0);
 			}
 			List<long> listProvNums=new List<long>();
 			for(int i=0;i<listProvs.Count;i++) {
@@ -976,13 +982,13 @@ namespace OpenDentBusiness {
 
 		#region Annual P&I Report
 		///<summary>If not using clinics then supply an empty list of clinics.</summary>
-		public static DataSet GetAnnualData(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
+		public static DataSet GetAnnualData(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics,bool showUnearned) {
 			//No need to check RemotingRole; no call to db.
 			//No need to check RemotingRole; no call to db.
 			if(listClinics.Count>0) {
 				_hasClinics=true;
 			}
-			DataSet dataSet=GetAnnualProdIncDataSet(dateFrom,dateTo,listProvs,listClinics,writeOffPay,hasAllProvs,hasAllClinics);
+			DataSet dataSet=GetAnnualProdIncDataSet(dateFrom,dateTo,listProvs,listClinics,writeOffPay,hasAllProvs,hasAllClinics,showUnearned);
 			DataTable tableProduction=dataSet.Tables["tableProduction"];
 			DataTable tableAdj=dataSet.Tables["tableAdj"];
 			DataTable tableInsWriteoff=dataSet.Tables["tableInsWriteoff"];
@@ -1174,9 +1180,9 @@ namespace OpenDentBusiness {
 
 		///<summary>Returns a dataset that contains 5 tables used to generate the annual report. If not using clinics then supply an empty list of clinics.
 		/// Does not work for Oracle (by chance not by design). Consider enhancing with DbHelper.Year(),DbHelper.Month(), DbHelper.Day() and enhancing the GroupBy Logic.</summary>
-		public static DataSet GetAnnualProdIncDataSet(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics) {
+		public static DataSet GetAnnualProdIncDataSet(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics,bool showUnearned) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetDS(MethodBase.GetCurrentMethod(),dateFrom,dateTo,listProvs,listClinics,writeOffPay,hasAllProvs,hasAllClinics);
+				return Meth.GetDS(MethodBase.GetCurrentMethod(),dateFrom,dateTo,listProvs,listClinics,writeOffPay,hasAllProvs,hasAllClinics,showUnearned);
 			}
 			List<long> listClinicNums=new List<long>();
 			for(int i=0;i<listClinics.Count;i++) {
@@ -1185,6 +1191,9 @@ namespace OpenDentBusiness {
 			List<long> listProvNums=new List<long>();
 			for(int i=0;i<listProvs.Count;i++) {
 				listProvNums.Add(listProvs[i].ProvNum);
+			}
+			if(!hasAllProvs && showUnearned) {
+				listClinicNums.Add(0);
 			}
 			//Procedures------------------------------------------------------------------------------
 			string whereProv="";

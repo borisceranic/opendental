@@ -317,7 +317,8 @@ namespace OpenDental{
 						|| DefCur.DefNum==PrefC.GetLong(PrefName.AppointmentTimeDismissedTrigger)
 						|| DefCur.DefNum==PrefC.GetLong(PrefName.TreatPlanDiscountAdjustmentType)
 						|| DefCur.DefNum==PrefC.GetLong(PrefName.BillingChargeAdjustmentType)
-						|| DefCur.DefNum==PrefC.GetLong(PrefName.FinanceChargeAdjustmentType)) 
+						|| DefCur.DefNum==PrefC.GetLong(PrefName.FinanceChargeAdjustmentType)
+						|| DefCur.DefNum==PrefC.GetLong(PrefName.PrepaymentUnearnedType)) 
 					{
 						MsgBox.Show(this,"You cannot hide a definition if it is in use within Module Preferences.");
 						return;

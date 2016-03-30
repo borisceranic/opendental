@@ -357,7 +357,58 @@ namespace OpenDentBusiness {
 					INSERT INTO displayreport(DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODEncounterFile',1,'Encounter File',5,0);";
 					Db.NonQ(command);
 				}
-
+				if(DataConnection.DBtype==DatabaseType.MySql) {//Insert PaySplitUnearnedType definition if it doesn't already exist.
+					command="SELECT COUNT(*) FROM definition WHERE Category=29 AND ItemName='Prepayment'";
+					if(PIn.Int(Db.GetCount(command))==0) {//PaySplitUnearnedType definition doesn't already exist
+						command="SELECT MAX(ItemOrder)+1 FROM definition WHERE Category=29";
+						string maxOrder=Db.GetScalar(command);
+						if(maxOrder=="") {
+							maxOrder="0";
+						}
+						command="INSERT INTO definition (Category, ItemOrder, ItemName) VALUES (29,"+maxOrder+",'Prepayment')";
+						Db.NonQ(command);
+					}
+				}
+				else {//oracle (Note for reviewer: I'm not at all sure this is oracle compatible)
+					command="SELECT COUNT(*) FROM definition WHERE Category=29 AND ItemName='Prepayment'";
+					if(PIn.Int(Db.GetCount(command))==0) {//PaySplitUnearnedType definition doesn't already exist
+						command="SELECT MAX(ItemOrder)+1 FROM definition WHERE Category=29";
+						string maxOrder=Db.GetScalar(command);
+						if(maxOrder=="") {
+							maxOrder="0";
+						}
+						command="INSERT INTO definition (DefNum,Category, ItemOrder, ItemName) VALUES ((SELECT MAX(DefNum)+1 FROM definition),29,"+maxOrder+",'Prepayment')";
+						Db.NonQ(command);
+					}
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="SELECT DefNum FROM definition WHERE Category=29 AND ItemName='Prepayment'";
+					string defNum=Db.GetScalar(command);
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('PrepaymentUnearnedType','"+defNum+"')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="SELECT DefNum FROM definition WHERE Category=29 AND ItemName='Prepayment'";
+					string defNum=Db.GetScalar(command);
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'PrepaymentUnearnedType','"+defNum+"')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE paysplit ADD PrepaymentNum bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE paysplit ADD INDEX (PrepaymentNum)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE paysplit ADD PrepaymentNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE paysplit SET PrepaymentNum = 0 WHERE PrepaymentNum IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE paysplit MODIFY PrepaymentNum NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX paysplit_PrepaymentNum ON paysplit (PrepaymentNum)";
+					Db.NonQ(command);
+				}
 				command="UPDATE preference SET ValueString = '16.2.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}

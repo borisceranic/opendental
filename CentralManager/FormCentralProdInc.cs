@@ -755,7 +755,7 @@ namespace CentralManager {
 			unassigned.ClinicNum=0;
 			unassigned.Description="Unassigned";//Is this how we should do this?  Will there always be different clinics? (I assume so, otherwise CEMT is kinda worthless)
 			listClinics.Add(unassigned);
-			listProdData=RpProdInc.GetAnnualData(_dateFrom,_dateTo,listProvs,listClinics,radioWriteoffPay.Checked,true,true);
+			listProdData=RpProdInc.GetAnnualData(_dateFrom,_dateTo,listProvs,listClinics,radioWriteoffPay.Checked,true,true,true);
 			odThread.Tag=new object[] { listProdData,conn };
 		}
 
@@ -773,7 +773,7 @@ namespace CentralManager {
 			unassigned.ClinicNum=0;
 			unassigned.Description="Unassigned";//Same issue here as above.
 			listClinics.Add(unassigned);
-			listProdData=RpProdInc.GetMonthlyData(_dateFrom,_dateTo,listProvs,listClinics,radioWriteoffPay.Checked,true,true);
+			listProdData=RpProdInc.GetMonthlyData(_dateFrom,_dateTo,listProvs,listClinics,radioWriteoffPay.Checked,true,true,true);
 			odThread.Tag=new object[] { listProdData,conn };
 		}
 
@@ -791,7 +791,7 @@ namespace CentralManager {
 			unassigned.ClinicNum=0;
 			unassigned.Description="Unassigned";//Same issue here as above.
 			listClinics.Add(unassigned);
-			dataSetProdData=RpProdInc.GetDailyData(_dateFrom,_dateTo,listProvs,listClinics,radioWriteoffPay.Checked,true,true,false,true);
+			dataSetProdData=RpProdInc.GetDailyData(_dateFrom,_dateTo,listProvs,listClinics,radioWriteoffPay.Checked,true,true,false,true,true);
 			odThread.Tag=new object[] { dataSetProdData,conn };
 		}
 
@@ -809,7 +809,7 @@ namespace CentralManager {
 			unassigned.ClinicNum=0;
 			unassigned.Description="Unassigned";//Same issue here as above.
 			listClinics.Add(unassigned);
-			listProdData=RpProdInc.GetProviderDataForClinics(_dateFrom,_dateTo,listProvs,listClinics,radioWriteoffPay.Checked,true,true);
+			listProdData=RpProdInc.GetProviderDataForClinics(_dateFrom,_dateTo,listProvs,listClinics,radioWriteoffPay.Checked,true,true,true);
 			odThread.Tag=new object[] { listProdData,conn,listProvs };
 		}
 

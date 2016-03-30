@@ -83,14 +83,17 @@ provider.Abbr, ";
 		}
 
 		///<summary>If not using clinics then supply an empty list of clinicNums.  listClinicNums must have at least one item if using clinics.</summary>
-		public static DataTable GetPatTable(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,List<long> listPatientTypes,bool hasAllProvs,bool hasAllClinics,bool hasPatientTypes,bool isGroupedByPatient) {
+		public static DataTable GetPatTable(DateTime dateFrom,DateTime dateTo,List<long> listProvNums,List<long> listClinicNums,List<long> listPatientTypes,bool hasAllProvs,bool hasAllClinics,bool hasPatientTypes,bool isGroupedByPatient,bool showUnearned) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateFrom,dateTo,listProvNums,listClinicNums,listPatientTypes,hasAllProvs,hasAllClinics,hasPatientTypes,isGroupedByPatient);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateFrom,dateTo,listProvNums,listClinicNums,listPatientTypes,hasAllProvs,hasAllClinics,hasPatientTypes,isGroupedByPatient,showUnearned);
 			}
 			//patient payments-----------------------------------------------------------------------------------------
 			string whereProv="";
 			if(!hasAllProvs) {
 				whereProv+=" AND paysplit.ProvNum IN("+string.Join(",",listProvNums)+") ";
+			}
+			if(!hasAllProvs && showUnearned) {
+				whereProv+=" OR paysplit.ProvNum=0 ";
 			}
 			string whereClin="";
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {

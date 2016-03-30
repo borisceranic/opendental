@@ -31,6 +31,7 @@ namespace OpenDental{
 		private Label labelSplits;
 		private ListBox listInsuranceTypes;
 		private CheckBox checkAllProv;
+		private CheckBox checkShowUnearned;
 		private List<Clinic> _listClinics;
 
 		///<summary></summary>
@@ -76,6 +77,7 @@ namespace OpenDental{
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
 			this.listInsuranceTypes = new System.Windows.Forms.ListBox();
+			this.checkShowUnearned = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -268,10 +270,21 @@ namespace OpenDental{
 			this.listInsuranceTypes.Size = new System.Drawing.Size(163, 186);
 			this.listInsuranceTypes.TabIndex = 55;
 			// 
+			// checkShowUnearned
+			// 
+			this.checkShowUnearned.Checked = true;
+			this.checkShowUnearned.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.checkShowUnearned.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkShowUnearned.Location = new System.Drawing.Point(592, 34);
+			this.checkShowUnearned.Name = "checkShowUnearned";
+			this.checkShowUnearned.Size = new System.Drawing.Size(95, 16);
+			this.checkShowUnearned.TabIndex = 56;
+			this.checkShowUnearned.Text = "Show Unearned";
+			// 
 			// FormRpPaySheet
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(818, 495);
+			this.Controls.Add(this.checkShowUnearned);
 			this.Controls.Add(this.listInsuranceTypes);
 			this.Controls.Add(this.checkAllClin);
 			this.Controls.Add(this.listClin);
@@ -293,7 +306,6 @@ namespace OpenDental{
 			this.MinimizeBox = false;
 			this.Name = "FormRpPaySheet";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Daily Payments Report";
 			this.Load += new System.EventHandler(this.FormPaymentSheet_Load);
 			this.groupBox1.ResumeLayout(false);
@@ -451,7 +463,7 @@ namespace OpenDental{
 				}
 			}
 			DataTable tableIns=RpPaySheet.GetInsTable(date1.SelectionStart,date2.SelectionStart,listProvNums,listClinicNums,listInsTypes,checkAllProv.Checked,checkAllClin.Checked,checkInsuranceTypes.Checked,radioPatient.Checked);
-			DataTable tablePat=RpPaySheet.GetPatTable(date1.SelectionStart,date2.SelectionStart,listProvNums,listClinicNums,listPatTypes,checkAllProv.Checked,checkAllClin.Checked,checkPatientTypes.Checked,radioPatient.Checked);
+			DataTable tablePat=RpPaySheet.GetPatTable(date1.SelectionStart,date2.SelectionStart,listProvNums,listClinicNums,listPatTypes,checkAllProv.Checked,checkAllClin.Checked,checkPatientTypes.Checked,radioPatient.Checked,checkShowUnearned.Checked);
 			string subtitleProvs="";
 			string subtitleClinics="";
 			if(checkAllProv.Checked) {
