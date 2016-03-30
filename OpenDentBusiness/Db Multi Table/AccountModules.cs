@@ -810,9 +810,9 @@ namespace OpenDentBusiness {
 				+"AND procedurelog.PatNum IN ("
 				+familyPatNums;
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
-				command+=") GROUP BY procedurelog.ClinicNum,procedurelog.BaseUnits,procedurelog.BillingNote,procedurecode.CodeNum,Descript,LaymanTerm,procedurelog.MedicalCode,procedurelog.PatNum,ProcCode,"
-					+DbHelper.DtimeToDate("procedurelog.ProcDate")+",ProcFee,procedurelog.ProcNum,procedurelog.ProcNumLab,procedurelog.ProvNum,procedurelog.Surf,ToothNum,"
-					+"ToothRange,UnitQty ";
+				command+=") GROUP BY procedurelog.ClinicNum,procedurelog.BaseUnits,procedurelog.BillingNote,procedurecode.CodeNum,procedurecode.AbbrDesc"
+					+",Descript,LaymanTerm,procedurelog.MedicalCode,procedurelog.PatNum,ProcCode,"+DbHelper.DtimeToDate("procedurelog.ProcDate")+",ProcFee"
+					+",procedurelog.ProcNum,procedurelog.ProcNumLab,procedurelog.ProvNum,procedurelog.Surf,ToothNum,ToothRange,UnitQty ";
 			}
 			else{//mysql. Including Descript in the GROUP BY causes mysql to lock up sometimes.  Unsure why.
 				command+=") GROUP BY procedurelog.ProcNum ";
