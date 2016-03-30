@@ -930,8 +930,9 @@ namespace OpenDentBusiness{
 			List<long> listPatNums=new List<long>();
 			List<long> listRefNums=new List<long>();
 			for(int i=0;i<raw.Rows.Count;i++) {
-				if(!listPatNums.Contains((long)raw.Rows[i]["apptPatNum"])) {
-					listPatNums.Add((long)raw.Rows[i]["apptPatNum"]);
+				long apptPatNum=PIn.Long(raw.Rows[i]["apptPatNum"].ToString());
+				if(!listPatNums.Contains(apptPatNum)) {
+					listPatNums.Add(apptPatNum);
 				}
 			}
 			List<RefAttach> listRefAttaches=RefAttaches.GetRefAttaches(listPatNums);
