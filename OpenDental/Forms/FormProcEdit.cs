@@ -3805,7 +3805,7 @@ namespace OpenDental{
 		private void gridPay_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			Payment PaymentCur=Payments.GetFromList(((PaySplit)PaySplitsForProc[e.Row]).PayNum,PaymentsForProc);
 			FormPayment FormP=new FormPayment(PatCur,FamCur,PaymentCur);
-			FormP.InitialPaySplit=((PaySplit)PaySplitsForProc[e.Row]).SplitNum;
+			FormP.InitialPaySplitNum=((PaySplit)PaySplitsForProc[e.Row]).SplitNum;
 			FormP.ShowDialog();
 			FillPayments();
 		}
