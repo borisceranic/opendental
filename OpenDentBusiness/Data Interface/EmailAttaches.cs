@@ -19,11 +19,7 @@ namespace OpenDentBusiness{
 		}
 
 		public static List<EmailAttach> GetForEmail(long emailMessageNum) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<EmailAttach>>(MethodBase.GetCurrentMethod(),emailMessageNum);
-			}
-			string command="SELECT * FROM emailattach WHERE EmailMessageNum="+POut.Long(emailMessageNum);
-			return Crud.EmailAttachCrud.SelectMany(command);
+			return GetForEmails(new List<long>() { emailMessageNum });
 		}
 
 		public static List<EmailAttach> GetForEmails(List<long> listEmailMessageNums) {
@@ -31,7 +27,13 @@ namespace OpenDentBusiness{
 				return Meth.GetObject<List<EmailAttach>>(MethodBase.GetCurrentMethod(),listEmailMessageNums);
 			}
 			List<EmailAttach> listAttaches=new List<EmailAttach>();
-			if(listEmailMessageNums.Count < 1) {
+			if(listEmailMessageNums==null || listEmailMessageNums.Count==0) {
+				return listAttaches;
+			}
+			//Skip all attachments that are for EmailMessageNum of 0 because those are meant for Templates, not emails.
+			//Use GetForTemplate() instead of GetForEmails if you want all template attachments.
+			List<long> listFilteredEmailMessageNums=listEmailMessageNums.FindAll(x => x!=0);
+			if(listFilteredEmailMessageNums.Count < 1) {
 				return listAttaches;
 			}
 			string command="SELECT * FROM emailattach WHERE EmailMessageNum IN("+string.Join(",",listEmailMessageNums)+")";
