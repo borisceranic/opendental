@@ -11462,12 +11462,13 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else if(programNum>0) {//oracle
-					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ClinicNum"
 						+") VALUES("
 						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
 						+"'"+POut.Long(programNum)+"', "
 						+"'Disable Advertising', "
-						+"'0')";
+						+"'0', "
+						+"0)";
 					Db.NonQ(command);
 				}
 				//DentalIntel Advertising block----------------------------------------------------------------------
@@ -11486,12 +11487,13 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else if(programNum>0) {//oracle
-					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ClinicNum"
 						+") VALUES("
 						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
 						+"'"+POut.Long(programNum)+"', "
 						+"'Disable Advertising', "
-						+"'0')";
+						+"'0', "
+						+"0)";
 					Db.NonQ(command);
 				}
 				//DentalTekSmartOfficePhone Advertising block----------------------------------------------------------------------
@@ -11510,12 +11512,13 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else if(programNum>0) {//oracle
-					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ClinicNum"
 						+") VALUES("
 						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
 						+"'"+POut.Long(programNum)+"', "
 						+"'Disable Advertising', "
-						+"'0')";
+						+"'0', "
+						+"0)";
 					Db.NonQ(command);
 				}
 				//CentralDataStorage Advertising block----------------------------------------------------------------------
@@ -11548,12 +11551,13 @@ namespace OpenDentBusiness {
 						+"'', "
 						+"'')";
 					programNum = Db.NonQ(command,true);
-					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ClinicNum"
 						+") VALUES("
 						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
 						+"'"+POut.Long(programNum)+"', "
 						+"'Disable Advertising', "
-						+"'0')";
+						+"'0', "
+						+"0)";
 					Db.NonQ(command);
 				}//end CentralDataStorage bridge
 				command="UPDATE preference SET ValueString = '15.4.29.0' WHERE PrefName = 'DataBaseVersion'";
@@ -13230,12 +13234,13 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ClinicNum"
 							+") VALUES("
 							+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
 							+"'"+POut.String(podiumProgramNum)+"', "
 							+"'Enter 0 to use Open Dental for sending review invitations, or 1 to use eConnector', "
-							+"'0')";
+							+"'0', "
+							+"0)";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -13247,12 +13252,13 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ClinicNum"
 							+") VALUES("
 							+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
 							+"'"+POut.String(podiumProgramNum)+"', "
 							+"'Send after appointment completed (minutes)', "
-							+"'5')";
+							+"'5', "
+							+"0)";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -13264,12 +13270,13 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ClinicNum"
 							+") VALUES("
 							+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
 							+"'"+POut.String(podiumProgramNum)+"', "
 							+"'Send after appointment time arrived (minutes)', "
-							+"'5')";
+							+"'5', "
+							+"0)";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -13281,12 +13288,13 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ClinicNum"
 							+") VALUES("
 							+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
 							+"'"+POut.String(podiumProgramNum)+"', "
 							+"'Send after appointment time dismissed (minutes)', "
-							+"'5')";
+							+"'5', "
+							+"0)";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -13298,12 +13306,13 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ClinicNum"
 							+") VALUES("
 							+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
 							+"'"+POut.String(podiumProgramNum)+"', "
 							+"'New patient trigger type', "
-							+"'0')";//ReviewInvitationTrigger.AppointmentCompleted
+							+"'0', "//ReviewInvitationTrigger.AppointmentCompleted
+							+"0)";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -13315,12 +13324,13 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue"
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ClinicNum"
 							+") VALUES("
 							+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
 							+"'"+POut.String(podiumProgramNum)+"', "
 							+"'Existing patient trigger type', "
-							+"'1')";//ReviewInvitationTrigger.AppointmentTimeArrived
+							+"'1', "//ReviewInvitationTrigger.AppointmentTimeArrived
+							+"0)";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
@@ -13378,6 +13388,7 @@ namespace OpenDentBusiness {
 			To16_1_13();
 		}
 
+		///<summary>Oracle compatible: 03/30/2016</summary>
 		private static void To16_1_13() {
 			if(FromVersion<new Version("16.1.13.0")) {
 				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.13.0"));//No translation in convert script.
