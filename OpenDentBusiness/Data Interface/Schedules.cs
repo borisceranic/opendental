@@ -876,7 +876,7 @@ namespace OpenDentBusiness{
 				return table;
 			}
 			//Consider re-writing to use employee cache
-			string command="SELECT employee.EmployeeNum,StartTime,StopTime,FName,Note,schedule.ScheduleNum "
+			string command="SELECT employee.EmployeeNum,StartTime,StopTime,FName,Note,schedule.ScheduleNum,LName "
 				+"FROM employee "
 				+"INNER JOIN schedule ON schedule.EmployeeNum=employee.EmployeeNum "
 				+"WHERE SchedType="+POut.Int((int)ScheduleType.Employee)+" "
@@ -889,7 +889,7 @@ namespace OpenDentBusiness{
 				command+="GROUP BY schedule.ScheduleNum ";
 			}
 			else {
-				command+="GROUP BY employee.EmployeeNum,StartTime,StopTime,FName,Note,schedule.ScheduleNum ";
+				command+="GROUP BY employee.EmployeeNum,StartTime,StopTime,FName,Note,schedule.ScheduleNum,LName ";
 			}
 			//Sort by Emp num so that sort is deterministic
 			command+="ORDER BY FName,LName,employee.EmployeeNum,StartTime";//order by FName for display, LName and EmployeeNum for emps with same FName
