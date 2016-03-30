@@ -460,12 +460,6 @@ namespace OpenDental {
 			//butPatList.Visible=PrefC.GetBool(PrefName.ShowFeatureEhr);
 			butPatExport.Visible=PrefC.GetBool(PrefName.ShowFeatureEhr);
 			FillLists();
-			//Arizona primary care list and label must only be visible when the Arizona primary
-			//care option is checked in the miscellaneous options.
-			if(UsingArizonaPrimaryCare()) {
-				labelArizonaPrimaryCare.Visible=true;
-				listArizonaPrimaryCare.Visible=true;
-			}
 			//Notify user if partial batch ins payments exist.
 			if(ClaimPayments.HasPartialPayments()) {
 				System.Windows.Forms.MessageBox.Show(Lan.g(this,"At least one insurance payment is not finalized")
@@ -546,19 +540,22 @@ namespace OpenDental {
 				labelPublicHealth.Visible=true;
 				listPublicHealth.Height=(_listPublicHealth.Count+1) * listPublicHealth.ItemHeight;
 			}
-			listArizonaPrimaryCare.Items.AddRange(_listArizonaPrimary.Select(x => x.Description).ToArray());
-			if(_listArizonaPrimary.Count==0) {
-				listArizonaPrimaryCare.Visible=false;
-				labelArizonaPrimaryCare.Visible=false;
-			}
-			else {
-				listArizonaPrimaryCare.Visible=true;
-				labelArizonaPrimaryCare.Visible=true;
-				listArizonaPrimaryCare.Height=(_listArizonaPrimary.Count+1) * listArizonaPrimaryCare.ItemHeight;
-			}
+			//Arizona primary care list and label must only be visible when the Arizona primary
+			//care option is checked in the miscellaneous options.
+				listArizonaPrimaryCare.Items.AddRange(_listArizonaPrimary.Select(x => x.Description).ToArray());
+				if(_listArizonaPrimary.Count==0 || !UsingArizonaPrimaryCare()) {
+					listArizonaPrimaryCare.Visible=false;
+					labelArizonaPrimaryCare.Visible=false;
+				}
+				else {
+					listArizonaPrimaryCare.Visible=true;
+					labelArizonaPrimaryCare.Visible=true;
+					listArizonaPrimaryCare.Height=(_listArizonaPrimary.Count+1) * listArizonaPrimaryCare.ItemHeight;
+				}
 		}
 
-		///<summary>When using Arizona Primary Care, there must be a handful of pre-defined patient fields which are required  to generate the Arizona Primary Care reports. This function will return true if all of the required patient fields exist which are necessary to run the Arizona Primary Care reports. Otherwise, false is returned.</summary>
+		///<summary>Returns true if all of the required patient fields exist which are necessary to run the Arizona Primary Care reports.
+		///Otherwise, false is returned.</summary>
 		public static bool UsingArizonaPrimaryCare() {
 			PatFieldDefs.RefreshCache();
 			string[] patientFieldNames=new string[] {
