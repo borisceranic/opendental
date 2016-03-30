@@ -1063,8 +1063,15 @@ namespace OpenDentBusiness {
 			}
 			if(componentsToLoad.ShowSheets) {
 				#region sheet
-				command="SELECT PatNum,Description,sheet.SheetNum,DateTimeSheet,SheetType,"
-					+"AVG(CASE WHEN FieldValue!='' AND sheet.SheetType="+POut.Long((int)SheetTypeEnum.Consent)+" THEN 1 ELSE 0 END) AS SigPresent "
+				string sigPresentCase="AVG(CASE WHEN FieldValue!='' AND sheet.SheetType="
+					+POut.Long((int)SheetTypeEnum.Consent)+" THEN 1 ELSE 0 END) AS SigPresent ";
+				//Oracle cannot use CLOB columns when DISTINCT, ORDER BY, or GROUP BY is used.
+				//Since we only care about the sheer presence of data, we'll look at the first character (or byte) of the CLOB column by using SUBSTR.
+				if(DataConnection.DBtype==DatabaseType.Oracle) {
+					sigPresentCase="AVG(CASE WHEN DBMS_LOB.SUBSTR(FieldValue,1)!='' AND sheet.SheetType="
+					+POut.Long((int)SheetTypeEnum.Consent)+" THEN 1 ELSE 0 END) AS SigPresent ";
+				}
+				command="SELECT PatNum,Description,sheet.SheetNum,DateTimeSheet,SheetType,"+sigPresentCase
 					+"FROM sheet "
 					+"LEFT JOIN sheetfield ON sheet.SheetNum=sheetfield.SheetNum "
 					+"AND sheetfield.FieldType="+POut.Long((int)SheetFieldType.SigBox)+" "
