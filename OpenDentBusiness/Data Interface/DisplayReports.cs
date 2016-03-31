@@ -37,6 +37,7 @@ namespace OpenDentBusiness{
 		public static void Sync(List<DisplayReport> listDisplayReport) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),listDisplayReport);
+				return;
 			}
 			Crud.DisplayReportCrud.Sync(listDisplayReport,GetAll(true));
 		}
