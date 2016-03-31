@@ -23,8 +23,8 @@ namespace OpenDentBusiness {
 		public long ProvNum;
 		///<summary>FK to clinic.ClinicNum.</summary>
 		public long ClinicNum;
-		///<summary>FK to paymentWeb.PaymentWebNum. THIS TABLE HAS NOT YET BEEN CREATED!!!</summary>
-		public long PaymentWebNum;
+		///<summary>FK to payment.PaymentNum.</summary>
+		public long PaymentNum;
 		///<summary>Timestamp at which this row was created. Auto generated on insert.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateTEntry)]
 		public DateTime DateTEntry;

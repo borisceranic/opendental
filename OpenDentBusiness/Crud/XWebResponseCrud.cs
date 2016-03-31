@@ -50,7 +50,7 @@ namespace OpenDentBusiness.Crud{
 				xWebResponse.PatNum               = PIn.Long  (row["PatNum"].ToString());
 				xWebResponse.ProvNum              = PIn.Long  (row["ProvNum"].ToString());
 				xWebResponse.ClinicNum            = PIn.Long  (row["ClinicNum"].ToString());
-				xWebResponse.PaymentWebNum        = PIn.Long  (row["PaymentWebNum"].ToString());
+				xWebResponse.PaymentNum           = PIn.Long  (row["PaymentNum"].ToString());
 				xWebResponse.DateTEntry           = PIn.DateT (row["DateTEntry"].ToString());
 				xWebResponse.DateTUpdate          = PIn.DateT (row["DateTUpdate"].ToString());
 				xWebResponse.TransactionStatus    = (OpenDentBusiness.XWebTransactionStatus)PIn.Int(row["TransactionStatus"].ToString());
@@ -102,7 +102,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("PatNum");
 			table.Columns.Add("ProvNum");
 			table.Columns.Add("ClinicNum");
-			table.Columns.Add("PaymentWebNum");
+			table.Columns.Add("PaymentNum");
 			table.Columns.Add("DateTEntry");
 			table.Columns.Add("DateTUpdate");
 			table.Columns.Add("TransactionStatus");
@@ -136,7 +136,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (xWebResponse.PatNum),
 					POut.Long  (xWebResponse.ProvNum),
 					POut.Long  (xWebResponse.ClinicNum),
-					POut.Long  (xWebResponse.PaymentWebNum),
+					POut.Long  (xWebResponse.PaymentNum),
 					POut.DateT (xWebResponse.DateTEntry,false),
 					POut.DateT (xWebResponse.DateTUpdate,false),
 					POut.Int   ((int)xWebResponse.TransactionStatus),
@@ -204,7 +204,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="XWebResponseNum,";
 			}
-			command+="PatNum,ProvNum,ClinicNum,PaymentWebNum,DateTEntry,DateTUpdate,TransactionStatus,ResponseCode,XWebResponseCode,ResponseDescription,OTK,HpfUrl,HpfExpiration,TransactionID,TransactionType,Alias,CardType,CardBrand,CardBrandShort,MaskedAcctNum,Amount,ApprovalCode,CardCodeResponse,ReceiptID,ExpDate,EntryMethod,ProcessorResponse,BatchNum,BatchAmount,AccountExpirationDate,DebugError) VALUES(";
+			command+="PatNum,ProvNum,ClinicNum,PaymentNum,DateTEntry,DateTUpdate,TransactionStatus,ResponseCode,XWebResponseCode,ResponseDescription,OTK,HpfUrl,HpfExpiration,TransactionID,TransactionType,Alias,CardType,CardBrand,CardBrandShort,MaskedAcctNum,Amount,ApprovalCode,CardCodeResponse,ReceiptID,ExpDate,EntryMethod,ProcessorResponse,BatchNum,BatchAmount,AccountExpirationDate,DebugError) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(xWebResponse.XWebResponseNum)+",";
 			}
@@ -212,7 +212,7 @@ namespace OpenDentBusiness.Crud{
 				     POut.Long  (xWebResponse.PatNum)+","
 				+    POut.Long  (xWebResponse.ProvNum)+","
 				+    POut.Long  (xWebResponse.ClinicNum)+","
-				+    POut.Long  (xWebResponse.PaymentWebNum)+","
+				+    POut.Long  (xWebResponse.PaymentNum)+","
 				+    DbHelper.Now()+","
 				+    POut.DateT (xWebResponse.DateTUpdate)+","
 				+    POut.Int   ((int)xWebResponse.TransactionStatus)+","
@@ -280,7 +280,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="XWebResponseNum,";
 			}
-			command+="PatNum,ProvNum,ClinicNum,PaymentWebNum,DateTEntry,DateTUpdate,TransactionStatus,ResponseCode,XWebResponseCode,ResponseDescription,OTK,HpfUrl,HpfExpiration,TransactionID,TransactionType,Alias,CardType,CardBrand,CardBrandShort,MaskedAcctNum,Amount,ApprovalCode,CardCodeResponse,ReceiptID,ExpDate,EntryMethod,ProcessorResponse,BatchNum,BatchAmount,AccountExpirationDate,DebugError) VALUES(";
+			command+="PatNum,ProvNum,ClinicNum,PaymentNum,DateTEntry,DateTUpdate,TransactionStatus,ResponseCode,XWebResponseCode,ResponseDescription,OTK,HpfUrl,HpfExpiration,TransactionID,TransactionType,Alias,CardType,CardBrand,CardBrandShort,MaskedAcctNum,Amount,ApprovalCode,CardCodeResponse,ReceiptID,ExpDate,EntryMethod,ProcessorResponse,BatchNum,BatchAmount,AccountExpirationDate,DebugError) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(xWebResponse.XWebResponseNum)+",";
 			}
@@ -288,7 +288,7 @@ namespace OpenDentBusiness.Crud{
 				     POut.Long  (xWebResponse.PatNum)+","
 				+    POut.Long  (xWebResponse.ProvNum)+","
 				+    POut.Long  (xWebResponse.ClinicNum)+","
-				+    POut.Long  (xWebResponse.PaymentWebNum)+","
+				+    POut.Long  (xWebResponse.PaymentNum)+","
 				+    DbHelper.Now()+","
 				+    POut.DateT (xWebResponse.DateTUpdate)+","
 				+    POut.Int   ((int)xWebResponse.TransactionStatus)+","
@@ -339,7 +339,7 @@ namespace OpenDentBusiness.Crud{
 				+"PatNum               =  "+POut.Long  (xWebResponse.PatNum)+", "
 				+"ProvNum              =  "+POut.Long  (xWebResponse.ProvNum)+", "
 				+"ClinicNum            =  "+POut.Long  (xWebResponse.ClinicNum)+", "
-				+"PaymentWebNum        =  "+POut.Long  (xWebResponse.PaymentWebNum)+", "
+				+"PaymentNum           =  "+POut.Long  (xWebResponse.PaymentNum)+", "
 				//DateTEntry not allowed to change
 				+"DateTUpdate          =  "+POut.DateT (xWebResponse.DateTUpdate)+", "
 				+"TransactionStatus    =  "+POut.Int   ((int)xWebResponse.TransactionStatus)+", "
@@ -394,9 +394,9 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="ClinicNum = "+POut.Long(xWebResponse.ClinicNum)+"";
 			}
-			if(xWebResponse.PaymentWebNum != oldXWebResponse.PaymentWebNum) {
+			if(xWebResponse.PaymentNum != oldXWebResponse.PaymentNum) {
 				if(command!=""){ command+=",";}
-				command+="PaymentWebNum = "+POut.Long(xWebResponse.PaymentWebNum)+"";
+				command+="PaymentNum = "+POut.Long(xWebResponse.PaymentNum)+"";
 			}
 			//DateTEntry not allowed to change
 			if(xWebResponse.DateTUpdate != oldXWebResponse.DateTUpdate) {
@@ -532,7 +532,7 @@ namespace OpenDentBusiness.Crud{
 			if(xWebResponse.ClinicNum != oldXWebResponse.ClinicNum) {
 				return true;
 			}
-			if(xWebResponse.PaymentWebNum != oldXWebResponse.PaymentWebNum) {
+			if(xWebResponse.PaymentNum != oldXWebResponse.PaymentNum) {
 				return true;
 			}
 			//DateTEntry not allowed to change
