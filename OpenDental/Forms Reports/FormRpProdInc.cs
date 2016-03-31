@@ -1051,11 +1051,11 @@ namespace OpenDental{
 				query.AddColumn("Pt Income",80,FieldValueType.Number,font);
 				query.AddColumn("Ins Income",80,FieldValueType.Number,font);
 				query.AddColumn("Tot Income",80,FieldValueType.Number,font);
-				query.AddGroupSummaryField("Total Production (Production + Adjustments - Writeoffs): ","Writeoff","Tot Prod",SummaryOperation.Sum,new List<int>() { 2 },Color.Black,new Font("Tahoma",9,FontStyle.Bold),104,20);
+				query.AddGroupSummaryField("Total Production (Production + Scheduled + Adjustments - Writeoffs): ","Writeoff","Tot Prod",SummaryOperation.Sum,new List<int>() { 2 },Color.Black,new Font("Tahoma",9,FontStyle.Bold),104,20);
 				query.AddGroupSummaryField("Total Income (Pt Income + Ins Income): ","Writeoff","Total Income",SummaryOperation.Sum,new List<int>() { 2 },Color.Black,new Font("Tahoma",9,FontStyle.Bold),0,25);
 			}
 			else {
-				query.AddGroupSummaryField("Total Production (Production + Adjustments - Writeoffs): ","Writeoff","Tot Prod",SummaryOperation.Sum,new List<int>() { 1 },Color.Black,new Font("Tahoma",9,FontStyle.Bold),104,20);
+				query.AddGroupSummaryField("Total Production (Production + Scheduled + Adjustments - Writeoffs): ","Writeoff","Tot Prod",SummaryOperation.Sum,new List<int>() { 1 },Color.Black,new Font("Tahoma",9,FontStyle.Bold),104,20);
 				query.AddGroupSummaryField("Total Income (Pt Income + Ins Income): ","Writeoff","Total Income",SummaryOperation.Sum,new List<int>() { 1 },Color.Black,new Font("Tahoma",9,FontStyle.Bold),0,25);
 			}
 			report.AddPageNum();
