@@ -680,7 +680,7 @@ namespace OpenDental{
 		}
 
 		private void butCheck2_Click(object sender,EventArgs e) {
-			if(RemotingClient.RemotingRole==RemotingRole.ServerWeb) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				MsgBox.Show(this,"Updates are only allowed from the web server");
 				return;
 			}
