@@ -1,6 +1,7 @@
 ﻿using CodeBase;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 
@@ -409,6 +410,18 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX paysplit_PrepaymentNum ON paysplit (PrepaymentNum)";
 					Db.NonQ(command);
 				}
+				//Add InsPlanEdit permission to everyone------------------------------------------------------
+				command="SELECT DISTINCT UserGroupNum FROM grouppermission";
+				DataTable table=Db.GetTable(command);
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+				   foreach(DataRow row in table.Rows) {
+					  long groupNum=PIn.Long(row["UserGroupNum"].ToString());
+					  command="INSERT INTO grouppermission (UserGroupNum,PermType) "
+						 +"VALUES("+POut.Long(groupNum)+",110)";//110 - InsPlanEdit
+					  Db.NonQ(command);
+				   }
+				}
+
 				command="UPDATE preference SET ValueString = '16.2.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}

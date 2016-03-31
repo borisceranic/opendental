@@ -121,6 +121,8 @@ namespace CentralManager {
 					node.Nodes.Add(node2);
 				treePermissions.Nodes.Add(node);
 			node=SetNode(Permissions.FamilyModule);
+				node2=SetNode(Permissions.InsPlanEdit);
+					node.Nodes.Add(node2);
 				node2=SetNode(Permissions.InsPlanChangeAssign);
 					node.Nodes.Add(node2);
 				node2=SetNode(Permissions.InsPlanChangeSubsc);

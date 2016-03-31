@@ -1097,6 +1097,11 @@ namespace OpenDental{
 		#endregion
 
 		private void FormInsBenefits_Load(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.InsPlanEdit,true)) {
+				butOK.Enabled=false;
+				butAdd.Enabled=false;
+				butDelete.Enabled=false;
+			}
 			benefitListAll=new List<Benefit>(OriginalBenList);
 			if(CovCats.GetForEbenCat(EbenefitCategory.Accident)==null
 				|| CovCats.GetForEbenCat(EbenefitCategory.Crowns)==null

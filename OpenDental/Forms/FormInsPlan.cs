@@ -1930,10 +1930,69 @@ namespace OpenDental{
 				_subOld=_subCur.Copy();
 			}
 			long patPlanNum=0;
+			if(!Security.IsAuthorized(Permissions.InsPlanEdit,true)) {
+				Label labelNoPermission=new Label();
+				labelNoPermission.Text=Lan.g(this,"No Insurance Plan Edit permission.  Patient and Subscriber Information can still be saved.");
+				labelNoPermission.Location=new Point(groupChanges.Location.X,groupChanges.Location.Y+10);
+				labelNoPermission.Size=new Size(groupChanges.Size.Width+0,groupChanges.Size.Height);
+				labelNoPermission.Visible=true;
+				this.Controls.Add(labelNoPermission);
+				groupChanges.Visible=false;
+				butPick.Enabled=false;
+				butPickCarrier.Enabled=false;
+				comboElectIDdescript.Enabled=false;
+				checkIsMedical.Enabled=false;
+				textEmployer.Enabled=false;
+				textCarrier.Enabled=false;
+				textPhone.Enabled=false;
+				textAddress.Enabled=false;
+				textAddress2.Enabled=false;
+				textCity.Enabled=false;
+				textState.Enabled=false;
+				textZip.Enabled=false;
+				textElectID.Enabled=false;
+				butSearch.Enabled=false;
+				checkNoSendElect.Enabled=false;
+				textGroupName.Enabled=false;
+				textGroupNum.Enabled=false;
+				textLinkedNum.Enabled=false;
+				textBIN.Enabled=false;
+				textDivisionNo.Enabled=false;
+				comboPlanType.Enabled=false;
+				checkAlternateCode.Enabled=false;
+				checkCodeSubst.Enabled=false;
+				checkClaimsUseUCR.Enabled=false;
+				checkIsHidden.Enabled=false;
+				comboFeeSched.Enabled=false;
+				comboClaimForm.Enabled=false;
+				comboCopay.Enabled=false;
+				comboAllowedFeeSched.Enabled=false;
+				comboCobRule.Enabled=false;
+				comboFilingCode.Enabled=false;
+				comboFilingCodeSubtype.Enabled=false;
+				checkShowBaseUnits.Enabled=false;
+				textDentaide.Enabled=false;
+				textPlanFlag.Enabled=false;
+				checkIsPMP.Enabled=false;
+				textCanadianDiagCode.Enabled=false;
+				textCanadianInstCode.Enabled=false;
+				textPlanNote.Enabled=false;
+				butGetElectronic.Enabled=false;
+				butImportTrojan.Enabled=false;
+				butIapFind.Enabled=false;
+				butBenefitNotes.Enabled=false;
+				checkDontVerify.Enabled=false;
+				textTrojanID.Enabled=false;
+				textDateLastVerifiedBenefits.Enabled=false;
+				butVerifyBenefits.Enabled=false;
+			}
 			if(PatPlanCur!=null) {
 				patPlanNum=PatPlanCur.PatPlanNum;
 			}
 			if(_subCur==null) {//editing from big list
+				if(!Security.IsAuthorized(Permissions.InsPlanEdit,true)) {
+					butOK.Enabled=false;
+				}
 				butPick.Visible=false;//This prevents an infinite loop
 				//groupRequestBen.Visible=false;//might try to make this functional later, but not now.
 				//groupRequestBen:---------------------------------------------
