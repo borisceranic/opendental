@@ -310,7 +310,7 @@ namespace OpenDentBusiness {
 				}
 				else {//oracle
 					command=@"
-					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODToday',0,'Today',0,0);
+					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT COALESCE(MAX(DisplayReportNum), 0)+1 FROM displayreport),'ODToday',0,'Today',0,0);
 					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODYesterday',1,'Yesterday',0,0);
 					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODThisMonth',2,'This Month',0,0);
 					INSERT INTO displayreport (DisplayReportNum,InternalName,ItemOrder,Description,Category,IsHidden) VALUES ((SELECT MAX(DisplayReportNum)+1 FROM displayreport),'ODLastMonth',3,'Last Month',0,0);
