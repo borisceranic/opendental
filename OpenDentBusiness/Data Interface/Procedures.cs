@@ -97,6 +97,10 @@ namespace OpenDentBusiness {
 
 		///<summary>Throws an exception if the given procedure cannot be deleted safely.</summary>
 		public static void ValidateDelete(long procNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),procNum);
+				return;
+			}
 			//Test to see if the procedure is attached to a claim
 			string command="SELECT COUNT(*) FROM claimproc WHERE ProcNum="+POut.Long(procNum)
 				+" AND ClaimNum > 0";
