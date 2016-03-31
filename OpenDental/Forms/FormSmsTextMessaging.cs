@@ -405,7 +405,7 @@ namespace OpenDental {
 			form.ExplicitPatNums=SmsFromMobiles.FindPatNums(
 				gridMessages.SelectedIndices.Select(x => (SmsFromMobile)gridMessages.Rows[x].Tag).ToList()[0].MobilePhoneNumber,//find mobile number of first sms
 				CultureInfo.CurrentCulture.Name.Substring(CultureInfo.CurrentCulture.Name.Length-2) //get country code of current environment
-				).Select(x=>x.Item1).ToList();//convert to a list of patnums.
+				).Select(x=>x[0]).ToList();//convert to a list of patnums.
 			if(form.ShowDialog()!=DialogResult.OK) {
 				return;
 			}
