@@ -124,7 +124,7 @@ namespace OpenDentBusiness{
 		///<para>If arrayStatuses is empty then messages with all statuses will be returned.</para></summary>
 		public static List<SmsFromMobile> GetMessages(DateTime dateStart,DateTime dateEnd,List <long> listClinicNums,long patNum,bool isMessageThread,params SmsFromStatus[] arrayStatuses) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<SmsFromMobile>>(MethodBase.GetCurrentMethod(),dateStart,dateEnd,listClinicNums,patNum,arrayStatuses);
+				return Meth.GetObject<List<SmsFromMobile>>(MethodBase.GetCurrentMethod(),dateStart,dateEnd,listClinicNums,patNum,isMessageThread,arrayStatuses);
 			}
 			List <string> listCommandFilters=new List<string>();
 			if(dateStart>DateTime.MinValue) {
@@ -168,18 +168,18 @@ namespace OpenDentBusiness{
 					countryCode=smsPhone.CountryCode;
 				}
 				//Item1=PatNum; Item2=Guarantor
-				List<Tuple<long,long>> listPatNums=FindPatNums(sms.MobilePhoneNumber,countryCode);
+				List<long[]> listPatNums=FindPatNums(sms.MobilePhoneNumber,countryCode);
 				sms.MatchCount=listPatNums.Count;
-				if(listPatNums.Count==0 || listPatNums.Select(x => x.Item2).Distinct().ToList().Count!=1){
+				if(listPatNums.Count==0 || listPatNums.Select(x => x[1]).Distinct().ToList().Count!=1){
 					//We could not find definitive match, either 0 matches found, or more than one match found with different garantors
 					Insert(sms);
 					continue;
 				}
 				if(listPatNums.Count==1) {
-					sms.PatNum=listPatNums[0].Item1;//PatNum
+					sms.PatNum=listPatNums[0][0];//PatNum
 				}
 				else {
-					sms.PatNum=listPatNums[0].Item2;//GuarantorNum;  more than one match, but all have the same garantor.
+					sms.PatNum=listPatNums[0][1];//GuarantorNum;  more than one match, but all have the same garantor.
 				}
 				Commlog comm=new Commlog() {
 					CommDateTime=sms.DateTimeReceived,
@@ -219,12 +219,12 @@ namespace OpenDentBusiness{
 			return Crud.SmsFromMobileCrud.Update(smsFromMobile,oldSmsFromMobile);
 		}
 
-		///<summary>Used to link SmsFromMobiles to the patients that they came from.</summary>
-		public static List<Tuple<long,long>> FindPatNums(string phonePat,string countryCode) {
+		///<summary>Used to link SmsFromMobiles to the patients that they came from. Returns list of patnum,garantorNum combos.</summary>
+		public static List<long[]> FindPatNums(string phonePat,string countryCode) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<Tuple<long,long>>>(MethodBase.GetCurrentMethod(),phonePat,countryCode);
+				return Meth.GetObject<List<long[]>>(MethodBase.GetCurrentMethod(),phonePat,countryCode);
 			}
-			List<Tuple<long,long>> retVal=new List<Tuple<long,long>>();
+			List<long[]> retVal=new List<long[]>();
 			try {
 				string phoneRegexp=ConvertPhoneToRegexp(phonePat,countryCode);
 				//DO NOT POut THESE PHONE NUMBERS. They have been cleaned for use in this function by dirtyPhoneHelper.
@@ -235,7 +235,7 @@ namespace OpenDentBusiness{
 						+"OR "+DbHelper.Regexp("WirelessPhone",phoneRegexp)+")";
 				DataTable table=Db.GetTable(command);
 				foreach(DataRow row in table.Rows) {
-					retVal.Add(new Tuple<long,long>(PIn.Long(row["PatNum"].ToString()),PIn.Long(row["Guarantor"].ToString())));
+					retVal.Add(new long[] { PIn.Long(row["PatNum"].ToString()),PIn.Long(row["Guarantor"].ToString()) });
 				}
 			}
 			catch {
