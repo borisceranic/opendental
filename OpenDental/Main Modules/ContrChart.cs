@@ -4460,15 +4460,8 @@ namespace OpenDental {
 						+Lan.g(this,"must complete Identify Proofing (IDP) before using eRx.  Call support for details."));
 				}
 				else {//Customer of OD proper or customer of a reseller
-					if(MessageBox.Show(Lan.g(this,"Provider")+" "+prov.Abbr+" "
-						+Lan.g(this,"must complete Identify Proofing (IDP) before using eRx.  There is a one time setup fee for Identity Proofing.  "
-						+"Step-by-Step details on IDP process can be found in the Online Software Manual (search for 'Identity Proofing') or call support.  "
-						+"Click OK below to begin Identity Proofing process now, or click Cancel to go back to the Chart."),
-						"",MessageBoxButtons.OKCancel)==DialogResult.OK)
-					{
-						Process.Start(
-							"https://universalid.verizon.com/uid/index.php/issuanceservice/registration/individual/41511098-65c2-4cfb-8ee5-6e021671a669/ZFR");
-					}
+					MessageBox.Show(Lan.g(this,"Provider")+" "+prov.Abbr+" "+Lan.g(this,"must complete Identify Proofing (IDP) before using eRx.  "
+						+"Please call support to schedule an IDP appointment.  During your appointment, you will be provided with details on how to begin IDP."));
 				}
 				isAccessAllowed=false;
 			}
