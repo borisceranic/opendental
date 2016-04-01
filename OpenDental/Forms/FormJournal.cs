@@ -1,9 +1,9 @@
 using System;
-using System.Drawing;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Drawing.Printing;
+using System.Linq;
 using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
@@ -105,11 +105,13 @@ namespace OpenDental{
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasAddButton = false;
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(0,56);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(844,615);
+			this.gridMain.Size = new System.Drawing.Size(874,615);
 			this.gridMain.TabIndex = 1;
 			this.gridMain.Title = null;
 			this.gridMain.TranslationName = "TableJournal";
@@ -121,7 +123,7 @@ namespace OpenDental{
 			this.ToolBarMain.ImageList = this.imageListMain;
 			this.ToolBarMain.Location = new System.Drawing.Point(0,0);
 			this.ToolBarMain.Name = "ToolBarMain";
-			this.ToolBarMain.Size = new System.Drawing.Size(844,29);
+			this.ToolBarMain.Size = new System.Drawing.Size(874,25);
 			this.ToolBarMain.TabIndex = 0;
 			this.ToolBarMain.ButtonClick += new OpenDental.UI.ODToolBarButtonClickEventHandler(this.ToolBarMain_ButtonClick);
 			// 
@@ -224,6 +226,8 @@ namespace OpenDental{
 			// 
 			this.textAmt.ForeColor = System.Drawing.SystemColors.WindowText;
 			this.textAmt.Location = new System.Drawing.Point(450,32);
+			this.textAmt.MaxVal = 100000000D;
+			this.textAmt.MinVal = -100000000D;
 			this.textAmt.Name = "textAmt";
 			this.textAmt.Size = new System.Drawing.Size(81,20);
 			this.textAmt.TabIndex = 11;
@@ -256,7 +260,7 @@ namespace OpenDental{
 			// FormJournal
 			// 
 			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
-			this.ClientSize = new System.Drawing.Size(844,671);
+			this.ClientSize = new System.Drawing.Size(874,671);
 			this.Controls.Add(this.textFindText);
 			this.Controls.Add(this.label4);
 			this.Controls.Add(this.label3);
@@ -275,11 +279,13 @@ namespace OpenDental{
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
+			this.MinimumSize = new System.Drawing.Size(890,180);
 			this.Name = "FormJournal";
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Transaction History";
 			this.Load += new System.EventHandler(this.FormJournal_Load);
+			this.ResizeEnd += new System.EventHandler(this.FormJournal_ResizeEnd);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -339,11 +345,14 @@ namespace OpenDental{
 		private delegate void ToolBarClick();
 
 		private void FillGrid(){
-			if(  textDateFrom.errorProvider1.GetError(textDateFrom)!=""
-				|| textDateTo.errorProvider1.GetError(textDateTo)!=""
-				){
+			if(textDateFrom.errorProvider1.GetError(textDateFrom)!="" || textDateTo.errorProvider1.GetError(textDateTo)!="") {
 				return;
 			}
+			//Resize grid to fit, important for later resizing
+			gridMain.BeginUpdate();
+			gridMain.Columns.Clear();
+			gridMain.Rows.Clear();
+			gridMain.EndUpdate();
 			DateTime dateFrom=PIn.Date(textDateFrom.Text);
 			DateTime dateTo;
 			if(textDateTo.Text==""){
@@ -364,7 +373,7 @@ namespace OpenDental{
 			string str="";
 			ODGridColumn col=new ODGridColumn(Lan.g("TableJournal","Chk #"),60,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableJournal","Date"),80);
+			col=new ODGridColumn(Lan.g("TableJournal","Date"),75);
 			gridMain.Columns.Add(col);
 			if(isPrinting){
 				col=new ODGridColumn(Lan.g("TableJournal","Memo"),200);
@@ -380,6 +389,9 @@ namespace OpenDental{
 				col=new ODGridColumn(Lan.g("TableJournal","Splits"),220);
 			}
 			gridMain.Columns.Add(col);
+			int colClearWidth=40;//because the "clear" column has not been added yet.
+			//divide the remaining grid width (taking the scroll bar width, 19, into account) into thirds for the debit, credit, and balance columns
+			int colW=(gridMain.Width-gridMain.Columns.OfType<ODGridColumn>().Sum(x => x.ColWidth)-colClearWidth-19)/3;
 			str=Lan.g("TableJournal","Debit");
 			if(Accounts.DebitIsPos(AccountCur.AcctType)){
 				str+=Lan.g("TableJournal","(+)");
@@ -387,7 +399,7 @@ namespace OpenDental{
 			else{
 				str+=Lan.g("TableJournal","(-)");
 			}
-			col=new ODGridColumn(str,65,HorizontalAlignment.Right);
+			col=new ODGridColumn(str,colW,HorizontalAlignment.Right);
 			gridMain.Columns.Add(col);
 			str=Lan.g("TableJournal","Credit");
 			if(Accounts.DebitIsPos(AccountCur.AcctType)) {
@@ -396,11 +408,11 @@ namespace OpenDental{
 			else {
 				str+=Lan.g("TableJournal","(+)");
 			}
-			col=new ODGridColumn(str,65,HorizontalAlignment.Right);
+			col=new ODGridColumn(str,colW,HorizontalAlignment.Right);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableJournal","Balance"),65,HorizontalAlignment.Right);
+			col=new ODGridColumn(Lan.g("TableJournal","Balance"),colW,HorizontalAlignment.Right);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableJournal","Clear"),55,HorizontalAlignment.Center);
+			col=new ODGridColumn(Lan.g("TableJournal","Clear"),colClearWidth,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
@@ -638,6 +650,11 @@ namespace OpenDental{
 			textDateTo.Text=calendarTo.SelectionStart.ToShortDateString();
 		}
 
+		///<summary>Fires when resizing is complete.  Window doesn't have maximize or minimize, so only need to handle manual resizing.</summary>
+		private void FormJournal_ResizeEnd(object sender,EventArgs e) {
+			FillGrid();
+		}
+
 		private void butRefresh_Click(object sender,EventArgs e) {
 			if(textDateFrom.errorProvider1.GetError(textDateFrom)!=""
 				|| textDateTo.errorProvider1.GetError(textDateTo)!=""
@@ -659,17 +676,6 @@ namespace OpenDental{
 		private void butCancel_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
-
-		
-
-		
-
-		
-
-		
-
-		
-
 
 	}
 }
