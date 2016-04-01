@@ -22,7 +22,12 @@ namespace OpenDental {
 
 		///<summary>Since Graphics doesn't have a line height property.  The second graphics object is used for measurement purposes.</summary>
 		public static void DrawString(Graphics g,Graphics gfx,string str,Font font,Brush brush,Rectangle bounds,StringAlignment sa) {
-			SizeF fit=new SizeF(bounds.Width*96f/100f-2,font.Height);
+			//SizeF fit=new SizeF(bounds.Width*96f/100f-2,font.Height);
+			//See task #711110 for more details on why the scaling factor of 96f/100f was determined to no longer be necessary.
+			//If a bug is found where using the scaling factor fixes it, double check the task and make sure that bug is fixed as well.
+			//Finally, make a really good note here describing why the scaling factor is necessary so we do not remove it again in the future.
+			//The minus 2 is for the left and right bounds (one for left and one for right).
+			SizeF fit=new SizeF(bounds.Width-2,font.Height);//Uses font.Height instead of bounds.Height because MeasureString() is performed one line a time
 			StringFormat format=StringFormat.GenericTypographic;
 			float pixelsPerLine=LineSpacingForFont(font.Name) * (float)font.Height;
 			float lineIdx=0;
@@ -88,7 +93,12 @@ namespace OpenDental {
 			//pixels: (except Size is em-size)
 			Font font=new Font(xfont.Name,(float)xfont.Size,fontstyle);
 			//pixels:
-			SizeF fit=new SizeF((float)(bounds.Width*96f/100f-2),(float)(font.Height));
+			//SizeF fit=new SizeF((float)(bounds.Width*96f/100f-2),(float)(font.Height));
+			//See task #711110 for more details on why the scaling factor of 96f/100f was determined to no longer be necessary.
+			//If a bug is found where using the scaling factor fixes it, double check the task and make sure that bug is fixed as well.
+			//Finally, make a really good note here describing why the scaling factor is necessary so we do not remove it again in the future.
+			//The minus 2 is for the left and right bounds (one for left and one for right).
+			SizeF fit=new SizeF(bounds.Width-2,font.Height);//Uses font.Height instead of bounds.Height because MeasureString() is performed one line a time
 			StringFormat format=StringFormat.GenericTypographic;
 			//pixels:
 			float pixelsPerLine=LineSpacingForFont(font.Name) * (float)font.Height;
