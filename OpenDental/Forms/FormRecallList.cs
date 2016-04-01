@@ -1240,13 +1240,15 @@ namespace OpenDental{
 			else { //me or static email address, email address for 'me' is the first one in _listEmailAddresses
 				emailAddressFrom=_listEmailAddresses[comboEmailFrom.SelectedIndex-1];//-1 to account for predefined "Clinic/Practice" items in combobox
 			}
-			string resultWebSched=Recalls.SendWebSchedNotifications(recallNums
+			List<string> listWebSchedErrors=Recalls.SendWebSchedNotifications(recallNums
 				,checkGroupFamilies.Checked
 				,(RecallListSort)comboSort.SelectedIndex
 				,emailAddressFrom);
 			Cursor=Cursors.Default;
-			if(!string.IsNullOrEmpty(resultWebSched)) {
-				MessageBox.Show(this,resultWebSched);//Show the error (already translated) to the user and then refresh the grid in case any were successful.
+			if(listWebSchedErrors.Count > 0) {
+				//Show the error (already translated) to the user and then refresh the grid in case any were successful.
+				MsgBoxCopyPaste msgBCP=new MsgBoxCopyPaste(string.Join("\r\n",listWebSchedErrors));
+				msgBCP.Show();
 			}
 			FillMain(null);
 		}
