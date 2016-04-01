@@ -5535,6 +5535,29 @@ namespace OpenDentBusiness {
 			return log;
 		}
 
+		[DbmMethod]
+		public static string UnscheduledApptsWithInvalidOpNum(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			string log="";
+			command="SELECT aptNum FROM appointment WHERE Op != 0 AND AptStatus=3";//UnschedList
+			table=Db.GetTable(command);
+			if(isCheck) {
+				if(table.Rows.Count>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Unscheduled appointments with invalid Op nums")+": "+table.Rows.Count.ToString()+"\r\n";
+				}
+			}
+			else {
+				command="UPDATE appointment SET Op=0 WHERE AptStatus=3";//UnschedList
+				Db.NonQ(command);
+				if(table.Rows.Count>0 || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","Unscheduled appointments with invalid Op nums corrected")+": "+table.Rows.Count.ToString()+"\r\n";
+				}
+			}
+			return log;
+		}
+
 		/// <summary>Only one user of a given UserName may be unhidden at a time. Warn the user and instruct them to hide extras.</summary>
 		[DbmMethod(HasBreakDown=true)]
 		public static string UserodDuplicateUser(bool verbose,bool isCheck) {
