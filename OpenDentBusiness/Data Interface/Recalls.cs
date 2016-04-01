@@ -1447,17 +1447,21 @@ namespace OpenDentBusiness{
 			return false;
 		}
 
-		///<summary>Used in the eConnector service.  Honors the preferences for Web Sched automation.</summary>
-		public static string SendAutomaticWebSchedNotifications() {
+		///<summary>Used in the eConnector service.  Honors the preferences for Web Sched automation.
+		///Returns a list of errors that the eConnector needs to log.  Returns an empty list if no errors or automatic sending is off.</summary>
+		public static List<string> SendAutomaticWebSchedNotifications() {
+			//No need to check RemotingRole; no call to db.
+			List<string> listErrors=new List<string>();
 			WebSchedAutomaticSend webSchedSendSetting=(WebSchedAutomaticSend)PrefC.GetInt(PrefName.WebSchedAutomaticSendSetting);
 			if(webSchedSendSetting==WebSchedAutomaticSend.DoNotSend) {
-				return "";//Do not flood the logs with unessecary text if they don't even have this enabled.
+				return listErrors;//Do not flood the logs with unessecary text if they don't even have this enabled.
 			}
 			try {
 				ValidateWebSched();
 			}
 			catch(Exception ex) {
-				return ex.Message;
+				listErrors.Add(ex.Message);
+				return listErrors;
 			}
 			DateTime fromDate=DateTime.MinValue;
 			DateTime toDate=DateTime.MinValue;
@@ -1500,16 +1504,17 @@ namespace OpenDentBusiness{
 				recallNums.Add(PIn.Long(table.Rows[i]["RecallNum"].ToString()));
 			}
 			if(recallNums.Count==0) {
-				return "";
+				return listErrors;
 			}
 			return SendWebSchedNotifications(recallNums,PrefC.GetBool(PrefName.RecallGroupByFamily),RecallListSort.Alphabetical);
 		}
 
 		///<summary>Makes several web service calls to WebServiceCustomersUpdates in order to get Web Sched URLs.
-		///Returns an error string to display to the user if anything went wrong otherwise returns empty string if all notifications sent.</summary>
-		public static string SendWebSchedNotifications(List<long> recallNums,bool isGroupFamily,RecallListSort sortBy) {
+		///Returns a list of errors to display to the user if anything went wrong otherwise returns empty list if everything was successful.</summary>
+		public static List<string> SendWebSchedNotifications(List<long> recallNums,bool isGroupFamily,RecallListSort sortBy,EmailAddress emailAddressOverride = null) {
 			//No need to check RemotingRole; no call to db.
 			string response="";
+			List<string> listErrors=new List<string>();
 			Dictionary<long,string> dictWebSchedParameters=new Dictionary<long,string>();
 			//Send off a web request to WebServiceCustomersUpdates to get the obfuscated URLs for the selected patients.
 			#region Send Web Service Request For URLs
@@ -1566,7 +1571,8 @@ namespace OpenDentBusiness{
 				if(nodeError!=null) {
 					error+="\r\n"+Lans.g("WebSched","Error Details")+":\r\n" +nodeError.InnerText;
 				}
-				return error;
+				listErrors.Add(error);
+				return listErrors;
 			}
 			#endregion
 			//At this point we know we got a valid response from our web service.
@@ -1624,8 +1630,10 @@ namespace OpenDentBusiness{
 					dictWebSchedParameters.TryGetValue(PIn.Long(addrTable.Rows[i]["RecallNum"].ToString()),out URL);
 				}
 				catch(Exception ex) {
-					string error=ex.Message+"\r\n";
-					return error+Lans.g("WebSched","Problem getting Web Sched URL for patient")+": "+addrTable.Rows[i]["patientNameFL"].ToString();
+					string error=ex.Message+"\r\n"
+						+Lans.g("WebSched","Problem getting Web Sched URL for patient")+": "+addrTable.Rows[i]["patientNameFL"].ToString();
+					listErrors.Add(error);
+					continue;
 				}
 				emailBody=emailBody.Replace("[URL]",URL);
 				string officePhone=PrefC.GetString(PrefName.PracticePhone);
@@ -1647,7 +1655,9 @@ namespace OpenDentBusiness{
 					if(ex.GetType()==typeof(System.ArgumentException)) {
 						error+=Lans.g("WebSched","Go to Setup | Appointments | Recall.  The subject for WebSched notifications must not span multiple lines.")+"\r\n";
 					}
-					return error+Lans.g("WebSched","Patient")+": "+addrTable.Rows[i]["patientNameFL"].ToString();
+					error+=Lans.g("WebSched","Patient")+": "+addrTable.Rows[i]["patientNameFL"].ToString();
+					listErrors.Add(error);
+					continue;
 				}
 				emailMessage.MsgDateTime=DateTime.Now;
 				emailMessage.SentOrReceived=EmailSentOrReceived.Sent;
@@ -1663,7 +1673,7 @@ namespace OpenDentBusiness{
 				Recalls.UpdateStatus(PIn.Long(addrTable.Rows[i]["RecallNum"].ToString()),PrefC.GetLong(PrefName.RecallStatusEmailed));
 				#endregion
 			}
-			return "";
+			return listErrors;
 		}
 
 		private struct TimeSlot {
