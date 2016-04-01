@@ -463,7 +463,7 @@ namespace OpenDental{
 				MsgBox.Show(this,"Operatory name cannot be blank.");
 				return;
 			}
-			if(checkIsHidden.Checked==true && Operatories.HasFutureApts(OpCur.OperatoryNum)) {
+			if(checkIsHidden.Checked==true && Operatories.HasFutureApts(OpCur.OperatoryNum,ApptStatus.UnschedList)) {
 				MsgBox.Show(this,"Can not hide an operatory with future appointments.");
 				checkIsHidden.Checked=false;
 				return;

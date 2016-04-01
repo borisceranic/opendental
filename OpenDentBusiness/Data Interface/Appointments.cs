@@ -341,6 +341,10 @@ namespace OpenDentBusiness{
 			}
 			ApptComms.UpdateForAppt(appointment);
 			Crud.AppointmentCrud.Update(appointment,oldAppointment);
+			if(appointment.AptStatus==ApptStatus.UnschedList && appointment.AptStatus!=oldAppointment.AptStatus) {
+				appointment.Op=0;
+				SetAptStatus(appointment.AptNum,appointment.AptStatus);
+			}
 		}
 
 		///<summary>Updates InsPlan1 and InsPlan2 for every appointment that isn't completed, broken, or a patient note for the patient passed in.</summary>
@@ -600,12 +604,15 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),aptNum,newStatus);
 				return;
 			}
-			string command="UPDATE appointment SET AptStatus="+POut.Long((int)newStatus)
-				+" WHERE AptNum="+POut.Long(aptNum);
+			string command="UPDATE appointment SET AptStatus="+POut.Long((int)newStatus);
+			if(newStatus==ApptStatus.UnschedList) {
+				command+=",Op=0";//We do this so that this appointment does not stop an operatory from being hidden.
+			}
+			command+=" WHERE AptNum="+POut.Long(aptNum);
+			Db.NonQ(command);
 			if(newStatus!=ApptStatus.Scheduled && newStatus!=ApptStatus.ASAP) {
 				ApptComms.DeleteForAppt(aptNum);//Delete the automated reminder if it was unscheduled.
 			}
-			Db.NonQ(command);
 		}
 
 		///<summary>The plan nums that are passed in are simply saved in columns in the appt.  Those two fields are used by approximately one office right now.</summary>

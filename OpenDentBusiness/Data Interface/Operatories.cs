@@ -134,13 +134,23 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Gets a list of all future appointments for a given Operatory.  Ordered by dateTime</summary>
-		public static bool HasFutureApts(long operatoryNum) {
+		public static bool HasFutureApts(long operatoryNum,params ApptStatus[] arrayIgnoreStatuses) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetBool(MethodBase.GetCurrentMethod(),operatoryNum);
 			}
 			string command="SELECT COUNT(*) FROM appointment "
-				+"WHERE Op = "+POut.Long(operatoryNum)+" "
-				+"AND AptDateTime > "+DbHelper.Now();
+				+"WHERE Op = "+POut.Long(operatoryNum)+" ";
+			if(arrayIgnoreStatuses.Length > 0) {
+				command+="AND AptStatus NOT IN (";
+				for(int i=0;i<arrayIgnoreStatuses.Length;i++) {
+					if(i > 0) {
+						command+=",";
+					}
+					command+=POut.Int((int)arrayIgnoreStatuses[i]);
+				}
+				command+=") ";
+			}
+			command+="AND AptDateTime > "+DbHelper.Now();
 			return PIn.Int(Db.GetScalar(command))>0;
 		}
 	
