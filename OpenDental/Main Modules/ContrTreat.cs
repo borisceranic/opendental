@@ -3457,7 +3457,7 @@ namespace OpenDental{
 				int numLabProcsUnselected=0;
 				List<int> selectedIndices=new List<int>(gridMain.SelectedIndices);
 				for(int i=0;i<selectedIndices.Count;i++) {
-					if(gridMain.Rows[gridMain.SelectedIndices[i]].Tag==null) {
+					if(gridMain.Rows[selectedIndices[i]].Tag==null) {
 						continue;//subtotal row.
 					}
 					Procedure proc=(Procedures.GetOneProc(((ProcTP)gridMain.Rows[selectedIndices[i]].Tag).ProcNumOrig,false));
@@ -3473,8 +3473,6 @@ namespace OpenDental{
 					MessageBox.Show(Lan.g(this,"Number of lab fee procedures unselected")+": "+numLabProcsUnselected.ToString());
 				}
 				if(gridMain.SelectedIndices.Length>7) {
-					List <int> selectedIndicies=new List<int>(gridMain.SelectedIndices);
-					selectedIndicies.Sort();
 					gridMain.SetSelected(false);
 					foreach(int selectedIdx in selectedIndices) {
 						if(gridMain.Rows[selectedIdx].Tag==null) {
