@@ -1870,7 +1870,7 @@ namespace OpenDental
 					}
 				}
 			}
-			if(counter==0) {
+			if(counter==0 || skippedTeeth.Count==32) {
 				return (0).ToString("F0");
 			}
 			return (100*counter/((32-skippedTeeth.Count)*6)).ToString("F0");
