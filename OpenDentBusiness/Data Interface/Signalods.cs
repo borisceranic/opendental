@@ -18,6 +18,7 @@ namespace OpenDentBusiness {
 
 		///<summary>Called in Form_Load() to subscribe a given form the signals.</summary>
 		public static bool Subscribe(Form form) {
+			//No need to check RemotingRole; no call to db.
 			ISignalProcessor sigProcessor = form as ISignalProcessor;
 			if(sigProcessor==null) {
 				return false;
@@ -33,6 +34,7 @@ namespace OpenDentBusiness {
 
 		///<summary>Retreives new signals from the DB, updates Caches, and broadcasts signals to all subscribed forms. Returns false if signals should stop being processed.</summary>
 		public static void SignalsTick(Action onShutdown) {
+			//No need to check RemotingRole; no call to db.
 			try {
 				List<Signalod> listSignals = RefreshTimed(SignalLastRefreshed);
 				if(listSignals.Count==0) {
@@ -47,11 +49,21 @@ namespace OpenDentBusiness {
 				BroadcastSignals(listSignals);
 			}
 			catch {
-				SignalLastRefreshed=MiscData.GetNowDateTime();
+				DateTime dateTimeRefreshed;
+				try {
+					//Signal processing should always use the server's time.
+					dateTimeRefreshed=MiscData.GetNowDateTime();
+				}
+				catch {
+					//If the server cannot be reached, we still need to move the signal processing forward so use local time as a fail-safe.
+					dateTimeRefreshed=DateTime.Now;
+				}
+				SignalLastRefreshed=dateTimeRefreshed;
 			}
 		}
 
 		public static void BroadcastSignals(List<Signalod> listSignals) {
+			//No need to check RemotingRole; no call to db.
 			_listISignalProcessors.ForEach(x => { try { x.ProcessSignals(listSignals); } catch {/*Do Nothing, or show msgbox?*/} });
 		}
 
