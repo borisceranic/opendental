@@ -3477,7 +3477,7 @@ namespace OpenDental{
 				int numLabProcsUnselected=0;
 				List<int> selectedIndices=new List<int>(gridMain.SelectedIndices);
 				for(int i=0;i<selectedIndices.Count;i++) {
-					if(gridMain.Rows[gridMain.SelectedIndices[i]].Tag==null) {
+					if(gridMain.Rows[selectedIndices[i]].Tag==null) {
 						continue;//subtotal row.
 					}
 					Procedure proc=(Procedures.GetOneProc(((ProcTP)gridMain.Rows[selectedIndices[i]].Tag).ProcNumOrig,false));
