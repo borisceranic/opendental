@@ -10,6 +10,7 @@ using System.Web.Services;
 using System.Web.Services.Protocols;
 using System.Xml;
 using System.Xml.Serialization;
+using CodeBase;
 using OpenDentBusiness;
 
 namespace OpenDentalServer {
@@ -32,6 +33,13 @@ namespace OpenDentalServer {
 			DataTransferObject dto=DataTransferObject.Deserialize(dtoString);
 			//XmlSerializer serializer;
 			try {
+				//Always attempt to set the database connection settings from the config file if they haven't been set yet.
+				//We use to ONLY load in database settings when Security.LogInWeb was called but that is not good enough now that we have more services.
+				//E.g. We do not want to manually call "Security.LogInWeb" from the CEMT when all we want is a single preference value.
+				if(string.IsNullOrEmpty(DataConnection.GetServerName()) && string.IsNullOrEmpty(DataConnection.GetConnectionString())) {
+					RemotingClient.RemotingRole=RemotingRole.ServerWeb;
+					Userods.LoadDatabaseInfoFromFile(ODFileUtils.CombinePaths(Server.MapPath("."),"OpenDentalServerConfig.xml"));
+				}
 				Type type = dto.GetType();
 				if(type == typeof(DtoGetTable)) {
 					DtoGetTable dtoGetTable=(DtoGetTable)dto;

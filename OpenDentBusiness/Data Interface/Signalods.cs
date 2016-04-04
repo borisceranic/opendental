@@ -47,7 +47,16 @@ namespace OpenDentBusiness {
 				BroadcastSignals(listSignals);
 			}
 			catch {
-				SignalLastRefreshed=MiscData.GetNowDateTime();
+				DateTime dateTimeRefreshed;
+				try {
+					//Signal processing should always use the server's time.
+					dateTimeRefreshed=MiscData.GetNowDateTime();
+				}
+				catch {
+					//If the server cannot be reached, we still need to move the signal processing forward so use local time as a fail-safe.
+					dateTimeRefreshed=DateTime.Now;
+				}
+				SignalLastRefreshed=dateTimeRefreshed;
 			}
 		}
 

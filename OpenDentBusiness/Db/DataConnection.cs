@@ -236,6 +236,11 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>From local variable.  Does not query the database.</summary>
+		public static string GetConnectionString() {
+			return ConnectionString;
+		}
+
+		///<summary>From local variable.  Does not query the database.</summary>
 		public static string GetDatabaseName() {
 			return Database;
 		}
