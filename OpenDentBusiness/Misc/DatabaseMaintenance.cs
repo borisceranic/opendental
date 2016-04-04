@@ -6218,7 +6218,7 @@ HAVING cnt>1";
 			}
 			//Get all clear text emailmessages that can have their RawEmailIn columns safely manipulated from the inbox.
 			//These emails are safe to remove attachments from the RawEmailIn because they have already been digested and attchments extracted.
-			string command="SELECT * FROM emailmessage "
+			string command="SELECT EmailMessageNum FROM emailmessage "
 				+"WHERE RawEmailIn!='' "
 				+"AND SentOrReceived IN ("+POut.Int((int)EmailSentOrReceived.Received)+","+POut.Int((int)EmailSentOrReceived.Read)+")";
 			//POut.Int((int)EmailSentOrReceived.ReceivedDirect)+","+POut.Int((int)EmailSentOrReceived.ReadDirect)
@@ -6227,8 +6227,8 @@ HAVING cnt>1";
 			//we would need to take an extra step at the end (after cleaning up attachments) to re-encrypt the modified email message. 
 			//The current customers complaining only have bloat with clear text emails so that is where we are going to start with the clean up tool.
 			ODEvent.Fire(new ODEventArgs("RawEmailCleanUp",Lans.g("DatabaseMaintenance","Getting email messages from the database...")));
-			List<EmailMessage> listEmailMessages=Crud.EmailMessageCrud.SelectMany(command);
-			if(listEmailMessages.Count==0) {
+			DataTable tableEmailMessageNums=Db.GetTable(command);
+			if(tableEmailMessageNums.Rows.Count==0) {
 				return Lans.g("DatabaseMaintenance","There are no email messages that need to be cleaned up.");
 			}
 			List<EmailAddress> listEmailAddresses=EmailAddresses.GetAll();//Do not use the cache because the cache doesn't contain all email addresses.
@@ -6237,10 +6237,11 @@ HAVING cnt>1";
 			int cleanedCount=0;
 			int index=1;
 			//Call the processing email logic for each email which will clear out the RawEmailIn column if the email is successfully digested.
-			foreach(EmailMessage emailMessage in listEmailMessages) {
+			foreach(DataRow row in tableEmailMessageNums.Rows) {
 				ODEvent.Fire(new ODEventArgs("RawEmailCleanUp",Lans.g("DatabaseMaintenance","Processing email message")
-					+"  "+index.ToString()+" / "+listEmailMessages.Count.ToString()));
+					+"  "+index.ToString()+" / "+tableEmailMessageNums.Rows.Count.ToString()));
 				index++;
+				EmailMessage emailMessage=EmailMessages.GetOne(PIn.Long(row["EmailMessageNum"].ToString()));
 				EmailMessage oldEmailMessage=emailMessage.Copy();
 				//Try and find the corresponding email address for this email.
 				EmailAddress emailAddress=listEmailAddresses.FirstOrDefault(x => x.EmailUsername.ToLower()==emailMessage.RecipientAddress.ToLower());
@@ -6263,14 +6264,14 @@ HAVING cnt>1";
 					errorCount++;
 				}
 			}
-			if(DataConnection.DBtype==DatabaseType.MySql && listEmailMessages.Count!=noChangeCount) {//Using MySQL and something actually changed.
+			if(DataConnection.DBtype==DatabaseType.MySql && tableEmailMessageNums.Rows.Count!=noChangeCount) {//Using MySQL and something actually changed.
 				//Optimize the emailmessage table so that the user can see the space savings within a File Explorer right away.
 				ODEvent.Fire(new ODEventArgs("RawEmailCleanUp",Lans.g("DatabaseMaintenance","Optimizing the email message table...")));
 				DatabaseMaintenance.OptimizeTable("emailmessage");
 			}
 			string strResults=Lans.g("DatabaseMaintenance","Done.  No clean up required.");
 			if(cleanedCount > 0 || errorCount > 0) {
-				strResults=Lans.g("DatabaseMaintenance","Total email messages considered")+": "+listEmailMessages.Count.ToString()+"\r\n"
+				strResults=Lans.g("DatabaseMaintenance","Total email messages considered")+": "+tableEmailMessageNums.Rows.Count.ToString()+"\r\n"
 					+Lans.g("DatabaseMaintenance","Email messages successfully cleaned up")+": "+cleanedCount.ToString()+"\r\n"
 					+Lans.g("DatabaseMaintenance","Email messages that did not nead to be cleaned up")+": "+noChangeCount.ToString()+"\r\n"
 					+Lans.g("DatabaseMaintenance","Email messages that failed to be cleaned up")+": "+errorCount.ToString();
