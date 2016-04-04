@@ -118,14 +118,27 @@ namespace OpenDentBusiness {
 		#region Static Globals
 
 		public static bool Is835(X12object xobj) {
-      if(xobj.FunctGroups.Count!=1) {//Exactly 1 GS segment in each 835.
-        return false;
-      }
-      if(xobj.FunctGroups[0].Header.Get(1)=="HP") {//GS01 (pg. 279)
-        return true;
-      }
-      return false;
-    }
+			if(xobj.FunctGroups.Count!=1) {//Exactly 1 GS segment in each 835.
+				return false;
+			}
+			if(xobj.FunctGroups[0].Header.Get(1)=="HP") {//GS01 (pg. 279)
+				return true;
+			}
+			return false;
+		}
+
+		///<summary>Returns true if the required Application Sender's Code within the GS - Functional Group Header is "DENTICAL".
+		///Returns false if there is no FunctGroups or the sender's code is not "DENTICAL".</summary>
+		public static bool IsDentical(X12object xobj) {
+			if(xobj.FunctGroups==null || xobj.FunctGroups.Count!=1) {//Exactly 1 GS segment in each 835.
+				return false;
+			}
+			//Check the Application Sender's Code.  Code identifying party sending transmission; codes agreed to by trading partners.
+			if(xobj.FunctGroups[0].Header.Get(2).Trim().ToUpper()=="DENTICAL") {//GS02 (standard guide pg. 279)
+				return true;
+			}
+			return false;
+		}
 
 		#endregion Static Globals
 
@@ -841,11 +854,16 @@ namespace OpenDentBusiness {
 			proc.DateServiceStart=dateClaimServiceStart;
 			proc.DateServiceEnd=dateClaimServiceEnd;
 			while(segNum<_listSegments.Count && _listSegments[segNum].SegmentID=="DTM") {
+				string dateStr=_listSegments[segNum].Get(2);
+				//Denti-cal has sent us invalid dates in the past.  Translate invalid dates for Denti-cal as 1/1/1
+				if(IsDentical(this) && dateStr=="00000000") {
+					dateStr="00010101";//Date expressed as CCYYMMDD where CC represents the first two digits of the calendar year.
+				}
 				if(_listSegments[segNum].Get(1)=="151") {//Service period end.
-					proc.DateServiceEnd=X12Parse.ToDate(_listSegments[segNum].Get(2));
+					proc.DateServiceEnd=X12Parse.ToDate(dateStr);
 				}
 				else {//_listSegments[segNum].Get(1)=="150" || _listSegments[segNum].Get(1)=="472"//Service period start
-					proc.DateServiceStart=X12Parse.ToDate(_listSegments[segNum].Get(2));
+					proc.DateServiceStart=X12Parse.ToDate(dateStr);
 				}
 				segNum++;
 			}
