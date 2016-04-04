@@ -2582,6 +2582,7 @@ namespace OpenDental{
 			threadEmailInbox.Start();
 			_claimReportRetrieveIntervalMS=(int)TimeSpan.FromMinutes(PrefC.GetInt(PrefName.ClaimReportReceiveInterval)).TotalMilliseconds;
 			_threadClaimReportRetrieve=new ODThread(_claimReportRetrieveIntervalMS,ThreadClaimReportRetrieve);
+			_threadClaimReportRetrieve.AddExceptionHandler(ThreadClaimReportException);
 			_threadClaimReportRetrieve.Name="Claim Report Thread";
 			_threadClaimReportRetrieve.Start();
 			_threadPodium=new ODThread(Podium.PodiumThreadIntervalMS,((ODThread o) => { Podium.ThreadPodiumSendInvitations(false); }));
@@ -4380,24 +4381,25 @@ namespace OpenDental{
 
 		///<summary>Usually set at 4 to 6 second intervals.</summary>
 		private void timerSignals_Tick(object sender,System.EventArgs e) {
-			DateTime dtInactive = dateTimeLastActivity+TimeSpan.FromMinutes((double)PrefC.GetInt(PrefName.SignalInactiveMinutes));
-			if((double)PrefC.GetInt(PrefName.SignalInactiveMinutes)!=0 && DateTime.Now>dtInactive) {
-				return;
+			try {
+				DateTime dtInactive=dateTimeLastActivity+TimeSpan.FromMinutes((double)PrefC.GetInt(PrefName.SignalInactiveMinutes));
+				if((double)PrefC.GetInt(PrefName.SignalInactiveMinutes)!=0 && DateTime.Now>dtInactive) {
+					return;
+				}
+				if(Security.CurUser==null) {
+					//User must be at the log in screen, so no need to process signals. We will need to look for shutdown signals since the last refreshed time when the user attempts to log in.
+					return;
+				}		
+				//Pre-Signal Processing
+				if(_butText!=null && _butText.Enabled && _butText.NotificationText==null) {//The Notification text has not been set since startup.  We need an accurate starting count.
+					SetSmsNotificationText(SmsFromMobiles.GetSmsNotification(),true);//Queries the database.  Send signal since we queried the database.
+				}
 			}
-			if(Security.CurUser==null) {
-				//User must be at the log in screen, so no need to process signals. We will need to look for shutdown signals since the last refreshed time when the user attempts to log in.
-				return;
-			}		
-			//Pre-Signal Processing
-			if(_butText!=null && _butText.Enabled && _butText.NotificationText==null) {//The Notification text has not been set since startup.  We need an accurate starting count.
-				SetSmsNotificationText(SmsFromMobiles.GetSmsNotification(),true);//Queries the database.  Send signal since we queried the database.
+			catch {
+				//Currently do nothing.
 			}
 			//Signal Processing
 			Signalods.SignalsTick(onShutdown);
-			//Post Signal Processing
-			if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {//No actual signals are sent, so this must happen independantly from SignalsTick.
-				lightSignalGrid1.SetConfs(PhoneConfs.GetAll());
-			}
 		}
 
 		///<summary>Called when a shutdown signal is found.</summary>
@@ -4962,6 +4964,10 @@ namespace OpenDental{
 					FormClaimReports.RetrieveAndImport(clearinghouseClin,true);
 				}
 			}
+		}
+
+		private void ThreadClaimReportException(Exception ex) {
+			//Currently do nothing.
 		}
 
 		///<summary>If the local computer is the computer where incoming email is fetched, then this thread runs in the background and checks for new
@@ -7312,56 +7318,59 @@ namespace OpenDental{
 		}
 
 		private void timerReplicationMonitor_Tick(object sender,EventArgs e) {
-			//this timer doesn't get turned on until after user successfully logs in.
-			if(ReplicationServers.Listt.Count==0) {//Listt will be automatically refreshed if null.
-				return;//user must not be using any replication
-			}
-			bool isSlaveMonitor=false;
-			for(int i=0;i<ReplicationServers.Listt.Count;i++) {
-				if(ReplicationServers.Listt[i].SlaveMonitor.ToString()!=Dns.GetHostName()) {
-					isSlaveMonitor=true;
+			try {
+				//this timer doesn't get turned on until after user successfully logs in.
+				if(ReplicationServers.Listt.Count==0) {//Listt will be automatically refreshed if null.
+					return;//user must not be using any replication
 				}
-			}
-			if(!isSlaveMonitor) {
-				return;
-			}
-			DataTable table=ReplicationServers.GetSlaveStatus();
-			if(table.Rows.Count==0) {
-				return;
-			}
-			if(table.Rows[0]["Replicate_Do_Db"].ToString().ToLower()!=DataConnection.GetDatabaseName().ToLower()) {//if the database we're connected to is not even involved in replication
-				return;
-			}
-			string status=table.Rows[0]["Slave_SQL_Running"].ToString();
-			if(status=="Yes") {
-				_isReplicationSlaveStopped=false;
-				return;
-			}
-			if(table.Rows[0]["Last_Errno"].ToString()=="0" && table.Rows[0]["Last_Error"].ToString()=="") {
-				//The slave SQL is not running, but there was not an error.
-				//This happens when the slave is manually stopped with an SQL statement, but stopping the slave does not hurt anything, so we should not prevent the user from using OD.
-				if(!_isReplicationSlaveStopped) {
-					_isReplicationSlaveStopped=true;
-					MessageBox.Show(Lan.g(this,"Warning: Replication data receive is off at server ")+ReplicationServers.GetForLocalComputer().Descript+".\r\n"
-						+Lan.g(this,"The server will not receive updates until the slave is started again.")+"\r\n"
-						+Lan.g(this,"Contact your IT admin to run the SQL command SLAVE START.")
-						);
+				bool isSlaveMonitor=false;
+				for(int i=0;i<ReplicationServers.Listt.Count;i++) {
+					if(ReplicationServers.Listt[i].SlaveMonitor.ToString()!=Dns.GetHostName()) {
+						isSlaveMonitor=true;
+					}
 				}
-				return;
+				if(!isSlaveMonitor) {
+					return;
+				}
+				DataTable table=ReplicationServers.GetSlaveStatus();
+				if(table.Rows.Count==0) {
+					return;
+				}
+				if(table.Rows[0]["Replicate_Do_Db"].ToString().ToLower()!=DataConnection.GetDatabaseName().ToLower()) {//if the database we're connected to is not even involved in replication
+					return;
+				}
+				string status=table.Rows[0]["Slave_SQL_Running"].ToString();
+				if(status=="Yes") {
+					_isReplicationSlaveStopped=false;
+					return;
+				}
+				if(table.Rows[0]["Last_Errno"].ToString()=="0" && table.Rows[0]["Last_Error"].ToString()=="") {
+					//The slave SQL is not running, but there was not an error.
+					//This happens when the slave is manually stopped with an SQL statement, but stopping the slave does not hurt anything, so we should not prevent the user from using OD.
+					if(!_isReplicationSlaveStopped) {
+						_isReplicationSlaveStopped=true;
+						MessageBox.Show(Lan.g(this,"Warning: Replication data receive is off at server ")+ReplicationServers.GetForLocalComputer().Descript+".\r\n"
+							+Lan.g(this,"The server will not receive updates until the slave is started again.")+"\r\n"
+							+Lan.g(this,"Contact your IT admin to run the SQL command SLAVE START.")
+							);
+					}
+					return;
+				}
+				//Shut down all copies of OD and set ReplicationFailureAtServer_id to this server_id
+				//No workstations will be able to connect to this single server while this flag is set.
+				Prefs.UpdateLong(PrefName.ReplicationFailureAtServer_id,ReplicationServers.Server_id);
+				//shut down all workstations on all servers
+				Signalods.SignalLastRefreshed=MiscData.GetNowDateTime().AddSeconds(5);
+				Signalod sig=new Signalod();
+				sig.ITypes=((int)InvalidType.ShutDownNow).ToString();
+				sig.SigType=SignalType.Invalid;
+				Signalods.Insert(sig);
+				Computers.ClearAllHeartBeats(Environment.MachineName);//always assume success
+				timerReplicationMonitor.Enabled=false;
+				MsgBox.Show(this,"This database is temporarily unavailable.  Please connect instead to your alternate database at the other location.");
+				Application.Exit();
 			}
-			//Shut down all copies of OD and set ReplicationFailureAtServer_id to this server_id
-			//No workstations will be able to connect to this single server while this flag is set.
-			Prefs.UpdateLong(PrefName.ReplicationFailureAtServer_id,ReplicationServers.Server_id);
-			//shut down all workstations on all servers
-			Signalods.SignalLastRefreshed=MiscData.GetNowDateTime().AddSeconds(5);
-			Signalod sig=new Signalod();
-			sig.ITypes=((int)InvalidType.ShutDownNow).ToString();
-			sig.SigType=SignalType.Invalid;
-			Signalods.Insert(sig);
-			Computers.ClearAllHeartBeats(Environment.MachineName);//always assume success
-			timerReplicationMonitor.Enabled=false;
-			MsgBox.Show(this,"This database is temporarily unavailable.  Please connect instead to your alternate database at the other location.");
-			Application.Exit();
+			catch { }
 		}
 
 		#region Logoff
