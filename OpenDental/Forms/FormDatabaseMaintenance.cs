@@ -560,8 +560,8 @@ namespace OpenDental {
 			this.label9.Name = "label9";
 			this.label9.Size = new System.Drawing.Size(631, 20);
 			this.label9.TabIndex = 50;
-			this.label9.Text = "Clears out attachments from raw email text (used only for debugging) in order to " +
-    "save database bloat.";
+			this.label9.Text = "Fixes emails which are encoded in the Chart progress notes.  Also clears unused a" +
+    "ttachments.";
 			this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// butRawEmails
@@ -875,8 +875,10 @@ namespace OpenDental {
 
 		private void butRawEmails_Click(object sender,EventArgs e) {
 			if(!MsgBox.Show(this,MsgBoxButtons.YesNo
-				,"This tool is only necessary to run if utilizing the email inbox feature and the emailmessage table has grown to a large size.\r\n"
-				+"It will safely remove raw message content from emails that have been successfully downloaded that no longer need the raw message.\r\n\r\n"
+				,"This tool is only necessary to run if utilizing the email inbox feature.\r\n"
+				+"Run this tool if email messages are encoded in the Chart progress notes, \r\n"
+				+"or if the emailmessage table has grown to a large size.\r\n"
+				+"This will decode any encoded clear text emails and will remove unused attachment content.\r\n\r\n"
 				+"This tool could take a long time to finish, do you wish to continue?"))
 			{
 				return;

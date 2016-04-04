@@ -130,7 +130,7 @@ namespace OpenDental {
 				if(listHtmlParts.Count>0) {//Html body found.
 					textBodyText.Visible=false;
 					_isLoading=true;
-					webBrowser.DocumentText=EmailMessages.ProcessMimeTextPart(listHtmlParts[0].Body.Text);
+					webBrowser.DocumentText=EmailMessages.ProcessMimeTextPart(listHtmlParts[0]);
 					webBrowser.Location=textBodyText.Location;
 					webBrowser.Size=textBodyText.Size;
 					webBrowser.Anchor=textBodyText.Anchor;
@@ -140,7 +140,7 @@ namespace OpenDental {
 					}
 				}
 				else if(listTextParts.Count>0) {//No html body found, however one specific mime part is for viewing in text only.					
-					textBodyText.Text=EmailMessages.ProcessMimeTextPart(listTextParts[0].Body.Text);
+					textBodyText.Text=EmailMessages.ProcessMimeTextPart(listTextParts[0]);
 				}
 				else {//No html body found and no text body found.  Last resort.  Show all mime parts which are not attachments (ugly).
 					textBodyText.Text=_emailMessage.BodyText;//This version of the body text includes all non-attachment mime parts.

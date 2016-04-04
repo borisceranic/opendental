@@ -800,14 +800,6 @@ namespace OpenDentBusiness{
 			return inMsg;
 		}
 
-		private static bool IsReceivedMessageEncrypted(Health.Direct.Agent.IncomingMessage inMsg) {
-			//No need to check RemotingRole; no call to db.
-			if(inMsg.Message.ContentType.ToLower().Contains("application/pkcs7-mime")) {
-				return true;//The email MIME/body is encrypted (known as S/MIME). Treated as an Encrypted/Direct message.
-			}
-			return false;
-		}
-
 		///<summary>Throws various exceptions if decryption fails.  Decryption will fail if the sender is not yet trusted by the recipient.  Decrypts and valudates trust.  If decrypted successfully, removes the sender signature from the decrypted attachments and moves them into inMsg.Signatures.</summary>
 		private static Health.Direct.Agent.IncomingMessage DecryptIncomingMessage(Health.Direct.Agent.IncomingMessage inMsg) {
 			//No need to check RemotingRole; no call to db.
@@ -827,7 +819,7 @@ namespace OpenDentBusiness{
 		{
 			//No need to check RemotingRole; no call to db.
 			Health.Direct.Agent.IncomingMessage inMsg=RawEmailToIncomingMessage(strRawEmail,emailAddressReceiver);
-			bool isEncrypted=IsReceivedMessageEncrypted(inMsg);
+			bool isEncrypted=IsMimeEntityEncrypted(inMsg.Message);
 			EmailMessage emailMessage=null;
 			if(isEncrypted) {
 				emailMessage=ConvertMessageToEmailMessage(inMsg.Message,false,false);//Exclude attachments until we decrypt.
@@ -968,7 +960,7 @@ namespace OpenDentBusiness{
 			List<Health.Direct.Common.Mime.MimeEntity> listMimeLeafNodes=null;
 			try {
 				inMsg=RawEmailToIncomingMessage(strRawEmailIn,emailAddressInbox);
-				if(IsReceivedMessageEncrypted(inMsg)) {
+				if(IsMimeEntityEncrypted(inMsg.Message)) {
 					inMsg=DecryptIncomingMessage(inMsg);
 				}
 				listMimeLeafNodes=GetMimeLeafNodes(inMsg.Message);
@@ -1027,7 +1019,7 @@ namespace OpenDentBusiness{
 		///Used to save images for received html messages.</summary>
 		public static string SaveMimeImageToFile(Health.Direct.Common.Mime.MimeEntity mimeEntityForImage,string directoryPath) {
 			//No need to check RemotingRole; no call to db.
-			if(!mimeEntityForImage.ContentTransferEncoding.Contains("base64")) {
+			if(!IsMimeEntityBase64(mimeEntityForImage)) {
 				return null;
 			}
 			try {
@@ -1141,7 +1133,7 @@ namespace OpenDentBusiness{
 				return false;
 			}
 			//No need to check RemotingRole; no call to db.
-			Health.Direct.Common.Certificates.SystemX509Store storeAnchors=Health.Direct.Common.Certificates.SystemX509Store.OpenAnchorEdit();//Open for read and write.  Corresponds to NHINDAnchors/Certificates.
+			Health.Direct.Common.Certificates.SystemX509Store storeAnchors=Health.Direct.Common.Certificates.SystemX509Store.OpenAnchor();//Open for read-only.  Corresponds to NHINDAnchors/Certificates.
 			if(GetValidCertForAddressFromStore(storeAnchors,strAddressTest,true)==null) {//Look for domain level and address level trust certificates (anchors).
 				return false;//None found.
 			}
@@ -1255,7 +1247,8 @@ namespace OpenDentBusiness{
 			return emailAddress;
 		}
 
-		///<summary>The strAddressTest can be either a full email address or a domain name.
+		///<summary>The specified certificate store must be open with read permissions (write permissions are not required, but are allowed).
+		///The strAddressTest can be either a full email address or a domain name.
 		///Set isDomainIncluded to true if you would like to include domain level certificates in addition to the certificates which match the exact test address.  Exact address matches will be preferred over domain matches.
 		///Otherwise, if isDomainIncluded is false, then only certificates which exactly match the test address will be included.</summary>
 		private static X509Certificate2 GetValidCertForAddressFromStore(Health.Direct.Common.Certificates.SystemX509Store store,string strAddressTest,bool isDomainIncluded) {
@@ -1424,7 +1417,7 @@ namespace OpenDentBusiness{
 				//The received email message date must be in a very specific format and must match the RFC822 standard.  Is a required field for RFC822.  http://tools.ietf.org/html/rfc822
 				//We show the datetime that the email landed onto the email server instead of the datetime that the email was downloaded.
 				//Examples: "3 Dec 2013 17:10:37 -0800", "10 Dec 2013 17:10:37 -0800", "Tue, 5 Nov 2013 17:10:37 +0000 (UTC)", "Tue, 12 Nov 2013 17:10:37 +0000 (UTC)"
-				if(message.DateValue.Contains("GMT")) {//Examples: Tue, 09 Sep 2014 23:16:36 GMT
+				if(message.DateValue.EndsWith("GMT")) {//Examples: Tue, 09 Sep 2014 23:16:36 GMT
 					emailMessage.MsgDateTime=DateTime.Parse(message.DateValue);
 				}
 				else if(message.DateValue.Contains(",")) {//The day-of-week, comma and following space are optional. Examples: "Tue, 3 Dec 2013 17:10:37 +0000", "Tue, 12 Nov 2013 17:10:37 +0000 (UTC)"
@@ -1455,7 +1448,7 @@ namespace OpenDentBusiness{
 			//We want to treat one part and multi-part emails the same way below, so we make our own list of leaf node mime parts (mime parts which have no children, also know as single part).
 			List<Health.Direct.Common.Mime.MimeEntity> listMimePartLeafNodes=GetMimeLeafNodes(message);
 			if(listMimePartLeafNodes==null) {
-				emailMessage.BodyText=ProcessMimeTextPart(message.Body.Text);
+				emailMessage.BodyText=ProcessMimeTextPart(message);
 				return emailMessage;
 			}
 			List<Health.Direct.Common.Mime.MimeEntity> listMimeBodyTextParts=new List<Health.Direct.Common.Mime.MimeEntity>();
@@ -1473,18 +1466,28 @@ namespace OpenDentBusiness{
 			if(listMimeBodyTextParts.Count>1) {
 				strTextPartBoundary=message.ParsedContentType.Boundary;
 			}
-			StringBuilder sbBodyText=new StringBuilder();
-			for(int i=0;i<listMimeBodyTextParts.Count;i++) {
-				if(strTextPartBoundary!="") {//For incoming Direct Ack messages.
-					sbBodyText.Append("\r\n--"+strTextPartBoundary+"\r\n");
-					sbBodyText.Append(listMimeBodyTextParts[i].ToString());//Includes not only the body text, but also content type and content disposition.
+			StringBuilder sbBodyText=new StringBuilder("");
+			if(isOutbound) {
+				for(int i=0;i<listMimeBodyTextParts.Count;i++) {
+					if(strTextPartBoundary!="") {//For outgoing Direct Ack messages.
+						sbBodyText.Append("\r\n--"+strTextPartBoundary+"\r\n");
+						sbBodyText.Append(listMimeBodyTextParts[i].ToString());//Includes not only the body text, but also content type and content disposition.
+					}
+					else {
+						sbBodyText.Append(ProcessMimeTextPart(listMimeBodyTextParts[i]));
+					}
 				}
-				else {
-					sbBodyText.Append(ProcessMimeTextPart(listMimeBodyTextParts[i].Body.Text));
+				if(strTextPartBoundary!="") {
+					sbBodyText.Append("\r\n--"+strTextPartBoundary+"--\r\n");
 				}
 			}
-			if(strTextPartBoundary!="") {
-				sbBodyText.Append("\r\n--"+strTextPartBoundary+"--\r\n");
+			else {
+				//All plain text body parts will show to the user in the chart module progress notes.
+				for(int i=0;i<listMimeBodyTextParts.Count;i++) {
+					if(IsMimeEntityTextPlain(listMimeBodyTextParts[i])) {
+						sbBodyText.Append(ProcessMimeTextPart(listMimeBodyTextParts[i]));
+					}
+				}
 			}
 			emailMessage.BodyText=sbBodyText.ToString();
 			emailMessage.Attachments=new List<EmailAttach>();
@@ -1504,7 +1507,7 @@ namespace OpenDentBusiness{
 					Health.Direct.Common.Mime.MimeEntity mimePartAttach=listMimeAttachParts[i];
 					byte[] arrayData=null;
 					try {
-						if(mimePartAttach.ContentTransferEncoding.ToLower().Contains("base64")) {
+						if(IsMimeEntityBase64(mimePartAttach)) {
 							arrayData=Convert.FromBase64String(mimePartAttach.Body.Text);
 						}
 					}
@@ -1607,8 +1610,16 @@ namespace OpenDentBusiness{
 			return message;
 		}
 
-		public static string ProcessMimeTextPart(string strBodyText) {
+		public static string ProcessMimeTextPart(Health.Direct.Common.Mime.MimeEntity mimeEntity) {
 			//No need to check RemotingRole; no call to db.
+			string strBodyText=mimeEntity.Body.Text;
+			//Convert clear text mime parts which are base64 encoded into utf8 to make the text readable (plain text, html, xml, etc...)
+			//This includes messages which were received as encryped and which were successfully decrypted.
+			if(!IsMimeEntityEncrypted(mimeEntity) && IsMimeEntityText(mimeEntity) && IsMimeEntityBase64(mimeEntity)) {
+				Encoding enc=GetMimeEncoding(mimeEntity);
+				byte[] arrayBodyBytes=Convert.FromBase64String(mimeEntity.Body.Text);
+				strBodyText=enc.GetString(arrayBodyBytes);
+			}
 			//Official documentation regarding text wrapping.  http://www.ietf.org/rfc/rfc2646.txt
 			//Both text and html bodies appear to be commonly wrapped at 75 characters with an extra '=' character added to the end of wrapped lines.
 			//We have seen email wrapped at 75 characters from a number of sources, including GoDaddy and Comodo.
@@ -1655,6 +1666,74 @@ namespace OpenDentBusiness{
 				}
 			}
 			return retVal.ToString();
+		}
+
+		private static Encoding GetMimeEncoding(Health.Direct.Common.Mime.MimeEntity mimeEntity) {
+			//We cannot use mimeEntity.ParsedContentType.CharSet because it fails if there are spaces around the equal sign of the charset statement.
+			string contentType=mimeEntity.ContentType.ToLower();
+			int charsetIndex=contentType.IndexOf("charset");
+			if(charsetIndex < 0) {
+				throw new ApplicationException("Mime encoding not specified.");
+			}
+			charsetIndex=contentType.IndexOf("=",charsetIndex+7);//Find the '=' after the "charset" string (ignoring spaces).
+			if(charsetIndex < 0) {
+				throw new ApplicationException("Mime encoding incorrectly specified.");
+			}
+			charsetIndex++;//Skip '='
+			while(charsetIndex < contentType.Length && Char.IsWhiteSpace(contentType[charsetIndex])) {//Skip white space after '='
+				charsetIndex++;
+			}
+			string encName="";
+			while(charsetIndex < contentType.Length && contentType[charsetIndex]!=';' && !Char.IsWhiteSpace(contentType[charsetIndex])) {
+				encName+=contentType[charsetIndex];
+				charsetIndex++;
+			}
+			encName=encName.Replace("\"","");//Remove double-quotes
+			Encoding enc=null;
+			try {
+				enc=Encoding.GetEncoding(encName);
+			}
+			catch {
+				if(encName.ToLower().StartsWith("cp")) {
+					string codePage=encName.Substring(2);
+					enc=Encoding.GetEncoding(int.Parse(codePage));
+				}
+			}
+			return enc;
+		}
+
+		private static bool IsMimeEntityEncrypted(Health.Direct.Common.Mime.MimeEntity mimeEntity) {
+			//No need to check RemotingRole; no call to db.
+			if(mimeEntity.ContentType!=null && mimeEntity.ContentType.ToLower().Contains("application/pkcs7-mime")) {
+				return true;//The email MIME/body is encrypted (known as S/MIME).  Treated as an Encrypted/Direct message.
+			}
+			return false;
+		}
+
+		private static bool IsMimeEntityBase64(Health.Direct.Common.Mime.MimeEntity mimeEntity) {
+			//No need to check RemotingRole; no call to db.
+			if(mimeEntity.ContentTransferEncoding!=null && mimeEntity.ContentTransferEncoding.ToLower().Contains("base64")) {
+				return true;
+			}
+			return false;
+		}
+
+		///<summary>Returns true if plain text, xml, html, etc...</summary>
+		private static bool IsMimeEntityText(Health.Direct.Common.Mime.MimeEntity mimeEntity) {
+			//No need to check RemotingRole; no call to db.
+			if(mimeEntity.ContentType!=null && mimeEntity.ContentType.ToLower().Contains("text/")) {
+				return true;
+			}
+			return false;
+		}
+
+		///<summary>Returns true if plain text, xml, html, etc...</summary>
+		private static bool IsMimeEntityTextPlain(Health.Direct.Common.Mime.MimeEntity mimeEntity) {
+			//No need to check RemotingRole; no call to db.
+			if(mimeEntity.ContentType!=null && mimeEntity.ContentType.ToLower().Contains("text/plain")) {
+				return true;
+			}
+			return false;
 		}
 
 		public static string GetEmailSentOrReceivedDescript(EmailSentOrReceived sentOrReceived) {
