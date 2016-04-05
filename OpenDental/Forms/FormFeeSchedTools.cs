@@ -920,7 +920,10 @@ namespace OpenDental{
 				MsgBox.Show(this,"Percent must be between -99 and 99.");
 				return;
 			}
-			if(!MsgBox.Show(this,true,"This will overwrite all values of the current fee schedule showing in the main window.  For this reason, you should be working on a copy.  Are you sure you want to continue?")){
+			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"This will overwrite all values of the selected fee schedule, causing all previously entered fee "
+				+"amounts to be lost.  It is recommended to first create a backup copy of the original fee schedule, then update the original fee schedule "
+				+"with the new fees.  Are you sure you want to continue?"))
+			{
 				return;
 			}
 			int round=0;//Default to dollar
