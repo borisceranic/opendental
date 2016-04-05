@@ -254,6 +254,22 @@ namespace OpenDentBusiness {
 			return carrier.CarrierName;
 		}
 
+		/// <summary>Returns a DataTable containing the PlanNum, CarrierNum, and CarrierName for a list of PlanNums.</summary>
+		public static DataTable GetCarrierNames(List<long> listPlanNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),listPlanNums);
+			}
+			if(listPlanNums.Count==0) {
+				return new DataTable();
+			}
+			string command="SELECT PlanNum,CarrierNum,'' AS CarrierName FROM insplan WHERE PlanNum IN ("+string.Join(",",listPlanNums)+")";
+			DataTable table=Db.GetTable(command);
+			foreach(DataRow row in table.Rows) {
+				row["CarrierName"]=Carriers.GetName(PIn.Long(row["CarrierNum"].ToString()));
+			}
+			return table;
+		}
+
 		/// <summary>Only used once in Claims.cs.  Gets insurance benefits remaining for one benefit year.  Returns actual remaining insurance based on ClaimProc data, taking into account inspaid and ins pending. Must supply all claimprocs for the patient.  Date used to determine which benefit year to calc.  Usually today's date.  The insplan.PlanNum is the plan to get value for.  ExcludeClaim is the ClaimNum to exclude, or enter -1 to include all.  This does not yet handle calculations where ortho max is different from regular max.  Just takes the most general annual max, and subtracts all benefits used from all categories.</summary>
 		public static double GetInsRem(List<ClaimProcHist> histList,DateTime asofDate,long planNum,long patPlanNum,long excludeClaim,List<InsPlan> planList,List<Benefit> benList,long patNum,long insSubNum) {
 			//No need to check RemotingRole; no call to db.

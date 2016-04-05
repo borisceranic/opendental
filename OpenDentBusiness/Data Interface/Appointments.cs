@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Drawing.Imaging;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 
@@ -756,29 +757,25 @@ namespace OpenDentBusiness{
 			table.Columns.Add("wkPhone");
 			table.Columns.Add("wirelessPhone");
 			table.Columns.Add("writeoffPPO");
-			string command="SELECT p1.Abbr ProvAbbr,p2.Abbr HygAbbr,patient.Address patAddress1,patient.Address2 patAddress2,patient.AddrNote patAddrNote,"
+			string command="SELECT patient.Address patAddress1,patient.Address2 patAddress2,patient.AddrNote patAddrNote,"
 				+"patient.ApptModNote patApptModNote,appointment.AppointmentTypeNum,appointment.AptDateTime apptAptDateTime,appointment.DateTimeArrived apptAptDateTimeArrived,appointment.AptNum apptAptNum,"
-			  +"appointment.AptStatus apptAptStatus,appointment.Assistant apptAssistant,"
+				+"appointment.AptStatus apptAptStatus,appointment.Assistant apptAssistant,"
 				+"patient.BillingType patBillingType,patient.BirthDate patBirthDate,patient.DateTimeDeceased patDateTimeDeceased,"
-				+"carrier1.CarrierName carrierName1,carrier2.CarrierName carrierName2,appointment.ClinicNum,"
+				+"appointment.InsPlan1,appointment.InsPlan2,appointment.ClinicNum,"
 				+"patient.ChartNumber patChartNumber,patient.City patCity,appointment.ColorOverride apptColorOverride,appointment.Confirmed apptConfirmed,"
 				+"patient.CreditType patCreditType,labcase.DateTimeChecked labcaseDateTimeChecked,"
 				+"labcase.DateTimeDue labcaseDateTimeDue,labcase.DateTimeRecd labcaseDateTimeRecd,labcase.DateTimeSent labcaseDateTimeSent,appointment.DateTimeAskedToArrive apptDateTimeAskedToArrive,"
 				+"patient.Email patEmail,guar.FamFinUrgNote guarFamFinUrgNote,patient.FName patFName,patient.Guarantor patGuarantor,"
-				+"COUNT(AllergyNum) hasAllergy,"
-				+"COUNT(DiseaseNum) hasDisease,"
 				+"patient.HmPhone patHmPhone,patient.ImageFolder patImageFolder,appointment.IsHygiene apptIsHygiene,appointment.IsNewPatient apptIsNewPatient,"
 				+"labcase.LabCaseNum labcaseLabCaseNum,patient.Language patLanguage,patient.LName patLName,patient.MedUrgNote patMedUrgNote,"
 				+"patient.MiddleI patMiddleI,appointment.Note apptNote,appointment.Op apptOp,appointment.PatNum apptPatNum,"
-				+"appointment.Pattern apptPattern,COUNT(patplan.InsSubNum) hasIns,patient.PreferConfirmMethod patPreferConfirmMethod,"
+				+"appointment.Pattern apptPattern,(CASE WHEN patplan.InsSubNum IS NULL THEN 0 ELSE 1 END) hasIns,patient.PreferConfirmMethod patPreferConfirmMethod,"
 				+"patient.PreferContactMethod patPreferContactMethod,patient.Preferred patPreferred,"
 				+"patient.PreferRecallMethod patPreferRecallMethod,patient.Premed patPremed,"
 				+"appointment.ProcDescript apptProcDescript,appointment.ProcsColored apptProcsColored,appointment.ProvHyg apptProvHyg,appointment.ProvNum apptProvNum,"
 				+"patient.State patState,patient.WirelessPhone patWirelessPhone,patient.WkPhone patWkPhone,patient.Zip patZip "
 				+"FROM appointment "
-				+"LEFT JOIN patient ON patient.PatNum=appointment.PatNum "
-				+"LEFT JOIN provider p1 ON p1.ProvNum=appointment.ProvNum "
-				+"LEFT JOIN provider p2 ON p2.ProvNum=appointment.ProvHyg ";
+				+"LEFT JOIN patient ON patient.PatNum=appointment.PatNum ";
 			if(isPlanned){
 				command+="LEFT JOIN labcase ON labcase.PlannedAptNum=appointment.AptNum AND labcase.PlannedAptNum!=0 ";
 			}
@@ -786,14 +783,7 @@ namespace OpenDentBusiness{
 				command+="LEFT JOIN labcase ON labcase.AptNum=appointment.AptNum AND labcase.AptNum!=0 ";
 			}
 			command+="LEFT JOIN patient guar ON guar.PatNum=patient.Guarantor "
-				+"LEFT JOIN patplan ON patplan.PatNum=patient.PatNum AND patplan.Ordinal=1 "
-				//these four lines are very rarely made use of. They depend on the appointment.InsPlan1/2 being filled, which is unreliable.
-				+"LEFT JOIN insplan plan1 ON InsPlan1=plan1.PlanNum "
-				+"LEFT JOIN insplan plan2 ON InsPlan2=plan2.PlanNum "
-				+"LEFT JOIN carrier carrier1 ON plan1.CarrierNum=carrier1.CarrierNum "
-				+"LEFT JOIN carrier carrier2 ON plan2.CarrierNum=carrier2.CarrierNum "
-				+"LEFT JOIN disease ON patient.PatNum=disease.PatNum AND disease.DiseaseDefNum <> "+POut.Long(PrefC.GetLong(PrefName.ProblemsIndicateNone))+" "
-				+"LEFT JOIN allergy ON patient.PatNum=allergy.PatNum AND allergy.AllergyDefNum <> "+POut.Long(PrefC.GetLong(PrefName.AllergiesIndicateNone))+" ";
+				+"LEFT JOIN patplan ON patplan.PatNum=patient.PatNum AND patplan.Ordinal=1 ";
 			if(aptNum==0){
 				command+="WHERE AptDateTime >= "+POut.Date(dateStart)+" "
 					+"AND AptDateTime < "+POut.Date(dateEnd.AddDays(1))+" "
@@ -806,23 +796,6 @@ namespace OpenDentBusiness{
 			}
 			else{
 				command+="WHERE appointment.AptNum="+POut.Long(aptNum);
-			}
-			if(DataConnection.DBtype==DatabaseType.MySql) {
-				command+=" GROUP BY appointment.AptNum";
-			}
-			else {//Oracle
-				command+=" GROUP BY p1.Abbr,p2.Abbr,patient.Address,patient.Address2,patient.AddrNote,"
-				+"patient.ApptModNote,appointment.AppointmentTypeNum,AptDateTime,appointment.DateTimeArrived,appointment.AptNum,appointment.AptStatus,appointment.Assistant,"
-				+"patient.BillingType,patient.BirthDate,patient.DateTimeDeceased,"
-				+"carrier1.CarrierName,carrier2.CarrierName,appointment.ClinicNum,"
-				+"patient.ChartNumber,patient.City,appointment.ColorOverride,appointment.Confirmed,patient.CreditType,"
-				+"labcase.DateTimeChecked,labcase.DateTimeDue,labcase.DateTimeRecd,labcase.DateTimeSent,appointment.DateTimeAskedToArrive,"
-				+"patient.Email,guar.FamFinUrgNote,patient.FName,patient.Guarantor,patient.HmPhone,patient.ImageFolder,appointment.IsHygiene,appointment.IsNewPatient,"
-				+"labcase.LabCaseNum,patient.Language,patient.LName,patient.MedUrgNote,patient.MiddleI,appointment.Note,appointment.Op,appointment.PatNum,"
-				+"Pattern,patient.PreferConfirmMethod,patient.PreferContactMethod,patient.Preferred,"
-				+"patient.PreferRecallMethod,patient.Premed,"
-				+"appointment.ProcDescript,appointment.ProcsColored,appointment.ProvHyg,appointment.ProvNum,"
-				+"patient.State,patient.WirelessPhone,patient.WkPhone,patient.Zip ";
 			}
 			DataTable raw=dcon.GetTable(command);
 			//rawProc table was historically used for other purposes.  It is currently only used for production--------------------------
@@ -932,16 +905,22 @@ namespace OpenDentBusiness{
 			}
 			command+=") ORDER BY Relationship";
 			DataTable rawGuardians=dcon.GetTable(command);
+			List<long> listPatNums=new List<long>();
+			List<long> listPlanNums=new List<long>();
+			foreach(DataRow rowRaw in raw.Rows) {
+				listPatNums.Add(PIn.Long(rowRaw["apptPatNum"].ToString()));
+				listPlanNums.Add(PIn.Long(rowRaw["InsPlan1"].ToString()));
+				listPlanNums.Add(PIn.Long(rowRaw["InsPlan2"].ToString()));
+			}
+			listPatNums=listPatNums.Distinct().ToList();
+			listPlanNums=listPlanNums.Distinct().ToList(); ;
+			Dictionary<long,string> dictCarriers=InsPlans.GetCarrierNames(listPlanNums).Rows.OfType<DataRow>()
+				.ToDictionary(x => PIn.Long(x["PlanNum"].ToString()),x => PIn.String(x["CarrierName"].ToString()));
+			List<long> listPatsWithDisease=Diseases.GetPatientsWithDisease(listPatNums);
+			List<long> listPatsWithAllergy=Allergies.GetPatientsWithAllergy(listPatNums);
 			Dictionary<long,string> dictRefFromPatNums=new Dictionary<long,string>();//Only contains FROM referrals 
 			Dictionary<long,string> dictRefToPatNums=new Dictionary<long,string>();//Only contains TO referrals
-			List<long> listPatNums=new List<long>();
 			List<long> listRefNums=new List<long>();
-			for(int i=0;i<raw.Rows.Count;i++) {
-				long apptPatNum=PIn.Long(raw.Rows[i]["apptPatNum"].ToString());
-				if(!listPatNums.Contains(apptPatNum)) {
-					listPatNums.Add(apptPatNum);
-				}
-			}
 			List<RefAttach> listRefAttaches=RefAttaches.GetRefAttaches(listPatNums);
 			for(int i=0;i<listRefAttaches.Count;i++) {
 				if(!listRefNums.Contains(listRefAttaches[i].ReferralNum)) {
@@ -1110,16 +1089,18 @@ namespace OpenDentBusiness{
 				row["hmPhone"]=Lans.g("Appointments","Hm: ")+raw.Rows[i]["patHmPhone"].ToString();
 				row["ImageFolder"]=raw.Rows[i]["patImageFolder"].ToString();
 				row["insurance"]="";
-				if(raw.Rows[i]["carrierName1"].ToString()!="") {
-					row["insurance"]+="Ins1: "+raw.Rows[i]["carrierName1"].ToString();
-					if(raw.Rows[i]["carrierName2"].ToString()!="") {
-						//if(row["insurance"].ToString()!="") {
-						row["insurance"]+="\r\n";
-						//}
-						row["insurance"]+="Ins2: "+raw.Rows[i]["carrierName2"].ToString();
-					}
+				long planNum1=PIn.Long(raw.Rows[i]["InsPlan1"].ToString());
+				long planNum2=PIn.Long(raw.Rows[i]["InsPlan2"].ToString());
+				if(planNum1>0 && dictCarriers.ContainsKey(planNum1)) {
+					row["insurance"]+=Lans.g("Appointments","Ins1")+": "+dictCarriers[planNum1];
 				}
-				else if(raw.Rows[i]["hasIns"].ToString()!="0") {
+				if(planNum2>0 && dictCarriers.ContainsKey(planNum2)) {
+					if(row["insurance"].ToString()!="") {
+						row["insurance"]+="\r\n";
+					}
+					row["insurance"]+=Lans.g("Appointments","Ins2")+": "+dictCarriers[planNum2];
+				}
+				if(raw.Rows[i]["hasIns"].ToString()!="0" && row["insurance"].ToString()=="") {
 					row["insurance"]=Lans.g("Appointments","Insured");
 				}
 				row["insToSend[!]"]="";
@@ -1162,7 +1143,10 @@ namespace OpenDentBusiness{
 					row["language"]=culture.DisplayName;
 				}
 				row["medOrPremed[+]"]="";
-				if(raw.Rows[i]["patMedUrgNote"].ToString()!="" || raw.Rows[i]["patPremed"].ToString()=="1" || raw.Rows[i]["hasDisease"].ToString()!="0" || raw.Rows[i]["hasAllergy"].ToString()!="0") {
+				long apptPatNum=PIn.Long(raw.Rows[i]["apptPatNum"].ToString());
+				if(raw.Rows[i]["patMedUrgNote"].ToString()!="" || raw.Rows[i]["patPremed"].ToString()=="1"
+					|| listPatsWithDisease.Contains(apptPatNum) || listPatsWithAllergy.Contains(apptPatNum))
+				{
 					row["medOrPremed[+]"]="+";
 				}
 				row["MedUrgNote"]=raw.Rows[i]["patMedUrgNote"].ToString();
@@ -1225,21 +1209,22 @@ namespace OpenDentBusiness{
 					adjustmentAmt+=(decimal)adjust.AdjAmt;
 				}
 				row["adjustmentTotal"]=adjustmentAmt.ToString();
+				long apptProvNum=PIn.Long(raw.Rows[i]["apptProvNum"].ToString());
+				long apptProvHyg=PIn.Long(raw.Rows[i]["apptProvHyg"].ToString());
 				if(raw.Rows[i]["apptIsHygiene"].ToString()=="1"){
-					row["provider"]=raw.Rows[i]["HygAbbr"].ToString();
-					if(raw.Rows[i]["ProvAbbr"].ToString()!=""){
-						row["provider"]+=" ("+raw.Rows[i]["ProvAbbr"].ToString()+")";
+					row["provider"]=Providers.GetAbbr(apptProvHyg);
+					if(apptProvNum!=0){
+						row["provider"]+=" ("+Providers.GetAbbr(apptProvNum)+")";
 					}
 				}
 				else{
-					row["provider"]=raw.Rows[i]["ProvAbbr"].ToString();
-					if(raw.Rows[i]["HygAbbr"].ToString()!="") {
-						row["provider"]+=" ("+raw.Rows[i]["HygAbbr"].ToString()+")";
+					row["provider"]=Providers.GetAbbr(apptProvNum);
+					if(apptProvHyg!=0) {
+						row["provider"]+=" ("+Providers.GetAbbr(apptProvHyg)+")";
 					}
 				}
 				row["ProvNum"]=raw.Rows[i]["apptProvNum"].ToString();
 				row["ProvHyg"]=raw.Rows[i]["apptProvHyg"].ToString();
-				long apptPatNum=PIn.Long(raw.Rows[i]["apptPatNum"].ToString());
 				if(dictRefFromPatNums.ContainsKey(apptPatNum)){//Add this patient's "from" referrals
 					row["referralFrom"]=dictRefFromPatNums[apptPatNum];
 				}

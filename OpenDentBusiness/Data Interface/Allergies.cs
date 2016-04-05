@@ -118,6 +118,19 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
+		///<summary>Returns a list of PatNums that have an allergy from the PatNums that are passed in.</summary>
+		public static List<long> GetPatientsWithAllergy(List<long> listPatNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<long>>(MethodBase.GetCurrentMethod(),listPatNums);
+			}
+			if(listPatNums.Count==0) {
+				return new List<long>();
+			}
+			string command="SELECT DISTINCT PatNum FROM allergy WHERE PatNum IN ("+string.Join(",",listPatNums)+") "
+				+"AND allergy.AllergyDefNum != "+POut.Long(PrefC.GetLong(PrefName.AllergiesIndicateNone));
+			return Db.GetListLong(command);
+		}
+
 		///<summary>Changes the value of the DateTStamp column to the current time stamp for all allergies of a patient</summary>
 		public static void ResetTimeStamps(long patNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
