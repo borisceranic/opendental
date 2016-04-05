@@ -85,13 +85,11 @@ namespace OpenDentBusiness{
 		///Supply a date range, using min and max values if user left blank.  If provNum=0, then it will get all provnums.  
 		///It looks for both provider match in either PriProv or SecProv.</summary>
 		public static DataTable GetRecallList(DateTime fromDate,DateTime toDate,bool groupByFamilies,long provNum,long clinicNum,
-			long siteNum,RecallListSort sortBy,RecallListShowNumberReminders showReminders,List<long> excludePatNums)
-		{
+			long siteNum,RecallListSort sortBy,RecallListShowNumberReminders showReminders,List<long> excludePatNums) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),fromDate,toDate,groupByFamilies,provNum,clinicNum,siteNum,sortBy,showReminders,excludePatNums);
 			}
 			DataTable table=new DataTable();
-			DataRow row;
 			//columns that start with lowercase are altered for display rather than being raw data.
 			table.Columns.Add("age");
 			table.Columns.Add("billingType");
@@ -118,312 +116,257 @@ namespace OpenDentBusiness{
 			table.Columns.Add("status");
 			List<DataRow> rows=new List<DataRow>();
 			string command;
-			command=@"SELECT patguar.BalTotal,patient.BillingType,patient.Birthdate,recall.DateDue,patient.ClinicNum,MAX(CommDateTime) ""_dateLastReminder"",
-				DisableUntilBalance,DisableUntilDate,
-				patient.Email,patguar.Email ""_guarEmail"",patguar.FName ""_guarFName"",
-				patguar.LName ""_guarLName"",patient.FName,
-				patient.Guarantor,patient.HmPhone,patguar.InsEst,patient.LName,recall.Note,
-				COUNT(commlog.CommlogNum) ""_numberOfReminders"",
-				recall.PatNum,patient.PreferRecallMethod,patient.Preferred,
-				recall.RecallInterval,recall.RecallNum,recall.RecallStatus,
-				recalltype.Description ""_recalltype"",patient.WirelessPhone,patient.WkPhone
-				FROM recall
-				LEFT JOIN patient ON recall.PatNum=patient.PatNum
-				LEFT JOIN patient patguar ON patient.Guarantor=patguar.PatNum
-				LEFT JOIN recalltype ON recall.RecallTypeNum=recalltype.RecallTypeNum
-				LEFT JOIN commlog ON commlog.PatNum=recall.PatNum
-				AND CommType="+POut.Long(Commlogs.GetTypeAuto(CommItemTypeAuto.RECALL))+" "
-				+"AND CommDateTime > recall.DatePrevious "
-				//We need to make commlog more restrictive for situations where a manually added recall has no date previous,
-				+"WHERE patient.patstatus=0 ";
-			if(provNum>0){
-				command+="AND (patient.PriProv="+POut.Long(provNum)+" "
-					+"OR patient.SecProv="+POut.Long(provNum)+") ";
+			#region Run Queries and Create Dictionaries
+			#region Recall query
+			command="SELECT recall.RecallNum,recall.PatNum,recall.DateDue,recall.DatePrevious,recall.RecallInterval,recall.RecallStatus,recall.Note,"
+				+"recall.DisableUntilBalance,recall.DisableUntilDate,recalltype.Description recalltype "
+				+"FROM recall "
+				+"INNER JOIN recalltype ON recall.RecallTypeNum=recalltype.RecallTypeNum "
+				+"WHERE recall.DateDue BETWEEN "+POut.Date(fromDate)+" AND "+POut.Date(toDate)+" "
+				+"AND recall.IsDisabled=0 ";
+			if(PrefC.GetString(PrefName.RecallTypesShowingInList)!="") {
+				command+="AND recall.RecallTypeNum IN("+PrefC.GetString(PrefName.RecallTypesShowingInList)+") ";
+			}
+			if(PrefC.GetBool(PrefName.RecallExcludeIfAnyFutureAppt)) {
+				command+="AND NOT EXISTS(SELECT * FROM appointment "
+					+"WHERE appointment.PatNum=recall.PatNum "
+					+"AND appointment.AptDateTime>"+DbHelper.Curdate()+" "//early this morning
+					+"AND appointment.AptStatus IN(1,4))";//scheduled,ASAP
+			}
+			else {
+				command+="AND recall.DateScheduled='0001-01-01'"; //Only show rows where no future recall appointment.
+			}
+			DataTable rawRecallTable=Db.GetTable(command);
+			#endregion Recall query
+			if(rawRecallTable.Rows.Count<1) {
+				return table;//No recalls, no need to proceed any further.
+			}
+			//Sort recalls into dictionary of PatNum to List<DataRow>, one DataRow for each recall. 
+			//Excludes recalls that are disabled.
+			Dictionary<long,List<DataRow>> dictRecallRows=rawRecallTable.Rows.OfType<DataRow>()
+				.GroupBy(x => PIn.Long(x["PatNum"].ToString()))
+				.ToDictionary(x => x.Key,x => x.ToList());
+			#region Patient query
+			command="SELECT patient.PatNum,patient.LName,patient.FName,patient.Preferred,patient.Birthdate,patient.HmPhone,patient.WkPhone,"
+				+"patient.WirelessPhone,patient.Email,patient.ClinicNum,patient.PreferRecallMethod,patient.BillingType,"
+				+"patient.Guarantor,patguar.LName guarLName,patguar.FName guarFName,patguar.Email guarEmail,patguar.InsEst,patguar.BalTotal "
+				+"FROM patient "
+				+"INNER JOIN patient patguar ON patient.Guarantor=patguar.PatNum "
+				+"WHERE patient.PatNum IN ("+string.Join(",",dictRecallRows.Keys)+") "
+				+"AND patient.PatStatus="+POut.Int((int)PatientStatus.Patient)+" ";
+			if(provNum>0) {
+				command+="AND (patient.PriProv="+POut.Long(provNum)+" OR patient.SecProv="+POut.Long(provNum)+") ";
 			}
 			if(clinicNum>0) {
 				command+="AND patient.ClinicNum="+POut.Long(clinicNum)+" ";
 			}
 			if(siteNum>0) {
-				command+="AND patient.SiteNum="+POut.Long(siteNum)+" ";
+				command+="AND patient.SiteNum="+POut.Long(siteNum);
 			}
-			command+="AND recall.DateDue >= "+POut.Date(fromDate)+" "
-				+"AND recall.DateDue <= "+POut.Date(toDate)+" "
-				+"AND recall.IsDisabled = 0 ";
-			if(PrefC.GetString(PrefName.RecallTypesShowingInList)!="") {
-				command+="AND recall.RecallTypeNum IN("+PrefC.GetString(PrefName.RecallTypesShowingInList)+") ";
+			DataTable rawPatientTable=Db.GetTable(command);
+			#endregion Patient query
+			if(rawPatientTable.Rows.Count<1) {
+				return table;//No active patients in recall list (after filtering by patstatus, provnum, sitenum, or clinicNum)
 			}
-			if(PrefC.GetBool(PrefName.RecallExcludeIfAnyFutureAppt)) {
-				string datesql="CURDATE()";
-				if(DataConnection.DBtype==DatabaseType.Oracle) {
-					datesql="(SELECT CURRENT_DATE FROM dual)";
-				}
-				command+=@"AND NOT EXISTS(SELECT * FROM appointment WHERE
-					appointment.PatNum=recall.PatNum AND appointment.AptDateTime > "+datesql//early this morning
-					+" AND appointment.AptStatus IN(1,4)) ";//scheduled,ASAP
+			//Create dict of PatNum to DataRow continaing pat/guarantor data, one row per patnum.
+			Dictionary<long,DataRow> dictPatientRows=rawPatientTable.Rows.OfType<DataRow>().ToDictionary(x => PIn.Long(x["PatNum"].ToString()));
+			//Create dict Guarantor to max DateDue for all family member recalls in the date range
+			Dictionary<long,DateTime> dictGuarMaxDateDue=rawPatientTable.Rows.OfType<DataRow>()
+				.GroupBy(x => PIn.Long(x["Guarantor"].ToString()),x => PIn.Long(x["PatNum"].ToString())) //get key=guarantor PatNum, value=family member PatNums
+				.ToDictionary(x => x.Key,x => x.Where(y => dictRecallRows.ContainsKey(y)) //where there is a recall for the family member
+					.SelectMany(y => dictRecallRows[y] //SelectMany because a patient may have more than one recalltype due
+						.Select(z => PIn.Date(z["DateDue"].ToString()))).Max());//Select max DateDue for all recalls for all family members
+			#region Commlog query
+			command="SELECT PatNum,CommDateTime "
+				+"FROM commlog "
+				+"WHERE CommType="+POut.Long(Commlogs.GetTypeAuto(CommItemTypeAuto.RECALL))+" "
+				+"AND PatNum IN ("+string.Join(",",dictPatientRows.Keys)+")";
+			DataTable rawCommlogTable=Db.GetTable(command);
+			#endregion Commlog query
+			//Create dictionary of key=PatNum, value=List<DataRow> where rows are recall commlogs for the patient
+			Dictionary<long,List<DataRow>> dictCommlogRows=new Dictionary<long,List<DataRow>>();
+			if(rawCommlogTable.Rows.Count>0) {
+				dictCommlogRows=rawCommlogTable.Rows.OfType<DataRow>()
+				.GroupBy(x => PIn.Long(x["PatNum"].ToString()),x => x)
+				.ToDictionary(x => x.Key,x => x.ToList());
 			}
-			else{
-				command+="AND recall.DateScheduled='0001-01-01' "; //Only show rows where no future recall appointment.
-			}
-			if(DataConnection.DBtype==DatabaseType.MySql) {
-				command+="GROUP BY recall.PatNum,recall.RecallTypeNum ";//GROUP BY RecallTypeNum forces both manual and prophy types to show independently.
-			}
-			else {
-				command+=@"GROUP BY  patguar.BalTotal,patient.BillingType,
-					patient.Birthdate,recall.DateDue,
-					DisableUntilBalance,DisableUntilDate,
-					patient.Email,patguar.Email,patguar.FName,
-					patguar.LName,patient.FName,
-					patient.Guarantor,patient.HmPhone,patguar.InsEst,patient.LName,recall.Note,
-					recall.PatNum,patient.PreferRecallMethod,patient.Preferred,
-					recall.RecallInterval,recall.RecallNum,recall.RecallStatus,
-					recalltype.Description,patient.WirelessPhone,patient.WkPhone,recall.RecallTypeNum ";
-			}
- 			DataTable rawtable=Db.GetTable(command);
+			#endregion Run Queries and Create Dictionaries
+			List<DataRow> listPatCommlogRows;
+			DataRow rowPat;
 			DateTime dateDue;
+			DateTime datePrevious;
 			DateTime dateRemind;
-			Interval interv;
-			Patient pat;
 			ContactMethod contmeth;
 			int numberOfReminders;
-			int maxNumberReminders=(int)PrefC.GetLong(PrefName.RecallMaxNumberReminders);
 			long patNum;
-			DateTime disableUntilDate;
+			long guarNum;
 			double disableUntilBalance;
 			double familyBalance;
-			for(int i=0;i<rawtable.Rows.Count;i++){
-				patNum=PIn.Long(rawtable.Rows[i]["PatNum"].ToString());
-				dateDue=PIn.Date(rawtable.Rows[i]["DateDue"].ToString());
-				dateRemind=PIn.Date(rawtable.Rows[i]["_dateLastReminder"].ToString());
-				numberOfReminders=PIn.Int(rawtable.Rows[i]["_numberOfReminders"].ToString());
-				if(numberOfReminders==0) {
-					//always show
-				}
-				else if(numberOfReminders==1) {
-					if(PrefC.GetLong(PrefName.RecallShowIfDaysFirstReminder)==-1) {
-						continue;
-					}
-					if(dateRemind.AddDays(PrefC.GetLong(PrefName.RecallShowIfDaysFirstReminder)).Date > DateTime.Today){ //> toDate
-						//|| dateRemind.AddDays(PrefC.GetLong(PrefName.RecallShowIfDaysFirstReminder)) < fromDate)
-						continue;
-					}
-				}
-				else{//2 or more reminders
-					if(PrefC.GetLong(PrefName.RecallShowIfDaysSecondReminder)==-1) {
-						continue;
-					}
-					if(dateRemind.AddDays(PrefC.GetLong(PrefName.RecallShowIfDaysSecondReminder)).Date > DateTime.Today){ //> toDate
-						//|| dateRemind.AddDays(PrefC.GetLong(PrefName.RecallShowIfDaysSecondReminder)) < fromDate)
-						continue;
-					}
-				}
-				if(maxNumberReminders != -1 && numberOfReminders > maxNumberReminders) {
+			DataRow row;
+			#region Create List of Rows for Return Table
+			//loop through the patients in the recall dictionary
+			foreach(KeyValuePair<long,List<DataRow>> kvp in dictRecallRows) {
+				patNum=kvp.Key;
+				if(!dictPatientRows.ContainsKey(patNum) || excludePatNums.Contains(patNum)) {//patient.PatStatus wasn't 'Patient' or in exclude list, skip
 					continue;
 				}
-				if(showReminders==RecallListShowNumberReminders.Zero) {
-					if(numberOfReminders != 0) {
-						continue;
-					}
+				rowPat=dictPatientRows[patNum];
+				guarNum=PIn.Long(rowPat["Guarantor"].ToString());
+				listPatCommlogRows=new List<DataRow>();
+				if(dictCommlogRows.ContainsKey(patNum)) {
+					listPatCommlogRows=dictCommlogRows[patNum];
 				}
-				else if(showReminders==RecallListShowNumberReminders.One) {
-					if(numberOfReminders != 1) {
-						continue;
-					}
+				familyBalance=PIn.Double(rowPat["BalTotal"].ToString());//from the guarantor's patient table
+				if(!PrefC.GetBool(PrefName.BalancesDontSubtractIns)) {//typical
+					familyBalance-=PIn.Double(rowPat["InsEst"].ToString());
 				}
-				else if(showReminders==RecallListShowNumberReminders.Two) {
-					if(numberOfReminders != 2) {
-						continue;
-					}
-				}
-				else if(showReminders==RecallListShowNumberReminders.Three) {
-					if(numberOfReminders != 3) {
-						continue;
-					}
-				}
-				else if(showReminders==RecallListShowNumberReminders.Four) {
-					if(numberOfReminders != 4) {
-						continue;
-					}
-				}
-				else if(showReminders==RecallListShowNumberReminders.Five) {
-					if(numberOfReminders != 5) {
-						continue;
-					}
-				}
-				else if(showReminders==RecallListShowNumberReminders.SixPlus) {
-					if(numberOfReminders < 6 ) {
-						continue;
-					}
-				}
-				if(excludePatNums.Contains(patNum)){
-					continue;
-				}
-				disableUntilDate=PIn.Date(rawtable.Rows[i]["DisableUntilDate"].ToString());
-				if(disableUntilDate.Year>1880 && disableUntilDate > DateTime.Today) {
-					continue;
-				}
-				disableUntilBalance=PIn.Double(rawtable.Rows[i]["DisableUntilBalance"].ToString());
-				if(disableUntilBalance>0) {
-					familyBalance=PIn.Double(rawtable.Rows[i]["BalTotal"].ToString());
-					if(!PrefC.GetBool(PrefName.BalancesDontSubtractIns)) {//typical
-						familyBalance-=PIn.Double(rawtable.Rows[i]["InsEst"].ToString());
-					}
-					if(familyBalance > disableUntilBalance) {
-						continue;
-					}
-				}
-				row=table.NewRow();
-				row["age"]=Patients.DateToAge(PIn.Date(rawtable.Rows[i]["Birthdate"].ToString())).ToString();//we don't care about m/y.
-				row["billingType"]=DefC.GetName(DefCat.BillingTypes,PIn.Long(rawtable.Rows[i]["BillingType"].ToString()));
-				row["ClinicNum"]=PIn.Long(rawtable.Rows[i]["ClinicNum"].ToString());
-				contmeth=(ContactMethod)PIn.Long(rawtable.Rows[i]["PreferRecallMethod"].ToString());
-				if(contmeth==ContactMethod.None){
-					if(!PrefC.GetBool(PrefName.RecallUseEmailIfHasEmailAddress)){//if user only wants to use email if contact method is email (it isn't for this patient)
-						row["contactMethod"]=Lans.g("FormRecallList","Hm:")+rawtable.Rows[i]["HmPhone"].ToString();
-					}
-					else{//if user wants to use email if there is an email address
-						if(groupByFamilies){
-							if(rawtable.Rows[i]["_guarEmail"].ToString() != "") {//since there is an email,
-								row["contactMethod"]=rawtable.Rows[i]["_guarEmail"].ToString();
-							}
-							else{
-								row["contactMethod"]=Lans.g("FormRecallList","Hm:")+rawtable.Rows[i]["HmPhone"].ToString();
-							}
+				//loop through the recalls for each patient
+				foreach(DataRow rowCur in kvp.Value) {
+					dateDue=PIn.Date(rowCur["DateDue"].ToString());
+					datePrevious=PIn.Date(rowCur["DatePrevious"].ToString());
+					//get list of commlog dates where the commlogs are recall commlogs and the date is after datePrevious for this recall
+					List<DateTime> listDTReminders=listPatCommlogRows.Select(x => PIn.DateT(x["CommDateTime"].ToString())).Where(x => x>datePrevious).ToList();
+					numberOfReminders=listDTReminders.Count();//number of recall commlogs that happened after datePrevious
+					dateRemind=listDTReminders.DefaultIfEmpty(DateTime.MinValue).Max();
+					#region Filter by Number of Reminders and Disabled Until Date/Balance
+					//filter by number of reminders, if numberOfReminders==0, always show
+					if(numberOfReminders==1) {
+						if(PrefC.GetInt(PrefName.RecallShowIfDaysFirstReminder)==-1) {
+							continue;
 						}
-						else{
-							if(rawtable.Rows[i]["Email"].ToString() != "") {//since there is an email,
-								row["contactMethod"]=rawtable.Rows[i]["Email"].ToString();
-							}
-							else{
-								row["contactMethod"]=Lans.g("FormRecallList","Hm:")+rawtable.Rows[i]["HmPhone"].ToString();
-							}
+						if(dateRemind.AddDays(PrefC.GetInt(PrefName.RecallShowIfDaysFirstReminder)).Date>DateTime.Today) {
+							continue;
 						}
 					}
-				}
-				if(contmeth==ContactMethod.HmPhone){
-					row["contactMethod"]=Lans.g("FormRecallList","Hm:")+rawtable.Rows[i]["HmPhone"].ToString();
-				}
-				if(contmeth==ContactMethod.WkPhone) {
-					row["contactMethod"]=Lans.g("FormRecallList","Wk:")+rawtable.Rows[i]["WkPhone"].ToString();
-				}
-				if(contmeth==ContactMethod.WirelessPh) {
-					row["contactMethod"]=Lans.g("FormRecallList","Cell:")+rawtable.Rows[i]["WirelessPhone"].ToString();
-				}
-				if(contmeth==ContactMethod.TextMessage) {
-					row["contactMethod"]=Lans.g("FormRecallList","Text:")+rawtable.Rows[i]["WirelessPhone"].ToString();
-				}
-				if(contmeth==ContactMethod.Email) {
-					if(groupByFamilies) {
-						//always use guarantor email
-						row["contactMethod"]=rawtable.Rows[i]["_guarEmail"].ToString();
+					else if(numberOfReminders>1) {
+						if(PrefC.GetInt(PrefName.RecallShowIfDaysSecondReminder)==-1) {
+							continue;
+						}
+						if(dateRemind.AddDays(PrefC.GetInt(PrefName.RecallShowIfDaysSecondReminder)).Date>DateTime.Today) {
+							continue;
+						}
 					}
-					else {
-						row["contactMethod"]=rawtable.Rows[i]["Email"].ToString();
+					if(PrefC.GetInt(PrefName.RecallMaxNumberReminders)>-1 && numberOfReminders>PrefC.GetInt(PrefName.RecallMaxNumberReminders)) {
+						continue;
 					}
-				}
-				if(contmeth==ContactMethod.Mail) {
-					row["contactMethod"]=Lans.g("FormRecallList","Mail");
-				}
-				if(contmeth==ContactMethod.DoNotCall || contmeth==ContactMethod.SeeNotes) {
-					row["contactMethod"]=Lans.g("enumContactMethod",contmeth.ToString());
-				}
-				if(dateRemind.Year<1880) {
+					if(showReminders==RecallListShowNumberReminders.All) {
+						//don't skip, add all to list
+					}
+					else if(showReminders<RecallListShowNumberReminders.SixPlus) {
+						if(numberOfReminders!=((int)showReminders-1)) {//if numberOfReminders!=enum value cast to int -1 to account for All being 0
+							continue;
+						}
+					}
+					else if(showReminders==RecallListShowNumberReminders.SixPlus) {
+						if(numberOfReminders<((int)showReminders-1)) {//numberOfReminders<6 (SixPlus is index 7 since All=0 and Zero=1, so -1)
+							continue;
+						}
+					}
+					//filter by disable until date and balance
+					if(PIn.Date(rowCur["DisableUntilDate"].ToString())>DateTime.Today) {
+						continue;
+					}
+					disableUntilBalance=PIn.Double(rowCur["DisableUntilBalance"].ToString());
+					if(disableUntilBalance>0 && familyBalance>disableUntilBalance) {
+						continue;
+					}
+					#endregion Filter by Number of Reminders and Disabled Until Date/Balance
+					#region Create Row
+					row=table.NewRow();
+					row["age"]=Patients.DateToAge(PIn.Date(rowPat["Birthdate"].ToString())).ToString();
+					row["billingType"]=DefC.GetName(DefCat.BillingTypes,PIn.Long(rowPat["BillingType"].ToString()));
+					row["ClinicNum"]=PIn.Long(rowPat["ClinicNum"].ToString());
+					#region Contact Method
+					contmeth=(ContactMethod)PIn.Long(rowPat["PreferRecallMethod"].ToString());
+					switch(contmeth) {
+						case ContactMethod.None:
+							if(PrefC.GetBool(PrefName.RecallUseEmailIfHasEmailAddress)) {//if user wants to use email if there is an email address
+								if(groupByFamilies && rowPat["guarEmail"].ToString()!="") {
+									row["contactMethod"]=rowPat["guarEmail"].ToString();
+									break;
+								}
+								else if(!groupByFamilies && rowPat["Email"].ToString()!="") {
+									row["contactMethod"]=rowPat["Email"].ToString();
+									break;
+								}
+							}
+							//no email, or user doesn't want to use email even if there is one, default to using HmPhone
+							row["contactMethod"]=Lans.g("FormRecallList","Hm")+":"+rowPat["HmPhone"].ToString();
+							break;
+						case ContactMethod.HmPhone:
+							row["contactMethod"]=Lans.g("FormRecallList","Hm")+":"+rowPat["HmPhone"].ToString();
+							break;
+						case ContactMethod.WkPhone:
+							row["contactMethod"]=Lans.g("FormRecallList","Wk")+":"+rowPat["WkPhone"].ToString();
+							break;
+						case ContactMethod.WirelessPh:
+							row["contactMethod"]=Lans.g("FormRecallList","Cell")+":"+rowPat["WirelessPhone"].ToString();
+							break;
+						case ContactMethod.TextMessage:
+							row["contactMethod"]=Lans.g("FormRecallList","Text")+":"+rowPat["WirelessPhone"].ToString();
+							break;
+						case ContactMethod.Email:
+							if(groupByFamilies) {
+								row["contactMethod"]=rowPat["guarEmail"].ToString();//always use guarantor email if grouped by fam
+							}
+							else {
+								row["contactMethod"]=rowPat["Email"].ToString();
+							}
+							break;
+						case ContactMethod.Mail:
+							row["contactMethod"]=Lans.g("FormRecallList","Mail");
+							break;
+						case ContactMethod.DoNotCall:
+						case ContactMethod.SeeNotes:
+							row["contactMethod"]=Lans.g("enumContactMethod",contmeth.ToString());
+							break;
+					}
+					#endregion Contact Method
 					row["dateLastReminder"]="";
-				}
-				else {
-					row["dateLastReminder"]=dateRemind.ToShortDateString();
-				}
-				row["DateDue"]=dateDue;
-				if(dateDue.Year<1880) {
-					row["dueDate"]="";
-				}
-				else {
-					row["dueDate"]=dateDue.ToShortDateString();
-				}
-				if(groupByFamilies) {
-					row["Email"]=rawtable.Rows[i]["_guarEmail"].ToString();
-				}
-				else {
-					row["Email"]=rawtable.Rows[i]["Email"].ToString();
-				}
-				row["FName"]=rawtable.Rows[i]["FName"].ToString();
-				row["Guarantor"]=rawtable.Rows[i]["Guarantor"].ToString();
-				row["guarFName"]=rawtable.Rows[i]["_guarFName"].ToString();
-				row["guarLName"]=rawtable.Rows[i]["_guarLName"].ToString();
-				row["LName"]=rawtable.Rows[i]["LName"].ToString();
-				row["maxDateDue"]=DateTime.MinValue;//we'll set the actual value in a subsequent loop
-				row["Note"]=rawtable.Rows[i]["Note"].ToString();
-				if(numberOfReminders==0) {
-					row["numberOfReminders"]="";
-				}
-				else {
-					row["numberOfReminders"]=numberOfReminders.ToString();
-				}
-				pat=new Patient();
-				pat.LName=rawtable.Rows[i]["LName"].ToString();
-				pat.FName=rawtable.Rows[i]["FName"].ToString();
-				pat.Preferred=rawtable.Rows[i]["Preferred"].ToString();
-				row["patientName"]=pat.GetNameLF();
-				row["PatNum"]=rawtable.Rows[i]["PatNum"].ToString();
-				/*if(contmeth==ContactMethod.None){
+					if(dateRemind.Year>1880) {
+						row["dateLastReminder"]=dateRemind.ToShortDateString();
+					}
+					row["DateDue"]=dateDue;
+					if(dateDue.Year>1880) {
+						row["dueDate"]=dateDue.ToShortDateString();
+					}
 					if(groupByFamilies) {
-						if(rawtable.Rows[i]["_guarEmail"].ToString() != "") {//since there is an email,
-							row["PreferRecallMethod"]=((int)ContactMethod.Email).ToString();
-						}
-						else {
-							row["PreferRecallMethod"]=((int)ContactMethod.None).ToString();
-						}
+						row["Email"]=rowPat["guarEmail"].ToString();
 					}
 					else {
-						if(rawtable.Rows[i]["Email"].ToString() != "") {//since there is an email,
-							row["PreferRecallMethod"]=((int)ContactMethod.Email).ToString();
-						}
-						else {
-							row["PreferRecallMethod"]=((int)ContactMethod.None).ToString();
-						}
+						row["Email"]=rowPat["Email"].ToString();
 					}
-				}
-				else{*/
-				row["PreferRecallMethod"]=rawtable.Rows[i]["PreferRecallMethod"].ToString();
-				//}
-				interv=new Interval(PIn.Int(rawtable.Rows[i]["RecallInterval"].ToString()));
-				row["recallInterval"]=interv.ToString();
-				row["RecallNum"]=rawtable.Rows[i]["RecallNum"].ToString();
-				row["recallType"]=rawtable.Rows[i]["_recalltype"].ToString();
-				row["status"]=DefC.GetName(DefCat.RecallUnschedStatus,PIn.Long(rawtable.Rows[i]["RecallStatus"].ToString()));
-				rows.Add(row);
-			}
-			//Now that we have eliminated some rows, this next section calculates the maxDateDue date for each family
-			//key=guarantor, value=maxDateDue
-			Dictionary<long,DateTime> dictMaxDateDue=new Dictionary<long,DateTime>();
-			long guarNum;
-			for(int i=0;i<rows.Count;i++) {
-				guarNum=PIn.Long(rows[i]["Guarantor"].ToString());
-				dateDue=(DateTime)rows[i]["DateDue"];
-				if(dictMaxDateDue.ContainsKey(guarNum)) {
-					if(dateDue > dictMaxDateDue[guarNum]) {
-						dictMaxDateDue[guarNum]=dateDue;
+					row["PatNum"]=patNum.ToString();
+					row["FName"]=rowPat["FName"].ToString();
+					row["LName"]=rowPat["LName"].ToString();
+					row["patientName"]=Patients.GetNameLF(rowPat["LName"].ToString(),rowPat["FName"].ToString(),rowPat["Preferred"].ToString(),"");
+					row["Guarantor"]=guarNum.ToString();
+					row["guarFName"]=rowPat["guarFName"].ToString();
+					row["guarLName"]=rowPat["guarLName"].ToString();
+					row["maxDateDue"]=DateTime.MinValue;
+					if(dictGuarMaxDateDue.ContainsKey(guarNum)) {
+						row["maxDateDue"]=dictGuarMaxDateDue[guarNum];
 					}
-				}
-				else {//no decision necessary
-					dictMaxDateDue.Add(guarNum,dateDue);
+					row["Note"]=rowCur["Note"].ToString();
+					row["numberOfReminders"]="";
+					if(numberOfReminders>0) {
+						row["numberOfReminders"]=numberOfReminders.ToString();
+					}
+					row["PreferRecallMethod"]=rowPat["PreferRecallMethod"].ToString();
+					row["recallInterval"]=(new Interval(PIn.Int(rowCur["RecallInterval"].ToString()))).ToString();
+					row["RecallNum"]=rowCur["RecallNum"].ToString();
+					row["recallType"]=rowCur["recalltype"].ToString();
+					row["status"]=DefC.GetName(DefCat.RecallUnschedStatus,PIn.Long(rowCur["RecallStatus"].ToString()));
+					#endregion Create Row
+					rows.Add(row);
 				}
 			}
-			for(int i=0;i<rows.Count;i++) {
-				guarNum=PIn.Long(rows[i]["Guarantor"].ToString());
-				if(dictMaxDateDue.ContainsKey(guarNum)) {
-					rows[i]["maxDateDue"]=dictMaxDateDue[guarNum];
-				}
-				else {
-					rows[i]["maxDateDue"]=DateTime.MinValue;//should never happen
-				}
-			}
+			#endregion Create List of Rows for Return Table
 			RecallComparer comparer=new RecallComparer();
 			comparer.GroupByFamilies=groupByFamilies;
 			comparer.SortBy=sortBy;
 			rows.Sort(comparer);
-			for(int i=0;i<rows.Count;i++) {
-				table.Rows.Add(rows[i]);
-			}
+			rows.ForEach(x => table.Rows.Add(x));
 			return table;
 		}
 
