@@ -29,6 +29,19 @@ namespace OpenDentBusiness {
 				command+=" AND ProbStatus="+POut.Int((int)ProblemStatus.Active);
 			}
 			return Crud.DiseaseCrud.SelectMany(command);
+		}		
+		
+		///<summary>Returns a list of PatNums that have a disease from the PatNums that are passed in.</summary>
+		public static List<long> GetPatientsWithDisease(List<long> listPatNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<long>>(MethodBase.GetCurrentMethod(),listPatNums);
+			}
+			if(listPatNums.Count==0) {
+				return new List<long>();
+			}
+			string command="SELECT DISTINCT PatNum FROM disease WHERE PatNum IN ("+string.Join(",",listPatNums)+") "
+				+"AND disease.DiseaseDefNum != "+POut.Long(PrefC.GetLong(PrefName.ProblemsIndicateNone));
+			return Db.GetListLong(command);
 		}
 
 		///<summary>Gets one disease by DiseaseNum from the db.</summary>
