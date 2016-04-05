@@ -12,7 +12,7 @@ using CodeBase;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("16.1.13.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("16.1.15.0");//This value must be changed when a new conversion is to be triggered.
 
 		#region Helper Functions
 
@@ -53,8 +53,13 @@ namespace OpenDentBusiness {
 				+"AND LOWER(TABLE_NAME)='"+POut.String(tableName.ToLower())+"' "
 				+"GROUP BY INDEX_NAME) cols "
 				+"WHERE cols.ColNames='"+POut.String(colNames.ToLower())+"'";
-			if(Db.GetCount(command)=="0") {
-				return false;
+			try {
+				if(Db.GetCount(command)=="0") {
+					return false;
+				}
+			}
+			catch(Exception ex) {
+				return false;//might happen if user does not have permission to query information schema tables.
 			}
 			return true;
 		}
@@ -13433,6 +13438,29 @@ namespace OpenDentBusiness {
 				   }
 				}
 				command="UPDATE preference SET ValueString='16.1.13.0' WHERE PrefName='DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			To16_1_15();
+		}
+
+		private static void To16_1_15() {
+			if(FromVersion<new Version("16.1.15.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.15.0"));//No translation in convert script.
+				string command = "";
+				try {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						if(!IndexExists("commlog","PatNum,CommDateTime,CommType")) {
+							command="ALTER TABLE commlog ADD INDEX indexPNCDateCType (PatNum,CommDateTime,CommType)";
+							Db.NonQ(command);
+						}
+					}
+					else {//oracle
+						command=@"CREATE INDEX commlog_PNCDateCType ON commlog (PatNum,CommDateTime,CommType)";
+						Db.NonQ(command);
+					}
+				}
+				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception
+				command="UPDATE preference SET ValueString='16.1.15.0' WHERE PrefName='DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			//To16_2_0();
