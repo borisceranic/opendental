@@ -5762,7 +5762,8 @@ namespace OpenDental{
 			//these areas have no autocodes
 			if(ProcedureCode2.TreatArea==TreatmentArea.Mouth
 				|| ProcedureCode2.TreatArea==TreatmentArea.Quad
-				|| ProcedureCode2.TreatArea==TreatmentArea.Sextant)
+				|| ProcedureCode2.TreatArea==TreatmentArea.Sextant
+				|| Procedures.IsAttachedToClaim(ProcCur,ClaimProcsForProc))
 			{
 				DialogResult=DialogResult.OK;
 				return;
