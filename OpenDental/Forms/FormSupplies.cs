@@ -332,7 +332,7 @@ namespace OpenDental {
 		}
 
 		private void butPrint_Click(object sender,EventArgs e) {
-			if(_listSuppliesOld.Count<1) {
+			if(gridMain.Rows.Count<1) {
 				MsgBox.Show(this,"Supply list is Empty.");
 				return;
 			}
