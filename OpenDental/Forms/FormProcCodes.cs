@@ -1057,16 +1057,30 @@ namespace OpenDental{
 		private void FillComboBoxes() {
 			//Save combo box selected indexes prior to changing stuff.
 			long feeSchedNum1Selected=0;//Default to the first 
-			if(comboFeeSched1.SelectedIndex > -1) {
-				feeSchedNum1Selected=_listFeeScheds[comboFeeSched1.SelectedIndex].FeeSchedNum;
-			}
 			long feeSchedNum2Selected=0;//Default to none
-			if(comboFeeSched2.SelectedIndex > 0) {
-				feeSchedNum2Selected=_listFeeScheds[comboFeeSched2.SelectedIndex-1].FeeSchedNum;
-			}
 			long feeSchedNum3Selected=0;//Default to none
-			if(comboFeeSched3.SelectedIndex > 0) {
-				feeSchedNum3Selected=_listFeeScheds[comboFeeSched3.SelectedIndex-1].FeeSchedNum;
+			if(_listFeeScheds.Count > 0) {
+				if(comboFeeSched1.SelectedIndex > -1) {
+					feeSchedNum1Selected=_listFeeScheds[comboFeeSched1.SelectedIndex].FeeSchedNum;
+				}
+				if(comboFeeSched2.SelectedIndex > 0) {
+					feeSchedNum2Selected=_listFeeScheds[comboFeeSched2.SelectedIndex-1].FeeSchedNum;
+				}
+				if(comboFeeSched3.SelectedIndex > 0) {
+					feeSchedNum3Selected=_listFeeScheds[comboFeeSched3.SelectedIndex-1].FeeSchedNum;
+				}
+			}
+			//Always update _listFeeScheds to reflect any potential changes.
+			_listFeeScheds=FeeSchedC.GetListShort();
+			//Check if feschednums from above were set to hidden, if so set selected index to 0 for the combo
+			if(feeSchedNum1Selected > 0 && !_listFeeScheds.Any(x => x.FeeSchedNum==feeSchedNum1Selected)) {
+				comboFeeSched1.SelectedIndex=0;
+			}
+			if(feeSchedNum2Selected > 0 && !_listFeeScheds.Any(x => x.FeeSchedNum==feeSchedNum2Selected)) {
+				comboFeeSched2.SelectedIndex=0;
+			}
+			if(feeSchedNum3Selected > 0 && !_listFeeScheds.Any(x => x.FeeSchedNum==feeSchedNum3Selected)) {
+				comboFeeSched3.SelectedIndex=0;
 			}
 			//The number of clinics and providers cannot change while inside this window.  Always reselect exactly what the user had before.
 			int comboClinic1Idx=comboClinic1.SelectedIndex;
@@ -1154,7 +1168,7 @@ namespace OpenDental{
 			comboProvider1.SelectedIndex=comboProv1Idx > -1 ? comboProv1Idx:0;
 			comboProvider2.SelectedIndex=comboProv2Idx > -1 ? comboProv2Idx:0;
 			comboProvider3.SelectedIndex=comboProv3Idx > -1 ? comboProv3Idx:0;
-			if(_listFeeScheds[comboFeeSched1.SelectedIndex].IsGlobal) {
+			if(_listFeeScheds.Count > 0 && _listFeeScheds[comboFeeSched1.SelectedIndex].IsGlobal) {
 				comboClinic1.Enabled=false;
 				butPickClinic1.Enabled=false;
 				comboClinic1.SelectedIndex=0;				
@@ -1631,9 +1645,6 @@ namespace OpenDental{
 			//won't even be visible if no permission
 			FormFeeScheds FormF=new FormFeeScheds(); //The Fee Scheds window can add or hide schedules.  It cannot delete schedules.
 			FormF.ShowDialog();
-			//Always update _listFeeScheds to reflect any potential changes.
-			DataValid.SetInvalid(InvalidType.FeeScheds);
-			_listFeeScheds=FeeSchedC.GetListShort();
 			FillComboBoxes();
 			FillGrid();
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Fee Schedules");
