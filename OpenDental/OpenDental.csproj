@@ -421,6 +421,12 @@
     <Compile Include="Forms\FormInvoiceItemSelect.designer.cs">
       <DependentUpon>FormInvoiceItemSelect.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormDecimalSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormDecimalSettings.designer.cs">
+      <DependentUpon>FormDecimalSettings.cs</DependentUpon>
+    </Compile>
     <Compile Include="InternalTools\Job Manager\FormEmailJobTemplateEdit.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -4061,6 +4067,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormInvoiceItemSelect.resx">
       <DependentUpon>FormInvoiceItemSelect.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormDecimalSettings.resx">
+      <DependentUpon>FormDecimalSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="InternalTools\Job Manager\FormEmailJobTemplateEdit.resx">
       <DependentUpon>FormEmailJobTemplateEdit.cs</DependentUpon>

@@ -179,6 +179,18 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE computerpref ADD NoShowDecimal tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE computerpref ADD NoShowDecimal number(3)";
+					Db.NonQ(command);
+					command="UPDATE computerpref SET NoShowDecimal = 0 WHERE NoShowDecimal IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE computerpref MODIFY NoShowDecimal NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE creditcard ADD ClinicNum bigint NOT NULL";
 					Db.NonQ(command);
 					command="ALTER TABLE creditcard ADD INDEX (ClinicNum)";

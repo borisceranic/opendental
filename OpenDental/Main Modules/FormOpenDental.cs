@@ -2631,6 +2631,12 @@ namespace OpenDental{
 					FormLAR.ShowDialog();
 				}
 			}
+			if(CultureInfo.CurrentCulture.NumberFormat.CurrencyDecimalDigits != 2 //We want our users to have their currency decimal setting set to 2.
+				&& !ComputerPrefs.LocalComputer.NoShowDecimal) 
+			{
+				FormDecimalSettings FormDS=new FormDecimalSettings();
+				FormDS.ShowDialog();
+			}
 			//Choose a default DirectX format when no DirectX format has been specified and running in DirectX tooth chart mode.
 			if(ComputerPrefs.LocalComputer.GraphicsSimple==DrawingMode.DirectX && ComputerPrefs.LocalComputer.DirectXFormat=="") {
 				try {

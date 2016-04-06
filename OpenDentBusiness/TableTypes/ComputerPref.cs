@@ -64,6 +64,8 @@ namespace OpenDentBusiness {
 		///When 0 the patient select window will use the DB wide pref PatientSelectUsesSearchButton.</summary>
 		public SearchMode PatSelectSearchMode;
 		public bool NoShowLanguage;
+		///<summary>If true, don't warn user if the region's decimal setting is not 2.</summary>
+		public bool NoShowDecimal;
 
 
 		public ComputerPref Copy(){
