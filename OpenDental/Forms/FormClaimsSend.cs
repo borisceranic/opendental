@@ -386,11 +386,11 @@ namespace OpenDental{
 			this.butDropTo.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butDropTo.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butDropTo.CornerRadius = 4F;
+			this.butDropTo.Image = global::OpenDental.Properties.Resources.arrowDownTriangle;
 			this.butDropTo.Location = new System.Drawing.Point(397, 4);
 			this.butDropTo.Name = "butDropTo";
 			this.butDropTo.Size = new System.Drawing.Size(22, 23);
 			this.butDropTo.TabIndex = 41;
-			this.butDropTo.Text = "V";
 			this.butDropTo.UseVisualStyleBackColor = true;
 			this.butDropTo.Click += new System.EventHandler(this.butDropTo_Click);
 			// 
@@ -401,11 +401,11 @@ namespace OpenDental{
 			this.butDropFrom.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butDropFrom.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butDropFrom.CornerRadius = 4F;
+			this.butDropFrom.Image = global::OpenDental.Properties.Resources.arrowDownTriangle;
 			this.butDropFrom.Location = new System.Drawing.Point(157, 4);
 			this.butDropFrom.Name = "butDropFrom";
 			this.butDropFrom.Size = new System.Drawing.Size(22, 23);
 			this.butDropFrom.TabIndex = 40;
-			this.butDropFrom.Text = "V";
 			this.butDropFrom.UseVisualStyleBackColor = true;
 			this.butDropFrom.Click += new System.EventHandler(this.butDropFrom_Click);
 			// 
@@ -453,7 +453,7 @@ namespace OpenDental{
 			this.MinimizeBox = false;
 			this.Name = "FormClaimsSend";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-			this.Text = "Send Claims";
+			this.Text = "Insurance Claims";
 			this.Load += new System.EventHandler(this.FormClaimsSend_Load);
 			this.Resize += new System.EventHandler(this.FormClaimsSend_Resize);
 			this.panelHistory.ResumeLayout(false);
@@ -599,6 +599,7 @@ namespace OpenDental{
 			ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Refresh"),-1,Lan.g(this,"Refresh the Grid"),"Refresh"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
+			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Procs Not Billed"),-1,"","ProcsNotBilled"));
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Close"),-1,"","Close"));
 			/*ArrayList toolButItems=ToolButItems.GetForToolBar(ToolBarsAvail.ClaimsSend);
 			for(int i=0;i<toolButItems.Count;i++){
@@ -615,6 +616,7 @@ namespace OpenDental{
 			ToolBarHistory.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
 			ToolBarHistory.Buttons.Add(new ODToolBarButton(Lan.g(this,"Print List"),2,
 				Lan.g(this,"Print history list."),"PrintList"));
+			ToolBarHistory.Buttons.Add(new ODToolBarButton(Lan.g(this,"Outstanding Procs"),-1,"","OutstandingProcs"));
 			/*#if DEBUG
 			ToolBarHistory.Buttons.Add(new ODToolBarButton(Lan.g(this,"Print Item"),2,
 				Lan.g(this,"For debugging, this will simply display the first item in the list."),"PrintItem"));
@@ -824,6 +826,12 @@ namespace OpenDental{
 					break;
 				case "Refresh":
 					toolBarButRefresh_Click();
+					break;
+				case "ProcsNotBilled":
+					FormRpProcNotBilledIns form=new FormRpProcNotBilledIns();
+					form.ShowDialog();
+					FillGrid();
+					FillHistory();
 					break;
 				case "Close":
 					Close();
@@ -1428,6 +1436,10 @@ namespace OpenDental{
 					break;
 				case "PrintItem":
 					PrintItem_Click();
+					break;
+				case "OutstandingProcs":
+					FormRpOutstandingIns formROI=new FormRpOutstandingIns();
+					formROI.ShowDialog();
 					break;
 			}
 		}

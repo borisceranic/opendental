@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Reflection;
 
 namespace OpenDentBusiness {
@@ -17,7 +18,7 @@ namespace OpenDentBusiness {
 			else {
 				query+=DbHelper.Concat("patient.LName","', '","patient.FName","' '","patient.MiddleI");
 			}
-			query+=" AS 'PatientName',procedurelog.ProcDate,procedurecode.Descript,procedurelog.ProcFee*(procedurelog.UnitQty+procedurelog.BaseUnits) "
+			query+=" AS 'PatientName',procedurelog.ProcDate,procedurecode.Descript,procedurelog.ProcFee*(procedurelog.UnitQty+procedurelog.BaseUnits),procedurelog.ProcNum "
 				+"FROM patient,procedurecode,procedurelog,claimproc,insplan "
 				+"WHERE claimproc.procnum=procedurelog.procnum "
 				+"AND patient.PatNum=procedurelog.PatNum "
@@ -29,13 +30,16 @@ namespace OpenDentBusiness {
 			query+="AND claimproc.NoBillIns=0 "
 				+"AND procedurelog.ProcFee>0 "
 				+"AND claimproc.Status="+(int)ClaimProcStatus.Estimate+" "
-				+"AND procedurelog.procstatus="+(int)ProcStat.C+" "
-				+"AND procedurelog.ProcDate	BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" ";
-				if(listClinicNums.Count>0) {
-					query+="AND procedurelog.ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
-				}
-				query+="GROUP BY procedurelog.ProcNum "
-				+"ORDER BY patient.LName,patient.FName";
+				+"AND procedurelog.procstatus="+(int)ProcStat.C+" ";
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {
+				query+="AND procedurecode.IsCanadianLab=0 ";//ignore Canadian labs
+			}
+			query+="AND procedurelog.ProcDate	BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" ";
+			if(listClinicNums.Count>0) {
+				query+="AND procedurelog.ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
+			}
+			query+="GROUP BY procedurelog.ProcNum "
+			+"ORDER BY patient.LName,patient.FName";
 			return Db.GetTable(query);
 		}
 
