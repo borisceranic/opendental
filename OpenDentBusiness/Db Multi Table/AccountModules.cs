@@ -862,6 +862,9 @@ namespace OpenDentBusiness {
 				if(ProcedureCodes.GetStringProcCode(PIn.Long(rawProc.Rows[i]["CodeNum"].ToString()))=="D9986") {//Broken appointment procedure
 					row["colorText"]=DefC.GetDefByExactName(DefCat.AccountColors,"Broken Appointment Procedure").ItemColor.ToArgb().ToString();
 				}
+				else if(ProcedureCodes.GetStringProcCode(PIn.Long(rawProc.Rows[i]["CodeNum"].ToString()))=="D9987") {//Canceled appointment procedure
+					row["colorText"]=DefC.GetDefByExactName(DefCat.AccountColors,"Canceled Appointment Procedure").ItemColor.ToArgb().ToString();
+				}
 				else {//Not a broken appointment procedure.
 					row["colorText"]=DefC.GetDefByExactName(DefCat.AccountColors,"Default").ItemColor.ToArgb().ToString();
 				}

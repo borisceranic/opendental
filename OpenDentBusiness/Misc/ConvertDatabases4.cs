@@ -433,6 +433,39 @@ namespace OpenDentBusiness {
 					  Db.NonQ(command);
 				   }
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {//Insert Canceled Appointment Procedure account color
+					command="SELECT MAX(ItemOrder)+1 FROM definition WHERE Category=0";//0 is AccountColor
+					string maxOrder=Db.GetScalar(command);
+					if(maxOrder=="") {
+						maxOrder="0";
+					}
+					command="SELECT ItemColor FROM definition WHERE Category=0 AND ItemName='Broken Appointment Procedure'";
+					string color=Db.GetScalar(command);
+					if(color=="") {
+						color="-16777031";//blue
+					}
+					command="INSERT INTO definition (Category, ItemOrder, ItemName, ItemColor) "
+						+"VALUES (0,"+maxOrder+",'Canceled Appointment Procedure','"+color+"')";
+					Db.NonQ(command);
+				}
+				else {//oracle 
+					command="SELECT MAX(ItemOrder)+1 FROM definition WHERE Category=0";//0 is AccountColor
+					string maxOrder=Db.GetScalar(command);
+					if(maxOrder=="") {
+						maxOrder="0";
+					}
+					command="SELECT ItemColor FROM definition WHERE Category=0 AND ItemName='Broken Appointment Procedure'";
+					string color=Db.GetScalar(command);
+					if(color=="") {
+						color="-16777031";//blue
+					}
+					command="INSERT INTO definition (DefNum, Category, ItemOrder, ItemName, ItemColor) "
+						+"VALUES ((SELECT MAX(DefNum)+1 FROM definition),"+maxOrder+",'Canceled Appointment Procedure','"+color+"')";
+					Db.NonQ(command);
+				}
+				
+
+
 
 				command="UPDATE preference SET ValueString = '16.2.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
