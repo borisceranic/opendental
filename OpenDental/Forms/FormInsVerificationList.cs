@@ -28,6 +28,8 @@ namespace OpenDental {
 		private List<Userod> _listUsersInRegion=new List<Userod>();
 		private List<Def> _listVerifyStatuses=new List<Def>();
 		private long _userNumVerifyGrid=0;
+		private int _selectedRowVerifyGrid;
+		private int _selectedRowAssignGrid;
 
 		public FormInsVerificationList() {
 			InitializeComponent();
@@ -63,6 +65,20 @@ namespace OpenDental {
 		}
 
 		private void FillDisplayInfo(InsVerify insVerifySelected) {
+			if(insVerifySelected==null) {
+				textSubscriberName.Text="";
+				textSubscriberBirthdate.Text="";
+				textSubscriberSSN.Text="";
+				textSubscriberID.Text="";
+				textInsPlanGroupName.Text="";
+				textInsPlanGroupNumber.Text="";
+				textInsPlanNote.Text="";
+				textCarrierName.Text="";
+				textCarrierPhoneNumber.Text="";
+				textInsPlanEmployer.Text="";
+				textInsVerifyReadOnlyNote.Text="";
+				return;
+			}
 			switch(insVerifySelected.VerifyType) {
 				case VerifyTypes.InsuranceBenefit:
 					FillInsuranceDisplay(InsPlans.GetPlan(insVerifySelected.FKey,null));
@@ -249,13 +265,14 @@ namespace OpenDental {
 				}
 				else {//Filter by user
 					_verifyUserNum=FormUP.SelectedUserNum;
-					FillGrids();
 				}
+				FillGrids();
 			}
 		}
 
 		#region Grid Verify
 		private void FillGridMain() {
+			_selectedRowVerifyGrid=gridMain.GetSelectedIndex();
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col;
@@ -286,6 +303,7 @@ namespace OpenDental {
 				gridMain.Rows.Add(VerifyRowToODGridRow(listGridRows[i]));
 			}
 			gridMain.EndUpdate();
+			gridMain.SetSelected(_selectedRowVerifyGrid,true);
 		}
 
 		private List<VerifyGridRow> GetRowsForVerifyGrid() {
@@ -509,6 +527,7 @@ namespace OpenDental {
 			}
 			insVerifyCur.DateLastVerified=DateTime.Today;
 			InsVerifyHists.InsertFromInsVerify(insVerifyCur);
+			FillDisplayInfo(null);
 			FillGrids();
 		}
 
@@ -578,6 +597,8 @@ namespace OpenDental {
 					//No need for action on Assign click
 					break;
 				case 2:
+					break;
+				case 3:
 					OnVerify();
 					break;
 			}
@@ -586,6 +607,7 @@ namespace OpenDental {
 
 		#region Grid Assign
 		private void FillGridAssign() {
+			_selectedRowAssignGrid=gridAssign.GetSelectedIndex();
 			gridAssign.BeginUpdate();
 			gridAssign.Columns.Clear();
 			ODGridColumn col;
@@ -616,6 +638,7 @@ namespace OpenDental {
 				gridAssign.Rows.Add(AssignRowToODGridRow(listGridRows[i]));
 			}
 			gridAssign.EndUpdate();
+			gridAssign.SetSelected(_selectedRowAssignGrid,true);
 		}
 
 		private List<AssignGridRow> GetRowsForAssignGrid() {
