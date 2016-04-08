@@ -207,7 +207,7 @@ namespace OpenDental {
 			// textDaysOldMax
 			// 
 			this.textDaysOldMax.Location = new System.Drawing.Point(220, 7);
-			this.textDaysOldMax.MaxVal = 255;
+			this.textDaysOldMax.MaxVal = 50000;
 			this.textDaysOldMax.MinVal = 0;
 			this.textDaysOldMax.Name = "textDaysOldMax";
 			this.textDaysOldMax.Size = new System.Drawing.Size(60, 20);
@@ -217,7 +217,7 @@ namespace OpenDental {
 			// textDaysOldMin
 			// 
 			this.textDaysOldMin.Location = new System.Drawing.Point(101, 7);
-			this.textDaysOldMin.MaxVal = 255;
+			this.textDaysOldMin.MaxVal = 50000;
 			this.textDaysOldMin.MinVal = 0;
 			this.textDaysOldMin.Name = "textDaysOldMin";
 			this.textDaysOldMin.Size = new System.Drawing.Size(60, 20);
@@ -392,17 +392,18 @@ namespace OpenDental {
 		}
 
 		private void FillGrid(bool isOnLoad=false) {
-			if(textDaysOldMin.Text.Trim()=="" || PIn.Double(textDaysOldMin.Text)==0) {
-				dateMin=DateTime.MinValue;
+			dateMin=DateTime.MinValue;
+			dateMax=DateTime.MinValue;
+			int daysOldMin=0;
+			int daysOldMax=0;
+			int.TryParse(textDaysOldMin.Text.Trim(),out daysOldMin);
+			int.TryParse(textDaysOldMax.Text.Trim(),out daysOldMax);
+			//can't use error provider here because this fires on text changed and cursor may not have left the control, so there is no error message yet
+			if(daysOldMin>0 && daysOldMin>=textDaysOldMin.MinVal && daysOldMin<=textDaysOldMin.MaxVal) {
+				dateMin=DateTimeOD.Today.AddDays(-1*daysOldMin);
 			}
-			else {
-				dateMin = DateTimeOD.Today.AddDays(-1 * PIn.Int(textDaysOldMin.Text));
-			}
-			if(textDaysOldMax.Text.Trim()=="" || PIn.Double(textDaysOldMax.Text)==0) {
-				dateMax=DateTime.MinValue;
-			}
-			else {
-				dateMax = DateTimeOD.Today.AddDays(-1 * PIn.Int(textDaysOldMax.Text));
+			if(daysOldMax>0 && daysOldMax>=textDaysOldMax.MinVal && daysOldMax<=textDaysOldMax.MaxVal) {
+				dateMax=DateTimeOD.Today.AddDays(-1*daysOldMax);
 			}
 			if(comboBoxMultiProv.SelectedIndices[0].ToString()=="0") {
 				isAllProv=true;
@@ -574,10 +575,6 @@ namespace OpenDental {
 			}
 			textBox1.Text=total.ToString("c");
 			gridMain.EndUpdate();
-		}
-
-		private void listProv_SelectedIndexChanged(object sender,EventArgs e) {
-			FillGrid();
 		}
 
 		private void butRefresh_Click(object sender,EventArgs e) {
