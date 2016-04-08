@@ -2,13 +2,16 @@
 using OpenDentBusiness;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace CentralManager {
 	public partial class FormCentralConnectionGroupEdit:Form {
 		///<summary>Global list of all connections.  Never changes, used for filling filtered connection list and limiting database calls.</summary>
 		private List<CentralConnection> _listConns;
+		///<summary>List of all connections that are already associated with the current connection group.</summary>
 		private List<CentralConnection> _listConnsCur;
+		///<summary>List of all conn group attaches so that we can sync them to the database upon closing.</summary>
 		private List<ConnGroupAttach> _listConnGroupAttaches;
 		///<summary>ConnectionGroupCur must be passed in from outside.</summary>
 		public ConnectionGroup ConnectionGroupCur;
@@ -26,14 +29,8 @@ namespace CentralManager {
 			}
 			else {//Take full list and filter out
 				_listConnGroupAttaches=ConnGroupAttaches.GetForGroup(ConnectionGroupCur.ConnectionGroupNum);
-				for(int i=0;i<_listConns.Count;i++) {
-					for(int j=0;j<_listConnGroupAttaches.Count;j++) {
-						if(_listConnGroupAttaches[j].CentralConnectionNum==_listConns[i].CentralConnectionNum) {//Match found
-							_listConnsCur.Add(_listConns[i]);
-							break;
-						}
-					}
-				}
+				//Grab all the connections associated to the corresponding connection group from the list of all connections.
+				_listConnsCur=_listConns.FindAll(x => _listConnGroupAttaches.Exists(y => y.CentralConnectionNum==x.CentralConnectionNum));
 			}
 			textDescription.Text=ConnectionGroupCur.Description;
 			FillGrid();
@@ -49,34 +46,33 @@ namespace CentralManager {
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<_listConnsCur.Count;i++) {
+			foreach(CentralConnection conn in _listConnsCur) {
 				row=new ODGridRow();
-				if(_listConnsCur[i].DatabaseName=="") {//uri
-					row.Cells.Add(_listConnsCur[i].ServiceURI);
+				if(conn.DatabaseName=="") {//uri
+					row.Cells.Add(conn.ServiceURI);
 				}
 				else {
-					row.Cells.Add(_listConnsCur[i].ServerName+", "+_listConnsCur[i].DatabaseName);
+					row.Cells.Add(conn.ServerName+", "+conn.DatabaseName);
 				}
-				row.Cells.Add(_listConnsCur[i].Note);
-				row.Tag=_listConnsCur[i];
+				row.Cells.Add(conn.Note);
+				row.Tag=conn;
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
 		}
 
 		private void butAdd_Click(object sender,EventArgs e) {
-			FormCentralConnections FormCC=new FormCentralConnections();
+			FormCentralConnections FormCC=new FormCentralConnections(_listConnsCur.Select(x => x.CentralConnectionNum).ToList());
 			foreach(CentralConnection conn in _listConns) {
 				FormCC.ListConns.Add(conn.Copy());//Add a copy of each CentralConnection to the FormCC's ListConns for display purposes.
 			}
 			FormCC.LabelText.Text=Lans.g(this,"Select connections then click OK to add them to the currently edited group.");
 			FormCC.Text=Lans.g(this,"Group Connections");
 			if(FormCC.ShowDialog()==DialogResult.OK) {
-				foreach(CentralConnection conn in FormCC.ListConns) {
-					if(!_listConnsCur.Exists(x => x.CentralConnectionNum==conn.CentralConnectionNum)) {
-						_listConnsCur.Add(conn);//Add any newly selected connections to the displayed list in this window, avoiding duplicates.
-					}
-				}
+				//Find all connections that do not already exist in _listConnsCur
+				List<CentralConnection> listNewConns=FormCC.ListConns.FindAll(x => !_listConnsCur.Exists(y => y.CentralConnectionNum==x.CentralConnectionNum));
+				//Add them to _listConnsCur
+				_listConnsCur.AddRange(listNewConns);
 			}
 			FillGrid();
 		}
@@ -87,9 +83,13 @@ namespace CentralManager {
 				return;
 			}
 			//Remove highlighted connections
-			for(int i=gridMain.SelectedIndices.Length-1;i>=0;i--) {//SelectedIndices is a sorted list, so we go backwards to chop off the highest to lowest values
-				_listConnsCur.RemoveAt(gridMain.SelectedIndices[i]);
+			//The following code is slightly harder to read but much faster than looping backwards through the list and using RemovingAt().
+			List<long> listConnNums=new List<long>();
+			foreach(int i in gridMain.SelectedIndices) {
+				listConnNums.Add(((CentralConnection)gridMain.Rows[i].Tag).CentralConnectionNum);
 			}
+			//Set our current list to a list that does not have any selected connections.
+			_listConnsCur=_listConnsCur.FindAll(x => !listConnNums.Exists(y => y==x.CentralConnectionNum));
 			FillGrid();
 		}
 
@@ -100,35 +100,18 @@ namespace CentralManager {
 				return;
 			}
 			ConnectionGroupCur.Description=textDescription.Text;
-			//Does each connection have a group attach?  If not, create one.
-			for(int i=0;i<_listConnsCur.Count;i++) {
-				bool isFound=false;
-				for(int j=0;j<_listConnGroupAttaches.Count;j++) {
-					if(_listConnsCur[i].CentralConnectionNum==_listConnGroupAttaches[j].CentralConnectionNum) {
-						isFound=true;
-						break;
-					}
-				}
-				if(!isFound) {
-					ConnGroupAttach connGA=new ConnGroupAttach();
-					connGA.CentralConnectionNum=_listConnsCur[i].CentralConnectionNum;
-					connGA.ConnectionGroupNum=ConnectionGroupCur.ConnectionGroupNum;
-					_listConnGroupAttaches.Add(connGA);
-				}
+			//Find all connections in our current list that do not have a corresponding conn group attach entry.
+			List<CentralConnection> listConnsToAdd=_listConnsCur.FindAll(x => !_listConnGroupAttaches.Exists(y => y.CentralConnectionNum==x.CentralConnectionNum));
+			//Add a conn group attach for each connection found.
+			foreach(CentralConnection conn in listConnsToAdd) {
+				ConnGroupAttach connGA=new ConnGroupAttach();
+				connGA.CentralConnectionNum=conn.CentralConnectionNum;
+				connGA.ConnectionGroupNum=ConnectionGroupCur.ConnectionGroupNum;
+				_listConnGroupAttaches.Add(connGA);
 			}
-			//Does each group attach have a connection?  If not, remove the attach.
-			for(int i=_listConnGroupAttaches.Count-1;i>=0;i--) {
-				bool isFound=false;
-				for(int j=0;j<_listConnsCur.Count;j++) {
-					if(_listConnGroupAttaches[i].CentralConnectionNum==_listConnsCur[j].CentralConnectionNum) {
-						isFound=true;
-						break;
-					}
-				}
-				if(!isFound) {
-					_listConnGroupAttaches.RemoveAt(i);
-				}
-			}
+			//Make sure that we only keep all conn group attaches that have a valid match.
+			//Removing any orphaned conn group attaches from our in-memory list will cause the sync to remove the entries from the db correctly.
+			_listConnGroupAttaches=_listConnGroupAttaches.FindAll(x => _listConnsCur.Exists(y => y.CentralConnectionNum==x.CentralConnectionNum));
 			//_listConnGroupAttaches now directly reflects what is shown in the UI, without creating duplicates.
 			ConnGroupAttaches.Sync(_listConnGroupAttaches,ConnectionGroupCur.ConnectionGroupNum);
 			DialogResult=DialogResult.OK;

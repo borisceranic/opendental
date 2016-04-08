@@ -23,9 +23,12 @@ namespace CentralManager {
 		///<summary>A full list of connections.</summary>
 		private List<CentralConnection> _listConns;
 		///<summary>A list used to sync against so multiple users' changes won't get overwritten.</summary>
-		private List<CentralConnection> _listConnsOld;
+		private List<CentralConnection> _listConnsOld=new List<CentralConnection>();
 		private List<ConnectionGroup> _listConnectionGroups;
 		private string _progVersion;
+		///<summary>A copy of the preference cache on load so that we don't waste time grabbing a deep copy of the cache which never updates.
+		///As soon as the CEMT starts to process signals this can be removed and implemented differently.</summary>
+		private Dictionary<string,Pref> _dictPrefs;
 
 		public FormCentralManager() {
 			InitializeComponent();
@@ -37,8 +40,8 @@ namespace CentralManager {
 			if(!GetConfigAndConnect()) {
 				return;
 			}
-			Cache.Refresh(InvalidType.Prefs);
-			Version storedVersion=new Version(PrefC.GetString(PrefName.ProgramVersion));
+			_dictPrefs=PrefC.GetDict();
+			Version storedVersion=new Version(PrefC.GetString(PrefName.ProgramVersion,_dictPrefs));
 			Version currentVersion=Assembly.GetAssembly(typeof(Db)).GetName().Version;
 			if(storedVersion.CompareTo(currentVersion)!=0) {
 				MessageBox.Show(Lan.g(this,"Program version")+": "+currentVersion.ToString()+"\r\n"
@@ -53,25 +56,12 @@ namespace CentralManager {
 				Application.CurrentCulture=cInfo;
 			}
 			this.Text+=" - "+Security.CurUser.UserName;
-			_listConnectionGroups=ConnectionGroups.GetListt();
-			comboConnectionGroups.Items.Clear();
-			comboConnectionGroups.Items.Add("All");
-			comboConnectionGroups.SelectedIndex=0;
-			for(int i=0;i<_listConnectionGroups.Count;i++) {
-				comboConnectionGroups.Items.Add(_listConnectionGroups[i].Description);
-				if(_listConnectionGroups[i].ConnectionGroupNum==PrefC.GetLong(PrefName.ConnGroupCEMT)) {
-					comboConnectionGroups.SelectedIndex=i+1;//0 is "All"
-				}
-			}
+			FillComboGroups(PrefC.GetLong(PrefName.ConnGroupCEMT,_dictPrefs));
 			_listConns=CentralConnections.GetConnections();
-			if(_listConns==null) {
-				_listConns=new List<CentralConnection>(); //They don't have any connections set up yet.
-			}
-			_listConnsOld=new List<CentralConnection>();
 			foreach(CentralConnection conn in _listConns) {
 				_listConnsOld.Add(conn.Copy());
 			}
-			_progVersion=PrefC.GetString(PrefName.ProgramVersion);
+			_progVersion=PrefC.GetString(PrefName.ProgramVersion,_dictPrefs);
 			labelVersion.Text="Version: "+_progVersion;
 			FillGrid();
 		}
@@ -106,7 +96,10 @@ namespace CentralManager {
 				database=nav.SelectSingleNode("Database").Value;
 				user=nav.SelectSingleNode("User").Value;
 				password=nav.SelectSingleNode("Password").Value;
-				middleTier=nav.SelectSingleNode("MiddleTierAddr").Value;
+				XPathNavigator nodeMT=nav.SelectSingleNode("MiddleTierAddr");
+				if(nodeMT!=null) {
+					middleTier=nodeMT.Value;
+				}
 			}
 			catch(Exception ex) {
 				//Common error: root element is missing
@@ -145,6 +138,20 @@ namespace CentralManager {
 			return true;
 		}
 
+		///<summary>Refreshes _listConnectionGroups with the current cache (could have been updated) and then selects the conn group passed in.</summary>
+		private void FillComboGroups(long connGroupNum) {
+			_listConnectionGroups=ConnectionGroups.GetListt();
+			comboConnectionGroups.Items.Clear();
+			comboConnectionGroups.Items.Add("All");
+			comboConnectionGroups.SelectedIndex=0;
+			for(int i=0;i<_listConnectionGroups.Count;i++) {
+				comboConnectionGroups.Items.Add(_listConnectionGroups[i].Description);
+				if(_listConnectionGroups[i].ConnectionGroupNum==connGroupNum) {
+					comboConnectionGroups.SelectedIndex=i+1;//0 is "All"
+				}
+			}
+		}
+
 		private void FillGrid() {
 			FillGrid(null);
 		}
@@ -167,24 +174,24 @@ namespace CentralManager {
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn("Note",300);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn("Status",100,HorizontalAlignment.Right);
+			col=new ODGridColumn("Status",100,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<listConnsFiltered.Count;i++) {
-				if(connNums!=null && !connNums.Contains(listConnsFiltered[i].CentralConnectionNum)) {
+			foreach(CentralConnection conn in listConnsFiltered) {
+				if(connNums!=null && !connNums.Contains(conn.CentralConnectionNum)) {
 					continue; //We only want certain connections showing up in the grid.
 				}
-				string status=listConnsFiltered[i].ConnectionStatus;
+				string status=conn.ConnectionStatus;
 				row=new ODGridRow();
-				row.Cells.Add(listConnsFiltered[i].ItemOrder.ToString());
-				if(listConnsFiltered[i].DatabaseName=="") {//uri
-					row.Cells.Add(listConnsFiltered[i].ServiceURI);
+				row.Cells.Add(conn.ItemOrder.ToString());
+				if(conn.DatabaseName=="") {//uri
+					row.Cells.Add(conn.ServiceURI);
 				}
 				else {
-					row.Cells.Add(listConnsFiltered[i].ServerName+", "+listConnsFiltered[i].DatabaseName);
+					row.Cells.Add(conn.ServerName+", "+conn.DatabaseName);
 				}
-				row.Cells.Add(listConnsFiltered[i].Note);
+				row.Cells.Add(conn.Note);
 				if(status=="") {
 					row.Cells.Add("Not checked");
 					row.Cells[3].ColorText=Color.DarkGoldenrod;
@@ -203,7 +210,7 @@ namespace CentralManager {
 					row.Cells.Add(status);
 					row.Cells[3].ColorText=Color.Red;
 				}
-				row.Tag=listConnsFiltered[i];
+				row.Tag=conn;
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
@@ -251,12 +258,6 @@ namespace CentralManager {
 		}
 		
 		private void comboConnectionGroups_SelectionChangeCommitted(object sender,EventArgs e) {
-			if(comboConnectionGroups.SelectedIndex==0) {
-				Prefs.UpdateLong(PrefName.ConnGroupCEMT,0);
-			}
-			else {
-				Prefs.UpdateLong(PrefName.ConnGroupCEMT,_listConnectionGroups[comboConnectionGroups.SelectedIndex-1].ConnectionGroupNum);
-			}
 			FillGrid();
 		}
 
@@ -283,22 +284,7 @@ namespace CentralManager {
 			FormCentralConnectionGroups FormCCG=new FormCentralConnectionGroups();
 			FormCCG.ShowDialog();
 			ConnectionGroups.RefreshCache();
-			_listConnectionGroups=ConnectionGroups.GetListt();
-			comboConnectionGroups.Items.Clear();
-			comboConnectionGroups.Items.Add("All");
-			comboConnectionGroups.SelectedIndex=0;//default to "All"
-			for(int i=0;i<_listConnectionGroups.Count;i++) {
-				comboConnectionGroups.Items.Add(_listConnectionGroups[i].Description);
-				if(connGroupCur!=null && connGroupCur.ConnectionGroupNum==_listConnectionGroups[i].ConnectionGroupNum) {
-					comboConnectionGroups.SelectedIndex=i+1;//Reselect the connection group that the user had before.
-				}
-			}
-			if(comboConnectionGroups.SelectedIndex==0) {
-				Prefs.UpdateLong(PrefName.ConnGroupCEMT,0);
-			}
-			else {
-				Prefs.UpdateLong(PrefName.ConnGroupCEMT,_listConnectionGroups[comboConnectionGroups.SelectedIndex-1].ConnectionGroupNum);
-			}
+			FillComboGroups(connGroupCur==null ? 0 : connGroupCur.ConnectionGroupNum);//Reselect the connection group that the user had before.
 			FillGrid();
 		}
 
@@ -396,6 +382,7 @@ namespace CentralManager {
 					continue;
 				}
 				ODThread odThread=new ODThread(ConnectAndVerify,new object[] { conn,_progVersion });
+				odThread.Name="VerifyThread"+i;
 				odThread.GroupName="Verify";
 				odThread.Start();
 			}
@@ -447,6 +434,7 @@ namespace CentralManager {
 					continue;
 				}
 				ODThread odThread=new ODThread(ConnectAndSearch,new object[] { conn });
+				odThread.Name="SearchThread"+i;
 				odThread.GroupName="Search";
 				odThread.Start();
 			}

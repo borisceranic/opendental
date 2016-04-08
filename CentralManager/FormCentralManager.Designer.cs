@@ -349,7 +349,7 @@
 			this.butEdit.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butEdit.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butEdit.CornerRadius = 4F;
-			this.butEdit.Location = new System.Drawing.Point(93, 494);
+			this.butEdit.Location = new System.Drawing.Point(93, 473);
 			this.butEdit.Name = "butEdit";
 			this.butEdit.Size = new System.Drawing.Size(75, 23);
 			this.butEdit.TabIndex = 217;
@@ -365,7 +365,7 @@
 			this.butAdd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAdd.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAdd.CornerRadius = 4F;
-			this.butAdd.Location = new System.Drawing.Point(12, 494);
+			this.butAdd.Location = new System.Drawing.Point(12, 473);
 			this.butAdd.Name = "butAdd";
 			this.butAdd.Size = new System.Drawing.Size(75, 23);
 			this.butAdd.TabIndex = 216;
@@ -385,7 +385,7 @@
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
 			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridMain.Size = new System.Drawing.Size(775, 462);
+			this.gridMain.Size = new System.Drawing.Size(775, 441);
 			this.gridMain.TabIndex = 5;
 			this.gridMain.Title = "Connections - double click to launch";
 			this.gridMain.TranslationName = "";
@@ -399,7 +399,7 @@
 			this.butRefreshConns.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butRefreshConns.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butRefreshConns.CornerRadius = 4F;
-			this.butRefreshConns.Location = new System.Drawing.Point(227, 494);
+			this.butRefreshConns.Location = new System.Drawing.Point(227, 473);
 			this.butRefreshConns.Name = "butRefreshConns";
 			this.butRefreshConns.Size = new System.Drawing.Size(115, 23);
 			this.butRefreshConns.TabIndex = 227;
@@ -423,7 +423,7 @@
 			// 
 			this.checkAutoLog.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.checkAutoLog.AutoSize = true;
-			this.checkAutoLog.Location = new System.Drawing.Point(661, 490);
+			this.checkAutoLog.Location = new System.Drawing.Point(661, 469);
 			this.checkAutoLog.Name = "checkAutoLog";
 			this.checkAutoLog.Size = new System.Drawing.Size(126, 17);
 			this.checkAutoLog.TabIndex = 228;
@@ -434,7 +434,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(974, 528);
+			this.ClientSize = new System.Drawing.Size(974, 507);
 			this.Controls.Add(this.checkAutoLog);
 			this.Controls.Add(this.labelVersion);
 			this.Controls.Add(this.butRefreshConns);

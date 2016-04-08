@@ -8,8 +8,9 @@ using System.Text;
 
 namespace OpenDentBusiness{
 	///<summary></summary>
-	public class CentralConnections{
-		///<summary></summary>
+	public class CentralConnections {
+
+		///<summary>Gets all the central connections from the database ordered by ItemOrder.</summary>
 		public static List<CentralConnection> GetConnections(){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<CentralConnection>>(MethodBase.GetCurrentMethod());
@@ -20,6 +21,7 @@ namespace OpenDentBusiness{
 
 		///<summary>Filters _listConns to only include connections that are associated to the selected connection group.</summary>
 		public static List<CentralConnection> FilterConnections(List<CentralConnection> listConns,string filterText,ConnectionGroup connGroup) {
+			//No need to check RemotingRole; no call to db.
 			//Get all ConnGroupAttaches for selected group.
 			List<CentralConnection> retVal=listConns;
 			if(connGroup!=null) {

@@ -2,6 +2,7 @@
 using OpenDentBusiness;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace CentralManager {
@@ -12,26 +13,33 @@ namespace CentralManager {
 		///<summary>A filtered list of connections.  Gets refilled every time FillGrid is called.</summary>
 		private List<CentralConnection> _listConnsDisplay;
 		private List<ConnectionGroup> _listConnectionGroups;
+		///<summary>A list of the currently selected CentralConnectionNums.</summary>
+		private List<long> _listSelectedConnNums;
 
-		public FormCentralConnections() {
+		public FormCentralConnections() : this(new List<long>()) {
+		}
+
+		///<summary>Launches the central connections window with the list of corresponding connections selected.</summary>
+		public FormCentralConnections(List<long> listSelectedConnNums) {
 			InitializeComponent();
 			ListConns=new List<CentralConnection>();
+			_listSelectedConnNums=listSelectedConnNums;
 		}
 
 		private void FormCentralConnections_Load(object sender,EventArgs e) {
 			_listConnectionGroups=ConnectionGroups.GetListt();
 			comboConnectionGroups.Items.Add("All");
-			comboConnectionGroups.SelectedIndex=0;
-			for(int i=0;i<_listConnectionGroups.Count;i++) {
-				comboConnectionGroups.Items.Add(_listConnectionGroups[i].Description);
-				if(_listConnectionGroups[i].ConnectionGroupNum==PrefC.GetLong(PrefName.ConnGroupCEMT)) {
-					comboConnectionGroups.SelectedIndex=i+1;//0 is "All"
-				}
-			}
+			comboConnectionGroups.Items.AddRange(_listConnectionGroups.Select(x => x.Description).ToArray());
+			comboConnectionGroups.SelectedIndex=0;//Default to all.
 			FillGrid();
 		}
 
 		private void FillGrid() {
+			if(_listSelectedConnNums.Count==0) {//Could have been set on load.
+				foreach(int i in gridMain.SelectedIndices) {
+					_listSelectedConnNums.Add(((CentralConnection)gridMain.Rows[i].Tag).CentralConnectionNum);
+				}
+			}
 			_listConnsDisplay=null;
 			if(comboConnectionGroups.SelectedIndex>0) {
 				_listConnsDisplay=CentralConnections.FilterConnections(ListConns,textSearch.Text,_listConnectionGroups[comboConnectionGroups.SelectedIndex-1]);
@@ -50,27 +58,28 @@ namespace CentralManager {
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			List<int> listIdxSelect=new List<int>();
-			for(int i=0;i<_listConnsDisplay.Count;i++) {
-				if(ListConns.Exists(x => x.CentralConnectionNum==_listConnsDisplay[i].CentralConnectionNum)) {
-					listIdxSelect.Add(i);
-				}
+			List<int> listSelectedIndices=new List<int>();
+			foreach(CentralConnection conn in _listConnsDisplay) {
 				row=new ODGridRow();
-				row.Cells.Add(_listConnsDisplay[i].ItemOrder.ToString());
-				if(_listConnsDisplay[i].DatabaseName=="") {//uri
-					row.Cells.Add(_listConnsDisplay[i].ServiceURI);
+				row.Cells.Add(conn.ItemOrder.ToString());
+				if(conn.DatabaseName=="") {//uri
+					row.Cells.Add(conn.ServiceURI);
 				}
 				else {
-					row.Cells.Add(_listConnsDisplay[i].ServerName+", "+_listConnsDisplay[i].DatabaseName);
+					row.Cells.Add(conn.ServerName+", "+conn.DatabaseName);
 				}
-				row.Cells.Add(_listConnsDisplay[i].Note);
-				row.Tag=_listConnsDisplay[i];
-				gridMain.Rows.Add(row); 
+				row.Cells.Add(conn.Note);
+				//Add the selected index if needed before adding the row to the collection of rows.
+				if(_listSelectedConnNums.Exists(x => x==(conn.CentralConnectionNum))) {
+					listSelectedIndices.Add(gridMain.Rows.Count);
+				}
+				row.Tag=conn;
+				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
-			for(int i=0;i<listIdxSelect.Count;i++) {
-				gridMain.SetSelected(listIdxSelect[i],true);
-			}
+			//Reselect any connections that were selected before re-filling the grid.
+			gridMain.SetSelected(listSelectedIndices.ToArray(),true);
+			_listSelectedConnNums.Clear();//Always clear the list out for subsequent Fills will remember selected indicies.
 		}
 
 		private void comboConnectionGroups_SelectionChangeCommitted(object sender,EventArgs e) {
@@ -102,8 +111,8 @@ namespace CentralManager {
 		private void butOK_Click(object sender,EventArgs e) {
 			//Add any selected connections to ListConns so that forms outside know which connections to add.
 			ListConns.Clear();
-			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
-				CentralConnection conn=(CentralConnection)gridMain.Rows[gridMain.SelectedIndices[i]].Tag;
+			foreach(int i in gridMain.SelectedIndices) {
+				CentralConnection conn=(CentralConnection)gridMain.Rows[i].Tag;
 				ListConns.Add(conn);
 			}
 			DialogResult=DialogResult.OK;
