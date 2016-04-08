@@ -11,7 +11,7 @@ namespace OpenDental{
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
-	public class FormLogOn : System.Windows.Forms.Form{
+	public class FormLogOn : System.Windows.Forms.Form {
 		private OpenDental.UI.Button butCancel;
 		private OpenDental.UI.Button butOK;
 		private System.Windows.Forms.ListBox listUser;
@@ -29,6 +29,8 @@ namespace OpenDental{
 		///The user will not be logged on (Security.CurUser is untouched) but CurUserSimpleSwitch will be set to the desired user.</summary>
 		public bool IsSimpleSwitch=false;
 		public Userod CurUserSimpleSwitch;
+		///<summary>If set AND available, this will be the user selected when the form opens.</summary>
+		public long UserNumPrompt;
 
 		///<summary></summary>
 		public FormLogOn()
@@ -224,11 +226,12 @@ namespace OpenDental{
 			else {//This will be the most common way to fill the user list.  Only includes non-hidden, non-CEMT users.
 				_listUsers=Userods.GetUsers();
 			}
-			for(int i=0;i<_listUsers.Count;i++){
-				listUser.Items.Add(_listUsers[i]);
-				if(Security.CurUser!=null && _listUsers[i].UserNum==Security.CurUser.UserNum){
-					listUser.SelectedIndex=i;
-				}
+			_listUsers.ForEach(x => listUser.Items.Add(x));
+			if(UserNumPrompt>0) {
+				listUser.SelectedIndex=_listUsers.FindIndex(x => x.UserNum==UserNumPrompt);//can be -1 if not found
+			}
+			else if(Security.CurUser!=null) {
+				listUser.SelectedIndex=_listUsers.FindIndex(x => x.UserNum==Security.CurUser.UserNum);//can be -1 if not found
 			}
 			if(listUser.SelectedIndex==-1){
 				listUser.SelectedIndex=0;

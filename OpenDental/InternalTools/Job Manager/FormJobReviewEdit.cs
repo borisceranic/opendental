@@ -71,6 +71,9 @@ namespace OpenDental {
 			}
 			//Otherwise login
 			FormLogOn FormLO = new FormLogOn() { IsSimpleSwitch=true };
+			if(JobReviewCur!=null) {
+				FormLO.UserNumPrompt=JobReviewCur.ReviewerNum;
+			}
 			FormLO.ShowDialog();
 			if(FormLO.DialogResult!=DialogResult.OK) {
 				return;
