@@ -13462,6 +13462,37 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString='16.1.15.0' WHERE PrefName='DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To16_1_16();
+		}
+
+		private static void To16_1_16() {
+			if(FromVersion<new Version("16.1.16.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.16.0"));//No translation in convert script.
+				string command="";
+				command="UPDATE program SET ProgName='Dimaxis' WHERE ProgName='Planmeca'";//Renaming Planmeca to Dimaxis
+				Db.NonQ(command);
+				//Add program property for birthdate format for Dimaxis
+				command=@"SELECT COUNT(*) FROM programproperty 
+					INNER JOIN program ON program.ProgramNum=programproperty.ProgramNum
+						AND program.ProgName='Dimaxis'
+					WHERE programproperty.PropertyDesc='Birthdate format (usually dd/MM/yyyy or MM/dd/yyyy)'";
+				if(Db.GetCount(command)=="0") {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						command=@"INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue) 
+							VALUES ((SELECT ProgramNum FROM program WHERE ProgName='Dimaxis'), 
+							'Birthdate format (usually dd/MM/yyyy or MM/dd/yyyy)','dd/MM/yyyy')";
+						Db.NonQ(command);
+					}
+					else {//oracle
+						command=@"INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue) 
+							VALUES ((SELECT MAX(ProgramPropertyNum)+1 FROM programproperty),(SELECT ProgramNum FROM program WHERE ProgName='Dimaxis'),
+							'Birthdate format (usually dd/MM/yyyy or MM/dd/yyyy)','dd/MM/yyyy')";
+						Db.NonQ(command);
+					}
+				}
+				command="UPDATE preference SET ValueString='16.1.16.0' WHERE PrefName='DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To16_2_0();
 		}
 
