@@ -7,6 +7,8 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
+using System.Linq;
+using System.Text;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -63,14 +65,78 @@ namespace OpenDental{
 		private ODGrid gridVitalSigns;
 		private UI.Button butGrowthChart;
 		private long _EhrNotPerfNum;
+		private TabPage tabTobaccoUse;
+		private GroupBox groupTobaccoUse;
+		private GroupBox groupIntervention;
+		private RadioButton radioRecentInterventions;
+		private CheckBox checkPatientDeclined;
+		private RadioButton radioAllInterventions;
+		private ODGrid gridInterventions;
+		private RadioButton radioMedInterventions;
+		private UI.Button butAddIntervention;
+		private RadioButton radioCounselInterventions;
+		private Label label7;
+		private Label label5;
+		private TextBox textDateIntervention;
+		private Label label8;
+		private ComboBox comboInterventionCode;
+		private GroupBox groupAssessment;
+		private RadioButton radioRecentStatuses;
+		private Label label9;
+		private ODGrid gridAssessments;
+		private RadioButton radioAllStatuses;
+		private ComboBox comboAssessmentType;
+		private RadioButton radioNonUserStatuses;
+		private Label label10;
+		private RadioButton radioUserStatuses;
+		private Label label11;
+		private TextBox textDateAssessed;
+		private UI.Button butAddAssessment;
+		private Label labelTobaccoStatus;
+		private ComboBox comboTobaccoStatus;
+		private Label label12;
+		private ComboBox comboSmokeStatus;
+		private Label label13;
 		private List<Vitalsign> _listVitalSigns;
+		///<summary>A copy of the original patient object, as it was when this form was first opened.</summary>
+		private Patient _patOld;
+		///<summary>List of tobacco use screening type codes.  Currently only 3 allowed SNOMED codes as of 2014.</summary>
+		private List<EhrCode> _listAssessmentCodes;
+		///<summary>All EhrCodes in the tobacco cessation counseling value set (2.16.840.1.113883.3.526.3.509).
+		///When comboInterventionType has selected index 0, load the counseling intervention codes into comboInterventionCode.</summary>
+		private List<EhrCode> _listCounselInterventionCodes;
+		///<summary>All EhrCodes in the tobacco cessation medication value set (2.16.840.1.113883.3.526.3.1190).
+		///When comboInterventionType has selected index 1, load the medication intervention codes into comboInterventionCode.</summary>
+		private List<EhrCode> _listMedInterventionCodes;
+		private List<EhrCode> _listRecentIntvCodes;
+		///<summary>This list contains all of the intervention codes in the comboInterventionCode, counsel, medication, both.</summary>
+		private List<EhrCode> _listInterventionCodes;
+		///<summary>All EhrCodes in the tobacco user value set (2.16.840.1.113883.3.526.3.1170).
+		///When radioAll or radioUser is selected, comboTobaccoStatuses will be filled with this list.</summary>
+		private List<EhrCode> _listUserCodes;
+		///<summary>All EhrCodes in the tobacco non-user value set (2.16.840.1.113883.3.526.3.1189).
+		///When radioAll or radioNonUser is selected, comboTobaccoStatuses will be filled with this list.</summary>
+		private List<EhrCode> _listNonUserCodes;
+		///<summary>List of tobacco statuses selected from the SNOMED list for this pat that aren't in the list of EHR user and non-user codes</summary>
+		private List<EhrCode> _listCustomTobaccoCodes;
+		///<summary>List of recently used tobacco statuses, ordered by a date used weighted sum of number of times used.  Codes used the most will be
+		///first in the list, with more recent EhrMeasureEvents having a heavier weight.</summary>
+		private List<EhrCode> _listRecentTobaccoCodes;
+		///<summary>This list contains all of the tobacco statuses in the comboTobaccoStatus, user, non-user, or both.  This list may also contain
+		///statuses that the user has selected from the SNOMED list that are not a user or non-user code.</summary>
+		private List<EhrCode> _listTobaccoStatuses;
+		private ToolTip _comboToolTip;
+		///<summary>Tab name to pre-select when form loads.
+		///i.e. "tabMedical", "tabProblems", "tabMedications", "tabAllergies", "tabFamHealthHist", "tabVitalSigns", or "tabTobaccoUse".</summary>
+		private string _selectedTab;
 
 
 		///<summary></summary>
-		public FormMedical(PatientNote patientNoteCur,Patient patCur){
+		public FormMedical(PatientNote patientNoteCur,Patient patCur,string selectedTab=""){
 			InitializeComponent();// Required for Windows Form Designer support
 			PatCur=patCur;
 			PatientNoteCur=patientNoteCur;
+			_selectedTab=selectedTab;
 			Lan.F(this);
 		}
 
@@ -135,6 +201,38 @@ namespace OpenDental{
 			this.butGrowthChart = new OpenDental.UI.Button();
 			this.butAddVitalSign = new OpenDental.UI.Button();
 			this.gridVitalSigns = new OpenDental.UI.ODGrid();
+			this.tabTobaccoUse = new System.Windows.Forms.TabPage();
+			this.groupTobaccoUse = new System.Windows.Forms.GroupBox();
+			this.groupIntervention = new System.Windows.Forms.GroupBox();
+			this.radioRecentInterventions = new System.Windows.Forms.RadioButton();
+			this.checkPatientDeclined = new System.Windows.Forms.CheckBox();
+			this.radioAllInterventions = new System.Windows.Forms.RadioButton();
+			this.gridInterventions = new OpenDental.UI.ODGrid();
+			this.radioMedInterventions = new System.Windows.Forms.RadioButton();
+			this.butAddIntervention = new OpenDental.UI.Button();
+			this.radioCounselInterventions = new System.Windows.Forms.RadioButton();
+			this.label7 = new System.Windows.Forms.Label();
+			this.label5 = new System.Windows.Forms.Label();
+			this.textDateIntervention = new System.Windows.Forms.TextBox();
+			this.label8 = new System.Windows.Forms.Label();
+			this.comboInterventionCode = new System.Windows.Forms.ComboBox();
+			this.groupAssessment = new System.Windows.Forms.GroupBox();
+			this.radioRecentStatuses = new System.Windows.Forms.RadioButton();
+			this.label9 = new System.Windows.Forms.Label();
+			this.gridAssessments = new OpenDental.UI.ODGrid();
+			this.radioAllStatuses = new System.Windows.Forms.RadioButton();
+			this.comboAssessmentType = new System.Windows.Forms.ComboBox();
+			this.radioNonUserStatuses = new System.Windows.Forms.RadioButton();
+			this.label10 = new System.Windows.Forms.Label();
+			this.radioUserStatuses = new System.Windows.Forms.RadioButton();
+			this.label11 = new System.Windows.Forms.Label();
+			this.textDateAssessed = new System.Windows.Forms.TextBox();
+			this.butAddAssessment = new OpenDental.UI.Button();
+			this.labelTobaccoStatus = new System.Windows.Forms.Label();
+			this.comboTobaccoStatus = new System.Windows.Forms.ComboBox();
+			this.label12 = new System.Windows.Forms.Label();
+			this.comboSmokeStatus = new System.Windows.Forms.ComboBox();
+			this.label13 = new System.Windows.Forms.Label();
 			this.tabControlFormMedical.SuspendLayout();
 			this.tabMedical.SuspendLayout();
 			this.groupMedsDocumented.SuspendLayout();
@@ -143,6 +241,10 @@ namespace OpenDental{
 			this.tabAllergies.SuspendLayout();
 			this.tabFamHealthHist.SuspendLayout();
 			this.tabVitalSigns.SuspendLayout();
+			this.tabTobaccoUse.SuspendLayout();
+			this.groupTobaccoUse.SuspendLayout();
+			this.groupIntervention.SuspendLayout();
+			this.groupAssessment.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// butOK
@@ -153,7 +255,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(610, 417);
+			this.butOK.Location = new System.Drawing.Point(796, 462);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 25);
 			this.butOK.TabIndex = 1;
@@ -169,7 +271,7 @@ namespace OpenDental{
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(703, 417);
+			this.butCancel.Location = new System.Drawing.Point(889, 462);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 25);
 			this.butCancel.TabIndex = 2;
@@ -219,7 +321,7 @@ namespace OpenDental{
 			this.gridMeds.Location = new System.Drawing.Point(6, 35);
 			this.gridMeds.Name = "gridMeds";
 			this.gridMeds.ScrollValue = 0;
-			this.gridMeds.Size = new System.Drawing.Size(757, 342);
+			this.gridMeds.Size = new System.Drawing.Size(943, 387);
 			this.gridMeds.TabIndex = 59;
 			this.gridMeds.Title = "Medications";
 			this.gridMeds.TranslationName = "TableMedications";
@@ -237,7 +339,7 @@ namespace OpenDental{
 			this.gridDiseases.Location = new System.Drawing.Point(6, 35);
 			this.gridDiseases.Name = "gridDiseases";
 			this.gridDiseases.ScrollValue = 0;
-			this.gridDiseases.Size = new System.Drawing.Size(759, 342);
+			this.gridDiseases.Size = new System.Drawing.Size(943, 387);
 			this.gridDiseases.TabIndex = 60;
 			this.gridDiseases.Title = "Problems";
 			this.gridDiseases.TranslationName = "TableDiseases";
@@ -267,7 +369,7 @@ namespace OpenDental{
 			this.gridAllergies.Location = new System.Drawing.Point(6, 35);
 			this.gridAllergies.Name = "gridAllergies";
 			this.gridAllergies.ScrollValue = 0;
-			this.gridAllergies.Size = new System.Drawing.Size(757, 342);
+			this.gridAllergies.Size = new System.Drawing.Size(943, 387);
 			this.gridAllergies.TabIndex = 63;
 			this.gridAllergies.Title = "Allergies";
 			this.gridAllergies.TranslationName = "TableDiseases";
@@ -304,13 +406,14 @@ namespace OpenDental{
 			// butPrint
 			// 
 			this.butPrint.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPrint.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.butPrint.Autosize = true;
 			this.butPrint.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPrint.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPrint.CornerRadius = 4F;
 			this.butPrint.Image = global::OpenDental.Properties.Resources.butPrintSmall;
 			this.butPrint.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butPrint.Location = new System.Drawing.Point(475, 6);
+			this.butPrint.Location = new System.Drawing.Point(663, 6);
 			this.butPrint.Name = "butPrint";
 			this.butPrint.Size = new System.Drawing.Size(116, 24);
 			this.butPrint.TabIndex = 66;
@@ -345,7 +448,7 @@ namespace OpenDental{
 			this.gridFamilyHealth.Location = new System.Drawing.Point(6, 35);
 			this.gridFamilyHealth.Name = "gridFamilyHealth";
 			this.gridFamilyHealth.ScrollValue = 0;
-			this.gridFamilyHealth.Size = new System.Drawing.Size(757, 342);
+			this.gridFamilyHealth.Size = new System.Drawing.Size(943, 387);
 			this.gridFamilyHealth.TabIndex = 69;
 			this.gridFamilyHealth.Title = "Family Health History";
 			this.gridFamilyHealth.TranslationName = "TableDiseases";
@@ -378,11 +481,13 @@ namespace OpenDental{
 			this.tabControlFormMedical.Controls.Add(this.tabAllergies);
 			this.tabControlFormMedical.Controls.Add(this.tabFamHealthHist);
 			this.tabControlFormMedical.Controls.Add(this.tabVitalSigns);
+			this.tabControlFormMedical.Controls.Add(this.tabTobaccoUse);
 			this.tabControlFormMedical.Location = new System.Drawing.Point(4, 3);
 			this.tabControlFormMedical.Name = "tabControlFormMedical";
 			this.tabControlFormMedical.SelectedIndex = 0;
-			this.tabControlFormMedical.Size = new System.Drawing.Size(777, 409);
+			this.tabControlFormMedical.Size = new System.Drawing.Size(963, 454);
 			this.tabControlFormMedical.TabIndex = 73;
+			this.tabControlFormMedical.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.tabControlFormMedical_Selecting);
 			// 
 			// tabMedical
 			// 
@@ -401,37 +506,37 @@ namespace OpenDental{
 			this.tabMedical.Location = new System.Drawing.Point(4, 22);
 			this.tabMedical.Name = "tabMedical";
 			this.tabMedical.Padding = new System.Windows.Forms.Padding(3);
-			this.tabMedical.Size = new System.Drawing.Size(769, 383);
+			this.tabMedical.Size = new System.Drawing.Size(955, 428);
 			this.tabMedical.TabIndex = 4;
 			this.tabMedical.Text = "Medical Info";
 			this.tabMedical.UseVisualStyleBackColor = true;
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(3, 120);
+			this.label4.Location = new System.Drawing.Point(6, 128);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(131, 18);
 			this.label4.TabIndex = 85;
 			this.label4.Text = "Medical Summary";
-			this.label4.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(4, 34);
+			this.label2.Location = new System.Drawing.Point(7, 34);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(131, 18);
 			this.label2.TabIndex = 86;
 			this.label2.Text = "Med Urgent";
-			this.label2.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(230, 34);
+			this.label3.Location = new System.Drawing.Point(288, 34);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(151, 18);
 			this.label3.TabIndex = 87;
 			this.label3.Text = "Service Notes";
-			this.label3.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// label1
 			// 
@@ -447,11 +552,12 @@ namespace OpenDental{
 			this.textMedical.AcceptsTab = true;
 			this.textMedical.BackColor = System.Drawing.SystemColors.Window;
 			this.textMedical.DetectUrls = false;
-			this.textMedical.Location = new System.Drawing.Point(6, 139);
+			this.textMedical.Location = new System.Drawing.Point(6, 147);
 			this.textMedical.Name = "textMedical";
 			this.textMedical.QuickPasteType = OpenDentBusiness.QuickPasteType.MedicalSummary;
 			this.textMedical.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textMedical.Size = new System.Drawing.Size(220, 69);
+			this.textMedical.Size = new System.Drawing.Size(275, 77);
+			this.textMedical.SpellCheckIsEnabled = false;
 			this.textMedical.TabIndex = 2;
 			this.textMedical.Text = "";
 			// 
@@ -478,11 +584,12 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textService.BackColor = System.Drawing.SystemColors.Window;
 			this.textService.DetectUrls = false;
-			this.textService.Location = new System.Drawing.Point(233, 53);
+			this.textService.Location = new System.Drawing.Point(288, 53);
 			this.textService.Name = "textService";
 			this.textService.QuickPasteType = OpenDentBusiness.QuickPasteType.ServiceNotes;
 			this.textService.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textService.Size = new System.Drawing.Size(527, 155);
+			this.textService.Size = new System.Drawing.Size(658, 171);
+			this.textService.SpellCheckIsEnabled = false;
 			this.textService.TabIndex = 3;
 			this.textService.Text = "";
 			// 
@@ -497,14 +604,16 @@ namespace OpenDental{
 			this.textMedUrgNote.Name = "textMedUrgNote";
 			this.textMedUrgNote.QuickPasteType = OpenDentBusiness.QuickPasteType.MedicalUrgent;
 			this.textMedUrgNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textMedUrgNote.Size = new System.Drawing.Size(220, 64);
+			this.textMedUrgNote.Size = new System.Drawing.Size(275, 72);
+			this.textMedUrgNote.SpellCheckIsEnabled = false;
 			this.textMedUrgNote.TabIndex = 1;
 			this.textMedUrgNote.Text = "";
 			// 
 			// checkPremed
 			// 
+			this.checkPremed.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.checkPremed.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkPremed.Location = new System.Drawing.Point(387, 29);
+			this.checkPremed.Location = new System.Drawing.Point(573, 29);
 			this.checkPremed.Name = "checkPremed";
 			this.checkPremed.Size = new System.Drawing.Size(195, 18);
 			this.checkPremed.TabIndex = 5;
@@ -514,9 +623,10 @@ namespace OpenDental{
 			// 
 			// groupMedsDocumented
 			// 
+			this.groupMedsDocumented.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.groupMedsDocumented.Controls.Add(this.radioMedsDocumentedNo);
 			this.groupMedsDocumented.Controls.Add(this.radioMedsDocumentedYes);
-			this.groupMedsDocumented.Location = new System.Drawing.Point(601, 14);
+			this.groupMedsDocumented.Location = new System.Drawing.Point(787, 14);
 			this.groupMedsDocumented.Name = "groupMedsDocumented";
 			this.groupMedsDocumented.Size = new System.Drawing.Size(159, 33);
 			this.groupMedsDocumented.TabIndex = 6;
@@ -545,12 +655,12 @@ namespace OpenDental{
 			// 
 			// label6
 			// 
-			this.label6.Location = new System.Drawing.Point(6, 211);
+			this.label6.Location = new System.Drawing.Point(9, 227);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(607, 18);
 			this.label6.TabIndex = 82;
 			this.label6.Text = "Medical History - Complete and Detailed (does not show in chart)";
-			this.label6.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
 			// textMedicalComp
 			// 
@@ -560,11 +670,12 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.textMedicalComp.BackColor = System.Drawing.SystemColors.Window;
 			this.textMedicalComp.DetectUrls = false;
-			this.textMedicalComp.Location = new System.Drawing.Point(9, 230);
+			this.textMedicalComp.Location = new System.Drawing.Point(9, 246);
 			this.textMedicalComp.Name = "textMedicalComp";
 			this.textMedicalComp.QuickPasteType = OpenDentBusiness.QuickPasteType.MedicalHistory;
 			this.textMedicalComp.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
-			this.textMedicalComp.Size = new System.Drawing.Size(751, 145);
+			this.textMedicalComp.Size = new System.Drawing.Size(937, 171);
+			this.textMedicalComp.SpellCheckIsEnabled = false;
 			this.textMedicalComp.TabIndex = 4;
 			this.textMedicalComp.Text = "";
 			// 
@@ -576,7 +687,7 @@ namespace OpenDental{
 			this.tabProblems.Location = new System.Drawing.Point(4, 22);
 			this.tabProblems.Name = "tabProblems";
 			this.tabProblems.Padding = new System.Windows.Forms.Padding(3);
-			this.tabProblems.Size = new System.Drawing.Size(769, 383);
+			this.tabProblems.Size = new System.Drawing.Size(955, 428);
 			this.tabProblems.TabIndex = 0;
 			this.tabProblems.Text = "Problems";
 			this.tabProblems.UseVisualStyleBackColor = true;
@@ -590,7 +701,7 @@ namespace OpenDental{
 			this.tabMedications.Location = new System.Drawing.Point(4, 22);
 			this.tabMedications.Name = "tabMedications";
 			this.tabMedications.Padding = new System.Windows.Forms.Padding(3);
-			this.tabMedications.Size = new System.Drawing.Size(769, 383);
+			this.tabMedications.Size = new System.Drawing.Size(955, 428);
 			this.tabMedications.TabIndex = 1;
 			this.tabMedications.Text = "Medications";
 			this.tabMedications.UseVisualStyleBackColor = true;
@@ -603,7 +714,7 @@ namespace OpenDental{
 			this.tabAllergies.Location = new System.Drawing.Point(4, 22);
 			this.tabAllergies.Name = "tabAllergies";
 			this.tabAllergies.Padding = new System.Windows.Forms.Padding(3);
-			this.tabAllergies.Size = new System.Drawing.Size(769, 383);
+			this.tabAllergies.Size = new System.Drawing.Size(955, 428);
 			this.tabAllergies.TabIndex = 2;
 			this.tabAllergies.Text = "Allergies";
 			this.tabAllergies.UseVisualStyleBackColor = true;
@@ -615,7 +726,7 @@ namespace OpenDental{
 			this.tabFamHealthHist.Location = new System.Drawing.Point(4, 22);
 			this.tabFamHealthHist.Name = "tabFamHealthHist";
 			this.tabFamHealthHist.Padding = new System.Windows.Forms.Padding(3);
-			this.tabFamHealthHist.Size = new System.Drawing.Size(769, 383);
+			this.tabFamHealthHist.Size = new System.Drawing.Size(955, 428);
 			this.tabFamHealthHist.TabIndex = 3;
 			this.tabFamHealthHist.Text = "Family Health History";
 			this.tabFamHealthHist.UseVisualStyleBackColor = true;
@@ -628,7 +739,7 @@ namespace OpenDental{
 			this.tabVitalSigns.Location = new System.Drawing.Point(4, 22);
 			this.tabVitalSigns.Name = "tabVitalSigns";
 			this.tabVitalSigns.Padding = new System.Windows.Forms.Padding(3);
-			this.tabVitalSigns.Size = new System.Drawing.Size(769, 383);
+			this.tabVitalSigns.Size = new System.Drawing.Size(955, 428);
 			this.tabVitalSigns.TabIndex = 5;
 			this.tabVitalSigns.Text = "Vital Signs";
 			this.tabVitalSigns.UseVisualStyleBackColor = true;
@@ -675,28 +786,406 @@ namespace OpenDental{
 			this.gridVitalSigns.Location = new System.Drawing.Point(6, 35);
 			this.gridVitalSigns.Name = "gridVitalSigns";
 			this.gridVitalSigns.ScrollValue = 0;
-			this.gridVitalSigns.Size = new System.Drawing.Size(757, 342);
+			this.gridVitalSigns.Size = new System.Drawing.Size(943, 387);
 			this.gridVitalSigns.TabIndex = 4;
 			this.gridVitalSigns.Title = "Vital Signs";
 			this.gridVitalSigns.TranslationName = null;
 			this.gridVitalSigns.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridVitalSigns_CellDoubleClick);
 			// 
+			// tabTobaccoUse
+			// 
+			this.tabTobaccoUse.Controls.Add(this.label12);
+			this.tabTobaccoUse.Controls.Add(this.comboSmokeStatus);
+			this.tabTobaccoUse.Controls.Add(this.label13);
+			this.tabTobaccoUse.Controls.Add(this.groupTobaccoUse);
+			this.tabTobaccoUse.Location = new System.Drawing.Point(4, 22);
+			this.tabTobaccoUse.Name = "tabTobaccoUse";
+			this.tabTobaccoUse.Padding = new System.Windows.Forms.Padding(3);
+			this.tabTobaccoUse.Size = new System.Drawing.Size(955, 428);
+			this.tabTobaccoUse.TabIndex = 0;
+			this.tabTobaccoUse.Text = "Tobacco Use";
+			this.tabTobaccoUse.UseVisualStyleBackColor = true;
+			// 
+			// groupTobaccoUse
+			// 
+			this.groupTobaccoUse.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupTobaccoUse.Controls.Add(this.groupIntervention);
+			this.groupTobaccoUse.Controls.Add(this.groupAssessment);
+			this.groupTobaccoUse.Location = new System.Drawing.Point(9, 69);
+			this.groupTobaccoUse.Name = "groupTobaccoUse";
+			this.groupTobaccoUse.Size = new System.Drawing.Size(937, 353);
+			this.groupTobaccoUse.TabIndex = 3;
+			this.groupTobaccoUse.TabStop = false;
+			this.groupTobaccoUse.Text = "Tobacco Use Screening and Cessation Intervention (CQM)";
+			// 
+			// groupIntervention
+			// 
+			this.groupIntervention.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupIntervention.Controls.Add(this.radioRecentInterventions);
+			this.groupIntervention.Controls.Add(this.checkPatientDeclined);
+			this.groupIntervention.Controls.Add(this.radioAllInterventions);
+			this.groupIntervention.Controls.Add(this.gridInterventions);
+			this.groupIntervention.Controls.Add(this.radioMedInterventions);
+			this.groupIntervention.Controls.Add(this.butAddIntervention);
+			this.groupIntervention.Controls.Add(this.radioCounselInterventions);
+			this.groupIntervention.Controls.Add(this.label7);
+			this.groupIntervention.Controls.Add(this.label5);
+			this.groupIntervention.Controls.Add(this.textDateIntervention);
+			this.groupIntervention.Controls.Add(this.label8);
+			this.groupIntervention.Controls.Add(this.comboInterventionCode);
+			this.groupIntervention.Location = new System.Drawing.Point(6, 190);
+			this.groupIntervention.Name = "groupIntervention";
+			this.groupIntervention.Size = new System.Drawing.Size(925, 157);
+			this.groupIntervention.TabIndex = 2;
+			this.groupIntervention.TabStop = false;
+			this.groupIntervention.Text = "Cessation Intervention";
+			// 
+			// radioRecentInterventions
+			// 
+			this.radioRecentInterventions.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.radioRecentInterventions.Location = new System.Drawing.Point(293, 50);
+			this.radioRecentInterventions.Name = "radioRecentInterventions";
+			this.radioRecentInterventions.Size = new System.Drawing.Size(67, 16);
+			this.radioRecentInterventions.TabIndex = 5;
+			this.radioRecentInterventions.TabStop = true;
+			this.radioRecentInterventions.Text = "Frequent";
+			this.radioRecentInterventions.CheckedChanged += new System.EventHandler(this.radioInterventions_CheckedChanged);
+			// 
+			// checkPatientDeclined
+			// 
+			this.checkPatientDeclined.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkPatientDeclined.Location = new System.Drawing.Point(100, 99);
+			this.checkPatientDeclined.Name = "checkPatientDeclined";
+			this.checkPatientDeclined.Size = new System.Drawing.Size(154, 18);
+			this.checkPatientDeclined.TabIndex = 7;
+			this.checkPatientDeclined.Text = "Patient Declined";
+			this.checkPatientDeclined.UseVisualStyleBackColor = true;
+			// 
+			// radioAllInterventions
+			// 
+			this.radioAllInterventions.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.radioAllInterventions.Location = new System.Drawing.Point(100, 50);
+			this.radioAllInterventions.Name = "radioAllInterventions";
+			this.radioAllInterventions.Size = new System.Drawing.Size(47, 16);
+			this.radioAllInterventions.TabIndex = 2;
+			this.radioAllInterventions.TabStop = true;
+			this.radioAllInterventions.Text = "All";
+			this.radioAllInterventions.CheckedChanged += new System.EventHandler(this.radioInterventions_CheckedChanged);
+			// 
+			// gridInterventions
+			// 
+			this.gridInterventions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridInterventions.HasAddButton = false;
+			this.gridInterventions.HasMultilineHeaders = false;
+			this.gridInterventions.HScrollVisible = false;
+			this.gridInterventions.Location = new System.Drawing.Point(366, 24);
+			this.gridInterventions.Name = "gridInterventions";
+			this.gridInterventions.ScrollValue = 0;
+			this.gridInterventions.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
+			this.gridInterventions.Size = new System.Drawing.Size(553, 122);
+			this.gridInterventions.TabIndex = 9;
+			this.gridInterventions.Title = "Intervention History";
+			this.gridInterventions.TranslationName = null;
+			this.gridInterventions.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridInterventions_CellDoubleClick);
+			// 
+			// radioMedInterventions
+			// 
+			this.radioMedInterventions.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.radioMedInterventions.Location = new System.Drawing.Point(153, 50);
+			this.radioMedInterventions.Name = "radioMedInterventions";
+			this.radioMedInterventions.Size = new System.Drawing.Size(55, 16);
+			this.radioMedInterventions.TabIndex = 3;
+			this.radioMedInterventions.TabStop = true;
+			this.radioMedInterventions.Text = "Med";
+			this.radioMedInterventions.CheckedChanged += new System.EventHandler(this.radioInterventions_CheckedChanged);
+			// 
+			// butAddIntervention
+			// 
+			this.butAddIntervention.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAddIntervention.Autosize = true;
+			this.butAddIntervention.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAddIntervention.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAddIntervention.CornerRadius = 4F;
+			this.butAddIntervention.Location = new System.Drawing.Point(100, 123);
+			this.butAddIntervention.Name = "butAddIntervention";
+			this.butAddIntervention.Size = new System.Drawing.Size(100, 23);
+			this.butAddIntervention.TabIndex = 8;
+			this.butAddIntervention.Text = "Add Intervention";
+			this.butAddIntervention.Click += new System.EventHandler(this.butIntervention_Click);
+			// 
+			// radioCounselInterventions
+			// 
+			this.radioCounselInterventions.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.radioCounselInterventions.Location = new System.Drawing.Point(213, 50);
+			this.radioCounselInterventions.Name = "radioCounselInterventions";
+			this.radioCounselInterventions.Size = new System.Drawing.Size(73, 16);
+			this.radioCounselInterventions.TabIndex = 4;
+			this.radioCounselInterventions.TabStop = true;
+			this.radioCounselInterventions.Text = "Counsel";
+			this.radioCounselInterventions.CheckedChanged += new System.EventHandler(this.radioInterventions_CheckedChanged);
+			// 
+			// label7
+			// 
+			this.label7.Location = new System.Drawing.Point(6, 50);
+			this.label7.Name = "label7";
+			this.label7.Size = new System.Drawing.Size(93, 16);
+			this.label7.TabIndex = 0;
+			this.label7.Text = "Filter Codes By";
+			this.label7.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// label5
+			// 
+			this.label5.Location = new System.Drawing.Point(6, 25);
+			this.label5.Name = "label5";
+			this.label5.Size = new System.Drawing.Size(93, 16);
+			this.label5.TabIndex = 0;
+			this.label5.Text = "Date Intervened";
+			this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textDateIntervention
+			// 
+			this.textDateIntervention.Location = new System.Drawing.Point(100, 24);
+			this.textDateIntervention.Name = "textDateIntervention";
+			this.textDateIntervention.ReadOnly = true;
+			this.textDateIntervention.Size = new System.Drawing.Size(140, 20);
+			this.textDateIntervention.TabIndex = 1;
+			// 
+			// label8
+			// 
+			this.label8.Location = new System.Drawing.Point(6, 73);
+			this.label8.Name = "label8";
+			this.label8.Size = new System.Drawing.Size(93, 16);
+			this.label8.TabIndex = 0;
+			this.label8.Text = "Intervention Code";
+			this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// comboInterventionCode
+			// 
+			this.comboInterventionCode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboInterventionCode.DropDownWidth = 340;
+			this.comboInterventionCode.FormattingEnabled = true;
+			this.comboInterventionCode.Location = new System.Drawing.Point(100, 72);
+			this.comboInterventionCode.MaxDropDownItems = 30;
+			this.comboInterventionCode.Name = "comboInterventionCode";
+			this.comboInterventionCode.Size = new System.Drawing.Size(260, 21);
+			this.comboInterventionCode.TabIndex = 6;
+			this.comboInterventionCode.SelectionChangeCommitted += new System.EventHandler(this.comboInterventionCode_SelectionChangeCommitted);
+			// 
+			// groupAssessment
+			// 
+			this.groupAssessment.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupAssessment.Controls.Add(this.radioRecentStatuses);
+			this.groupAssessment.Controls.Add(this.label9);
+			this.groupAssessment.Controls.Add(this.gridAssessments);
+			this.groupAssessment.Controls.Add(this.radioAllStatuses);
+			this.groupAssessment.Controls.Add(this.comboAssessmentType);
+			this.groupAssessment.Controls.Add(this.radioNonUserStatuses);
+			this.groupAssessment.Controls.Add(this.label10);
+			this.groupAssessment.Controls.Add(this.radioUserStatuses);
+			this.groupAssessment.Controls.Add(this.label11);
+			this.groupAssessment.Controls.Add(this.textDateAssessed);
+			this.groupAssessment.Controls.Add(this.butAddAssessment);
+			this.groupAssessment.Controls.Add(this.labelTobaccoStatus);
+			this.groupAssessment.Controls.Add(this.comboTobaccoStatus);
+			this.groupAssessment.Location = new System.Drawing.Point(6, 20);
+			this.groupAssessment.Name = "groupAssessment";
+			this.groupAssessment.Size = new System.Drawing.Size(925, 160);
+			this.groupAssessment.TabIndex = 1;
+			this.groupAssessment.TabStop = false;
+			this.groupAssessment.Text = "Tobacco Use Assessment";
+			// 
+			// radioRecentStatuses
+			// 
+			this.radioRecentStatuses.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.radioRecentStatuses.Location = new System.Drawing.Point(293, 78);
+			this.radioRecentStatuses.Name = "radioRecentStatuses";
+			this.radioRecentStatuses.Size = new System.Drawing.Size(67, 16);
+			this.radioRecentStatuses.TabIndex = 6;
+			this.radioRecentStatuses.TabStop = true;
+			this.radioRecentStatuses.Text = "Frequent";
+			this.radioRecentStatuses.CheckedChanged += new System.EventHandler(this.radioTobaccoStatuses_CheckedChanged);
+			// 
+			// label9
+			// 
+			this.label9.Location = new System.Drawing.Point(6, 77);
+			this.label9.Name = "label9";
+			this.label9.Size = new System.Drawing.Size(93, 16);
+			this.label9.TabIndex = 0;
+			this.label9.Text = "Filter Statuses By";
+			this.label9.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// gridAssessments
+			// 
+			this.gridAssessments.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridAssessments.HasAddButton = false;
+			this.gridAssessments.HasMultilineHeaders = false;
+			this.gridAssessments.HScrollVisible = false;
+			this.gridAssessments.Location = new System.Drawing.Point(366, 24);
+			this.gridAssessments.Name = "gridAssessments";
+			this.gridAssessments.ScrollValue = 0;
+			this.gridAssessments.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
+			this.gridAssessments.Size = new System.Drawing.Size(553, 125);
+			this.gridAssessments.TabIndex = 9;
+			this.gridAssessments.Title = "Assessment History";
+			this.gridAssessments.TranslationName = null;
+			this.gridAssessments.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridAssessments_CellDoubleClick);
+			// 
+			// radioAllStatuses
+			// 
+			this.radioAllStatuses.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.radioAllStatuses.Location = new System.Drawing.Point(100, 77);
+			this.radioAllStatuses.Name = "radioAllStatuses";
+			this.radioAllStatuses.Size = new System.Drawing.Size(47, 16);
+			this.radioAllStatuses.TabIndex = 3;
+			this.radioAllStatuses.TabStop = true;
+			this.radioAllStatuses.Text = "All";
+			this.radioAllStatuses.CheckedChanged += new System.EventHandler(this.radioTobaccoStatuses_CheckedChanged);
+			// 
+			// comboAssessmentType
+			// 
+			this.comboAssessmentType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboAssessmentType.DropDownWidth = 350;
+			this.comboAssessmentType.FormattingEnabled = true;
+			this.comboAssessmentType.Location = new System.Drawing.Point(100, 50);
+			this.comboAssessmentType.MaxDropDownItems = 30;
+			this.comboAssessmentType.Name = "comboAssessmentType";
+			this.comboAssessmentType.Size = new System.Drawing.Size(260, 21);
+			this.comboAssessmentType.TabIndex = 2;
+			// 
+			// radioNonUserStatuses
+			// 
+			this.radioNonUserStatuses.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.radioNonUserStatuses.Location = new System.Drawing.Point(213, 77);
+			this.radioNonUserStatuses.Name = "radioNonUserStatuses";
+			this.radioNonUserStatuses.Size = new System.Drawing.Size(73, 16);
+			this.radioNonUserStatuses.TabIndex = 5;
+			this.radioNonUserStatuses.TabStop = true;
+			this.radioNonUserStatuses.Text = "Non-user";
+			this.radioNonUserStatuses.CheckedChanged += new System.EventHandler(this.radioTobaccoStatuses_CheckedChanged);
+			// 
+			// label10
+			// 
+			this.label10.Location = new System.Drawing.Point(6, 51);
+			this.label10.Name = "label10";
+			this.label10.Size = new System.Drawing.Size(93, 16);
+			this.label10.TabIndex = 0;
+			this.label10.Text = "Assessment Type";
+			this.label10.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// radioUserStatuses
+			// 
+			this.radioUserStatuses.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.radioUserStatuses.Location = new System.Drawing.Point(153, 77);
+			this.radioUserStatuses.Name = "radioUserStatuses";
+			this.radioUserStatuses.Size = new System.Drawing.Size(55, 16);
+			this.radioUserStatuses.TabIndex = 4;
+			this.radioUserStatuses.TabStop = true;
+			this.radioUserStatuses.Text = "User";
+			this.radioUserStatuses.CheckedChanged += new System.EventHandler(this.radioTobaccoStatuses_CheckedChanged);
+			// 
+			// label11
+			// 
+			this.label11.Location = new System.Drawing.Point(6, 25);
+			this.label11.Name = "label11";
+			this.label11.Size = new System.Drawing.Size(93, 16);
+			this.label11.TabIndex = 0;
+			this.label11.Text = "Date Assessed";
+			this.label11.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// textDateAssessed
+			// 
+			this.textDateAssessed.Location = new System.Drawing.Point(100, 24);
+			this.textDateAssessed.Name = "textDateAssessed";
+			this.textDateAssessed.ReadOnly = true;
+			this.textDateAssessed.Size = new System.Drawing.Size(140, 20);
+			this.textDateAssessed.TabIndex = 1;
+			// 
+			// butAddAssessment
+			// 
+			this.butAddAssessment.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAddAssessment.Autosize = true;
+			this.butAddAssessment.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAddAssessment.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAddAssessment.CornerRadius = 4F;
+			this.butAddAssessment.Location = new System.Drawing.Point(100, 126);
+			this.butAddAssessment.Name = "butAddAssessment";
+			this.butAddAssessment.Size = new System.Drawing.Size(100, 23);
+			this.butAddAssessment.TabIndex = 8;
+			this.butAddAssessment.Text = "Add Assessment";
+			this.butAddAssessment.Click += new System.EventHandler(this.butAssessed_Click);
+			// 
+			// labelTobaccoStatus
+			// 
+			this.labelTobaccoStatus.Location = new System.Drawing.Point(6, 100);
+			this.labelTobaccoStatus.Name = "labelTobaccoStatus";
+			this.labelTobaccoStatus.Size = new System.Drawing.Size(93, 16);
+			this.labelTobaccoStatus.TabIndex = 0;
+			this.labelTobaccoStatus.Text = "Tobacco Status";
+			this.labelTobaccoStatus.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// comboTobaccoStatus
+			// 
+			this.comboTobaccoStatus.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboTobaccoStatus.DropDownWidth = 325;
+			this.comboTobaccoStatus.FormattingEnabled = true;
+			this.comboTobaccoStatus.Location = new System.Drawing.Point(100, 99);
+			this.comboTobaccoStatus.MaxDropDownItems = 30;
+			this.comboTobaccoStatus.Name = "comboTobaccoStatus";
+			this.comboTobaccoStatus.Size = new System.Drawing.Size(260, 21);
+			this.comboTobaccoStatus.TabIndex = 7;
+			this.comboTobaccoStatus.SelectionChangeCommitted += new System.EventHandler(this.comboTobaccoStatus_SelectionChangeCommitted);
+			// 
+			// label12
+			// 
+			this.label12.Location = new System.Drawing.Point(378, 27);
+			this.label12.Name = "label12";
+			this.label12.Size = new System.Drawing.Size(383, 16);
+			this.label12.TabIndex = 4;
+			this.label12.Text = "Used for calculating MU measures.";
+			this.label12.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// comboSmokeStatus
+			// 
+			this.comboSmokeStatus.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboSmokeStatus.FormattingEnabled = true;
+			this.comboSmokeStatus.Location = new System.Drawing.Point(147, 26);
+			this.comboSmokeStatus.MaxDropDownItems = 30;
+			this.comboSmokeStatus.Name = "comboSmokeStatus";
+			this.comboSmokeStatus.Size = new System.Drawing.Size(225, 21);
+			this.comboSmokeStatus.TabIndex = 6;
+			this.comboSmokeStatus.SelectionChangeCommitted += new System.EventHandler(this.comboSmokeStatus_SelectionChangeCommitted);
+			// 
+			// label13
+			// 
+			this.label13.Location = new System.Drawing.Point(6, 27);
+			this.label13.Name = "label13";
+			this.label13.Size = new System.Drawing.Size(135, 16);
+			this.label13.TabIndex = 5;
+			this.label13.Text = "Current Smoking Status";
+			this.label13.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormMedical
 			// 
 			this.AcceptButton = this.butOK;
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
-			this.ClientSize = new System.Drawing.Size(788, 450);
+			this.ClientSize = new System.Drawing.Size(974, 495);
 			this.Controls.Add(this.tabControlFormMedical);
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.butOK);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
-			this.MinimumSize = new System.Drawing.Size(500, 250);
+			this.MinimumSize = new System.Drawing.Size(818, 533);
 			this.Name = "FormMedical";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Medical";
 			this.Load += new System.EventHandler(this.FormMedical_Load);
 			this.tabControlFormMedical.ResumeLayout(false);
@@ -707,6 +1196,12 @@ namespace OpenDental{
 			this.tabAllergies.ResumeLayout(false);
 			this.tabFamHealthHist.ResumeLayout(false);
 			this.tabVitalSigns.ResumeLayout(false);
+			this.tabTobaccoUse.ResumeLayout(false);
+			this.groupTobaccoUse.ResumeLayout(false);
+			this.groupIntervention.ResumeLayout(false);
+			this.groupIntervention.PerformLayout();
+			this.groupAssessment.ResumeLayout(false);
+			this.groupAssessment.PerformLayout();
 			this.ResumeLayout(false);
 
 		}
@@ -714,6 +1209,7 @@ namespace OpenDental{
 
 		private void FormMedical_Load(object sender, System.EventArgs e){
 			SecurityLogs.MakeLogEntry(Permissions.MedicalInfoViewed,PatCur.PatNum,"Patient medical information viewed");
+			_patOld=PatCur.Copy();
 			checkPremed.Checked=PatCur.Premed;
 			textMedUrgNote.Text=PatCur.MedUrgNote;
 			textMedical.Text=PatientNoteCur.Medical;
@@ -725,11 +1221,13 @@ namespace OpenDental{
 			if(PrefC.GetBool(PrefName.ShowFeatureEhr)) {
 				FillFamilyHealth();
 				FillVitalSigns();
+				TobaccoUseTabLoad();
 			}
 			else {
 				//remove EHR only tabs if ShowFeatureEHR is not enabled.
 				tabControlFormMedical.TabPages.RemoveByKey("tabVitalSigns");
 				tabControlFormMedical.TabPages.RemoveByKey("tabFamHealthHist");
+				tabControlFormMedical.TabPages.RemoveByKey("tabTobaccoUse");
 			}
 			List<EhrMeasureEvent> listDocumentedMedEvents=EhrMeasureEvents.RefreshByType(PatCur.PatNum,EhrMeasureEventType.CurrentMedsDocumented);
 			_EhrMeasureEventNum=0;
@@ -752,8 +1250,14 @@ namespace OpenDental{
 					break;
 				}
 			}
+			//_selectedTab is set and tab wasn't removed from TabPages, i.e. EHR show feature enabled
+			if(_selectedTab!="" && tabControlFormMedical.TabPages.ContainsKey(_selectedTab)) {
+				//If tab is disabled, i.e. tabTobaccoUse disabled due to LOINC table missing, tabControlFormMedical_Selecting event handler will cancel
+				tabControlFormMedical.SelectTab(_selectedTab);
+			}
 		}
 
+		#region Medications Tab
 		private void FillMeds() {
 			Medications.Refresh();
 			medList=MedicationPats.Refresh(PatCur.PatNum,checkDiscontinued.Checked);
@@ -936,6 +1440,23 @@ namespace OpenDental{
 			g.Dispose();
 		}
 
+		private void checkShowDiscontinuedMeds_MouseUp(object sender,MouseEventArgs e) {
+			FillMeds();
+		}
+
+		private void checkDiscontinued_KeyUp(object sender,KeyEventArgs e) {
+			FillMeds();
+		}
+
+		private void butMedicationReconcile_Click(object sender,EventArgs e) {
+			FormMedicationReconcile FormMR=new FormMedicationReconcile();
+			FormMR.PatCur=PatCur;
+			FormMR.ShowDialog();
+			FillMeds();
+		}
+		#endregion Medications Tab
+
+		#region Medical Info Tab
 		/// <summary>This report is a brute force, one page medical history report. It is not designed to handle more than one page. It does not print service notes or medications.</summary>
 		private void butPrintMedical_Click(object sender,EventArgs e) {
 			pd=new PrintDocument();
@@ -1033,7 +1554,9 @@ namespace OpenDental{
 			yPos+=textHeight;
 			g.Dispose();
 		}
+		#endregion Medical Info Tab
 
+		#region Family Health History Tab
 		private void FillFamilyHealth() {
 			ListFamHealth=FamilyHealths.GetFamilyHealthForPat(PatCur.PatNum);
 			gridFamilyHealth.BeginUpdate();
@@ -1056,6 +1579,28 @@ namespace OpenDental{
 			gridFamilyHealth.EndUpdate();
 		}
 
+		private void gridFamilyHealth_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			FormFamilyHealthEdit FormFHE=new FormFamilyHealthEdit();
+			FormFHE.FamilyHealthCur=ListFamHealth[e.Row];
+			FormFHE.ShowDialog();
+			FillFamilyHealth();
+		}
+
+		private void butAddFamilyHistory_Click(object sender,EventArgs e) {
+			FormFamilyHealthEdit FormFHE=new FormFamilyHealthEdit();
+			FamilyHealth famH=new FamilyHealth();
+			famH.PatNum=PatCur.PatNum;
+			famH.IsNew=true;
+			FormFHE.FamilyHealthCur=famH;
+			FormFHE.ShowDialog();
+			if(FormFHE.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			FillFamilyHealth();
+		}
+		#endregion Family Health History Tab
+
+		#region Problems Tab
 		private void FillProblems(){
 			DiseaseList=Diseases.Refresh(checkShowInactiveProblems.Checked,PatCur.PatNum);
 			gridDiseases.BeginUpdate();
@@ -1090,89 +1635,6 @@ namespace OpenDental{
 				gridDiseases.Rows.Add(row);
 			}
 			gridDiseases.EndUpdate();
-		}
-
-		private void FillAllergies() {
-			allergyList=Allergies.GetAll(PatCur.PatNum,checkShowInactiveAllergies.Checked);
-			gridAllergies.BeginUpdate();
-			gridAllergies.Columns.Clear();
-			ODGridColumn col;
-			if(CDSPermissions.GetForUser(Security.CurUser.UserNum).ShowInfobutton) {//Security.IsAuthorized(Permissions.EhrInfoButton,true)) {
-				col=new ODGridColumn("",18);//infoButton
-				col.ImageList=imageListInfoButton;
-				gridAllergies.Columns.Add(col);
-			}
-			col=new ODGridColumn(Lan.g("TableAllergies","Allergy"),150);
-			gridAllergies.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableAllergies","Reaction"),500);
-			gridAllergies.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableAllergies","Status"),40,HorizontalAlignment.Center);
-			gridAllergies.Columns.Add(col);
-			gridAllergies.Rows.Clear();
-			ODGridRow row;
-			for(int i=0;i<allergyList.Count;i++){
-				row=new ODGridRow();
-				if(CDSPermissions.GetForUser(Security.CurUser.UserNum).ShowInfobutton) {//Security.IsAuthorized(Permissions.EhrInfoButton,true)) {
-					row.Cells.Add("0");//index of infobutton
-				}
-				AllergyDef allergyDef=AllergyDefs.GetOne(allergyList[i].AllergyDefNum);
-				row.Cells.Add(allergyDef.Description);
-				if(allergyList[i].DateAdverseReaction<DateTime.Parse("1-1-1800")) {
-					row.Cells.Add(allergyList[i].Reaction);
-				}
-				else {
-					row.Cells.Add(allergyList[i].Reaction+" "+allergyList[i].DateAdverseReaction.ToShortDateString());
-				}
-				if(allergyList[i].StatusIsActive) {
-					row.Cells.Add("Active");
-				}
-				else {
-					row.Cells.Add("Inactive");
-				}
-				gridAllergies.Rows.Add(row);
-			}
-			gridAllergies.EndUpdate();
-		}
-
-		private void FillVitalSigns() {
-			gridVitalSigns.BeginUpdate();
-			gridVitalSigns.Columns.Clear();
-			ODGridColumn col=new ODGridColumn("Date",80);
-			gridVitalSigns.Columns.Add(col);
-			col=new ODGridColumn("Pulse",55);
-			gridVitalSigns.Columns.Add(col);
-			col=new ODGridColumn("Height",55);
-			gridVitalSigns.Columns.Add(col);
-			col=new ODGridColumn("Weight",55);
-			gridVitalSigns.Columns.Add(col);
-			col=new ODGridColumn("BP",55);
-			gridVitalSigns.Columns.Add(col);
-			col=new ODGridColumn("BMI",55);
-			gridVitalSigns.Columns.Add(col);
-			col=new ODGridColumn("Documentation for Followup or Ineligible",150);
-			gridVitalSigns.Columns.Add(col);
-			_listVitalSigns=Vitalsigns.Refresh(PatCur.PatNum);
-			gridVitalSigns.Rows.Clear();
-			ODGridRow row;
-			for(int i=0;i<_listVitalSigns.Count;i++) {
-				row=new ODGridRow();
-				row.Cells.Add(_listVitalSigns[i].DateTaken.ToShortDateString());
-				row.Cells.Add(_listVitalSigns[i].Pulse.ToString()+" bpm");
-				row.Cells.Add(_listVitalSigns[i].Height.ToString()+" in.");
-				row.Cells.Add(_listVitalSigns[i].Weight.ToString()+" lbs.");
-				row.Cells.Add(_listVitalSigns[i].BpSystolic.ToString()+"/"+_listVitalSigns[i].BpDiastolic.ToString());
-				//BMI = (lbs*703)/(in^2)
-				float bmi=Vitalsigns.CalcBMI(_listVitalSigns[i].Weight,_listVitalSigns[i].Height);
-				if(bmi!=0) {
-					row.Cells.Add(bmi.ToString("n1"));
-				}
-				else {//leave cell blank because there is not a valid bmi
-					row.Cells.Add("");
-				}
-				row.Cells.Add(_listVitalSigns[i].Documentation);
-				gridVitalSigns.Rows.Add(row);
-			}
-			gridVitalSigns.EndUpdate();
 		}
 
 		private void butAddProblem_Click(object sender,EventArgs e) {
@@ -1246,25 +1708,49 @@ namespace OpenDental{
 		private void checkShowInactiveProblems_CheckedChanged(object sender,EventArgs e) {
 			FillProblems();
 		}
+		#endregion Problems Tab
 
-		private void gridFamilyHealth_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			FormFamilyHealthEdit FormFHE=new FormFamilyHealthEdit();
-			FormFHE.FamilyHealthCur=ListFamHealth[e.Row];
-			FormFHE.ShowDialog();
-			FillFamilyHealth();
-		}
-
-		private void butAddFamilyHistory_Click(object sender,EventArgs e) {
-			FormFamilyHealthEdit FormFHE=new FormFamilyHealthEdit();
-			FamilyHealth famH=new FamilyHealth();
-			famH.PatNum=PatCur.PatNum;
-			famH.IsNew=true;
-			FormFHE.FamilyHealthCur=famH;
-			FormFHE.ShowDialog();
-			if(FormFHE.DialogResult!=DialogResult.OK) {
-				return;
+		#region Allergies Tab
+		private void FillAllergies() {
+			allergyList=Allergies.GetAll(PatCur.PatNum,checkShowInactiveAllergies.Checked);
+			gridAllergies.BeginUpdate();
+			gridAllergies.Columns.Clear();
+			ODGridColumn col;
+			if(CDSPermissions.GetForUser(Security.CurUser.UserNum).ShowInfobutton) {//Security.IsAuthorized(Permissions.EhrInfoButton,true)) {
+				col=new ODGridColumn("",18);//infoButton
+				col.ImageList=imageListInfoButton;
+				gridAllergies.Columns.Add(col);
 			}
-			FillFamilyHealth();
+			col=new ODGridColumn(Lan.g("TableAllergies","Allergy"),150);
+			gridAllergies.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("TableAllergies","Reaction"),500);
+			gridAllergies.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("TableAllergies","Status"),40,HorizontalAlignment.Center);
+			gridAllergies.Columns.Add(col);
+			gridAllergies.Rows.Clear();
+			ODGridRow row;
+			for(int i=0;i<allergyList.Count;i++){
+				row=new ODGridRow();
+				if(CDSPermissions.GetForUser(Security.CurUser.UserNum).ShowInfobutton) {//Security.IsAuthorized(Permissions.EhrInfoButton,true)) {
+					row.Cells.Add("0");//index of infobutton
+				}
+				AllergyDef allergyDef=AllergyDefs.GetOne(allergyList[i].AllergyDefNum);
+				row.Cells.Add(allergyDef.Description);
+				if(allergyList[i].DateAdverseReaction<DateTime.Parse("1-1-1800")) {
+					row.Cells.Add(allergyList[i].Reaction);
+				}
+				else {
+					row.Cells.Add(allergyList[i].Reaction+" "+allergyList[i].DateAdverseReaction.ToShortDateString());
+				}
+				if(allergyList[i].StatusIsActive) {
+					row.Cells.Add("Active");
+				}
+				else {
+					row.Cells.Add("Inactive");
+				}
+				gridAllergies.Rows.Add(row);
+			}
+			gridAllergies.EndUpdate();
 		}
 
 		private void gridAllergies_CellClick(object sender,ODGridClickEventArgs e) {
@@ -1301,33 +1787,6 @@ namespace OpenDental{
 			FillAllergies();
 		}
 
-		/*
-		private void butQuestions_Click(object sender,EventArgs e) {
-			FormQuestionnaire FormQ=new FormQuestionnaire(PatCur.PatNum);
-			FormQ.ShowDialog();
-			if(Questions.PatHasQuest(PatCur.PatNum)) {
-				butQuestions.Text=Lan.g(this,"Edit Questionnaire");
-			}
-			else {
-				butQuestions.Text=Lan.g(this,"New Questionnaire");
-			}
-		}*/
-
-		private void checkShowDiscontinuedMeds_MouseUp(object sender,MouseEventArgs e) {
-			FillMeds();
-		}
-
-		private void checkDiscontinued_KeyUp(object sender,KeyEventArgs e) {
-			FillMeds();
-		}
-
-		private void butMedicationReconcile_Click(object sender,EventArgs e) {
-			FormMedicationReconcile FormMR=new FormMedicationReconcile();
-			FormMR.PatCur=PatCur;
-			FormMR.ShowDialog();
-			FillMeds();
-		}
-
 		private void butAddAllergy_Click(object sender,EventArgs e) {
 			FormAllergyEdit formA=new FormAllergyEdit();
 			formA.AllergyCur=new Allergy();
@@ -1344,6 +1803,49 @@ namespace OpenDental{
 				FormCDSI.ShowIfRequired(false);
 			}
 			FillAllergies();
+		}
+		#endregion Allergies Tab
+
+		#region Vital Signs Tab
+		private void FillVitalSigns() {
+			gridVitalSigns.BeginUpdate();
+			gridVitalSigns.Columns.Clear();
+			ODGridColumn col=new ODGridColumn("Date",80);
+			gridVitalSigns.Columns.Add(col);
+			col=new ODGridColumn("Pulse",55);
+			gridVitalSigns.Columns.Add(col);
+			col=new ODGridColumn("Height",55);
+			gridVitalSigns.Columns.Add(col);
+			col=new ODGridColumn("Weight",55);
+			gridVitalSigns.Columns.Add(col);
+			col=new ODGridColumn("BP",55);
+			gridVitalSigns.Columns.Add(col);
+			col=new ODGridColumn("BMI",55);
+			gridVitalSigns.Columns.Add(col);
+			col=new ODGridColumn("Documentation for Followup or Ineligible",150);
+			gridVitalSigns.Columns.Add(col);
+			_listVitalSigns=Vitalsigns.Refresh(PatCur.PatNum);
+			gridVitalSigns.Rows.Clear();
+			ODGridRow row;
+			for(int i=0;i<_listVitalSigns.Count;i++) {
+				row=new ODGridRow();
+				row.Cells.Add(_listVitalSigns[i].DateTaken.ToShortDateString());
+				row.Cells.Add(_listVitalSigns[i].Pulse.ToString()+" bpm");
+				row.Cells.Add(_listVitalSigns[i].Height.ToString()+" in.");
+				row.Cells.Add(_listVitalSigns[i].Weight.ToString()+" lbs.");
+				row.Cells.Add(_listVitalSigns[i].BpSystolic.ToString()+"/"+_listVitalSigns[i].BpDiastolic.ToString());
+				//BMI = (lbs*703)/(in^2)
+				float bmi=Vitalsigns.CalcBMI(_listVitalSigns[i].Weight,_listVitalSigns[i].Height);
+				if(bmi!=0) {
+					row.Cells.Add(bmi.ToString("n1"));
+				}
+				else {//leave cell blank because there is not a valid bmi
+					row.Cells.Add("");
+				}
+				row.Cells.Add(_listVitalSigns[i].Documentation);
+				gridVitalSigns.Rows.Add(row);
+			}
+			gridVitalSigns.EndUpdate();
 		}
 
 		private void butAddVitalSign_Click(object sender,EventArgs e) {
@@ -1368,12 +1870,495 @@ namespace OpenDental{
 			FormGC.PatNum=PatCur.PatNum;
 			FormGC.ShowDialog();
 		}
+		#endregion Vital Signs Tab
+
+		#region Tobacco Use Tab
+		private void TobaccoUseTabLoad() {
+			textDateAssessed.Text=DateTime.Now.ToString();
+			textDateIntervention.Text=DateTime.Now.ToString();
+			#region ComboSmokeStatus
+			comboSmokeStatus.Items.Add("None");//First and default index
+			//Smoking statuses add in the same order as they appear in the SmokingSnoMed enum (Starting at comboSmokeStatus index 1).
+			//Changes to the enum order will change the order added so they will always match
+			for(int i=0;i<Enum.GetNames(typeof(SmokingSnoMed)).Length;i++) {
+				//if snomed code exists in the snomed table, use the snomed description for the combo box, otherwise use the original abbreviated description
+				Snomed smokeCur=Snomeds.GetByCode(((SmokingSnoMed)i).ToString().Substring(1));
+				if(smokeCur!=null) {
+					comboSmokeStatus.Items.Add(smokeCur.Description);
+				}
+				else {
+					switch((SmokingSnoMed)i) {
+						case SmokingSnoMed._266927001:
+							comboSmokeStatus.Items.Add("UnknownIfEver");
+							break;
+						case SmokingSnoMed._77176002:
+							comboSmokeStatus.Items.Add("SmokerUnknownCurrent");
+							break;
+						case SmokingSnoMed._266919005:
+							comboSmokeStatus.Items.Add("NeverSmoked");
+							break;
+						case SmokingSnoMed._8517006:
+							comboSmokeStatus.Items.Add("FormerSmoker");
+							break;
+						case SmokingSnoMed._428041000124106:
+							comboSmokeStatus.Items.Add("CurrentSomeDay");
+							break;
+						case SmokingSnoMed._449868002:
+							comboSmokeStatus.Items.Add("CurrentEveryDay");
+							break;
+						case SmokingSnoMed._428061000124105:
+							comboSmokeStatus.Items.Add("LightSmoker");
+							break;
+						case SmokingSnoMed._428071000124103:
+							comboSmokeStatus.Items.Add("HeavySmoker");
+							break;
+					}
+				}
+			}
+			comboSmokeStatus.SelectedIndex=0;//None
+			try {
+				comboSmokeStatus.SelectedIndex=(int)Enum.Parse(typeof(SmokingSnoMed),"_"+PatCur.SmokingSnoMed,true)+1;
+			}
+			catch {
+				//if not one of the statuses in the enum, get the Snomed object from the patient's current smoking snomed code
+				Snomed smokeCur=Snomeds.GetByCode(PatCur.SmokingSnoMed);
+				if(smokeCur!=null) {//valid snomed code, set the combo box text to this snomed description
+					comboSmokeStatus.SelectedIndex=-1;
+					comboSmokeStatus.Text=smokeCur.Description;
+				}
+			}
+			#endregion
+			//This takes a while the first time the window loads due to Code Systems.
+			Cursor=Cursors.WaitCursor;
+			FillGridAssessments();
+			FillGridInterventions();
+			Cursor=Cursors.Default;
+			#region ComboAssessmentType
+			_listAssessmentCodes=EhrCodes.GetForValueSetOIDs(new List<string> { "2.16.840.1.113883.3.526.3.1278" },true);//'Tobacco Use Screening' value set
+			//Should only happen if the EHR.dll doesn't exist or the codes in the ehrcode list don't exist in the corresponding table
+			if(_listAssessmentCodes.Count==0) {
+				//disable the tobacco use tab, message box will show if the user tries to select it
+				((Control)tabControlFormMedical.TabPages[tabControlFormMedical.TabPages.IndexOfKey("tabTobaccoUse")]).Enabled=false;
+				return;
+			}
+			_listAssessmentCodes.ForEach(x => comboAssessmentType.Items.Add(x.Description));
+			string mostRecentAssessmentCode="";
+			if(gridAssessments.Rows.Count>1) {
+				//gridAssessments.Rows are tagged with all TobaccoUseAssessed events for the patient ordered by DateTEvent, last is most recent
+				mostRecentAssessmentCode=((EhrMeasureEvent)gridAssessments.Rows[gridAssessments.Rows.Count-1].Tag).CodeValueResult;
+			}
+			//use Math.Max so that if _listAssessmentCodes doesn't contain the mostRecentAssessment code the combobox will default to the first in the list
+			comboAssessmentType.SelectedIndex=Math.Max(0,_listAssessmentCodes.FindIndex(x => x.CodeValue==mostRecentAssessmentCode));
+			#endregion ComboAssessmentType
+			#region ComboTobaccoStatus
+			//list is filled with the EhrCodes for all tobacco user statuses using the CQM value set
+			_listUserCodes=EhrCodes.GetForValueSetOIDs(new List<string> { "2.16.840.1.113883.3.526.3.1170" },true).OrderBy(x => x.Description).ToList();
+			//list is filled with the EhrCodes for all tobacco non-user statuses using the CQM value set
+			_listNonUserCodes=EhrCodes.GetForValueSetOIDs(new List<string> { "2.16.840.1.113883.3.526.3.1189" },true).OrderBy(x => x.Description).ToList();
+			_listRecentTobaccoCodes=EhrCodes.GetForEventTypeByUse(EhrMeasureEventType.TobaccoUseAssessed);
+			//list is filled with any SNOMEDCT codes that are attached to EhrMeasureEvents for the patient that are not in the User and NonUser lists
+			_listCustomTobaccoCodes=new List<EhrCode>();
+			//codeValues is an array of all user and non-user tobacco codes
+			string[] codeValues=_listUserCodes.Concat(_listNonUserCodes).Concat(_listRecentTobaccoCodes).Select(x => x.CodeValue).ToArray();
+			//listEventCodes will contain all unique tobacco codes that are not in the user and non-user lists
+			List<string> listEventCodes=new List<string>();
+			foreach(ODGridRow row in gridAssessments.Rows) {
+				string eventCodeCur=((EhrMeasureEvent)row.Tag).CodeValueResult;
+				if(codeValues.Contains(eventCodeCur) || listEventCodes.Contains(eventCodeCur)) {
+					continue;
+				}
+				listEventCodes.Add(eventCodeCur);
+			}
+			Snomed sCur;
+			foreach(string eventCode in listEventCodes.OrderBy(x => x)) {
+				sCur=Snomeds.GetByCode(eventCode);
+				if(sCur==null) {//don't add invalid SNOMEDCT codes
+					continue;
+				}
+				_listCustomTobaccoCodes.Add(new EhrCode { CodeValue=sCur.SnomedCode,Description=sCur.Description });
+			}
+			_listCustomTobaccoCodes=_listCustomTobaccoCodes.OrderBy(x => x.Description).ToList();
+			//list will contain all of the tobacco status EhrCodes currently in comboTobaccoStatus
+			_listTobaccoStatuses=new List<EhrCode>();
+			//default to all tobacco statuses (custom, user, and non-user) in the status dropdown box
+			radioRecentStatuses.Checked=true;//causes combo box and _listTobaccoStatuses to be filled with all statuses
+			#endregion ComboTobaccoStatus
+			#region ComboInterventionType and ComboInterventionCode
+			//list is filled with EhrCodes for counseling interventions using the CQM value set
+			_listCounselInterventionCodes=EhrCodes.GetForValueSetOIDs(new List<string> { "2.16.840.1.113883.3.526.3.509" },true).OrderBy(x => x.Description).ToList();
+			//list is filled with EhrCodes for medication interventions using the CQM value set
+			_listMedInterventionCodes=EhrCodes.GetForValueSetOIDs(new List<string> { "2.16.840.1.113883.3.526.3.1190" },true).OrderBy(x => x.Description).ToList();
+			_listRecentIntvCodes=EhrCodes.GetForIntervAndMedByUse(InterventionCodeSet.TobaccoCessation,new List<string> { "2.16.840.1.113883.3.526.3.1190" });
+			_listInterventionCodes=new List<EhrCode>();
+			//default to all interventions (couseling and medication) in the intervention dropdown box
+			radioRecentInterventions.Checked=true;//causes combo box and _listInterventionCodes to be filled with all intervention codes
+			#endregion ComboInterventionType and ComboInterventionCode
+			_comboToolTip=new ToolTip() { InitialDelay=1000,ReshowDelay=1000,ShowAlways=true };
+		}
+
+		private void FillGridAssessments() {
+			gridAssessments.BeginUpdate();
+			gridAssessments.Columns.Clear();
+			gridAssessments.Columns.Add(new ODGridColumn("Date",70));
+			gridAssessments.Columns.Add(new ODGridColumn("Type",170));
+			gridAssessments.Columns.Add(new ODGridColumn("Description",170));
+			gridAssessments.Columns.Add(new ODGridColumn("Documentation",170));
+			gridAssessments.Rows.Clear();
+			ODGridRow row;
+			Loinc lCur;
+			Snomed sCur;
+			List<EhrMeasureEvent> listEvents=EhrMeasureEvents.RefreshByType(PatCur.PatNum,EhrMeasureEventType.TobaccoUseAssessed);
+			foreach(EhrMeasureEvent eventCur in listEvents) {
+				row=new ODGridRow();
+				row.Cells.Add(eventCur.DateTEvent.ToShortDateString());
+				lCur=Loincs.GetByCode(eventCur.CodeValueEvent);//TobaccoUseAssessed events can be one of three types, all LOINC codes
+				row.Cells.Add(lCur!=null?lCur.NameLongCommon:eventCur.EventType.ToString());
+				sCur=Snomeds.GetByCode(eventCur.CodeValueResult);
+				row.Cells.Add(sCur!=null?sCur.Description:"");
+				row.Cells.Add(eventCur.MoreInfo);
+				row.Tag=eventCur;
+				gridAssessments.Rows.Add(row);
+			}
+			gridAssessments.EndUpdate();
+		}
+
+		private void FillGridInterventions() {
+			gridInterventions.BeginUpdate();
+			gridInterventions.Columns.Clear();
+			gridInterventions.Columns.Add(new ODGridColumn("Date",70));
+			gridInterventions.Columns.Add(new ODGridColumn("Type",150));
+			gridInterventions.Columns.Add(new ODGridColumn("Description",160));
+			gridInterventions.Columns.Add(new ODGridColumn("Declined",60) { TextAlign=HorizontalAlignment.Center });
+			gridInterventions.Columns.Add(new ODGridColumn("Documentation",140));
+			gridInterventions.Rows.Clear();
+			//build list of rows of CessationInterventions and CessationMedications so we can order the list by date and type before filling the grid
+			List<ODGridRow> listRows=new List<ODGridRow>();
+			ODGridRow row;
+			#region CessationInterventions
+			Cpt cptCur;
+			Snomed sCur;
+			RxNorm rCur;
+			string type;
+			string descript;
+			List<Intervention> listInterventions=Interventions.Refresh(PatCur.PatNum,InterventionCodeSet.TobaccoCessation);
+			foreach(Intervention iCur in listInterventions) {
+				row=new ODGridRow();
+				row.Cells.Add(iCur.DateEntry.ToShortDateString());
+				type=InterventionCodeSet.TobaccoCessation.ToString()+" Counseling";
+				descript="";
+				switch(iCur.CodeSystem) {
+					case "CPT":
+						cptCur=Cpts.GetByCode(iCur.CodeValue);
+						descript=cptCur!=null?cptCur.Description:"";
+						break;
+					case "SNOMEDCT":
+						sCur=Snomeds.GetByCode(iCur.CodeValue);
+						descript=sCur!=null?sCur.Description:"";
+						break;
+					case "RXNORM":
+						//if the user checks the "Patient Declined" checkbox, we enter the tobacco cessation medication as an intervention that was declined
+						type=InterventionCodeSet.TobaccoCessation.ToString()+" Medication";
+						rCur=RxNorms.GetByRxCUI(iCur.CodeValue);
+						descript=rCur!=null?rCur.Description:"";
+						break;
+				}
+				row.Cells.Add(type);
+				row.Cells.Add(descript);
+				row.Cells.Add(iCur.IsPatDeclined?"X":"");
+				row.Cells.Add(iCur.Note);
+				row.Tag=iCur;
+				listRows.Add(row);
+			}
+			#endregion
+			#region CessationMedications
+			//Tobacco Use Cessation Pharmacotherapy Value Set
+			string[] arrayRxCuiStrings=EhrCodes.GetForValueSetOIDs(new List<string> { "2.16.840.1.113883.3.526.3.1190" },true)
+				.Select(x => x.CodeValue).ToArray();
+			//arrayRxCuiStrings will contain 41 RxCui strings for tobacco cessation medications if those exist in the rxnorm table
+			List<MedicationPat> listMedPats=MedicationPats.Refresh(PatCur.PatNum,true).FindAll(x => arrayRxCuiStrings.Contains(x.RxCui.ToString()));
+			foreach(MedicationPat medPatCur in listMedPats) {
+				row=new ODGridRow();
+				List<string> listMedDates=new List<string>();
+				if(medPatCur.DateStart.Year>1880) {
+					listMedDates.Add(medPatCur.DateStart.ToShortDateString());
+				}
+				if(medPatCur.DateStop.Year>1880) {
+					listMedDates.Add(medPatCur.DateStop.ToShortDateString());
+				}
+				if(listMedDates.Count==0) {
+					listMedDates.Add(medPatCur.DateTStamp.ToShortDateString());
+				}
+				row.Cells.Add(listMedDates.Count==0?"":string.Join(" - ",listMedDates));
+				row.Cells.Add(InterventionCodeSet.TobaccoCessation.ToString()+" Medication");
+				row.Cells.Add(RxNorms.GetDescByRxCui(medPatCur.RxCui.ToString()));
+				row.Cells.Add(medPatCur.PatNote);
+				row.Tag=medPatCur;
+				listRows.Add(row);
+			}
+			#endregion
+			listRows.OrderBy(x => PIn.Date(x.Cells[0].Text))//rows ordered by date, oldest first
+				.ThenBy(x => x.Cells[3].Text!="")
+				//interventions at the top, declined med interventions below normal interventions
+				.ThenBy(x => x.Tag.GetType().Name!="Intervention" || ((Intervention)x.Tag).CodeSystem=="RXNORM").ToList()
+				.ForEach(x => gridInterventions.Rows.Add(x));//then add rows to gridInterventions
+			gridInterventions.EndUpdate();
+		}
+
+		private void gridAssessments_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			//we will allow them to change the DateTEvent, but not the status or more info box
+			FormEhrMeasureEventEdit FormM=new FormEhrMeasureEventEdit((EhrMeasureEvent)gridAssessments.Rows[e.Row].Tag);
+			FormM.ShowDialog();
+			FillGridAssessments();
+		}
+
+		private void gridInterventions_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			Object objCur=gridInterventions.Rows[e.Row].Tag;
+			//the intervention grid will be filled with Interventions and MedicationPats, load form accordingly
+			if(objCur is Intervention) {
+				FormInterventionEdit FormI=new FormInterventionEdit();
+				FormI.InterventionCur=(Intervention)objCur;
+				FormI.IsAllTypes=false;
+				FormI.IsSelectionMode=false;
+				FormI.InterventionCur.IsNew=false;
+				FormI.ShowDialog();
+			}
+			else if(objCur is MedicationPat) {
+				FormMedPat FormMP=new FormMedPat();
+				FormMP.MedicationPatCur=(MedicationPat)objCur;
+				FormMP.IsNew=false;
+				FormMP.ShowDialog();
+			}
+			FillGridInterventions();
+		}
+
+		private void comboSmokeStatus_SelectionChangeCommitted(object sender,EventArgs e) {
+			if(comboSmokeStatus.SelectedIndex<1) {//If None or text set to other selected Snomed code so -1, do not create an event
+				return;
+			}
+			//Insert measure event if one does not already exist for this date
+			DateTime dateTEntered=PIn.DateT(textDateAssessed.Text);//will be set to DateTime.Now when form loads
+			EhrMeasureEvent eventCur;
+			foreach(ODGridRow row in gridAssessments.Rows) {
+				eventCur=(EhrMeasureEvent)row.Tag;
+				if(eventCur.DateTEvent.Date==dateTEntered.Date) {//one already exists for this date, don't auto insert event
+					return;
+				}
+			}
+			//no entry for the date entered, so insert one
+			eventCur=new EhrMeasureEvent();
+			eventCur.DateTEvent=dateTEntered;
+			eventCur.EventType=EhrMeasureEventType.TobaccoUseAssessed;
+			eventCur.PatNum=PatCur.PatNum;
+			eventCur.CodeValueEvent=_listAssessmentCodes[comboAssessmentType.SelectedIndex].CodeValue;
+			eventCur.CodeSystemEvent=_listAssessmentCodes[comboAssessmentType.SelectedIndex].CodeSystem;
+			//SelectedIndex guaranteed to be greater than 0
+			eventCur.CodeValueResult=((SmokingSnoMed)comboSmokeStatus.SelectedIndex-1).ToString().Substring(1);
+			eventCur.CodeSystemResult="SNOMEDCT";//only allow SNOMEDCT codes for now.
+			eventCur.MoreInfo="";
+			EhrMeasureEvents.Insert(eventCur);
+			FillGridAssessments();
+		}
+
+		private void comboTobaccoStatus_SelectionChangeCommitted(object sender,EventArgs e) {
+			if(comboTobaccoStatus.SelectedIndex<_listTobaccoStatuses.Count) {//user selected a code in the list, just return
+				return;
+			}
+			if(comboTobaccoStatus.SelectedIndex==_listTobaccoStatuses.Count
+				&& !MsgBox.Show(this,MsgBoxButtons.OKCancel,"Selecting a code that is not in the recommended list of codes may make "
+					+"it more difficult to meet CQM's."))
+			{
+				comboTobaccoStatus.SelectedIndex=-1;
+				return;
+			}
+			//user wants to select a custom status from the SNOMED list
+			FormSnomeds FormS=new FormSnomeds();
+			FormS.IsSelectionMode=true;
+			FormS.ShowDialog();
+			if(FormS.DialogResult!=DialogResult.OK) {
+				comboTobaccoStatus.SelectedIndex=-1;
+				return;
+			}
+			if(!_listTobaccoStatuses.Any(x => x.CodeValue==FormS.SelectedSnomed.SnomedCode)) {
+				_listCustomTobaccoCodes.Add(new EhrCode() { CodeValue=FormS.SelectedSnomed.SnomedCode,Description=FormS.SelectedSnomed.Description });
+				_listCustomTobaccoCodes=_listCustomTobaccoCodes.OrderBy(x => x.Description).ToList();
+				radioTobaccoStatuses_CheckedChanged(new[] { radioUserStatuses,radioNonUserStatuses }.Where(x => x.Checked)
+					.DefaultIfEmpty(radioAllStatuses).FirstOrDefault()
+					,new EventArgs());//refills drop down with newly added custom code
+			}
+			//selected code guaranteed to exist in the drop down at this point
+			comboTobaccoStatus.Items.Clear();
+			comboTobaccoStatus.Items.AddRange(_listTobaccoStatuses.Select(x => x.Description).ToArray());
+			comboTobaccoStatus.Items.Add(Lan.g(this,"Choose from all SNOMED CT codes")+"...");
+			comboTobaccoStatus.SelectedIndex=_listTobaccoStatuses.FindIndex(x => x.CodeValue==FormS.SelectedSnomed.SnomedCode);//add 1 for ...choose from
+		}
+
+		private void comboInterventionCode_SelectionChangeCommitted(object sender,EventArgs e) {
+			if(comboInterventionCode.SelectedIndex>=0) {
+				_comboToolTip.SetToolTip(comboInterventionCode,_listInterventionCodes[comboInterventionCode.SelectedIndex].Description);
+			}
+		}
+
+		///<summary>Fill comboInterventionCode with counseling and medication intervention codes using _listCounselInterventionCodes
+		///and/or _listMedInterventionCodes depending on which radio button is selected.</summary>
+		private void radioInterventions_CheckedChanged(object sender,EventArgs e) {
+			RadioButton radButCur=(RadioButton)sender;
+			if(!radButCur.Checked) {//if not checked, do nothing, caused by another radio button being checked
+				return;
+			}
+			_listInterventionCodes.Clear();
+			if(radButCur.Name==radioRecentInterventions.Name) {
+				_listInterventionCodes.AddRange(_listRecentIntvCodes);
+			}
+			if(new[] { radioAllInterventions.Name,radioCounselInterventions.Name }.Contains(radButCur.Name)) {
+				_listInterventionCodes.AddRange(_listCounselInterventionCodes);
+			}
+			if(new[] { radioAllInterventions.Name,radioMedInterventions.Name }.Contains(radButCur.Name)) {
+				_listInterventionCodes.AddRange(_listMedInterventionCodes);
+			}
+			_listInterventionCodes=_listInterventionCodes.OrderBy(x => x.Description).ToList();
+			comboInterventionCode.Items.Clear();
+			//this is the max width of the description, minus the width of "..." and, if > 30 items in the list, the width of the vertical scroll bar
+			int maxItemWidth=comboInterventionCode.DropDownWidth-(_listInterventionCodes.Count>30?25:8);//8 for just "...", 25 for scroll bar plus "..."
+			foreach(EhrCode code in _listInterventionCodes) {
+				if(TextRenderer.MeasureText(code.Description,comboInterventionCode.Font).Width<comboInterventionCode.DropDownWidth-15
+					|| code.Description.Length<3)
+				{
+					comboInterventionCode.Items.Add(code.Description);
+					continue;
+				}
+				StringBuilder abbrDesc=new StringBuilder();
+				foreach(char c in code.Description) {
+					if(TextRenderer.MeasureText(abbrDesc.ToString()+c,comboInterventionCode.Font).Width<maxItemWidth) {
+						abbrDesc.Append(c);
+						continue;
+					}
+					comboInterventionCode.Items.Add(abbrDesc.ToString()+"...");
+					break;
+				}
+			}
+		}
+
+		///<summary>Fill comboTobaccoStatus with user and non-user tobacco status codes using _listUserCodes and/or _listNonUserCodes
+		///depending on which radio button is selected.</summary>
+		private void radioTobaccoStatuses_CheckedChanged(object sender,EventArgs e) {
+			RadioButton radButCur=(RadioButton)sender;
+			if(!radButCur.Checked) {
+				return;
+			}
+			_listTobaccoStatuses.Clear();
+			if(_listCustomTobaccoCodes.Count>0) {
+				_listTobaccoStatuses.AddRange(_listCustomTobaccoCodes);
+			}
+			if(radButCur.Name==radioRecentStatuses.Name) {
+				_listTobaccoStatuses.AddRange(_listRecentTobaccoCodes);
+			}
+			else {
+				if(new[] { radioAllStatuses.Name,radioUserStatuses.Name }.Contains(radButCur.Name)) {
+					_listTobaccoStatuses.AddRange(_listUserCodes);
+				}
+				if(new[] { radioAllStatuses.Name,radioNonUserStatuses.Name }.Contains(radButCur.Name)) {
+					_listTobaccoStatuses.AddRange(_listNonUserCodes);
+				}
+			}
+			_listTobaccoStatuses=_listTobaccoStatuses.OrderBy(x => x.Description).ToList();
+			comboTobaccoStatus.Items.Clear();
+			comboTobaccoStatus.Items.AddRange(_listTobaccoStatuses.Select(x => x.Description).ToArray());
+			comboTobaccoStatus.Items.Add(Lan.g(this,"Choose from all SNOMED CT codes")+"...");
+		}
+
+		///<summary>If the LOINC table has not been imported, the Tobacco Use tab is disabled, but we want it to remain visible like the other EHR show
+		///feature enabled tabs.  But since the combo boxes etc. cannot be filled without the LOINC table, don't allow selecting the tab.</summary>
+		private void tabControlFormMedical_Selecting(object sender,TabControlCancelEventArgs e) {
+			if(!((Control)e.TabPage).Enabled) {
+				e.Cancel=true;
+				MsgBox.Show(this,"The codes used for Tobacco Use Screening assessments do not exist in the LOINC table in your database.  You must run the "
+					+"Code System Importer tool in Setup | Chart | EHR to import this code set before accessing the Tobacco Use Tab.");
+			}
+		}
+
+		private void butAssessed_Click(object sender,EventArgs e) {
+			if(comboTobaccoStatus.SelectedIndex<0 || comboTobaccoStatus.SelectedIndex>=_listTobaccoStatuses.Count) {
+				MsgBox.Show(this,"You must select a tobacco status.");
+				return;
+			}
+			DateTime dateTEntered=PIn.DateT(textDateAssessed.Text);
+			EhrMeasureEvent meas=new EhrMeasureEvent();
+			meas.DateTEvent=dateTEntered;
+			meas.EventType=EhrMeasureEventType.TobaccoUseAssessed;
+			meas.PatNum=PatCur.PatNum;
+			meas.CodeValueEvent=_listAssessmentCodes[comboAssessmentType.SelectedIndex].CodeValue;
+			meas.CodeSystemEvent=_listAssessmentCodes[comboAssessmentType.SelectedIndex].CodeSystem;
+			meas.CodeValueResult=_listTobaccoStatuses[comboTobaccoStatus.SelectedIndex].CodeValue;
+			meas.CodeSystemResult="SNOMEDCT";//only allow SNOMEDCT codes for now.
+			meas.MoreInfo="";
+			EhrMeasureEvents.Insert(meas);
+			comboTobaccoStatus.SelectedIndex=-1;
+			FillGridAssessments();
+		}
+
+		private void butIntervention_Click(object sender,EventArgs e) {
+			if(comboInterventionCode.SelectedIndex<0) {
+				MsgBox.Show(this,"You must select an intervention code.");
+				return;
+			}
+			EhrCode iCodeCur=_listInterventionCodes[comboInterventionCode.SelectedIndex];
+			DateTime dateCur=PIn.Date(textDateIntervention.Text);
+			if(iCodeCur.CodeSystem=="RXNORM" && !checkPatientDeclined.Checked) {//if patient declines the medication, enter as a declined intervention
+				//codeVal will be RxCui of medication, see if it already exists in Medication table
+				Medication medCur=Medications.GetMedicationFromDbByRxCui(PIn.Long(iCodeCur.CodeValue));
+				if(medCur==null) {//no med with this RxCui, create one
+					medCur=new Medication();
+					Medications.Insert(medCur);//so that we will have the primary key
+					medCur.GenericNum=medCur.MedicationNum;
+					medCur.RxCui=PIn.Long(iCodeCur.CodeValue);
+					medCur.MedName=RxNorms.GetDescByRxCui(iCodeCur.CodeValue);
+					Medications.Update(medCur);
+					Medications.Refresh();//refresh cache to include new medication
+				}
+				MedicationPat medPatCur=new MedicationPat();
+				medPatCur.PatNum=PatCur.PatNum;
+				medPatCur.ProvNum=PatCur.PriProv;
+				medPatCur.MedicationNum=medCur.MedicationNum;
+				medPatCur.RxCui=medCur.RxCui;
+				medPatCur.DateStart=dateCur;
+				FormMedPat FormMP=new FormMedPat();
+				FormMP.MedicationPatCur=medPatCur;
+				FormMP.IsNew=true;
+				FormMP.ShowDialog();
+				if(FormMP.DialogResult!=DialogResult.OK) {
+					return;
+				}
+				if(FormMP.MedicationPatCur.DateStart.Date<dateCur.AddMonths(-6).Date || FormMP.MedicationPatCur.DateStart.Date>dateCur.Date) {
+					MsgBox.Show(this,"The medication order just entered is not within the 6 months prior to the date of this intervention.  You can modify the "
+						+"date of the medication order in the patient's medical history section.");
+				}
+			}
+			else {
+				Intervention iCur=new Intervention();
+				iCur.PatNum=PatCur.PatNum;
+				iCur.ProvNum=PatCur.PriProv;
+				iCur.DateEntry=dateCur;
+				iCur.CodeValue=iCodeCur.CodeValue;
+				iCur.CodeSystem=iCodeCur.CodeSystem;
+				iCur.CodeSet=InterventionCodeSet.TobaccoCessation;
+				iCur.IsPatDeclined=checkPatientDeclined.Checked;
+				Interventions.Insert(iCur);
+			}
+			comboInterventionCode.SelectedIndex=-1;
+			FillGridInterventions();
+		}
+		#endregion Tobacco Use Tab
 
 		private void butOK_Click(object sender, System.EventArgs e) {
-			Patient PatOld=PatCur.Copy();
+			if(comboSmokeStatus.SelectedIndex==0) {//None
+				PatCur.SmokingSnoMed="";
+			}
+			else {
+				PatCur.SmokingSnoMed=((SmokingSnoMed)comboSmokeStatus.SelectedIndex-1).ToString().Substring(1);
+			}
 			PatCur.Premed=checkPremed.Checked;
 			PatCur.MedUrgNote=textMedUrgNote.Text;
-			Patients.Update(PatCur,PatOld);
+			Patients.Update(PatCur,_patOld);
 			PatientNoteCur.Medical=textMedical.Text;
 			PatientNoteCur.Service=textService.Text;
 			PatientNoteCur.MedicalComp=textMedicalComp.Text;
@@ -1414,21 +2399,6 @@ namespace OpenDental{
 		private void butCancel_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
-
-
-		
-
-	
-
-		
-
-		
-
-		
-
-	
-
-		
 
 	}
 }

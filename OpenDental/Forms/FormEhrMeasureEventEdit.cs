@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using OpenDentBusiness;
 
@@ -31,6 +32,18 @@ namespace OpenDental {
 				if(sCur!=null) {
 					textResult.Text=sCur.Description;//Examples: Non-smoker (finding) or Smoker (finding)
 				}
+				//only visible if event is a tobacco use assessment
+				textTobaccoDesireToQuit.Visible=true;
+				textTobaccoDuration.Visible=true;
+				textTobaccoStartDate.Visible=true;
+				labelTobaccoDesireToQuit.Visible=true;
+				labelTobaccoDesireScale.Visible=true;
+				labelTobaccoStartDate.Visible=true;
+				textTobaccoDesireToQuit.Text=_measureEventCur.TobaccoCessationDesire.ToString();
+				if(_measureEventCur.DateStartTobacco.Year>=1880) {
+					textTobaccoStartDate.Text=_measureEventCur.DateStartTobacco.ToShortDateString();
+				}
+				CalcTobaccoDuration();
 			}
 			else {
 				//Currently, the TobaccoUseAssessed events are the only ones that can be deleted.
@@ -40,6 +53,43 @@ namespace OpenDental {
 				textType.Text=_measureEventCur.EventType.ToString();
 			}
 			textMoreInfo.Text=_measureEventCur.MoreInfo;
+		}
+
+		public void CalcTobaccoDuration() {
+			textTobaccoDuration.Text="";
+			if(textTobaccoStartDate.errorProvider1.GetError(textTobaccoStartDate)!="") {
+				return;
+			}
+			DateTime startDate=PIn.Date(textTobaccoStartDate.Text);
+			if(startDate>DateTime.Today || startDate.Year<1880) {
+				return;
+			}
+			int years=DateTime.Now.Year-startDate.Year;
+			int months=0;
+			if(startDate.Month<DateTime.Now.Month) {//startdate anniversary was in a previous
+				months=DateTime.Now.Month-startDate.Month;
+				if(DateTime.Now.Day>startDate.Day) {//start month is before current month, and start day is before current day, don't count current month
+					months--;
+				}
+			}
+			else if(startDate.Month==DateTime.Now.Month) {//startdate anniversary this month
+				if(startDate.Day>DateTime.Now.Day) {//start date anniversary hasn't happened this month, subtract a year and months=11
+					years--;
+					months=11;
+				}
+			}
+			else {//startdate anniversary later in the year
+				years--;
+				months=12-(startDate.Month-DateTime.Now.Month);
+				if(startDate.Day>DateTime.Now.Day) {
+					months--;//haven't reached the day of the month of the startdate, don't count the current month yet
+				}
+			}
+			textTobaccoDuration.Text=years.ToString()+"y "+months.ToString()+"m";
+		}
+
+		private void textTobaccoStartDate_Validated(object sender,EventArgs e) {
+			CalcTobaccoDuration();
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {
@@ -57,30 +107,41 @@ namespace OpenDental {
 
 		private void butOK_Click(object sender,EventArgs e) {
 			//inserts never happen here.  Only updates.
-			if(textDateTime.errorProvider1.GetError(textDateTime)!="") {
-				MsgBox.Show(this,"Please enter a valid date time.");
-				return;
-			}
-			string logEntry="";
-			if(_measureEventCur.MoreInfo!=textMoreInfo.Text) {
-				logEntry+=Lan.g(this,"EHR Measure Event was edited.  More Info was changed.")+"  ";
-			}
 			DateTime dateTEvent=PIn.DateT(textDateTime.Text);
-			if(_measureEventCur.DateTEvent!=dateTEvent) {
-				if(logEntry=="") {
-					logEntry+=Lan.g(this,"EHR Measure Event was edited.")+"  ";
-				}
-				logEntry+=Lan.g(this,"Date was changed from")+": "+_measureEventCur.DateTEvent.ToString()+" "
-					+Lan.g(this,"to")+": "+dateTEvent.ToString();
-			}
-			if(logEntry=="") {//No changes occurred.
-				DialogResult=DialogResult.OK;
+			if(dateTEvent==DateTime.MinValue) {
+				MsgBox.Show(this,"Please enter a valid date time.");//because this must always be valid
 				return;
 			}
-			SecurityLogs.MakeLogEntry(Permissions.EhrMeasureEventEdit,_measureEventCur.PatNum,logEntry);
-			_measureEventCur.MoreInfo=textMoreInfo.Text;
-			_measureEventCur.DateTEvent=dateTEvent;
-			if(_measureEventCur.IsNew) {
+			if(textTobaccoStartDate.Visible //only visible for tobacco use assessments
+				&& textTobaccoStartDate.errorProvider1.GetError(textTobaccoStartDate)!="")
+			{
+				MsgBox.Show(this,"Please fix data entry errors first.");
+				return;
+			}
+			if(textTobaccoDesireToQuit.Visible //only visible for tobacco use assessments
+				&& textTobaccoDesireToQuit.errorProvider1.GetError(textTobaccoDesireToQuit)!="")
+			{
+				MsgBox.Show(this,"Please fix data entry errors first.");
+				return;
+			}
+			List<string> listLogEdits=new List<string>();
+			if(_measureEventCur.MoreInfo!=textMoreInfo.Text) {
+				listLogEdits.Add(Lan.g(this,"More Info was changed."));
+				_measureEventCur.MoreInfo=textMoreInfo.Text;
+			}
+			if(_measureEventCur.DateTEvent!=dateTEvent) {
+				listLogEdits.Add(Lan.g(this,"Date was changed from")+": "+_measureEventCur.DateTEvent.ToString()+" "+Lan.g(this,"to")+": "+dateTEvent.ToString()+".");
+				_measureEventCur.DateTEvent=dateTEvent;
+			}
+			if(textTobaccoStartDate.Visible && textTobaccoDesireToQuit.Visible) {
+				_measureEventCur.DateStartTobacco=PIn.Date(textTobaccoStartDate.Text);
+				_measureEventCur.TobaccoCessationDesire=PIn.Byte(textTobaccoDesireToQuit.Text);
+			}
+			if(listLogEdits.Count>0) {
+				listLogEdits.Insert(0,Lan.g(this,"EHR Measure Event was edited."));
+				SecurityLogs.MakeLogEntry(Permissions.EhrMeasureEventEdit,_measureEventCur.PatNum,string.Join("  ",listLogEdits));
+			}
+			if(_measureEventCur.IsNew) {//should never happen, only updates happen here
 				EhrMeasureEvents.Insert(_measureEventCur);
 			}
 			else {
@@ -92,12 +153,6 @@ namespace OpenDental {
 		private void butCancel_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
-
-
-
-
-	
-
 
 	}
 }

@@ -463,6 +463,30 @@ namespace OpenDentBusiness {
 						+"VALUES ((SELECT MAX(DefNum)+1 FROM definition),"+maxOrder+",'Canceled Appointment Procedure','"+color+"')";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE ehrmeasureevent ADD TobaccoCessationDesire tinyint unsigned NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE ehrmeasureevent ADD TobaccoCessationDesire number(3)";
+					Db.NonQ(command);
+					command="UPDATE ehrmeasureevent SET TobaccoCessationDesire = 0 WHERE TobaccoCessationDesire IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE ehrmeasureevent MODIFY TobaccoCessationDesire NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE ehrmeasureevent ADD DateStartTobacco date NOT NULL DEFAULT '0001-01-01'";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE ehrmeasureevent ADD DateStartTobacco date";
+					Db.NonQ(command);
+					command="UPDATE ehrmeasureevent SET DateStartTobacco = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE DateStartTobacco IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE ehrmeasureevent MODIFY DateStartTobacco NOT NULL";
+					Db.NonQ(command);
+				}
 				
 
 

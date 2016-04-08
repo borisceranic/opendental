@@ -28,6 +28,10 @@ namespace OpenDentBusiness {
 		public string CodeSystemResult;
 		///<summary>A foreign key to a table associated with the EventType.  0 indicates not in use.  Used to properly count denominators for specific measure types.</summary>
 		public long FKey;
+		///<summary>The date the patient started using tobacco.</summary>
+		public DateTime DateStartTobacco;
+		///<summary>How eager a tobacco user is to quit using tobacco.  Scale of 1-10.</summary>
+		public byte TobaccoCessationDesire;
 
 
 		///<summary></summary>

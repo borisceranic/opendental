@@ -4795,6 +4795,10 @@ namespace OpenDental {
 		private void Tool_EHR_Click(bool onLoadShowOrders) {
 			//Quarterly key check was removed from here so that any customer can use EHR tools
 			//But we require a EHR subscription for them to obtain their MU reports.
+			if(Providers.GetProv(PatCur.PriProv)==null) {
+				MsgBox.Show(this,"Please set the patient's primary provider first.");
+				return;
+			}
 			FormEHR FormE = new FormEHR();
 			FormE.PatNum=PatCur.PatNum;
 			FormE.PatNotCur=PatientNoteCur;
@@ -5231,7 +5235,7 @@ namespace OpenDental {
 						cell.Bold=YN.Yes;
 						row.Cells.Add(cell);
 						row.ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor;
-						row.Tag="med";
+						row.Tag="tabAllergies";
 						if(allergyList.Count>0) {
 							row.Cells.Add("");
 							gridPtInfo.Rows.Add(row);
@@ -5247,7 +5251,7 @@ namespace OpenDental {
 							row.Cells.Add(cell);
 							row.Cells.Add(allergyList[i].Reaction);
 							row.ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor;
-							row.Tag="med";
+							row.Tag="tabAllergies";
 							if(i!=allergyList.Count-1) {
 								gridPtInfo.Rows.Add(row);
 							}
@@ -5342,14 +5346,14 @@ namespace OpenDental {
 						cell.Bold=YN.Yes;
 						row.Cells.Add(cell);
 						row.ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor;
-						row.Tag="med";
+						row.Tag="tabMedical";
 						break;
 					#endregion Med Urgent
 					#region Medical Summary
 					case "Medical Summary":
 						row.Cells.Add(PatientNoteCur.Medical);
 						row.ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor;
-						row.Tag="med";
+						row.Tag="tabMedical";
 						break;
 					#endregion Medical Summary
 					#region Medications
@@ -5367,7 +5371,7 @@ namespace OpenDental {
 						cell.Bold=YN.Yes;
 						row.Cells.Add(cell);
 						row.ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor;
-						row.Tag="med";
+						row.Tag="tabMedications";
 						if(medList.Count>0) {
 							row.Cells.Add("");
 							gridPtInfo.Rows.Add(row);
@@ -5400,7 +5404,7 @@ namespace OpenDental {
 							}
 							row.Cells.Add(text);
 							row.ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor;
-							row.Tag="med";
+							row.Tag="tabMedications";
 							if(i!=medList.Count-1) {
 								gridPtInfo.Rows.Add(row);
 							}
@@ -5463,7 +5467,7 @@ namespace OpenDental {
 							cell.Bold=YN.Yes;
 							row.Cells.Add(cell);
 							row.ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor;
-							row.Tag="med";
+							row.Tag="tabMedical";
 							gridPtInfo.Rows.Add(row);
 						}
 						break;
@@ -5500,7 +5504,7 @@ namespace OpenDental {
 						cell.Bold=YN.Yes;
 						row.Cells.Add(cell);
 						row.ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor;
-						row.Tag="med";
+						row.Tag="tabProblems";
 						if(DiseaseList.Count>0) {
 							row.Cells.Add("");
 							gridPtInfo.Rows.Add(row);
@@ -5527,7 +5531,7 @@ namespace OpenDental {
 								//row.Cells.Add(DiseaseList[i].PatNote);//no place to show a pat note
 							}
 							row.ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor;
-							row.Tag="med";
+							row.Tag="tabProblems";
 							if(i!=DiseaseList.Count-1) {
 								gridPtInfo.Rows.Add(row);
 							}
@@ -5655,7 +5659,7 @@ namespace OpenDental {
 					case "Service Notes":
 						row.Cells.Add(PatientNoteCur.Service);
 						row.ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor;
-						row.Tag="med";
+						row.Tag="tabMedical";
 						break;
 					#endregion Service Notes
 					#region Super Head
@@ -5671,21 +5675,24 @@ namespace OpenDental {
 					#endregion Super Head
 					#region Tobacco Use (Patient Smoking Status)
 					case "Tobacco Use":
+						if(!PrefC.GetBool(PrefName.ShowFeatureEhr)) {
+							continue;
+						}
 						List<EhrMeasureEvent> listTobaccoStatuses=EhrMeasureEvents.RefreshByType(PatCur.PatNum,EhrMeasureEventType.TobaccoUseAssessed)
 							.OrderByDescending(x => x.DateTEvent).Take(3).ToList();//only display the last three assessments at most
-						row=new ODGridRow() { ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor,Tag="TobaccoUse" };
+						row=new ODGridRow() { ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor,Tag="tabTobaccoUse" };
 						row.Cells.Add(new ODGridCell(Text=fields[f].Description==""?fields[f].InternalName:fields[f].Description) { Bold=YN.Yes });
-						row.Cells.Add(listTobaccoStatuses.Count>0 ? "" : Lan.g("TableChartPtInfo","none"));
+						row.Cells.Add(listTobaccoStatuses.Count>0?"":Lan.g("TableChartPtInfo","none"));
 						if(listTobaccoStatuses.Count>0) {
 							gridPtInfo.Rows.Add(row);
 						}
 						Snomed snmCur;
-						for(int i = 0;i<listTobaccoStatuses.Count;i++) {//show the last three tobacco use assessments at most
+						for(int i=0;i<listTobaccoStatuses.Count;i++) {//show the last three tobacco use assessments at most
 							EhrMeasureEvent eCur=listTobaccoStatuses[i];
-							row=new ODGridRow() { ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor,Tag="TobaccoUse" };
+							row=new ODGridRow() { ColorBackG=DefC.Long[(int)DefCat.MiscColors][3].ItemColor,Tag="tabTobaccoUse" };
 							snmCur=Snomeds.GetByCode(eCur.CodeValueResult);
-							row.Cells.Add(snmCur!=null ? snmCur.Description : "");
-							row.Cells.Add(eCur.DateTEvent.ToShortDateString()+(eCur.MoreInfo=="" ? "" : (" - "+eCur.MoreInfo)));
+							row.Cells.Add(snmCur!=null?snmCur.Description:"");
+							row.Cells.Add(eCur.DateTEvent.ToShortDateString()+(eCur.MoreInfo==""?"":(" - "+eCur.MoreInfo)));
 							if(i==listTobaccoStatuses.Count-1) {
 								break;//don't add last row here, handled outside of switch statement
 							}
@@ -5696,7 +5703,8 @@ namespace OpenDental {
 				}
 				if(fields[f].InternalName=="PatFields"
 					|| fields[f].InternalName=="Premedicate"
-					|| fields[f].InternalName=="Registration Keys") {
+					|| fields[f].InternalName=="Registration Keys")
+				{
 					//For fields that might have zero rows, we can't add the row here.  Adding rows is instead done in the case clause.
 					//But some fields that are based on lists will always have one row, even if there are no items in the list.
 					//Do not add those kinds here.
@@ -9695,8 +9703,8 @@ namespace OpenDental {
 				return;
 			}
 			if(gridPtInfo.Rows[e.Row].Tag!=null) {
-				if(gridPtInfo.Rows[e.Row].Tag.ToString()=="med") {
-					FormMedical FormM=new FormMedical(PatientNoteCur,PatCur);
+				if(new[] { "tabMedical","tabProblems","tabMedications","tabAllergies","tabTobaccoUse" }.Contains(gridPtInfo.Rows[e.Row].Tag.ToString())) {
+					FormMedical FormM=new FormMedical(PatientNoteCur,PatCur,gridPtInfo.Rows[e.Row].Tag.ToString());
 					FormM.ShowDialog();
 					ModuleSelected(PatCur.PatNum);
 					return;
@@ -9765,17 +9773,6 @@ namespace OpenDental {
 				}
 				if(gridPtInfo.Rows[e.Row].Tag.ToString()=="Broken Appts") {					
 					return;//This row is just for display; it can't be edited.
-				}
-				if(gridPtInfo.Rows[e.Row].Tag.ToString()=="TobaccoUse") {
-					FormEhrPatientSmoking FormPS=new FormEhrPatientSmoking();
-					FormPS.PatCur=PatCur;
-					FormPS.ShowDialog();
-					if(FormPS.DialogResult==DialogResult.OK) {
-						PatCur=Patients.GetPat(PatCur.PatNum);//patient's smoke status may have been updated, refresh from db
-					}
-					//fill patient info whether DialogResult.OK or Cancel, since assessments may have been inserted/updated even if the user presses cancel
-					FillPtInfo();
-					return;
 				}
 				if(gridPtInfo.Rows[e.Row].Tag.GetType()==typeof(CustRefEntry)) {
 					FormReferenceEntryEdit FormRE=new FormReferenceEntryEdit((CustRefEntry)gridPtInfo.Rows[e.Row].Tag);

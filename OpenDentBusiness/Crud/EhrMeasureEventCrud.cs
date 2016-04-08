@@ -46,16 +46,18 @@ namespace OpenDentBusiness.Crud{
 			EhrMeasureEvent ehrMeasureEvent;
 			foreach(DataRow row in table.Rows) {
 				ehrMeasureEvent=new EhrMeasureEvent();
-				ehrMeasureEvent.EhrMeasureEventNum= PIn.Long  (row["EhrMeasureEventNum"].ToString());
-				ehrMeasureEvent.DateTEvent        = PIn.DateT (row["DateTEvent"].ToString());
-				ehrMeasureEvent.EventType         = (OpenDentBusiness.EhrMeasureEventType)PIn.Int(row["EventType"].ToString());
-				ehrMeasureEvent.PatNum            = PIn.Long  (row["PatNum"].ToString());
-				ehrMeasureEvent.MoreInfo          = PIn.String(row["MoreInfo"].ToString());
-				ehrMeasureEvent.CodeValueEvent    = PIn.String(row["CodeValueEvent"].ToString());
-				ehrMeasureEvent.CodeSystemEvent   = PIn.String(row["CodeSystemEvent"].ToString());
-				ehrMeasureEvent.CodeValueResult   = PIn.String(row["CodeValueResult"].ToString());
-				ehrMeasureEvent.CodeSystemResult  = PIn.String(row["CodeSystemResult"].ToString());
-				ehrMeasureEvent.FKey              = PIn.Long  (row["FKey"].ToString());
+				ehrMeasureEvent.EhrMeasureEventNum    = PIn.Long  (row["EhrMeasureEventNum"].ToString());
+				ehrMeasureEvent.DateTEvent            = PIn.DateT (row["DateTEvent"].ToString());
+				ehrMeasureEvent.EventType             = (OpenDentBusiness.EhrMeasureEventType)PIn.Int(row["EventType"].ToString());
+				ehrMeasureEvent.PatNum                = PIn.Long  (row["PatNum"].ToString());
+				ehrMeasureEvent.MoreInfo              = PIn.String(row["MoreInfo"].ToString());
+				ehrMeasureEvent.CodeValueEvent        = PIn.String(row["CodeValueEvent"].ToString());
+				ehrMeasureEvent.CodeSystemEvent       = PIn.String(row["CodeSystemEvent"].ToString());
+				ehrMeasureEvent.CodeValueResult       = PIn.String(row["CodeValueResult"].ToString());
+				ehrMeasureEvent.CodeSystemResult      = PIn.String(row["CodeSystemResult"].ToString());
+				ehrMeasureEvent.FKey                  = PIn.Long  (row["FKey"].ToString());
+				ehrMeasureEvent.DateStartTobacco      = PIn.Date  (row["DateStartTobacco"].ToString());
+				ehrMeasureEvent.TobaccoCessationDesire= PIn.Byte  (row["TobaccoCessationDesire"].ToString());
 				retVal.Add(ehrMeasureEvent);
 			}
 			return retVal;
@@ -77,6 +79,8 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("CodeValueResult");
 			table.Columns.Add("CodeSystemResult");
 			table.Columns.Add("FKey");
+			table.Columns.Add("DateStartTobacco");
+			table.Columns.Add("TobaccoCessationDesire");
 			foreach(EhrMeasureEvent ehrMeasureEvent in listEhrMeasureEvents) {
 				table.Rows.Add(new object[] {
 					POut.Long  (ehrMeasureEvent.EhrMeasureEventNum),
@@ -89,6 +93,8 @@ namespace OpenDentBusiness.Crud{
 					            ehrMeasureEvent.CodeValueResult,
 					            ehrMeasureEvent.CodeSystemResult,
 					POut.Long  (ehrMeasureEvent.FKey),
+					POut.DateT (ehrMeasureEvent.DateStartTobacco,false),
+					POut.Byte  (ehrMeasureEvent.TobaccoCessationDesire),
 				});
 			}
 			return table;
@@ -129,7 +135,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="EhrMeasureEventNum,";
 			}
-			command+="DateTEvent,EventType,PatNum,MoreInfo,CodeValueEvent,CodeSystemEvent,CodeValueResult,CodeSystemResult,FKey) VALUES(";
+			command+="DateTEvent,EventType,PatNum,MoreInfo,CodeValueEvent,CodeSystemEvent,CodeValueResult,CodeSystemResult,FKey,DateStartTobacco,TobaccoCessationDesire) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(ehrMeasureEvent.EhrMeasureEventNum)+",";
 			}
@@ -142,7 +148,9 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(ehrMeasureEvent.CodeSystemEvent)+"',"
 				+"'"+POut.String(ehrMeasureEvent.CodeValueResult)+"',"
 				+"'"+POut.String(ehrMeasureEvent.CodeSystemResult)+"',"
-				+    POut.Long  (ehrMeasureEvent.FKey)+")";
+				+    POut.Long  (ehrMeasureEvent.FKey)+","
+				+    POut.Date  (ehrMeasureEvent.DateStartTobacco)+","
+				+    POut.Byte  (ehrMeasureEvent.TobaccoCessationDesire)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -175,7 +183,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="EhrMeasureEventNum,";
 			}
-			command+="DateTEvent,EventType,PatNum,MoreInfo,CodeValueEvent,CodeSystemEvent,CodeValueResult,CodeSystemResult,FKey) VALUES(";
+			command+="DateTEvent,EventType,PatNum,MoreInfo,CodeValueEvent,CodeSystemEvent,CodeValueResult,CodeSystemResult,FKey,DateStartTobacco,TobaccoCessationDesire) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(ehrMeasureEvent.EhrMeasureEventNum)+",";
 			}
@@ -188,7 +196,9 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.String(ehrMeasureEvent.CodeSystemEvent)+"',"
 				+"'"+POut.String(ehrMeasureEvent.CodeValueResult)+"',"
 				+"'"+POut.String(ehrMeasureEvent.CodeSystemResult)+"',"
-				+    POut.Long  (ehrMeasureEvent.FKey)+")";
+				+    POut.Long  (ehrMeasureEvent.FKey)+","
+				+    POut.Date  (ehrMeasureEvent.DateStartTobacco)+","
+				+    POut.Byte  (ehrMeasureEvent.TobaccoCessationDesire)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -201,15 +211,17 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one EhrMeasureEvent in the database.</summary>
 		public static void Update(EhrMeasureEvent ehrMeasureEvent){
 			string command="UPDATE ehrmeasureevent SET "
-				+"DateTEvent        =  "+POut.DateT (ehrMeasureEvent.DateTEvent)+", "
-				+"EventType         =  "+POut.Int   ((int)ehrMeasureEvent.EventType)+", "
-				+"PatNum            =  "+POut.Long  (ehrMeasureEvent.PatNum)+", "
-				+"MoreInfo          = '"+POut.String(ehrMeasureEvent.MoreInfo)+"', "
-				+"CodeValueEvent    = '"+POut.String(ehrMeasureEvent.CodeValueEvent)+"', "
-				+"CodeSystemEvent   = '"+POut.String(ehrMeasureEvent.CodeSystemEvent)+"', "
-				+"CodeValueResult   = '"+POut.String(ehrMeasureEvent.CodeValueResult)+"', "
-				+"CodeSystemResult  = '"+POut.String(ehrMeasureEvent.CodeSystemResult)+"', "
-				+"FKey              =  "+POut.Long  (ehrMeasureEvent.FKey)+" "
+				+"DateTEvent            =  "+POut.DateT (ehrMeasureEvent.DateTEvent)+", "
+				+"EventType             =  "+POut.Int   ((int)ehrMeasureEvent.EventType)+", "
+				+"PatNum                =  "+POut.Long  (ehrMeasureEvent.PatNum)+", "
+				+"MoreInfo              = '"+POut.String(ehrMeasureEvent.MoreInfo)+"', "
+				+"CodeValueEvent        = '"+POut.String(ehrMeasureEvent.CodeValueEvent)+"', "
+				+"CodeSystemEvent       = '"+POut.String(ehrMeasureEvent.CodeSystemEvent)+"', "
+				+"CodeValueResult       = '"+POut.String(ehrMeasureEvent.CodeValueResult)+"', "
+				+"CodeSystemResult      = '"+POut.String(ehrMeasureEvent.CodeSystemResult)+"', "
+				+"FKey                  =  "+POut.Long  (ehrMeasureEvent.FKey)+", "
+				+"DateStartTobacco      =  "+POut.Date  (ehrMeasureEvent.DateStartTobacco)+", "
+				+"TobaccoCessationDesire=  "+POut.Byte  (ehrMeasureEvent.TobaccoCessationDesire)+" "
 				+"WHERE EhrMeasureEventNum = "+POut.Long(ehrMeasureEvent.EhrMeasureEventNum);
 			Db.NonQ(command);
 		}
@@ -253,6 +265,14 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="FKey = "+POut.Long(ehrMeasureEvent.FKey)+"";
 			}
+			if(ehrMeasureEvent.DateStartTobacco.Date != oldEhrMeasureEvent.DateStartTobacco.Date) {
+				if(command!=""){ command+=",";}
+				command+="DateStartTobacco = "+POut.Date(ehrMeasureEvent.DateStartTobacco)+"";
+			}
+			if(ehrMeasureEvent.TobaccoCessationDesire != oldEhrMeasureEvent.TobaccoCessationDesire) {
+				if(command!=""){ command+=",";}
+				command+="TobaccoCessationDesire = "+POut.Byte(ehrMeasureEvent.TobaccoCessationDesire)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -290,6 +310,12 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			if(ehrMeasureEvent.FKey != oldEhrMeasureEvent.FKey) {
+				return true;
+			}
+			if(ehrMeasureEvent.DateStartTobacco.Date != oldEhrMeasureEvent.DateStartTobacco.Date) {
+				return true;
+			}
+			if(ehrMeasureEvent.TobaccoCessationDesire != oldEhrMeasureEvent.TobaccoCessationDesire) {
 				return true;
 			}
 			return false;

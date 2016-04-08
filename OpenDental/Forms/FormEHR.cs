@@ -177,32 +177,24 @@ namespace OpenDental {
 			if(e.Col==3) {
 				switch(listMu[e.Row].MeasureType) {
 					case EhrMeasureType.ProblemList:
-						FormMed=new FormMedical(PatNotCur,PatCur);
+						FormMed=new FormMedical(PatNotCur,PatCur,"tabProblems");
 						FormMed.ShowDialog();
 						FillGridMu();
-						//ResultOnClosing=EhrFormResult.Medical;
-						//Close();
 						break;
 					case EhrMeasureType.MedicationList:
-						FormMed=new FormMedical(PatNotCur,PatCur);
+						FormMed=new FormMedical(PatNotCur,PatCur,"tabMedications");
 						FormMed.ShowDialog();
 						FillGridMu();
-						//ResultOnClosing=EhrFormResult.Medical;
-						//Close();
 						break;
 					case EhrMeasureType.AllergyList:
-						FormMed=new FormMedical(PatNotCur,PatCur);
+						FormMed=new FormMedical(PatNotCur,PatCur,"tabAllergies");
 						FormMed.ShowDialog();
 						FillGridMu();
-						//ResultOnClosing=EhrFormResult.Medical;
-						//Close();
 						break;
 					case EhrMeasureType.Demographics:
 						FormPatientEdit FormPatEdit=new FormPatientEdit(PatCur, PatFamCur);
 						FormPatEdit.ShowDialog();
 						FillGridMu();
-						//ResultOnClosing=EhrFormResult.PatientEdit;
-						//Close();
 						break;
 					case EhrMeasureType.Education:
 						FormEhrEduResourcesPat FormEDUPat = new FormEhrEduResourcesPat();
@@ -216,8 +208,6 @@ namespace OpenDental {
 						FormPatPort.PatCur=PatCur;
 						FormPatPort.ShowDialog();
 						FillGridMu();
-						//ResultOnClosing=EhrFormResult.Online;
-						//Close();
 						break;
 					case EhrMeasureType.ProvOrderEntry:
 					case EhrMeasureType.CPOE_MedOrdersOnly:
@@ -231,16 +221,13 @@ namespace OpenDental {
 					case EhrMeasureType.VitalSignsBMIOnly:
 					case EhrMeasureType.VitalSignsBPOnly:
 					case EhrMeasureType.VitalSigns2014:
-						FormVitalsigns FormVital=new FormVitalsigns();
-						FormVital.PatNum=PatNum;
-						FormVital.ShowDialog();
+						FormMed=new FormMedical(PatNotCur,PatCur,"tabVitalSigns");
+						FormMed.ShowDialog();
 						FillGridMu();
 						break;
 					case EhrMeasureType.Smoking:
-						FormEhrPatientSmoking FormPS=new FormEhrPatientSmoking();
-						FormPS.PatCur=PatCur;
-						FormPS.ShowDialog();
-						PatCur=Patients.GetPat(PatNum);
+						FormMed=new FormMedical(PatNotCur,PatCur,"tabTobaccoUse");
+						FormMed.ShowDialog();
 						FillGridMu();
 						break;
 					case EhrMeasureType.Lab:
@@ -309,8 +296,6 @@ namespace OpenDental {
 						FormMedRec.PatCur=PatCur;
 						FormMedRec.ShowDialog();
 						FillGridMu();
-						//ResultOnClosing=EhrFormResult.MedReconcile;
-						//Close();
 						break;
 					case EhrMeasureType.SummaryOfCare:
 						FormEhrSummaryOfCare FormSoC=new FormEhrSummaryOfCare();
@@ -328,7 +313,7 @@ namespace OpenDental {
 						//Patient Sent
 						break;
 					case EhrMeasureType.FamilyHistory:
-						FormMed=new FormMedical(PatNotCur,PatCur);
+						FormMed=new FormMedical(PatNotCur,PatCur,"tabFamHealthHist");
 						FormMed.ShowDialog();
 						FillGridMu();
 						break;
