@@ -1,7 +1,9 @@
-﻿using OpenDental.UI;
+﻿using OpenDental;
+using OpenDental.UI;
 using OpenDentBusiness;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace CentralManager {
@@ -14,10 +16,23 @@ namespace CentralManager {
 
 		private void FormCentralConnectionGroups_Load(object sender,EventArgs e) {
 			_listCentralConnGroups=ConnectionGroups.GetListt();
+			long defaultConnGroupNum=PrefC.GetLong(PrefName.ConnGroupCEMT);
+			comboConnectionGroup.Items.Clear();
+			comboConnectionGroup.Items.Add(Lan.g(this,"All"));
+			comboConnectionGroup.SelectedIndex=0;//Select all by default.
+			//Fill in the list of conn groups and update the selected index of the combo box if needed.
+			for(int i=0;i<_listCentralConnGroups.Count;i++) {
+				comboConnectionGroup.Items.Add(_listCentralConnGroups[i].Description);
+				if(_listCentralConnGroups[i].ConnectionGroupNum==defaultConnGroupNum) {
+					comboConnectionGroup.SelectedIndex=i+1;
+				}
+			}
 			FillGrid();
 		}
 
 		private void FillGrid() {
+			//Get all conn group attaches because we will be using all of them in order to show counts.
+			List<ConnGroupAttach> listConnGroupAttaches=ConnGroupAttaches.GetAll();
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lans.g(this,"Group Name"),280);
@@ -26,11 +41,11 @@ namespace CentralManager {
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<_listCentralConnGroups.Count;i++) {
+			foreach(ConnectionGroup connGroup in _listCentralConnGroups) {
 				row=new ODGridRow();
-				row.Cells.Add(_listCentralConnGroups[i].Description);
-				row.Cells.Add(ConnGroupAttaches.GetCountByGroup(_listCentralConnGroups[i].ConnectionGroupNum).ToString());
-				row.Tag=_listCentralConnGroups[i];//Not really used currently, but we may want to add filtering later.
+				row.Cells.Add(connGroup.Description);
+				row.Cells.Add(listConnGroupAttaches.FindAll(x => x.ConnectionGroupNum==connGroup.ConnectionGroupNum).Count.ToString());
+				row.Tag=connGroup;//Not really used currently, but we may want to add filtering later.
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
@@ -76,6 +91,12 @@ namespace CentralManager {
 		}
 
 		private void FormCentralConnectionGroups_FormClosing(object sender,FormClosingEventArgs e) {
+			if(comboConnectionGroup.SelectedIndex==0) {
+				Prefs.UpdateLong(PrefName.ConnGroupCEMT,0);
+			}
+			else {
+				Prefs.UpdateLong(PrefName.ConnGroupCEMT,_listCentralConnGroups[comboConnectionGroup.SelectedIndex-1].ConnectionGroupNum);
+			}
 			ConnectionGroups.Sync(_listCentralConnGroups);//Reflect all changes in the database.
 		}
 

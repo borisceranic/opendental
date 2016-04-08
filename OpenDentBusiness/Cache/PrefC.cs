@@ -81,9 +81,11 @@ namespace OpenDentBusiness {
 			}
 		}
 
-		///<summary>Gets a pref of type long.</summary>
-		public static long GetLong(PrefName prefName) {
-			Dictionary<string,Pref> dictPrefs=GetDict();
+		///<summary>Gets a pref of type long.  Pass in a dictionary of preferences to avoid getting a deep copy of the current cache.</summary>
+		public static long GetLong(PrefName prefName,Dictionary<string,Pref> dictPrefs=null) {
+			if(dictPrefs==null) {
+				dictPrefs=GetDict();
+			}
 			if(!dictPrefs.ContainsKey(prefName.ToString())) {
 				throw new Exception(prefName+" is an invalid pref name.");
 			}
@@ -138,9 +140,11 @@ namespace OpenDentBusiness {
 			return PIn.Bool(dictPrefs[prefName.ToString()].ValueString);
 		}
 
-		///<summary>Gets a pref of type string.</summary>
-		public static string GetString(PrefName prefName) {
-			Dictionary<string,Pref> dictPrefs=GetDict();
+		///<summary>Gets a pref of type string.  Pass in a dictionary of preferences to avoid getting a deep copy of the current cache.</summary>
+		public static string GetString(PrefName prefName,Dictionary<string,Pref> dictPrefs=null) {
+			if(dictPrefs==null) {
+				dictPrefs=GetDict();
+			}
 			if(!dictPrefs.ContainsKey(prefName.ToString())) {
 				throw new Exception(prefName+" is an invalid pref name.");
 			}
