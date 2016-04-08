@@ -57,6 +57,7 @@ namespace CentralManager {
 				}
 				//At this point we know the connection has not been filtered out, so fire up a thread to go get the patient data table for the search.
 				ODThread odThread=new ODThread(GetPtDataTableForConn,new object[]{ListConns[i]});
+				odThread.Name="FetchPatsThread"+i;
 				odThread.GroupName="FetchPats";
 				odThread.Start();
 			}

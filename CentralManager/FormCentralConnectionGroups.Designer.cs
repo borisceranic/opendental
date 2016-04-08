@@ -28,6 +28,7 @@
 			this.butClose = new OpenDental.UI.Button();
 			this.label1 = new System.Windows.Forms.Label();
 			this.butAdd = new OpenDental.UI.Button();
+			this.comboConnectionGroup = new System.Windows.Forms.ComboBox();
 			this.SuspendLayout();
 			// 
 			// gridMain
@@ -35,11 +36,13 @@
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasAddButton = false;
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(13, 32);
+			this.gridMain.Location = new System.Drawing.Point(12, 32);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(353, 348);
+			this.gridMain.Size = new System.Drawing.Size(338, 377);
 			this.gridMain.TabIndex = 0;
 			this.gridMain.Title = "Groups";
 			this.gridMain.TranslationName = null;
@@ -53,7 +56,7 @@
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(291, 386);
+			this.butClose.Location = new System.Drawing.Point(356, 386);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 23);
 			this.butClose.TabIndex = 2;
@@ -63,34 +66,45 @@
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(9, 9);
+			this.label1.Location = new System.Drawing.Point(187, 8);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(354, 20);
+			this.label1.Size = new System.Drawing.Size(244, 15);
 			this.label1.TabIndex = 5;
-			this.label1.Text = "Double click to edit a connection group.";
+			this.label1.Text = "Default Connection Group (global)";
 			// 
 			// butAdd
 			// 
 			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butAdd.Anchor = System.Windows.Forms.AnchorStyles.Right;
 			this.butAdd.Autosize = true;
 			this.butAdd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAdd.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAdd.CornerRadius = 4F;
 			this.butAdd.Image = ((System.Drawing.Image)(resources.GetObject("butAdd.Image")));
 			this.butAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butAdd.Location = new System.Drawing.Point(13, 386);
+			this.butAdd.Location = new System.Drawing.Point(356, 199);
 			this.butAdd.Name = "butAdd";
 			this.butAdd.Size = new System.Drawing.Size(75, 23);
 			this.butAdd.TabIndex = 218;
 			this.butAdd.Text = "&Add";
 			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
 			// 
+			// comboConnectionGroup
+			// 
+			this.comboConnectionGroup.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboConnectionGroup.FormattingEnabled = true;
+			this.comboConnectionGroup.Location = new System.Drawing.Point(12, 5);
+			this.comboConnectionGroup.MaxDropDownItems = 20;
+			this.comboConnectionGroup.Name = "comboConnectionGroup";
+			this.comboConnectionGroup.Size = new System.Drawing.Size(169, 21);
+			this.comboConnectionGroup.TabIndex = 219;
+			// 
 			// FormCentralConnectionGroups
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(378, 421);
+			this.ClientSize = new System.Drawing.Size(443, 421);
+			this.Controls.Add(this.comboConnectionGroup);
 			this.Controls.Add(this.butAdd);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.butClose);
@@ -113,5 +127,6 @@
 		private OpenDental.UI.Button butClose;
 		private System.Windows.Forms.Label label1;
 		private OpenDental.UI.Button butAdd;
+		private System.Windows.Forms.ComboBox comboConnectionGroup;
 	}
 }
