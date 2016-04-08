@@ -40,6 +40,10 @@ namespace OpenDental{
 		private UI.Button butNewClaims;
 		private DateTime _myReportDateTo;
 		private List<long> _listPatNum;
+		private bool _isOnLoad;
+		private const int _colWidthPatName=200;
+		private const int _colWidthProcDate=110;
+		private const int _colWidthAmount=90;
 
 		///<summary></summary>
 		public FormRpProcNotBilledIns(){
@@ -87,17 +91,19 @@ namespace OpenDental{
 			// 
 			// calendarTo
 			// 
-			this.calendarTo.Location = new System.Drawing.Point(238, 33);
+			this.calendarTo.Location = new System.Drawing.Point(251, 33);
 			this.calendarTo.Name = "calendarTo";
 			this.calendarTo.TabIndex = 2;
 			this.calendarTo.Visible = false;
+			this.calendarTo.DateSelected += new System.Windows.Forms.DateRangeEventHandler(this.calendarTo_DateSelected);
 			// 
 			// calendarFrom
 			// 
-			this.calendarFrom.Location = new System.Drawing.Point(12, 33);
+			this.calendarFrom.Location = new System.Drawing.Point(25, 33);
 			this.calendarFrom.Name = "calendarFrom";
 			this.calendarFrom.TabIndex = 1;
 			this.calendarFrom.Visible = false;
+			this.calendarFrom.DateSelected += new System.Windows.Forms.DateRangeEventHandler(this.calendarFrom_DateSelected);
 			// 
 			// butClose
 			// 
@@ -108,7 +114,7 @@ namespace OpenDental{
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
 			this.butClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butClose.Location = new System.Drawing.Point(885, 667);
+			this.butClose.Location = new System.Drawing.Point(872, 666);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 26);
 			this.butClose.TabIndex = 4;
@@ -125,7 +131,7 @@ namespace OpenDental{
 			this.butPrint.CornerRadius = 4F;
 			this.butPrint.Image = global::OpenDental.Properties.Resources.butPrintSmall;
 			this.butPrint.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butPrint.Location = new System.Drawing.Point(12, 667);
+			this.butPrint.Location = new System.Drawing.Point(25, 666);
 			this.butPrint.Name = "butPrint";
 			this.butPrint.Size = new System.Drawing.Size(75, 26);
 			this.butPrint.TabIndex = 3;
@@ -134,9 +140,8 @@ namespace OpenDental{
 			// 
 			// checkMedical
 			// 
-			this.checkMedical.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.checkMedical.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkMedical.Location = new System.Drawing.Point(743, 9);
+			this.checkMedical.Location = new System.Drawing.Point(730, 9);
 			this.checkMedical.Name = "checkMedical";
 			this.checkMedical.Size = new System.Drawing.Size(217, 21);
 			this.checkMedical.TabIndex = 11;
@@ -148,7 +153,7 @@ namespace OpenDental{
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(34, 11);
+			this.label1.Location = new System.Drawing.Point(47, 11);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(48, 16);
 			this.label1.TabIndex = 61;
@@ -163,19 +168,20 @@ namespace OpenDental{
 			this.butDropFrom.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butDropFrom.CornerRadius = 4F;
 			this.butDropFrom.Image = global::OpenDental.Properties.Resources.arrowDownTriangle;
-			this.butDropFrom.Location = new System.Drawing.Point(168, 8);
+			this.butDropFrom.Location = new System.Drawing.Point(177, 11);
 			this.butDropFrom.Name = "butDropFrom";
-			this.butDropFrom.Size = new System.Drawing.Size(22, 23);
+			this.butDropFrom.Size = new System.Drawing.Size(22, 18);
 			this.butDropFrom.TabIndex = 63;
 			this.butDropFrom.UseVisualStyleBackColor = true;
 			this.butDropFrom.Click += new System.EventHandler(this.butDropFrom_Click);
 			// 
 			// textDateFrom
 			// 
-			this.textDateFrom.Location = new System.Drawing.Point(85, 10);
+			this.textDateFrom.Location = new System.Drawing.Point(98, 10);
 			this.textDateFrom.Name = "textDateFrom";
-			this.textDateFrom.Size = new System.Drawing.Size(81, 20);
+			this.textDateFrom.Size = new System.Drawing.Size(102, 20);
 			this.textDateFrom.TabIndex = 62;
+			this.textDateFrom.Validated += new System.EventHandler(this.textDateFrom_Validated);
 			// 
 			// butDropTo
 			// 
@@ -185,16 +191,16 @@ namespace OpenDental{
 			this.butDropTo.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butDropTo.CornerRadius = 4F;
 			this.butDropTo.Image = global::OpenDental.Properties.Resources.arrowDownTriangle;
-			this.butDropTo.Location = new System.Drawing.Point(405, 7);
+			this.butDropTo.Location = new System.Drawing.Point(414, 10);
 			this.butDropTo.Name = "butDropTo";
-			this.butDropTo.Size = new System.Drawing.Size(22, 23);
+			this.butDropTo.Size = new System.Drawing.Size(22, 18);
 			this.butDropTo.TabIndex = 66;
 			this.butDropTo.UseVisualStyleBackColor = true;
 			this.butDropTo.Click += new System.EventHandler(this.butDropTo_Click);
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(276, 11);
+			this.label2.Location = new System.Drawing.Point(289, 11);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(45, 16);
 			this.label2.TabIndex = 64;
@@ -203,15 +209,15 @@ namespace OpenDental{
 			// 
 			// textDateTo
 			// 
-			this.textDateTo.Location = new System.Drawing.Point(322, 9);
+			this.textDateTo.Location = new System.Drawing.Point(335, 9);
 			this.textDateTo.Name = "textDateTo";
-			this.textDateTo.Size = new System.Drawing.Size(81, 20);
+			this.textDateTo.Size = new System.Drawing.Size(102, 20);
 			this.textDateTo.TabIndex = 65;
+			this.textDateTo.Validated += new System.EventHandler(this.textDateTo_Validated);
 			// 
 			// labelClinic
 			// 
-			this.labelClinic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.labelClinic.Location = new System.Drawing.Point(489, 11);
+			this.labelClinic.Location = new System.Drawing.Point(481, 10);
 			this.labelClinic.Name = "labelClinic";
 			this.labelClinic.Size = new System.Drawing.Size(87, 16);
 			this.labelClinic.TabIndex = 68;
@@ -220,11 +226,10 @@ namespace OpenDental{
 			// 
 			// comboBoxMultiClinics
 			// 
-			this.comboBoxMultiClinics.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.comboBoxMultiClinics.BackColor = System.Drawing.SystemColors.Window;
 			this.comboBoxMultiClinics.DroppedDown = false;
 			this.comboBoxMultiClinics.Items = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiClinics.Items")));
-			this.comboBoxMultiClinics.Location = new System.Drawing.Point(577, 9);
+			this.comboBoxMultiClinics.Location = new System.Drawing.Point(569, 8);
 			this.comboBoxMultiClinics.Name = "comboBoxMultiClinics";
 			this.comboBoxMultiClinics.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiClinics.SelectedIndices")));
 			this.comboBoxMultiClinics.Size = new System.Drawing.Size(160, 21);
@@ -239,14 +244,15 @@ namespace OpenDental{
 			this.gridMain.HasAddButton = false;
 			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(12, 33);
+			this.gridMain.Location = new System.Drawing.Point(25, 33);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
 			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridMain.Size = new System.Drawing.Size(948, 630);
+			this.gridMain.Size = new System.Drawing.Size(922, 630);
 			this.gridMain.TabIndex = 69;
 			this.gridMain.Title = "Procedures Not Billed";
 			this.gridMain.TranslationName = null;
+			this.gridMain.Resize += new System.EventHandler(this.gridMain_Resize);
 			// 
 			// butNewClaims
 			// 
@@ -256,9 +262,9 @@ namespace OpenDental{
 			this.butNewClaims.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butNewClaims.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butNewClaims.CornerRadius = 4F;
-			this.butNewClaims.Location = new System.Drawing.Point(435, 669);
+			this.butNewClaims.Location = new System.Drawing.Point(450, 666);
 			this.butNewClaims.Name = "butNewClaims";
-			this.butNewClaims.Size = new System.Drawing.Size(75, 23);
+			this.butNewClaims.Size = new System.Drawing.Size(75, 26);
 			this.butNewClaims.TabIndex = 71;
 			this.butNewClaims.Text = "New Claims";
 			this.butNewClaims.UseVisualStyleBackColor = true;
@@ -285,9 +291,7 @@ namespace OpenDental{
 			this.Controls.Add(this.calendarFrom);
 			this.Controls.Add(this.gridMain);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MaximizeBox = false;
-			this.MinimizeBox = false;
-			this.MinimumSize = new System.Drawing.Size(758, 515);
+			this.MinimumSize = new System.Drawing.Size(990, 734);
 			this.Name = "FormRpProcNotBilledIns";
 			this.ShowInTaskbar = false;
 			this.Text = "Procedures Not Billed to Insurance";
@@ -297,7 +301,14 @@ namespace OpenDental{
 
 		}
 		#endregion
+
+		private void gridMain_Resize(object sender,EventArgs e) {
+			CreateOrResizeGridColumns();
+		}
+
 		private void FormProcNotAttach_Load(object sender, System.EventArgs e) {
+			_isOnLoad=true;
+			_listPatNum=new List<long>();
 			calendarFrom.SelectionStart=DateTime.Today;
 			calendarTo.SelectionStart=DateTime.Today;
 			textDateFrom.Text=DateTime.Today.ToShortDateString();
@@ -328,21 +339,33 @@ namespace OpenDental{
 				labelClinic.Visible=false;
 			}
 			FillGrid();
+			_isOnLoad=false;
+		}
+
+		private void CreateOrResizeGridColumns() {
+			gridMain.BeginUpdate();
+			int colWidthVariable=gridMain.Width-_colWidthPatName-_colWidthProcDate-_colWidthAmount-10;//10 for scrollbar
+			ODGridColumn col=null;
+			if(gridMain.Columns.Count==0) {
+				col=new ODGridColumn(Lan.g(this,"Patient Name"),_colWidthPatName);
+				gridMain.Columns.Add(col);
+				col=new ODGridColumn(Lan.g(this,"Procedure Date"),_colWidthProcDate);
+				gridMain.Columns.Add(col);
+				col=new ODGridColumn(Lan.g(this,"Procedure Descipion"),colWidthVariable);
+				gridMain.Columns.Add(col);
+				col=new ODGridColumn(Lan.g(this,"Amount"),_colWidthAmount,HorizontalAlignment.Right);
+				gridMain.Columns.Add(col);
+			}
+			else {
+				gridMain.Columns[2].ColWidth=colWidthVariable;//Procedure Description
+			}
+			gridMain.EndUpdate();
 		}
 		
 		private void FillGrid() {
-			RefreshReport();
-			_listPatNum=new List<long>();
+			RefreshReport();			
+			CreateOrResizeGridColumns();
 			gridMain.BeginUpdate();
-			gridMain.Columns.Clear();
-			ODGridColumn col=new ODGridColumn(Lan.g(this,"Patient Name"),200);
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Procedure Date"),110);
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Procedure Descipion"),300);
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g(this,"Amount"),90);
-			gridMain.Columns.Add(col);	 
 			gridMain.Rows.Clear();
 			ODGridRow row;
 			for(int i=0;i<_myReport.ReportObjects.Count;i++) {
@@ -364,61 +387,9 @@ namespace OpenDental{
 			gridMain.EndUpdate();
 		}
 
-		private void butDropFrom_Click(object sender,EventArgs e) {
-			ToggleCalendars();
-		}
-
-		private void butDropTo_Click(object sender,EventArgs e) {
-			ToggleCalendars();
-		}
-
-		private void ToggleCalendars() {
-			if(calendarFrom.Visible) {
-				//Hide the calendars and fillGrid() so that the new date range values will be reflected.
-				calendarFrom.Visible=false;
-				calendarTo.Visible=false;
-				FillGrid();
-			}
-			else {
-				//set the date on the calendars to match what's showing in the boxes
-				if(textDateFrom.errorProvider1.GetError(textDateFrom)==""
-					&& textDateTo.errorProvider1.GetError(textDateTo)=="") {//if no date errors
-					if(textDateFrom.Text=="") {
-						calendarFrom.SetDate(DateTime.Today);
-					}
-					else {
-						calendarFrom.SetDate(PIn.Date(textDateFrom.Text));
-					}
-					if(textDateTo.Text=="") {
-						calendarTo.SetDate(DateTime.Today);
-					}
-					else {
-						calendarTo.SetDate(PIn.Date(textDateTo.Text));
-					}
-				}
-				//show the calendars
-				calendarFrom.Visible=true;
-				calendarTo.Visible=true;
-			}
-			textDateFrom.Text=_myReportDateFrom.ToShortDateString();
-			textDateTo.Text=_myReportDateTo.ToShortDateString();
-		}
-
-		//Only be called in fillGrid().
+		//Only called in FillGrid().
 		private void RefreshReport() {
-			if(calendarTo.SelectionStart<calendarFrom.SelectionStart) {
-				MsgBox.Show(this,"End date cannot be before start date.");
-				return;
-			}
-			bool isAllClinics=comboBoxMultiClinics.ListSelectedIndices.Contains(0);
-			if(PrefC.HasClinicsEnabled) {
-				if(!isAllClinics && comboBoxMultiClinics.SelectedIndices.Count==0) {
-					MsgBox.Show(this,"At least one clinic must be selected.");
-					return;
-				}
-			}
-			_myReportDateFrom=calendarFrom.SelectionStart;
-			_myReportDateTo=calendarTo.SelectionStart;
+			ValidateFields();
 			List<long> listClinicNums=new List<long>();
 			if(PrefC.HasClinicsEnabled) {
 				if(comboBoxMultiClinics.ListSelectedIndices.Contains(0)) {
@@ -482,14 +453,85 @@ namespace OpenDental{
 				_myReport.AddSubTitle("Clinics",subtitleClinics);
 			}
 			QueryObject query=_myReport.AddQuery(tableNotBilled,DateTimeOD.Today.ToShortDateString());
-			query.AddColumn("Patient Name",200,FieldValueType.String);
-			query.AddColumn("Procedure Date",110,FieldValueType.Date);
+			query.AddColumn("Patient Name",_colWidthPatName,FieldValueType.String);
+			query.AddColumn("Procedure Date",_colWidthProcDate,FieldValueType.Date);
 			query.GetColumnDetail("Procedure Date").StringFormat="d";
 			query.AddColumn("Procedure Description",300,FieldValueType.String);
-			query.AddColumn("Amount",90,FieldValueType.Number);
+			query.AddColumn("Amount",_colWidthAmount,FieldValueType.Number);
 			_myReport.AddPageNum();
-			if(!_myReport.SubmitQueries()) {
+			if(!_myReport.SubmitQueries(!_isOnLoad)) {//If we are loading and there are no results for _myReport do not show msgbox found in SubmitQueryies(...).
 				return;
+			}
+		}
+
+		private void butDropFrom_Click(object sender,EventArgs e) {
+			ToggleCalendars();
+		}
+
+		private void calendarFrom_DateSelected(object sender,DateRangeEventArgs e) {
+			textDateFrom.Text=calendarFrom.SelectionStart.ToShortDateString();
+		}
+
+		private void butDropTo_Click(object sender,EventArgs e) {
+			ToggleCalendars();
+		}
+
+		private void calendarTo_DateSelected(object sender,DateRangeEventArgs e) {
+			textDateTo.Text=calendarTo.SelectionStart.ToShortDateString();
+		}
+
+		private void ToggleCalendars() {
+			if(calendarFrom.Visible) {//Both calendars are currently visible.
+				//Hide the calendars and FillGrid() so that the new date range values will be reflected.
+				calendarFrom.Visible=false;
+				calendarTo.Visible=false;
+				FillGrid();
+			}
+			else {//Both calendars are currently invisible.
+				//show the calendars
+				calendarFrom.Visible=true;
+				calendarTo.Visible=true;
+				//set the date on the calendars to match what's showing in the boxes
+				if(textDateFrom.errorProvider1.GetError(textDateFrom)=="" && textDateTo.errorProvider1.GetError(textDateTo)=="") {//if no date errors
+					if(textDateFrom.Text=="") {
+						calendarFrom.SetDate(DateTime.Today);
+					}
+					else {
+						calendarFrom.SetDate(PIn.Date(textDateFrom.Text));
+					}
+					if(textDateTo.Text=="") {
+						calendarTo.SetDate(DateTime.Today);
+					}
+					else {
+						calendarTo.SetDate(PIn.Date(textDateTo.Text));
+					}
+				}
+			}
+		}
+
+		//Only called in RefreshReport().
+		private void ValidateFields() {
+			try {
+				_myReportDateFrom=DateTime.Parse(textDateFrom.Text);
+			}
+			catch{
+				_myReportDateFrom=DateTime.MinValue;
+			}
+			try {
+				_myReportDateTo=DateTime.Parse(textDateTo.Text);
+			}
+			catch{
+				_myReportDateTo=DateTime.MaxValue;
+			}
+			if(_myReportDateFrom<_myReportDateTo) {
+				_myReportDateFrom=DateTime.MinValue;
+				_myReportDateTo=DateTime.MaxValue;
+			}
+			if(PrefC.HasClinicsEnabled) {
+			bool isAllClinics=comboBoxMultiClinics.ListSelectedIndices.Contains(0);
+				if(!isAllClinics && comboBoxMultiClinics.SelectedIndices.Count==0) {
+					comboBoxMultiClinics.SetSelected(0,true);//All clinics.
+				}
 			}
 		}
 
@@ -769,66 +811,22 @@ namespace OpenDental{
 			FillGrid();
 		}
 		
+		private void textDateTo_Validated(object sender,EventArgs e) {
+			FillGrid();
+		}
+
+		private void textDateFrom_Validated(object sender,EventArgs e) {
+			FillGrid();
+		}
+
 		private void checkMedical_Click(object sender,EventArgs e) {
 			FillGrid();
 		}
 
 		//Mimics FormRpOustandingIns.butPrint_Click()
 		private void butPrint_Click(object sender,EventArgs e) {
-			_pagesPrinted=0;
-			PrintDocument pd=new PrintDocument();
-			pd.PrintPage+=new PrintPageEventHandler(this.pd_PrintPage);
-			pd.DefaultPageSettings.Margins=new Margins(25,25,40,40);
-			if(pd.DefaultPageSettings.PrintableArea.Height==0) {
-				pd.DefaultPageSettings.PaperSize=new PaperSize("default",850,1100);
-			}
-			_headingPrinted=false;
-			try {
-			#if DEBUG
-				FormRpPrintPreview pView=new FormRpPrintPreview();
-				pView.printPreviewControl2.Document=pd;
-				pView.ShowDialog();
-			#else
-					if(PrinterL.SetPrinter(pd,PrintSituation.Default,0,"Outstanding insurance report printed")) {
-						pd.Print();
-					}
-			#endif
-			}
-			catch {
-				MessageBox.Show(Lan.g(this,"Printer not available"));
-			}
-		}
-		
-		private void pd_PrintPage(object sender,System.Drawing.Printing.PrintPageEventArgs e) {
-			Rectangle bounds=e.MarginBounds;
-			//new Rectangle(50,40,800,1035);//Some printers can handle up to 1042
-			Graphics g=e.Graphics;
-			string text;
-			Font headingFont=new Font("Arial",13,FontStyle.Bold);
-			Font subHeadingFont=new Font("Arial",10,FontStyle.Bold);
-			int yPos=bounds.Top;
-			int center=bounds.X+bounds.Width/2;
-			#region printHeading
-			if(!_headingPrinted) {
-				text=Lan.g(this,"Procedures Not Billed to Insurance");
-				g.DrawString(text,headingFont,Brushes.Black,center-g.MeasureString(text,headingFont).Width/2,yPos);
-				yPos+=(int)g.MeasureString(text,headingFont).Height;
-				yPos+=20;
-				_headingPrinted=true;
-				_headingPrintH=yPos;
-			}
-			#endregion
-			yPos=gridMain.PrintPage(g,_pagesPrinted,bounds,_headingPrintH);
-			_pagesPrinted++;
-			if(yPos==-1) {
-				e.HasMorePages=true;
-			}
-			else {
-				e.HasMorePages=false;
-				text="Total: $"+_procTotalAmt.ToString("F");
-				g.DrawString(text,subHeadingFont,Brushes.Black,center+gridMain.Width/2-g.MeasureString(text,subHeadingFont).Width-10,yPos);
-			}
-			g.Dispose();
+			FormReportComplex FormR=new FormReportComplex(_myReport);
+			FormR.ShowDialog();
 		}
 
 		//Logic mimics ContrAccount.toolBarButIns_Click()

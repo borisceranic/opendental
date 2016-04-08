@@ -369,9 +369,9 @@ namespace OpenDental.ReportingComplex {
 			,ArrayList myDefaultValues,string myPromptingText,string mySnippet,ReportFKType myReportFKType){
 			_parameterFields.Add(new ParameterField(myName,myValueType,myDefaultValues,myPromptingText,mySnippet,myReportFKType));
 		}
-
+		
 		///<summary>Submits the queries to the database and makes query objects for each query with the results.  Returns false if one of the queries failed.</summary>
-		public bool SubmitQueries(){
+		public bool SubmitQueries(bool isShowMessage=true){
 			bool hasRows=false;
 			Graphics grfx=Graphics.FromImage(new Bitmap(1,1));
 			string displayText;
@@ -498,7 +498,7 @@ namespace OpenDental.ReportingComplex {
 					newReportObjects.Add(_reportObjects[i]);
 				}
 			}
-			if(!hasRows) {
+			if(!hasRows && isShowMessage) {
 				MsgBox.Show(this,"The report has no results to show.");
 				return false;
 			}
