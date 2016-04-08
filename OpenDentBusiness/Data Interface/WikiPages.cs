@@ -10,6 +10,12 @@ using System.Xml;
 namespace OpenDentBusiness{
 	///<summary></summary>
 	public class WikiPages{
+		///<summary>Defines delegate signature to be used for WikiPages.NavPageDelegate.</summary>
+		public delegate void NavToPageDelegate(string pageTitle);
+
+		///<summary>Sent in from FormOpendental. Allows static method for business layer to cause wikipage navigation in FormOpendental.</summary>
+		public static NavToPageDelegate NavPageDelegate;
+
 		#region CachePattern
 		///<summary>The only wiki page that gets cached is the master page.</summary>
 		private static WikiPage masterPage;

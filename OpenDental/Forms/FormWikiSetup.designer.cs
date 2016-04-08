@@ -28,6 +28,8 @@ namespace OpenDental{
 			this.butCancel = new OpenDental.UI.Button();
 			this.textMaster = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
+			this.checkDetectLinks = new System.Windows.Forms.CheckBox();
+			this.checkCreatePageFromLinks = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// butOK
@@ -70,7 +72,7 @@ namespace OpenDental{
 			this.textMaster.Multiline = true;
 			this.textMaster.Name = "textMaster";
 			this.textMaster.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-			this.textMaster.Size = new System.Drawing.Size(920, 683);
+			this.textMaster.Size = new System.Drawing.Size(920, 667);
 			this.textMaster.TabIndex = 4;
 			// 
 			// label1
@@ -82,17 +84,42 @@ namespace OpenDental{
 			this.label1.Text = "Master Page:";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
+			// checkDetectLinks
+			// 
+			this.checkDetectLinks.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.checkDetectLinks.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkDetectLinks.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkDetectLinks.Location = new System.Drawing.Point(12, 701);
+			this.checkDetectLinks.Name = "checkDetectLinks";
+			this.checkDetectLinks.Size = new System.Drawing.Size(230, 19);
+			this.checkDetectLinks.TabIndex = 76;
+			this.checkDetectLinks.Text = "Detect wiki links in textboxes and grids";
+			this.checkDetectLinks.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// checkCreatePageFromLinks
+			// 
+			this.checkCreatePageFromLinks.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.checkCreatePageFromLinks.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkCreatePageFromLinks.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkCreatePageFromLinks.Location = new System.Drawing.Point(12, 722);
+			this.checkCreatePageFromLinks.Name = "checkCreatePageFromLinks";
+			this.checkCreatePageFromLinks.Size = new System.Drawing.Size(230, 19);
+			this.checkCreatePageFromLinks.TabIndex = 77;
+			this.checkCreatePageFromLinks.Text = "Allow new wiki pages from links";
+			this.checkCreatePageFromLinks.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormWikiSetup
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(944, 753);
+			this.Controls.Add(this.checkCreatePageFromLinks);
+			this.Controls.Add(this.checkDetectLinks);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.textMaster);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormWikiSetup";
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Wiki Setup";
 			this.Load += new System.EventHandler(this.FormWikiSetup_Load);
 			this.ResumeLayout(false);
@@ -106,5 +133,7 @@ namespace OpenDental{
 		private OpenDental.UI.Button butCancel;
 		private System.Windows.Forms.TextBox textMaster;
 		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.CheckBox checkDetectLinks;
+		private System.Windows.Forms.CheckBox checkCreatePageFromLinks;
 	}
 }

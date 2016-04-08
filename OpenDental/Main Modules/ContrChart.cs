@@ -9885,6 +9885,7 @@ namespace OpenDental {
 					menuItemPrintDay.Visible=true;
 				}
 				Plugins.HookAddCode(this,"ContrChart.gridProg_MouseUp_end",menuProgRight,gridProg,PatCur);
+				gridProg.ContextMenu=menuProgRight;//set for WikiDetectLinks feature.
 				menuProgRight.Show(gridProg,new Point(e.X,e.Y));
 			}
 		}

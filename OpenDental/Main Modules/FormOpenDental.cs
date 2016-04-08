@@ -2654,6 +2654,7 @@ namespace OpenDental{
 					//The tooth chart will default to Simple2D mode if the above code fails for any reason.  This will at least get the user into the program.
 				}
 			}
+			WikiPages.NavPageDelegate=S_WikiLoadPage;
 			Signalods.Subscribe(this);
 			Plugins.HookAddCode(this,"FormOpenDental.Load_end");
 		}
@@ -6559,6 +6560,15 @@ namespace OpenDental{
 				FormMyWiki.WindowState=FormWindowState.Normal;
 			}
 			FormMyWiki.BringToFront();
+		}
+
+		public static void S_WikiLoadPage(string pageTitle) {
+			if(!PrefC.GetBool(PrefName.WikiCreatePageFromLink) && !WikiPages.CheckPageNamesExist(new List<string>{ pageTitle })[0]) {
+				MsgBox.Show("FormOpenDental","Wiki page does not exist.");
+				return;
+			}
+			_formOpenDentalS.menuItemWiki_Click(_formOpenDentalS,null);
+			_formOpenDentalS.FormMyWiki.LoadWikiPagePublic(pageTitle);
 		}
 
 		#endregion

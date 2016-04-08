@@ -66,6 +66,11 @@ namespace OpenDental {
 			}
 		}
 
+		public void LoadWikiPagePublic(string pageTitle) {
+			Application.DoEvents();//allow initialization
+			navPage(pageTitle);
+		}
+
 		///<summary>Before calling this, make sure to increment/decrement the historyNavBack index to keep track of the position in history.  If loading a new page, decrement historyNavBack before calling this function.  </summary>
 		private void LoadWikiPage(string pageTitle) {
 			//This is called from 11 different places, any time the program needs to refresh a page from the db.

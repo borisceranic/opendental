@@ -11,6 +11,8 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 using PdfSharp.Drawing;
 using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace OpenDental.UI {
 	///<summary></summary>
@@ -125,6 +127,8 @@ namespace OpenDental.UI {
 		private bool _hasAddButton;
 		/// <summary>Truncates the note to this many characters.</summary>
 		private int _noteLengthLimit=10000;
+		private List<MenuItem> _listMenuItemLinks;
+		private Point _currentClickLocation;
 
 		///<summary></summary>
 		public ODGrid() {
@@ -1304,13 +1308,15 @@ namespace OpenDental.UI {
 			{
 				TitleAddClick(this,e);
 			}
-			if(MouseDownRow==-1) {
-				return;//click was in the title or header section
+			if(MouseDownRow>-1 && MouseDownCol>-1) {//on a row and not to the side of the columns.
+				OnCellClick(MouseDownCol,MouseDownRow,lastButtonPressed);
 			}
-			if(MouseDownCol==-1) {
-				return;//click was to the right of the columns
+		}
+
+		private static void OpenWikiPage(string pageTitle) {
+			if(WikiPages.NavPageDelegate!=null) {
+				WikiPages.NavPageDelegate(pageTitle);
 			}
-			OnCellClick(MouseDownCol,MouseDownRow,lastButtonPressed);
 		}
 		#endregion Clicking
 
@@ -2603,10 +2609,65 @@ namespace OpenDental.UI {
 
 		#region MouseEvents
 
+		///<summary>Several location throughout the program the context menu changes. This subscribes each menu to use the popup helper below.</summary>
+		protected override void OnContextMenuChanged(EventArgs e) {
+			base.OnContextMenuChanged(e);
+			if(this.ContextMenu!=null) {
+				this.ContextMenu.Popup+=PopupHelper;
+			}
+		}
+
+		///<summary>Just prior to displaying the context menu, add wiki links if neccesary.</summary>
+		private void PopupHelper(object sender, EventArgs e) {
+			removeWikiMenu();
+			if(!PrefC.GetBool(PrefName.WikiDetectLinks)) {//NOTE: if this preference is changed while the program is open there MAY be some lingering wiki links in the context menu. 
+				//It is not worth it to force users to log off and back on again, or to run the link removal code below EVERY time, even if the pref is disabled.
+				return;
+			}
+			int rowClick = PointToRow(_currentClickLocation.Y);
+			int colClick = PointToCol(_currentClickLocation.X);
+			if(rowClick<0 || colClick<0) {//don't diplay links, not on grid row.
+				return;
+			}
+			if(lastButtonPressed==MouseButtons.Right && rowClick<=this.Rows.Count) {
+				ODGridRow row = this.Rows[rowClick];
+				if(this.ContextMenu==null) {
+					this.ContextMenu=new ContextMenu();
+					return;
+				}
+				_listMenuItemLinks=new List<MenuItem>();
+				if(this.ContextMenu.MenuItems.Count>0) {
+					_listMenuItemLinks.Add(new MenuItem("-"));
+				}
+				StringBuilder sb = new StringBuilder();
+				row.Cells.OfType<ODGridCell>().ToList().ForEach(x => sb.AppendLine(x.Text));
+				sb.AppendLine(row.Note);
+				MatchCollection matches = Regex.Matches(sb.ToString(),@"\[\[.+?]]");
+				foreach(Match match in matches) {
+					_listMenuItemLinks.Add(new MenuItem("Wiki - "+match.Value.Trim('[').Trim(']'),(s,eArg) => { OpenWikiPage(match.Value.Trim('[').Trim(']')); }));
+				}
+				_listMenuItemLinks=_listMenuItemLinks.OrderByDescending(x => x.Text=="-").ThenBy(x => x.Text).ToList();//alphabetize the link items.
+				if(_listMenuItemLinks.Any(x=>x.Text!="-")) {//at least one REAL menu item that is not the divider.
+					_listMenuItemLinks.ForEach(x => this.ContextMenu.MenuItems.Add(x));
+				}
+			}
+		}
+
+		///<summary>Removes wikiLinks from context menu.</summary>
+		private void removeWikiMenu() {
+			if(this.ContextMenu==null || _listMenuItemLinks==null) {
+				return;
+			}
+			foreach(MenuItem mi in _listMenuItemLinks) {
+				this.ContextMenu.MenuItems.Remove(mi);
+			}
+		}
+
 		///<summary></summary>
 		protected override void OnMouseDown(MouseEventArgs e) {
 			base.OnMouseDown(e);
 			lastButtonPressed=e.Button;//used in the click event.
+			_currentClickLocation=e.Location;//stored for later use during context menu display
 			if(e.Button==MouseButtons.Right) {
 				if(selectedIndices.Count>0) {//if there are already rows selected, then ignore right click
 					return;
@@ -2718,7 +2779,11 @@ namespace OpenDental.UI {
 			base.OnMouseUp(e);
 			//if(e.Button==MouseButtons.Right){
 			//	return;
-			//}
+			//}		
+			if(this.ContextMenu==null) {
+				this.ContextMenu=new ContextMenu();
+				this.ContextMenu.Show(this,_currentClickLocation);//triggers autofill via the popup helper.
+			}
 			MouseIsDown=false;
 			mouseIsDownInHeader=false;
 		}

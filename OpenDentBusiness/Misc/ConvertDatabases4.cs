@@ -487,9 +487,22 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE ehrmeasureevent MODIFY DateStartTobacco NOT NULL";
 					Db.NonQ(command);
 				}
-				
-
-
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference (PrefName,ValueString) VALUES('WikiDetectLinks','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference (PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'WikiDetectLinks','0')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference (PrefName,ValueString) VALUES('WikiCreatePageFromLink','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference (PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'WikiCreatePageFromLink','0')";
+					Db.NonQ(command);
+				}
 
 				command="UPDATE preference SET ValueString = '16.2.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);

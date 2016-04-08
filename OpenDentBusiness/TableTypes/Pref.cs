@@ -710,6 +710,10 @@ namespace OpenDentBusiness {
 		WebSchedSubject2,
 		WebSchedSubject3,
 		WebServiceServerName,
+		///<summary>If enabled, allows users to right click on ODTextboxes or ODGrids to populate the context menu with any detected wiki links.</summary>
+		WikiDetectLinks,
+		///<summary>If enabled, allows users to create new wiki pages when following links from textboxes and grids. (Disable to prevent proliferation of misspelled wiki pages.)</summary>
+		WikiCreatePageFromLink,
 		WordProcessorPath,
 		XRayExposureLevel
 	}

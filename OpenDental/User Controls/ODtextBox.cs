@@ -11,6 +11,7 @@ using OpenDental.UI;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Linq;
 
 namespace OpenDental {
 	/// <summary>This is used instead of a regular textbox when quickpaste functionality is needed.</summary>
@@ -61,6 +62,20 @@ namespace OpenDental {
 		///The new dll has been available since Windows XP SP1, released in 2002.  .NET is just set to use the old dll by default.</summary>
 		private static IntPtr _libPtr;
 		private bool isImeComposition;
+		private bool _detectLinksEnabled;
+		///<summary>Must track menuitems that we have added, so that we know which ones to take away when reconstructing context menu.</summary>
+		private List<MenuItem> _listMenuItemLinks;
+
+		[Category("Behavior"), Description("Set true to enable context menu to detect links.")]
+		[DefaultValue(true)]
+		public bool DetectLinksEnabled {
+			get {
+				return _detectLinksEnabled;
+			}
+			set {
+				_detectLinksEnabled=value;
+			}
+		}
 
 		///<summary>Set true to enable spell checking in this control.</summary>
 		[Category("Behavior"),Description("Set true to enable spell checking.")]
@@ -357,6 +372,29 @@ namespace OpenDental {
 				contextMenu.MenuItems[7].Visible=true;//Disable Spell Check
 				contextMenu.MenuItems[8].Visible=true;//contextMenu separator
 			}
+			if(!PrefC.GetBool(PrefName.WikiDetectLinks)) {//NOTE: if this preference is changed while the program is open there MAY be some lingering wiki links in the context menu. 
+				//It is not worth it to force users to log off and back on again, or to run the link removal code below EVERY time, even if the pref is disabled.
+				return;
+			}
+			if(_listMenuItemLinks==null) {
+				_listMenuItemLinks=new List<MenuItem>();
+			}
+			_listMenuItemLinks.ForEach(x => contextMenu.MenuItems.Remove(x));//remove items from previous pass.
+			_listMenuItemLinks.Clear();
+			_listMenuItemLinks.Add(new MenuItem("-"));
+			MatchCollection matches=Regex.Matches(Text,@"\[\[.+?]]");//wiki links.
+			foreach(Match match in matches) {
+				_listMenuItemLinks.Add(new MenuItem("Wiki - "+match.Value.Trim('[').Trim(']'),(s,eArg) => { OpenWikiPage(match.Value.Trim('[').Trim(']')); }));
+			}
+			_listMenuItemLinks=_listMenuItemLinks.OrderByDescending(x=>x.Text=="-").ThenBy(x => x.Text).ToList();//alphabetize the link items.
+			if(_listMenuItemLinks.Any(x => x.Text!="-")) {//at least one REAL menu item that is not the divider.
+				_listMenuItemLinks.ForEach(x => contextMenu.MenuItems.Add(x));
+			}
+		}
+
+		private static void OpenWikiPage(string pageTitle) {
+			FormOpenDental.S_WikiLoadPage(pageTitle);
+			//WikiPages.NavPageDelegate(pageTitle); //this also works, but makes an extra hop to the business layer
 		}
 
 		///<summary>Determines whether the right click was on a misspelled word.  Also sets the start and end index of chars to be replaced in text.</summary>
