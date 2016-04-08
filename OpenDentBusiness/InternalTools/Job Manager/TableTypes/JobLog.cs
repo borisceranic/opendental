@@ -8,8 +8,8 @@ namespace OpenDentBusiness {
 	///All schema changes are done directly on our live database as needed.
 	///Used to store a brief history of a job including approved job states and cahnges to expert or engineer.</summary>
 	[Serializable]
-	//[CrudTable(IsMissingInGeneral=true,IsSynchable=true)]
-	[CrudTable(IsSynchable=true)]
+	[CrudTable(IsMissingInGeneral=true,IsSynchable=true)]
+	//[CrudTable(IsSynchable=true)]
 	public class JobLog:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]

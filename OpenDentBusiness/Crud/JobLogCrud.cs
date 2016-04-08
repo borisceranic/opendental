@@ -80,7 +80,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (jobLog.UserNumChanged),
 					POut.Long  (jobLog.UserNumExpert),
 					POut.Long  (jobLog.UserNumEngineer),
-					POut.DateT (jobLog.DateTimeEntry),
+					POut.DateT (jobLog.DateTimeEntry,false),
 					            jobLog.Description,
 					            jobLog.MainRTF,
 				});
