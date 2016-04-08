@@ -883,7 +883,11 @@ namespace OpenDentBusiness{
 				+"AND SchedDate="+POut.Date(dateStart)+" "
 				+"AND employee.IsHidden=0 ";
 			if(PrefC.HasClinicsEnabled) {//Using clinics.
-				command+="AND employee.EmployeeNum IN ("+string.Join(",",Employees.GetEmpsForClinic(clinicNum).Select(x => x.EmployeeNum))+") ";
+				List<Employee> listEmps=Employees.GetEmpsForClinic(clinicNum);
+				if(listEmps.Count==0) {
+					return table;
+				}
+				command+="AND employee.EmployeeNum IN ("+string.Join(",",listEmps.Select(x => x.EmployeeNum))+") ";
 			}
 			if(DataConnection.DBtype==DatabaseType.MySql) {
 				command+="GROUP BY schedule.ScheduleNum ";
