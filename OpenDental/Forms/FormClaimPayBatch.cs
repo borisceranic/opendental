@@ -780,15 +780,11 @@ namespace OpenDental{
 			Cursor.Current=Cursors.WaitCursor;
 			//gridAttached-----------------------------------------------------------------------------------------------
 			ClaimsAttached=Claims.GetAttachedToPayment(ClaimPaymentCur.ClaimPaymentNum);
-			bool didReorder=false;
 			for(int i=0;i<ClaimsAttached.Count;i++) {
 				if(ClaimsAttached[i].PaymentRow!=i+1) {
 					ClaimProcs.SetPaymentRow(ClaimsAttached[i].ClaimNum,ClaimPaymentCur.ClaimPaymentNum,i+1);
-					didReorder=true;
+					ClaimsAttached[i].PaymentRow=i+1;
 				}
-			}
-			if(didReorder) {
-				ClaimsAttached=Claims.GetAttachedToPayment(ClaimPaymentCur.ClaimPaymentNum);
 			}
 			gridAttached.BeginUpdate();
 			gridAttached.Columns.Clear();
