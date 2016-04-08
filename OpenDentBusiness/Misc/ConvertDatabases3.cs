@@ -11,7 +11,7 @@ using CodeBase;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("15.4.32.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("15.4.45.0");//This value must be changed when a new conversion is to be triggered.
 
 		#region Helper Functions
 
@@ -11647,6 +11647,28 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				command="UPDATE preference SET ValueString='15.4.32.0' WHERE PrefName='DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			To15_4_45();
+		}
+
+		private static void To15_4_45() {
+			if(FromVersion<new Version("15.4.45.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 15.4.45.0"));
+				string command="";
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue) "
+						+"VALUES ((SELECT ProgramNum FROM program WHERE ProgName='Planmeca'),"
+						+"'Birthdate format (usually dd/MM/yyyy or MM/dd/yyyy)','dd/MM/yyyy');";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue) "
+						+"VALUES ((SELECT MAX(ProgramPropertyNum)+1 FROM programproperty),(SELECT ProgramNum FROM program WHERE ProgName='Planmeca'),"
+						+"'Birthdate format (usually dd/MM/yyyy or MM/dd/yyyy)','dd/MM/yyyy');";
+					Db.NonQ(command);
+				}
+				command="UPDATE preference SET ValueString = '15.4.45.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			//To15_4_X();
