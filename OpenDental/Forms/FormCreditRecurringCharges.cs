@@ -265,6 +265,10 @@ namespace OpenDental {
 		}
 
 		private void butRefresh_Click(object sender,EventArgs e) {
+			RefreshRecurringCharges();
+		}
+
+		private void RefreshRecurringCharges() {
 			Cursor=Cursors.WaitCursor;
 			List<long> listSelectedCCNums=new List<long>();
 			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
@@ -725,6 +729,7 @@ namespace OpenDental {
 		///<summary>Will process payments for all authorized charges for each CC stored and marked for recurring charges.  X-Charge or PayConnect must be
 		///enabled.  Program validation done on load and if properties are not valid the form will close and exit.</summary>
 		private void butSend_Click(object sender,EventArgs e) {
+			RefreshRecurringCharges();
 			if(gridMain.SelectedIndices.Length<1) {
 				MsgBox.Show(this,"Must select at least one recurring charge.");
 				return;
