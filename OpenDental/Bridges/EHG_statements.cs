@@ -23,6 +23,27 @@ namespace OpenDental.Bridges {
 		//private static string userName="";
 		//private static string password="";
 
+		///<summary>Returns empty list if no errors.  Otherwise returns a list with error messages.</summary>
+		public static List <string> Validate(long clinicNum) {
+			List <string> listErrors=new List<string>();
+			Clinic clinic=Clinics.GetClinic(clinicNum);
+			Ebill eBillClinic=Ebills.GetForClinic(clinicNum);
+			Ebill eBillDefault=Ebills.GetForClinic(0);
+			EHG_Address addressRemit=null;
+			if(eBillClinic==null) {
+				addressRemit=GetAddress(eBillDefault.RemitAddress,clinic);
+			}
+			else {
+				addressRemit=GetAddress(eBillClinic.RemitAddress,clinic);
+			}
+			if(addressRemit.Address1.Trim().Length==0 || addressRemit.City.Trim().Length==0
+				|| addressRemit.State.Trim().Length==0 || addressRemit.Zip.Trim().Length==0)
+			{
+				listErrors.Add(Lan.g("EHG_Statements","invalid")+" "+Lan.g("EHG_Statements",addressRemit.Source));
+			}
+			return listErrors;
+		}
+
 		///<summary>Generates all the xml up to the point where the first statement would go.</summary>
 		public static void GeneratePracticeInfo(XmlWriter writer,long clinicNum) {
 			Clinic clinic=Clinics.GetClinic(clinicNum);
@@ -82,55 +103,74 @@ namespace OpenDental.Bridges {
 		}
 
 		private static void WriteAddress(XmlWriter writer,EbillAddress eBillAddress,Clinic clinic) {
+			EHG_Address address=GetAddress(eBillAddress,clinic);
+			writer.WriteElementString("Address1",address.Address1);
+			writer.WriteElementString("Address2",address.Address2);
+			writer.WriteElementString("City",address.City);
+			writer.WriteElementString("State",address.State);
+			writer.WriteElementString("Zip",address.Zip);
+			writer.WriteElementString("Phone",address.Phone);
+		}
+
+		///<summary>The clinic variable can be null.</summary>
+		public static EHG_Address GetAddress(EbillAddress eBillAddress,Clinic clinic) {
+			EHG_Address address=new EHG_Address();
 			//If using practice information or using the default (no clinic) Ebill and a clinic enum is specified, use the practice level information.
 			if(eBillAddress==EbillAddress.PracticePhysical || (clinic==null && eBillAddress==EbillAddress.ClinicPhysical)) {
-				writer.WriteElementString("Address1",PrefC.GetString(PrefName.PracticeAddress));
-				writer.WriteElementString("Address2",PrefC.GetString(PrefName.PracticeAddress2));
-				writer.WriteElementString("City",PrefC.GetString(PrefName.PracticeCity));
-				writer.WriteElementString("State",PrefC.GetString(PrefName.PracticeST));
-				writer.WriteElementString("Zip",PrefC.GetString(PrefName.PracticeZip));
-				writer.WriteElementString("Phone",PrefC.GetString(PrefName.PracticePhone));//enforced to be 10 digit fairly rigidly by the UI
+				address.Address1=PrefC.GetString(PrefName.PracticeAddress);
+				address.Address2=PrefC.GetString(PrefName.PracticeAddress2);
+				address.City=PrefC.GetString(PrefName.PracticeCity);
+				address.State=PrefC.GetString(PrefName.PracticeST);
+				address.Zip=PrefC.GetString(PrefName.PracticeZip);
+				address.Phone=PrefC.GetString(PrefName.PracticePhone);//enforced to be 10 digit fairly rigidly by the UI
+				address.Source="Practice Physical Treating Address";
 			}
 			else if(eBillAddress==EbillAddress.PracticePayTo || (clinic==null && eBillAddress==EbillAddress.ClinicPayTo)) {
-				writer.WriteElementString("Address1",PrefC.GetString(PrefName.PracticePayToAddress));
-				writer.WriteElementString("Address2",PrefC.GetString(PrefName.PracticePayToAddress2));
-				writer.WriteElementString("City",PrefC.GetString(PrefName.PracticePayToCity));
-				writer.WriteElementString("State",PrefC.GetString(PrefName.PracticePayToST));
-				writer.WriteElementString("Zip",PrefC.GetString(PrefName.PracticePayToZip));
-				writer.WriteElementString("Phone",PrefC.GetString(PrefName.PracticePhone));//enforced to be 10 digit fairly rigidly by the UI
+				address.Address1=PrefC.GetString(PrefName.PracticePayToAddress);
+				address.Address2=PrefC.GetString(PrefName.PracticePayToAddress2);
+				address.City=PrefC.GetString(PrefName.PracticePayToCity);
+				address.State=PrefC.GetString(PrefName.PracticePayToST);
+				address.Zip=PrefC.GetString(PrefName.PracticePayToZip);
+				address.Phone=PrefC.GetString(PrefName.PracticePhone);//enforced to be 10 digit fairly rigidly by the UI
+				address.Source="Practice Pay To Address";
 			}
 			else if(eBillAddress==EbillAddress.PracticeBilling || (clinic==null && eBillAddress==EbillAddress.ClinicBilling)) {
-				writer.WriteElementString("Address1",PrefC.GetString(PrefName.PracticeBillingAddress));
-				writer.WriteElementString("Address2",PrefC.GetString(PrefName.PracticeBillingAddress2));
-				writer.WriteElementString("City",PrefC.GetString(PrefName.PracticeBillingCity));
-				writer.WriteElementString("State",PrefC.GetString(PrefName.PracticeBillingST));
-				writer.WriteElementString("Zip",PrefC.GetString(PrefName.PracticeBillingZip));
-				writer.WriteElementString("Phone",PrefC.GetString(PrefName.PracticePhone));//enforced to be 10 digit fairly rigidly by the UI
+				address.Address1=PrefC.GetString(PrefName.PracticeBillingAddress);
+				address.Address2=PrefC.GetString(PrefName.PracticeBillingAddress2);
+				address.City=PrefC.GetString(PrefName.PracticeBillingCity);
+				address.State=PrefC.GetString(PrefName.PracticeBillingST);
+				address.Zip=PrefC.GetString(PrefName.PracticeBillingZip);
+				address.Phone=PrefC.GetString(PrefName.PracticePhone);//enforced to be 10 digit fairly rigidly by the UI
+				address.Source="Practice Billing Address";
 			}
 			else if(eBillAddress==EbillAddress.ClinicPhysical) {
-				writer.WriteElementString("Address1",clinic.Address);
-				writer.WriteElementString("Address2",clinic.Address2);
-				writer.WriteElementString("City",clinic.City);
-				writer.WriteElementString("State",clinic.State);
-				writer.WriteElementString("Zip",clinic.Zip);
-				writer.WriteElementString("Phone",clinic.Phone);//enforced to be 10 digit fairly rigidly by the UI
+				address.Address1=clinic.Address;
+				address.Address2=clinic.Address2;
+				address.City=clinic.City;
+				address.State=clinic.State;
+				address.Zip=clinic.Zip;
+				address.Phone=clinic.Phone;//enforced to be 10 digit fairly rigidly by the UI
+				address.Source="Clinic Physical Treating Address";
 			}
 			else if(eBillAddress==EbillAddress.ClinicPayTo) {
-				writer.WriteElementString("Address1",clinic.PayToAddress);
-				writer.WriteElementString("Address2",clinic.PayToAddress2);
-				writer.WriteElementString("City",clinic.PayToCity);
-				writer.WriteElementString("State",clinic.PayToState);
-				writer.WriteElementString("Zip",clinic.PayToZip);
-				writer.WriteElementString("Phone",clinic.Phone);//enforced to be 10 digit fairly rigidly by the UI
+				address.Address1=clinic.PayToAddress;
+				address.Address2=clinic.PayToAddress2;
+				address.City=clinic.PayToCity;
+				address.State=clinic.PayToState;
+				address.Zip=clinic.PayToZip;
+				address.Phone=clinic.Phone;//enforced to be 10 digit fairly rigidly by the UI
+				address.Source="Clinic Pay To Address";
 			}
 			else if(eBillAddress==EbillAddress.ClinicBilling) {
-				writer.WriteElementString("Address1",clinic.BillingAddress);
-				writer.WriteElementString("Address2",clinic.BillingAddress2);
-				writer.WriteElementString("City",clinic.BillingCity);
-				writer.WriteElementString("State",clinic.BillingState);
-				writer.WriteElementString("Zip",clinic.BillingZip);
-				writer.WriteElementString("Phone",clinic.Phone);//enforced to be 10 digit fairly rigidly by the UI
+				address.Address1=clinic.BillingAddress;
+				address.Address2=clinic.BillingAddress2;
+				address.City=clinic.BillingCity;
+				address.State=clinic.BillingState;
+				address.Zip=clinic.BillingZip;
+				address.Phone=clinic.Phone;//enforced to be 10 digit fairly rigidly by the UI
+				address.Source="Clinic Billing Address";
 			}
+			return address;
 		}
 
 		///<summary>Adds the xml for one statement. Validation is performed here. Throws an exception if there is a validation failure.</summary>
@@ -606,4 +646,15 @@ namespace OpenDental.Bridges {
 
 
 	}
+
+	public class EHG_Address {
+		public string Address1;
+		public string Address2;
+		public string City;
+		public string State;
+		public string Zip;
+		public string Phone;
+		public string Source;
+	}
+
 }
