@@ -35,10 +35,15 @@ namespace OpenDentBusiness{
 			//Random keys not necessary to check because of 1:1 patNum.
 			//However, this is a lazy insert, so multiple locations might attempt it.
 			//Just in case, we will have it fail silently.
-			EhrPatient ehrPatient=new EhrPatient();
-			ehrPatient.PatNum=patNum;
 			try {
-				Crud.EhrPatientCrud.Insert(ehrPatient,true);
+				string command="INSERT INTO ehrpatient (PatNum) VALUES('"+patNum+"')";
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					//We may need to do this in Oracle in the future as well.
+					//If using Replication, then we need to watch for duplicate errors, because the insert is lazy.
+					//Replication servers can insert a patient note with a primary key belonging to another replication server's key range.
+					command+=" ON DUPLICATE KEY UPDATE PatNum='"+patNum+"'";
+				}
+				Db.NonQ(command);
 			}
 			catch {
 				//Fail Silently.
