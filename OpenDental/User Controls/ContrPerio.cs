@@ -1659,7 +1659,7 @@ namespace OpenDental
 				//to the right
 				section=GetSection(CurCell.Y);
 				if((!DirectionIsRight && isReverse) || (DirectionIsRight && !isReverse)){
-					if(CurCell.X==1){//if first column
+					if(CurCell.X==1 && !startedOnSkipped){//if first column
 						if(section==0){//usually in reverse
 							return;//no jump.  This is the starting point.
 						}
