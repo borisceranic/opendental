@@ -7,6 +7,7 @@ using System.Xml;
 using System.Xml.XPath;
 using System.Text.RegularExpressions;
 using Ionic.Zip;
+using System.Linq;
 
 namespace OpenDentBusiness {
 	///<summary>Used in Ehr quality measures.</summary>
@@ -3386,13 +3387,6 @@ namespace OpenDentBusiness {
 				return retval;
 			}
 			List<EhrCode> listEhrCodes=EhrCodes.GetForValueSetOIDs(listValueSetOIDs,false);
-			string rxcuiCodes="";
-			for(int i=0;i<listEhrCodes.Count;i++) {
-				if(i>0) {
-					rxcuiCodes+=",";
-				}
-				rxcuiCodes+=listEhrCodes[i].CodeValue;
-			}
 			string command="SELECT medicationpat.MedicationPatNum,medicationpat.PatNum,medicationpat.DateStart,medicationpat.DateStop,medicationpat.PatNote,"
 				+"(CASE WHEN medication.RxCui IS NULL THEN medicationpat.RxCui ELSE medication.RxCui END) AS RxCui "
 				+"FROM medicationpat "
@@ -3404,7 +3398,8 @@ namespace OpenDentBusiness {
 			if(listPatNums!=null && listPatNums.Count>0) {
 				command+="AND medicationpat.PatNum IN("+string.Join(",",listPatNums)+") ";
 			}
-			if(rxcuiCodes!="") {
+			if(listEhrCodes.Count>0) {
+				string rxcuiCodes=string.Join(",",listEhrCodes.Select(x => "'"+POut.String(x.CodeValue)+"'"));
 				command+="AND (medicationpat.RxCui IN("+rxcuiCodes+") OR medication.RxCui IN("+rxcuiCodes+")) ";
 			}
 			command+="ORDER BY medicationpat.PatNum,medicationpat.DateStart DESC";
@@ -3460,20 +3455,6 @@ namespace OpenDentBusiness {
 			}
 			List<EhrCode> listItems=EhrCodes.GetForValueSetOIDs(listValueSetOIDs,false);
 			List<EhrCode> listReasons=EhrCodes.GetForValueSetOIDs(listReasonOIDs,false);
-			string itemCodes="";
-			string reasonCodes="";
-			for(int i=0;i<listItems.Count;i++) {
-				if(i>0) {
-					itemCodes+=",";
-				}
-				itemCodes+=listItems[i].CodeValue;
-			}
-			for(int i=0;i<listReasons.Count;i++) {
-				if(i>0) {
-					reasonCodes+=",";
-				}
-				reasonCodes+=listReasons[i].CodeValue;
-			}
 			//Reasons not done come from these value sets for our 9 CQMs:
 			//Medical Reason Grouping Value Set 2.16.840.1.113883.3.526.3.1007
 			//Patient Reason Grouping Value Set 2.16.840.1.113883.3.526.3.1008
@@ -3493,11 +3474,11 @@ namespace OpenDentBusiness {
 			if(listPatNums!=null && listPatNums.Count>0) {
 				command+="AND ehrnotperformed.PatNum IN("+string.Join(",",listPatNums)+") ";
 			}
-			if(itemCodes!="") {
-				command+="AND ehrnotperformed.CodeValue IN("+itemCodes+") ";
+			if(listItems.Count>0) {
+				command+="AND ehrnotperformed.CodeValue IN("+string.Join(",",listItems.Select(x => "'"+POut.String(x.CodeValue)+"'"))+") ";
 			}
-			if(reasonCodes!="") {
-				command+="AND ehrnotperformed.CodeValueReason IN("+reasonCodes+") ";
+			if(listReasons.Count>0) {
+				command+="AND ehrnotperformed.CodeValueReason IN("+string.Join(",",listReasons.Select(x => "'"+POut.String(x.CodeValue)+"'"))+") ";
 			}
 			command+="GROUP BY ehrnotperformed.EhrNotPerformedNum "//just in case a code was in one of the code system tables more than once, should never happen
 				+"ORDER BY ehrnotperformed.PatNum,ehrnotperformed.DateEntry DESC";
