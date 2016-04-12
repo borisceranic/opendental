@@ -116,7 +116,6 @@ namespace CentralManager {
 				try {
 					dcon.SetDb(computerName,database,user,password,"","",DataConnection.DBtype);
 					RemotingClient.RemotingRole=RemotingRole.ClientDirect;
-					Cache.RefreshCache(((int)InvalidType.AllLocal).ToString());
 					FormCentralLogOn FormCLO=new FormCentralLogOn();
 					if(FormCLO.ShowDialog()!=DialogResult.OK) {
 						Application.Exit();
