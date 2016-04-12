@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using OpenDentBusiness.Crud;
@@ -59,30 +60,64 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<ClaimPaySplit>>(MethodBase.GetCurrentMethod(),carrierName,LName,FName);
 			}
-			string command="SELECT claim.DateService,claim.ProvTreat,"+DbHelper.Concat("patient.LName","', '","patient.FName")+" patName_,"
-				+"carrierA.CarrierName,ClaimFee feeBilled_,SUM(claimproc.InsPayAmt) insPayAmt_,claim.ClaimNum,"//SUM(claimproc.FeeBilled) feeBilled_ was low if inspay 0 on proc
-				+"claimproc.ClaimPaymentNum,clinic.Description,claim.PatNum,PaymentRow "
-				+"FROM (SELECT CarrierNum, CarrierName FROM carrier WHERE CarrierName LIKE '"+POut.String(carrierName)+"%') carrierA "
-				+"INNER JOIN insplan ON insplan.CarrierNum = carrierA.CarrierNum "
-				+"INNER JOIN claim ON insplan.PlanNum = claim.PlanNum "
-				+"INNER JOIN claimproc ON claimproc.ClaimNum = claim.ClaimNum "
-				+"INNER JOIN patient ON patient.PatNum = claimproc.PatNum "
-					+"AND patient.LName LIKE '"+POut.String(LName)+"%'"
-					+"AND patient.FName LIKE '"+POut.String(FName)+"%'"
-				+"LEFT JOIN clinic ON clinic.ClinicNum = claimproc.ClinicNum "
-				+"WHERE (claim.ClaimStatus = 'S' "
-					+"OR (claim.ClaimStatus='R' AND claimproc.InsPayAmt!=0)) "//certain (very few) received claims will have payment amounts entered but not attached to payment
-				+"AND ClaimType != 'PreAuth' AND claimproc.ClaimPaymentNum=0 ";
+			string command="SELECT claim.DateService,claim.ProvTreat,'' AS patName_,carrierA.CarrierName,claim.ClaimFee feeBilled_,"
+				+"SUM(claimproc.InsPayAmt) insPayAmt_,claim.ClaimNum,0 AS ClaimPaymentNum,claim.ClinicNum,'' AS Description,claim.PatNum,0 AS PaymentRow "
+				+"FROM ("
+					+"SELECT insplan.PlanNum,carrier.CarrierName "
+					+"FROM carrier "
+					+"INNER JOIN insplan ON carrier.CarrierNum=insplan.CarrierNum "
+					+"WHERE carrier.CarrierName LIKE '"+POut.String(carrierName)+"%'"
+				+") carrierA "
+				+"INNER JOIN claim ON carrierA.PlanNum=claim.PlanNum "
+				+"INNER JOIN claimproc ON claimproc.ClaimNum=claim.ClaimNum "
+				+"WHERE (claim.ClaimStatus='S' OR (claim.ClaimStatus='R' AND claimproc.InsPayAmt!=0)) "
+				+"AND claim.ClaimType!='PreAuth' "
+				+"AND claimproc.ClaimPaymentNum=0 ";
 			if(DataConnection.DBtype==DatabaseType.MySql) {
-				command+="GROUP BY claim.ClaimNum ";
+				command+="GROUP BY claim.ClaimNum";
 			}
 			else {//oracle
-				command+="GROUP BY claim.DateService,claim.ProvTreat,"+DbHelper.Concat("patient.LName","', '","patient.FName")+","
-					+"carrierA.CarrierName,ClaimFee,claim.ClaimNum,claimproc.ClaimPaymentNum,Description,claim.PatNum,PaymentRow ";
+				command+="GROUP BY claim.DateService,claim.ProvTreat,carrierA.CarrierName,claim.ClaimFee,claim.ClaimNum,claim.ClinicNum,claim.PatNum";
 			}
-			command+="ORDER BY CarrierName,patName_";
 			DataTable table=Db.GetTable(command);
-			return ClaimPaySplitTableToList(table);
+			if(table.Rows.Count==0) {
+				return new List<ClaimPaySplit>();//no claims
+			}
+			command="SELECT PatNum,LName,FName FROM patient "
+				+"WHERE PatNum IN("+string.Join(",",table.Rows.OfType<DataRow>().Select(x => x["PatNum"].ToString()))+") ";
+			if(!string.IsNullOrEmpty(LName)) {
+				command+="AND LName LIKE '"+POut.String(LName)+"%' ";
+			}
+			if(!string.IsNullOrEmpty(FName)) {
+				command+="AND FName LIKE '"+POut.String(FName)+"%'";
+			}
+			DataTable patTable=Db.GetTable(command);
+			if(patTable.Rows.Count==0) {
+				return new List<ClaimPaySplit>();//all patients filtered out, return empty list
+			}
+			//make dictionary of key=PatNum, value=LName, FName, used to fill table patName_ column
+			Dictionary<long,string> dictPatNames=patTable.Rows.OfType<DataRow>()
+				.ToDictionary(x => PIn.Long(x["PatNum"].ToString()),x => x["LName"].ToString()+", "+x["FName"].ToString());
+			//create dictionary of key=ClinicNum, value=Description, used to fill table Description column
+			Dictionary<long,string> dictClinicNames=new Dictionary<long, string>();
+			if(PrefC.HasClinicsEnabled && Clinics.List.Length>0) {
+				dictClinicNames=Clinics.List.ToDictionary(x => x.ClinicNum,x => x.Description);
+			}
+			long patNumCur;
+			long clinicNumCur;
+			for(int i=table.Rows.Count-1;i>-1;i--) {//itterate backwards
+				patNumCur=PIn.Long(table.Rows[i]["PatNum"].ToString());
+				if(!dictPatNames.ContainsKey(patNumCur)) {
+					table.Rows.RemoveAt(i);//list filtered by name, remove from results
+					continue;
+				}
+				table.Rows[i]["patName_"]=dictPatNames[patNumCur];
+				clinicNumCur=PIn.Long(table.Rows[i]["ClinicNum"].ToString());
+				if(dictClinicNames.ContainsKey(clinicNumCur)) {
+					table.Rows[i]["Description"]=dictClinicNames[clinicNumCur];
+				}
+			}
+			return ClaimPaySplitTableToList(table).OrderBy(x => x.Carrier).ThenBy(x => x.PatName).ToList();
 		}
 
 		/// <summary>Gets all 'claims' attached to the claimpayment.</summary>
