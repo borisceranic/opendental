@@ -104,6 +104,9 @@ namespace OpenDentBusiness{
 		///updates.  Not user editable with the UI.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.TimeStamp)]
 		public DateTime SecDateTEdit;
+		///<summary>The date the claim proc was first set to received or supplemental. Will not be updated if the procedure is set to unreceived and set 
+		///to received or supplemental again.</summary>
+		public DateTime DateSuppReceived;
 
 		///<summary>Returns a copy of this ClaimProc.</summary>
 		public ClaimProc Copy(){

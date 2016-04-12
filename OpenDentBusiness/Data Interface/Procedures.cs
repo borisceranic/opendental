@@ -54,6 +54,12 @@ namespace OpenDentBusiness {
 				procedure.ProcNum=Meth.GetLong(MethodBase.GetCurrentMethod(),procedure);
 				return procedure.ProcNum;
 			}
+			if(procedure.ProcStatus==ProcStat.C) {
+				procedure.DateComplete=DateTime.Today;
+			}
+			else {//In case someone tried to programmatically set the DateComplete when they shouldn't have.
+				procedure.DateComplete=DateTime.MinValue;
+			}
 			Crud.ProcedureCrud.Insert(procedure);
 			if(procedure.Note!="") {
 				ProcNote note=new ProcNote();
@@ -76,6 +82,9 @@ namespace OpenDentBusiness {
 			}
 			if(oldProcedure.ProcStatus==ProcStat.C && procedure.ProcStatus!=ProcStat.C) {//Setting a completed procedure to TP
 				Adjustments.DeleteForProcedure(procedure.ProcNum);
+			}
+			if(procedure.ProcStatus==ProcStat.C && procedure.DateComplete.Year<1880) {
+				procedure.DateComplete=DateTime.Today;
 			}
 			bool result=Crud.ProcedureCrud.Update(procedure,oldProcedure);
 			if(procedure.Note!=oldProcedure.Note

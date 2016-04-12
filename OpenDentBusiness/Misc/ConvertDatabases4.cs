@@ -486,6 +486,29 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 					command="ALTER TABLE ehrmeasureevent MODIFY DateStartTobacco NOT NULL";
 					Db.NonQ(command);
+				}				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE procedurelog ADD DateComplete date NOT NULL DEFAULT '0001-01-01'";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE procedurelog ADD DateComplete date";
+					Db.NonQ(command);
+					command="UPDATE procedurelog SET DateComplete = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE DateComplete IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE procedurelog MODIFY DateComplete NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE claimproc ADD DateSuppReceived date NOT NULL DEFAULT '0001-01-01'";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE claimproc ADD DateSuppReceived date";
+					Db.NonQ(command);
+					command="UPDATE claimproc SET DateSuppReceived = TO_DATE('0001-01-01','YYYY-MM-DD') WHERE DateSuppReceived IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claimproc MODIFY DateSuppReceived NOT NULL";
+					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="INSERT INTO preference (PrefName,ValueString) VALUES('WikiDetectLinks','0')";

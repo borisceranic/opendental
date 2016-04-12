@@ -89,6 +89,7 @@ namespace OpenDentBusiness.Crud{
 				claimProc.SecUserNumEntry     = PIn.Long  (row["SecUserNumEntry"].ToString());
 				claimProc.SecDateEntry        = PIn.Date  (row["SecDateEntry"].ToString());
 				claimProc.SecDateTEdit        = PIn.DateT (row["SecDateTEdit"].ToString());
+				claimProc.DateSuppReceived    = PIn.Date  (row["DateSuppReceived"].ToString());
 				retVal.Add(claimProc);
 			}
 			return retVal;
@@ -143,6 +144,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("SecUserNumEntry");
 			table.Columns.Add("SecDateEntry");
 			table.Columns.Add("SecDateTEdit");
+			table.Columns.Add("DateSuppReceived");
 			foreach(ClaimProc claimProc in listClaimProcs) {
 				table.Rows.Add(new object[] {
 					POut.Long  (claimProc.ClaimProcNum),
@@ -188,6 +190,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (claimProc.SecUserNumEntry),
 					POut.DateT (claimProc.SecDateEntry,false),
 					POut.DateT (claimProc.SecDateTEdit,false),
+					POut.DateT (claimProc.DateSuppReceived,false),
 				});
 			}
 			return table;
@@ -228,7 +231,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ClaimProcNum,";
 			}
-			command+="ProcNum,ClaimNum,PatNum,ProvNum,FeeBilled,InsPayEst,DedApplied,Status,InsPayAmt,Remarks,ClaimPaymentNum,PlanNum,DateCP,WriteOff,CodeSent,AllowedOverride,Percentage,PercentOverride,CopayAmt,NoBillIns,PaidOtherIns,BaseEst,CopayOverride,ProcDate,DateEntry,LineNumber,DedEst,DedEstOverride,InsEstTotal,InsEstTotalOverride,PaidOtherInsOverride,EstimateNote,WriteOffEst,WriteOffEstOverride,ClinicNum,InsSubNum,PaymentRow,PayPlanNum,ClaimPaymentTracking,SecUserNumEntry,SecDateEntry) VALUES(";
+			command+="ProcNum,ClaimNum,PatNum,ProvNum,FeeBilled,InsPayEst,DedApplied,Status,InsPayAmt,Remarks,ClaimPaymentNum,PlanNum,DateCP,WriteOff,CodeSent,AllowedOverride,Percentage,PercentOverride,CopayAmt,NoBillIns,PaidOtherIns,BaseEst,CopayOverride,ProcDate,DateEntry,LineNumber,DedEst,DedEstOverride,InsEstTotal,InsEstTotalOverride,PaidOtherInsOverride,EstimateNote,WriteOffEst,WriteOffEstOverride,ClinicNum,InsSubNum,PaymentRow,PayPlanNum,ClaimPaymentTracking,SecUserNumEntry,SecDateEntry,DateSuppReceived) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(claimProc.ClaimProcNum)+",";
 			}
@@ -273,8 +276,9 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (claimProc.PayPlanNum)+","
 				+    POut.Long  (claimProc.ClaimPaymentTracking)+","
 				+    POut.Long  (claimProc.SecUserNumEntry)+","
-				+    DbHelper.Now()+")";
+				+    DbHelper.Now()+","
 				//SecDateTEdit can only be set by MySQL
+				+    POut.Date  (claimProc.DateSuppReceived)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -307,7 +311,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ClaimProcNum,";
 			}
-			command+="ProcNum,ClaimNum,PatNum,ProvNum,FeeBilled,InsPayEst,DedApplied,Status,InsPayAmt,Remarks,ClaimPaymentNum,PlanNum,DateCP,WriteOff,CodeSent,AllowedOverride,Percentage,PercentOverride,CopayAmt,NoBillIns,PaidOtherIns,BaseEst,CopayOverride,ProcDate,DateEntry,LineNumber,DedEst,DedEstOverride,InsEstTotal,InsEstTotalOverride,PaidOtherInsOverride,EstimateNote,WriteOffEst,WriteOffEstOverride,ClinicNum,InsSubNum,PaymentRow,PayPlanNum,ClaimPaymentTracking,SecUserNumEntry,SecDateEntry) VALUES(";
+			command+="ProcNum,ClaimNum,PatNum,ProvNum,FeeBilled,InsPayEst,DedApplied,Status,InsPayAmt,Remarks,ClaimPaymentNum,PlanNum,DateCP,WriteOff,CodeSent,AllowedOverride,Percentage,PercentOverride,CopayAmt,NoBillIns,PaidOtherIns,BaseEst,CopayOverride,ProcDate,DateEntry,LineNumber,DedEst,DedEstOverride,InsEstTotal,InsEstTotalOverride,PaidOtherInsOverride,EstimateNote,WriteOffEst,WriteOffEstOverride,ClinicNum,InsSubNum,PaymentRow,PayPlanNum,ClaimPaymentTracking,SecUserNumEntry,SecDateEntry,DateSuppReceived) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(claimProc.ClaimProcNum)+",";
 			}
@@ -352,8 +356,9 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (claimProc.PayPlanNum)+","
 				+    POut.Long  (claimProc.ClaimPaymentTracking)+","
 				+    POut.Long  (claimProc.SecUserNumEntry)+","
-				+    DbHelper.Now()+")";
+				+    DbHelper.Now()+","
 				//SecDateTEdit can only be set by MySQL
+				+    POut.Date  (claimProc.DateSuppReceived)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -404,10 +409,11 @@ namespace OpenDentBusiness.Crud{
 				+"InsSubNum           =  "+POut.Long  (claimProc.InsSubNum)+", "
 				+"PaymentRow          =  "+POut.Int   (claimProc.PaymentRow)+", "
 				+"PayPlanNum          =  "+POut.Long  (claimProc.PayPlanNum)+", "
-				+"ClaimPaymentTracking=  "+POut.Long  (claimProc.ClaimPaymentTracking)+" "
+				+"ClaimPaymentTracking=  "+POut.Long  (claimProc.ClaimPaymentTracking)+", "
 				//SecUserNumEntry excluded from update
 				//SecDateEntry not allowed to change
 				//SecDateTEdit can only be set by MySQL
+				+"DateSuppReceived    =  "+POut.Date  (claimProc.DateSuppReceived)+" "
 				+"WHERE ClaimProcNum = "+POut.Long(claimProc.ClaimProcNum);
 			Db.NonQ(command);
 		}
@@ -574,6 +580,10 @@ namespace OpenDentBusiness.Crud{
 			//SecUserNumEntry excluded from update
 			//SecDateEntry not allowed to change
 			//SecDateTEdit can only be set by MySQL
+			if(claimProc.DateSuppReceived.Date != oldClaimProc.DateSuppReceived.Date) {
+				if(command!=""){ command+=",";}
+				command+="DateSuppReceived = "+POut.Date(claimProc.DateSuppReceived)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -706,6 +716,9 @@ namespace OpenDentBusiness.Crud{
 			//SecUserNumEntry excluded from update
 			//SecDateEntry not allowed to change
 			//SecDateTEdit can only be set by MySQL
+			if(claimProc.DateSuppReceived.Date != oldClaimProc.DateSuppReceived.Date) {
+				return true;
+			}
 			return false;
 		}
 

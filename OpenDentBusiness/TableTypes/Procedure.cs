@@ -147,6 +147,9 @@ namespace OpenDentBusiness {
 		[CrudColumn(SpecialType=CrudSpecialColType.DateEntry)]
 		public DateTime SecDateEntry;
 		//No SecDateTEdit, DateTStamp already exists and is the timestamp updated by MySQL when a row is added or changed
+		///<summary>The date the procedure was originally set complete. Will not be updated if the procedure is set incomplete and set complete again.
+		///</summary>
+		public DateTime DateComplete;
 
 		///<summary>Not a database column.  Saved in database in the procnote table.  This note is only the most recent note from that table.  If user changes it, then the business layer handles it by adding another procnote to that table.</summary>
 		[CrudColumn(IsNotDbColumn=true)]

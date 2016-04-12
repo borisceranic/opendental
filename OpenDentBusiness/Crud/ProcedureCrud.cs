@@ -108,6 +108,7 @@ namespace OpenDentBusiness.Crud{
 				procedure.IsCpoe            = PIn.Bool  (row["IsCpoe"].ToString());
 				procedure.SecUserNumEntry   = PIn.Long  (row["SecUserNumEntry"].ToString());
 				procedure.SecDateEntry      = PIn.Date  (row["SecDateEntry"].ToString());
+				procedure.DateComplete      = PIn.Date  (row["DateComplete"].ToString());
 				retVal.Add(procedure);
 			}
 			return retVal;
@@ -181,6 +182,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("IsCpoe");
 			table.Columns.Add("SecUserNumEntry");
 			table.Columns.Add("SecDateEntry");
+			table.Columns.Add("DateComplete");
 			foreach(Procedure procedure in listProcedures) {
 				table.Rows.Add(new object[] {
 					POut.Long  (procedure.ProcNum),
@@ -245,6 +247,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Bool  (procedure.IsCpoe),
 					POut.Long  (procedure.SecUserNumEntry),
 					POut.DateT (procedure.SecDateEntry,false),
+					POut.DateT (procedure.DateComplete,false),
 				});
 			}
 			return table;
@@ -285,7 +288,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ProcNum,";
 			}
-			command+="PatNum,AptNum,OldCode,ProcDate,ProcFee,Surf,ToothNum,ToothRange,Priority,ProcStatus,ProvNum,Dx,PlannedAptNum,PlaceService,Prosthesis,DateOriginalProsth,ClaimNote,DateEntryC,ClinicNum,MedicalCode,DiagnosticCode,IsPrincDiag,ProcNumLab,BillingTypeOne,BillingTypeTwo,CodeNum,CodeMod1,CodeMod2,CodeMod3,CodeMod4,RevCode,UnitQty,BaseUnits,StartTime,StopTime,DateTP,SiteNum,HideGraphics,CanadianTypeCodes,ProcTime,ProcTimeEnd,Prognosis,DrugUnit,DrugQty,UnitQtyType,StatementNum,IsLocked,BillingNote,RepeatChargeNum,DiagnosticCode2,DiagnosticCode3,DiagnosticCode4,Discount,SnomedBodySite,ProvOrderOverride,IsDateProsthEst,IcdVersion,IsCpoe,SecUserNumEntry,SecDateEntry) VALUES(";
+			command+="PatNum,AptNum,OldCode,ProcDate,ProcFee,Surf,ToothNum,ToothRange,Priority,ProcStatus,ProvNum,Dx,PlannedAptNum,PlaceService,Prosthesis,DateOriginalProsth,ClaimNote,DateEntryC,ClinicNum,MedicalCode,DiagnosticCode,IsPrincDiag,ProcNumLab,BillingTypeOne,BillingTypeTwo,CodeNum,CodeMod1,CodeMod2,CodeMod3,CodeMod4,RevCode,UnitQty,BaseUnits,StartTime,StopTime,DateTP,SiteNum,HideGraphics,CanadianTypeCodes,ProcTime,ProcTimeEnd,Prognosis,DrugUnit,DrugQty,UnitQtyType,StatementNum,IsLocked,BillingNote,RepeatChargeNum,DiagnosticCode2,DiagnosticCode3,DiagnosticCode4,Discount,SnomedBodySite,ProvOrderOverride,IsDateProsthEst,IcdVersion,IsCpoe,SecUserNumEntry,SecDateEntry,DateComplete) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(procedure.ProcNum)+",";
 			}
@@ -350,7 +353,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Byte  (procedure.IcdVersion)+","
 				+    POut.Bool  (procedure.IsCpoe)+","
 				+    POut.Long  (procedure.SecUserNumEntry)+","
-				+    DbHelper.Now()+")";
+				+    DbHelper.Now()+","
+				+    POut.Date  (procedure.DateComplete)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -383,7 +387,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ProcNum,";
 			}
-			command+="PatNum,AptNum,OldCode,ProcDate,ProcFee,Surf,ToothNum,ToothRange,Priority,ProcStatus,ProvNum,Dx,PlannedAptNum,PlaceService,Prosthesis,DateOriginalProsth,ClaimNote,DateEntryC,ClinicNum,MedicalCode,DiagnosticCode,IsPrincDiag,ProcNumLab,BillingTypeOne,BillingTypeTwo,CodeNum,CodeMod1,CodeMod2,CodeMod3,CodeMod4,RevCode,UnitQty,BaseUnits,StartTime,StopTime,DateTP,SiteNum,HideGraphics,CanadianTypeCodes,ProcTime,ProcTimeEnd,Prognosis,DrugUnit,DrugQty,UnitQtyType,StatementNum,IsLocked,BillingNote,RepeatChargeNum,DiagnosticCode2,DiagnosticCode3,DiagnosticCode4,Discount,SnomedBodySite,ProvOrderOverride,IsDateProsthEst,IcdVersion,IsCpoe,SecUserNumEntry,SecDateEntry) VALUES(";
+			command+="PatNum,AptNum,OldCode,ProcDate,ProcFee,Surf,ToothNum,ToothRange,Priority,ProcStatus,ProvNum,Dx,PlannedAptNum,PlaceService,Prosthesis,DateOriginalProsth,ClaimNote,DateEntryC,ClinicNum,MedicalCode,DiagnosticCode,IsPrincDiag,ProcNumLab,BillingTypeOne,BillingTypeTwo,CodeNum,CodeMod1,CodeMod2,CodeMod3,CodeMod4,RevCode,UnitQty,BaseUnits,StartTime,StopTime,DateTP,SiteNum,HideGraphics,CanadianTypeCodes,ProcTime,ProcTimeEnd,Prognosis,DrugUnit,DrugQty,UnitQtyType,StatementNum,IsLocked,BillingNote,RepeatChargeNum,DiagnosticCode2,DiagnosticCode3,DiagnosticCode4,Discount,SnomedBodySite,ProvOrderOverride,IsDateProsthEst,IcdVersion,IsCpoe,SecUserNumEntry,SecDateEntry,DateComplete) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(procedure.ProcNum)+",";
 			}
@@ -448,7 +452,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Byte  (procedure.IcdVersion)+","
 				+    POut.Bool  (procedure.IsCpoe)+","
 				+    POut.Long  (procedure.SecUserNumEntry)+","
-				+    DbHelper.Now()+")";
+				+    DbHelper.Now()+","
+				+    POut.Date  (procedure.DateComplete)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -519,9 +524,10 @@ namespace OpenDentBusiness.Crud{
 				+"ProvOrderOverride =  "+POut.Long  (procedure.ProvOrderOverride)+", "
 				+"IsDateProsthEst   =  "+POut.Bool  (procedure.IsDateProsthEst)+", "
 				+"IcdVersion        =  "+POut.Byte  (procedure.IcdVersion)+", "
-				+"IsCpoe            =  "+POut.Bool  (procedure.IsCpoe)+" "
+				+"IsCpoe            =  "+POut.Bool  (procedure.IsCpoe)+", "
 				//SecUserNumEntry excluded from update
 				//SecDateEntry not allowed to change
+				+"DateComplete      =  "+POut.Date  (procedure.DateComplete)+" "
 				+"WHERE ProcNum = "+POut.Long(procedure.ProcNum);
 			Db.NonQ(command);
 		}
@@ -764,6 +770,10 @@ namespace OpenDentBusiness.Crud{
 			}
 			//SecUserNumEntry excluded from update
 			//SecDateEntry not allowed to change
+			if(procedure.DateComplete.Date != oldProcedure.DateComplete.Date) {
+				if(command!=""){ command+=",";}
+				command+="DateComplete = "+POut.Date(procedure.DateComplete)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -953,6 +963,9 @@ namespace OpenDentBusiness.Crud{
 			}
 			//SecUserNumEntry excluded from update
 			//SecDateEntry not allowed to change
+			if(procedure.DateComplete.Date != oldProcedure.DateComplete.Date) {
+				return true;
+			}
 			return false;
 		}
 

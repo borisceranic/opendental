@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Reflection;
 
 namespace OpenDentBusiness{
@@ -75,6 +76,12 @@ namespace OpenDentBusiness{
 				cp.ClaimProcNum=Meth.GetLong(MethodBase.GetCurrentMethod(),cp);
 				return cp.ClaimProcNum;
 			}
+			if(new[] { ClaimProcStatus.Received,ClaimProcStatus.Supplemental}.Contains(cp.Status)) {
+				cp.DateSuppReceived=DateTime.Today;
+			}
+			else {//In case someone tried to programmatically set the DateSuppReceived when they shouldn't have
+				cp.DateSuppReceived=DateTime.MinValue;
+			}
 			return Crud.ClaimProcCrud.Insert(cp);
 		}
 
@@ -83,6 +90,11 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),cp);
 				return;
+			}
+			if(new[] { ClaimProcStatus.Received,ClaimProcStatus.Supplemental }.Contains(cp.Status)
+				&& cp.DateSuppReceived.Year<1880) 
+			{
+				cp.DateSuppReceived=DateTime.Today;
 			}
 			Crud.ClaimProcCrud.Update(cp);
 		}
