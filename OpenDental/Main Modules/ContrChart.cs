@@ -9633,6 +9633,9 @@ namespace OpenDental {
 					}
 					return;
 				}
+				if(gridPtInfo.Rows[e.Row].Tag.ToString()=="Broken Appts") {
+					return;//This row is just for display; it can't be edited.
+				}
 				if(gridPtInfo.Rows[e.Row].Tag.GetType()==typeof(CustRefEntry)) {
 					FormReferenceEntryEdit FormRE=new FormReferenceEntryEdit((CustRefEntry)gridPtInfo.Rows[e.Row].Tag);
 					FormRE.ShowDialog();
