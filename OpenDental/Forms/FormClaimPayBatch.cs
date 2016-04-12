@@ -778,17 +778,13 @@ namespace OpenDental{
 
 		private void FillGrids(){
 			Cursor.Current=Cursors.WaitCursor;
-			//gridAttached-----------------------------------------------------------------------------------------------
+			#region gridAttached
 			ClaimsAttached=Claims.GetAttachedToPayment(ClaimPaymentCur.ClaimPaymentNum);
-			bool didReorder=false;
 			for(int i=0;i<ClaimsAttached.Count;i++) {
 				if(ClaimsAttached[i].PaymentRow!=i+1) {
 					ClaimProcs.SetPaymentRow(ClaimsAttached[i].ClaimNum,ClaimPaymentCur.ClaimPaymentNum,i+1);
-					didReorder=true;
+					ClaimsAttached[i].PaymentRow=i+1;
 				}
-			}
-			if(didReorder) {
-				ClaimsAttached=Claims.GetAttachedToPayment(ClaimPaymentCur.ClaimPaymentNum);
 			}
 			gridAttached.BeginUpdate();
 			gridAttached.Columns.Clear();
@@ -810,21 +806,27 @@ namespace OpenDental{
 			gridAttached.Rows.Clear();
 			ODGridRow row;
 			double total=0;
-			for(int i=0;i<ClaimsAttached.Count;i++) {
-				total+=ClaimsAttached[i].InsPayAmt;
+			foreach(ClaimPaySplit claimPS in ClaimsAttached) {
+				total+=claimPS.InsPayAmt;
 				row=new ODGridRow();
-				row.Cells.Add(ClaimsAttached[i].PaymentRow.ToString());
-				row.Cells.Add(ClaimsAttached[i].DateClaim.ToShortDateString());
-				row.Cells.Add(ClaimsAttached[i].ClinicDesc);
-				row.Cells.Add(ClaimsAttached[i].Carrier);
-				row.Cells.Add(ClaimsAttached[i].PatName);
-				row.Cells.Add(ClaimsAttached[i].FeeBilled.ToString("F"));
-				row.Cells.Add(ClaimsAttached[i].InsPayAmt.ToString("F"));
+				row.Cells.Add(claimPS.PaymentRow.ToString());
+				row.Cells.Add(claimPS.DateClaim.ToShortDateString());
+				row.Cells.Add(claimPS.ClinicDesc);
+				row.Cells.Add(claimPS.Carrier);
+				row.Cells.Add(claimPS.PatName);
+				row.Cells.Add(claimPS.FeeBilled.ToString("F"));
+				row.Cells.Add(claimPS.InsPayAmt.ToString("F"));
 				gridAttached.Rows.Add(row);
 			}
 			gridAttached.EndUpdate();
 			textTotal.Text=total.ToString("F");
-			//gridOutstanding-------------------------------------------------------------------------------------------------
+			#endregion gridAttached
+			if((IsFromClaim && IsNew) || !ClaimPaymentCur.IsPartial) {//gridOut isn't visible
+				//if new batch claim payment opened from a claim, or if it's locked (not partial), gridOut isn't visible so no need to fill it
+				Cursor.Current=Cursors.Default;
+				return;
+			}
+			#region gridOutstanding
 			int scrollValue=gridOut.ScrollValue;
 			int selectedIdx=gridOut.GetSelectedIndex();
 			ClaimsOutstanding=Claims.GetOutstandingClaims(textCarrier.Text,textLName.Text,textFName.Text);
@@ -845,20 +847,21 @@ namespace OpenDental{
 			col=new ODGridColumn(Lan.g(this,"Payment"),70,HorizontalAlignment.Right);
 			gridOut.Columns.Add(col);
 			gridOut.Rows.Clear();
-			for(int i=0;i<ClaimsOutstanding.Count;i++){
+			foreach(ClaimPaySplit claimPS in ClaimsOutstanding) {
 				row=new ODGridRow();
 				row.Cells.Add("");
-				row.Cells.Add(ClaimsOutstanding[i].DateClaim.ToShortDateString());
-				row.Cells.Add(ClaimsOutstanding[i].ClinicDesc);
-				row.Cells.Add(ClaimsOutstanding[i].Carrier);
-				row.Cells.Add(ClaimsOutstanding[i].PatName);
-				row.Cells.Add(ClaimsOutstanding[i].FeeBilled.ToString("F"));
-				row.Cells.Add(ClaimsOutstanding[i].InsPayAmt.ToString("F"));
+				row.Cells.Add(claimPS.DateClaim.ToShortDateString());
+				row.Cells.Add(claimPS.ClinicDesc);
+				row.Cells.Add(claimPS.Carrier);
+				row.Cells.Add(claimPS.PatName);
+				row.Cells.Add(claimPS.FeeBilled.ToString("F"));
+				row.Cells.Add(claimPS.InsPayAmt.ToString("F"));
 				gridOut.Rows.Add(row);
 			}
 			gridOut.EndUpdate();
 			gridOut.ScrollValue=scrollValue;
 			gridOut.SetSelected(selectedIdx,true);
+			#endregion gridOutstanding
 			Cursor.Current=Cursors.Default;
 		}
 
