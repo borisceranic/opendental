@@ -13490,6 +13490,62 @@ namespace OpenDentBusiness {
 						Db.NonQ(command);
 					}
 				}
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.16 - carrier index"));//No translation in convert script.
+				try {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						if(!IndexExists("carrier","CarrierNum,CarrierName")) {
+							command="ALTER TABLE carrier ADD INDEX CarrierNumName (CarrierNum,CarrierName)";
+							Db.NonQ(command);
+						}
+					}
+					else {//oracle
+						command=@"CREATE INDEX carrier_CarrierNumName ON carrier (CarrierNum,CarrierName)";
+						Db.NonQ(command);
+					}
+				}
+				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.16 - claim index"));//No translation in convert script.
+				try {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						if(!IndexExists("claim","PlanNum,ClaimStatus,ClaimType,PatNum,ClaimNum,DateService,ProvTreat,ClaimFee,ClinicNum")) {
+							command="ALTER TABLE claim ADD INDEX indexOutClaimCovering (PlanNum,ClaimStatus,ClaimType,PatNum,ClaimNum,DateService,ProvTreat,ClaimFee,ClinicNum)";
+							Db.NonQ(command);
+						}
+					}
+					else {//oracle
+						command=@"CREATE INDEX claim_OutClaimCovering ON claim (PlanNum,ClaimStatus,ClaimType,PatNum,ClaimNum,DateService,ProvTreat,ClaimFee,ClinicNum)";
+						Db.NonQ(command);
+					}
+				}
+				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.16 - claimproc index"));//No translation in convert script.
+				try {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						if(!IndexExists("claimproc","ClaimNum,ClaimPaymentNum,InsPayAmt")) {
+							command="ALTER TABLE claimproc ADD INDEX indexOutClaimCovering (ClaimNum,ClaimPaymentNum,InsPayAmt)";
+							Db.NonQ(command);
+						}
+					}
+					else {//oracle
+						command=@"CREATE INDEX claimproc_OutClaimCovering ON claimproc (ClaimNum,ClaimPaymentNum,InsPayAmt)";
+						Db.NonQ(command);
+					}
+				}
+				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.16 - insplan index"));//No translation in convert script.
+				try {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						if(!IndexExists("insplan","CarrierNum,PlanNum")) {
+							command="ALTER TABLE insplan ADD INDEX CarrierNumPlanNum (CarrierNum,PlanNum)";
+							Db.NonQ(command);
+						}
+					}
+					else {//oracle
+						command=@"CREATE INDEX insplan_CarrierNumPlanNum ON insplan (CarrierNum,PlanNum)";
+						Db.NonQ(command);
+					}
+				}
+				catch(Exception ex) { }//Only an index. (Exception ex) required to catch thrown exception
 				command="UPDATE preference SET ValueString='16.1.16.0' WHERE PrefName='DataBaseVersion'";
 				Db.NonQ(command);
 			}
