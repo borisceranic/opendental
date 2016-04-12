@@ -108,7 +108,6 @@ namespace CentralManager {
 			try {
 				dcon.SetDb(computerName,database,user,password,"","",DataConnection.DBtype);
 				RemotingClient.RemotingRole=RemotingRole.ClientDirect;
-				Cache.RefreshCache(((int)InvalidType.AllLocal).ToString());
 				return true;
 			}
 			catch(Exception ex){
