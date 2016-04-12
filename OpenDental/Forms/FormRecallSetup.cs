@@ -1628,14 +1628,14 @@ namespace OpenDental{
 		#region Appt Reminder Setup
 
 		private void FillPriorityTab() {
-			if(SmsPhones.IsIntegratedTextingEnabled() && SmsPhones.IsTextingForCountry("US")) {
-				labelTextMessage.Text+=" (Not editable for US)";
-				textMessageText.ReadOnly=true;
-				textMessageText.Text=ApptComms.ApptReminderMsgUS;
-			}
-			else {
-				textMessageText.Text=PrefC.GetString(PrefName.ApptReminderDayMessage);
-			}
+			//if(SmsPhones.IsIntegratedTextingEnabled() && SmsPhones.IsTextingForCountry("US")) {
+			//	labelTextMessage.Text+=" (Not editable for US)";
+			//	textMessageText.ReadOnly=true;
+			//	textMessageText.Text=ApptComms.ApptReminderMsgUS;
+			//}
+			//else {
+			textMessageText.Text=PrefC.GetString(PrefName.ApptReminderDayMessage);
+			//}
 			textMessageEmail.Text=PrefC.GetString(PrefName.ApptReminderEmailMessage);
 			_arrayPriorities=PrefC.GetString(PrefName.ApptReminderSendOrder).Split(',');
 			FillGridPriority();

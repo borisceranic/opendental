@@ -7,7 +7,7 @@ using System.Text;
 namespace OpenDentBusiness{
 	///<summary></summary>
 	public class ApptComms {
-		public const string ApptReminderMsgUS = @"Appointment Reminder: [nameF] is scheduled for [apptTime] on [apptDate] at [clinicName]. Call [clinicPhone] if issue. No Reply";
+		//public const string ApptReminderMsgUS = @"Appointment Reminder: [nameF] is scheduled for [apptTime] on [apptDate] at [clinicName]. Call [clinicPhone] if issue. No Reply";
 
 		///<summary></summary>
 		public static List<ApptComm> Refresh(long patNum){
@@ -376,12 +376,12 @@ namespace OpenDentBusiness{
 				return pat.LName+", "+pat.FName+" "+Lans.g("ApptComms","cannot be sent texts")+".  ";
 			}
 			string message;
-			if(SmsPhones.IsIntegratedTextingEnabled() && SmsPhones.IsTextingForCountry("US")) {
-				message=FillMessage(ApptComms.ApptReminderMsgUS,pat,appt);
-			}
-			else {
-				message=FillMessage(PrefC.GetString(PrefName.ApptReminderDayMessage),pat,appt);
-			}
+			//if(SmsPhones.IsIntegratedTextingEnabled() && SmsPhones.IsTextingForCountry("US")) {
+			//	message=FillMessage(ApptComms.ApptReminderMsgUS,pat,appt);
+			//}
+			//else {
+			message=FillMessage(PrefC.GetString(PrefName.ApptReminderDayMessage),pat,appt);
+			//}
 			try {
 				SmsToMobiles.SendSmsSingle(pat.PatNum,patPhone,message,pat.ClinicNum,SmsMessageSource.Reminder);
 			}
