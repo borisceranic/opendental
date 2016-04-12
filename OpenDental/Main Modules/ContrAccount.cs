@@ -178,6 +178,7 @@ namespace OpenDental {
 		private ContextMenu contextMenuPayment;
 		private MenuItem menuItemPay;
 		private List<DisplayField> _patInfoDisplayFields;
+		public static string ClaimErrorsCur;
 		#endregion UserVariables
 
 		///<summary></summary>
@@ -2921,7 +2922,9 @@ namespace OpenDental {
 						toolBarButAdj_Click();
 						break;
 					case "Insurance":
-						toolBarButIns_Click();
+						if(toolBarButIns_Click(true,PatCur,FamCur,gridAccount,DataSetMain.Tables["account"])) {
+							ModuleSelected(PatCur.PatNum);
+						}
 						break;
 					case "PayPlan":
 						toolBarButPayPlan_Click();
@@ -3014,37 +3017,52 @@ namespace OpenDental {
 			ModuleSelected(PatCur.PatNum);
 		}
 
-		private bool CheckClearinghouseDefaults() {
+		private static bool CheckClearinghouseDefaults() {
 			if(PrefC.GetLong(PrefName.ClearinghouseDefaultDent)==0) {
-				MsgBox.Show(this,"No default dental clearinghouse defined.");
+				MsgBox.Show("ContrAccount","No default dental clearinghouse defined.");
 				return false;
 			}
 			if(PrefC.GetBool(PrefName.ShowFeatureMedicalInsurance) && PrefC.GetLong(PrefName.ClearinghouseDefaultMed)==0) {
-				MsgBox.Show(this,"No default medical clearinghouse defined.");
+				MsgBox.Show("ContrAccount","No default medical clearinghouse defined.");
 				return false;
 			}
 			return true;
 		}
 
-		private void toolBarButIns_Click() {
-			if(!CheckClearinghouseDefaults()) {
-				return;
+		///<summary>Be sure to translate message before calling this function.</summary>
+		private static void LogClaimError(string message,bool isVerbose) {
+			if(ClaimErrorsCur!="") {
+				ClaimErrorsCur+="\r\n";
 			}
-			List <PatPlan> PatPlanList=PatPlans.Refresh(PatCur.PatNum);
-			List<InsSub> SubList=InsSubs.RefreshForFam(FamCur);
+			ClaimErrorsCur+=message;
+			if(isVerbose) {
+				MessageBox.Show(message);
+			}
+		}
+
+		///<summary>Returns true if the Account module needs to be refreshed.
+		///The grid contains the procedures to be attached to the claim.  Procedures are attached based on selection.
+		///The table is the raw data which corresponds to the information showing in the grid.
+		///This function requires table to have the following columns (at minimum): ProcNum, chargesDouble</summary>
+		public static bool toolBarButIns_Click(bool isVerbose,Patient pat,Family fam,ODGrid grid,DataTable table) {
+			ClaimErrorsCur="";
+			if(!CheckClearinghouseDefaults()) {
+				return false;
+			}
+			List <PatPlan> PatPlanList=PatPlans.Refresh(pat.PatNum);
+			List<InsSub> SubList=InsSubs.RefreshForFam(fam);
 			List<InsPlan> InsPlanList=InsPlans.RefreshForSubList(SubList);
-			List<ClaimProc> ClaimProcList=ClaimProcs.Refresh(PatCur.PatNum);
+			List<ClaimProc> ClaimProcList=ClaimProcs.Refresh(pat.PatNum);
 			List <Benefit> BenefitList=Benefits.Refresh(PatPlanList,SubList);
-			List<Procedure> procsForPat=Procedures.Refresh(PatCur.PatNum);
+			List<Procedure> procsForPat=Procedures.Refresh(pat.PatNum);
 			if(PatPlanList.Count==0){
-				MsgBox.Show(this,"Patient does not have insurance.");
-				return;
+				LogClaimError(Lan.g("ContrAccount","Patient does not have insurance."),isVerbose);
+				return false;
 			}
 			int countSelected=0;
-			DataTable table=DataSetMain.Tables["account"];
 			InsPlan plan;
 			InsSub sub;
-			if(gridAccount.SelectedIndices.Length==0){
+			if(grid.SelectedIndices.Length==0){
 				//autoselect procedures
 				for(int i=0;i<table.Rows.Count;i++){//loop through every line showing on screen
 					if(table.Rows[i]["ProcNum"].ToString()=="0"){
@@ -3066,32 +3084,33 @@ namespace OpenDental {
 					sub=InsSubs.GetSub(PatPlans.GetInsSubNum(PatPlanList,ordinal),SubList);
 					if(Procedures.NeedsSent(proc.ProcNum,sub.InsSubNum,ClaimProcList)){
 						if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && countSelected==7) {//Canadian. en-CA or fr-CA
-							MsgBox.Show(this,"Only the first 7 procedures will be automatically selected.  You will need to create another claim for the remaining procedures.");
+							LogClaimError(Lan.g("ContrAccount","Only the first 7 procedures will be automatically selected.  "
+								+"You will need to create another claim for the remaining procedures."),isVerbose);
 							continue;//only send 7.  
 						}
 						countSelected++;
-						gridAccount.SetSelected(i,true);
+						grid.SetSelected(i,true);
 					}
 				}
-				if(gridAccount.SelectedIndices.Length==0){//if still none selected
-					MessageBox.Show(Lan.g(this,"Please select procedures first."));
-					return;
+				if(grid.SelectedIndices.Length==0){//if still none selected
+					LogClaimError(Lan.g("ContrAccount","Please select procedures first."),isVerbose);
+					return false;
 				}
 			}
 			bool allAreProcedures=true;//In Canada, this will also be true if the user selected labs.
-			for(int i=0;i<gridAccount.SelectedIndices.Length;i++){
-				if(table.Rows[gridAccount.SelectedIndices[i]]["ProcNum"].ToString()=="0"){
+			for(int i=0;i<grid.SelectedIndices.Length;i++){
+				if(table.Rows[grid.SelectedIndices[i]]["ProcNum"].ToString()=="0"){
 					allAreProcedures=false;
 				}
 			}
 			if(!allAreProcedures){
-				MsgBox.Show(this,"You can only select procedures.");
-				return;
+				LogClaimError(Lan.g("ContrAccount","You can only select procedures."),isVerbose);
+				return false;
 			}
 			//At this point, all selected items are procedures.  In Canada, the selections may also include labs.
-			InsCanadaValidateProcs(procsForPat,table);
-			if(gridAccount.SelectedIndices.Length<1){
-				return;
+			InsCanadaValidateProcs(procsForPat,table,isVerbose,grid);
+			if(grid.SelectedIndices.Length<1){
+				return false;
 			}
 			string claimType="P";
 			//If they have medical insurance and no dental, make the claim type Medical.  This is to avoid the scenario of multiple med ins and no dental.
@@ -3101,61 +3120,60 @@ namespace OpenDental {
 			{
 				claimType="Med";
 			}
-			Claim ClaimCur=CreateClaim(claimType,PatPlanList,InsPlanList,ClaimProcList,procsForPat,SubList);
-			ClaimProcList=ClaimProcs.Refresh(PatCur.PatNum);
+			Claim ClaimCur=CreateClaim(claimType,PatPlanList,InsPlanList,ClaimProcList,procsForPat,SubList,isVerbose,pat,table,grid);
+			ClaimProcList=ClaimProcs.Refresh(pat.PatNum);
 			if(ClaimCur.ClaimNum==0){
-				ModuleSelected(PatCur.PatNum);
-				return;
+				return true;
 			}
 			ClaimCur.ClaimStatus="W";
 			ClaimCur.DateSent=DateTimeOD.Today;
-			ClaimL.CalculateAndUpdate(procsForPat,InsPlanList,ClaimCur,PatPlanList,BenefitList,PatCur.Age,SubList);
-			FormClaimEdit FormCE=new FormClaimEdit(ClaimCur,PatCur,FamCur);
-			FormCE.IsNew=true;//this causes it to delete the claim if cancelling.
-			FormCE.ShowDialog();
-			if(FormCE.DialogResult!=DialogResult.OK){
-				ModuleSelected(PatCur.PatNum);
-				return;//will have already been deleted
+			ClaimL.CalculateAndUpdate(procsForPat,InsPlanList,ClaimCur,PatPlanList,BenefitList,pat.Age,SubList);
+			if(isVerbose) {//Only provide the user with the option to cancel the claim if attempting to create a single claim manually.
+				FormClaimEdit FormCE=new FormClaimEdit(ClaimCur,pat,fam);
+				FormCE.IsNew=true;//this causes it to delete the claim if cancelling.
+				FormCE.ShowDialog();
+				if(FormCE.DialogResult!=DialogResult.OK) {
+					return true;//will have already been deleted
+				}
 			}
 			if(PatPlans.GetOrdinal(PriSecMed.Secondary,PatPlanList,InsPlanList,SubList)>0 //if there exists a secondary plan
 				&& !CultureInfo.CurrentCulture.Name.EndsWith("CA"))//And not Canada (don't create secondary claim for Canada)
 			{
 				sub=InsSubs.GetSub(PatPlans.GetInsSubNum(PatPlanList,PatPlans.GetOrdinal(PriSecMed.Secondary,PatPlanList,InsPlanList,SubList)),SubList);
 				plan=InsPlans.GetPlan(sub.PlanNum,InsPlanList);
-				ClaimCur=CreateClaim("S",PatPlanList,InsPlanList,ClaimProcList,procsForPat,SubList);
+				ClaimCur=CreateClaim("S",PatPlanList,InsPlanList,ClaimProcList,procsForPat,SubList,isVerbose,pat,table,grid);
 				if(ClaimCur.ClaimNum==0){
-					ModuleSelected(PatCur.PatNum);
-					return;
+					return true;
 				}
-				ClaimProcList=ClaimProcs.Refresh(PatCur.PatNum);
+				ClaimProcList=ClaimProcs.Refresh(pat.PatNum);
 				ClaimCur.ClaimStatus="H";
-				ClaimL.CalculateAndUpdate(procsForPat,InsPlanList,ClaimCur,PatPlanList,BenefitList,PatCur.Age,SubList);
+				ClaimL.CalculateAndUpdate(procsForPat,InsPlanList,ClaimCur,PatPlanList,BenefitList,pat.Age,SubList);
 			}
-			ModuleSelected(PatCur.PatNum);
+			return true;
 		}
 
 		///<summary>The procsForPat variable is all of the current procedures for the current patient. The tableAccount variable is the table from the DataSetMain object containing the information for the account grid.</summary>
-		private void InsCanadaValidateProcs(List <Procedure> procsForPat,DataTable tableAccount) {
+		private static void InsCanadaValidateProcs(List <Procedure> procsForPat,DataTable tableAccount,bool isVerbose,ODGrid grid) {
 			int labProcsUnselected=0;
-			List<int> selectedIndicies=new List<int>(gridAccount.SelectedIndices);
+			List<int> selectedIndicies=new List<int>(grid.SelectedIndices);
 			for(int i=0;i<selectedIndicies.Count;i++) {
 				Procedure proc=Procedures.GetProcFromList(procsForPat,PIn.Long(tableAccount.Rows[selectedIndicies[i]]["ProcNum"].ToString()));
 				ProcedureCode procCode=ProcedureCodes.GetProcCodeFromDb(proc.CodeNum);
 				if(procCode.IsCanadianLab) {
-					gridAccount.SetSelected(selectedIndicies[i],false);
+					grid.SetSelected(selectedIndicies[i],false);
 					labProcsUnselected++;
 				}
 			}
 			if(labProcsUnselected>0) {
-				MessageBox.Show(Lan.g(this,"Number of lab fee procedures automatically unselected")+": "+labProcsUnselected.ToString());
+				LogClaimError(Lan.g("ContrAccount","Number of lab fee procedures automatically unselected")+": "+labProcsUnselected.ToString(),isVerbose);
 			}
-			if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && gridAccount.SelectedIndices.Length>7) {//Canadian. en-CA or fr-CA
-				selectedIndicies=new List<int>(gridAccount.SelectedIndices);
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA") && grid.SelectedIndices.Length>7) {//Canadian. en-CA or fr-CA
+				selectedIndicies=new List<int>(grid.SelectedIndices);
 				selectedIndicies.Sort();
 				for(int i=0;i<selectedIndicies.Count;i++) { //Unselect all but the first 7 procedures with the smallest index numbers.
-					gridAccount.SetSelected(selectedIndicies[i],(i<7));
+					grid.SetSelected(selectedIndicies[i],(i<7));
 				}
-				MsgBox.Show(this,"Only the first 7 procedures will be selected.  You will need to create another claim for the remaining procedures.");
+				LogClaimError(Lan.g("ContrAccount","Only the first 7 procedures will be selected.  You will need to create another claim for the remaining procedures."),isVerbose);
 			}
 		}
 
@@ -3164,7 +3182,7 @@ namespace OpenDental {
 		///But it does not refresh any data. Does not do a final update of the new claim.  Does not enter fee amounts.
 		///claimType=P,S,Med,or Other
 		///Returns a 'new' claim object (ClaimNum=0) to indicate that the user does not want to create the claim or there are validation issues.</summary>
-		private Claim CreateClaim(string claimType,List <PatPlan> PatPlanList,List <InsPlan> planList,List<ClaimProc> ClaimProcList,List<Procedure> procsForPat,List<InsSub> subList){
+		private static Claim CreateClaim(string claimType,List <PatPlan> PatPlanList,List <InsPlan> planList,List<ClaimProc> ClaimProcList,List<Procedure> procsForPat,List<InsSub> subList,bool isVerbose,Patient pat,DataTable table,ODGrid grid){
 			long claimFormNum = 0;
 			InsPlan PlanCur=new InsPlan();
 			InsSub SubCur=new InsSub();
@@ -3184,7 +3202,7 @@ namespace OpenDental {
 					PlanCur=InsPlans.GetPlan(SubCur.PlanNum,planList);
 					break;
 				case "Other":
-					FormClaimCreate FormCC=new FormClaimCreate(PatCur.PatNum);
+					FormClaimCreate FormCC=new FormClaimCreate(pat.PatNum);
 					FormCC.ShowDialog();
 					if(FormCC.DialogResult!=DialogResult.OK){
 						return new Claim();
@@ -3194,7 +3212,6 @@ namespace OpenDental {
 					relatOther=FormCC.PatRelat;
 					break;
 			}
-			DataTable table=DataSetMain.Tables["account"];
 			Procedure proc;
 			//Order the selected procedures in the same order that they show in the TP module for the following reasons:
 			//1) Maintains the same procedure order on preauths and claims (required for Denti-Cal).
@@ -3205,8 +3222,8 @@ namespace OpenDental {
 			List<Procedure> listSelectedProcs=new List<Procedure>();
 			for(int i=0;i<procsForPat.Count;i++) {
 				proc=procsForPat[i];
-				for(int j=0;j<gridAccount.SelectedIndices.Length;j++) {
-					long procNum=PIn.Long(table.Rows[gridAccount.SelectedIndices[j]]["ProcNum"].ToString());
+				for(int j=0;j<grid.SelectedIndices.Length;j++) {
+					long procNum=PIn.Long(table.Rows[grid.SelectedIndices[j]]["ProcNum"].ToString());
 					if(proc.ProcNum==procNum) {
 						listSelectedProcs.Add(proc);
 						break;
@@ -3220,24 +3237,24 @@ namespace OpenDental {
 				.ThenBy(x => Tooth.ToInt(x.ToothNum))
 				.ThenBy(x=>x.ProcDate).ToList();
 			if((claimType=="P" || claimType=="S") && Procedures.GetUniqueDiagnosticCodes(listProcs,false).Count>4) {
-				MsgBox.Show(this,"Claim has more than 4 unique diagnosis codes.  Create multiple claims instead.");
+				LogClaimError(Lan.g("ContrAccount","Claim has more than 4 unique diagnosis codes.  Create multiple claims instead."),isVerbose);
 				return new Claim();
 			}
 			if(Procedures.GetUniqueDiagnosticCodes(listProcs,true).Count>12) {
-				MsgBox.Show(this,"Claim has more than 12 unique diagnosis codes.  Create multiple claims instead.");
+				LogClaimError(Lan.g("ContrAccount","Claim has more than 12 unique diagnosis codes.  Create multiple claims instead."),isVerbose);
 				return new Claim();
 			}
 			for(int i=0;i<listProcs.Count;i++){
 				proc=listProcs[i];
 				if(Procedures.NoBillIns(proc,ClaimProcList,PlanCur.PlanNum)){
-					MsgBox.Show(this,"Not allowed to send procedures to insurance that are marked 'Do not bill to ins'.");
+					LogClaimError(Lan.g("ContrAccount","Not allowed to send procedures to insurance that are marked 'Do not bill to ins'."),isVerbose);
 					return new Claim();
 				}
 			}
 			for(int i=0;i<listProcs.Count;i++){
 				proc=listProcs[i];
 				if(Procedures.IsAlreadyAttachedToClaim(proc,ClaimProcList,SubCur.InsSubNum)){
-					MsgBox.Show(this,"Not allowed to send a procedure to the same insurance company twice.");
+					LogClaimError(Lan.g("ContrAccount","Not allowed to send a procedure to the same insurance company twice."),isVerbose);
 					return new Claim();
 				}
 			}
@@ -3247,11 +3264,11 @@ namespace OpenDental {
 			for(int i=1;i<listProcs.Count;i++){//skips 0
 				proc=listProcs[i];
 				if(clinicNum!=proc.ClinicNum){
-					MsgBox.Show(this,"All procedures do not have the same clinic.");
+					LogClaimError(Lan.g("ContrAccount","All procedures do not have the same clinic."),isVerbose);
 					return new Claim();
 				}
 				if(proc.PlaceService!=placeService) {
-					MsgBox.Show(this,"All procedures do not have the same place of service.");
+					LogClaimError(Lan.g("ContrAccount","All procedures do not have the same place of service."),isVerbose);
 					return new Claim();
 				}
 			}
@@ -3283,7 +3300,7 @@ namespace OpenDental {
 					ClaimProcs.Insert(claimProcs[i]);//this makes a duplicate in db with different claimProcNum
 				}
 			}
-			ClaimCur.PatNum=PatCur.PatNum;
+			ClaimCur.PatNum=pat.PatNum;
 			ClaimCur.DateService=claimProcs[claimProcs.Length-1].ProcDate;
 			ClaimCur.ClinicNum=clinicNum;
 			ClaimCur.PlaceService=proc.PlaceService;
@@ -3352,7 +3369,7 @@ namespace OpenDental {
 				}
 			}
 			if(Providers.GetIsSec(ClaimCur.ProvTreat)){
-				ClaimCur.ProvTreat=PatCur.PriProv;
+				ClaimCur.ProvTreat=pat.PriProv;
 				//OK if 0, because auto select first in list when open claim
 			}
 			//claimfee calcs in ClaimEdit
@@ -3427,7 +3444,7 @@ namespace OpenDental {
 
 		///<summary>Creates a snapshot for the claimprocs passed in.  Used for reporting purposes.  claimType=P,S
 		///Only creates snapshots if the feature is enabled and if the claimproc is of certain statuses.</summary>
-		private void CreateClaimSnapshot(string claimType,List<ClaimProc> listClaimProcs,double procFee) {//,List<Procedure> listPatProcs
+		private static void CreateClaimSnapshot(string claimType,List<ClaimProc> listClaimProcs,double procFee) {//,List<Procedure> listPatProcs
 			if(!PrefC.GetBool(PrefName.ClaimSnapshotEnabled) || (claimType!="P" && claimType!="S")) {
 				return;
 			}
@@ -3451,6 +3468,7 @@ namespace OpenDental {
 		}
 
 		private void menuInsPri_Click(object sender, System.EventArgs e) {
+			ClaimErrorsCur="";
 			if(!CheckClearinghouseDefaults()) {
 				return;
 			}
@@ -3484,8 +3502,8 @@ namespace OpenDental {
 				return;
 			}
 			//At this point, all selected items are procedures.
-			InsCanadaValidateProcs(procsForPat,table);
-			Claim ClaimCur=CreateClaim("P",PatPlanList,InsPlanList,ClaimProcList,procsForPat,SubList);
+			InsCanadaValidateProcs(procsForPat,table,true,gridAccount);
+			Claim ClaimCur=CreateClaim("P",PatPlanList,InsPlanList,ClaimProcList,procsForPat,SubList,true,PatCur,DataSetMain.Tables["account"],gridAccount);
 			if(ClaimCur.ClaimNum==0){
 				ModuleSelected(PatCur.PatNum);
 				return;
@@ -3501,6 +3519,7 @@ namespace OpenDental {
 		}
 
 		private void menuInsSec_Click(object sender, System.EventArgs e) {
+			ClaimErrorsCur="";
 			if(!CheckClearinghouseDefaults()) {
 				return;
 			}
@@ -3534,8 +3553,8 @@ namespace OpenDental {
 				return;
 			}
 			//At this point, all selected items are procedures.
-			InsCanadaValidateProcs(procsForPat,table);
-			Claim ClaimCur=CreateClaim("S",PatPlanList,InsPlanList,ClaimProcList,procsForPat,SubList);
+			InsCanadaValidateProcs(procsForPat,table,true,gridAccount);
+			Claim ClaimCur=CreateClaim("S",PatPlanList,InsPlanList,ClaimProcList,procsForPat,SubList,true,PatCur,DataSetMain.Tables["account"],gridAccount);
 			if(ClaimCur.ClaimNum==0){
 				ModuleSelected(PatCur.PatNum);
 				return;
@@ -3550,6 +3569,7 @@ namespace OpenDental {
 		}
 
 		private void menuInsMedical_Click(object sender, System.EventArgs e) {
+			ClaimErrorsCur="";
 			if(!CheckClearinghouseDefaults()) {
 				return;
 			}
@@ -3605,7 +3625,7 @@ namespace OpenDental {
 				MsgBox.Show(this,"You can only select procedures.");
 				return;
 			}
-			Claim ClaimCur=CreateClaim("Med",PatPlanList,InsPlanList,ClaimProcList,procsForPat,SubList);
+			Claim ClaimCur=CreateClaim("Med",PatPlanList,InsPlanList,ClaimProcList,procsForPat,SubList,true,PatCur,DataSetMain.Tables["account"],gridAccount);
 			if(ClaimCur.ClaimNum==0){
 				ModuleSelected(PatCur.PatNum);
 				return;
@@ -3621,6 +3641,7 @@ namespace OpenDental {
 		}
 
 		private void menuInsOther_Click(object sender, System.EventArgs e) {
+			ClaimErrorsCur="";
 			if(!CheckClearinghouseDefaults()) {
 				return;
 			}
@@ -3645,7 +3666,7 @@ namespace OpenDental {
 				MessageBox.Show(Lan.g(this,"You can only select procedures."));
 				return;
 			}
-			Claim ClaimCur=CreateClaim("Other",PatPlanList,InsPlanList,ClaimProcList,procsForPat,SubList);
+			Claim ClaimCur=CreateClaim("Other",PatPlanList,InsPlanList,ClaimProcList,procsForPat,SubList,true,PatCur,DataSetMain.Tables["account"],gridAccount);
 			if(ClaimCur.ClaimNum==0){
 				ModuleSelected(PatCur.PatNum);
 				return;
