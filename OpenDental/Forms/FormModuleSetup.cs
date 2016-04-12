@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Linq;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -164,6 +165,10 @@ namespace OpenDental{
 		private Label label28;
 		private ComboBox comboUnallocatedSplits;
 		private Def[] _arrayPaySplitUnearnedType;
+		private UI.Button butBadDebt;
+		private ListBox listboxBadDebtAdjs;
+		private GroupBox groupBox4;
+		private Label label29;
 		private GroupBox groupBox3;
 
 		///<summary>Default constructor.  Opens the form with the Appts tab selected.</summary>
@@ -273,6 +278,8 @@ namespace OpenDental{
 			this.label15 = new System.Windows.Forms.Label();
 			this.comboCobRule = new System.Windows.Forms.ComboBox();
 			this.tabAccount = new System.Windows.Forms.TabPage();
+			this.listboxBadDebtAdjs = new System.Windows.Forms.ListBox();
+			this.butBadDebt = new OpenDental.UI.Button();
 			this.label28 = new System.Windows.Forms.Label();
 			this.comboUnallocatedSplits = new System.Windows.Forms.ComboBox();
 			this.label27 = new System.Windows.Forms.Label();
@@ -346,6 +353,8 @@ namespace OpenDental{
 			this.colorDialog = new System.Windows.Forms.ColorDialog();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.label29 = new System.Windows.Forms.Label();
+			this.groupBox4 = new System.Windows.Forms.GroupBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.groupBox2.SuspendLayout();
@@ -357,6 +366,7 @@ namespace OpenDental{
 			this.groupBox3.SuspendLayout();
 			this.tabManage.SuspendLayout();
 			this.groupBox1.SuspendLayout();
+			this.groupBox4.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -1216,6 +1226,7 @@ namespace OpenDental{
 			// tabAccount
 			// 
 			this.tabAccount.BackColor = System.Drawing.SystemColors.Window;
+			this.tabAccount.Controls.Add(this.groupBox4);
 			this.tabAccount.Controls.Add(this.label28);
 			this.tabAccount.Controls.Add(this.comboUnallocatedSplits);
 			this.tabAccount.Controls.Add(this.label27);
@@ -1247,6 +1258,29 @@ namespace OpenDental{
 			this.tabAccount.Size = new System.Drawing.Size(466, 511);
 			this.tabAccount.TabIndex = 2;
 			this.tabAccount.Text = "Account";
+			// 
+			// listboxBadDebtAdjs
+			// 
+			this.listboxBadDebtAdjs.FormattingEnabled = true;
+			this.listboxBadDebtAdjs.Location = new System.Drawing.Point(189, 11);
+			this.listboxBadDebtAdjs.Name = "listboxBadDebtAdjs";
+			this.listboxBadDebtAdjs.SelectionMode = System.Windows.Forms.SelectionMode.None;
+			this.listboxBadDebtAdjs.Size = new System.Drawing.Size(120, 108);
+			this.listboxBadDebtAdjs.TabIndex = 197;
+			// 
+			// butBadDebt
+			// 
+			this.butBadDebt.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butBadDebt.Autosize = true;
+			this.butBadDebt.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butBadDebt.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butBadDebt.CornerRadius = 4F;
+			this.butBadDebt.Location = new System.Drawing.Point(117, 92);
+			this.butBadDebt.Name = "butBadDebt";
+			this.butBadDebt.Size = new System.Drawing.Size(68, 23);
+			this.butBadDebt.TabIndex = 197;
+			this.butBadDebt.Text = "Edit";
+			this.butBadDebt.Click += new System.EventHandler(this.butBadDebt_Click);
 			// 
 			// label28
 			// 
@@ -2083,6 +2117,27 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// label29
+			// 
+			this.label29.Location = new System.Drawing.Point(4, 12);
+			this.label29.Name = "label29";
+			this.label29.Size = new System.Drawing.Size(184, 20);
+			this.label29.TabIndex = 223;
+			this.label29.Text = "Current Bad Debt Adj Types:";
+			this.label29.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// groupBox4
+			// 
+			this.groupBox4.Controls.Add(this.listboxBadDebtAdjs);
+			this.groupBox4.Controls.Add(this.label29);
+			this.groupBox4.Controls.Add(this.butBadDebt);
+			this.groupBox4.Location = new System.Drawing.Point(126, 386);
+			this.groupBox4.Name = "groupBox4";
+			this.groupBox4.Size = new System.Drawing.Size(314, 122);
+			this.groupBox4.TabIndex = 224;
+			this.groupBox4.TabStop = false;
+			this.groupBox4.Text = "Bad Debt Adjustments";
+			// 
 			// FormModuleSetup
 			// 
 			this.ClientSize = new System.Drawing.Size(543, 590);
@@ -2113,6 +2168,7 @@ namespace OpenDental{
 			this.tabManage.ResumeLayout(false);
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();
+			this.groupBox4.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
@@ -2284,6 +2340,12 @@ namespace OpenDental{
 					comboUnallocatedSplits.SelectedIndex=i;
 				}
 			}
+			string[] arrayDefNums=PrefC.GetString(PrefName.BadDebtAdjustmentTypes).Split(new char[] {','}); //comma-delimited list.
+			List<long> listBadAdjDefNums = new List<long>();
+			foreach(string strDefNum in arrayDefNums) {
+				listBadAdjDefNums.Add(PIn.Long(strDefNum));
+			}
+			FillListboxBadDebt(DefC.GetDefs(DefCat.AdjTypes,listBadAdjDefNums));
 			#endregion
 			#region TP Module
 			//TP module-----------------------------------------------------------------------
@@ -2774,8 +2836,28 @@ namespace OpenDental{
 			}
 		}
 
-		
+		private void butBadDebt_Click(object sender,EventArgs e) {
+			string[] arrayDefNums=PrefC.GetString(PrefName.BadDebtAdjustmentTypes).Split(new char[] {','}); //comma-delimited list.
+			List<long> listBadAdjDefNums = new List<long>();
+			foreach(string strDefNum in arrayDefNums) {
+				listBadAdjDefNums.Add(PIn.Long(strDefNum));
+			}
+			List<Def> listBadAdjDefs=DefC.GetDefs(DefCat.AdjTypes,listBadAdjDefNums);
+			FormDefinitionPicker FormDP = new FormDefinitionPicker(DefCat.AdjTypes,listBadAdjDefs);
+			FormDP.ShowDialog();
+			if(FormDP.DialogResult==DialogResult.OK) {
+				FillListboxBadDebt(FormDP.ListSelectedDefs);
+				string strListBadDebtAdjTypes=String.Join(",",FormDP.ListSelectedDefs.Select(x => x.DefNum));
+				Prefs.UpdateString(PrefName.BadDebtAdjustmentTypes,strListBadDebtAdjTypes);
+			}
+		}
 
+		private void FillListboxBadDebt(List<Def> listSelectedDefs) {
+			listboxBadDebtAdjs.Items.Clear();
+			foreach(Def defCur in listSelectedDefs) {
+				listboxBadDebtAdjs.Items.Add(defCur.ItemName);
+			}
+		}
 	}
 }
 

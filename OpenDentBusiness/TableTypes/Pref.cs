@@ -105,6 +105,7 @@ namespace OpenDentBusiness {
 		BackupRestoreFromPath,
 		BackupRestoreToPath,
 		BackupToPath,
+		BadDebtAdjustmentTypes,
 		BalancesDontSubtractIns,
 		BankAddress,
 		BankRouting,

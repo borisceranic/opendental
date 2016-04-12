@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
+using System.Linq;
 
 namespace OpenDentBusiness {
 	public class DefC {
@@ -98,6 +99,24 @@ namespace OpenDentBusiness {
 		public static Def[] GetList(DefCat defCat) {
 			Def[][] arrayDefs=GetArrayShort();
 			return arrayDefs[(int)defCat];
+		}
+
+		///<summary>Gets a list of all defs for one category.</summary>
+		public static List<Def> GetListLong(DefCat DefCat) {
+			Def[][] arrayDefs=GetArrayLong();
+			return arrayDefs[(int)DefCat].ToList();
+		}
+
+		///<summary>Gets a list of defs from the list of defnums and passed-in cat.</summary>
+		public static List<Def> GetDefs(DefCat Cat, List<long> listDefNums) {
+			List<Def> retVal=new List<Def>();
+			List<Def> listDefs=GetListLong(Cat);
+			foreach(Def defCur in listDefs) {
+				if(listDefNums.Any(x => x == defCur.DefNum)) {
+					retVal.Add(defCur);
+				}
+			}
+			return retVal;
 		}
 
 		///<summary>Get one def from Long.  Returns null if not found.  Only used for very limited situations.  Other Get functions tend to be much more useful since they don't return null.  There is also BIG potential for silent bugs if you use this.ItemOrder instead of GetOrder().</summary>
