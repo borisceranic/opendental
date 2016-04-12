@@ -340,6 +340,7 @@ namespace OpenDental{
 			else{
 				ProcCodeNotes.Update(NoteCur);
 			}
+			DataValid.SetInvalid(InvalidType.ProcCodes);
 			DialogResult=DialogResult.OK;
 		}
 
