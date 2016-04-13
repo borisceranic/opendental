@@ -5750,6 +5750,7 @@ namespace OpenDental{
 				return;
 			}
 			FillPatientButton(Patients.GetPat(CurPatNum));
+			RefreshCurrentModule();
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Modules");
 		}
 
