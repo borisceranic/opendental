@@ -300,11 +300,30 @@ namespace OpenDentBusiness{
 			//TreatPlans.Update(treatPlanCur);
 		}
 
+		///<summary>May not return correct values if notes are stored with newline characters.</summary>
+		public static List<long> GetNumsByNote(string oldNote) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<long>>(MethodBase.GetCurrentMethod(),oldNote);
+			}
+			oldNote=oldNote.Replace("\r","").Replace("\n","\r\n");
+			string command="SELECT TreatPlanNum FROM treatplan WHERE Note='"+POut.String(oldNote)+"' "+
+				"AND TPStatus IN ("+POut.Int((int)TreatPlanStatus.Active)+","+POut.Int((int)TreatPlanStatus.Inactive)+")";
+			return Db.GetListLong(command);
+		}
 
-
-
-
-
+		/// <summary>	Updates the default note on active/inactive treatment plans with new note</summary>
+		public static void UpdateNotes(string newNote, List<long> listTPNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),newNote,listTPNums);
+				return;
+			}
+			if(listTPNums==null || listTPNums.Count==0) {
+				return;
+			}
+			string command="UPDATE treatplan SET Note='"+POut.String(newNote)+"' "
+				+"WHERE TreatPlanNum IN ("+string.Join(",",listTPNums)+")";
+ 			Db.NonQ(command);
+		}
 
 	}
 

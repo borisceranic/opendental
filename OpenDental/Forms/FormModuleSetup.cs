@@ -2289,6 +2289,24 @@ namespace OpenDental{
 				MsgBox.Show(this,"Days until medication order stop date cannot be a negative number.");
 				return;
 			}
+			if(PrefC.GetString(PrefName.TreatmentPlanNote)!=textTreatNote.Text) {
+				List<long> listTreatPlanNums=TreatPlans.GetNumsByNote(PrefC.GetString(PrefName.TreatmentPlanNote));//Find active/inactive TP's that match exactly.
+				if(listTreatPlanNums.Count>0) {
+					DialogResult dr=MessageBox.Show(Lan.g(this,"Unsaved treatment plans found with default notes")+": "+listTreatPlanNums.Count+"\r\n"
+						+Lan.g(this,"Would you like to change them now?"),"",MessageBoxButtons.YesNoCancel);
+					switch(dr) {
+						case DialogResult.Cancel:
+							return;
+						case DialogResult.Yes:
+						case DialogResult.OK:
+							TreatPlans.UpdateNotes(textTreatNote.Text,listTreatPlanNums);//change tp notes
+							break;
+						default://includes "No"
+							//do nothing
+							break;
+					}
+				}
+			}//end if TP Note Changed
 			if(
 				#region Appointment Module
 				Prefs.UpdateBool(PrefName.AppointmentBubblesDisabled,checkAppointmentBubblesDisabled.Checked)
