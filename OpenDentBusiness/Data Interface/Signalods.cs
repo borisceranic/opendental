@@ -32,21 +32,23 @@ namespace OpenDentBusiness {
 			return true;
 		}
 
-		///<summary>Retreives new signals from the DB, updates Caches, and broadcasts signals to all subscribed forms. Returns false if signals should stop being processed.</summary>
-		public static void SignalsTick(Action onShutdown) {
+		///<summary>Retreives new signals from the DB, updates Caches, and broadcasts signals to all subscribed forms.
+		///Returns the list of signals processed if there weren't any errors.  Otherwise, returns an empty list.</summary>
+		public static List<Signalod> SignalsTick(Action onShutdown) {
 			//No need to check RemotingRole; no call to db.
 			try {
-				List<Signalod> listSignals = RefreshTimed(SignalLastRefreshed);
+				List<Signalod> listSignals=RefreshTimed(SignalLastRefreshed);
 				if(listSignals.Count==0) {
-					return;
+					return new List<Signalod>();
 				}
 				SignalLastRefreshed=listSignals.SelectMany(x=> new[] { x.SigDateTime,x.AckTime }).Max();
 				if(listSignals.Any(x => x.ITypes.Contains(((int)InvalidType.ShutDownNow).ToString()))) {
 					onShutdown();
-					return;
+					return new List<Signalod>();
 				}
 				Cache.RefreshCache(string.Join(",",listSignals.SelectMany(x => x.ITypes.Split(',').Distinct())));//refresh invalid data
 				BroadcastSignals(listSignals);
+				return listSignals;
 			}
 			catch {
 				DateTime dateTimeRefreshed;
@@ -60,6 +62,7 @@ namespace OpenDentBusiness {
 				}
 				SignalLastRefreshed=dateTimeRefreshed;
 			}
+			return new List<Signalod>();
 		}
 
 		public static void BroadcastSignals(List<Signalod> listSignals) {

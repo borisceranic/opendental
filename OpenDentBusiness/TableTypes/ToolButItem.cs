@@ -15,6 +15,12 @@ namespace OpenDentBusiness{
 		///<summary>The text to show on the toolbar button.</summary>
 		public string ButtonText;
 		//later include ComputerName.  If blank, then show on all computers.
+
+		///<summary></summary>
+		public static int Compare(ToolButItem item1,ToolButItem item2) {
+			return item1.ButtonText.CompareTo(item2.ButtonText);
+		}
+
 	}
 
 	

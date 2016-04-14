@@ -2479,6 +2479,7 @@ namespace OpenDental{
 			}
 			myOutlookBar.Invalidate();
 			LayoutToolBar();
+			RefreshMenuReports();
 			//If clinics are enabled, we will set the public ClinicNum variable
 			//If the user is restricted to a clinic(s), and the computerpref clinic is not one of the user's restricted clinics, the user's clinic will be selected
 			//If the user is not restricted, or if the user is restricted but has access to the computerpref clinic, the computerpref clinic will be selected
@@ -3196,7 +3197,7 @@ namespace OpenDental{
 				ToolBarMain.Buttons.Add(button);
 			}
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Popups"),-1,Lan.g(this,"Edit popups for this patient"),"Popups"));
-			ProgramL.LoadToolbar(ToolBarMain,ToolBarsAvail.AllModules);
+			ProgramL.LoadToolbar(ToolBarMain,ToolBarsAvail.MainToolbar);
 			Plugins.HookAddCode(this,"FormOpenDental.LayoutToolBar_end");
 			ToolBarMain.Invalidate();
 		}
@@ -4397,7 +4398,10 @@ namespace OpenDental{
 				//Currently do nothing.
 			}
 			//Signal Processing
-			Signalods.SignalsTick(onShutdown);
+			List<Signalod> listSignals=Signalods.SignalsTick(onShutdown);
+			if(listSignals.Exists(x => x.ITypes.Contains(((int)InvalidType.Programs).ToString()))) {
+				RefreshMenuReports();
+			}
 		}
 
 		///<summary>Called when a shutdown signal is found.</summary>
@@ -5828,6 +5832,7 @@ namespace OpenDental{
 			FormPL.ShowDialog();
 			ContrChart2.InitializeLocalData();//for eCW
 			LayoutToolBar();
+			RefreshMenuReports();
 			if(CurPatNum>0) {
 				Patient pat=Patients.GetPat(CurPatNum);
 				FillPatientButton(pat);
@@ -6243,6 +6248,41 @@ namespace OpenDental{
 			_formUserQuery.FormClosed+=new FormClosedEventHandler((object senderF,FormClosedEventArgs eF) => { _formUserQuery=null; });
 			_formUserQuery.Show();
 		}		
+
+		private void RefreshMenuReports() {
+			//Find the index of the last separator which separates the static menu items from the dynamic menu items.
+			int separatorIndex=-1;
+			for(int i=0;i<menuItemReportsHeader.MenuItems.Count;i++) {
+				if(menuItemReportsHeader.MenuItems[i].Text=="-") {
+					separatorIndex=i;
+				}
+			}
+			//Remove dynamic items and separator.  Leave hard coded items.
+			if(separatorIndex!=-1) {
+				for(int i=menuItemReportsHeader.MenuItems.Count-1;i>=separatorIndex;i--) {
+					menuItemReportsHeader.MenuItems.RemoveAt(i);
+				}
+			}
+			ArrayList arrayToolButItems=ToolButItems.GetForToolBar(ToolBarsAvail.ReportsMenu);
+			if(arrayToolButItems.Count==0) {
+				return;//Return early to avoid adding a useless separator in the menu.
+			}
+			//Add separator, then dynamic items to the bottom of the menu.
+			menuItemReportsHeader.MenuItems.Add("-");//Separator			
+			List <ToolButItem> listToolButItems=arrayToolButItems.Cast<ToolButItem>().ToList();
+			listToolButItems.Sort(ToolButItem.Compare);//Alphabetical order
+			foreach(ToolButItem toolButItemCur in listToolButItems) {
+				MenuItem menuItem=new MenuItem(toolButItemCur.ButtonText,menuReportLink_Click);
+				menuItem.Tag=toolButItemCur;
+				menuItemReportsHeader.MenuItems.Add(menuItem);
+			}
+		}
+
+		private void menuReportLink_Click(object sender,System.EventArgs e) {
+			MenuItem menuItem=(MenuItem)sender;
+			ToolButItem toolButItemCur=((ToolButItem)menuItem.Tag);			
+			ProgramL.Execute(toolButItemCur.ProgramNum,Patients.GetPat(CurPatNum));
+		}
 
 		#endregion
 

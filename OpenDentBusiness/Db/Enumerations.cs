@@ -621,7 +621,9 @@ namespace OpenDentBusiness{
 		///<summary>6</summary>
 		ClaimsSend,
 		///<summary>7 Shows in the toolbar at the top that is common to all modules.</summary>
-		AllModules
+		MainToolbar,
+		///<summary>8 Shows in the main menu Reports submenu.</summary>
+		ReportsMenu,
 	}
 
 	///<summary></summary>

@@ -367,7 +367,7 @@ namespace OpenDental{
 					Image image=PIn.Bitmap(programCur.ButtonImage);
 					ToolBarMain.ImageList.Images.Add(key,image);
 				}
-				if(toolBarsAvail!=ToolBarsAvail.AllModules) {
+				if(toolBarsAvail!=ToolBarsAvail.MainToolbar) {
 					ToolBarMain.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
 				}
 				ToolBarMain.Buttons.Add(new ODToolBarButton(toolButItemCur.ButtonText,-1,"",programCur));

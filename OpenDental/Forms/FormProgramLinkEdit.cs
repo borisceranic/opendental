@@ -126,7 +126,7 @@ namespace OpenDental{
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(702, 514);
+			this.butCancel.Location = new System.Drawing.Point(673, 514);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 26);
 			this.butCancel.TabIndex = 0;
@@ -141,7 +141,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(702, 473);
+			this.butOK.Location = new System.Drawing.Point(673, 473);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 26);
 			this.butOK.TabIndex = 1;
@@ -244,17 +244,17 @@ namespace OpenDental{
 			// 
 			// listToolBars
 			// 
-			this.listToolBars.Location = new System.Drawing.Point(15, 281);
+			this.listToolBars.Location = new System.Drawing.Point(15, 273);
 			this.listToolBars.Name = "listToolBars";
 			this.listToolBars.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listToolBars.Size = new System.Drawing.Size(156, 108);
+			this.listToolBars.Size = new System.Drawing.Size(156, 121);
 			this.listToolBars.TabIndex = 53;
 			// 
 			// label6
 			// 
 			this.label6.Location = new System.Drawing.Point(14, 247);
 			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(223, 30);
+			this.label6.Size = new System.Drawing.Size(223, 22);
 			this.label6.TabIndex = 56;
 			this.label6.Text = "Add a button to these toolbars";
 			this.label6.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
@@ -401,7 +401,7 @@ namespace OpenDental{
 			// butOutputFile
 			// 
 			this.butOutputFile.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butOutputFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butOutputFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.butOutputFile.Autosize = true;
 			this.butOutputFile.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOutputFile.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -427,9 +427,8 @@ namespace OpenDental{
 			// 
 			// FormProgramLinkEdit
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.CancelButton = this.butCancel;
-			this.ClientSize = new System.Drawing.Size(797, 560);
+			this.ClientSize = new System.Drawing.Size(768, 560);
 			this.Controls.Add(this.checkHideButtons);
 			this.Controls.Add(this.butOutputFile);
 			this.Controls.Add(this.pictureBox);
@@ -460,12 +459,12 @@ namespace OpenDental{
 			this.Controls.Add(this.checkEnabled);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
 			this.Name = "FormProgramLinkEdit";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Program Link";
 			this.Closing += new System.ComponentModel.CancelEventHandler(this.FormProgramLinkEdit_Closing);
 			this.Load += new System.EventHandler(this.FormProgramLinkEdit_Load);
