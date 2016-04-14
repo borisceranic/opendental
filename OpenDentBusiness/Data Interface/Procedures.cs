@@ -1220,7 +1220,8 @@ namespace OpenDentBusiness {
 		public static Procedure[] GetListTP(List<Procedure> procList) {
 			//No need to check RemotingRole; no call to db.
 			return procList.Where(x => x.ProcStatus==ProcStat.TP)
-				.OrderBy(x => x.PriorityOrder)
+				.OrderBy(x => x.PriorityOrder<0)//all priorityOrder values should be either -1 for unassigned or >0 for assigned.
+				.ThenBy(x => x.PriorityOrder)
 				.ThenBy(x => x.ToothRange)
 				.ThenBy(x => Tooth.ToInt(x.ToothNum))
 				.ThenBy(x => ProcedureCodes.GetStringProcCode(x.CodeNum))
