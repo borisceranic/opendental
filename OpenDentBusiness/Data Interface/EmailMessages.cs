@@ -103,6 +103,9 @@ namespace OpenDentBusiness{
 			}
 			Crud.EmailMessageCrud.Update(message);
 			if(updateAttachments) {
+				foreach(EmailAttach attach in message.Attachments) {
+					attach.EmailMessageNum=message.EmailMessageNum;//update all of the emailmessagenums for the attachments.
+				};
 				EmailAttaches.Sync(message.EmailMessageNum,message.Attachments);
 			}
 		}
