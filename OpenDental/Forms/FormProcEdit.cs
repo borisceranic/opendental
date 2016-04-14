@@ -268,6 +268,8 @@ namespace OpenDental{
 		private bool _isQuickAdd=false;
 		///<summary>Users can temporarily log in on this form.  Defaults to Security.CurUser.</summary>
 		private Userod _curUser=Security.CurUser;
+		private UI.Button butAddExistAdj;
+
 		///<summary>True if the user clicked the Change User button.</summary>
 		private bool _hasUserChanged;
 
@@ -501,6 +503,7 @@ namespace OpenDental{
 			this.butOK = new OpenDental.UI.Button();
 			this.signatureBoxWrapper = new OpenDental.UI.SignatureBoxWrapper();
 			this.butChangeUser = new OpenDental.UI.Button();
+			this.butAddExistAdj = new OpenDental.UI.Button();
 			this.groupQuadrant.SuspendLayout();
 			this.groupArch.SuspendLayout();
 			this.panelSurfaces.SuspendLayout();
@@ -1900,6 +1903,7 @@ namespace OpenDental{
 			// 
 			// tabPageFinancial
 			// 
+			this.tabPageFinancial.Controls.Add(this.butAddExistAdj);
 			this.tabPageFinancial.Controls.Add(this.gridPay);
 			this.tabPageFinancial.Controls.Add(this.gridAdj);
 			this.tabPageFinancial.Controls.Add(this.label20);
@@ -1993,7 +1997,7 @@ namespace OpenDental{
 			this.butAddAdjust.Name = "butAddAdjust";
 			this.butAddAdjust.Size = new System.Drawing.Size(126, 24);
 			this.butAddAdjust.TabIndex = 72;
-			this.butAddAdjust.Text = "Add Adjustment";
+			this.butAddAdjust.Text = "Add New Adj";
 			this.butAddAdjust.Click += new System.EventHandler(this.butAddAdjust_Click);
 			// 
 			// gridIns
@@ -2576,6 +2580,7 @@ namespace OpenDental{
 			// 
 			this.textClaimNote.AcceptsTab = true;
 			this.textClaimNote.BackColor = System.Drawing.SystemColors.Window;
+			this.textClaimNote.DetectLinksEnabled = false;
 			this.textClaimNote.DetectUrls = false;
 			this.textClaimNote.Location = new System.Drawing.Point(106, 364);
 			this.textClaimNote.MaxLength = 80;
@@ -2583,6 +2588,7 @@ namespace OpenDental{
 			this.textClaimNote.QuickPasteType = OpenDentBusiness.QuickPasteType.Procedure;
 			this.textClaimNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textClaimNote.Size = new System.Drawing.Size(277, 43);
+			this.textClaimNote.SpellCheckIsEnabled = false;
 			this.textClaimNote.TabIndex = 173;
 			this.textClaimNote.Text = "";
 			// 
@@ -2632,12 +2638,14 @@ namespace OpenDental{
 			// 
 			this.textNotes.AcceptsTab = true;
 			this.textNotes.BackColor = System.Drawing.SystemColors.Window;
+			this.textNotes.DetectLinksEnabled = false;
 			this.textNotes.DetectUrls = false;
 			this.textNotes.Location = new System.Drawing.Point(504, 157);
 			this.textNotes.Name = "textNotes";
 			this.textNotes.QuickPasteType = OpenDentBusiness.QuickPasteType.Procedure;
 			this.textNotes.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textNotes.Size = new System.Drawing.Size(450, 164);
+			this.textNotes.SpellCheckIsEnabled = false;
 			this.textNotes.TabIndex = 1;
 			this.textNotes.Text = "";
 			this.textNotes.TextChanged += new System.EventHandler(this.textNotes_TextChanged);
@@ -2743,6 +2751,22 @@ namespace OpenDental{
 			this.butChangeUser.TabIndex = 182;
 			this.butChangeUser.Text = "...";
 			this.butChangeUser.Click += new System.EventHandler(this.butChangeUser_Click);
+			// 
+			// butAddExistAdj
+			// 
+			this.butAddExistAdj.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAddExistAdj.Autosize = true;
+			this.butAddExistAdj.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butAddExistAdj.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butAddExistAdj.CornerRadius = 4F;
+			this.butAddExistAdj.Image = global::OpenDental.Properties.Resources.Add;
+			this.butAddExistAdj.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butAddExistAdj.Location = new System.Drawing.Point(589, 6);
+			this.butAddExistAdj.Name = "butAddExistAdj";
+			this.butAddExistAdj.Size = new System.Drawing.Size(126, 24);
+			this.butAddExistAdj.TabIndex = 118;
+			this.butAddExistAdj.Text = "Link Existing Adj";
+			this.butAddExistAdj.Click += new System.EventHandler(this.butAddExistAdj_Click);
 			// 
 			// FormProcEdit
 			// 
@@ -3871,6 +3895,27 @@ namespace OpenDental{
 			FormAdjust FormA=new FormAdjust(PatCur,adj);
 			FormA.IsNew=true;
 			FormA.ShowDialog();
+			FillAdj();
+		}
+
+		private void butAddExistAdj_Click(object sender,EventArgs e) {
+			if(!Security.IsAuthorized(Permissions.AdjustmentEdit)) {
+				return;
+			}
+			if(ProcCur.ProcStatus!=ProcStat.C){
+				MsgBox.Show(this,"Adjustments may only be added to completed procedures.");
+				return;
+			}
+			FormAdjustmentPicker FormAP=new FormAdjustmentPicker(PatCur.PatNum,true);
+			if(FormAP.ShowDialog()!=DialogResult.OK) {
+				return;
+			}
+			if(!Security.IsAuthorized(Permissions.AdjustmentEdit,FormAP.SelectedAdjustment.AdjDate)) {
+				return;
+			}
+			FormAP.SelectedAdjustment.ProcNum=ProcCur.ProcNum;
+			FormAP.SelectedAdjustment.ProcDate=ProcCur.ProcDate;
+			Adjustments.Update(FormAP.SelectedAdjustment);
 			FillAdj();
 		}
 

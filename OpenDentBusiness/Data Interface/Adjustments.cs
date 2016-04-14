@@ -147,10 +147,13 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Used from ContrAccount and ProcEdit to display and calculate adjustments attached to procs.</summary>
-		public static double GetTotForProc(long procNum,Adjustment[] List) {
+		public static double GetTotForProc(long procNum,Adjustment[] List,long excludedNum=0) {
 			//No need to check RemotingRole; no call to db.
 			double retVal=0;
 			for(int i=0;i<List.Length;i++){
+				if((List[i].AdjNum==excludedNum)) {
+					continue;
+				}
 				if(List[i].ProcNum==procNum){
 					retVal+=List[i].AdjAmt;
 				}
