@@ -1503,12 +1503,30 @@ namespace OpenDental {
 				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Delete?")) {
 					return;
 				}
+				if(Tasks.GetOne(TaskCur.TaskNum)==null) {
+					MsgBox.Show(this,"Task already deleted.");//if task has remained open and has become stale on a workstation.
+					butDelete.Enabled=false;
+					butOK.Enabled=false;
+					butSend.Enabled=false;
+					butAddNote.Enabled=false;
+					Text+=" - {"+Lan.g(this,"Deleted")+"}";
+					return;
+				}
 				//TaskListNum=-1 is only possible if it's new.  This will never get hit if it's new.
 				if(TaskCur.TaskListNum==0) {
 					Tasks.TaskEditCreateLog(Lan.g(this,"Deleted task"),TaskCur);
 				}
 				else {
-					Tasks.TaskEditCreateLog(Lan.g(this,"Deleted task from tasklist")+" "+TaskLists.GetOne(TaskCur.TaskListNum).Descript,TaskCur);
+					string logText=Lan.g(this,"Deleted task from tasklist");
+					TaskList tList=TaskLists.GetOne(TaskCur.TaskListNum);
+					if(tList!=null) {
+						logText+=" "+tList.Descript;
+					}
+					else {
+						logText+=". Task list no longer exists";
+					}
+					logText+=".";
+					Tasks.TaskEditCreateLog(logText,TaskCur);
 				}
 			}
 			Tasks.Delete(TaskCur.TaskNum);//always do it this way to clean up all four tables
