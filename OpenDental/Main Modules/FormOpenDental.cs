@@ -141,7 +141,6 @@ namespace OpenDental{
 		///<summary>When user logs out, this keeps track of where they were for when they log back in.</summary>
 		private int LastModule;
 		private System.Windows.Forms.MenuItem menuItemRepeatingCharges;
-		private System.Windows.Forms.MenuItem menuItemImportXML;
 		private MenuItem menuItemTimeCards;
 		private MenuItem menuItemApptRules;
 		private MenuItem menuItemAuditTrail;
@@ -597,7 +596,6 @@ namespace OpenDental{
 			this.menuItem1 = new System.Windows.Forms.MenuItem();
 			this.menuItemDuplicateBlockouts = new System.Windows.Forms.MenuItem();
 			this.menuItemCreateAtoZFolders = new System.Windows.Forms.MenuItem();
-			this.menuItemImportXML = new System.Windows.Forms.MenuItem();
 			this.menuItemMergeMedications = new System.Windows.Forms.MenuItem();
 			this.menuItemMergePatients = new System.Windows.Forms.MenuItem();
 			this.menuItemMergeProviders = new System.Windows.Forms.MenuItem();
@@ -1514,7 +1512,6 @@ namespace OpenDental{
 			this.menuItem1.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.menuItemDuplicateBlockouts,
             this.menuItemCreateAtoZFolders,
-            this.menuItemImportXML,
             this.menuItemMergeMedications,
             this.menuItemMergePatients,
             this.menuItemMergeProviders,
@@ -1539,69 +1536,63 @@ namespace OpenDental{
 			this.menuItemCreateAtoZFolders.Text = "Create A to Z Folders";
 			this.menuItemCreateAtoZFolders.Click += new System.EventHandler(this.menuItemCreateAtoZFolders_Click);
 			// 
-			// menuItemImportXML
-			// 
-			this.menuItemImportXML.Index = 2;
-			this.menuItemImportXML.Text = "Import Patient XML";
-			this.menuItemImportXML.Click += new System.EventHandler(this.menuItemImportXML_Click);
-			// 
 			// menuItemMergeMedications
 			// 
-			this.menuItemMergeMedications.Index = 3;
+			this.menuItemMergeMedications.Index = 2;
 			this.menuItemMergeMedications.Text = "Merge Medications";
 			this.menuItemMergeMedications.Click += new System.EventHandler(this.menuItemMergeMedications_Click);
 			// 
 			// menuItemMergePatients
 			// 
-			this.menuItemMergePatients.Index = 4;
+			this.menuItemMergePatients.Index = 3;
 			this.menuItemMergePatients.Text = "Merge Patients";
 			this.menuItemMergePatients.Click += new System.EventHandler(this.menuItemMergePatients_Click);
 			// 
 			// menuItemMergeProviders
 			// 
-			this.menuItemMergeProviders.Index = 5;
+			this.menuItemMergeProviders.Index = 4;
 			this.menuItemMergeProviders.Text = "Merge Providers";
 			this.menuItemMergeProviders.Click += new System.EventHandler(this.menuItemMergeProviders_Click);
 			// 
 			// menuItemMergeReferrals
 			// 
-			this.menuItemMergeReferrals.Index = 6;
+			this.menuItemMergeReferrals.Index = 5;
 			this.menuItemMergeReferrals.Text = "Merge Referrals";
 			this.menuItemMergeReferrals.Click += new System.EventHandler(this.menuItemMergeReferrals_Click);
 			// 
 			// menuItemMoveSubscribers
 			// 
-			this.menuItemMoveSubscribers.Index = 7;
+			this.menuItemMoveSubscribers.Index = 6;
 			this.menuItemMoveSubscribers.Text = "Move Subscribers";
 			this.menuItemMoveSubscribers.Click += new System.EventHandler(this.menuItemMoveSubscribers_Click);
 			// 
 			// menuItemProcLockTool
 			// 
-			this.menuItemProcLockTool.Index = 8;
+			this.menuItemProcLockTool.Index = 7;
 			this.menuItemProcLockTool.Text = "Procedure Lock Tool";
 			this.menuItemProcLockTool.Click += new System.EventHandler(this.menuItemProcLockTool_Click);
 			// 
 			// menuItemShutdown
 			// 
-			this.menuItemShutdown.Index = 9;
+			this.menuItemShutdown.Index = 8;
 			this.menuItemShutdown.Text = "Shutdown All Workstations";
 			this.menuItemShutdown.Click += new System.EventHandler(this.menuItemShutdown_Click);
 			// 
 			// menuTelephone
 			// 
-			this.menuTelephone.Index = 10;
+			this.menuTelephone.Index = 9;
 			this.menuTelephone.Text = "Telephone Numbers";
 			this.menuTelephone.Click += new System.EventHandler(this.menuTelephone_Click);
 			// 
 			// menuItemTestLatency
 			// 
-			this.menuItemTestLatency.Index = 11;
+			this.menuItemTestLatency.Index = 10;
 			this.menuItemTestLatency.Text = "Test Latency";
 			this.menuItemTestLatency.Click += new System.EventHandler(this.menuItemTestLatency_Click);
 			// 
 			// menuItemXChargeReconcile
 			// 
-			this.menuItemXChargeReconcile.Index = 12;
+			this.menuItemXChargeReconcile.Index = 11;
 			this.menuItemXChargeReconcile.Text = "X-Charge Reconcile";
 			this.menuItemXChargeReconcile.Visible = false;
 			this.menuItemXChargeReconcile.Click += new System.EventHandler(this.menuItemXChargeReconcile_Click);
@@ -6296,11 +6287,6 @@ namespace OpenDental{
 			FormAtoZFoldersCreate FormA=new FormAtoZFoldersCreate();
 			FormA.ShowDialog();
 			//Security log entries are made from within the form.
-		}
-
-		private void menuItemImportXML_Click(object sender,System.EventArgs e) {
-			FormImportXML FormI=new FormImportXML();
-			FormI.ShowDialog();
 		}
 
 		private void menuItemMergeMedications_Click(object sender,EventArgs e) {

@@ -13,7 +13,7 @@ using OpenDentBusiness;
 
 namespace OpenDental{
 	/// <summary>
-	/// Summary description for FormBasicTemplate.
+	/// Deprecated as of 4/13/2016. Deemed too time-consuming to upkeep the complexity of importing patient info through XML.
 	/// </summary>
 	public class FormImportXML : ODForm {
 		private OpenDental.UI.Button butCancel;
@@ -84,47 +84,46 @@ namespace OpenDental{
 			// 
 			// butCancel
 			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butCancel.Autosize = true;
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(756,649);
+			this.butCancel.Location = new System.Drawing.Point(756, 649);
 			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75,26);
+			this.butCancel.Size = new System.Drawing.Size(75, 26);
 			this.butCancel.TabIndex = 0;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
 			// butOK
 			// 
-			this.butOK.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butOK.Autosize = true;
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(756,613);
+			this.butOK.Location = new System.Drawing.Point(756, 613);
 			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75,26);
+			this.butOK.Size = new System.Drawing.Size(75, 26);
 			this.butOK.TabIndex = 1;
 			this.butOK.Text = "Import";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
 			// textMain
 			// 
-			this.textMain.Location = new System.Drawing.Point(7,7);
+			this.textMain.Location = new System.Drawing.Point(7, 7);
 			this.textMain.Multiline = true;
 			this.textMain.Name = "textMain";
 			this.textMain.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-			this.textMain.Size = new System.Drawing.Size(737,673);
+			this.textMain.Size = new System.Drawing.Size(737, 673);
 			this.textMain.TabIndex = 2;
 			// 
 			// FormImportXML
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
-			this.ClientSize = new System.Drawing.Size(847,687);
+			this.ClientSize = new System.Drawing.Size(847, 687);
 			this.Controls.Add(this.textMain);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
@@ -133,7 +132,6 @@ namespace OpenDental{
 			this.MinimizeBox = false;
 			this.Name = "FormImportXML";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Import Patient";
 			this.Load += new System.EventHandler(this.FormImportXML_Load);
 			this.ResumeLayout(false);
