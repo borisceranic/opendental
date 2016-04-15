@@ -94,6 +94,9 @@ namespace OpenDentBusiness {
 		///<summary>Debug information regarding this response. Can only be set by XWebResponses.ProcessOutstandingTransactions().</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
 		public string DebugError;
+		///<summary>Will be entered as Payment.PayNote once payment transaction has completed.</summary>
+		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
+		public string PayNote;
 
 		///<summary>Returned from XWeb Gateway as an int. Helper method to convert to enum.</summary>
 		public static XWebResponseCodes ConvertResponseCode(int responseCode) {
@@ -115,7 +118,7 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>These fields should persist from instance to instance for the same OTK.</summary>
-		public void SetPersistentFields(long xWebResponseNum,string transactionType,long patNum,long provNum,long clinicNum,double amount,string otk,string hpfUrl,DateTime hpfExpiration,string debugError) {
+		public void SetPersistentFields(long xWebResponseNum,string transactionType,long patNum,long provNum,long clinicNum,double amount,string otk,string hpfUrl,DateTime hpfExpiration,string debugError,string payNote) {
 			XWebResponseNum=xWebResponseNum;
 			TransactionType=transactionType;
 			PatNum=patNum;
@@ -126,6 +129,7 @@ namespace OpenDentBusiness {
 			HpfUrl=hpfUrl;
 			HpfExpiration=hpfExpiration;
 			DebugError=debugError;
+			PayNote=payNote;
 		}
 	}
 
