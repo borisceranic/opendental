@@ -41,6 +41,16 @@ namespace CentralManager {
 			_dictPrefs=PrefC.GetDict();
 			Version storedVersion=new Version(PrefC.GetString(PrefName.ProgramVersion,_dictPrefs));
 			Version currentVersion=Assembly.GetAssembly(typeof(Db)).GetName().Version;
+			string syncCodePref=PrefC.GetString(PrefName.CentralManagerSyncCode,_dictPrefs);
+			if(syncCodePref=="") {
+				//Generate new sync code of 10 alphanumeric characters.
+				Random rand=new Random();
+				string allowedChars="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+				for(int i=0;i<10;i++) {
+					syncCodePref+=allowedChars[rand.Next(allowedChars.Length)];
+				}
+				Prefs.UpdateString(PrefName.CentralManagerSyncCode,syncCodePref);
+			}
 			if(storedVersion.CompareTo(currentVersion)!=0) {
 				MessageBox.Show(Lan.g(this,"Program version")+": "+currentVersion.ToString()+"\r\n"
 					+Lan.g(this,"Database version")+": "+storedVersion.ToString()+"\r\n"

@@ -17,6 +17,7 @@ namespace CentralManager {
 		private static int _securityLockDays;
 		private static bool _securityLockAdmin;
 		private static bool _securityCentralLock;
+		private static string _syncCode;
 
 		///<summary>Called from the interface to sync all settings.</summary>
 		public static void SyncAll(List<CentralConnection> listConns) {
@@ -41,6 +42,7 @@ namespace CentralManager {
 			_securityLockDays=PrefC.GetInt(PrefName.SecurityLockDays);
 			_securityLockAdmin=PrefC.GetBool(PrefName.SecurityLockIncludesAdmin);
 			_securityCentralLock=PrefC.GetBool(PrefName.CentralManagerSecurityLock);
+			_syncCode=PrefC.GetString(PrefName.CentralManagerSyncCode);
 			List<CentralUserData> listCentralUserData=new List<CentralUserData>();
 			for(int i=0;i<_listCEMTUsers.Count;i++) {
 				bool hasUserGroup=false;
@@ -60,6 +62,7 @@ namespace CentralManager {
 			}
 			string failedConns="";
 			string nameConflicts="";
+			string failedSyncCodes="";
 			for(int i=0;i<listConns.Count;i++) {
 				List<CentralUserData> listCentralDataForThreads=new List<CentralUserData>();
 				for(int j=0;j<listCentralUserData.Count;j++) {
@@ -83,10 +86,11 @@ namespace CentralManager {
 			for(int i=0;i<listComplThreads.Count;i++) {
 				failedConns+=((List<string>)listComplThreads[i].Tag)[0];
 				nameConflicts+=((List<string>)listComplThreads[i].Tag)[1];
+				failedSyncCodes+=((List<string>)listComplThreads[i].Tag)[2];
 				listComplThreads[i].QuitAsync();
 			}
 			string errorText="";
-			if(failedConns=="" && nameConflicts=="") {
+			if(failedConns=="" && nameConflicts=="" && failedSyncCodes=="") {
 				errorText+="Done";
 			}
 			if(failedConns!="") {
@@ -94,6 +98,9 @@ namespace CentralManager {
 			}
 			if(nameConflicts!="") {
 				errorText+="Name Conflicts:\r\n"+nameConflicts+"Please rename users and try again.\r\n";
+			}
+			if(failedSyncCodes!="") {
+				errorText+="Incorrect Sync Codes:\r\n"+failedSyncCodes+"\r\n";
 			}
 			MsgBoxCopyPaste MsgBoxCopyPaste=new MsgBoxCopyPaste(errorText);
 			MsgBoxCopyPaste.ShowDialog();
@@ -103,20 +110,27 @@ namespace CentralManager {
 		private static void ConnectAndSyncAll(ODThread odThread) {
 			CentralConnection connection=(CentralConnection)odThread.Parameters[0];
 			List<CentralUserData> listCentralUserData=(List<CentralUserData>)odThread.Parameters[1];
-			string failedConns="";
-			string nameConflicts="";
+			string serverName="";
+			if(connection.ServiceURI!="") {
+				serverName=connection.ServiceURI;
+			}
+			else {
+				serverName=connection.ServerName+", "+connection.DatabaseName;
+			}
 			if(!CentralConnectionHelper.UpdateCentralConnection(connection,false)) {//No updating the cache since we're going to be connecting to multiple remote servers at the same time.
-				string serverName="";
-				if(connection.ServiceURI!="") {
-					serverName=connection.ServiceURI;
-				}
-				else {
-					serverName=connection.ServerName+", "+connection.DatabaseName;
-				}
-				failedConns+=serverName+"\r\n";
-				odThread.Tag=new List<string>() { failedConns,nameConflicts };
+				odThread.Tag=new List<string>() { serverName+"\r\n","","" };
 				connection.ConnectionStatus="OFFLINE";
 				return;
+			}
+			string remoteSyncCode=PrefC.GetStringNoCache(PrefName.CentralManagerSyncCode);
+			if(remoteSyncCode!=_syncCode) {
+				if(remoteSyncCode=="") {
+					Prefs.UpdateStringNoCache(PrefName.CentralManagerSyncCode,_syncCode);//Lock in the sync code for the remote server.
+				}
+				else {
+					odThread.Tag=new List<string>() { serverName+"\r\n","",remoteSyncCode };
+					return;
+				}
 			}
 			//Push the preferences to the server.
 			Prefs.UpdateStringNoCache(PrefName.SecurityLockDate,_securityLockDate);
@@ -130,16 +144,10 @@ namespace CentralManager {
 			#region Detect Conflicts
 			//User conflicts
 			bool nameConflict=false;
+			string nameConflicts="";
 			for(int i=0;i<_listCEMTUsers.Count;i++) {
 				for(int j=0;j<listRemoteUsers.Count;j++) {
 					if(listRemoteUsers[j].UserName==_listCEMTUsers[i].UserName && listRemoteUsers[j].UserNumCEMT==0) {//User doesn't belong to CEMT
-						string serverName="";
-						if(connection.ServiceURI!="") {
-							serverName=connection.ServiceURI;
-						}
-						else {
-							serverName=connection.ServerName+", "+connection.DatabaseName;
-						}
 						nameConflicts+=listRemoteUsers[i].UserName+" already exists in "+serverName+"\r\n";
 						nameConflict=true;
 						break;
@@ -147,7 +155,7 @@ namespace CentralManager {
 				}
 			}
 			if(nameConflict) {
-				odThread.Tag=new List<string>() { failedConns,nameConflicts };
+				odThread.Tag=new List<string>() { serverName,nameConflicts,"" };
 				return;//Skip on to the next connection.
 			}
 			#endregion Detect Conflicts
@@ -179,43 +187,44 @@ namespace CentralManager {
 				UserGroups.DeleteNoCache(listRemoteCEMTUserGroupsForDeletion[j]);
 			}
 			SecurityLogs.MakeLogEntryNoCache(Permissions.SecurityAdmin,0,"Enterprise Management Tool synced users.");
-			odThread.Tag=new List<string>() { "","" };//No errors.
+			odThread.Tag=new List<string>() { "","","" };//No errors.
 		}
 
 		///<summary>Function used by threads to connect to remote databases and sync user settings.</summary>
 		private static void ConnectAndSyncUsers(ODThread odThread) {
 			CentralConnection connection=(CentralConnection)odThread.Parameters[0];
 			List<CentralUserData> listCentralUserData=(List<CentralUserData>)odThread.Parameters[1];
-			string failedConns="";
-			string nameConflicts="";
+			string serverName="";
+			if(connection.ServiceURI!="") {
+				serverName=connection.ServiceURI;
+			}
+			else {
+				serverName=connection.ServerName+", "+connection.DatabaseName;
+			}
 			if(!CentralConnectionHelper.UpdateCentralConnection(connection,false)) {//No updating the cache since we're going to be connecting to multiple remote servers at the same time.
-				string serverName="";
-				if(connection.ServiceURI!="") {
-					serverName=connection.ServiceURI;
-				}
-				else {
-					serverName=connection.ServerName+", "+connection.DatabaseName;
-				}
-				failedConns+=serverName+"\r\n";
-				odThread.Tag=new List<string>() { failedConns,nameConflicts };
+				odThread.Tag=new List<string>() { serverName+"\r\n","","" };
 				connection.ConnectionStatus="OFFLINE";
 				return;
+			}
+			string remoteSyncCode=PrefC.GetStringNoCache(PrefName.CentralManagerSyncCode);
+			if(remoteSyncCode!=_syncCode) {
+				if(remoteSyncCode=="") {
+					Prefs.UpdateStringNoCache(PrefName.CentralManagerSyncCode,_syncCode);//Lock in the sync code for the remote server.
+				}
+				else {
+					odThread.Tag=new List<string>() { serverName+"\r\n","",remoteSyncCode };
+					return;
+				}
 			}
 			//Get remote users, usergroups, and associated permissions
 			List<Userod> listRemoteUsers=Userods.GetUsersNoCache();
 			#region Detect Conflicts
 			//User conflicts
 			bool nameConflict=false;
+			string nameConflicts="";
 			for(int i=0;i<_listCEMTUsers.Count;i++) {
 				for(int j=0;j<listRemoteUsers.Count;j++) {
 					if(listRemoteUsers[j].UserName==_listCEMTUsers[i].UserName && listRemoteUsers[j].UserNumCEMT==0) {//User doesn't belong to CEMT
-						string serverName="";
-						if(connection.ServiceURI!="") {
-							serverName=connection.ServiceURI;
-						}
-						else {
-							serverName=connection.ServerName+", "+connection.DatabaseName;
-						}
 						nameConflicts+=listRemoteUsers[i].UserName+" already exists in "+serverName+"\r\n";
 						nameConflict=true;
 						break;
@@ -223,7 +232,7 @@ namespace CentralManager {
 				}
 			}
 			if(nameConflict) {
-				odThread.Tag=new List<string>() { failedConns,nameConflicts };
+				odThread.Tag=new List<string>() { serverName+"\r\n",nameConflicts,"" };
 				return;//Skip on to the next connection.
 			}
 			#endregion Detect Conflicts
@@ -255,27 +264,34 @@ namespace CentralManager {
 				UserGroups.DeleteNoCache(listRemoteCEMTUserGroupsForDeletion[j]);
 			}
 			SecurityLogs.MakeLogEntryNoCache(Permissions.SecurityAdmin,0,"Enterprise Management Tool synced users.");
-			odThread.Tag=new List<string>() { "","" };//No errors.
+			odThread.Tag=new List<string>() { "","","" };//No errors.
 		}
 
 		///<summary>Function used by threads to connect to remote databases and sync security lock settings.</summary>
 		private static void ConnectAndSyncLocks(ODThread odThread) {
 			CentralConnection connection=(CentralConnection)odThread.Parameters[0];
 			List<CentralUserData> listCentralUserData=(List<CentralUserData>)odThread.Parameters[1];
-			string failedConns="";
-			string nameConflicts="";
-			if(!CentralConnectionHelper.UpdateCentralConnection(connection,false)) {//No updating the cache since we're going to be connecting to multiple remote servers at the same time.
-				string serverName="";
-				if(connection.ServiceURI!="") {
-					serverName=connection.ServiceURI;
-				}
-				else {
-					serverName=connection.ServerName+", "+connection.DatabaseName;
-				}
-				failedConns+=serverName+"\r\n";
-				odThread.Tag=new List<string>() { failedConns,nameConflicts };
+			string serverName="";
+			if(connection.ServiceURI!="") {
+				serverName=connection.ServiceURI;
+			}
+			else {
+				serverName=connection.ServerName+", "+connection.DatabaseName;
+			}
+			if(!CentralConnectionHelper.UpdateCentralConnection(connection,false)) {//No updating the cache since we're going to be connecting to multiple remote servers at the same time.				
+				odThread.Tag=new List<string>() { serverName+"\r\n","","" };
 				connection.ConnectionStatus="OFFLINE";
 				return;
+			}
+			string remoteSyncCode=PrefC.GetString(PrefName.CentralManagerSyncCode);
+			if(remoteSyncCode!=_syncCode) {
+				if(remoteSyncCode=="") {
+					Prefs.UpdateStringNoCache(PrefName.CentralManagerSyncCode,_syncCode);//Lock in the sync code for the remote server.
+				}
+				else {
+					odThread.Tag=new List<string>() { serverName+"\r\n","",remoteSyncCode };
+					return;
+				}
 			}
 			//Push the preferences to the server.
 			Prefs.UpdateStringNoCache(PrefName.SecurityLockDate,_securityLockDate);
@@ -284,7 +300,7 @@ namespace CentralManager {
 			Prefs.UpdateBoolNoCache(PrefName.CentralManagerSecurityLock,_securityCentralLock);
 			Signalods.SetInvalidNoCache(InvalidType.Prefs);
 			SecurityLogs.MakeLogEntryNoCache(Permissions.SecurityAdmin,0,"Enterprise Management Tool updated security settings");
-			odThread.Tag=new List<string>() { "","" };//No errors.
+			odThread.Tag=new List<string>() { "","","" };//No errors.
 		}
 
 		///<summary>Custom data structure for containing a UserGroup and its associated list of GroupPermissions and users.</summary>

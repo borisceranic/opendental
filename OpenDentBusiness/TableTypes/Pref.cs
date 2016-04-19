@@ -167,6 +167,8 @@ namespace OpenDentBusiness {
 		CentralManagerSecurityLock,
 		///<summary>This is the hash of the password that is needed to open the Central Manager tool.</summary>
 		CentralManagerPassHash,
+		///<summary>Blank by default.  Contains a key for the CEMT.  Each CEMT database contains a unique sync code.  Syncing from the CEMT will skip any databases without the correct sync code.</summary>
+		CentralManagerSyncCode,
 		///<summary>Deprecated.</summary>
 		ChartQuickAddHideAmalgam,
 		///<summary>Deprecated. If set to true (1), then after adding a proc, a row will be added to datatable instead of rebuilding entire datatable by making queries to the database.

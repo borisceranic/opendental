@@ -613,6 +613,14 @@ namespace OpenDentBusiness {
 						+"'Carestream')";
 					Db.NonQ(command);
 				}//end Carestream bridge
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES('CentralManagerSyncCode','')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference (PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'CentralManagerSyncCode','')";
+					Db.NonQ(command);
+				}
 
 				command="UPDATE preference SET ValueString = '16.2.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);

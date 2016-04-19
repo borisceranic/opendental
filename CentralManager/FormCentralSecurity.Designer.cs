@@ -47,6 +47,8 @@
 			this.butOK = new OpenDental.UI.Button();
 			this.butSyncUsers = new OpenDental.UI.Button();
 			this.butSyncLocks = new OpenDental.UI.Button();
+			this.textSyncCode = new System.Windows.Forms.TextBox();
+			this.label5 = new System.Windows.Forms.Label();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -166,6 +168,8 @@
 			// 
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridMain.HasAddButton = false;
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(12, 9);
 			this.gridMain.MinimumSize = new System.Drawing.Size(200, 0);
@@ -322,11 +326,31 @@
 			this.butSyncLocks.Text = "Sync Locks";
 			this.butSyncLocks.Click += new System.EventHandler(this.butSyncLocks_Click);
 			// 
+			// textSyncCode
+			// 
+			this.textSyncCode.Location = new System.Drawing.Point(519, 404);
+			this.textSyncCode.Name = "textSyncCode";
+			this.textSyncCode.ReadOnly = true;
+			this.textSyncCode.Size = new System.Drawing.Size(122, 20);
+			this.textSyncCode.TabIndex = 110;
+			// 
+			// label5
+			// 
+			this.label5.Location = new System.Drawing.Point(516, 335);
+			this.label5.Name = "label5";
+			this.label5.Size = new System.Drawing.Size(125, 67);
+			this.label5.TabIndex = 111;
+			this.label5.Text = "Sync Code - All databases which can sync with this one will have the code below i" +
+    "n their misc setup window.";
+			this.label5.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+			// 
 			// FormCentralSecurity
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(653, 628);
+			this.Controls.Add(this.label5);
+			this.Controls.Add(this.textSyncCode);
 			this.Controls.Add(this.butSyncLocks);
 			this.Controls.Add(this.butSyncUsers);
 			this.Controls.Add(this.butOK);
@@ -350,6 +374,7 @@
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();
 			this.ResumeLayout(false);
+			this.PerformLayout();
 
 		}
 
@@ -377,7 +402,7 @@
 		private OpenDental.UI.Button butOK;
 		private OpenDental.UI.Button butSyncUsers;
 		private OpenDental.UI.Button butSyncLocks;
-
-
+		private System.Windows.Forms.TextBox textSyncCode;
+		private System.Windows.Forms.Label label5;
 	}
 }

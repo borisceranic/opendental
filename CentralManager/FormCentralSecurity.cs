@@ -25,6 +25,7 @@ namespace CentralManager {
 		}
 
 		private void FormCentralSecurity_Load(object sender,EventArgs e) {
+			textSyncCode.Text=PrefC.GetString(PrefName.CentralManagerSyncCode);
 			FillTreePermissionsInitial();
 			FillUsers();
 			FillTreePerm();

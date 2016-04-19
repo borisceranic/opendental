@@ -54,6 +54,9 @@ namespace OpenDental {
 		private UI.Button butDecimal;
 		private TextBox textNumDecimals;
 		private Label label7;
+		private TextBox textSyncCode;
+		private Label label8;
+		private UI.Button butClearCode;
 		private List<string> _trackLastClinicBy;
 		//private List<Def> posAdjTypes;
 
@@ -122,6 +125,9 @@ namespace OpenDental {
 			this.textSigInterval = new OpenDental.ValidNumber();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.textSyncCode = new System.Windows.Forms.TextBox();
+			this.label8 = new System.Windows.Forms.Label();
+			this.butClearCode = new OpenDental.UI.Button();
 			this.groupBox6.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupBoxTaskDefaults.SuspendLayout();
@@ -165,7 +171,7 @@ namespace OpenDental {
 			// 
 			// textNumDecimals
 			// 
-			this.textNumDecimals.Location = new System.Drawing.Point(402, 323);
+			this.textNumDecimals.Location = new System.Drawing.Point(402, 291);
 			this.textNumDecimals.Name = "textNumDecimals";
 			this.textNumDecimals.ReadOnly = true;
 			this.textNumDecimals.Size = new System.Drawing.Size(47, 20);
@@ -175,7 +181,7 @@ namespace OpenDental {
 			// label7
 			// 
 			this.label7.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label7.Location = new System.Drawing.Point(122, 325);
+			this.label7.Location = new System.Drawing.Point(122, 293);
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(279, 17);
 			this.label7.TabIndex = 218;
@@ -186,7 +192,7 @@ namespace OpenDental {
 			// 
 			this.comboTrackClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboTrackClinic.FormattingEnabled = true;
-			this.comboTrackClinic.Location = new System.Drawing.Point(319, 582);
+			this.comboTrackClinic.Location = new System.Drawing.Point(319, 550);
 			this.comboTrackClinic.Name = "comboTrackClinic";
 			this.comboTrackClinic.Size = new System.Drawing.Size(130, 21);
 			this.comboTrackClinic.TabIndex = 215;
@@ -194,7 +200,7 @@ namespace OpenDental {
 			// labelTrackClinic
 			// 
 			this.labelTrackClinic.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.labelTrackClinic.Location = new System.Drawing.Point(122, 585);
+			this.labelTrackClinic.Location = new System.Drawing.Point(122, 553);
 			this.labelTrackClinic.Name = "labelTrackClinic";
 			this.labelTrackClinic.Size = new System.Drawing.Size(195, 15);
 			this.labelTrackClinic.TabIndex = 216;
@@ -205,7 +211,7 @@ namespace OpenDental {
 			// 
 			this.checkTimeCardUseLocal.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkTimeCardUseLocal.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkTimeCardUseLocal.Location = new System.Drawing.Point(81, 137);
+			this.checkTimeCardUseLocal.Location = new System.Drawing.Point(81, 126);
 			this.checkTimeCardUseLocal.Name = "checkTimeCardUseLocal";
 			this.checkTimeCardUseLocal.Size = new System.Drawing.Size(368, 17);
 			this.checkTimeCardUseLocal.TabIndex = 214;
@@ -214,7 +220,7 @@ namespace OpenDental {
 			// 
 			// textLanguageAndRegion
 			// 
-			this.textLanguageAndRegion.Location = new System.Drawing.Point(284, 297);
+			this.textLanguageAndRegion.Location = new System.Drawing.Point(284, 265);
 			this.textLanguageAndRegion.Name = "textLanguageAndRegion";
 			this.textLanguageAndRegion.ReadOnly = true;
 			this.textLanguageAndRegion.Size = new System.Drawing.Size(165, 20);
@@ -223,7 +229,7 @@ namespace OpenDental {
 			// label6
 			// 
 			this.label6.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label6.Location = new System.Drawing.Point(4, 299);
+			this.label6.Location = new System.Drawing.Point(4, 267);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(279, 17);
 			this.label6.TabIndex = 205;
@@ -234,7 +240,7 @@ namespace OpenDental {
 			// 
 			this.checkImeCompositionCompatibility.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkImeCompositionCompatibility.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkImeCompositionCompatibility.Location = new System.Drawing.Point(15, 345);
+			this.checkImeCompositionCompatibility.Location = new System.Drawing.Point(15, 313);
 			this.checkImeCompositionCompatibility.Name = "checkImeCompositionCompatibility";
 			this.checkImeCompositionCompatibility.Size = new System.Drawing.Size(434, 19);
 			this.checkImeCompositionCompatibility.TabIndex = 203;
@@ -245,7 +251,7 @@ namespace OpenDental {
 			// 
 			this.checkRefresh.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkRefresh.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkRefresh.Location = new System.Drawing.Point(14, 158);
+			this.checkRefresh.Location = new System.Drawing.Point(14, 147);
 			this.checkRefresh.Name = "checkRefresh";
 			this.checkRefresh.Size = new System.Drawing.Size(435, 18);
 			this.checkRefresh.TabIndex = 202;
@@ -257,7 +263,7 @@ namespace OpenDental {
 			// 
 			this.checkPrefFName.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkPrefFName.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkPrefFName.Location = new System.Drawing.Point(15, 175);
+			this.checkPrefFName.Location = new System.Drawing.Point(15, 164);
 			this.checkPrefFName.Name = "checkPrefFName";
 			this.checkPrefFName.Size = new System.Drawing.Size(434, 19);
 			this.checkPrefFName.TabIndex = 79;
@@ -267,9 +273,9 @@ namespace OpenDental {
 			// label5
 			// 
 			this.label5.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label5.Location = new System.Drawing.Point(41, 231);
+			this.label5.Location = new System.Drawing.Point(41, 207);
 			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(333, 35);
+			this.label5.Size = new System.Drawing.Size(333, 28);
 			this.label5.TabIndex = 200;
 			this.label5.Text = "Disable signal interval after this many minutes of user inactivity.\r\nLeave blank " +
     "to disable.";
@@ -279,7 +285,7 @@ namespace OpenDental {
 			// 
 			this.checkColorTheme.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkColorTheme.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkColorTheme.Location = new System.Drawing.Point(87, 118);
+			this.checkColorTheme.Location = new System.Drawing.Point(87, 107);
 			this.checkColorTheme.Name = "checkColorTheme";
 			this.checkColorTheme.Size = new System.Drawing.Size(362, 17);
 			this.checkColorTheme.TabIndex = 199;
@@ -288,7 +294,7 @@ namespace OpenDental {
 			// 
 			// textWebServiceServerName
 			// 
-			this.textWebServiceServerName.Location = new System.Drawing.Point(284, 368);
+			this.textWebServiceServerName.Location = new System.Drawing.Point(284, 336);
 			this.textWebServiceServerName.Name = "textWebServiceServerName";
 			this.textWebServiceServerName.Size = new System.Drawing.Size(165, 20);
 			this.textWebServiceServerName.TabIndex = 197;
@@ -296,7 +302,7 @@ namespace OpenDental {
 			// label2
 			// 
 			this.label2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label2.Location = new System.Drawing.Point(4, 371);
+			this.label2.Location = new System.Drawing.Point(4, 339);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(279, 17);
 			this.label2.TabIndex = 198;
@@ -306,7 +312,7 @@ namespace OpenDental {
 			// label1
 			// 
 			this.label1.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label1.Location = new System.Drawing.Point(12, 9);
+			this.label1.Location = new System.Drawing.Point(12, 2);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(453, 17);
 			this.label1.TabIndex = 196;
@@ -321,7 +327,7 @@ namespace OpenDental {
 			this.groupBox6.Controls.Add(this.comboShowID);
 			this.groupBox6.Controls.Add(this.label17);
 			this.groupBox6.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox6.Location = new System.Drawing.Point(12, 31);
+			this.groupBox6.Location = new System.Drawing.Point(12, 24);
 			this.groupBox6.Name = "groupBox6";
 			this.groupBox6.Size = new System.Drawing.Size(453, 83);
 			this.groupBox6.TabIndex = 195;
@@ -383,7 +389,7 @@ namespace OpenDental {
 			this.groupBox2.Controls.Add(this.checkTaskListAlwaysShow);
 			this.groupBox2.Controls.Add(this.checkTasksCheckOnStartup);
 			this.groupBox2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox2.Location = new System.Drawing.Point(101, 392);
+			this.groupBox2.Location = new System.Drawing.Point(101, 360);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Size = new System.Drawing.Size(364, 184);
 			this.groupBox2.TabIndex = 188;
@@ -510,7 +516,7 @@ namespace OpenDental {
 			// label4
 			// 
 			this.label4.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label4.Location = new System.Drawing.Point(59, 272);
+			this.label4.Location = new System.Drawing.Point(59, 240);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(298, 17);
 			this.label4.TabIndex = 64;
@@ -520,7 +526,7 @@ namespace OpenDental {
 			// label3
 			// 
 			this.label3.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label3.Location = new System.Drawing.Point(41, 196);
+			this.label3.Location = new System.Drawing.Point(41, 181);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(333, 35);
 			this.label3.TabIndex = 56;
@@ -535,7 +541,7 @@ namespace OpenDental {
 			this.butDecimal.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butDecimal.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butDecimal.CornerRadius = 2F;
-			this.butDecimal.Location = new System.Drawing.Point(455, 322);
+			this.butDecimal.Location = new System.Drawing.Point(455, 290);
 			this.butDecimal.Name = "butDecimal";
 			this.butDecimal.Size = new System.Drawing.Size(23, 21);
 			this.butDecimal.TabIndex = 219;
@@ -549,7 +555,7 @@ namespace OpenDental {
 			this.butPickLanguageAndRegion.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPickLanguageAndRegion.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPickLanguageAndRegion.CornerRadius = 2F;
-			this.butPickLanguageAndRegion.Location = new System.Drawing.Point(455, 296);
+			this.butPickLanguageAndRegion.Location = new System.Drawing.Point(455, 264);
 			this.butPickLanguageAndRegion.Name = "butPickLanguageAndRegion";
 			this.butPickLanguageAndRegion.Size = new System.Drawing.Size(23, 21);
 			this.butPickLanguageAndRegion.TabIndex = 206;
@@ -558,7 +564,7 @@ namespace OpenDental {
 			// 
 			// textInactiveSignal
 			// 
-			this.textInactiveSignal.Location = new System.Drawing.Point(375, 236);
+			this.textInactiveSignal.Location = new System.Drawing.Point(375, 212);
 			this.textInactiveSignal.MaxVal = 1000000;
 			this.textInactiveSignal.MinVal = 1;
 			this.textInactiveSignal.Name = "textInactiveSignal";
@@ -573,7 +579,7 @@ namespace OpenDental {
 			this.butLanguages.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butLanguages.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butLanguages.CornerRadius = 4F;
-			this.butLanguages.Location = new System.Drawing.Point(360, 267);
+			this.butLanguages.Location = new System.Drawing.Point(360, 235);
 			this.butLanguages.Name = "butLanguages";
 			this.butLanguages.Size = new System.Drawing.Size(88, 24);
 			this.butLanguages.TabIndex = 63;
@@ -582,7 +588,7 @@ namespace OpenDental {
 			// 
 			// textSigInterval
 			// 
-			this.textSigInterval.Location = new System.Drawing.Point(375, 201);
+			this.textSigInterval.Location = new System.Drawing.Point(375, 186);
 			this.textSigInterval.MaxVal = 1000000;
 			this.textSigInterval.MinVal = 1;
 			this.textSigInterval.Name = "textSigInterval";
@@ -621,9 +627,43 @@ namespace OpenDental {
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// textSyncCode
+			// 
+			this.textSyncCode.Location = new System.Drawing.Point(352, 579);
+			this.textSyncCode.Name = "textSyncCode";
+			this.textSyncCode.ReadOnly = true;
+			this.textSyncCode.Size = new System.Drawing.Size(74, 20);
+			this.textSyncCode.TabIndex = 220;
+			// 
+			// label8
+			// 
+			this.label8.Location = new System.Drawing.Point(4, 579);
+			this.label8.Name = "label8";
+			this.label8.Size = new System.Drawing.Size(347, 20);
+			this.label8.TabIndex = 221;
+			this.label8.Text = "Sync code for CEMT.  Clear if you want to sync from a different source.";
+			this.label8.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// butClearCode
+			// 
+			this.butClearCode.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butClearCode.Autosize = false;
+			this.butClearCode.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butClearCode.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butClearCode.CornerRadius = 2F;
+			this.butClearCode.Location = new System.Drawing.Point(432, 578);
+			this.butClearCode.Name = "butClearCode";
+			this.butClearCode.Size = new System.Drawing.Size(43, 21);
+			this.butClearCode.TabIndex = 222;
+			this.butClearCode.Text = "Clear";
+			this.butClearCode.Click += new System.EventHandler(this.butClearCode_Click);
+			// 
 			// FormMisc
 			// 
 			this.ClientSize = new System.Drawing.Size(582, 616);
+			this.Controls.Add(this.butClearCode);
+			this.Controls.Add(this.label8);
+			this.Controls.Add(this.textSyncCode);
 			this.Controls.Add(this.butDecimal);
 			this.Controls.Add(this.textNumDecimals);
 			this.Controls.Add(this.label7);
@@ -731,6 +771,7 @@ namespace OpenDental {
 				labelTrackClinic.Visible=false;
 				comboTrackClinic.Visible=false;
 			}
+			textSyncCode.Text=PrefC.GetString(PrefName.CentralManagerSyncCode);
 		}
 
 		private void butLanguages_Click(object sender,EventArgs e) {
@@ -785,6 +826,10 @@ namespace OpenDental {
 			}
 		}
 
+		private void butClearCode_Click(object sender,EventArgs e) {
+			textSyncCode.Text="";
+		}
+
 		private void butOK_Click(object sender, System.EventArgs e) {
 			if( validNumX.errorProvider1.GetError(validNumX)!=""
 				| validNumY.errorProvider1.GetError(validNumY)!="")
@@ -816,6 +861,7 @@ namespace OpenDental {
 				| Prefs.UpdateBool(PrefName.PatientSelectUsesSearchButton,!checkRefresh.Checked)
 				| Prefs.UpdateBool(PrefName.ImeCompositionCompatibility,checkImeCompositionCompatibility.Checked)
 				| Prefs.UpdateString(PrefName.ClinicTrackLast,_trackLastClinicBy[comboTrackClinic.SelectedIndex])
+				| Prefs.UpdateString(PrefName.CentralManagerSyncCode,textSyncCode.Text)
 				)
 			{
 				changed=true;
