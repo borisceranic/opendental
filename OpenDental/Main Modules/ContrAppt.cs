@@ -4182,8 +4182,9 @@ namespace OpenDental {
 					FormAE.ShowDialog();
 					if(FormAE.DialogResult==DialogResult.OK) {
 						if(apt.IsNewPatient) {
-							AutomationL.Trigger(AutomationTrigger.CreateApptNewPat,null,apt.PatNum);
+							AutomationL.Trigger(AutomationTrigger.CreateApptNewPat,null,apt.PatNum,apt.AptNum);
 						}
+						AutomationL.Trigger(AutomationTrigger.CreateAppt,null,apt.PatNum,apt.AptNum);
 						RefreshModuleDataPatient(PatCur.PatNum);
 						FormOpenDental.S_Contr_PatientSelected(PatCur);
 						//RefreshModulePatient(PatCurNum);

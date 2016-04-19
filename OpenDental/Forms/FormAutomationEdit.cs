@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
+using System.Linq;
 
 namespace OpenDental{
 	/// <summary>
@@ -38,8 +39,21 @@ namespace OpenDental{
 		private OpenDental.UI.ODGrid gridMain;
 		private OpenDental.UI.Button butAdd;
 		private Automation AutoCur;
+		private ComboBox comboApptStatus;
+		private Label labelApptStatus;
 		private List<AutomationCondition> autoList;
-		
+		///<summary>List of actions currently in the drop down.  Some actions are only available for specific triggers, so this is possibly a sub-set of
+		///all AutomationAction enum values.</summary>
+		private List<AutomationAction> _listAutoActions;
+		///<summary>subset of allowed appointment statuses, in the same order as enum.</summary>
+		private List<ApptStatus> _listApptStatuses=new List<ApptStatus> {
+				ApptStatus.Scheduled,
+				ApptStatus.Complete,
+				ApptStatus.UnschedList,
+				ApptStatus.ASAP,
+				ApptStatus.Broken
+			};
+
 		///<summary></summary>
 		public FormAutomationEdit(Automation autoCur)
 		{
@@ -94,12 +108,14 @@ namespace OpenDental{
 			this.butProcCode = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.comboApptStatus = new System.Windows.Forms.ComboBox();
+			this.labelApptStatus = new System.Windows.Forms.Label();
 			butDelete = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// butDelete
 			// 
-			butDelete.AdjustImageLocation = new System.Drawing.Point(0,0);
+			butDelete.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			butDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			butDelete.Autosize = true;
 			butDelete.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
@@ -107,105 +123,105 @@ namespace OpenDental{
 			butDelete.CornerRadius = 4F;
 			butDelete.Image = global::OpenDental.Properties.Resources.deleteX;
 			butDelete.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			butDelete.Location = new System.Drawing.Point(48,454);
+			butDelete.Location = new System.Drawing.Point(48, 454);
 			butDelete.Name = "butDelete";
-			butDelete.Size = new System.Drawing.Size(75,24);
+			butDelete.Size = new System.Drawing.Size(75, 24);
 			butDelete.TabIndex = 16;
 			butDelete.Text = "&Delete";
 			butDelete.Click += new System.EventHandler(this.butDelete_Click);
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(48,24);
+			this.label1.Location = new System.Drawing.Point(48, 24);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(111,20);
+			this.label1.Size = new System.Drawing.Size(111, 20);
 			this.label1.TabIndex = 11;
 			this.label1.Text = "Description";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textDescription
 			// 
-			this.textDescription.Location = new System.Drawing.Point(161,25);
+			this.textDescription.Location = new System.Drawing.Point(161, 25);
 			this.textDescription.Name = "textDescription";
-			this.textDescription.Size = new System.Drawing.Size(316,20);
+			this.textDescription.Size = new System.Drawing.Size(316, 20);
 			this.textDescription.TabIndex = 0;
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(48,50);
+			this.label2.Location = new System.Drawing.Point(48, 50);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(111,20);
+			this.label2.Size = new System.Drawing.Size(111, 20);
 			this.label2.TabIndex = 18;
 			this.label2.Text = "Trigger";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textProcCodes
 			// 
-			this.textProcCodes.Location = new System.Drawing.Point(161,77);
+			this.textProcCodes.Location = new System.Drawing.Point(161, 77);
 			this.textProcCodes.Name = "textProcCodes";
-			this.textProcCodes.Size = new System.Drawing.Size(316,20);
+			this.textProcCodes.Size = new System.Drawing.Size(316, 20);
 			this.textProcCodes.TabIndex = 2;
 			// 
 			// labelProcCodes
 			// 
-			this.labelProcCodes.Location = new System.Drawing.Point(13,76);
+			this.labelProcCodes.Location = new System.Drawing.Point(13, 76);
 			this.labelProcCodes.Name = "labelProcCodes";
-			this.labelProcCodes.Size = new System.Drawing.Size(146,29);
+			this.labelProcCodes.Size = new System.Drawing.Size(146, 29);
 			this.labelProcCodes.TabIndex = 20;
 			this.labelProcCodes.Text = "Procedure Code(s)\r\n(separated with commas)";
 			this.labelProcCodes.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(48,255);
+			this.label4.Location = new System.Drawing.Point(16, 256);
 			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(111,20);
+			this.label4.Size = new System.Drawing.Size(143, 17);
 			this.label4.TabIndex = 21;
 			this.label4.Text = "Action";
 			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// labelSheetDef
 			// 
-			this.labelSheetDef.Location = new System.Drawing.Point(48,282);
+			this.labelSheetDef.Location = new System.Drawing.Point(16, 282);
 			this.labelSheetDef.Name = "labelSheetDef";
-			this.labelSheetDef.Size = new System.Drawing.Size(111,20);
+			this.labelSheetDef.Size = new System.Drawing.Size(143, 17);
 			this.labelSheetDef.TabIndex = 22;
 			this.labelSheetDef.Text = "Sheet Def";
 			this.labelSheetDef.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// labelCommType
 			// 
-			this.labelCommType.Location = new System.Drawing.Point(48,307);
+			this.labelCommType.Location = new System.Drawing.Point(16, 308);
 			this.labelCommType.Name = "labelCommType";
-			this.labelCommType.Size = new System.Drawing.Size(111,20);
+			this.labelCommType.Size = new System.Drawing.Size(143, 17);
 			this.labelCommType.TabIndex = 24;
 			this.labelCommType.Text = "CommType";
 			this.labelCommType.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// labelMessage
 			// 
-			this.labelMessage.Location = new System.Drawing.Point(39,333);
+			this.labelMessage.Location = new System.Drawing.Point(16, 358);
 			this.labelMessage.Name = "labelMessage";
-			this.labelMessage.Size = new System.Drawing.Size(120,20);
+			this.labelMessage.Size = new System.Drawing.Size(143, 17);
 			this.labelMessage.TabIndex = 25;
 			this.labelMessage.Text = "Message";
 			this.labelMessage.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textMessage
 			// 
-			this.textMessage.Location = new System.Drawing.Point(161,334);
+			this.textMessage.Location = new System.Drawing.Point(161, 359);
 			this.textMessage.Multiline = true;
 			this.textMessage.Name = "textMessage";
-			this.textMessage.Size = new System.Drawing.Size(316,73);
+			this.textMessage.Size = new System.Drawing.Size(316, 73);
 			this.textMessage.TabIndex = 26;
 			// 
 			// comboTrigger
 			// 
 			this.comboTrigger.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboTrigger.FormattingEnabled = true;
-			this.comboTrigger.Location = new System.Drawing.Point(161,50);
+			this.comboTrigger.Location = new System.Drawing.Point(161, 50);
 			this.comboTrigger.Name = "comboTrigger";
-			this.comboTrigger.Size = new System.Drawing.Size(183,21);
+			this.comboTrigger.Size = new System.Drawing.Size(183, 21);
 			this.comboTrigger.TabIndex = 27;
 			this.comboTrigger.SelectedIndexChanged += new System.EventHandler(this.comboTrigger_SelectedIndexChanged);
 			// 
@@ -213,9 +229,9 @@ namespace OpenDental{
 			// 
 			this.comboAction.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboAction.FormattingEnabled = true;
-			this.comboAction.Location = new System.Drawing.Point(161,255);
+			this.comboAction.Location = new System.Drawing.Point(161, 255);
 			this.comboAction.Name = "comboAction";
-			this.comboAction.Size = new System.Drawing.Size(183,21);
+			this.comboAction.Size = new System.Drawing.Size(183, 21);
 			this.comboAction.TabIndex = 28;
 			this.comboAction.SelectedIndexChanged += new System.EventHandler(this.comboAction_SelectedIndexChanged);
 			// 
@@ -223,44 +239,46 @@ namespace OpenDental{
 			// 
 			this.comboCommType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboCommType.FormattingEnabled = true;
-			this.comboCommType.Location = new System.Drawing.Point(161,307);
+			this.comboCommType.Location = new System.Drawing.Point(161, 307);
 			this.comboCommType.Name = "comboCommType";
-			this.comboCommType.Size = new System.Drawing.Size(183,21);
+			this.comboCommType.Size = new System.Drawing.Size(183, 21);
 			this.comboCommType.TabIndex = 29;
 			// 
 			// comboSheetDef
 			// 
 			this.comboSheetDef.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboSheetDef.FormattingEnabled = true;
-			this.comboSheetDef.Location = new System.Drawing.Point(161,281);
+			this.comboSheetDef.Location = new System.Drawing.Point(161, 281);
 			this.comboSheetDef.Name = "comboSheetDef";
-			this.comboSheetDef.Size = new System.Drawing.Size(183,21);
+			this.comboSheetDef.Size = new System.Drawing.Size(183, 21);
 			this.comboSheetDef.TabIndex = 31;
 			// 
 			// butAdd
 			// 
-			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butAdd.Autosize = true;
 			this.butAdd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAdd.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAdd.CornerRadius = 4F;
 			this.butAdd.Image = global::OpenDental.Properties.Resources.Add;
 			this.butAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butAdd.Location = new System.Drawing.Point(677,225);
+			this.butAdd.Location = new System.Drawing.Point(677, 225);
 			this.butAdd.Name = "butAdd";
-			this.butAdd.Size = new System.Drawing.Size(65,24);
+			this.butAdd.Size = new System.Drawing.Size(65, 24);
 			this.butAdd.TabIndex = 35;
 			this.butAdd.Text = "Add";
 			this.butAdd.Click += new System.EventHandler(this.butAdd_Click);
 			// 
 			// gridMain
 			// 
+			this.gridMain.HasAddButton = false;
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(161,103);
+			this.gridMain.Location = new System.Drawing.Point(161, 103);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
 			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.None;
-			this.gridMain.Size = new System.Drawing.Size(510,146);
+			this.gridMain.Size = new System.Drawing.Size(510, 146);
 			this.gridMain.TabIndex = 34;
 			this.gridMain.Title = "Conditions";
 			this.gridMain.TranslationName = null;
@@ -268,53 +286,72 @@ namespace OpenDental{
 			// 
 			// butProcCode
 			// 
-			this.butProcCode.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butProcCode.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butProcCode.Autosize = true;
 			this.butProcCode.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butProcCode.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butProcCode.CornerRadius = 4F;
 			this.butProcCode.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butProcCode.Location = new System.Drawing.Point(479,75);
+			this.butProcCode.Location = new System.Drawing.Point(479, 75);
 			this.butProcCode.Name = "butProcCode";
-			this.butProcCode.Size = new System.Drawing.Size(23,24);
+			this.butProcCode.Size = new System.Drawing.Size(23, 24);
 			this.butProcCode.TabIndex = 32;
 			this.butProcCode.Text = "...";
 			this.butProcCode.Click += new System.EventHandler(this.butProcCode_Click);
 			// 
 			// butOK
 			// 
-			this.butOK.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butOK.Autosize = true;
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(677,422);
+			this.butOK.Location = new System.Drawing.Point(677, 422);
 			this.butOK.Name = "butOK";
-			this.butOK.Size = new System.Drawing.Size(75,24);
+			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 4;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
 			// butCancel
 			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0,0);
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
 			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butCancel.Autosize = true;
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(677,454);
+			this.butCancel.Location = new System.Drawing.Point(677, 454);
 			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75,24);
+			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 5;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
+			// comboApptStatus
+			// 
+			this.comboApptStatus.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboApptStatus.FormattingEnabled = true;
+			this.comboApptStatus.Location = new System.Drawing.Point(161, 333);
+			this.comboApptStatus.Name = "comboApptStatus";
+			this.comboApptStatus.Size = new System.Drawing.Size(183, 21);
+			this.comboApptStatus.TabIndex = 37;
+			// 
+			// labelApptStatus
+			// 
+			this.labelApptStatus.Location = new System.Drawing.Point(16, 334);
+			this.labelApptStatus.Name = "labelApptStatus";
+			this.labelApptStatus.Size = new System.Drawing.Size(143, 17);
+			this.labelApptStatus.TabIndex = 36;
+			this.labelApptStatus.Text = "Appointment Status";
+			this.labelApptStatus.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormAutomationEdit
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5,13);
-			this.ClientSize = new System.Drawing.Size(778,498);
+			this.ClientSize = new System.Drawing.Size(778, 498);
+			this.Controls.Add(this.comboApptStatus);
+			this.Controls.Add(this.labelApptStatus);
 			this.Controls.Add(this.butAdd);
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butProcCode);
@@ -340,7 +377,6 @@ namespace OpenDental{
 			this.MinimizeBox = false;
 			this.Name = "FormAutomationEdit";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Automation";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormAutomationEdit_FormClosing);
 			this.Load += new System.EventHandler(this.FormAutomationEdit_Load);
@@ -357,10 +393,6 @@ namespace OpenDental{
 			}
 			comboTrigger.SelectedIndex=(int)AutoCur.Autotrigger;
 			textProcCodes.Text=AutoCur.ProcCodes;//although might not be visible.
-			for(int i=0;i<Enum.GetNames(typeof(AutomationAction)).Length;i++) {
-				comboAction.Items.Add(Enum.GetNames(typeof(AutomationAction))[i]);
-			}
-			comboAction.SelectedIndex=(int)AutoCur.AutoAction;
 			for(int i=0;i<SheetDefC.Listt.Count;i++) {
 				comboSheetDef.Items.Add(SheetDefC.Listt[i].Description);
 				if(AutoCur.SheetDefNum==SheetDefC.Listt[i].SheetDefNum) {
@@ -373,6 +405,8 @@ namespace OpenDental{
 					comboCommType.SelectedIndex=i;
 				}
 			}
+			_listApptStatuses.ForEach(x => comboApptStatus.Items.Add(x.ToString()));
+			comboApptStatus.SelectedIndex=_listApptStatuses.FindIndex(x => x==AutoCur.AptStatus);//can be -1;
 			textMessage.Text=AutoCur.MessageContent;
 			FillGrid();
 		}
@@ -401,6 +435,23 @@ namespace OpenDental{
 		}
 
 		private void comboTrigger_SelectedIndexChanged(object sender,EventArgs e) {
+			int selectedIndex=comboAction.SelectedIndex;
+			comboAction.Items.Clear();
+			_listAutoActions=Enum.GetValues(typeof(AutomationAction)).OfType<AutomationAction>().ToList();
+			//only add the SetApptStatus action if the triggers CreateAppt or CreateApptNewPat are selected, since that's the only time we have an AptNum
+			if(comboTrigger.SelectedIndex!=(int)AutomationTrigger.CreateAppt && comboTrigger.SelectedIndex!=(int)AutomationTrigger.CreateApptNewPat) {
+				_listAutoActions.Remove(AutomationAction.SetApptStatus);
+			}
+			comboAction.Items.AddRange(_listAutoActions.Select(x => x.ToString()).ToArray());
+			if(selectedIndex==-1 || selectedIndex>=comboAction.Items.Count) {
+				comboAction.SelectedIndex=_listAutoActions.IndexOf(AutoCur.AutoAction);
+			}
+			else {
+				comboAction.SelectedIndex=selectedIndex;
+			}
+			if(comboAction.SelectedIndex==-1) {
+				comboAction.SelectedIndex=0;
+			}
 			if(comboTrigger.SelectedIndex==(int)AutomationTrigger.CompleteProcedure) {
 				labelProcCodes.Visible=true;
 				textProcCodes.Visible=true;
@@ -414,27 +465,43 @@ namespace OpenDental{
 		}
 
 		private void comboAction_SelectedIndexChanged(object sender,EventArgs e) {
-			if(comboAction.SelectedIndex==(int)AutomationAction.CreateCommlog) {
+			if(_listAutoActions[comboAction.SelectedIndex]==AutomationAction.CreateCommlog) {
 				labelSheetDef.Visible=false;
 				comboSheetDef.Visible=false;
 				labelCommType.Visible=true;
 				comboCommType.Visible=true;
+				labelApptStatus.Visible=false;
+				comboApptStatus.Visible=false;
 				labelMessage.Visible=true;
 				textMessage.Visible=true;
 			}
-			else if(comboAction.SelectedIndex==(int)AutomationAction.PopUp) {
+			else if(_listAutoActions[comboAction.SelectedIndex]==AutomationAction.PopUp) {
 				labelSheetDef.Visible=false;
 				comboSheetDef.Visible=false;
 				labelCommType.Visible=false;
 				comboCommType.Visible=false;
+				labelApptStatus.Visible=false;
+				comboApptStatus.Visible=false;
 				labelMessage.Visible=true;
 				textMessage.Visible=true;
+			}
+			else if(_listAutoActions[comboAction.SelectedIndex]==AutomationAction.SetApptStatus) {
+				labelSheetDef.Visible=false;
+				comboSheetDef.Visible=false;
+				labelCommType.Visible=false;
+				comboCommType.Visible=false;
+				labelApptStatus.Visible=true;
+				comboApptStatus.Visible=true;
+				labelMessage.Visible=false;
+				textMessage.Visible=false;
 			}
 			else {
 				labelSheetDef.Visible=true;
 				comboSheetDef.Visible=true;
 				labelCommType.Visible=false;
 				comboCommType.Visible=false;
+				labelApptStatus.Visible=false;
+				comboApptStatus.Visible=false;
 				labelMessage.Visible=false;
 				textMessage.Visible=false;
 			}
@@ -509,19 +576,19 @@ namespace OpenDental{
 					}
 				}
 			}
-			if(comboAction.SelectedIndex==(int)AutomationAction.CreateCommlog){
+			if(_listAutoActions[comboAction.SelectedIndex]==AutomationAction.CreateCommlog){
 				if(comboCommType.SelectedIndex==-1){
 					MsgBox.Show(this,"A CommType must be selected.");
 					return;
 				}
 			}
-			if(comboAction.SelectedIndex==(int)AutomationAction.PopUp) {
+			if(_listAutoActions[comboAction.SelectedIndex]==AutomationAction.PopUp) {
 				if(textMessage.Text.Trim()==string.Empty) {
 					MsgBox.Show(this,"Message cannot be blank.");
 					return;
 				}
 			}
-			if(comboAction.SelectedIndex==(int)AutomationAction.PrintPatientLetter){
+			if(_listAutoActions[comboAction.SelectedIndex]==AutomationAction.PrintPatientLetter){
 				if(comboSheetDef.SelectedIndex==-1){
 					MsgBox.Show(this,"A SheetDef must be selected.");
 					return;
@@ -531,7 +598,7 @@ namespace OpenDental{
 					return;
 				}
 			}
-			if(comboAction.SelectedIndex==(int)AutomationAction.PrintReferralLetter) {
+			if(_listAutoActions[comboAction.SelectedIndex]==AutomationAction.PrintReferralLetter) {
 				if(comboSheetDef.SelectedIndex==-1) {
 					MsgBox.Show(this,"A SheetDef must be selected.");
 					return;
@@ -541,13 +608,19 @@ namespace OpenDental{
 					return;
 				}
 			}
-			if(comboAction.SelectedIndex==(int)AutomationAction.ShowExamSheet) {
+			if(_listAutoActions[comboAction.SelectedIndex]==AutomationAction.ShowExamSheet) {
 				if(comboSheetDef.SelectedIndex==-1) {
 					MsgBox.Show(this,"A SheetDef must be selected.");
 					return;
 				}
 				if(SheetDefC.Listt[comboSheetDef.SelectedIndex].SheetType!=SheetTypeEnum.ExamSheet) {
 					MsgBox.Show(this,"The selected sheet type must be an exam sheet.");
+					return;
+				}
+			}
+			if(_listAutoActions[comboAction.SelectedIndex]==AutomationAction.SetApptStatus) {
+				if(comboApptStatus.SelectedIndex==-1) {
+					MsgBox.Show(this,"An Appointment Status must be selected.");
 					return;
 				}
 			}
@@ -559,17 +632,17 @@ namespace OpenDental{
 			else {
 				AutoCur.ProcCodes="";
 			}
-			AutoCur.AutoAction=(AutomationAction)comboAction.SelectedIndex;
-			if(comboAction.SelectedIndex==(int)AutomationAction.PrintPatientLetter
-				|| comboAction.SelectedIndex==(int)AutomationAction.PrintReferralLetter
-				|| comboAction.SelectedIndex==(int)AutomationAction.ShowExamSheet) 
+			AutoCur.AutoAction=_listAutoActions[comboAction.SelectedIndex];
+			if(_listAutoActions[comboAction.SelectedIndex]==AutomationAction.PrintPatientLetter
+				|| _listAutoActions[comboAction.SelectedIndex]==AutomationAction.PrintReferralLetter
+				|| _listAutoActions[comboAction.SelectedIndex]==AutomationAction.ShowExamSheet) 
 			{
 				AutoCur.SheetDefNum=SheetDefC.Listt[comboSheetDef.SelectedIndex].SheetDefNum;
 			}
 			else {
 				AutoCur.SheetDefNum=0;
 			}
-			if(comboAction.SelectedIndex==(int)AutomationAction.CreateCommlog) {
+			if(_listAutoActions[comboAction.SelectedIndex]==AutomationAction.CreateCommlog) {
 				AutoCur.CommType=DefC.Short[(int)DefCat.CommLogTypes][comboCommType.SelectedIndex].DefNum;
 				AutoCur.MessageContent=textMessage.Text;
 			}
@@ -577,9 +650,15 @@ namespace OpenDental{
 				AutoCur.CommType=0;
 				AutoCur.MessageContent="";
 			}
-			if(comboAction.SelectedIndex==(int)AutomationAction.PopUp) {
+			if(_listAutoActions[comboAction.SelectedIndex]==AutomationAction.PopUp) {
 				AutoCur.MessageContent=textMessage.Text;
 			}//MessageContent was already set blank if not PopUp or Commlog above.
+			if(_listAutoActions[comboAction.SelectedIndex]==AutomationAction.SetApptStatus) {
+				AutoCur.AptStatus=_listApptStatuses[comboApptStatus.SelectedIndex];
+			}
+			else {
+				AutoCur.AptStatus=ApptStatus.None;//not an automation to set ApptStatus
+			}
 			Automations.Update(AutoCur);//Because always inserted before opening this form.
 			DialogResult=DialogResult.OK;
 		}

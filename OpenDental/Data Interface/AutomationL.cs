@@ -8,8 +8,9 @@ using System.Windows.Forms;
 
 namespace OpenDental {
 	public class AutomationL {
-		///<summary>ProcCodes will be null unless trigger is CompleteProcedure.  This routine will generally fail silently.  Will return true if a trigger happened.</summary>
-		public static bool Trigger(AutomationTrigger trigger,List<string> procCodes,long patNum) {
+		///<summary>ProcCodes will be null unless trigger is CompleteProcedure.
+		///This routine will generally fail silently.  Will return true if a trigger happened.</summary>
+		public static bool Trigger(AutomationTrigger trigger,List<string> procCodes,long patNum,long aptNum=0) {
 			if(patNum==0) {//Could happen for OpenPatient trigger
 				return false;
 			}
@@ -19,117 +20,91 @@ namespace OpenDental {
 					continue;
 				}
 				if(trigger==AutomationTrigger.CompleteProcedure) {
-					if(procCodes==null) {
+					if(procCodes==null || procCodes.Count==0) {
 						continue;//fail silently
 					}
-					bool codeFound=false;
 					string[] arrayCodes=Automations.Listt[i].ProcCodes.Split(',');
-					for(int p=0;p<procCodes.Count;p++) {
-						for(int a=0;a<arrayCodes.Length;a++) {
-							if(arrayCodes[a]==procCodes[p]) {
-								codeFound=true;
-								break;
-							}
-						}
-					}
-					if(!codeFound) {
+					if(procCodes.All(x => !arrayCodes.Contains(x))) {
 						continue;
 					}
 				}
 				//matching automation item has been found
 				//Get possible list of conditions that exist for this automation item
 				List<AutomationCondition> autoConditionsList=AutomationConditions.GetListByAutomationNum(Automations.Listt[i].AutomationNum);
-				if(Automations.Listt[i].AutoAction==AutomationAction.CreateCommlog) {
-					if(autoConditionsList.Count>0) {
-						if(!CheckAutomationConditions(autoConditionsList,patNum)) {
-							continue;
-						}
-					}
-					Commlog CommlogCur=new Commlog();
-					CommlogCur.PatNum=patNum;
-					CommlogCur.CommDateTime=DateTime.Now;
-					CommlogCur.CommType=Automations.Listt[i].CommType;
-					CommlogCur.Note=Automations.Listt[i].MessageContent;
-					CommlogCur.Mode_=CommItemMode.None;
-					CommlogCur.UserNum=Security.CurUser.UserNum;
-					FormCommItem FormCI=new FormCommItem(CommlogCur);
-					FormCI.IsNew=true;
-					FormCI.ShowDialog();
-					automationHappened=true;
+				if(autoConditionsList.Count>0 && !CheckAutomationConditions(autoConditionsList,patNum)) {
+					continue;
 				}
-				else if(Automations.Listt[i].AutoAction==AutomationAction.PopUp) {
-					if(autoConditionsList.Count>0) {
-						if(!CheckAutomationConditions(autoConditionsList,patNum)) {
-							continue;
-						}
-					}
-					MessageBox.Show(Automations.Listt[i].MessageContent);
-					automationHappened=true;
-				}
-				else if(Automations.Listt[i].AutoAction==AutomationAction.PrintPatientLetter) {
-					if(autoConditionsList.Count>0) {
-						if(!CheckAutomationConditions(autoConditionsList,patNum)) {
-							continue;
-						}
-					}
-					SheetDef sheetDef=SheetDefs.GetSheetDef(Automations.Listt[i].SheetDefNum);
-					Sheet sheet=SheetUtil.CreateSheet(sheetDef,patNum);
-					SheetParameter.SetParameter(sheet,"PatNum",patNum);
-					//SheetParameter.SetParameter(sheet,"ReferralNum",referral.ReferralNum);
-					SheetFiller.FillFields(sheet);
-					using(Bitmap bmp=new Bitmap(100,100)) {//a dummy bitmap for the graphics object
-						using(Graphics g=Graphics.FromImage(bmp)) {
-							SheetUtil.CalculateHeights(sheet,g);
-						}
-					}
-					FormSheetFillEdit FormSF=new FormSheetFillEdit(sheet);
-					FormSF.ShowDialog();
-					automationHappened=true;
-				}
-				else if(Automations.Listt[i].AutoAction==AutomationAction.PrintReferralLetter) {
-					if(autoConditionsList.Count>0) {
-						if(!CheckAutomationConditions(autoConditionsList,patNum)) {
-							continue;
-						}
-					}
-					long referralNum=RefAttaches.GetReferralNum(patNum);
-					if(referralNum==0) {
-						MsgBox.Show("Automations","This patient has no referral source entered.");
+				SheetDef sheetDef;
+				Sheet sheet;
+				FormSheetFillEdit FormSF;
+				switch(Automations.Listt[i].AutoAction) {
+					case AutomationAction.CreateCommlog:
+						Commlog commlogCur=new Commlog();
+						commlogCur.PatNum=patNum;
+						commlogCur.CommDateTime=DateTime.Now;
+						commlogCur.CommType=Automations.Listt[i].CommType;
+						commlogCur.Note=Automations.Listt[i].MessageContent;
+						commlogCur.Mode_=CommItemMode.None;
+						commlogCur.UserNum=Security.CurUser.UserNum;
+						FormCommItem FormCI=new FormCommItem(commlogCur);
+						FormCI.IsNew=true;
+						FormCI.ShowDialog();
 						automationHappened=true;
 						continue;
-					}
-					SheetDef sheetDef=SheetDefs.GetSheetDef(Automations.Listt[i].SheetDefNum);
-					Sheet sheet=SheetUtil.CreateSheet(sheetDef,patNum);
-					SheetParameter.SetParameter(sheet,"PatNum",patNum);
-					SheetParameter.SetParameter(sheet,"ReferralNum",referralNum);
-					SheetFiller.FillFields(sheet);
-					using(Bitmap bmp=new Bitmap(100,100)) {//a dummy bitmap for the graphics object
+					case AutomationAction.PopUp:
+						MessageBox.Show(Automations.Listt[i].MessageContent);
+						automationHappened=true;
+						continue;
+					case AutomationAction.PrintPatientLetter:
+					case AutomationAction.ShowExamSheet:
+						sheetDef=SheetDefs.GetSheetDef(Automations.Listt[i].SheetDefNum);
+						sheet=SheetUtil.CreateSheet(sheetDef,patNum);
+						SheetParameter.SetParameter(sheet,"PatNum",patNum);
+						SheetFiller.FillFields(sheet);
+						using(Bitmap bmp=new Bitmap(100,100))//a dummy bitmap for the graphics object
 						using(Graphics g=Graphics.FromImage(bmp)) {
 							SheetUtil.CalculateHeights(sheet,g);
 						}
-					}
-					FormSheetFillEdit FormSF=new FormSheetFillEdit(sheet);
-					FormSF.ShowDialog();
-					automationHappened=true;
-				}
-				else if(Automations.Listt[i].AutoAction==AutomationAction.ShowExamSheet) {
-					if(autoConditionsList.Count>0) {
-						if(!CheckAutomationConditions(autoConditionsList,patNum)) {
+						FormSF=new FormSheetFillEdit(sheet);
+						FormSF.ShowDialog();
+						automationHappened=true;
+						continue;
+					case AutomationAction.PrintReferralLetter:
+						long referralNum=RefAttaches.GetReferralNum(patNum);
+						if(referralNum==0) {
+							MsgBox.Show("Automations","This patient has no referral source entered.");
+							automationHappened=true;
 							continue;
 						}
-					}
-					SheetDef sheetDef=SheetDefs.GetSheetDef(Automations.Listt[i].SheetDefNum);
-					Sheet sheet=SheetUtil.CreateSheet(sheetDef,patNum);
-					SheetParameter.SetParameter(sheet,"PatNum",patNum);
-					SheetFiller.FillFields(sheet);
-					using(Bitmap bmp=new Bitmap(100,100)) {//a dummy bitmap for the graphics object
+						sheetDef=SheetDefs.GetSheetDef(Automations.Listt[i].SheetDefNum);
+						sheet=SheetUtil.CreateSheet(sheetDef,patNum);
+						SheetParameter.SetParameter(sheet,"PatNum",patNum);
+						SheetParameter.SetParameter(sheet,"ReferralNum",referralNum);
+						SheetFiller.FillFields(sheet);
+						using(Bitmap bmp=new Bitmap(100,100))//a dummy bitmap for the graphics object
 						using(Graphics g=Graphics.FromImage(bmp)) {
 							SheetUtil.CalculateHeights(sheet,g);
 						}
-					}
-					FormSheetFillEdit FormSF=new FormSheetFillEdit(sheet);
-					FormSF.ShowDialog();
-					automationHappened=true;
+						FormSF=new FormSheetFillEdit(sheet);
+						FormSF.ShowDialog();
+						automationHappened=true;
+						continue;
+					case AutomationAction.SetApptStatus:
+						if(Automations.Listt[i].AptStatus==ApptStatus.None) {
+							MsgBox.Show("Automations","Invalid appointment status set in automation.");
+							automationHappened=true;
+							continue;
+						}
+						Appointment aptNew=Appointments.GetOneApt(aptNum);
+						if(aptNew==null) {
+							MsgBox.Show("Automations","Invalid appointment for automation.");
+							automationHappened=true;
+							continue;
+						}
+						Appointment aptOld=aptNew.Clone();
+						aptNew.AptStatus=Automations.Listt[i].AptStatus;
+						Appointments.Update(aptNew,aptOld);
+						continue;
 				}
 			}
 			return automationHappened;

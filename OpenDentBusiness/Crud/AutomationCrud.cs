@@ -54,6 +54,7 @@ namespace OpenDentBusiness.Crud{
 				automation.SheetDefNum   = PIn.Long  (row["SheetDefNum"].ToString());
 				automation.CommType      = PIn.Long  (row["CommType"].ToString());
 				automation.MessageContent= PIn.String(row["MessageContent"].ToString());
+				automation.AptStatus     = (OpenDentBusiness.ApptStatus)PIn.Int(row["AptStatus"].ToString());
 				retVal.Add(automation);
 			}
 			return retVal;
@@ -73,6 +74,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("SheetDefNum");
 			table.Columns.Add("CommType");
 			table.Columns.Add("MessageContent");
+			table.Columns.Add("AptStatus");
 			foreach(Automation automation in listAutomations) {
 				table.Rows.Add(new object[] {
 					POut.Long  (automation.AutomationNum),
@@ -83,6 +85,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (automation.SheetDefNum),
 					POut.Long  (automation.CommType),
 					            automation.MessageContent,
+					POut.Int   ((int)automation.AptStatus),
 				});
 			}
 			return table;
@@ -123,7 +126,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="AutomationNum,";
 			}
-			command+="Description,Autotrigger,ProcCodes,AutoAction,SheetDefNum,CommType,MessageContent) VALUES(";
+			command+="Description,Autotrigger,ProcCodes,AutoAction,SheetDefNum,CommType,MessageContent,AptStatus) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(automation.AutomationNum)+",";
 			}
@@ -134,7 +137,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)automation.AutoAction)+","
 				+    POut.Long  (automation.SheetDefNum)+","
 				+    POut.Long  (automation.CommType)+","
-				+"'"+POut.String(automation.MessageContent)+"')";
+				+"'"+POut.String(automation.MessageContent)+"',"
+				+    POut.Int   ((int)automation.AptStatus)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -167,7 +171,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="AutomationNum,";
 			}
-			command+="Description,Autotrigger,ProcCodes,AutoAction,SheetDefNum,CommType,MessageContent) VALUES(";
+			command+="Description,Autotrigger,ProcCodes,AutoAction,SheetDefNum,CommType,MessageContent,AptStatus) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(automation.AutomationNum)+",";
 			}
@@ -178,7 +182,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)automation.AutoAction)+","
 				+    POut.Long  (automation.SheetDefNum)+","
 				+    POut.Long  (automation.CommType)+","
-				+"'"+POut.String(automation.MessageContent)+"')";
+				+"'"+POut.String(automation.MessageContent)+"',"
+				+    POut.Int   ((int)automation.AptStatus)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -197,7 +202,8 @@ namespace OpenDentBusiness.Crud{
 				+"AutoAction    =  "+POut.Int   ((int)automation.AutoAction)+", "
 				+"SheetDefNum   =  "+POut.Long  (automation.SheetDefNum)+", "
 				+"CommType      =  "+POut.Long  (automation.CommType)+", "
-				+"MessageContent= '"+POut.String(automation.MessageContent)+"' "
+				+"MessageContent= '"+POut.String(automation.MessageContent)+"', "
+				+"AptStatus     =  "+POut.Int   ((int)automation.AptStatus)+" "
 				+"WHERE AutomationNum = "+POut.Long(automation.AutomationNum);
 			Db.NonQ(command);
 		}
@@ -233,6 +239,10 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="MessageContent = '"+POut.String(automation.MessageContent)+"'";
 			}
+			if(automation.AptStatus != oldAutomation.AptStatus) {
+				if(command!=""){ command+=",";}
+				command+="AptStatus = "+POut.Int   ((int)automation.AptStatus)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -264,6 +274,9 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			if(automation.MessageContent != oldAutomation.MessageContent) {
+				return true;
+			}
+			if(automation.AptStatus != oldAutomation.AptStatus) {
 				return true;
 			}
 			return false;

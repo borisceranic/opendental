@@ -425,9 +425,10 @@ namespace OpenDentBusiness {
 				//Add InsPlanEdit permission to everyone------------------------------------------------------
 				command="SELECT DISTINCT UserGroupNum FROM grouppermission";
 				DataTable table=Db.GetTable(command);
+				long groupNum;
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 				   foreach(DataRow row in table.Rows) {
-					  long groupNum=PIn.Long(row["UserGroupNum"].ToString());
+					  groupNum=PIn.Long(row["UserGroupNum"].ToString());
 					  command="INSERT INTO grouppermission (UserGroupNum,PermType) "
 						 +"VALUES("+POut.Long(groupNum)+",110)";//110 - InsPlanEdit
 					  Db.NonQ(command);
@@ -486,7 +487,8 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 					command="ALTER TABLE ehrmeasureevent MODIFY DateStartTobacco NOT NULL";
 					Db.NonQ(command);
-				}				if(DataConnection.DBtype==DatabaseType.MySql) {
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command="ALTER TABLE procedurelog ADD DateComplete date NOT NULL DEFAULT '0001-01-01'";
 					Db.NonQ(command);
 				}
@@ -532,6 +534,18 @@ namespace OpenDentBusiness {
 				}
 				else {//oracle
 					command="INSERT INTO preference (PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'BadDebtAdjustmentTypes','')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE automation ADD AptStatus tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE automation ADD AptStatus number(3)";
+					Db.NonQ(command);
+					command="UPDATE automation SET AptStatus = 0 WHERE AptStatus IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE automation MODIFY AptStatus NOT NULL";
 					Db.NonQ(command);
 				}
 

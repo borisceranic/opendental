@@ -1033,8 +1033,9 @@ namespace OpenDental{
 				oResult=OtherResult.NewToPinBoard;
 			}
 			if(AptCur.IsNewPatient) {
-				AutomationL.Trigger(AutomationTrigger.CreateApptNewPat,null,AptCur.PatNum);
+				AutomationL.Trigger(AutomationTrigger.CreateApptNewPat,null,AptCur.PatNum,AptCur.AptNum);
 			}
+			AutomationL.Trigger(AutomationTrigger.CreateAppt,null,AptCur.PatNum,AptCur.AptNum);
 			DialogResult=DialogResult.OK;
 		}
 

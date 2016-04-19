@@ -23,6 +23,8 @@ namespace OpenDentBusiness{
 		public long CommType;
 		///<summary>If a commlog action, then this is the text that goes in the commlog.  If this is a ShowStatementNoteBold action, then this is the NoteBold. Might later be expanded to work with email or to use variables.</summary>
 		public string MessageContent;
+		///<summary>Enum:ApptStatus .</summary>
+		public ApptStatus AptStatus;
 
 		public Automation Copy() {
 			return (Automation)MemberwiseClone();
@@ -41,7 +43,9 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		CreateApptNewPat,
 		///<summary>Regardless of module.  Usually only used with conditions.</summary>
-		OpenPatient
+		OpenPatient,
+		///<summary></summary>
+		CreateAppt
 		//<summary>Either a single statement or as part of the billing process.  Either print or </summary>
 		//CreateStatement
 	}
@@ -57,7 +61,9 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		ShowExamSheet,
 		///<summary></summary>
-		PopUp
+		PopUp,
+		///<summary></summary>
+		SetApptStatus
 		//<summary></summary>
 		//AddStatementNoteBold
 	}
