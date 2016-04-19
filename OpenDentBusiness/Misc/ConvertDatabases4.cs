@@ -548,6 +548,71 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE automation MODIFY AptStatus NOT NULL";
 					Db.NonQ(command);
 				}
+				//Insert Carestream bridge-----------------------------------------------------------------
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO program (ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+						+") VALUES("
+						+"'Carestream', "
+						+"'Carestream from www.carestreamdental.com', "
+						+"'0', "
+						+"'"+POut.String(@"pwimage.exe")+"', "
+						+"'', "//leave blank if none
+						+"'')";
+					long programNum=Db.NonQ(command,true);
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"'"+POut.Long(programNum)+"', "
+						+"'Enter 0 to use PatientNum, or 1 to use ChartNum', "
+						+"'0')";
+					Db.NonQ(command);
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"'"+POut.Long(programNum)+"', "
+						+"'Patient.ini path', "
+						+"'"+POut.String(@"C:\Carestream\Patient.ini")+"')";
+					Db.NonQ(command);
+					command="INSERT INTO toolbutitem (ProgramNum,ToolBar,ButtonText) "
+						+"VALUES ("
+						+"'"+POut.Long(programNum)+"', "
+						+"'2', "//ToolBarsAvail.ChartModule
+						+"'Carestream')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO program (ProgramNum,ProgName,ProgDesc,Enabled,Path,CommandLine,Note"
+						+") VALUES("
+						+"(SELECT MAX(ProgramNum)+1 FROM program),"
+						+"'Carestream', "
+						+"'Carestream from www.carestreamdental.com', "
+						+"'0', "
+						+"'"+POut.String(@"pwimage.exe")+"', "
+						+"'', "//leave blank if none
+						+"'')";
+					long programNum=Db.NonQ(command,true);
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ClinicNum"
+						+") VALUES("
+						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+						+"'"+POut.Long(programNum)+"', "
+						+"'Enter 0 to use PatientNum, or 1 to use ChartNum', "
+						+"'0', "
+						+"'0')";
+					Db.NonQ(command);
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ClinicNum"
+						+") VALUES("
+						+"(SELECT MAX(ProgramPropertyNum+1) FROM programproperty),"
+						+"'"+POut.Long(programNum)+"', "
+						+"'Patient.ini path', "
+						+"'"+POut.String(@"C:\Carestream\Patient.ini")+"', "
+						+"'0')";
+					Db.NonQ(command);
+					command="INSERT INTO toolbutitem (ToolButItemNum,ProgramNum,ToolBar,ButtonText) "
+						+"VALUES ("
+						+"(SELECT MAX(ToolButItemNum)+1 FROM toolbutitem),"
+						+"'"+POut.Long(programNum)+"', "
+						+"'2', "//ToolBarsAvail.ChartModule
+						+"'Carestream')";
+					Db.NonQ(command);
+				}//end Carestream bridge
 
 				command="UPDATE preference SET ValueString = '16.2.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);

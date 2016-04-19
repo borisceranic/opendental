@@ -71,6 +71,10 @@ namespace OpenDental{
 				CaptureLink.SendData(prog,pat);
 				return;
 			}
+			else if(prog.ProgName==ProgramName.Carestream.ToString()) {
+				Carestream.SendData(prog,pat);
+				return;
+			}
 			else if(prog.ProgName==ProgramName.Cerec.ToString()) {
 				Cerec.SendData(prog,pat);
 				return;

@@ -342,6 +342,7 @@
     <Compile Include="Bridges\VixWinOld.cs" />
     <Compile Include="Bridges\XVWeb.cs" />
     <Compile Include="Bridges\ZImage.cs" />
+    <Compile Include="Carestream.cs" />
     <Compile Include="Data Interface\ActionNeededL.cs" />
     <Compile Include="Data Interface\AutomationL.cs" />
     <Compile Include="Data Interface\ClaimL.cs" />

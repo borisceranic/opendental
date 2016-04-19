@@ -192,6 +192,8 @@ namespace OpenDentBusiness{
 			//CallFire: Has no file paths containing outgoing patient data from Open Dental.
 			//Camsight: Has no file paths containing outgoing patient data from Open Dental.
 			//CaptureLink: Has no file paths containing outgoing patient data from Open Dental.
+			//Carestream:
+			ScrubFileForProperty(ProgramName.Carestream,"Patient.ini path","",true);//C:\Carestream\Patient.ini
 			//Cerec: Has no file paths containing outgoing patient data from Open Dental.
 			//CliniView: Has no file paths containing outgoing patient data from Open Dental.
 			//ClioSoft: Has no file paths containing outgoing patient data from Open Dental.

@@ -46,6 +46,7 @@ namespace OpenDentBusiness{
 		CallFire,
 		Camsight,
 		CaptureLink,
+		Carestream,
 		CentralDataStorage,
 		Cerec,
 		CleaRay,
