@@ -26,8 +26,11 @@ namespace OpenDental.Eclaims
 			
 		}
 
-		///<summary>Returns true if the communications were successful, and false if they failed. If they failed, a rollback will happen automatically by deleting the previously created X12 file. The batchnum is supplied for the possible rollback.  Also used for mail retrieval.</summary>
-		public static bool Launch(Clearinghouse clearinghouseClin,int batchNum) {//called from Eclaims and FormClaimReports.cs. Clinic-level clearinghouse passed in.
+		///<summary>Used for both sending claims and receiving reports.  Set isSilent to true to hide the cmd window popup.
+		///Returns true if the communications were successful, and false if they failed.  If they failed, a rollback will happen automatically by 
+		///deleting the previously created X12 file.  The batchnum is supplied for the possible rollback.  Also used for mail retrieval.</summary>
+		public static bool Launch(Clearinghouse clearinghouseClin,int batchNum,bool isSilent=false) {
+			//called from Eclaims and FormClaimReports.cs. Clinic-level clearinghouse passed in.
 			string arguments="";
 			try{
 				if(!Directory.Exists(clearinghouseClin.ExportPath)){
@@ -42,11 +45,33 @@ namespace OpenDental.Eclaims
 				arguments="\""+ODFileUtils.RemoveTrailingSeparators(clearinghouseClin.ExportPath)+"\\"+"*.*\" "//upload claims path
 					+"\""+ODFileUtils.RemoveTrailingSeparators(clearinghouseClin.ResponsePath)+"\" "//Mail path
 					+"316 "//vendor number.  
-					+clearinghouseClin.LoginID+" "//Client number. Assigned by us, and we have to coordinate for all other 'vendors' of Open Dental, because there is only one vendor number for OD for now.
+					//LoginID is client number.  Assigned by us, and we have to coordinate for all other 'vendors' of Open Dental,
+					//because there is only one vendor number for OD for now.
+					+clearinghouseClin.LoginID+" "
 					+clearinghouseClin.Password;
 				//call the WebMD client program
-				Process process=Process.Start(clearinghouseClin.ClientProgram,arguments);
+				Process process=new Process();
 				process.EnableRaisingEvents=true;
+				if(isSilent) {
+					process.StartInfo.UseShellExecute=false;//Required to redirect standard input on the next line.
+					process.StartInfo.RedirectStandardInput=true;//Required to send a newline character into the input stream below.
+					process.StartInfo.CreateNoWindow=true;
+					process.StartInfo.WindowStyle=ProcessWindowStyle.Hidden;
+				}
+				process.StartInfo.FileName=clearinghouseClin.ClientProgram;
+				process.StartInfo.Arguments=arguments;
+				process.Start();
+				if(isSilent) {
+					//If the LoginID or password are incorrect, then the WebMD client program will show an error message and wait for the user to click enter.
+					//Above we redirected standard input so that we could send a newline into the input.
+					//This way if the LoginID or password are incorrect, then the WebMD client will still exit.
+					//Write an excessive amount of newlines in case the WebMD client asks multiple questions.
+					//If we send the input before the WebMD client is ready, then the input is queued until it is needed.
+					//If no input is needed, then the input will be ignored.
+					for(int i=0;i<10;i++) {
+						process.StandardInput.WriteLine();
+					}
+				}
 				process.WaitForExit();
 				//delete the uploaded claims
 				string[] files=Directory.GetFiles(clearinghouseClin.ExportPath);
