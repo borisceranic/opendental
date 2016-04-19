@@ -1235,7 +1235,7 @@ namespace OpenDental
 		private void butAttachPrepay_Click(object sender,EventArgs e) {
 			FormPaySplitSelect FormPSS=new FormPaySplitSelect(PaySplitCur.PatNum);
 			FormPSS.IsPrePay=true;
-			FormPSS.SplitCur=PaySplitCur.SplitNum;
+			FormPSS.SplitNumCur=PaySplitCur.SplitNum;
 			if(FormPSS.ShowDialog()!=DialogResult.OK) {
 				return;
 			}			

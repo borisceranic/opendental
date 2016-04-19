@@ -2161,6 +2161,7 @@ namespace OpenDentBusiness {
 				command+="PatNum= "+POut.Long(fam.ListPats[i].PatNum);
 			}
 			command+=")";
+			//Unearned Amount from this datatable is deprecated.  Account module uses S-class methods to calculate it now.
 			double unearnedAmt=PIn.Double(Db.GetScalar(command));
 			row=table.NewRow();
 			row["descript"]="unearnedIncome";

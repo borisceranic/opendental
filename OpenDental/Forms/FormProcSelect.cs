@@ -24,6 +24,8 @@ namespace OpenDental{
 		public List<Procedure> ListSelectedProcs;
 		///<summary>When this is set to true, it shows a different list of procs.  It shows all completed procs for the family that are not already attached to a provkey.</summary>
 		public bool IsForProvKeys;
+		///<summary>Set to true to enable multiple procedure selection mode.</summary>
+		public bool IsMultiSelect;
 
 		///<summary>This form only displays completed procedures to pick from.</summary>
 		public FormProcSelect(long patNum)
@@ -85,7 +87,7 @@ namespace OpenDental{
 			this.gridMain.Location = new System.Drawing.Point(40, 34);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
+			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.One;
 			this.gridMain.Size = new System.Drawing.Size(559, 505);
 			this.gridMain.TabIndex = 140;
 			this.gridMain.Title = "Procedures";
@@ -143,6 +145,9 @@ namespace OpenDental{
 		#endregion
 
 		private void FormProcSelect_Load(object sender, System.EventArgs e) {
+			if(IsMultiSelect) {
+				gridMain.SelectionMode=OpenDental.UI.GridSelectionMode.MultiExtended;
+			}
 			ListSelectedProcs=new List<Procedure>();
 			if(IsForProvKeys) {
 				ProcList=Procedures.GetForProvKey(PatNum);

@@ -45,6 +45,7 @@ namespace CentralManager {
 			this.radioAnnual = new System.Windows.Forms.RadioButton();
 			this.radioDaily = new System.Windows.Forms.RadioButton();
 			this.radioMonthly = new System.Windows.Forms.RadioButton();
+			this.checkShowUnearned = new System.Windows.Forms.CheckBox();
 			this.groupBox3.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -288,10 +289,22 @@ namespace CentralManager {
 			this.radioMonthly.Text = "Monthly";
 			this.radioMonthly.Click += new System.EventHandler(this.radioMonthly_Click);
 			// 
+			// checkShowUnearned
+			// 
+			this.checkShowUnearned.Checked = true;
+			this.checkShowUnearned.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.checkShowUnearned.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkShowUnearned.Location = new System.Drawing.Point(173, 289);
+			this.checkShowUnearned.Name = "checkShowUnearned";
+			this.checkShowUnearned.Size = new System.Drawing.Size(95, 16);
+			this.checkShowUnearned.TabIndex = 53;
+			this.checkShowUnearned.Text = "Show Unearned";
+			// 
 			// FormCentralProdInc
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(481, 341);
+			this.Controls.Add(this.checkShowUnearned);
 			this.Controls.Add(this.groupBox3);
 			this.Controls.Add(this.groupBox2);
 			this.Controls.Add(this.textToday);
@@ -338,5 +351,6 @@ namespace CentralManager {
 		private System.Windows.Forms.RadioButton radioDaily;
 		private System.Windows.Forms.RadioButton radioMonthly;
 		private System.Windows.Forms.RadioButton radioProvider;
+		private System.Windows.Forms.CheckBox checkShowUnearned;
 	}
 }

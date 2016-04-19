@@ -259,7 +259,8 @@ namespace OpenDentBusiness{
 				+"WHERE ProvNum=0 "
 				+"AND UnearnedType!=0 "
 				+"AND PrePaymentNum=0 "
-				+"AND PatNum IN ("+String.Join(",",listFamPatNums)+")";
+				+"AND PatNum IN ("+String.Join(",",listFamPatNums)+") "
+				+"ORDER BY ProcDate";
 			return Crud.PaySplitCrud.SelectMany(command);
 		}
 

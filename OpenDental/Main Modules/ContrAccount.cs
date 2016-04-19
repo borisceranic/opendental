@@ -2990,6 +2990,7 @@ namespace OpenDental {
 				}
 				else { 
 					FormProcSelect FormPS=new FormProcSelect(PatCur.PatNum);
+					FormPS.IsMultiSelect=true;
 					if(FormPS.ShowDialog()!=DialogResult.OK) {
 						return;
 					}

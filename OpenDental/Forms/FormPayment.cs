@@ -639,6 +639,7 @@ namespace OpenDental {
 			// 
 			this.textNote.AcceptsTab = true;
 			this.textNote.BackColor = System.Drawing.SystemColors.Window;
+			this.textNote.DetectLinksEnabled = false;
 			this.textNote.DetectUrls = false;
 			this.textNote.Location = new System.Drawing.Point(106, 152);
 			this.textNote.MaxLength = 4000;
@@ -740,9 +741,9 @@ namespace OpenDental {
 			this.butPrePay.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			this.butPrePay.Location = new System.Drawing.Point(207, 90);
 			this.butPrePay.Name = "butPrePay";
-			this.butPrePay.Size = new System.Drawing.Size(92, 20);
+			this.butPrePay.Size = new System.Drawing.Size(61, 20);
 			this.butPrePay.TabIndex = 136;
-			this.butPrePay.Text = "Prepayment";
+			this.butPrePay.Text = "Prepay";
 			this.butPrePay.Click += new System.EventHandler(this.butPrePay_Click);
 			// 
 			// FormPayment
@@ -921,9 +922,7 @@ namespace OpenDental {
 						split.SplitAmt=patPortion;
 						split.DatePay=DateTime.Now;
 						split.ProcDate=DateTime.Now;
-						if(proc.ProcNum!=0) {
-							split.ProcNum=proc.ProcNum;
-						}
+						split.ProcNum=proc.ProcNum;
 						_listPaySplits.Add(split);
 						textAmount.Text=(PIn.Double(textAmount.Text)+patPortion).ToString("F");
 						continue;
@@ -964,9 +963,7 @@ namespace OpenDental {
 							split.SplitAmt=amtToUse;
 							split.DatePay=DateTime.Now;
 							split.ProcDate=DateTime.Now;
-							if(proc.ProcNum!=0) {
-								split.ProcNum=proc.ProcNum;
-							}
+							split.ProcNum=proc.ProcNum;
 							_listPaySplits.Add(split);
 							if(patPortion-amtToUse>0) {//The remaining UnearnedAmt didn't pay for the whole proc, let's be nice and make them a split for the difference.
 								split=new PaySplit();
@@ -978,9 +975,7 @@ namespace OpenDental {
 								split.SplitAmt=(patPortion-amtToUse);
 								split.DatePay=DateTime.Now;
 								split.ProcDate=DateTime.Now;
-								if(proc.ProcNum!=0) {
-									split.ProcNum=proc.ProcNum;
-								}
+								split.ProcNum=proc.ProcNum;
 								_listPaySplits.Add(split);
 								textAmount.Text=(PIn.Double(textAmount.Text)+(patPortion-amtToUse)).ToString("F");
 							}
@@ -2363,7 +2358,7 @@ namespace OpenDental {
 		}
 
 		private void butPrePay_Click(object sender,EventArgs e) {
-			if(PIn.Double(textAmount.Text)==0) {
+			if(PIn.Double(textAmount.Text)<=0) {
 				MsgBox.Show(this,"Amount must be greater than zero.");
 				return;
 			}

@@ -39,7 +39,7 @@ namespace OpenDental{
 			this.label1.Size = new System.Drawing.Size(559, 25);
 			this.label1.TabIndex = 3;
 			this.label1.Text = "The list below contains adjustments and completed procedures that have not been a" +
-    "ttatched to an invoice.";
+    "ttached to an invoice.";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
 			// gridMain

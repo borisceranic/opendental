@@ -434,7 +434,7 @@ namespace OpenDental{
 			this.checkShowUnearned.Checked = true;
 			this.checkShowUnearned.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkShowUnearned.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkShowUnearned.Location = new System.Drawing.Point(96, 146);
+			this.checkShowUnearned.Location = new System.Drawing.Point(38, 353);
 			this.checkShowUnearned.Name = "checkShowUnearned";
 			this.checkShowUnearned.Size = new System.Drawing.Size(95, 16);
 			this.checkShowUnearned.TabIndex = 52;

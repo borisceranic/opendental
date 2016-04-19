@@ -809,12 +809,12 @@ namespace OpenDentBusiness {
 			for(int i=0;i<listClinics.Count;i++) {
 				listClinicNums.Add(listClinics[i].ClinicNum);
 			}
-			if(!hasAllProvs && showUnearned) {
-				listClinicNums.Add(0);
-			}
 			List<long> listProvNums=new List<long>();
 			for(int i=0;i<listProvs.Count;i++) {
 				listProvNums.Add(listProvs[i].ProvNum);
+			}
+			if(!hasAllProvs && showUnearned) {
+				listProvNums.Add(0);
 			}
 			//Procedures------------------------------------------------------------------------------
 			string whereProv="";
@@ -1193,7 +1193,7 @@ namespace OpenDentBusiness {
 				listProvNums.Add(listProvs[i].ProvNum);
 			}
 			if(!hasAllProvs && showUnearned) {
-				listClinicNums.Add(0);
+				listProvNums.Add(0);
 			}
 			//Procedures------------------------------------------------------------------------------
 			string whereProv="";

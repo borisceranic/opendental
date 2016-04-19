@@ -14,7 +14,7 @@ namespace OpenDental {
 		private ODGrid gridMain;
 		private long _patNum;
 		public bool IsPrePay;
-		public long SplitCur;
+		public long SplitNumCur;
 		///<summary>This list will contain all selected PaySplits when OK is pressed.</summary>
 		public List<PaySplit> ListSelectedSplits;
 
@@ -34,7 +34,7 @@ namespace OpenDental {
 					List<PaySplit> listSplitsForSplit=PaySplits.GetSplitsForPrepay(_listPaySplits);
 					decimal splitTotal=0;
 					foreach(PaySplit paySplit in listSplitsForSplit) {
-						if(paySplit.SplitNum==SplitCur) {
+						if(paySplit.SplitNum==SplitNumCur) {
 							continue;
 						}
 						splitTotal+=(decimal)paySplit.SplitAmt;
@@ -64,7 +64,7 @@ namespace OpenDental {
 			gridMain.Columns.Clear();
 			ODGridColumn col=new ODGridColumn(Lan.g("TableInvoiceItems","Date"),70);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableInvoiceItems","PatName"),120);
+			col=new ODGridColumn(Lan.g("TableInvoiceItems","Patient Name"),120);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableInvoiceItems","Prov"),120);
 			gridMain.Columns.Add(col);
