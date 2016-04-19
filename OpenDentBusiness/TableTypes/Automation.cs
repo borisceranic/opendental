@@ -45,7 +45,9 @@ namespace OpenDentBusiness{
 		///<summary>Regardless of module.  Usually only used with conditions.</summary>
 		OpenPatient,
 		///<summary></summary>
-		CreateAppt
+		CreateAppt,
+		///<summary>Attaching a procedure to a scheduled appointment.</summary>
+		ScheduleProcedure
 		//<summary>Either a single statement or as part of the billing process.  Either print or </summary>
 		//CreateStatement
 	}
@@ -63,7 +65,9 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		PopUp,
 		///<summary></summary>
-		SetApptStatus
+		SetApptStatus,
+		///<summary></summary>
+		ShowConsentForm
 		//<summary></summary>
 		//AddStatementNoteBold
 	}

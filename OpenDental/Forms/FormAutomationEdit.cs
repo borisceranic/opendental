@@ -452,7 +452,9 @@ namespace OpenDental{
 			if(comboAction.SelectedIndex==-1) {
 				comboAction.SelectedIndex=0;
 			}
-			if(comboTrigger.SelectedIndex==(int)AutomationTrigger.CompleteProcedure) {
+			if(comboTrigger.SelectedIndex==(int)AutomationTrigger.CompleteProcedure
+				|| comboTrigger.SelectedIndex==(int)AutomationTrigger.ScheduleProcedure)
+			{
 				labelProcCodes.Visible=true;
 				textProcCodes.Visible=true;
 				butProcCode.Visible=true;
@@ -559,7 +561,9 @@ namespace OpenDental{
 				MsgBox.Show(this,"Description not allowed to be blank.");
 				return;
 			}
-			if(comboTrigger.SelectedIndex==(int)AutomationTrigger.CompleteProcedure){
+			if(comboTrigger.SelectedIndex==(int)AutomationTrigger.CompleteProcedure
+				|| comboTrigger.SelectedIndex==(int)AutomationTrigger.ScheduleProcedure)
+			{
 				if(textProcCodes.Text.Contains(" ")){
 					MsgBox.Show(this,"Procedure codes cannot contain any spaces.");
 					return;
@@ -624,9 +628,21 @@ namespace OpenDental{
 					return;
 				}
 			}
+			if(_listAutoActions[comboAction.SelectedIndex]==AutomationAction.ShowConsentForm) {
+				if(comboSheetDef.SelectedIndex==-1) {
+					MsgBox.Show(this,"A SheetDef must be selected.");
+					return;
+				}
+				if(SheetDefC.Listt[comboSheetDef.SelectedIndex].SheetType!=SheetTypeEnum.Consent) {
+					MsgBox.Show(this,"The selected sheet type must be a consent form.");
+					return;
+				}
+			}
 			AutoCur.Description=textDescription.Text;
 			AutoCur.Autotrigger=(AutomationTrigger)comboTrigger.SelectedIndex;
-			if(comboTrigger.SelectedIndex==(int)AutomationTrigger.CompleteProcedure) {
+			if(comboTrigger.SelectedIndex==(int)AutomationTrigger.CompleteProcedure
+				|| comboTrigger.SelectedIndex==(int)AutomationTrigger.ScheduleProcedure)
+			{
 				AutoCur.ProcCodes=textProcCodes.Text;
 			}
 			else {
@@ -635,7 +651,8 @@ namespace OpenDental{
 			AutoCur.AutoAction=_listAutoActions[comboAction.SelectedIndex];
 			if(_listAutoActions[comboAction.SelectedIndex]==AutomationAction.PrintPatientLetter
 				|| _listAutoActions[comboAction.SelectedIndex]==AutomationAction.PrintReferralLetter
-				|| _listAutoActions[comboAction.SelectedIndex]==AutomationAction.ShowExamSheet) 
+				|| _listAutoActions[comboAction.SelectedIndex]==AutomationAction.ShowExamSheet
+				|| _listAutoActions[comboAction.SelectedIndex]==AutomationAction.ShowConsentForm)
 			{
 				AutoCur.SheetDefNum=SheetDefC.Listt[comboSheetDef.SelectedIndex].SheetDefNum;
 			}

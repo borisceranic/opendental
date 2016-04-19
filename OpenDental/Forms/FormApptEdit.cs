@@ -3592,6 +3592,14 @@ namespace OpenDental{
 			}
 			else {//DialogResult==DialogResult.OK (User clicked OK or Delete)
 				Procedures.Sync(_listProcs,AptCur);
+				if(AptCur.AptStatus==ApptStatus.Scheduled || AptCur.AptStatus==ApptStatus.ASAP) {
+					//all ProcNums attached to the appt when form opened
+					List<long> listProcNumsAttachedStart=_listProcsFromDB.FindAll(y => y.AptNum==AptCur.AptNum).Select(x => x.ProcNum).ToList();
+					//find all procs that are currently attached to the appt that weren't when the form opened
+					List<string> listProcCodes=_listProcs.FindAll(x => x.AptNum==AptCur.AptNum && !listProcNumsAttachedStart.Contains(x.ProcNum))
+						.Select(x => ProcedureCodes.GetStringProcCode(x.CodeNum)).Distinct().ToList();//get list of string proc codes
+					AutomationL.Trigger(AutomationTrigger.ScheduleProcedure,listProcCodes,AptCur.PatNum);
+				}
 			}
 			//Sync detaches any attached procedures within Appointments.Delete() but doesn't create any ApptComm items.
 			Appointments.Sync(_listAppointments,_listAppointmentsOld,AptCur.PatNum);

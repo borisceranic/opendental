@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace OpenDental {
 	public class AutomationL {
-		///<summary>ProcCodes will be null unless trigger is CompleteProcedure.
+		///<summary>ProcCodes will be null unless trigger is CompleteProcedure or ScheduledProcedure.
 		///This routine will generally fail silently.  Will return true if a trigger happened.</summary>
 		public static bool Trigger(AutomationTrigger trigger,List<string> procCodes,long patNum,long aptNum=0) {
 			if(patNum==0) {//Could happen for OpenPatient trigger
@@ -19,7 +19,7 @@ namespace OpenDental {
 				if(Automations.Listt[i].Autotrigger!=trigger) {
 					continue;
 				}
-				if(trigger==AutomationTrigger.CompleteProcedure) {
+				if(trigger==AutomationTrigger.CompleteProcedure || trigger==AutomationTrigger.ScheduleProcedure) {
 					if(procCodes==null || procCodes.Count==0) {
 						continue;//fail silently
 					}
@@ -57,6 +57,7 @@ namespace OpenDental {
 						continue;
 					case AutomationAction.PrintPatientLetter:
 					case AutomationAction.ShowExamSheet:
+					case AutomationAction.ShowConsentForm:
 						sheetDef=SheetDefs.GetSheetDef(Automations.Listt[i].SheetDefNum);
 						sheet=SheetUtil.CreateSheet(sheetDef,patNum);
 						SheetParameter.SetParameter(sheet,"PatNum",patNum);

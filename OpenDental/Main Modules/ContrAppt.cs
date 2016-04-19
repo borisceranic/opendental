@@ -2766,6 +2766,7 @@ namespace OpenDental {
 			else{
 				aptCur.ClinicNum=curOp.ClinicNum;
 			}
+			bool isCreate=false;
 			if(aptCur.AptStatus==ApptStatus.Planned) {//if Planned appt is on pinboard
 				long plannedAptNum=aptCur.AptNum;
 				LabCase lab=LabCases.GetForPlanned(aptCur.AptNum);
@@ -2852,7 +2853,6 @@ namespace OpenDental {
 				aptCur.Confirmed=DefC.Short[(int)DefCat.ApptConfirmed][0].DefNum;//Causes the confirmation status to be reset.
 				try {
 					Appointments.Update(aptCur,aptOld);
-					bool isCreate=false;
 					if(aptOld.AptStatus==ApptStatus.UnschedList && aptOld.AptDateTime==DateTime.MinValue) { //If new appt is being added to schedule from pinboard
 						SecurityLogs.MakeLogEntry(Permissions.AppointmentCreate,aptCur.PatNum,
 							aptCur.AptDateTime.ToString()+", "+aptCur.ProcDescript,
@@ -2914,6 +2914,9 @@ namespace OpenDental {
 			List<string> procCodes=new List<string>();
 			for(int i=0;i<procsForSingleApt.Count;i++) {
 				procCodes.Add(ProcedureCodes.GetProcCode((long)procsForSingleApt[i].CodeNum).ProcCode);
+			}
+			if(isCreate) {//new appointment (not planned) is being added to the schedule from the pinboard, trigger ScheduleProcedure automation
+				AutomationL.Trigger(AutomationTrigger.ScheduleProcedure,procCodes,aptCur.PatNum);
 			}
 			//Recalls.SynchScheduledApptLazy(aptCur.PatNum, aptCur.AptDateTime, procCodes);
 			Recalls.SynchScheduledApptFull(aptCur.PatNum);
