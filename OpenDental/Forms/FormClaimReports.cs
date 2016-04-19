@@ -233,7 +233,7 @@ namespace OpenDental{
 				return "";
 			}
 			if(clearinghouseClin.CommBridge==EclaimsCommBridge.WebMD){
-				if(!WebMD.Launch(clearinghouseClin,0)){
+				if(!WebMD.Launch(clearinghouseClin,0,isAutomaticMode)){
 					return Lan.g("FormClaimReports","Error retrieving.")+"\r\n"+WebMD.ErrorMessage;
 				}
 			}
