@@ -8145,14 +8145,26 @@ namespace OpenDental {
 			for(int i=0;i<autoCodeList.Length;i++){
 				for(int n=0;n==0 || n<toothChart.SelectedTeeth.Count;n++) {
 					isValid=true;
-					if(toothChart.SelectedTeeth.Count!=0)
+					if(toothChart.SelectedTeeth.Count!=0) {
 						toothNum=toothChart.SelectedTeeth[n];
-					else
+					}
+					else {
 						toothNum="";
+					}
 					isAdditional= n!=0;
 					ProcCur=new Procedure();//this will be an insert, so no need to set CurOld
 					//Clean to db
-					string surf=Tooth.SurfTidyForClaims(textSurf.Text,toothNum);
+					string surf="";
+					//For Canadians, when the only surface charted is 5, we need to not remove the 5 so that the correct one surface auto code is found.
+					//However, if multiple surfaces are chated with the 5 then we need to remove the 5 because the surface is redundant.  E.g. B5 -> B
+					if(textSurf.Text=="5" && CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+						//5 is the Canadian equivalent of V and V is how we save it to the database.
+						//We have to do this little extra step right here because SurfTidyForClaims() ignores the 5 surface because it Converts db to claim value.
+						surf="V";
+					}
+					else {
+						surf=Tooth.SurfTidyForClaims(textSurf.Text,toothNum);
+					}
 					ProcCur.CodeNum=AutoCodeItems.GetCodeNum(autoCodeList[i],toothNum,surf,isAdditional,PatCur.PatNum,PatCur.Age);
 					tArea=ProcedureCodes.GetProcCode(ProcCur.CodeNum).TreatArea;
 					if((tArea==TreatmentArea.Arch
