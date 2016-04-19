@@ -122,8 +122,9 @@ namespace OpenDentBusiness{
 			if(DataConnection.DBtype==DatabaseType.Oracle){
 				datesql="(SELECT CURRENT_DATE FROM dual)";
 			}
-			string command="SELECT * FROM sheet WHERE PatNum="+POut.Long(patNum)
-				+" AND "+DbHelper.DtimeToDate("DateTimeSheet")+" = "+datesql;
+			string command="SELECT * FROM sheet WHERE PatNum="+POut.Long(patNum)+" "
+				+"AND "+DbHelper.DtimeToDate("DateTimeSheet")+" = "+datesql+" "
+				+"AND IsDeleted=0";
 			return Crud.SheetCrud.SelectMany(command);
 		}
 
