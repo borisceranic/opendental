@@ -3427,6 +3427,7 @@ namespace OpenDental{
 					AptCur.AptNum);
 			}
 			if(IsNew) {
+				Procedures.Sync(_listProcs,AptCur);//Deleted procedures were not getting synced in new deleted appointments
 				DialogResult=DialogResult.Cancel;
 			}
 			else {
