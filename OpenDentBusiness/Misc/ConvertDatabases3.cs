@@ -13436,6 +13436,14 @@ namespace OpenDentBusiness {
 					  Db.NonQ(command);
 				   }
 				}
+				else {//oracle
+				   foreach(DataRow row in table.Rows) {
+					  groupNum=PIn.Long(row["UserGroupNum"].ToString());
+					  command="INSERT INTO grouppermission (GroupPermNum,NewerDays,UserGroupNum,PermType) "
+						 +"VALUES((SELECT MAX(GroupPermNum)+1 FROM grouppermission),0,"+POut.Long(groupNum)+",115)";//115 - InsPlanVerifyList
+					  Db.NonQ(command);
+				   }
+				}
 				command="UPDATE preference SET ValueString='16.1.13.0' WHERE PrefName='DataBaseVersion'";
 				Db.NonQ(command);
 			}

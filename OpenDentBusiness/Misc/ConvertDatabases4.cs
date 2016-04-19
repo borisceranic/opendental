@@ -434,6 +434,14 @@ namespace OpenDentBusiness {
 					  Db.NonQ(command);
 				   }
 				}
+				else {//oracle
+				   foreach(DataRow row in table.Rows) {
+					  groupNum=PIn.Long(row["UserGroupNum"].ToString());
+					  command="INSERT INTO grouppermission (GroupPermNum,NewerDays,UserGroupNum,PermType) "
+						 +"VALUES((SELECT MAX(GroupPermNum)+1 FROM grouppermission),0,"+POut.Long(groupNum)+",110)";//110 - InsPlanEdit
+					  Db.NonQ(command);
+				   }
+				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {//Insert Canceled Appointment Procedure account color
 					command="SELECT MAX(ItemOrder)+1 FROM definition WHERE Category=0";//0 is AccountColor
 					string maxOrder=Db.GetScalar(command);
@@ -620,6 +628,50 @@ namespace OpenDentBusiness {
 				else {//oracle
 					command="INSERT INTO preference (PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'CentralManagerSyncCode','')";
 					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE claimsnapshot ADD ClaimProcNum bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claimsnapshot ADD INDEX (ClaimProcNum)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE claimsnapshot ADD ClaimProcNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE claimsnapshot SET ClaimProcNum = 0 WHERE ClaimProcNum IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claimsnapshot MODIFY ClaimProcNum NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX claimsnapshot_ClaimProcNum ON claimsnapshot (ClaimProcNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE claimsnapshot ADD SnapshotTrigger tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE claimsnapshot ADD SnapshotTrigger number(3)";
+					Db.NonQ(command);
+					command="UPDATE claimsnapshot SET SnapshotTrigger = 0 WHERE SnapshotTrigger IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE claimsnapshot MODIFY SnapshotTrigger NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+				   command="INSERT INTO preference(PrefName,ValueString) VALUES('ClaimSnapshotRunTime','1881-01-01 23:30:00')";
+				   Db.NonQ(command);
+				}
+				else {//oracle
+				   command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ClaimSnapshotRunTime','1881-01-01 23:30:00')";
+				   Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+				   command="INSERT INTO preference(PrefName,ValueString) VALUES('ClaimSnapshotTriggerType','ClaimCreate')";
+				   Db.NonQ(command);
+				}
+				else {//oracle
+				   command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ClaimSnapshotTriggerType','ClaimCreate')";
+				   Db.NonQ(command);
 				}
 
 				command="UPDATE preference SET ValueString = '16.2.0.0' WHERE PrefName = 'DataBaseVersion'";
