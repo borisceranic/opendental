@@ -832,6 +832,26 @@ namespace OpenDental {
 					butPay.Enabled=false;
 					checkRecurring.Enabled=false;
 					butSplitManage.Enabled=false;
+					panelXcharge.Enabled=false;
+					butPayConnect.Enabled=false;
+					if(Security.IsAuthorized(Permissions.SplitCreatePastLockDate,true)) {
+						//Since we are enabling the OK button, we need to make sure everything else is disabled (except for Add Split and Split Manager).
+						butOK.Enabled=true;
+						butAdd.Enabled=true;
+						butSplitManage.Enabled=true;
+						comboClinic.Enabled=false;
+						textDate.ReadOnly=true;
+						textAmount.ReadOnly=true;
+						butPrePay.Enabled=false;
+						textCheckNum.ReadOnly=true;
+						textBankBranch.ReadOnly=true;
+						textNote.ReadOnly=true;
+						checkPayTypeNone.Enabled=false;
+						listPayType.Enabled=false;
+						comboDepositAccount.Enabled=false;
+						comboCreditCards.Enabled=false;
+						checkPayPlan.Enabled=false;
+					}
 				}
 			}
 			if(PrefC.HasClinicsEnabled) {
@@ -1263,7 +1283,9 @@ namespace OpenDental {
 				butPay.Enabled=false;
 			}
 			else {
-				butPay.Enabled=true;
+				if(Security.IsAuthorized(Permissions.PaymentEdit,_paymentCur.PayDate,true)) {
+					butPay.Enabled=true;
+				}
 			}
 			_tableBalances=Patients.GetPaymentStartingBalances(_patCur.Guarantor,_paymentCur.PayNum,checkBalanceGroupByProv.Checked);
 			FillGridBal();
@@ -2422,8 +2444,11 @@ namespace OpenDental {
 			}
 			else {
 				//Editing an old entry will already be blocked if the date was too old, and user will not be able to click OK button
-				//This catches it if user changed the date to be older.
-				if(!Security.IsAuthorized(Permissions.PaymentEdit,PIn.Date(textDate.Text))) {
+				//This catches it if user changed the date to be older. If user has SplitCreatePastLockDate permission and has not changed the date, then
+				//it is okay to save the payment.
+				if((!Security.IsAuthorized(Permissions.SplitCreatePastLockDate,true)
+					|| _paymentOld.PayDate!=PIn.Date(textDate.Text))
+					&& !Security.IsAuthorized(Permissions.PaymentEdit,PIn.Date(textDate.Text))) {
 					return false;
 				}
 			}

@@ -271,6 +271,8 @@ namespace OpenDentBusiness{
 		InsPlanDropPat,
 		///<summary>115 - Allows users to be assigned Insurance Verifications.</summary>
 		InsPlanVerifyList,
+		///<summary>116 - Allows users to bypass the global lock date to add paysplits.</summary>
+		SplitCreatePastLockDate
 	}
 
 	

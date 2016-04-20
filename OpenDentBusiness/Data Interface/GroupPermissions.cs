@@ -306,7 +306,9 @@ namespace OpenDentBusiness{
 				//case Permissions.InsPlanAddPat:
 				//case Permissions.InsPlanDropPat:
 				case Permissions.InsPlanVerifyList:
-				return false;//Does not have audit Trail if uncommented.
+				//case Permissions.SheetEdit:
+				//case Permissions.SplitCreatePastLockDate:
+					return false;//Does not have audit Trail if uncommented.
 			}
 			return true;
 		}
@@ -491,6 +493,8 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Setup - Covers a wide variety of setup functions");
 				case Permissions.SheetEdit:
 					return Lans.g("enumPermissions","Sheet Edit");
+				case Permissions.SplitCreatePastLockDate:
+					return Lans.g("enumPermissions","Pay Split Create after Global Lock Date");
 				case Permissions.TaskEdit:
 					return Lans.g("enumPermissions","Task Edit");
 				case Permissions.TaskListCreate:

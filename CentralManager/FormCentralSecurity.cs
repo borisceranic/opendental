@@ -149,6 +149,8 @@ namespace CentralManager {
 						node2.Nodes.Add(node3);
 					node3=SetNode(Permissions.PaymentEdit);
 						node2.Nodes.Add(node3);
+					node3=SetNode(Permissions.SplitCreatePastLockDate);
+						node2.Nodes.Add(node3);
 					node.Nodes.Add(node2);
 				node2=SetNode("Adjustment");
 					node3=SetNode(Permissions.AdjustmentCreate);

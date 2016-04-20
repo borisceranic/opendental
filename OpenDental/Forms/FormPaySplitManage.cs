@@ -38,6 +38,10 @@ namespace OpenDental {
 
 		///<summary>Performs all of the Load functionality.  Public so it can be called from unit tests.</summary>
 		public void Init(bool isTest) {
+			if(!Security.IsAuthorized(Permissions.PaymentEdit,PaymentCur.PayDate,true)) {
+				butDelete.Enabled=false;
+				butClear.Enabled=false;
+			}
 			_listAccountCharges=new List<AccountEntry>();
 			textPayAmt.Text=PaymentAmt.ToString("f");
 			AmtTotal=PaymentAmt;
@@ -492,6 +496,9 @@ namespace OpenDental {
 		
 		///<summary>Allows editing of an individual double clicked paysplit entry.</summary>
 		private void gridSplits_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			if(!Security.IsAuthorized(Permissions.PaymentEdit,PaymentCur.PayDate,true)) {
+				return;
+			}
 			PaySplit paySplitOld=(PaySplit)gridSplits.Rows[e.Row].Tag;
 			PaySplit paySplit=paySplitOld.Copy();
 			FormPaySplitEdit FormPSE=new FormPaySplitEdit(FamCur);
