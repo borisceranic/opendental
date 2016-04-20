@@ -39,7 +39,7 @@ namespace OpenDentBusiness {
 				query+="AND procedurelog.ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
 			}
 			query+="GROUP BY procedurelog.ProcNum "
-			+"ORDER BY patient.LName,patient.FName";
+				+"ORDER BY patient.LName,patient.FName,patient.PatNum,procedurelog.ProcDate";
 			return Db.GetTable(query);
 		}
 

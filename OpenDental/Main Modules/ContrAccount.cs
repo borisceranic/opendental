@@ -178,7 +178,10 @@ namespace OpenDental {
 		private ContextMenu contextMenuPayment;
 		private MenuItem menuItemPay;
 		private List<DisplayField> _patInfoDisplayFields;
+		///<summary>Used by FormRpProcNotBilledIns to determine what errors happened while trying to create claims.</summary>
 		public static string ClaimErrorsCur;
+		///<summary>Used by FormRpProcNotBilledIns to determine how many claims were created.</summary>
+		public static int ClaimCreatedCount;
 		#endregion UserVariables
 
 		///<summary></summary>
@@ -3047,6 +3050,7 @@ namespace OpenDental {
 		///This function requires table to have the following columns (at minimum): ProcNum, chargesDouble</summary>
 		public static bool toolBarButIns_Click(bool isVerbose,Patient pat,Family fam,ODGrid grid,DataTable table) {
 			ClaimErrorsCur="";
+			ClaimCreatedCount=0;
 			if(!CheckClearinghouseDefaults()) {
 				return false;
 			}
@@ -3439,6 +3443,7 @@ namespace OpenDental {
 			}
 			//Insert claim snapshots for historical reporting purposes.
 			CreateClaimSnapshot(claimType,listClaimProcs,proc.ProcFee);//,procsForPat
+			ClaimCreatedCount++;
 			return ClaimCur;
 			//return null;
 		}

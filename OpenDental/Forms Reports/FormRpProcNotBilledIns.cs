@@ -11,9 +11,10 @@ using OpenDental.UI;
 using System.Drawing.Printing;
 using System.Globalization;
 using System.Linq;
+using CodeBase;
 
 namespace OpenDental{
-///<summary></summary>
+	///<summary></summary>
 	public class FormRpProcNotBilledIns : ODForm {
 		private System.Windows.Forms.MonthCalendar calendarTo;
 		private System.Windows.Forms.MonthCalendar calendarFrom;
@@ -32,15 +33,10 @@ namespace OpenDental{
 		private UI.ODGrid gridMain;
 		private List<Clinic> _listClinics;
 		private ReportComplex _myReport;
-		private int _pagesPrinted;
-		private bool _headingPrinted;
-		private int _headingPrintH;
 		private decimal _procTotalAmt;
 		private DateTime _myReportDateFrom;
 		private UI.Button butNewClaims;
 		private DateTime _myReportDateTo;
-		private List<long> _listPatNum;
-		private bool _isOnLoad;
 		private const int _colWidthPatName=200;
 		private const int _colWidthProcDate=110;
 		private const int _colWidthAmount=90;
@@ -223,6 +219,7 @@ namespace OpenDental{
 			this.labelClinic.TabIndex = 68;
 			this.labelClinic.Text = "Clinics";
 			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelClinic.Visible = false;
 			// 
 			// comboBoxMultiClinics
 			// 
@@ -234,6 +231,7 @@ namespace OpenDental{
 			this.comboBoxMultiClinics.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiClinics.SelectedIndices")));
 			this.comboBoxMultiClinics.Size = new System.Drawing.Size(160, 21);
 			this.comboBoxMultiClinics.TabIndex = 67;
+			this.comboBoxMultiClinics.Visible = false;
 			this.comboBoxMultiClinics.Leave += new System.EventHandler(this.comboBoxMultiClinics_SelectionChangeCommitted);
 			// 
 			// gridMain
@@ -307,8 +305,6 @@ namespace OpenDental{
 		}
 
 		private void FormProcNotAttach_Load(object sender, System.EventArgs e) {
-			_isOnLoad=true;
-			_listPatNum=new List<long>();
 			calendarFrom.SelectionStart=DateTime.Today;
 			calendarTo.SelectionStart=DateTime.Today;
 			textDateFrom.Text=DateTime.Today.ToShortDateString();
@@ -317,29 +313,11 @@ namespace OpenDental{
 				checkMedical.Visible=true;
 			}
 			if(PrefC.HasClinicsEnabled) {
-				_listClinics=Clinics.GetForUserod(Security.CurUser);
-				comboBoxMultiClinics.Items.Add(Lan.g(this,"All"));
-				if(!Security.CurUser.ClinicIsRestricted) {
-					comboBoxMultiClinics.Items.Add(Lan.g(this,"Unassigned"));
-					comboBoxMultiClinics.SetSelected(1,true);
-				}
-				for(int i=0;i<_listClinics.Count;i++) {
-					int curIndex=comboBoxMultiClinics.Items.Add(_listClinics[i].Description);
-					if(Clinics.ClinicNum==0) {
-						comboBoxMultiClinics.SetSelected(curIndex,true);
-					}
-					if(_listClinics[i].ClinicNum==Clinics.ClinicNum) {
-						comboBoxMultiClinics.SelectedIndices.Clear();
-						comboBoxMultiClinics.SetSelected(curIndex,true);
-					}
-				}
-			}
-			else {
-				comboBoxMultiClinics.Visible=false;
-				labelClinic.Visible=false;
+				comboBoxMultiClinics.Visible=true;
+				labelClinic.Visible=true;
+				FillClinics();
 			}
 			FillGrid();
-			_isOnLoad=false;
 		}
 
 		private void CreateOrResizeGridColumns() {
@@ -380,11 +358,30 @@ namespace OpenDental{
 					row.Cells.Add(queryObj.ReportTable.Rows[j][2].ToString());//Procedure Description
 					row.Cells.Add(PIn.Double(queryObj.ReportTable.Rows[j][3].ToString()).ToString("c"));//Amount
 					_procTotalAmt+=PIn.Decimal(queryObj.ReportTable.Rows[j][3].ToString());
-					row.Tag=PIn.Long(queryObj.ReportTable.Rows[j][4].ToString());//Used in butNewClaims_Click().
+					row.Tag=PIn.Long(queryObj.ReportTable.Rows[j][4].ToString());//Tag set to ProcNum.  Used in butNewClaims_Click().
 					gridMain.Rows.Add(row);
 				}
 			}
 			gridMain.EndUpdate();
+		}
+
+		private void FillClinics() {
+			_listClinics=Clinics.GetForUserod(Security.CurUser);
+			comboBoxMultiClinics.Items.Add(Lan.g(this,"All"));
+			if(!Security.CurUser.ClinicIsRestricted) {
+				comboBoxMultiClinics.Items.Add(Lan.g(this,"Unassigned"));
+				comboBoxMultiClinics.SetSelected(1,true);
+			}
+			for(int i=0;i<_listClinics.Count;i++) {
+				int curIndex=comboBoxMultiClinics.Items.Add(_listClinics[i].Description);
+				if(Clinics.ClinicNum==0) {
+					comboBoxMultiClinics.SetSelected(curIndex,true);
+				}
+				if(_listClinics[i].ClinicNum==Clinics.ClinicNum) {
+					comboBoxMultiClinics.SelectedIndices.Clear();
+					comboBoxMultiClinics.SetSelected(curIndex,true);
+				}
+			}
 		}
 
 		//Only called in FillGrid().
@@ -392,24 +389,24 @@ namespace OpenDental{
 			ValidateFields();
 			List<long> listClinicNums=new List<long>();
 			if(PrefC.HasClinicsEnabled) {
-				if(comboBoxMultiClinics.ListSelectedIndices.Contains(0)) {
+				if(comboBoxMultiClinics.ListSelectedIndices.Contains(0)) {//All option selected
 					for(int j=0;j<_listClinics.Count;j++) {
 						listClinicNums.Add(_listClinics[j].ClinicNum);//Add all clinics this person has access to.
 					}
 					if(!Security.CurUser.ClinicIsRestricted) {
-						listClinicNums.Add(0);
+						listClinicNums.Add(0);//Unassigned
 					}
 				}
-				else {
+				else {//All option not selected
 					for(int i=0;i<comboBoxMultiClinics.ListSelectedIndices.Count;i++) {
 						if(Security.CurUser.ClinicIsRestricted) {
-							listClinicNums.Add(_listClinics[comboBoxMultiClinics.ListSelectedIndices[i]-1].ClinicNum);
+							listClinicNums.Add(_listClinics[comboBoxMultiClinics.ListSelectedIndices[i]-1].ClinicNum);//Minus 1 to skip over the All.
 						}
-						else if(comboBoxMultiClinics.ListSelectedIndices[i]==1) {
-							listClinicNums.Add(0);
+						else if(comboBoxMultiClinics.ListSelectedIndices[i]==1) {//Not restricted and user selected Unassigned.
+							listClinicNums.Add(0);//Unassigned
 						}
-						else {
-							listClinicNums.Add(_listClinics[comboBoxMultiClinics.ListSelectedIndices[i]-2].ClinicNum);
+						else {//Not restricted and Unassigned option is not selected.
+							listClinicNums.Add(_listClinics[comboBoxMultiClinics.ListSelectedIndices[i]-2].ClinicNum);//Minus 2 to skip over All and Unassigned.
 						}
 					}
 				}
@@ -417,24 +414,24 @@ namespace OpenDental{
 			DataTable tableNotBilled=RpProcNotBilledIns.GetProcsNotBilled(listClinicNums,checkMedical.Checked,_myReportDateFrom,_myReportDateTo);
 			string subtitleClinics="";
 			if(PrefC.HasClinicsEnabled) {
-				if(comboBoxMultiClinics.ListSelectedIndices.Contains(0)) {
-					for(int j=0;j<_listClinics.Count;j++) {
-						listClinicNums.Add(_listClinics[j].ClinicNum);//Add all clinics this person has access to.
-					}
-					if(!Security.CurUser.ClinicIsRestricted) {
-						listClinicNums.Add(0);
-					}
+				if(comboBoxMultiClinics.ListSelectedIndices.Contains(0)) {//All option selected
+					subtitleClinics=Lan.g(this,"All Clinics");
 				}
 				else {
 					for(int i=0;i<comboBoxMultiClinics.ListSelectedIndices.Count;i++) {
+						if(i>0) {
+							subtitleClinics+=", ";
+						}
 						if(Security.CurUser.ClinicIsRestricted) {
-							listClinicNums.Add(_listClinics[comboBoxMultiClinics.ListSelectedIndices[i]-1].ClinicNum);
+							subtitleClinics+=_listClinics[comboBoxMultiClinics.ListSelectedIndices[i]-1].Description;//Minus 1 for All.
 						}
-						else if(comboBoxMultiClinics.ListSelectedIndices[i]==1) {
-							listClinicNums.Add(0);
-						}
-						else {
-							listClinicNums.Add(_listClinics[comboBoxMultiClinics.ListSelectedIndices[i]-2].ClinicNum);
+						else {//Not restricted
+							if(comboBoxMultiClinics.ListSelectedIndices[i]==1) {//Unassigned option selected.
+								subtitleClinics+=Lan.g(this,"Unassigned");
+							}
+							else {
+								subtitleClinics+=_listClinics[comboBoxMultiClinics.ListSelectedIndices[i]-2].Description;//Minus 2 for All and Unassigned.
+							}
 						}
 					}
 				}
@@ -459,7 +456,7 @@ namespace OpenDental{
 			query.AddColumn("Procedure Description",300,FieldValueType.String);
 			query.AddColumn("Amount",_colWidthAmount,FieldValueType.Number);
 			_myReport.AddPageNum();
-			if(!_myReport.SubmitQueries(!_isOnLoad)) {//If we are loading and there are no results for _myReport do not show msgbox found in SubmitQueryies(...).
+			if(!_myReport.SubmitQueries(false)) {//If we are loading and there are no results for _myReport do not show msgbox found in SubmitQueryies(...).
 				return;
 			}
 		}
@@ -523,287 +520,15 @@ namespace OpenDental{
 			catch{
 				_myReportDateTo=DateTime.MaxValue;
 			}
-			if(_myReportDateFrom<_myReportDateTo) {
+			if(_myReportDateFrom>_myReportDateTo) {
 				_myReportDateFrom=DateTime.MinValue;
 				_myReportDateTo=DateTime.MaxValue;
 			}
 			if(PrefC.HasClinicsEnabled) {
-			bool isAllClinics=comboBoxMultiClinics.ListSelectedIndices.Contains(0);
+				bool isAllClinics=comboBoxMultiClinics.ListSelectedIndices.Contains(0);
 				if(!isAllClinics && comboBoxMultiClinics.SelectedIndices.Count==0) {
 					comboBoxMultiClinics.SetSelected(0,true);//All clinics.
 				}
-			}
-		}
-
-		private bool CheckClearinghouseDefaults() {
-			if(PrefC.GetLong(PrefName.ClearinghouseDefaultDent)==0) {
-				MsgBox.Show(this,"No default dental clearinghouse defined.");
-				return false;
-			}
-			if(PrefC.GetBool(PrefName.ShowFeatureMedicalInsurance)&&PrefC.GetLong(PrefName.ClearinghouseDefaultMed)==0) {
-				MsgBox.Show(this,"No default medical clearinghouse defined.");
-				return false;
-			}
-			return true;
-		}
-
-		///<summary>The only validation that's been done is just to make sure that only procedures are selected.  
-		///All validation on the procedures selected is done here.  Creates and saves claim initially, attaching all selected procedures.  
-		///But it does not refresh any data. Does not do a final update of the new claim.  Does not enter fee amounts.
-		///claimType=P,S,Med,or Other
-		///Returns a 'new' claim object (ClaimNum=0) to indicate that the user does not want to create the claim or there are validation issues.</summary>
-		private Claim CreateClaim(Patient PatCur,string claimType,List<PatPlan> PatPlanList,List<InsPlan> planList,List<ClaimProc> ClaimProcList,List<Procedure> procsForPat,List<InsSub> subList,List<PatNumWithProcNum>listProcsForClaim) {
-			long claimFormNum=0;
-			InsPlan PlanCur=new InsPlan();
-			InsSub SubCur=new InsSub();
-			Relat relatOther=Relat.Self;
-			switch(claimType) {
-				case "P":
-					SubCur=InsSubs.GetSub(PatPlans.GetInsSubNum(PatPlanList,PatPlans.GetOrdinal(PriSecMed.Primary,PatPlanList,planList,subList)),subList);
-					PlanCur=InsPlans.GetPlan(SubCur.PlanNum,planList);
-					break;
-				case "S":
-					SubCur=InsSubs.GetSub(PatPlans.GetInsSubNum(PatPlanList,PatPlans.GetOrdinal(PriSecMed.Secondary,PatPlanList,planList,subList)),subList);
-					PlanCur=InsPlans.GetPlan(SubCur.PlanNum,planList);
-					break;
-				case "Med":
-					//It's already been verified that a med plan exists
-					SubCur=InsSubs.GetSub(PatPlans.GetInsSubNum(PatPlanList,PatPlans.GetOrdinal(PriSecMed.Medical,PatPlanList,planList,subList)),subList);
-					PlanCur=InsPlans.GetPlan(SubCur.PlanNum,planList);
-					break;
-				case "Other":
-					FormClaimCreate FormCC=new FormClaimCreate(PatCur.PatNum);
-					FormCC.ShowDialog();
-					if(FormCC.DialogResult!=DialogResult.OK) {
-						return new Claim();
-					}
-					PlanCur=FormCC.SelectedPlan;
-					SubCur=FormCC.SelectedSub;
-					relatOther=FormCC.PatRelat;
-					break;
-			}
-			Procedure proc;
-			List<Procedure> listProcs=new List<Procedure>();
-			for(int i=0;i<listProcsForClaim.Count;i++) {
-				proc=Procedures.GetProcFromList(procsForPat,listProcsForClaim[i].ProcNum);
-				string des=ProcedureCodes.GetProcCode(proc.CodeNum).Descript;
-				listProcs.Add(proc);
-			}
-			if((claimType=="P"||claimType=="S")&&Procedures.GetUniqueDiagnosticCodes(listProcs,false).Count>4) {
-				MsgBox.Show(this,"Claim has more than 4 unique diagnosis codes.  Create multiple claims instead.");
-				return new Claim();
-			}
-			if(Procedures.GetUniqueDiagnosticCodes(listProcs,true).Count>12) {
-				MsgBox.Show(this,"Claim has more than 12 unique diagnosis codes.  Create multiple claims instead.");
-				return new Claim();
-			}
-			for(int i=0;i<listProcsForClaim.Count;i++) {
-				proc=Procedures.GetProcFromList(procsForPat,listProcsForClaim[i].ProcNum);
-				if(Procedures.NoBillIns(proc,ClaimProcList,PlanCur.PlanNum)) {
-					MsgBox.Show(this,"Not allowed to send procedures to insurance that are marked 'Do not bill to ins'.");
-					return new Claim();
-				}
-			}
-			for(int i=0;i<listProcsForClaim.Count;i++) {
-				proc=Procedures.GetProcFromList(procsForPat,listProcsForClaim[i].ProcNum);
-				string des=ProcedureCodes.GetProcCode(proc.CodeNum).Descript;
-				if(Procedures.IsAlreadyAttachedToClaim(proc,ClaimProcList,SubCur.InsSubNum)) {
-					MsgBox.Show(this,"Not allowed to send a procedure to the same insurance company twice.");
-					return new Claim();
-				}
-			}
-			proc=Procedures.GetProcFromList(procsForPat,listProcsForClaim[0].ProcNum);
-			long clinicNum=proc.ClinicNum;
-			PlaceOfService placeService=proc.PlaceService;
-			for(int i=1;i<listProcsForClaim.Count;i++) {//skips 0
-				proc=Procedures.GetProcFromList(procsForPat,listProcsForClaim[i].ProcNum);
-				if(clinicNum!=proc.ClinicNum) {
-					MsgBox.Show(this,"All procedures do not have the same clinic.");
-					return new Claim();
-				}
-				if(proc.PlaceService!=placeService) {
-					MsgBox.Show(this,"All procedures do not have the same place of service.");
-					return new Claim();
-				}
-			}
-			ClaimProc[] claimProcs=new ClaimProc[listProcsForClaim.Count];//1:1 with selectedIndices
-			long procNum;
-			for(int i=0;i<listProcsForClaim.Count;i++) {//loop through selected procs
-																														//and try to find an estimate that can be used
-				procNum=PIn.Long(listProcsForClaim[i].ProcNum.ToString());
-				claimProcs[i]=Procedures.GetClaimProcEstimate(procNum,ClaimProcList,PlanCur,SubCur.InsSubNum);
-			}
-			for(int i=0;i<claimProcs.Length;i++) {//loop through each claimProc
-																							//and create any missing estimates. This handles claims to 3rd and 4th ins co's.
-				if(claimProcs[i]==null) {
-					claimProcs[i]=new ClaimProc();
-					proc=Procedures.GetProcFromList(procsForPat,listProcsForClaim[i].ProcNum);
-					ClaimProcs.CreateEst(claimProcs[i],proc,PlanCur,SubCur);
-				}
-			}
-			Claim ClaimCur=new Claim();
-			Claims.Insert(ClaimCur);
-			for(int i=0;i<claimProcs.Length;i++) {
-				if(claimProcs[i].Status==ClaimProcStatus.CapComplete) {
-					claimProcs[i].ClaimNum=ClaimCur.ClaimNum;
-					claimProcs[i]=claimProcs[i].Copy();
-					claimProcs[i].WriteOff=0;
-					claimProcs[i].CopayAmt=-1;
-					claimProcs[i].CopayOverride=-1;
-					//status will get changed down below
-					ClaimProcs.Insert(claimProcs[i]);//this makes a duplicate in db with different claimProcNum
-				}
-			}
-			ClaimCur.PatNum=PatCur.PatNum;
-			ClaimCur.DateService=claimProcs[claimProcs.Length-1].ProcDate;
-			ClaimCur.ClinicNum=clinicNum;
-			ClaimCur.PlaceService=proc.PlaceService;
-			//datesent
-			ClaimCur.ClaimStatus="U";
-			//datereceived
-			InsSub sub;
-			ClaimCur.PlanNum=PlanCur.PlanNum;
-			ClaimCur.InsSubNum=SubCur.InsSubNum;
-			switch(claimType) {
-				case "P":
-					ClaimCur.PatRelat=PatPlans.GetRelat(PatPlanList,PatPlans.GetOrdinal(PriSecMed.Primary,PatPlanList,planList,subList));
-					ClaimCur.ClaimType="P";
-					ClaimCur.InsSubNum2=PatPlans.GetInsSubNum(PatPlanList,PatPlans.GetOrdinal(PriSecMed.Secondary,PatPlanList,planList,subList));
-					sub=InsSubs.GetSub(ClaimCur.InsSubNum2,subList);
-					if(sub.PlanNum>0&&InsPlans.RefreshOne(sub.PlanNum).IsMedical) {
-						ClaimCur.PlanNum2=0;//no sec ins
-						ClaimCur.PatRelat2=Relat.Self;
-					}
-					else {
-						ClaimCur.PlanNum2=sub.PlanNum;//might be 0 if no sec ins
-						ClaimCur.PatRelat2=PatPlans.GetRelat(PatPlanList,PatPlans.GetOrdinal(PriSecMed.Secondary,PatPlanList,planList,subList));
-					}
-					break;
-				case "S":
-					ClaimCur.PatRelat=PatPlans.GetRelat(PatPlanList,PatPlans.GetOrdinal(PriSecMed.Secondary,PatPlanList,planList,subList));
-					ClaimCur.ClaimType="S";
-					ClaimCur.InsSubNum2=PatPlans.GetInsSubNum(PatPlanList,PatPlans.GetOrdinal(PriSecMed.Primary,PatPlanList,planList,subList));
-					sub=InsSubs.GetSub(ClaimCur.InsSubNum2,subList);
-					ClaimCur.PlanNum2=sub.PlanNum;
-					ClaimCur.PatRelat2=PatPlans.GetRelat(PatPlanList,PatPlans.GetOrdinal(PriSecMed.Primary,PatPlanList,planList,subList));
-					break;
-				case "Med":
-					ClaimCur.PatRelat=PatPlans.GetFromList(PatPlanList,SubCur.InsSubNum).Relationship;
-					ClaimCur.ClaimType="Other";
-					if(PrefC.GetBool(PrefName.ClaimMedTypeIsInstWhenInsPlanIsMedical)) {
-						ClaimCur.MedType=EnumClaimMedType.Institutional;
-					}
-					else {
-						ClaimCur.MedType=EnumClaimMedType.Medical;
-					}
-					break;
-				case "Other":
-					ClaimCur.PatRelat=relatOther;
-					ClaimCur.ClaimType="Other";
-					//plannum2 is not automatically filled in.
-					ClaimCur.ClaimForm=claimFormNum;
-					if(PlanCur.IsMedical) {
-						if(PrefC.GetBool(PrefName.ClaimMedTypeIsInstWhenInsPlanIsMedical)) {
-							ClaimCur.MedType=EnumClaimMedType.Institutional;
-						}
-						else {
-							ClaimCur.MedType=EnumClaimMedType.Medical;
-						}
-					}
-					break;
-			}
-			if(PlanCur.PlanType=="c") {//if capitation
-				ClaimCur.ClaimType="Cap";
-			}
-			ClaimCur.ProvTreat=Procedures.GetProcFromList(procsForPat,PIn.Long(listProcsForClaim[0].ProcNum.ToString())).ProvNum;
-			for(int i=0;i<listProcsForClaim.Count;i++) {
-				proc=Procedures.GetProcFromList(procsForPat,listProcsForClaim[i].ProcNum);
-				if(!Providers.GetIsSec(proc.ProvNum)) {//if not a hygienist
-					ClaimCur.ProvTreat=proc.ProvNum;
-				}
-			}
-			if(Providers.GetIsSec(ClaimCur.ProvTreat)) {
-				ClaimCur.ProvTreat=PatCur.PriProv;
-				//OK if 0, because auto select first in list when open claim
-			}
-			ClaimCur.IsProsthesis="N";
-			ClaimCur.ProvBill=Providers.GetBillingProvNum(ClaimCur.ProvTreat,ClaimCur.ClinicNum);
-			Provider prov=Providers.GetProv(ClaimCur.ProvTreat);
-			if(prov.ProvNumBillingOverride!=0) {
-				ClaimCur.ProvBill=prov.ProvNumBillingOverride;
-			}
-			ClaimCur.EmployRelated=YN.No;
-			ClaimCur.ClaimForm=PlanCur.ClaimFormNum;
-			for(int i=0;i<claimProcs.Length;i++) {
-				proc=Procedures.GetProcFromList(procsForPat,listProcsForClaim[i].ProcNum);
-				claimProcs[i].ClaimNum=ClaimCur.ClaimNum;
-				if(PlanCur.PlanType=="c") {
-					claimProcs[i].Status=ClaimProcStatus.CapClaim;
-				}
-				else
-					claimProcs[i].Status=ClaimProcStatus.NotReceived;
-				if(PlanCur.UseAltCode&&(ProcedureCodes.GetProcCode(proc.CodeNum).AlternateCode1!="")) {
-					claimProcs[i].CodeSent=ProcedureCodes.GetProcCode(proc.CodeNum).AlternateCode1;
-				}
-				else if(PlanCur.IsMedical&&proc.MedicalCode!="") {
-					claimProcs[i].CodeSent=proc.MedicalCode;
-				}
-				else {
-					claimProcs[i].CodeSent=ProcedureCodes.GetProcCode(proc.CodeNum).ProcCode;
-					if(claimProcs[i].CodeSent.Length>5&&claimProcs[i].CodeSent.Substring(0,1)=="D") {
-						claimProcs[i].CodeSent=claimProcs[i].CodeSent.Substring(0,5);
-					}
-					if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
-						if(claimProcs[i].CodeSent.Length>5) { //In Canadian electronic claims, codes can contain letters or numbers and cannot be longer than 5 characters.
-							claimProcs[i].CodeSent=claimProcs[i].CodeSent.Substring(0,5);
-						}
-					}
-				}
-			}//for claimProc
-			List <ClaimProc> listClaimProcs=new List<ClaimProc>(claimProcs);
-			for(int i=0;i<listClaimProcs.Count;i++) {
-				listClaimProcs[i].LineNumber=(byte)(i+1);
-				ClaimProcs.Update(listClaimProcs[i]);
-			}
-			//Insert claim snapshots for historical reporting purposes.
-			CreateClaimSnapshot(claimType,listClaimProcs,proc.ProcFee);//,procsForPat
-			return ClaimCur;
-			//return null;
-		}
-
-		//<summary>The procsForPat variable is all of the current procedures for the current patient. The tableAccount variable is the table from the DataSetMain object containing the information for the account grid.</summary>
-		private void InsCanadaValidateProcs(List<Procedure> procsForPat,List<PatNumWithProcNum> listProcsForClaim) {
-			if(!CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Not Canadian (en-CA or fr-CA).
-				return;
-			}
-			if(listProcsForClaim.Count<8) {//Canadian customer but no need to split procedures to multiple claims.
-				return;
-			}
-			//Limit each claim to 7 procedures. Canadian claim requirement.
-			listProcsForClaim.Take(7).ToList().ForEach(p => p.IsVisited=true);
-			listProcsForClaim.RemoveAll(p => p.IsVisited == false);
-		}
-
-		private void CreateClaimSnapshot(string claimType,List<ClaimProc> listClaimProcs,double procFee) {//,List<Procedure> listPatProcs
-			if(!PrefC.GetBool(PrefName.ClaimSnapshotEnabled) || (claimType!="P" && claimType!="S")) {
-				return;
-			}
-			//Loop through all the claimprocs and create a claimsnapshot entry for each.
-			for(int i=0;i<listClaimProcs.Count;i++) {
-				if(listClaimProcs[i].Status==ClaimProcStatus.CapClaim
-					|| listClaimProcs[i].Status==ClaimProcStatus.CapComplete
-					|| listClaimProcs[i].Status==ClaimProcStatus.CapEstimate
-					|| listClaimProcs[i].Status==ClaimProcStatus.Preauth) 
-				{
-					continue;
-				}
-				ClaimSnapshot snapshot=new ClaimSnapshot();
-				snapshot.ProcNum=listClaimProcs[i].ProcNum;
-				snapshot.Writeoff=listClaimProcs[i].WriteOffEst;
-				snapshot.InsPayEst=listClaimProcs[i].InsEstTotal;
-				snapshot.Fee=procFee;
-				snapshot.ClaimType=claimType;				
-				ClaimSnapshots.Insert(snapshot);
 			}
 		}
 
@@ -822,125 +547,110 @@ namespace OpenDental{
 		private void checkMedical_Click(object sender,EventArgs e) {
 			FillGrid();
 		}
-
-		//Mimics FormRpOustandingIns.butPrint_Click()
+		
 		private void butPrint_Click(object sender,EventArgs e) {
 			FormReportComplex FormR=new FormReportComplex(_myReport);
 			FormR.ShowDialog();
 		}
-
-		//Logic mimics ContrAccount.toolBarButIns_Click()
-		private void butNewClaims_Click(object sender,EventArgs e) {//Mimics ContrAccount.toolBarButIns_Click()
-			if(!CheckClearinghouseDefaults()) {
-				return;
+		
+		private void butNewClaims_Click(object sender,EventArgs e) {
+			if(gridMain.SelectedIndices.Length==0) {//Equivalent to selecting all procedures from gridMain.
+				gridMain.SetSelected(true);
 			}
-			List<PatNumWithProcNum> listProcWithIndice=new List<PatNumWithProcNum>();
-			List<PatNumWithProcNum> listProcsForClaim=null;//Stores pertinent procedures to be put on each claim as they are built.
-			_listPatNum.Clear();
-			long procNumCur;
-			long patNumCur;
+			//Generate List and Table----------------------------------------------------------------------------------------------------------------------
+			//List of all procedures being shown.
+			//Pulls procedures based off of the PatNum, if the row was selected in gridMain and if it has been attached to a claim.
+			List<PatNumWithProcNum> listProcWithIndices=new List<PatNumWithProcNum>();
+			List<long> listPatNums=new List<long>();
+			//Table needs to be 1:1 with gridMain due to logic in ContrAccount.toolBarButIns_Click(...).
+			DataTable table=new DataTable();
+			//Required columns as mentioned by ContrAccount.toolBarButIns_Click().
+			table.Columns.Add("ProcNum");
+			table.Columns.Add("chargesDouble");
 			for(int i=0;i<gridMain.Rows.Count;i++) {
-				if(gridMain.SelectedIndices.Length!=0 && !gridMain.SelectedIndices.Contains(i)) {
-					continue;//We have selected indices from gridMain and this row is not one of them.
+				long procNumCur=PIn.Long(gridMain.Rows[i].Tag.ToString());//Tag is set to procNum in fillGrid().
+				Procedure procCur=Procedures.GetOneProc(procNumCur,false);
+				long patNumCur=procCur.PatNum;
+				bool isSelected=gridMain.SelectedIndices.Contains(i);
+				listProcWithIndices.Add(new PatNumWithProcNum(patNumCur,procNumCur,i,isSelected));
+				DataRow row=table.NewRow();
+				row["ProcNum"]=procNumCur;
+				#region Calculate chargesDouble
+				//Logic copied from AccountModules.GetAccount(...) line 857.
+				double qty=(procCur.UnitQty+procCur.BaseUnits);
+				if(qty==0){
+					qty=1;
 				}
-				procNumCur=PIn.Long(gridMain.Rows[i].Tag.ToString());//Tag is set to procNum in fillGrid().
-				patNumCur=Procedures.GetOneProc(procNumCur,false).PatNum;//??optimize?
-				listProcWithIndice.Add(new PatNumWithProcNum(patNumCur,procNumCur));
-				if(_listPatNum.Contains(patNumCur)) {
+				List<ClaimProc> listClaimProcs=ClaimProcs.RefreshForProc(procNumCur);
+				double writeOffCapSum=listClaimProcs.Where(x => x.Status==ClaimProcStatus.CapComplete).Select(y => y.WriteOff).ToList().Sum();
+				row["chargesDouble"]=(procCur.ProcFee*qty)-writeOffCapSum;
+				#endregion Calculate chargesDouble
+				table.Rows.Add(row);
+				if(listPatNums.Contains(patNumCur)) {
 					continue;
 				}
-				_listPatNum.Add(patNumCur);
+				listPatNums.Add(patNumCur);
 			}
-			Patient PatCur;
-			Family FamCur;
-			List <PatPlan> PatPlanList=null;
-			List<InsSub> SubList=null;
-			List<InsPlan> InsPlanList=null;
-			List<ClaimProc> ClaimProcList=null;
-			List <Benefit> BenefitList=null;
-			List<Procedure> procsForPat=null;
-			bool doMultiClaimForPat=false;//Flag only used for Canadian customers who have more then 7 procedures attempting to be attached to a claim.
+			//Create Claims--------------------------------------------------------------------------------------------------------------------------------
+			string claimErrors="";
+			int claimCreatedCount=0;
 			long patNumOld=0;
-			for(int i=0;i<_listPatNum.Count;i++) {
-				if(doMultiClaimForPat) {
-					//Equivalent to maintaining the same patNum.
-					//Will only happen for Canadian customers where a patient has more then 7 procedures attempting to be attached to a claim.
-					//When we need multiple claims the logic below will pick the remaining non visited prcedures for the same patient using the IsVisited flag.
-					//Currently this will only happen for Canadian customers when a patient has more than 7 procedures attempting to attach to a claim.
-					i--;
-					doMultiClaimForPat=false;
+			//The procedures show in the grid ordered by patient.  Also listPatNums contains unique patnums which are in the same order as the grid.
+			for(int i=0;i<listPatNums.Count;i++) {
+				Patient patCur=Patients.GetPat(listPatNums[i]);
+				gridMain.SetSelected(false);//Need to deslect all rows each time so that ContrAccount.toolBarButIns_Click(...) only uses pertinent rows.
+				List<PatNumWithProcNum> listProcs=listProcWithIndices.Where(x => x.PatNum == listPatNums[i] && x.IsRowSelected && !x.IsAttached).ToList();
+				if(listProcs.Count>7 && CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+					listProcs=listProcs.Take(7).ToList();//Returns first 7 items of the list.
+					i--;//To maintain the same patient, in order to create one or more additional claims for the remaining procedures.
 				}
-				PatCur=Patients.GetPat(_listPatNum[i]);
-				//This way we do not do unnecessary queries with the database when we revisit a patient.
-				//Currently should only happen for Canadian customers who need to create multiple claims for a single patient.
-				if(patNumOld!=PatCur.PatNum) {
-					FamCur=Patients.GetFamily(_listPatNum[i]);
-					listProcsForClaim=listProcWithIndice.Where(x => x.PatNum==PatCur.PatNum&&!x.IsVisited).ToList();
-					doMultiClaimForPat=(listProcsForClaim.Count>7&&CultureInfo.CurrentCulture.Name.EndsWith("CA"));
-					PatPlanList=PatPlans.Refresh(PatCur.PatNum);
-					SubList=InsSubs.RefreshForFam(FamCur);
-					InsPlanList=InsPlans.RefreshForSubList(SubList);
-					ClaimProcList=ClaimProcs.Refresh(PatCur.PatNum);
-					BenefitList=Benefits.Refresh(PatPlanList,SubList);
-					procsForPat=Procedures.Refresh(PatCur.PatNum);
+				for(int j=0;j<listProcs.Count;j++) {
+					//Select the pertinent rows so that they will be flagged to be attached to the claim below.
+					gridMain.SetSelected(listProcs[j].RowIndex,true);
 				}
-				if(PatPlanList.Count==0) {
-					MsgBox.Show(this,"Patient does not have insurance.");
-					return;
+				ContrAccount.toolBarButIns_Click(false,patCur,Patients.GetFamily(patCur.PatNum),gridMain,table);
+				string errorTitle=patCur.PatNum+" "+patCur.GetNameLFnoPref()+" - ";
+				if(patNumOld==patCur.PatNum) {//Should only happen for Canadian customers who are attempting to create a claim with more then 7 procedures.
+					string spaces=new string(new char[errorTitle.Length]).Replace('\0', ' ');
+					claimErrors+=spaces+ContrAccount.ClaimErrorsCur+"\r\n";
 				}
-				InsCanadaValidateProcs(procsForPat,listProcsForClaim);//Unselects lab fees and limitis Canadian customers to at most 7 procs per claim.
-				string claimType="P";
-				//If they have medical insurance and no dental, make the claim type Medical.  This is to avoid the scenario of multiple med ins and no dental.
-				if(PatPlans.GetOrdinal(PriSecMed.Medical,PatPlanList,InsPlanList,SubList)>0
-					&&PatPlans.GetOrdinal(PriSecMed.Primary,PatPlanList,InsPlanList,SubList)==0
-					&&PatPlans.GetOrdinal(PriSecMed.Secondary,PatPlanList,InsPlanList,SubList)==0) {
-					claimType="Med";
+				else {
+					claimErrors+=errorTitle+ContrAccount.ClaimErrorsCur+"\r\n";
 				}
-				Claim ClaimCur=CreateClaim(PatCur,claimType,PatPlanList,InsPlanList,ClaimProcList,procsForPat,SubList,listProcsForClaim);
-				ClaimProcList=ClaimProcs.Refresh(PatCur.PatNum);
-				if(ClaimCur.ClaimNum==0) {
-					return;
-				}
-				ClaimCur.ClaimStatus="W";
-				ClaimCur.DateSent=DateTimeOD.Today;
-				ClaimL.CalculateAndUpdate(procsForPat,InsPlanList,ClaimCur,PatPlanList,BenefitList,PatCur.Age,SubList);
-				if(PatPlans.GetOrdinal(PriSecMed.Secondary,PatPlanList,InsPlanList,SubList)>0 //if there exists a secondary plan
-					&&!CultureInfo.CurrentCulture.Name.EndsWith("CA"))//And not Canada (don't create secondary claim for Canada)
-				{
-					InsSub sub=InsSubs.GetSub(PatPlans.GetInsSubNum(PatPlanList,PatPlans.GetOrdinal(PriSecMed.Secondary,PatPlanList,InsPlanList,SubList)),SubList);
-					InsPlan plan=InsPlans.GetPlan(sub.PlanNum,InsPlanList);
-					ClaimCur=CreateClaim(PatCur,"S",PatPlanList,InsPlanList,ClaimProcList,procsForPat,SubList,listProcsForClaim);
-					if(ClaimCur.ClaimNum==0) {
-						return;
-					}
-					ClaimProcList=ClaimProcs.Refresh(PatCur.PatNum);
-					ClaimCur.ClaimStatus="H";
-					ClaimL.CalculateAndUpdate(procsForPat,InsPlanList,ClaimCur,PatPlanList,BenefitList,PatCur.Age,SubList);
-				}
-				patNumOld=PatCur.PatNum;
+				claimCreatedCount+=ContrAccount.ClaimCreatedCount;
+				listProcs.ForEach(x => x.IsAttached=true);//This way we can not attach procedures to multiple claims thanks to the logic above.
+				patNumOld=patCur.PatNum;
 			}
-			gridMain.SetSelected(false);
 			FillGrid();
+			if(!string.IsNullOrEmpty(claimErrors)) {
+				MsgBoxCopyPaste form=new MsgBoxCopyPaste(claimErrors);
+				form.ShowDialog();
+			}
+			MessageBox.Show(Lan.g(this,"Number of claims created")+": "+claimCreatedCount);
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
+	
+	}//end class FormRpProcNotBilledIns
 
-	}
-
-	//Used so that when we can easily select pertinent procedures for a specific patient when creating claims. 
-	class PatNumWithProcNum {
+	///<summary>Used so that we can easily select pertinent procedures for a specific patient when creating claims.</summary>
+	internal class PatNumWithProcNum {
 		public long PatNum;
 		public long ProcNum;
-		//Flag used to make sure we do not attach procedures to multiple claims.
-		//Very important for Canadian customers when we need to make multiple claims.
-		public bool IsVisited;
+		public int RowIndex;
+		public bool IsRowSelected;
+		///<summary>Flag used to make sure we do not attach procedures to multiple claims.
+		///Very important for Canadian customers when we need to make multiple claims.</summary>
+		public bool IsAttached;
 
-		public PatNumWithProcNum(long patNum,long procNum) {
-			this.PatNum=patNum;
-			this.ProcNum=procNum;
-			this.IsVisited=false;
+		public PatNumWithProcNum(long patNum,long procNum,int rowIndex,bool isRowSelected) {
+			PatNum=patNum;
+			ProcNum=procNum;
+			RowIndex=rowIndex;
+			IsRowSelected=isRowSelected;
+			IsAttached=false;
 		}
 	}
 }
