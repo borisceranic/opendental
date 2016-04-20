@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using OpenDental.UI;
+using System.Linq;
 
 namespace OpenDental
 {
@@ -43,6 +44,7 @@ namespace OpenDental
 		private ValidDouble textLabFees;
 		private List<InsSub> SubList;
 		private List<Def> _listClaimPaymentTrackingDefs;
+		private List<ClaimProc> _listClaimProcsOld;
 
 		///<summary></summary>
 		public FormClaimPayTotal(Patient patCur,Family famCur,List <InsPlan> planList,List<PatPlan> patPlanList,List<InsSub> subList){
@@ -304,6 +306,10 @@ namespace OpenDental
 		#endregion
 
 		private void FormClaimPayTotal_Load(object sender, System.EventArgs e) {
+			_listClaimProcsOld=new List<ClaimProc>();
+			foreach(ClaimProc cp in ClaimProcsToEdit) {
+				_listClaimProcsOld.Add(cp.Copy());
+			}
 			ProcList=Procedures.Refresh(PatCur.PatNum);
 			if(!CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				textLabFees.Visible=false;
@@ -738,6 +744,9 @@ namespace OpenDental
 				return;
 			}
 			SaveAllowedFees();
+			if(PatPlanList.Find(x => x.InsSubNum==_listClaimProcsOld[0].InsSubNum).Ordinal==1) {
+				ClaimSnapshots.CreateClaimSnapshot(_listClaimProcsOld,ClaimSnapshotTrigger.InsPayment);
+			}
 			DialogResult=DialogResult.OK;
 		}
 

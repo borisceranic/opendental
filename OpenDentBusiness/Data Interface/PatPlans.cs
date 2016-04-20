@@ -310,7 +310,18 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 			InsVerifies.DeleteByFKey(patPlanNum,VerifyTypes.PatientEnrollment);
 		}
-		
+
+		public static List<PatPlan> GetListByInsSubNums(List<long> listInsSubNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<PatPlan>>(MethodBase.GetCurrentMethod(),listInsSubNums);
+			}
+			List<PatPlan> listPatPlans=new List<PatPlan>();
+			if(listInsSubNums==null || listInsSubNums.Count<1) {
+				return listPatPlans;
+			}
+			string command="SELECT * FROM patplan WHERE InsSubNum IN("+string.Join(",",listInsSubNums)+")";
+			return Crud.PatPlanCrud.SelectMany(command);
+		}
 	}
 
 	/// <summary>This is only used in the GetOrdinal method above.</summary>

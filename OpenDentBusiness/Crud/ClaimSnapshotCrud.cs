@@ -53,6 +53,8 @@ namespace OpenDentBusiness.Crud{
 				claimSnapshot.InsPayEst       = PIn.Double(row["InsPayEst"].ToString());
 				claimSnapshot.Fee             = PIn.Double(row["Fee"].ToString());
 				claimSnapshot.DateTEntry      = PIn.DateT (row["DateTEntry"].ToString());
+				claimSnapshot.ClaimProcNum    = PIn.Long  (row["ClaimProcNum"].ToString());
+				claimSnapshot.SnapshotTrigger = (OpenDentBusiness.ClaimSnapshotTrigger)PIn.Int(row["SnapshotTrigger"].ToString());
 				retVal.Add(claimSnapshot);
 			}
 			return retVal;
@@ -71,6 +73,8 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("InsPayEst");
 			table.Columns.Add("Fee");
 			table.Columns.Add("DateTEntry");
+			table.Columns.Add("ClaimProcNum");
+			table.Columns.Add("SnapshotTrigger");
 			foreach(ClaimSnapshot claimSnapshot in listClaimSnapshots) {
 				table.Rows.Add(new object[] {
 					POut.Long  (claimSnapshot.ClaimSnapshotNum),
@@ -80,6 +84,8 @@ namespace OpenDentBusiness.Crud{
 					POut.Double(claimSnapshot.InsPayEst),
 					POut.Double(claimSnapshot.Fee),
 					POut.DateT (claimSnapshot.DateTEntry,false),
+					POut.Long  (claimSnapshot.ClaimProcNum),
+					POut.Int   ((int)claimSnapshot.SnapshotTrigger),
 				});
 			}
 			return table;
@@ -120,7 +126,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ClaimSnapshotNum,";
 			}
-			command+="ProcNum,ClaimType,Writeoff,InsPayEst,Fee,DateTEntry) VALUES(";
+			command+="ProcNum,ClaimType,Writeoff,InsPayEst,Fee,DateTEntry,ClaimProcNum,SnapshotTrigger) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(claimSnapshot.ClaimSnapshotNum)+",";
 			}
@@ -130,7 +136,9 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.Double(claimSnapshot.Writeoff)+"',"
 				+"'"+POut.Double(claimSnapshot.InsPayEst)+"',"
 				+"'"+POut.Double(claimSnapshot.Fee)+"',"
-				+    DbHelper.Now()+")";
+				+    DbHelper.Now()+","
+				+    POut.Long  (claimSnapshot.ClaimProcNum)+","
+				+    POut.Int   ((int)claimSnapshot.SnapshotTrigger)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -163,7 +171,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ClaimSnapshotNum,";
 			}
-			command+="ProcNum,ClaimType,Writeoff,InsPayEst,Fee,DateTEntry) VALUES(";
+			command+="ProcNum,ClaimType,Writeoff,InsPayEst,Fee,DateTEntry,ClaimProcNum,SnapshotTrigger) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(claimSnapshot.ClaimSnapshotNum)+",";
 			}
@@ -173,7 +181,9 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.Double(claimSnapshot.Writeoff)+"',"
 				+"'"+POut.Double(claimSnapshot.InsPayEst)+"',"
 				+"'"+POut.Double(claimSnapshot.Fee)+"',"
-				+    DbHelper.Now()+")";
+				+    DbHelper.Now()+","
+				+    POut.Long  (claimSnapshot.ClaimProcNum)+","
+				+    POut.Int   ((int)claimSnapshot.SnapshotTrigger)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -190,8 +200,10 @@ namespace OpenDentBusiness.Crud{
 				+"ClaimType       = '"+POut.String(claimSnapshot.ClaimType)+"', "
 				+"Writeoff        = '"+POut.Double(claimSnapshot.Writeoff)+"', "
 				+"InsPayEst       = '"+POut.Double(claimSnapshot.InsPayEst)+"', "
-				+"Fee             = '"+POut.Double(claimSnapshot.Fee)+"' "
+				+"Fee             = '"+POut.Double(claimSnapshot.Fee)+"', "
 				//DateTEntry not allowed to change
+				+"ClaimProcNum    =  "+POut.Long  (claimSnapshot.ClaimProcNum)+", "
+				+"SnapshotTrigger =  "+POut.Int   ((int)claimSnapshot.SnapshotTrigger)+" "
 				+"WHERE ClaimSnapshotNum = "+POut.Long(claimSnapshot.ClaimSnapshotNum);
 			Db.NonQ(command);
 		}
@@ -220,6 +232,14 @@ namespace OpenDentBusiness.Crud{
 				command+="Fee = '"+POut.Double(claimSnapshot.Fee)+"'";
 			}
 			//DateTEntry not allowed to change
+			if(claimSnapshot.ClaimProcNum != oldClaimSnapshot.ClaimProcNum) {
+				if(command!=""){ command+=",";}
+				command+="ClaimProcNum = "+POut.Long(claimSnapshot.ClaimProcNum)+"";
+			}
+			if(claimSnapshot.SnapshotTrigger != oldClaimSnapshot.SnapshotTrigger) {
+				if(command!=""){ command+=",";}
+				command+="SnapshotTrigger = "+POut.Int   ((int)claimSnapshot.SnapshotTrigger)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -248,6 +268,12 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			//DateTEntry not allowed to change
+			if(claimSnapshot.ClaimProcNum != oldClaimSnapshot.ClaimProcNum) {
+				return true;
+			}
+			if(claimSnapshot.SnapshotTrigger != oldClaimSnapshot.SnapshotTrigger) {
+				return true;
+			}
 			return false;
 		}
 

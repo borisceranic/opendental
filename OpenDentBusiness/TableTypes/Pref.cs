@@ -187,8 +187,13 @@ namespace OpenDentBusiness {
 		///Validating all claims on load was old behavior that was significantly slowing down the loading of the send claims window.
 		///Several offices complained that we took away the validation until they attempt sending the claim.</summary>
 		ClaimsSendWindowValidatesOnLoad,
-		///<summary>Boolean.  0 by default.  If enabled, snapshots of claimprocs are created when claims are created.  There is currently no UI for this preference.</summary>
+		///<summary>Boolean.  0 by default.  If enabled, snapshots of claimprocs are created when claims are created.</summary>
 		ClaimSnapshotEnabled,
+		///<summary>DateTime where the time is the only useful part. 
+		///Stores the time of day that the eConnector should create a claimsnapshot.</summary>
+		ClaimSnapshotRunTime,
+		///<summary>Enumeration of type "ClaimSnapshotTrigger".  ClaimCreate by default.  This preference determines how ClaimSnapshots get created. Stored as the enumeration.ToString().</summary>
+		ClaimSnapshotTriggerType,
 		ClaimsValidateACN,
 		ClearinghouseDefaultDent,
 		ClearinghouseDefaultMed,

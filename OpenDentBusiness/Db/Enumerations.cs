@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 
 namespace OpenDentBusiness{
 	///<summary>This is an enumeration of all the enumeration types that are used in the database.  This is used in the reporting classes to make the data human-readable.  May need to be updated with recent additions.</summary>
@@ -1534,6 +1535,16 @@ namespace OpenDentBusiness{
 		PatNumAsc,
 		///<summary>3.</summary>
 		PatNumDesc
+	}
+	
+	///<summary>The Enumeration value for which Claim Snapshot Trigger that will be stored.</summary>
+	public enum ClaimSnapshotTrigger {
+		[Description("Claim Created")]
+		ClaimCreate,
+		[Description("eConnector - Specific Time")]
+		EConnector,
+		[Description("Insurance Payment Received")]
+		InsPayment
 	}
 
 	

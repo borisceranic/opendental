@@ -3442,35 +3442,16 @@ namespace OpenDental {
 				ClaimProcs.Update(listClaimProcs[i]);
 			}
 			//Insert claim snapshots for historical reporting purposes.
-			CreateClaimSnapshot(claimType,listClaimProcs,proc.ProcFee);//,procsForPat
+			if(PIn.Enum<ClaimSnapshotTrigger>(PrefC.GetString(PrefName.ClaimSnapshotTriggerType),true)==ClaimSnapshotTrigger.ClaimCreate && claimType=="P") {
+				List<PatPlan> listPatPlans=PatPlans.GetListByInsSubNums(listClaimProcs.Select(x => x.InsSubNum).ToList());
+				PatPlan patPlanPrimary=listPatPlans.FirstOrDefault(x => x.PatNum==pat.PatNum && x.Ordinal==1);
+				if(patPlanPrimary!=null) {
+					ClaimSnapshots.CreateClaimSnapshot(listClaimProcs.FindAll(x => x.InsSubNum==patPlanPrimary.InsSubNum),ClaimSnapshotTrigger.ClaimCreate);
+				}
+			}
 			ClaimCreatedCount++;
 			return ClaimCur;
 			//return null;
-		}
-
-		///<summary>Creates a snapshot for the claimprocs passed in.  Used for reporting purposes.  claimType=P,S
-		///Only creates snapshots if the feature is enabled and if the claimproc is of certain statuses.</summary>
-		private static void CreateClaimSnapshot(string claimType,List<ClaimProc> listClaimProcs,double procFee) {//,List<Procedure> listPatProcs
-			if(!PrefC.GetBool(PrefName.ClaimSnapshotEnabled) || (claimType!="P" && claimType!="S")) {
-				return;
-			}
-			//Loop through all the claimprocs and create a claimsnapshot entry for each.
-			for(int i=0;i<listClaimProcs.Count;i++) {
-				if(listClaimProcs[i].Status==ClaimProcStatus.CapClaim
-					|| listClaimProcs[i].Status==ClaimProcStatus.CapComplete
-					|| listClaimProcs[i].Status==ClaimProcStatus.CapEstimate
-					|| listClaimProcs[i].Status==ClaimProcStatus.Preauth) 
-				{
-					continue;
-				}
-				ClaimSnapshot snapshot=new ClaimSnapshot();
-				snapshot.ProcNum=listClaimProcs[i].ProcNum;
-				snapshot.Writeoff=listClaimProcs[i].WriteOffEst;
-				snapshot.InsPayEst=listClaimProcs[i].InsEstTotal;
-				snapshot.Fee=procFee;
-				snapshot.ClaimType=claimType;				
-				ClaimSnapshots.Insert(snapshot);
-			}
 		}
 
 		private void menuInsPri_Click(object sender, System.EventArgs e) {

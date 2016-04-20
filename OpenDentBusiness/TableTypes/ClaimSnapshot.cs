@@ -9,7 +9,7 @@ namespace OpenDentBusiness {
 		public long ClaimSnapshotNum;
 		///<summary>FK to procedurelog.ProcNum</summary>
 		public long ProcNum;
-		///<summary>"S" or "P" only.</summary>
+		///<summary>Deprecated column.  Used to store "S"=Secondary or "P"=Primary to identify the claim type for the claimproc.</summary>
 		public string ClaimType;
 		///<summary></summary>
 		public double Writeoff;
@@ -20,6 +20,10 @@ namespace OpenDentBusiness {
 		///<summary>The date/time that the snapshot was created.  Not user editable.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.DateTEntry)]
 		public DateTime DateTEntry;
+		///<summary>FK to claimproc.ClaimProcNum</summary>
+		public long ClaimProcNum;
+		///<summary>Enum:ClaimSnapshotTrigger Stores the trigger to which this ClaimSnapshot was created.</summary>
+		public ClaimSnapshotTrigger SnapshotTrigger;
 
 		public ClaimSnapshot Copy(){
 			return (ClaimSnapshot)this.MemberwiseClone();

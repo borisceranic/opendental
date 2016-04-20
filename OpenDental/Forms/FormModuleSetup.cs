@@ -169,6 +169,12 @@ namespace OpenDental{
 		private ListBox listboxBadDebtAdjs;
 		private GroupBox groupBox4;
 		private Label label29;
+		private GroupBox groupBox5;
+		private CheckBox checkEnableClaimSnapshot;
+		private Label label31;
+		private Label label30;
+		private TextBox textClaimSnapshotRunTime;
+		private ComboBox comboClaimSnapshotTrigger;
 		private GroupBox groupBox3;
 
 		///<summary>Default constructor.  Opens the form with the Appts tab selected.</summary>
@@ -278,7 +284,9 @@ namespace OpenDental{
 			this.label15 = new System.Windows.Forms.Label();
 			this.comboCobRule = new System.Windows.Forms.ComboBox();
 			this.tabAccount = new System.Windows.Forms.TabPage();
+			this.groupBox4 = new System.Windows.Forms.GroupBox();
 			this.listboxBadDebtAdjs = new System.Windows.Forms.ListBox();
+			this.label29 = new System.Windows.Forms.Label();
 			this.butBadDebt = new OpenDental.UI.Button();
 			this.label28 = new System.Windows.Forms.Label();
 			this.comboUnallocatedSplits = new System.Windows.Forms.ComboBox();
@@ -353,20 +361,25 @@ namespace OpenDental{
 			this.colorDialog = new System.Windows.Forms.ColorDialog();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.label29 = new System.Windows.Forms.Label();
-			this.groupBox4 = new System.Windows.Forms.GroupBox();
+			this.groupBox5 = new System.Windows.Forms.GroupBox();
+			this.checkEnableClaimSnapshot = new System.Windows.Forms.CheckBox();
+			this.comboClaimSnapshotTrigger = new System.Windows.Forms.ComboBox();
+			this.textClaimSnapshotRunTime = new System.Windows.Forms.TextBox();
+			this.label30 = new System.Windows.Forms.Label();
+			this.label31 = new System.Windows.Forms.Label();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.tabFamily.SuspendLayout();
 			this.tabAccount.SuspendLayout();
+			this.groupBox4.SuspendLayout();
 			this.tabTreatPlan.SuspendLayout();
 			this.tabChart.SuspendLayout();
 			this.tabImages.SuspendLayout();
 			this.groupBox3.SuspendLayout();
 			this.tabManage.SuspendLayout();
 			this.groupBox1.SuspendLayout();
-			this.groupBox4.SuspendLayout();
+			this.groupBox5.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -1079,6 +1092,7 @@ namespace OpenDental{
 			// tabFamily
 			// 
 			this.tabFamily.BackColor = System.Drawing.SystemColors.Window;
+			this.tabFamily.Controls.Add(this.groupBox5);
 			this.tabFamily.Controls.Add(this.checkSuperFamSync);
 			this.tabFamily.Controls.Add(this.label26);
 			this.tabFamily.Controls.Add(this.comboSuperFamSort);
@@ -1259,6 +1273,18 @@ namespace OpenDental{
 			this.tabAccount.TabIndex = 2;
 			this.tabAccount.Text = "Account";
 			// 
+			// groupBox4
+			// 
+			this.groupBox4.Controls.Add(this.listboxBadDebtAdjs);
+			this.groupBox4.Controls.Add(this.label29);
+			this.groupBox4.Controls.Add(this.butBadDebt);
+			this.groupBox4.Location = new System.Drawing.Point(126, 386);
+			this.groupBox4.Name = "groupBox4";
+			this.groupBox4.Size = new System.Drawing.Size(314, 122);
+			this.groupBox4.TabIndex = 224;
+			this.groupBox4.TabStop = false;
+			this.groupBox4.Text = "Bad Debt Adjustments";
+			// 
 			// listboxBadDebtAdjs
 			// 
 			this.listboxBadDebtAdjs.FormattingEnabled = true;
@@ -1267,6 +1293,15 @@ namespace OpenDental{
 			this.listboxBadDebtAdjs.SelectionMode = System.Windows.Forms.SelectionMode.None;
 			this.listboxBadDebtAdjs.Size = new System.Drawing.Size(120, 108);
 			this.listboxBadDebtAdjs.TabIndex = 197;
+			// 
+			// label29
+			// 
+			this.label29.Location = new System.Drawing.Point(4, 12);
+			this.label29.Name = "label29";
+			this.label29.Size = new System.Drawing.Size(184, 20);
+			this.label29.TabIndex = 223;
+			this.label29.Text = "Current Bad Debt Adj Types:";
+			this.label29.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// butBadDebt
 			// 
@@ -2117,26 +2152,67 @@ namespace OpenDental{
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// label29
+			// groupBox5
 			// 
-			this.label29.Location = new System.Drawing.Point(4, 12);
-			this.label29.Name = "label29";
-			this.label29.Size = new System.Drawing.Size(184, 20);
-			this.label29.TabIndex = 223;
-			this.label29.Text = "Current Bad Debt Adj Types:";
-			this.label29.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.groupBox5.Controls.Add(this.label31);
+			this.groupBox5.Controls.Add(this.label30);
+			this.groupBox5.Controls.Add(this.textClaimSnapshotRunTime);
+			this.groupBox5.Controls.Add(this.comboClaimSnapshotTrigger);
+			this.groupBox5.Controls.Add(this.checkEnableClaimSnapshot);
+			this.groupBox5.Location = new System.Drawing.Point(98, 282);
+			this.groupBox5.Name = "groupBox5";
+			this.groupBox5.Size = new System.Drawing.Size(346, 100);
+			this.groupBox5.TabIndex = 220;
+			this.groupBox5.TabStop = false;
+			this.groupBox5.Text = "Claim Snapshot";
 			// 
-			// groupBox4
+			// checkEnableClaimSnapshot
 			// 
-			this.groupBox4.Controls.Add(this.listboxBadDebtAdjs);
-			this.groupBox4.Controls.Add(this.label29);
-			this.groupBox4.Controls.Add(this.butBadDebt);
-			this.groupBox4.Location = new System.Drawing.Point(126, 386);
-			this.groupBox4.Name = "groupBox4";
-			this.groupBox4.Size = new System.Drawing.Size(314, 122);
-			this.groupBox4.TabIndex = 224;
-			this.groupBox4.TabStop = false;
-			this.groupBox4.Text = "Bad Debt Adjustments";
+			this.checkEnableClaimSnapshot.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkEnableClaimSnapshot.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkEnableClaimSnapshot.Location = new System.Drawing.Point(101, 9);
+			this.checkEnableClaimSnapshot.Name = "checkEnableClaimSnapshot";
+			this.checkEnableClaimSnapshot.Size = new System.Drawing.Size(241, 17);
+			this.checkEnableClaimSnapshot.TabIndex = 220;
+			this.checkEnableClaimSnapshot.Text = "Enable Claim Snapshots";
+			this.checkEnableClaimSnapshot.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// comboClaimSnapshotTrigger
+			// 
+			this.comboClaimSnapshotTrigger.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboClaimSnapshotTrigger.FormattingEnabled = true;
+			this.comboClaimSnapshotTrigger.Location = new System.Drawing.Point(194, 28);
+			this.comboClaimSnapshotTrigger.MaxDropDownItems = 30;
+			this.comboClaimSnapshotTrigger.Name = "comboClaimSnapshotTrigger";
+			this.comboClaimSnapshotTrigger.Size = new System.Drawing.Size(148, 21);
+			this.comboClaimSnapshotTrigger.TabIndex = 221;
+			// 
+			// textClaimSnapshotRunTime
+			// 
+			this.textClaimSnapshotRunTime.Location = new System.Drawing.Point(232, 54);
+			this.textClaimSnapshotRunTime.Name = "textClaimSnapshotRunTime";
+			this.textClaimSnapshotRunTime.Size = new System.Drawing.Size(110, 20);
+			this.textClaimSnapshotRunTime.TabIndex = 222;
+			// 
+			// label30
+			// 
+			this.label30.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.label30.Location = new System.Drawing.Point(59, 57);
+			this.label30.Name = "label30";
+			this.label30.Size = new System.Drawing.Size(167, 15);
+			this.label30.TabIndex = 223;
+			this.label30.Text = "eConnector Run Time";
+			this.label30.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// label31
+			// 
+			this.label31.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.label31.Location = new System.Drawing.Point(24, 31);
+			this.label31.Name = "label31";
+			this.label31.Size = new System.Drawing.Size(164, 15);
+			this.label31.TabIndex = 224;
+			this.label31.Text = "Snapshot Trigger";
+			this.label31.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// FormModuleSetup
 			// 
@@ -2159,6 +2235,7 @@ namespace OpenDental{
 			this.tabFamily.ResumeLayout(false);
 			this.tabAccount.ResumeLayout(false);
 			this.tabAccount.PerformLayout();
+			this.groupBox4.ResumeLayout(false);
 			this.tabTreatPlan.ResumeLayout(false);
 			this.tabTreatPlan.PerformLayout();
 			this.tabChart.ResumeLayout(false);
@@ -2168,7 +2245,8 @@ namespace OpenDental{
 			this.tabManage.ResumeLayout(false);
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();
-			this.groupBox4.ResumeLayout(false);
+			this.groupBox5.ResumeLayout(false);
+			this.groupBox5.PerformLayout();
 			this.ResumeLayout(false);
 
 		}
@@ -2308,6 +2386,13 @@ namespace OpenDental{
 			}
 			comboSuperFamSort.SelectedIndex=PrefC.GetInt(PrefName.SuperFamSortStrategy);
 			checkSuperFamSync.Checked=PrefC.GetBool(PrefName.PatientAllSuperFamilySync);
+			checkEnableClaimSnapshot.Checked=PrefC.GetBool(PrefName.ClaimSnapshotEnabled);
+			comboClaimSnapshotTrigger.Items.Clear();
+			foreach(ClaimSnapshotTrigger trigger in Enum.GetValues(typeof(ClaimSnapshotTrigger))) {
+				comboClaimSnapshotTrigger.Items.Add(trigger.GetDescription());
+			}
+			comboClaimSnapshotTrigger.SelectedIndex=(int)PIn.Enum<ClaimSnapshotTrigger>(PrefC.GetString(PrefName.ClaimSnapshotTriggerType),true);
+			textClaimSnapshotRunTime.Text=PrefC.GetDateT(PrefName.ClaimSnapshotRunTime).ToShortTimeString();
 			#endregion
 			#region Account Module
 			//Account module-----------------------------------------------------------------------
@@ -2671,16 +2756,22 @@ namespace OpenDental{
 				MsgBox.Show(this,"Days until medication order stop date cannot be a negative number.");
 				return;
 			}
+			DateTime claimSnapshotRunTime=DateTime.MinValue;
+			if(!DateTime.TryParse(textClaimSnapshotRunTime.Text,out claimSnapshotRunTime)) {
+				MsgBox.Show(this,"eConnector Snapshot Run Time must be a valid time value.");
+				return;
+			}
+			claimSnapshotRunTime=new DateTime(1881,01,01,claimSnapshotRunTime.Hour,claimSnapshotRunTime.Minute,claimSnapshotRunTime.Second);
 			int imageModuleIsCollapsedVal=0;
 			if(radioImagesModuleTreeIsExpanded.Checked) {
-        imageModuleIsCollapsedVal=0;
-      }
-      else if(radioImagesModuleTreeIsCollapsed.Checked) {
-        imageModuleIsCollapsedVal=1;
-      }
-      else if(radioImagesModuleTreeIsPersistentPerUser.Checked) {
-        imageModuleIsCollapsedVal=2;
-      }
+				imageModuleIsCollapsedVal=0;
+			}
+			else if(radioImagesModuleTreeIsCollapsed.Checked) {
+				imageModuleIsCollapsedVal=1;
+			}
+			else if(radioImagesModuleTreeIsPersistentPerUser.Checked) {
+				imageModuleIsCollapsedVal=2;
+			}
 			if(PrefC.GetString(PrefName.TreatmentPlanNote)!=textTreatNote.Text) {
 				List<long> listTreatPlanNums=TreatPlans.GetNumsByNote(PrefC.GetString(PrefName.TreatmentPlanNote));//Find active/inactive TP's that match exactly.
 				if(listTreatPlanNums.Count>0) {
@@ -2738,6 +2829,8 @@ namespace OpenDental{
 				| Prefs.UpdateBool(PrefName.PriProvDefaultToSelectProv,checkSelectProv.Checked)
 				| Prefs.UpdateInt(PrefName.SuperFamSortStrategy,comboSuperFamSort.SelectedIndex)
 				| Prefs.UpdateBool(PrefName.PatientAllSuperFamilySync,checkSuperFamSync.Checked)
+				| Prefs.UpdateBool(PrefName.ClaimSnapshotEnabled,checkEnableClaimSnapshot.Checked)
+				| Prefs.UpdateDateT(PrefName.ClaimSnapshotRunTime,claimSnapshotRunTime)
 				#endregion
 				#region Account Module
 				| Prefs.UpdateBool(PrefName.BalancesDontSubtractIns,checkBalancesDontSubtractIns.Checked)
@@ -2818,6 +2911,14 @@ namespace OpenDental{
 			else{
 				if(Prefs.UpdateLong(PrefName.StatementsCalcDueDate,PIn.Long(textStatementsCalcDueDate.Text))){
 					_changed=true;
+				}
+			}
+			foreach(ClaimSnapshotTrigger trigger in Enum.GetValues(typeof(ClaimSnapshotTrigger))) {
+				if(trigger.GetDescription()==comboClaimSnapshotTrigger.Text) {
+					if(Prefs.UpdateString(PrefName.ClaimSnapshotTriggerType,trigger.ToString())) {
+						_changed=true;
+					}
+					break;
 				}
 			}
 			long timeArrivedTrigger=0;

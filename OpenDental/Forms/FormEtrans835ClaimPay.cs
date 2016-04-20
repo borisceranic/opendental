@@ -45,6 +45,7 @@ namespace OpenDental {
 		private Label label5;
 		///<summary>The claim procs shown in the grid.  These procs are saved to/from the grid, but changes are not saved to the database unless the OK button is pressed or an individual claim proc is double-clicked for editing.</summary>
 		public List <ClaimProc> ListClaimProcsForClaim;
+		private List<ClaimProc> _listClaimProcsOld;
 
 		///<summary></summary>
 		public FormEtrans835ClaimPay(Hx835_Claim claimPaid,Claim claim,Patient patCur,Family famCur,List<InsPlan> planList,List<PatPlan> patPlanList,List<InsSub> subList) {
@@ -415,6 +416,10 @@ namespace OpenDental {
 		#endregion
 
 		private void FormEtrans835ClaimPay_Load(object sender, System.EventArgs e) {
+			_listClaimProcsOld=new List<ClaimProc>();
+			foreach(ClaimProc cp in ListClaimProcsForClaim) {
+				_listClaimProcsOld.Add(cp.Copy());
+			}
 			_listProcs=Procedures.Refresh(_patCur.PatNum);
 			FillGridClaimAdjustments();
 			FillGridProcedureBreakdown();
@@ -899,6 +904,9 @@ namespace OpenDental {
 			}
 			SaveAllowedFees();
 			ReceivePayment();
+			if(_listPatPlans.Find(x => x.InsSubNum==_listClaimProcsOld[0].InsSubNum).Ordinal==1) {
+				ClaimSnapshots.CreateClaimSnapshot(_listClaimProcsOld,ClaimSnapshotTrigger.InsPayment);
+			}
 			DialogResult=DialogResult.OK;
 		}
 
