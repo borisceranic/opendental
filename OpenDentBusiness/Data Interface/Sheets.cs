@@ -69,8 +69,9 @@ namespace OpenDentBusiness{
 				+"WHERE sheet.SheetNum=sheetfield.SheetNum "
 				+"AND sheetfield.FieldType="+POut.Long((int)SheetFieldType.Parameter)
 				+" AND sheetfield.FieldName='ReferralNum' "
-				+"AND sheetfield.FieldValue='"+POut.Long(referralNum)+"')"
-				+" ORDER BY DateTimeSheet";
+				+"AND sheetfield.FieldValue='"+POut.Long(referralNum)+"') "
+				+"AND IsDeleted=0 "
+				+"ORDER BY DateTimeSheet";
 			return Crud.SheetCrud.SelectMany(command);
 		}
 
@@ -85,7 +86,8 @@ namespace OpenDentBusiness{
 				+" AND sheet.SheetType="+POut.Long((int)SheetTypeEnum.LabSlip)
 				+" AND sheetfield.FieldType="+POut.Long((int)SheetFieldType.Parameter)
 				+" AND sheetfield.FieldName='LabCaseNum' "
-				+"AND sheetfield.FieldValue='"+POut.Long(labCaseNum)+"'";
+				+"AND sheetfield.FieldValue='"+POut.Long(labCaseNum)+"' "
+				+"AND IsDeleted=0";
 			return Crud.SheetCrud.SelectOne(command);
 		}
 
@@ -99,7 +101,8 @@ namespace OpenDentBusiness{
 				+" AND sheet.SheetType="+POut.Long((int)SheetTypeEnum.Rx)
 				+" AND sheetfield.FieldType="+POut.Long((int)SheetFieldType.Parameter)
 				+" AND sheetfield.FieldName='RxNum' "
-				+"AND sheetfield.FieldValue='"+POut.Long(rxNum)+"'";
+				+"AND sheetfield.FieldValue='"+POut.Long(rxNum)+"' "
+				+"AND IsDeleted=0";
 			return Crud.SheetCrud.SelectOne(command);
 		}
 
@@ -109,7 +112,8 @@ namespace OpenDentBusiness{
 				return Meth.GetObject<List<Sheet>>(MethodBase.GetCurrentMethod(),patNum);
 			}
 			string command="SELECT * FROM sheet WHERE PatNum="+POut.Long(patNum)
-				+" AND ShowInTerminal > 0 ORDER BY ShowInTerminal";
+				+" AND ShowInTerminal > 0 AND IsDeleted=0 "
+				+"ORDER BY ShowInTerminal";
 			return Crud.SheetCrud.SelectMany(command);
 		}
 
@@ -133,7 +137,7 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Sheet>>(MethodBase.GetCurrentMethod(),patNum);
 			}
-			string command="SELECT * FROM sheet WHERE PatNum="+POut.Long(patNum);
+			string command="SELECT * FROM sheet WHERE IsDeleted=0 AND PatNum="+POut.Long(patNum);
 			return Crud.SheetCrud.SelectMany(command);
 		}
 
@@ -147,7 +151,8 @@ namespace OpenDentBusiness{
 			if(DataConnection.DBtype==DatabaseType.MySql) {
 				command="SELECT sheet.* FROM sheetfield "
 					+"LEFT JOIN sheet ON sheet.SheetNum = sheetfield.SheetNum "
-					+"WHERE FieldType = 10 "//PatImage
+					+"WHERE IsDeleted=0 "
+					+"AND FieldType = 10 "//PatImage
 					+"AND FieldValue = "+POut.Long(docNum)+" "//FieldName == DocCategory, which we do not care about here.
 					+"GROUP BY sheet.SheetNum";
 			}
@@ -156,7 +161,8 @@ namespace OpenDentBusiness{
 				command="SELECT sheet.SheetNum,sheet.SheetType,sheet.PatNum,sheet.DateTimeSheet,sheet.FontSize,sheet.FontName,sheet.Width"
 					+",sheet.Height,sheet.IsLandscape,DBMS_LOB.SUBSTR(sheet.InternalNote,1000,1),sheet.Description,sheet.ShowInTerminal,sheet.IsWebForm FROM sheet "
 					+"LEFT JOIN sheetfield ON sheet.SheetNum = sheetfield.SheetNum "
-					+"WHERE FieldType = 10 "//PatImage
+					+"WHERE IsDeleted=0 "
+					+"AND FieldType = 10 "//PatImage
 					+"AND TO_CHAR(FieldValue) = '"+POut.Long(docNum)+"' "//FieldName == DocCategory, which we do not care about here.
 					+"GROUP BY sheet.SheetNum,sheet.SheetType,sheet.PatNum,sheet.DateTimeSheet,sheet.FontSize,sheet.FontName,sheet.Width"
 					+",sheet.Height,sheet.IsLandscape,DBMS_LOB.SUBSTR(sheet.InternalNote,1000,1),sheet.Description,sheet.ShowInTerminal,sheet.IsWebForm";
@@ -171,9 +177,10 @@ namespace OpenDentBusiness{
 			}
 			string command="SELECT * FROM sheet WHERE DateTimeSheet="
 				+"(SELECT MAX(DateTimeSheet) FROM sheet WHERE PatNum="+POut.Long(patNum)+" "
-				+"AND Description='"+POut.String(examDescript)+"') "
+				+"AND Description='"+POut.String(examDescript)+"' AND IsDeleted=0) "
 				+"AND PatNum="+POut.Long(patNum)+" "
 				+"AND Description='"+POut.String(examDescript)+"' "
+				+"AND IsDeleted=0 "
 				+"LIMIT 1";
 			return Crud.SheetCrud.SelectOne(command);
 		}
@@ -353,7 +360,8 @@ namespace OpenDentBusiness{
 				return Meth.GetObject<List<Sheet>>(MethodBase.GetCurrentMethod(),patNum,startDate,endDate,examDescript);
 			}
 			string command="SELECT * "
-				+"FROM sheet WHERE PatNum="+POut.Long(patNum)+" "
+				+"FROM sheet WHERE IsDeleted=0 "
+				+"AND PatNum="+POut.Long(patNum)+" "
 				+"AND SheetType="+POut.Int((int)SheetTypeEnum.ExamSheet)+" ";
 			if(examDescript!=""){
 				command+="AND Description LIKE '%"+POut.String(examDescript)+"%' ";//case insensitive text matches
@@ -431,7 +439,7 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<byte>(MethodBase.GetCurrentMethod(),patNum);
 			}
-			string command="SELECT MAX(ShowInTerminal) FROM sheet WHERE PatNum="+POut.Long(patNum);
+			string command="SELECT MAX(ShowInTerminal) FROM sheet WHERE IsDeleted=0 AND PatNum="+POut.Long(patNum);
 			return PIn.Byte(Db.GetScalar(command));
 		}
 
