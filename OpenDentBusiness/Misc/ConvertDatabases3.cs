@@ -13398,9 +13398,9 @@ namespace OpenDentBusiness {
 			if(FromVersion<new Version("16.1.13.0")) {
 				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.13.0"));//No translation in convert script.
 				string command="";
-				command="SELECT DefNum FROM definition WHERE ItemName='Unverified'";
+				command="SELECT DefNum FROM definition WHERE ItemName='Unverified' AND Category=38";//38 = InsuranceVerificationStatus
 				string unverifiedDefNum=Db.GetScalar(command);
-				command="SELECT DefNum FROM definition WHERE ItemName='Verified'";
+				command="SELECT DefNum FROM definition WHERE ItemName='Verified' AND Category=38";//38 = InsuranceVerificationStatus
 				string verifiedDefNum=Db.GetScalar(command);
 				command="UPDATE insverify SET DefNum='0' WHERE DefNum="+unverifiedDefNum+" OR DefNum="+verifiedDefNum;
 				Db.NonQ(command);
