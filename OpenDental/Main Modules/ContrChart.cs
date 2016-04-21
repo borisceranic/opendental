@@ -7474,7 +7474,9 @@ namespace OpenDental {
 			}
 		}
 
-		///<summary>Sets many fields for a new procedure, then displays it for editing before inserting it into the db.  No need to worry about ProcOld because it's an insert, not an update.</summary>
+		///<summary>Sets many fields for a new procedure, then displays it for editing before inserting it into the db.  No need to worry about ProcOld
+		///because it's an insert, not an update.  The regions in AddProcedure and AddQuick should be in the same order. In version 15.3 a bug was     
+		///introduced because the order of the regions changed and no longer matched.</summary>
 		private void AddProcedure(Procedure ProcCur){
 			//procnum
 			ProcCur.PatNum=PatCur.PatNum;
@@ -7491,8 +7493,16 @@ namespace OpenDental {
 				ProcCur.ProcDate=PIn.Date(textDate.Text);
 			}
 			ProcCur.DateTP=ProcCur.ProcDate;
+			#region ProvNum
 			long provPri=PatCur.PriProv;
 			long provSec=PatCur.SecProv;
+			for(int i=0;i<ApptList.Length;i++) {
+				if(ApptList[i].AptDateTime.Date==DateTime.Today && ApptList[i].AptStatus!=ApptStatus.Planned) {
+					provPri=ApptList[i].ProvNum;
+					provSec=ApptList[i].ProvHyg;
+					break;
+				}
+			}
 			if(ProcedureCodes.GetProcCode(ProcCur.CodeNum).IsHygiene && provSec != 0) {
 				ProcCur.ProvNum=provSec;
 			}
@@ -7501,6 +7511,13 @@ namespace OpenDental {
 			}
 			if(ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault!=0) {//override provnum if there is a default for this proc
 				ProcCur.ProvNum=ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault;
+			}
+			#endregion ProvNum
+			if(newStatus==ProcStat.C) {
+				ProcCur.Note=ProcCodeNotes.GetNote(ProcCur.ProvNum,ProcCur.CodeNum);
+			}
+			else {
+				ProcCur.Note="";
 			}
 			ProcCur.ClinicNum=PatCur.ClinicNum;
 			if(newStatus==ProcStat.R || newStatus==ProcStat.EO || newStatus==ProcStat.EC) {
@@ -7562,19 +7579,6 @@ namespace OpenDental {
 				ProcCur.Priority=DefC.Short[(int)DefCat.TxPriorities][comboPriority.SelectedIndex-1].DefNum;
 			}
 			ProcCur.ProcStatus=newStatus;
-			for(int i=0;i<ApptList.Length;i++) {
-				if(ApptList[i].AptDateTime.Date==DateTime.Today && ApptList[i].AptStatus!=ApptStatus.Planned) {
-					provPri=ApptList[i].ProvNum;
-					provSec=ApptList[i].ProvHyg;
-					break;
-				}
-			}
-			if(newStatus==ProcStat.C) {
-				ProcCur.Note=ProcCodeNotes.GetNote(ProcCur.ProvNum,ProcCur.CodeNum);
-			}
-			else {
-				ProcCur.Note="";
-			}
 			if(listDx.SelectedIndex!=-1) {
 				ProcCur.Dx=DefC.Short[(int)DefCat.Diagnosis][listDx.SelectedIndex].DefNum;
 			}
@@ -7634,8 +7638,10 @@ namespace OpenDental {
 				Recalls.Synch(PatCur.PatNum);
 			}
 		}
-			
-		///<summary>No user dialog is shown.  This only works for some kinds of procedures.  Set the codeNum first.</summary>
+
+		///<summary>No user dialog is shown.  This only works for some kinds of procedures.  Set the codeNum first.  
+		///The regions in AddProcedure and AddQuick should be in the same order.  In version 15.3 a bug was introduced because the order of the regions
+		///changed and no longer matched.</summary>
 		private void AddQuick(Procedure ProcCur){
 			Plugins.HookAddCode(this,"ContrChart.AddQuick_begin",ProcCur);
 			//procnum
@@ -7652,6 +7658,7 @@ namespace OpenDental {
 				ProcCur.ProcDate=PIn.Date(textDate.Text);
 			}
 			ProcCur.DateTP=ProcCur.ProcDate;
+			#region ProvNum
 			long provPri=PatCur.PriProv;
 			long provSec=PatCur.SecProv;
 			for(int i=0;i<ApptList.Length;i++) {
@@ -7670,6 +7677,7 @@ namespace OpenDental {
 			if(ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault!=0) {//override provnum if there is a default for this proc
 				ProcCur.ProvNum=ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault;
 			}
+			#endregion ProvNum
 			if(newStatus==ProcStat.C) {
 				ProcCur.Note=ProcCodeNotes.GetNote(ProcCur.ProvNum,ProcCur.CodeNum);
 			}
