@@ -8638,8 +8638,7 @@ namespace OpenDental {
 			if(tabProc.Height<50){//skip if the tab control is short(not visible){
 				return;
 			}
-			if(tabProc.SelectedIndex==2)//movements tab
-			{
+			if(tabProc.SelectedTab==tabMovements) {//cannot use tab index because of Orion
 				if(toothChart.SelectedTeeth.Count==0) {
 					textShiftM.Text="";
 					textShiftO.Text="";
@@ -8692,7 +8691,7 @@ namespace OpenDental {
 					}
 				}
 			}//if movements tab
-			if(tabProc.SelectedIndex==1){//missing teeth
+			else if(tabProc.SelectedTab==tabMissing) {//cannot use tab index because of Orion
 				listHidden.Items.Clear();
 				HiddenTeeth=ToothInitials.GetHiddenTeeth(ToothInitialList);
 				for(int i=0;i<HiddenTeeth.Count;i++){
