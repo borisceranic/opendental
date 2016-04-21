@@ -68,6 +68,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenDentalWebCore", "..\..\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenDentalGraph", "OpenDentalGraph\OpenDentalGraph.csproj", "{015E240B-23FB-4D91-B20C-CE221DDCCB0F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xFHIR", "xFHIR\xFHIR.csproj", "{3B82FF38-846E-494B-81A6-682DCF11ABCB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

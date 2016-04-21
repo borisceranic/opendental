@@ -34,7 +34,7 @@ namespace OpenDentBusiness{
 		///	The PatNum column will represent the patient who is taking the action.  
 		///PlanNum with PermType InsPlanChangeCarrierName tracks carrier name changes.</summary>
 		public long FKey;
-		///<summary>Enum:LogSources None, WebSched, InsPlanImport834.</summary>
+		///<summary>Enum:LogSources None, WebSched, InsPlanImport834, FHIR.</summary>
 		public LogSources LogSource;
 
 		///<summary>PatNum-NameLF</summary>
@@ -61,6 +61,8 @@ namespace OpenDentBusiness{
 		///<summary>4 - Database maintenance.  This process creates patients which are known to be missing,
 		///but the user may not be aware that the fix involves patient recreation.</summary>
 		DBM,
+		///<summary>5 - FHIR is an automated process which the user may not be aware of.</summary>
+		FHIR
 	}
 
 	
