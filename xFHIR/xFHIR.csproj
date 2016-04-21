@@ -232,7 +232,6 @@
     <Compile Include="DataTypes\HumanName.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="DataTypes\Link.cs" />
-    <Compile Include="Resources\PatientFHIR.cs" />
     <Compile Include="DataTypes\Period.cs" />
     <Compile Include="DataTypes\Reference.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
