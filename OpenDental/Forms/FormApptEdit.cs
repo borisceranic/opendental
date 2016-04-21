@@ -3517,7 +3517,6 @@ namespace OpenDental{
 					SecurityLogs.MakeLogEntry(Permissions.AppointmentCompleteEdit,pat.PatNum,
 					AptCur.AptDateTime.ToShortDateString()+", "+AptCur.ProcDescript+logEntryMessage,AptCur.AptNum);
 				}
-				SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,pat.PatNum,AptCur.AptDateTime.ToShortDateString()+", "+AptCur.ProcDescript+logEntryMessage,AptCur.AptNum);
 				sendHL7=true;
 			}
 			//If there is an existing HL7 def enabled, send a SIU message if there is an outbound SIU message defined
