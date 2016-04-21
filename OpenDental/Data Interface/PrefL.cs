@@ -46,6 +46,22 @@ namespace OpenDental {
 
 		///<summary>Copies the installation directory files into the database.  Set hasAtoZ to true to copy to the AtoZ share as well.</summary>
 		public static bool CopyFromHereToUpdateFiles(Version versionCurrent,bool isSilent,bool hasAtoZ) {
+			if(hasAtoZ && PrefC.AtoZfolderUsed) {
+				string prefImagePath=ImageStore.GetPreferredAtoZpath();
+				if(prefImagePath==null || !Directory.Exists(prefImagePath)) {//AtoZ folder not found
+					if(isSilent) {
+						FormOpenDental.ExitCode=300;//AtoZ folder not found (Warning)
+						return false;
+					}
+					FormPath FormP=new FormPath();
+					FormP.IsStartingUp=true;
+					FormP.ShowDialog();
+					if(FormP.DialogResult!=DialogResult.OK) {
+						MsgBox.Show("Prefs","Invalid A to Z path.  Closing program.");
+						return false;
+					}
+				}
+			}
 			if(!isSilent) {
 				ODThread odThreadRecopy=new ODThread(ShowRecopyProgress);
 				odThreadRecopy.Name="RecopyProgressThread";
