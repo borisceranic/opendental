@@ -10,8 +10,9 @@ namespace xFHIR {
 	public class DbConn {
 		public static void ConnectIfNecessary() {
 			if(string.IsNullOrEmpty(DataConnection.GetServerName()) && string.IsNullOrEmpty(DataConnection.GetConnectionString())) {
-				RemotingClient.RemotingRole=RemotingRole.ServerWeb;
+				//RemotingClient.RemotingRole=RemotingRole.ServerWeb;
 				Userods.LoadDatabaseInfoFromFile(HostingEnvironment.MapPath(@"~\OpenDentalFHIRConfig.xml"));
+				Security.CurUser=new Userod() { UserName="ODServiceSecUser" };
 			}
 		}
 

@@ -121,7 +121,7 @@ namespace xFHIR {
 			//	return StatusCode(HttpStatusCode.NoContent);
 			//}
 			//Appointment aptCur=AppointmentCrud.SelectOne(oidEx.IDInternal);
-			Appointment aptCur=AppointmentCrud.SelectOne(id.ToString());
+			Appointment aptCur=AppointmentCrud.SelectOne(id);
 			if(aptCur==null) {
 				return StatusCode(HttpStatusCode.NoContent);
 			}
@@ -215,8 +215,8 @@ namespace xFHIR {
 			//long aptNum=oidEx.IDInternal;
 			//OIDExternals.Delete(oidEx.OIDExternalNum);
 			long aptNum=id;
-			Appointments.Delete(aptNum);
 			Appointment apt=Appointments.GetOneApt(aptNum);
+			Appointments.Delete(aptNum);
 			string logText=Lans.g("FormAudit","Deleted from FHIR.")+" "+apt.AptDateTime+" "+apt.ProcDescript;
 			if(apt.AptStatus==ApptStatus.Complete) {
 				SecurityLogs.MakeLogEntry(Permissions.AppointmentCompleteEdit,apt.PatNum,logText,apt.AptNum,LogSources.FHIR);
