@@ -2273,7 +2273,7 @@ namespace OpenDental{
 				if(CommandLineArgs.Length==0) {
 					Splash.Show();
 				}
-				if(!PrefsStartup(isSilentUpdate)) {//looks for the AtoZ folder here, but would like to eventually move that down to after login.  In Release, refreshes the Pref cache if conversion successful.
+				if(!PrefsStartup(isSilentUpdate)) {//In Release, refreshes the Pref cache if conversion successful.
 					Cursor=Cursors.Default;
 					Splash.Dispose();
 					if(ExitCode==0) {
@@ -2459,6 +2459,19 @@ namespace OpenDental{
 								return;
 							}
 						}
+					}
+				}
+			}
+			if(PrefC.AtoZfolderUsed) {
+				string prefImagePath=ImageStore.GetPreferredAtoZpath();
+				if(prefImagePath==null || !Directory.Exists(prefImagePath)) {//AtoZ folder not found
+					//Cache.Refresh(InvalidType.Security);
+					FormPath FormP=new FormPath();
+					FormP.IsStartingUp=true;
+					FormP.ShowDialog();
+					if(FormP.DialogResult!=DialogResult.OK) {
+						MsgBox.Show(this,"Invalid A to Z path.  Closing program.");
+						Application.Exit();
 					}
 				}
 			}
@@ -2782,26 +2795,6 @@ namespace OpenDental{
 			}
 			if(!isSilentUpdate) {
 				PrefL.MySqlVersion55Remind();
-			}
-			if(PrefC.AtoZfolderUsed) {
-				string prefImagePath=ImageStore.GetPreferredAtoZpath();
-				if(prefImagePath==null || !Directory.Exists(prefImagePath)) {//AtoZ folder not found
-					if(isSilentUpdate) {
-						ExitCode=300;//AtoZ folder not found (Warning)
-						Application.Exit();
-						return false;
-					}
-					Cache.Refresh(InvalidType.Security);
-					FormPath FormP=new FormPath();
-					FormP.IsStartingUp=true;
-					FormP.ShowDialog();
-					if(FormP.DialogResult!=DialogResult.OK) {
-						MsgBox.Show(this,"Invalid A to Z path.  Closing program.");
-						Application.Exit();
-						return false;
-					}
-					Cache.Refresh(InvalidType.Prefs);//because listening thread not started yet.
-				}
 			}
 			if(!PrefL.CheckProgramVersion(isSilentUpdate)){
 				return false;
