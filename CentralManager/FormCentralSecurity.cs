@@ -382,12 +382,13 @@ namespace CentralManager {
 				}
 			}
 			if(_clickedPermNode.ImageIndex==1) {//unchecked, so need to add a permission
-				GroupPermission perm=new GroupPermission();
-				perm.PermType=(Permissions)_clickedPermNode.Tag;
-				perm.UserGroupNum=_selectedGroupNum;
+				GroupPermission perm=new GroupPermission() {
+					IsNew=true,
+					PermType=(Permissions)_clickedPermNode.Tag,
+					UserGroupNum=_selectedGroupNum
+				};
 				if(GroupPermissions.PermTakesDates(perm.PermType)) {
 					FormCentralGroupPermEdit FormCG=new FormCentralGroupPermEdit(perm);
-					perm.IsNew=true;
 					FormCG.ShowDialog();
 					if(FormCG.DialogResult==DialogResult.Cancel) {
 						treePermissions.EndUpdate();
