@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ComponentModel;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using Button=OpenDental.UI.Button;
@@ -46,6 +47,9 @@ namespace OpenDental{
 		private Button butCalculate;
 		private Label labelBillingCycleDay;
 		private ValidNumber textBillingDay;
+		private Label labelPatNum;
+		private TextBox textPatNum;
+		private Button butMoveTo;
 		private RepeatCharge RepeatCur;
 
 		///<summary></summary>
@@ -111,6 +115,9 @@ namespace OpenDental{
 			this.butCancel = new OpenDental.UI.Button();
 			this.labelBillingCycleDay = new System.Windows.Forms.Label();
 			this.textBillingDay = new OpenDental.ValidNumber();
+			this.labelPatNum = new System.Windows.Forms.Label();
+			this.textPatNum = new System.Windows.Forms.TextBox();
+			this.butMoveTo = new OpenDental.UI.Button();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -393,7 +400,7 @@ namespace OpenDental{
 			// 
 			// labelBillingCycleDay
 			// 
-			this.labelBillingCycleDay.Location = new System.Drawing.Point(372, 50);
+			this.labelBillingCycleDay.Location = new System.Drawing.Point(372, 67);
 			this.labelBillingCycleDay.Name = "labelBillingCycleDay";
 			this.labelBillingCycleDay.Size = new System.Drawing.Size(137, 16);
 			this.labelBillingCycleDay.TabIndex = 55;
@@ -403,7 +410,7 @@ namespace OpenDental{
 			// 
 			// textBillingDay
 			// 
-			this.textBillingDay.Location = new System.Drawing.Point(511, 49);
+			this.textBillingDay.Location = new System.Drawing.Point(511, 66);
 			this.textBillingDay.MaxVal = 31;
 			this.textBillingDay.MinVal = 1;
 			this.textBillingDay.Name = "textBillingDay";
@@ -411,10 +418,46 @@ namespace OpenDental{
 			this.textBillingDay.TabIndex = 8;
 			this.textBillingDay.Visible = false;
 			// 
+			// labelPatNum
+			// 
+			this.labelPatNum.Location = new System.Drawing.Point(400, 93);
+			this.labelPatNum.Name = "labelPatNum";
+			this.labelPatNum.Size = new System.Drawing.Size(110, 16);
+			this.labelPatNum.TabIndex = 58;
+			this.labelPatNum.Text = "PatNum";
+			this.labelPatNum.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelPatNum.Visible = false;
+			// 
+			// textPatNum
+			// 
+			this.textPatNum.Location = new System.Drawing.Point(511, 92);
+			this.textPatNum.Name = "textPatNum";
+			this.textPatNum.ReadOnly = true;
+			this.textPatNum.Size = new System.Drawing.Size(75, 20);
+			this.textPatNum.TabIndex = 57;
+			this.textPatNum.Visible = false;
+			// 
+			// butMoveTo
+			// 
+			this.butMoveTo.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butMoveTo.Autosize = true;
+			this.butMoveTo.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butMoveTo.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butMoveTo.CornerRadius = 4F;
+			this.butMoveTo.Location = new System.Drawing.Point(588, 90);
+			this.butMoveTo.Name = "butMoveTo";
+			this.butMoveTo.Size = new System.Drawing.Size(75, 24);
+			this.butMoveTo.TabIndex = 56;
+			this.butMoveTo.Text = "Move To";
+			this.butMoveTo.Visible = false;
+			this.butMoveTo.Click += new System.EventHandler(this.butMoveTo_Click);
+			// 
 			// FormRepeatChargeEdit
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(705, 545);
+			this.Controls.Add(this.labelPatNum);
+			this.Controls.Add(this.textPatNum);
+			this.Controls.Add(this.butMoveTo);
 			this.Controls.Add(this.textBillingDay);
 			this.Controls.Add(this.labelBillingCycleDay);
 			this.Controls.Add(this.groupBox1);
@@ -444,7 +487,6 @@ namespace OpenDental{
 			this.MinimizeBox = false;
 			this.Name = "FormRepeatChargeEdit";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Repeat Charge";
 			this.Load += new System.EventHandler(this.FormRepeatChargeEdit_Load);
 			this.groupBox1.ResumeLayout(false);
@@ -456,8 +498,7 @@ namespace OpenDental{
 		#endregion
 
 		private void FormRepeatChargeEdit_Load(object sender,EventArgs e) {
-			//Set the title bar to show the patient's name much like the main screen does.
-			Text+=" - "+Patients.GetLim(RepeatCur.PatNum).GetNameLF();
+			SetPatient();
 			if(IsNew){
 				FormProcCodes FormP=new FormProcCodes();
 				FormP.IsSelectionMode=true;
@@ -476,6 +517,13 @@ namespace OpenDental{
 				RepeatCur.ProcCode=ProcedureCodes.GetStringProcCode(FormP.SelectedCodeNum);
 				RepeatCur.IsEnabled=true;
 				RepeatCur.CreatesClaim=false;
+			}
+			else {//Existing repeating charge
+				if(PrefC.GetBool(PrefName.DistributorKey) && Regex.IsMatch(RepeatCur.ProcCode,"^Z[0-9]{3,}$")) {//Only visible if HQ and a eRx Z code.
+					labelPatNum.Visible=true;
+					textPatNum.Visible=true;
+					butMoveTo.Visible=true;
+				}
 			}
 			textCode.Text=RepeatCur.ProcCode;
 			textDesc.Text=ProcedureCodes.GetProcCode(RepeatCur.ProcCode).Descript;
@@ -523,6 +571,12 @@ namespace OpenDental{
 				labelBillingCycleDay.Visible=true;
 				textBillingDay.Visible=true;
 			}
+		}
+
+		private void SetPatient() {
+			//Set the title bar to show the patient's name much like the main screen does.
+			Text+=" - "+Patients.GetLim(RepeatCur.PatNum).GetNameLF();
+			textPatNum.Text=RepeatCur.PatNum.ToString();
 		}
 
 		///<summary>Adds the procedure code of the repeating charge to a credit card on the patient's account if the user okays it.</summary>
@@ -609,6 +663,17 @@ namespace OpenDental{
 				return;
 			}
 			textChargeAmt.Text=(PIn.Double(textTotalAmount.Text)/PIn.Double(textNumOfCharges.Text)).ToString("F");
+		}
+
+		private void butMoveTo_Click(object sender,EventArgs e) {
+			FormPatientSelect form=new FormPatientSelect();
+			if(form.ShowDialog()!=DialogResult.OK) {
+				return;
+			}
+			RepeatCur.PatNum=form.SelectedPatNum;
+			SetPatient();
+			Patient pat=Patients.GetPat(RepeatCur.PatNum);
+			textBillingDay.Text=pat.BillingCycleDay.ToString();
 		}
 
 		private void butDelete_Click(object sender, EventArgs e) {
