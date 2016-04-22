@@ -554,6 +554,9 @@ namespace OpenDental{
 		}
 		
 		private void butNewClaims_Click(object sender,EventArgs e) {
+			if(!ContrAccount.CheckClearinghouseDefaults()) {
+				return;
+			}
 			if(gridMain.SelectedIndices.Length==0) {//Equivalent to selecting all procedures from gridMain.
 				gridMain.SetSelected(true);
 			}
@@ -570,9 +573,29 @@ namespace OpenDental{
 			for(int i=0;i<gridMain.Rows.Count;i++) {
 				long procNumCur=PIn.Long(gridMain.Rows[i].Tag.ToString());//Tag is set to procNum in fillGrid().
 				Procedure procCur=Procedures.GetOneProc(procNumCur,false);
+				//TODO: If patient changed, use Claims.Refresh() to get claims for patient, and use ClaimProcs.Refresh() and ClaimProcs.GetForProc().
+				List<ClaimProc> listClaimProcs=ClaimProcs.RefreshForProc(procNumCur);
 				long patNumCur=procCur.PatNum;
 				bool isSelected=gridMain.SelectedIndices.Contains(i);
-				listProcWithIndices.Add(new PatNumWithProcNum(patNumCur,procNumCur,i,isSelected));
+				bool hasPriClaim=false;
+				bool hasSecClaim=false;
+				if(Procedures.IsAttachedToClaim(procNumCur)) {
+					for(int j=0;j<listClaimProcs.Count;j++) {
+						ClaimProc claimProcCur=listClaimProcs[j];
+						if(claimProcCur.ClaimNum > 0 && claimProcCur.Status != ClaimProcStatus.Preauth) {
+							Claim claimCur=Claims.GetClaim(claimProcCur.ClaimNum);
+							switch(claimCur.ClaimType) {
+								case "P":
+									hasPriClaim=true;
+									break;
+								case "S":
+									hasSecClaim=true;
+									break;
+							}
+						}
+					}
+				}
+				listProcWithIndices.Add(new PatNumWithProcNum(patNumCur,procNumCur,i,isSelected,hasPriClaim,hasSecClaim));
 				DataRow row=table.NewRow();
 				row["ProcNum"]=procNumCur;
 				#region Calculate chargesDouble
@@ -581,7 +604,6 @@ namespace OpenDental{
 				if(qty==0){
 					qty=1;
 				}
-				List<ClaimProc> listClaimProcs=ClaimProcs.RefreshForProc(procNumCur);
 				double writeOffCapSum=listClaimProcs.Where(x => x.Status==ClaimProcStatus.CapComplete).Select(y => y.WriteOff).ToList().Sum();
 				row["chargesDouble"]=(procCur.ProcFee*qty)-writeOffCapSum;
 				#endregion Calculate chargesDouble
@@ -597,12 +619,32 @@ namespace OpenDental{
 			long patNumOld=0;
 			//The procedures show in the grid ordered by patient.  Also listPatNums contains unique patnums which are in the same order as the grid.
 			for(int i=0;i<listPatNums.Count;i++) {
+				List<PatNumWithProcNum> listProcs=listProcWithIndices.Where(x => x.PatNum == listPatNums[i] && x.IsRowSelected && !x.IsAttached).ToList();
+				//List<PatNumWithProcNum> listProcsNoClaims=listProcs.Where(x => x.HasPriClaim==false && x.HasSecClaim==false).ToList();
+				//List<PatNumWithProcNum> listProcsNoPrimary=listProcs.Where(x => x.HasPriClaim==false && x.HasSecClaim==true).ToList();
+				//List<PatNumWithProcNum> listProcsNoSecondary=listProcs.Where(x => x.HasPriClaim==true && x.HasSecClaim==false).ToList();
+				//List<PatNumWithProcNum> listProcsNoOther=listProcs.Where(x => x.HasPriClaim==true && x.HasSecClaim==true).ToList();
+				//IEnumerable<IGrouping<bool,PatNumWithProcNum>> listClaimComboGroups=listProcs.GroupBy(x => x.HasPriClaim);
+				//foreach(IGrouping<bool,PatNumWithProcNum> comboGroup in listClaimComboGroups) {
+				//	if(comboGroup.Key) {//Procedures that have a primary claim already, assume need to create secondary.
+
+				//	}
+				//	else {//Procedures that do not have a primary claim but may have a secondary claim.
+
+				//	}
+				//}
+				if(listProcs.Count==0) {
+					continue;
+				}
 				Patient patCur=Patients.GetPat(listPatNums[i]);
 				gridMain.SetSelected(false);//Need to deslect all rows each time so that ContrAccount.toolBarButIns_Click(...) only uses pertinent rows.
-				List<PatNumWithProcNum> listProcs=listProcWithIndices.Where(x => x.PatNum == listPatNums[i] && x.IsRowSelected && !x.IsAttached).ToList();
 				if(listProcs.Count>7 && CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 					listProcs=listProcs.Take(7).ToList();//Returns first 7 items of the list.
 					i--;//To maintain the same patient, in order to create one or more additional claims for the remaining procedures.
+				}
+				CheckUniqueDiagnosticCodes(listProcs);
+				if(listProcs.Count==0) {
+					continue;
 				}
 				for(int j=0;j<listProcs.Count;j++) {
 					//Select the pertinent rows so that they will be flagged to be attached to the claim below.
@@ -610,16 +652,15 @@ namespace OpenDental{
 				}
 				ContrAccount.toolBarButIns_Click(false,patCur,Patients.GetFamily(patCur.PatNum),gridMain,table);
 				string errorTitle=patCur.PatNum+" "+patCur.GetNameLFnoPref()+" - ";
-				if(patNumOld==patCur.PatNum) {//Should only happen for Canadian customers who are attempting to create a claim with more then 7 procedures.
-					string spaces=new string(new char[errorTitle.Length]).Replace('\0', ' ');
-					claimErrors+=spaces+ContrAccount.ClaimErrorsCur+"\r\n";
+				if(patNumOld==patCur.PatNum && !string.IsNullOrEmpty(ContrAccount.ClaimErrorsCur)){ 
+					claimErrors+="\t\t"+ContrAccount.ClaimErrorsCur+"\r\n";
 				}
-				else {
+				else if(!string.IsNullOrEmpty(ContrAccount.ClaimErrorsCur)){
 					claimErrors+=errorTitle+ContrAccount.ClaimErrorsCur+"\r\n";
+					patNumOld=patCur.PatNum;
 				}
 				claimCreatedCount+=ContrAccount.ClaimCreatedCount;
 				listProcs.ForEach(x => x.IsAttached=true);//This way we can not attach procedures to multiple claims thanks to the logic above.
-				patNumOld=patCur.PatNum;
 			}
 			FillGrid();
 			if(!string.IsNullOrEmpty(claimErrors)) {
@@ -627,6 +668,32 @@ namespace OpenDental{
 				form.ShowDialog();
 			}
 			MessageBox.Show(Lan.g(this,"Number of claims created")+": "+claimCreatedCount);
+		}
+		
+		//Mimics ContrAccount.CreateClaim(...)
+		private void CheckUniqueDiagnosticCodes(List<PatNumWithProcNum> listProcs) {
+			//TODO: Consider getting all procedures for the patient ahead of time, and using that cache to get listProcedures to save a query.
+			List<Procedure> listProcedures=Procedures.GetManyProc(listProcs.Select(x => x.ProcNum).ToList(),false);
+			//If they have medical insurance and no dental, make the claim type Medical.  This is to avoid the scenario of multiple med ins and no dental.
+			bool isMedical=false;
+			//TODO: Get plan info for patient further up, to reduce amount of queries.
+			List <PatPlan> listPatPlans=PatPlans.Refresh(listProcs[0].PatNum);
+			List<InsSub> listInsSubs=InsSubs.RefreshForFam(Patients.GetFamily(listProcs[0].PatNum));
+			List<InsPlan> listInsPlans=InsPlans.RefreshForSubList(listInsSubs);
+			if(PatPlans.GetOrdinal(PriSecMed.Medical,listPatPlans,listInsPlans,listInsSubs)>0
+				&& PatPlans.GetOrdinal(PriSecMed.Primary,listPatPlans,listInsPlans,listInsSubs)==0
+				&& PatPlans.GetOrdinal(PriSecMed.Secondary,listPatPlans,listInsPlans,listInsSubs)==0)
+			{
+				isMedical=true;
+			}
+			while(listProcs.Count > 0 && !isMedical && Procedures.GetUniqueDiagnosticCodes(listProcedures,false).Count > 4) {//dental
+				listProcedures.RemoveAt(listProcedures.Count-1);
+				listProcs.RemoveAt(listProcedures.Count-1);
+			}
+			while(listProcs.Count > 0 && isMedical && Procedures.GetUniqueDiagnosticCodes(listProcedures,true).Count > 12) {//medical
+				listProcedures.RemoveAt(listProcedures.Count-1);
+				listProcs.RemoveAt(listProcedures.Count-1);
+			}
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {
@@ -644,13 +711,17 @@ namespace OpenDental{
 		///<summary>Flag used to make sure we do not attach procedures to multiple claims.
 		///Very important for Canadian customers when we need to make multiple claims.</summary>
 		public bool IsAttached;
+		public bool HasPriClaim;
+		public bool HasSecClaim;
 
-		public PatNumWithProcNum(long patNum,long procNum,int rowIndex,bool isRowSelected) {
+		public PatNumWithProcNum(long patNum,long procNum,int rowIndex,bool isRowSelected,bool hasPriClaim,bool hasSecClaim) {
 			PatNum=patNum;
 			ProcNum=procNum;
 			RowIndex=rowIndex;
 			IsRowSelected=isRowSelected;
 			IsAttached=false;
+			HasPriClaim=hasPriClaim;
+			HasSecClaim=hasSecClaim;
 		}
 	}
 }

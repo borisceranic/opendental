@@ -3021,7 +3021,7 @@ namespace OpenDental {
 			ModuleSelected(PatCur.PatNum);
 		}
 
-		private static bool CheckClearinghouseDefaults() {
+		public static bool CheckClearinghouseDefaults() {
 			if(PrefC.GetLong(PrefName.ClearinghouseDefaultDent)==0) {
 				MsgBox.Show("ContrAccount","No default dental clearinghouse defined.");
 				return false;
