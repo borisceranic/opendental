@@ -563,6 +563,8 @@ namespace OpenDentBusiness {
 				decimal balanceForward=0;
 				DataSet account=GetAccount(guarantor.PatNum,fromDate,toDate,true,false,statementNum,showProcBreakdown,showPayNotes,isInvoice,showAdjNotes
 					,isForStatementPrinting,guarantor,fam,out payPlanDue,out balanceForward);
+				//Setting the PatNum for all rows to the guarantor so that each family will be interminged in one grid. 
+				account.Tables["account"].Rows.Cast<DataRow>().ToList().ForEach(x => x["PatNum"]=guarantor.PatNum);
 				account.Tables.Add(GetApptTable(fam,false,guarantor.PatNum));
 				account.Tables.Add(GetMisc(fam,guarantor.PatNum,payPlanDue,balanceForward));
 				retVal.Merge(account);//This works for the purposes we need it for.  Sheets framework auto-splits entries by patnum.
