@@ -406,6 +406,20 @@ namespace OpenDental{
 			}
 		}
 
+		///<summary>Tries to show the file browser dialog to the user.  Returns true if the user actually selected a path from the dialog.
+		///Returns false if the user cancels out.  Also, shows a warning message and returns false if an exception occurred.</summary>
+		private bool ShowFileBrowserDialog() {
+			//A customer is having a "Unable to retrieve root folder" unhandled exception occur when trying to show the file browser dialog.
+			//Therefore, try to show the dialog and if any exception occurs simply show a message box giving some suggestions to the user.
+			try {
+				return (fb.ShowDialog()==DialogResult.OK);
+			}
+			catch(Exception) {
+				MsgBox.Show(this,"There was an error showing the Browse window.\r\nTry running as an Administrator or manually typing in a path.");
+				return false;
+			}
+		}
+
 		///<summary>Returns the given path with the local OS path separators as necessary.</summary>
 		public static string FixDirSeparators(string path){
 			if(Environment.OSVersion.Platform==PlatformID.Unix){
@@ -418,7 +432,7 @@ namespace OpenDental{
 		}
 
 		private void butBrowseDoc_Click(object sender,EventArgs e) {
-			if(fb.ShowDialog()!=DialogResult.OK) {
+			if(!ShowFileBrowserDialog()) {
 				return;
 			}
 			//Ensure that the path entered has slashes matching the current OS (in case entered manually).
@@ -445,25 +459,25 @@ namespace OpenDental{
 		}
 
 		private void butBrowseServer_Click(object sender,EventArgs e) {
-			if(fb.ShowDialog()==DialogResult.OK) {
+			if(ShowFileBrowserDialog()) {
 				textServerPath.Text=fb.SelectedPath;
 			}
 		}
 
 		private void butBrowseLocal_Click(object sender,EventArgs e) {
-			if(fb.ShowDialog()==DialogResult.OK) {
+			if(ShowFileBrowserDialog()) {
 				textLocalPath.Text=fb.SelectedPath;
 			}
 		}
 
-		private void butBrowseExport_Click(object sender, System.EventArgs e){
-		  if(fb.ShowDialog()==DialogResult.OK){
+		private void butBrowseExport_Click(object sender, System.EventArgs e) {
+			if(ShowFileBrowserDialog()) {
 				textExportPath.Text=fb.SelectedPath;
 			}
 		}
 
 		private void butBrowseLetter_Click(object sender, System.EventArgs e) {
-			if(fb.ShowDialog()==DialogResult.OK){
+			if(ShowFileBrowserDialog()) {
 				textLetterMergePath.Text=fb.SelectedPath;
 			}
 		}
