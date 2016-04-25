@@ -469,7 +469,7 @@ namespace OpenDentBusiness {
 						color="-16777031";//blue
 					}
 					command="INSERT INTO definition (DefNum, Category, ItemOrder, ItemName, ItemColor) "
-						+"VALUES ((SELECT MAX(DefNum)+1 FROM definition),"+maxOrder+",'Canceled Appointment Procedure','"+color+"')";
+						+"VALUES ((SELECT MAX(DefNum)+1 FROM definition),0,"+maxOrder+",'Canceled Appointment Procedure','"+color+"')";
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
