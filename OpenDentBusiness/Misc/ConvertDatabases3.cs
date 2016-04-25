@@ -13472,6 +13472,7 @@ namespace OpenDentBusiness {
 			To16_1_16();
 		}
 
+		///<summary>Oracle compatible: 04/25/2016</summary>
 		private static void To16_1_16() {
 			if(FromVersion<new Version("16.1.16.0")) {
 				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.16.0"));//No translation in convert script.
@@ -13491,9 +13492,9 @@ namespace OpenDentBusiness {
 						Db.NonQ(command);
 					}
 					else {//oracle
-						command=@"INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue) 
+						command=@"INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ClinicNum) 
 							VALUES ((SELECT MAX(ProgramPropertyNum)+1 FROM programproperty),(SELECT ProgramNum FROM program WHERE ProgName='Dimaxis'),
-							'Birthdate format (usually dd/MM/yyyy or MM/dd/yyyy)','dd/MM/yyyy')";
+							'Birthdate format (usually dd/MM/yyyy or MM/dd/yyyy)','dd/MM/yyyy',0)";
 						Db.NonQ(command);
 					}
 				}
