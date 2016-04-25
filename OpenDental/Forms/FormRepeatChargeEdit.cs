@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ComponentModel;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using Button=OpenDental.UI.Button;
@@ -46,7 +47,15 @@ namespace OpenDental{
 		private Button butCalculate;
 		private Label labelBillingCycleDay;
 		private ValidNumber textBillingDay;
+		private Label labelPatNum;
+		private TextBox textPatNum;
+		private Button butMoveTo;
+		private Label labelNpi;
+		private Label labelErxAccountId;
+		private TextBox textNpi;
+		private TextBox textErxAccountId;
 		private RepeatCharge RepeatCur;
+		private bool _isErx;
 
 		///<summary></summary>
 		public FormRepeatChargeEdit(RepeatCharge repeatCur)
@@ -111,6 +120,13 @@ namespace OpenDental{
 			this.butCancel = new OpenDental.UI.Button();
 			this.labelBillingCycleDay = new System.Windows.Forms.Label();
 			this.textBillingDay = new OpenDental.ValidNumber();
+			this.labelPatNum = new System.Windows.Forms.Label();
+			this.textPatNum = new System.Windows.Forms.TextBox();
+			this.butMoveTo = new OpenDental.UI.Button();
+			this.labelNpi = new System.Windows.Forms.Label();
+			this.labelErxAccountId = new System.Windows.Forms.Label();
+			this.textNpi = new System.Windows.Forms.TextBox();
+			this.textErxAccountId = new System.Windows.Forms.TextBox();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -393,7 +409,7 @@ namespace OpenDental{
 			// 
 			// labelBillingCycleDay
 			// 
-			this.labelBillingCycleDay.Location = new System.Drawing.Point(372, 50);
+			this.labelBillingCycleDay.Location = new System.Drawing.Point(372, 67);
 			this.labelBillingCycleDay.Name = "labelBillingCycleDay";
 			this.labelBillingCycleDay.Size = new System.Drawing.Size(137, 16);
 			this.labelBillingCycleDay.TabIndex = 55;
@@ -403,7 +419,7 @@ namespace OpenDental{
 			// 
 			// textBillingDay
 			// 
-			this.textBillingDay.Location = new System.Drawing.Point(511, 49);
+			this.textBillingDay.Location = new System.Drawing.Point(511, 66);
 			this.textBillingDay.MaxVal = 31;
 			this.textBillingDay.MinVal = 1;
 			this.textBillingDay.Name = "textBillingDay";
@@ -411,10 +427,86 @@ namespace OpenDental{
 			this.textBillingDay.TabIndex = 8;
 			this.textBillingDay.Visible = false;
 			// 
+			// labelPatNum
+			// 
+			this.labelPatNum.Location = new System.Drawing.Point(400, 93);
+			this.labelPatNum.Name = "labelPatNum";
+			this.labelPatNum.Size = new System.Drawing.Size(110, 16);
+			this.labelPatNum.TabIndex = 58;
+			this.labelPatNum.Text = "PatNum";
+			this.labelPatNum.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelPatNum.Visible = false;
+			// 
+			// textPatNum
+			// 
+			this.textPatNum.Location = new System.Drawing.Point(511, 92);
+			this.textPatNum.Name = "textPatNum";
+			this.textPatNum.ReadOnly = true;
+			this.textPatNum.Size = new System.Drawing.Size(75, 20);
+			this.textPatNum.TabIndex = 57;
+			this.textPatNum.Visible = false;
+			// 
+			// butMoveTo
+			// 
+			this.butMoveTo.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butMoveTo.Autosize = true;
+			this.butMoveTo.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butMoveTo.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butMoveTo.CornerRadius = 4F;
+			this.butMoveTo.Location = new System.Drawing.Point(588, 90);
+			this.butMoveTo.Name = "butMoveTo";
+			this.butMoveTo.Size = new System.Drawing.Size(75, 24);
+			this.butMoveTo.TabIndex = 56;
+			this.butMoveTo.Text = "Move To";
+			this.butMoveTo.Visible = false;
+			this.butMoveTo.Click += new System.EventHandler(this.butMoveTo_Click);
+			// 
+			// labelNpi
+			// 
+			this.labelNpi.Location = new System.Drawing.Point(372, 119);
+			this.labelNpi.Name = "labelNpi";
+			this.labelNpi.Size = new System.Drawing.Size(137, 16);
+			this.labelNpi.TabIndex = 60;
+			this.labelNpi.Text = "NPI";
+			this.labelNpi.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelNpi.Visible = false;
+			// 
+			// labelErxAccountId
+			// 
+			this.labelErxAccountId.Location = new System.Drawing.Point(372, 145);
+			this.labelErxAccountId.Name = "labelErxAccountId";
+			this.labelErxAccountId.Size = new System.Drawing.Size(137, 16);
+			this.labelErxAccountId.TabIndex = 62;
+			this.labelErxAccountId.Text = "ErxAccountId";
+			this.labelErxAccountId.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.labelErxAccountId.Visible = false;
+			// 
+			// textNpi
+			// 
+			this.textNpi.Location = new System.Drawing.Point(511, 118);
+			this.textNpi.Name = "textNpi";
+			this.textNpi.Size = new System.Drawing.Size(75, 20);
+			this.textNpi.TabIndex = 63;
+			this.textNpi.Visible = false;
+			// 
+			// textErxAccountId
+			// 
+			this.textErxAccountId.Location = new System.Drawing.Point(511, 144);
+			this.textErxAccountId.Name = "textErxAccountId";
+			this.textErxAccountId.Size = new System.Drawing.Size(75, 20);
+			this.textErxAccountId.TabIndex = 64;
+			this.textErxAccountId.Visible = false;
+			// 
 			// FormRepeatChargeEdit
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(705, 545);
+			this.Controls.Add(this.textErxAccountId);
+			this.Controls.Add(this.textNpi);
+			this.Controls.Add(this.labelErxAccountId);
+			this.Controls.Add(this.labelNpi);
+			this.Controls.Add(this.labelPatNum);
+			this.Controls.Add(this.textPatNum);
+			this.Controls.Add(this.butMoveTo);
 			this.Controls.Add(this.textBillingDay);
 			this.Controls.Add(this.labelBillingCycleDay);
 			this.Controls.Add(this.groupBox1);
@@ -439,12 +531,12 @@ namespace OpenDental{
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
+			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
 			this.Name = "FormRepeatChargeEdit";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Repeat Charge";
 			this.Load += new System.EventHandler(this.FormRepeatChargeEdit_Load);
 			this.groupBox1.ResumeLayout(false);
@@ -456,8 +548,7 @@ namespace OpenDental{
 		#endregion
 
 		private void FormRepeatChargeEdit_Load(object sender,EventArgs e) {
-			//Set the title bar to show the patient's name much like the main screen does.
-			Text+=" - "+Patients.GetLim(RepeatCur.PatNum).GetNameLF();
+			SetPatient();
 			if(IsNew){
 				FormProcCodes FormP=new FormProcCodes();
 				FormP.IsSelectionMode=true;
@@ -487,6 +578,29 @@ namespace OpenDental{
 				textDateStop.Text=RepeatCur.DateStop.ToShortDateString();
 			}
 			textNote.Text=RepeatCur.Note;
+			_isErx=false;
+			if(PrefC.GetBool(PrefName.DistributorKey) && Regex.IsMatch(RepeatCur.ProcCode,"^Z[0-9]{3,}$")) {//Is eRx if HQ and a using an eRx Z code.
+				_isErx=true;
+				labelPatNum.Visible=true;
+				textPatNum.Visible=true;
+				butMoveTo.Visible=true;
+				labelNpi.Visible=true;
+				textNpi.Visible=true;
+				labelErxAccountId.Visible=true;
+				textErxAccountId.Visible=true;
+				if(!IsNew) {//Existing eRx repeating charge.
+					Match m=Regex.Match(RepeatCur.Note,"^NPI=([0-9]{10})(  ErxAccountId=([0-9]+\\-[a-zA-Z0-9]{5}))?(\r\n)?",RegexOptions.IgnoreCase);
+					if(m.Success) {
+						textNpi.Text=m.Result("$1");
+						textErxAccountId.Text=m.Result("$3");
+						textNote.Text=RepeatCur.Note.Substring(m.Length);//We use m.length so we can additionally skip the newline if present.
+					}
+					textNpi.ReadOnly=true;
+					if(textErxAccountId.Text!="") {
+						textErxAccountId.ReadOnly=true;
+					}
+				}
+			}
 			checkCopyNoteToProc.Checked=RepeatCur.CopyNoteToProc;
 			checkCreatesClaim.Checked=RepeatCur.CreatesClaim;
 			checkIsEnabled.Checked=RepeatCur.IsEnabled;
@@ -523,6 +637,12 @@ namespace OpenDental{
 				labelBillingCycleDay.Visible=true;
 				textBillingDay.Visible=true;
 			}
+		}
+
+		private void SetPatient() {
+			//Set the title bar to show the patient's name much like the main screen does.
+			Text+=" - "+Patients.GetLim(RepeatCur.PatNum).GetNameLF();
+			textPatNum.Text=RepeatCur.PatNum.ToString();
 		}
 
 		///<summary>Adds the procedure code of the repeating charge to a credit card on the patient's account if the user okays it.</summary>
@@ -611,6 +731,25 @@ namespace OpenDental{
 			textChargeAmt.Text=(PIn.Double(textTotalAmount.Text)/PIn.Double(textNumOfCharges.Text)).ToString("F");
 		}
 
+	///<summary>This button is only visible internally and for other distributors.</summary>
+		private void butMoveTo_Click(object sender,EventArgs e) {
+			if(!Regex.IsMatch(textErxAccountId.Text,"^[0-9]+\\-[a-zA-Z0-9]{5}$")) {
+				MsgBox.Show(this,"A valid ErxAccountId is required before moving this eRx repeating charge to another customer.  "
+					+"The ErxAccountId is typically filled in automatically when running eRx billing.  You can manually enter by "
+					+"logging into the eRx portal and clicking the Maintain Top-Level Account Kids link, "
+					+"then locate the customer account in the list and copy the customer Account ID into the ErxAccountId of this repeating charge.");
+				return;
+			}
+			FormPatientSelect form=new FormPatientSelect();
+			if(form.ShowDialog()!=DialogResult.OK) {
+				return;
+			}
+			RepeatCur.PatNum=form.SelectedPatNum;
+			SetPatient();
+			Patient pat=Patients.GetPat(RepeatCur.PatNum);
+			textBillingDay.Text=pat.BillingCycleDay.ToString();
+		}
+
 		private void butDelete_Click(object sender, EventArgs e) {
 			RepeatCharges.Delete(RepeatCur);
 			DialogResult=DialogResult.OK;
@@ -641,6 +780,14 @@ namespace OpenDental{
 					return;
 				}
 			}
+			if(_isErx && !Regex.IsMatch(textNpi.Text,"^[0-9]{10}$")) {
+				MsgBox.Show(this,"Invalid NPI.  Must be 10 digits.");
+				return;
+			}
+			if(_isErx && textErxAccountId.Text!="" && !Regex.IsMatch(textErxAccountId.Text,"^[0-9]+\\-[a-zA-Z0-9]{5}$")) {
+				MsgBox.Show(this,"Invalid ErxAccountId.");
+				return;
+			}
 			if(PrefC.GetBool(PrefName.BillingUseBillingCycleDay) && textBillingDay.Text!="") {
 				Patient patOld=Patients.GetPat(RepeatCur.PatNum);
 				Patient patNew=patOld.Copy();
@@ -651,7 +798,19 @@ namespace OpenDental{
 			RepeatCur.ChargeAmt=PIn.Double(textChargeAmt.Text);
 			RepeatCur.DateStart=PIn.Date(textDateStart.Text);
 			RepeatCur.DateStop=PIn.Date(textDateStop.Text);
-			RepeatCur.Note=textNote.Text;
+			if(_isErx) {
+				RepeatCur.Note="NPI="+textNpi.Text;
+				if(textErxAccountId.Text!="") {
+					RepeatCur.Note+="  ErxAccountId="+textErxAccountId.Text;
+				}
+				if(textNote.Text!="") {//The user typed a comment.
+					RepeatCur.Note+="\r\n";
+				}
+				RepeatCur.Note+=textNote.Text;
+			}
+			else {
+				RepeatCur.Note=textNote.Text;
+			}
 			RepeatCur.CopyNoteToProc=checkCopyNoteToProc.Checked;
 			RepeatCur.IsEnabled=checkIsEnabled.Checked;
 			RepeatCur.CreatesClaim=checkCreatesClaim.Checked;

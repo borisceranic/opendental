@@ -78,14 +78,13 @@ namespace OpenDentBusiness{
 			Db.NonQ(command);
 		}
 
-		///<summary>For internal use only.  Returns the eRx repeating charges on the specified customer account.  The NPI does not have its own field, it is stored in the repeating charge note.</summary>
-		public static List<RepeatCharge> GetForErx(long patNum) {
+		///<summary>For internal use only.  Returns all eRx repeating charges for all customers.</summary>
+		public static List<RepeatCharge> GetForErx() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<RepeatCharge>>(MethodBase.GetCurrentMethod(),patNum);
+				return Meth.GetObject<List<RepeatCharge>>(MethodBase.GetCurrentMethod());
 			}
 			//Does not need to be Oracle compatible because this is an internal tool only.
-			string command="SELECT * FROM repeatcharge "
-				+"WHERE PatNum="+POut.Long(patNum)+" AND ProcCode REGEXP '^Z[0-9]{3,}$'";
+			string command="SELECT * FROM repeatcharge WHERE ProcCode REGEXP '^Z[0-9]{3,}$'";
 			return Crud.RepeatChargeCrud.SelectMany(command);
 		}
 
