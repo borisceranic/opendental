@@ -644,7 +644,7 @@ namespace OpenDentBusiness {
 				+"FROM appointment "
 				+"INNER JOIN patient ON patient.PatNum=appointment.PatNum "
 				+"INNER JOIN procedurelog ON procedurelog.AptNum=appointment.AptNum "
-				+"WHERE AptStatus="+POut.Int((int)ApptStatus.Scheduled)+" "
+				+"WHERE AptStatus IN("+POut.Int((int)ApptStatus.Scheduled)+","+POut.Int((int)ApptStatus.ASAP)+") "
 				+"AND procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+" "
 				+"ORDER BY PatName";
 			table=Db.GetTable(command);
