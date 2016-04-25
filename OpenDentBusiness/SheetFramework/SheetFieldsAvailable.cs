@@ -363,7 +363,7 @@ namespace OpenDentBusiness{
 				//most fields turned out to work best as static text.
 			}
 			else if(outInCheck==OutInCheck.In) {
-				//Not applicable
+				list.Add(NewInput("misc"));
 			}
 			else if(outInCheck==OutInCheck.Check) {
 				//Not applicable
