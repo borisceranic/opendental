@@ -116,7 +116,12 @@ namespace OpenDental {
 					if(repeatChargeForNpi==null) {
 						continue;//The information needed to reformat this repeating charge is not available from NewCrop at this time.
 					}
-					repeatChargeForNpi.Note=repeatChargeForNpi.Note.Insert(14,"\r\nErxAccountId="+charge.ErxAccountId);//Insert just after NPI=##########
+					string npi=repeatChargeForNpi.Note.Substring(0,14);//NPI=##########
+					string comments=repeatChargeForNpi.Note.Substring(npi.Length);
+					if(comments.Length > 0 && !comments.StartsWith("\r\n")) {
+						comments="\r\n"+comments;
+					}
+					repeatChargeForNpi.Note=npi+"  ErxAccountId="+charge.ErxAccountId+comments;					
 					RepeatCharges.Update(repeatChargeForNpi);
 					listErxUpdateRepeatCharges.Remove(repeatChargeForNpi);//Remove from list now that format is correct.  Also prevents multiple edits.
 				}
@@ -310,8 +315,7 @@ namespace OpenDental {
 					repeatCur.ProcCode=GetProcCodeForNewCharge(charge.PatNumForRegKey);
 					repeatCur.ChargeAmt=15;//15$/month
 					repeatCur.DateStart=dateErxCharge;
-					repeatCur.Note="NPI="+charge.NPI+"\r\n"
-						+"ErxAccountId="+charge.ErxAccountId;
+					repeatCur.Note="NPI="+charge.NPI+"  ErxAccountId="+charge.ErxAccountId;
 					repeatCur.IsEnabled=true;
 					repeatCur.CopyNoteToProc=true;//Copy the billing note to the procedure note by default so that the customer can see the NPI the charge corresponds to. Can be unchecked by user if a private note is added later (rare).
 					if(!RepeatCharges.ActiveRepeatChargeExists(repeatCur.PatNum)) { 
@@ -354,6 +358,7 @@ namespace OpenDental {
 			FillGrid();
 			Cursor=Cursors.Default;
 			StringBuilder sbMsg=new StringBuilder();
+			sbMsg.AppendLine("Done.");
 			if(numSkipped>0) {
 				sbMsg.AppendLine("Number skipped due to old DateBilling (over 3 months ago): "+numSkipped);
 			}
