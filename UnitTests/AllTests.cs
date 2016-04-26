@@ -2978,7 +2978,7 @@ namespace UnitTests {
 			Patients.Update(pat,patOld);
 			Prefs.UpdateBool(PrefName.BillingUseBillingCycleDay,true);
 			UpdateHistoryT.CreateUpdateHistory("16.1.1.0");
-			DataValid.SetInvalid(InvalidType.Prefs);
+			Prefs.RefreshCache();
 			//delete all existing repeating charges
 			List<RepeatCharge> listRepeatingCharges=RepeatCharges.Refresh(0).ToList();
 			listRepeatingCharges.ForEach(x => RepeatCharges.Delete(x));
@@ -3117,7 +3117,7 @@ namespace UnitTests {
 			Patients.Update(pat,patOld);
 			Prefs.UpdateBool(PrefName.BillingUseBillingCycleDay,true);
 			UpdateHistoryT.CreateUpdateHistory("16.1.1.0");//Sets a timestamp that determines which logic we use to calculate repeate charge procedures
-			DataValid.SetInvalid(InvalidType.Prefs);
+			Prefs.RefreshCache();
 			List<RepeatCharge> listRepeatingCharges=RepeatCharges.Refresh(0).ToList();
 			listRepeatingCharges.ForEach(x => RepeatCharges.Delete(x));
 			DateTime dateRun=new DateTime(DateTime.Today.AddMonths(2).Year,DateTime.Today.AddMonths(2).Month,15);//The 15th of two months from now
@@ -3259,7 +3259,7 @@ namespace UnitTests {
 			Patients.Update(pat,patOld);
 			Prefs.UpdateBool(PrefName.BillingUseBillingCycleDay,true);
 			UpdateHistoryT.CreateUpdateHistory("16.1.1.0");
-			DataValid.SetInvalid(InvalidType.Prefs);
+			Prefs.RefreshCache();
 			List<RepeatCharge> listRepeatingCharges=RepeatCharges.Refresh(0).ToList();
 			listRepeatingCharges.ForEach(x => RepeatCharges.Delete(x));
 			DateTime dateRun=new DateTime(2015,12,15);
@@ -3331,7 +3331,7 @@ namespace UnitTests {
 			Patients.Update(pat,patOld);
 			Prefs.UpdateBool(PrefName.BillingUseBillingCycleDay,true);
 			UpdateHistoryT.CreateUpdateHistory("16.1.1.0");
-			DataValid.SetInvalid(InvalidType.Prefs);
+			Prefs.RefreshCache();
 			List<RepeatCharge> listRepeatingCharges=RepeatCharges.Refresh(0).ToList();
 			listRepeatingCharges.ForEach(x => RepeatCharges.Delete(x));
 			DateTime dateRun=new DateTime(2015,12,15);
