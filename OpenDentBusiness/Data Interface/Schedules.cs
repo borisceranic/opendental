@@ -431,7 +431,7 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Schedule>>(MethodBase.GetCurrentMethod(),dateClear);
 			}
-			string command="SELECT * FROM Schedule Where SchedDate="+POut.Date(dateClear);
+			string command="SELECT * FROM schedule Where SchedDate="+POut.Date(dateClear);
 			return Crud.ScheduleCrud.SelectMany(command);
 		}
 		
