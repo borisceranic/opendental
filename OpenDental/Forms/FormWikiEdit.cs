@@ -26,6 +26,7 @@ namespace OpenDental {
 			InitializeComponent();
 			Lan.F(this);
 			this.textContent.TextChanged += new System.EventHandler(this.textContent_TextChanged);
+			WikiSaveEvent.Fired+=WikiSaveEvent_Fired;
 		}
 
 		private void FormWikiEdit_Load(object sender,EventArgs e) {			
@@ -320,6 +321,12 @@ namespace OpenDental {
 			Undo_Click();
 		}
 
+		private void WikiSaveEvent_Fired(ODEventArgs e) {
+			if(e.Name=="ForceSaveWiki") {
+				SaveDraft_Click(false);
+			}
+		}
+
 		private void Save_Click() {
       if(!ValidateWikiPage(true)) {
         return;
@@ -382,15 +389,15 @@ namespace OpenDental {
 		}
 
 		///<summary>Saves the the currently edited Wikipage as a draft. This method is copied from Save_Click with a few modifications.</summary>
-		private void SaveDraft_Click() {
-			if(WikiPageCur.IsNew) {
+		private void SaveDraft_Click(bool showMsgBox=true) {
+			if(showMsgBox && WikiPageCur.IsNew) {
 				MsgBox.Show(this,"You may not save a new Wiki page as a draft.  Save the Wiki page, then create a draft.");
 				return;
 			}
-			if(!ValidateWikiPage(true)) {
+			if(!ValidateWikiPage(true,showMsgBox)) {
 				return;
 			}
-      if(_isInvalidPreview) {
+      if(showMsgBox && _isInvalidPreview) {
         MsgBox.Show(this,"This page is in an invalid state and cannot be saved as a draft.");
         return;
       }
@@ -430,7 +437,9 @@ namespace OpenDental {
 				}
 				catch (Exception ex){
 					//should never happen due to the if Draft check above.
-					MessageBox.Show(ex.Message);
+					if(showMsgBox) {
+						MessageBox.Show(ex.Message);
+					}
 					return;
 				}
 			}
@@ -670,7 +679,7 @@ namespace OpenDental {
 		}
 
 		///<summary>Validates content, and keywords.  isForSaving can be false if just validating for refresh.</summary>
-		private bool ValidateWikiPage(bool isForSaving) {
+		private bool ValidateWikiPage(bool isForSaving,bool showMsgBox=true) {
 			//xml validation----------------------------------------------------------------------------------------------------
 			string s=textContent.Text;
 			//"<",">", and "&"-----------------------------------------------------------------------------------------------------------
@@ -684,7 +693,9 @@ namespace OpenDental {
 				doc.Load(reader);
 			}
 			catch(Exception ex){
-				MessageBox.Show(ex.Message);
+				if(showMsgBox) {
+					MessageBox.Show(ex.Message);
+				}
 				return false;
 			}
 			try{
@@ -692,7 +703,9 @@ namespace OpenDental {
 				ValidateNodes(doc.DocumentElement.ChildNodes);
 			}
 			catch(Exception ex){
-				MessageBox.Show(ex.Message);
+				if(showMsgBox) {
+					MessageBox.Show(ex.Message);
+				}
 				return false;
 			}
 			//Cannot have CR within tag definition---------------------------------------------------------------------------------
@@ -701,7 +714,9 @@ namespace OpenDental {
 			MatchCollection tagMatches=Regex.Matches(textContent.Text,"(?<!&)<.*?>",RegexOptions.Singleline);
 			for(int i=0;i<tagMatches.Count;i++) {
 				if(tagMatches[i].ToString().Contains("\r\n")) {
-					MessageBox.Show(Lan.g(this,"Tag definitions cannot contain a return line: ")+tagMatches[i].Value.Replace("\r\n",""));
+					if(showMsgBox) {
+						MessageBox.Show(Lan.g(this,"Tag definitions cannot contain a return line: ")+tagMatches[i].Value.Replace("\r\n",""));
+					}
 					return false;
 				}
 			}
@@ -715,14 +730,18 @@ namespace OpenDental {
 			}
 			MatchCollection matches=Regex.Matches(textContent.Text,@"\[\[(img:).*?\]\]");// [[img:myimage.jpg]]
 			if(matches.Count>0 && !PrefC.AtoZfolderUsed) {
-				MsgBox.Show(this,"Cannot use images in wiki if storing images in database.");
+				if(showMsgBox) {
+					MsgBox.Show(this,"Cannot use images in wiki if storing images in database.");
+				}
 				return false;
 			}
 			if(isForSaving) {
 				for(int i=0;i<matches.Count;i++) {
 					string imgPath=ODFileUtils.CombinePaths(wikiImagePath,matches[i].Value.Substring(6).Trim(']'));
 					if(!System.IO.File.Exists(imgPath)) {
-						MessageBox.Show(Lan.g(this,"Not allowed to save because image does not exist: ")+imgPath);
+						if(showMsgBox) {
+							MessageBox.Show(Lan.g(this,"Not allowed to save because image does not exist: ")+imgPath);
+						}
 						return false;
 					}
 				}
@@ -731,7 +750,9 @@ namespace OpenDental {
 			matches=Regex.Matches(textContent.Text,@"\[\[(list:).*?\]\]");// [[list:CustomList]]
 			foreach(Match match in matches) {
 				if(!WikiLists.CheckExists(match.Value.Substring(7).Trim(']'))) {
-					MessageBox.Show(Lan.g(this,"Wiki list does not exist in database")+" : "+match.Value.Substring(7).Trim(']'));
+					if(showMsgBox) {
+						MessageBox.Show(Lan.g(this,"Wiki list does not exist in database")+" : "+match.Value.Substring(7).Trim(']'));
+					}
 					return false;
 				}
 			}
@@ -740,21 +761,29 @@ namespace OpenDental {
 			for(int i=0;i<lines.Length;i++) {
 				if(lines[i].Trim().StartsWith("*")) {
 					if(!lines[i].StartsWith("*")) {
-						MsgBox.Show(this,"Stars used for lists may not have a space before them.");
+						if(showMsgBox) {
+							MsgBox.Show(this,"Stars used for lists may not have a space before them.");
+						}
 						return false;
 					}
 					if(lines[i].Trim().StartsWith("* ")) {
-						MsgBox.Show(this,"Stars used for lists may not have a space after them.");
+						if(showMsgBox) {
+							MsgBox.Show(this,"Stars used for lists may not have a space after them.");
+						}
 						return false;
 					}
 				}
 				if(lines[i].Trim().StartsWith("#")) {
 					if(!lines[i].StartsWith("#")) {
-						MsgBox.Show(this,"Hashes used for lists may not have a space before them.");
+						if(showMsgBox) {
+							MsgBox.Show(this,"Hashes used for lists may not have a space before them.");
+						}
 						return false;
 					}
 					if(lines[i].Trim().StartsWith("# ")) {
-						MsgBox.Show(this,"Hashes used for lists may not have a space after them.");
+						if(showMsgBox) {
+							MsgBox.Show(this,"Hashes used for lists may not have a space after them.");
+						}
 						return false;
 					}
 				}
@@ -763,7 +792,9 @@ namespace OpenDental {
 			matches=Regex.Matches(textContent.Text,@"\[\[.*?\]\]");
 			foreach(Match match in matches) {
 				if(match.Value.Contains("\"") && !match.Value.StartsWith("[[color:") && !match.Value.StartsWith("[[font:")) {//allow colored text to have quotes.
-					MessageBox.Show(Lan.g(this,"Link cannot contain double quotes: ")+match.Value);
+					if(showMsgBox) {
+						MessageBox.Show(Lan.g(this,"Link cannot contain double quotes: ")+match.Value);
+					}
 					return false;
 				}
 				//This is not needed because our regex doesn't even catch them if the span a line break.  It's just interpreted as plain text.
@@ -783,7 +814,9 @@ namespace OpenDental {
 				}
 				else {
 					if(match.Value.Contains("|")) {
-						MessageBox.Show(Lan.g(this,"Internal link cannot contain a pipe character:")+match.Value);
+						if(showMsgBox) {
+							MessageBox.Show(Lan.g(this,"Internal link cannot contain a pipe character:")+match.Value);
+						}
 						return false;
 					}
 				}
@@ -800,36 +833,50 @@ namespace OpenDental {
 			matches=Regex.Matches(s,@"(<body>?|[\r\n|\r|\n]?)(\{\|(.+?)\|\})(</body>?|[\r\n|\r|\n]?)",RegexOptions.Singleline);
 			foreach(Match match in matches) {
 				if(match.Groups[1].Value=="") {
-					MsgBox.Show(this,"A table markup section must begin with {| on a new line.");
+					if(showMsgBox) {
+						MsgBox.Show(this,"A table markup section must begin with {| on a new line.");
+					}
 					return false;
 				}
 				if(match.Groups[4].Value=="") {
-					MsgBox.Show(this,"A table markup section must end with |} on a new line by itself.");
+					if(showMsgBox) {
+						MsgBox.Show(this,"A table markup section must end with |} on a new line by itself.");
+					}
 					return false;
 				}
 				lines=match.Groups[2].Value.Split(new string[] { "{|\r\n","\r\n|-\r\n","\r\n|}" },StringSplitOptions.RemoveEmptyEntries);
 				if(!match.Groups[2].Value.StartsWith("{|")) {
-					MsgBox.Show(this,"The first line of a table markup section must be exactly {|, with no additional characters.");
+					if(showMsgBox) {
+						MsgBox.Show(this,"The first line of a table markup section must be exactly {|, with no additional characters.");
+					}
 					return false;
 				}
 				if(!lines[0].StartsWith("!")) {
-					MsgBox.Show(this,"The second line of a table markup section must start with ! to indicate column headers.");
+					if(showMsgBox) {
+						MsgBox.Show(this,"The second line of a table markup section must start with ! to indicate column headers.");
+					}
 					return false;
 				}
 				if(lines[0].StartsWith("! ")) {
-					MsgBox.Show(this,"In the table, at line 2, there cannot be a space after the first !");
+					if(showMsgBox) {
+						MsgBox.Show(this,"In the table, at line 2, there cannot be a space after the first !");
+					}
 					return false;
 				}
 				string[] cells=lines[0].Substring(1).Split(new string[] { "!!" },StringSplitOptions.None);//this also strips off the leading !
 				for(int c=0;c<cells.Length;c++) {
 					if(!Regex.IsMatch(cells[c],@"^(Width="")\d+""\|")) {//e.g. Width="90"| 
-						MsgBox.Show(this,"In the table markup, each header must be formatted like this: Width=\"#\"|...");
+						if(showMsgBox) {
+							MsgBox.Show(this,"In the table markup, each header must be formatted like this: Width=\"#\"|...");
+						}
 						return false;
 					}
 				}
 				for(int i=1;i<lines.Length;i++) {//loop through the lines after the header
 					if(!lines[i].StartsWith("|")) {
-						MessageBox.Show(Lan.g(this,"Table rows must start with |.  At line ")+(i+1).ToString()+Lan.g(this,", this was found instead:")+lines[i]);
+						if(showMsgBox) {
+							MessageBox.Show(Lan.g(this,"Table rows must start with |.  At line ")+(i+1).ToString()+Lan.g(this,", this was found instead:")+lines[i]);
+						}
 						return false;
 					}
 					//if(lines[i].StartsWith("| ")) {
@@ -840,7 +887,9 @@ namespace OpenDental {
 					//I guess we don't really care what they put in a row.  We can just interpret garbage as a single cell.
 				}
 				if(!match.Groups[2].Value.EndsWith("\r\n|}")) {
-					MsgBox.Show(this,"The last line of a table markup section must be exactly |}, with no additional characters.");
+					if(showMsgBox) {
+						MsgBox.Show(this,"The last line of a table markup section must be exactly |}, with no additional characters.");
+					}
 					return false;
 				}
 			}

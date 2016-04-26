@@ -7512,6 +7512,9 @@ namespace OpenDental{
 				//Currently there is no way to tell if LogOffNow got called from a user initiating the log off, or if this is the auto log off feature.
 				//Therefore, when the auto log off feature is enabled, we will forcefully close all forms because some forms might have pop ups within FormClosing prevent the form from closing.
 				//That introduces the possibility of sensitive information staying visible in the background while the program waits for user input.
+				if(openForm.Name=="FormWikiEdit") {
+					WikiSaveEvent.Fire(new ODEventArgs("ForceSaveWiki"));
+				}
 				if(isForceClose) {
 					openForm.Dispose();//Strictly disposing of a form will not perform the closing events.
 				}
