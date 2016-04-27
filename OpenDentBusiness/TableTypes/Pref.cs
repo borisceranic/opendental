@@ -197,6 +197,8 @@ namespace OpenDentBusiness {
 		ClaimsValidateACN,
 		ClearinghouseDefaultDent,
 		ClearinghouseDefaultMed,
+		///<summary>Boolean.  0 by default.  If enabled, lists clinics in alphabetical order.</summary>
+		ClinicListIsAlphabetical,
 		///<summary>String, "Workstation"(default), "User", "None". See FormMisc. Determines how recently viewed clinics should be tracked.</summary>
 		ClinicTrackLast,
 		ColorTheme,

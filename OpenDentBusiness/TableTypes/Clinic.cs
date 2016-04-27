@@ -4,11 +4,12 @@ namespace OpenDentBusiness{
 
 	///<summary>A clinic is usually a separate physical office location.  If multiple clinics are sharing one database, then this is used.  Patients, Operatories, Claims, and many other types of objects can be assigned to a clinic.</summary>
 	[Serializable()]
+	[CrudTable(IsSynchable=true)]
 	public class Clinic:TableBase {
 		///<summary>Primary key.  Used in patient,payment,claimpayment,appointment,procedurelog, etc.</summary>
 		[CrudColumn(IsPriKey=true)]
 		public long ClinicNum;
-		///<summary>.</summary>
+		///<summary>Clinics cache is sorted by Description if preference ClinicListIsAlphabetical is true.</summary>
 		public string Description;
 		///<summary>.</summary>
 		public string Address;
@@ -66,6 +67,8 @@ namespace OpenDentBusiness{
 		public bool UseBillAddrOnClaims;
 		///<summary>FK to definition.DefNum when definition.DefCat is Regions.</summary>
 		public long Region;
+		///<summary>0 based.  Clinics cache is sorted by ItemOrder if the preference ClinicListIsAlphabetical is false.</summary>
+		public int ItemOrder;
 
 		///<summary>Returns a copy of this Clinic.</summary>
 		public Clinic Copy(){

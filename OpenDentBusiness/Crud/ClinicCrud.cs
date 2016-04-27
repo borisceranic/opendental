@@ -75,6 +75,7 @@ namespace OpenDentBusiness.Crud{
 				clinic.IsMedicalOnly      = PIn.Bool  (row["IsMedicalOnly"].ToString());
 				clinic.UseBillAddrOnClaims= PIn.Bool  (row["UseBillAddrOnClaims"].ToString());
 				clinic.Region             = PIn.Long  (row["Region"].ToString());
+				clinic.ItemOrder          = PIn.Int   (row["ItemOrder"].ToString());
 				retVal.Add(clinic);
 			}
 			return retVal;
@@ -115,6 +116,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("IsMedicalOnly");
 			table.Columns.Add("UseBillAddrOnClaims");
 			table.Columns.Add("Region");
+			table.Columns.Add("ItemOrder");
 			foreach(Clinic clinic in listClinics) {
 				table.Rows.Add(new object[] {
 					POut.Long  (clinic.ClinicNum),
@@ -146,6 +148,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Bool  (clinic.IsMedicalOnly),
 					POut.Bool  (clinic.UseBillAddrOnClaims),
 					POut.Long  (clinic.Region),
+					POut.Int   (clinic.ItemOrder),
 				});
 			}
 			return table;
@@ -186,7 +189,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ClinicNum,";
 			}
-			command+="Description,Address,Address2,City,State,Zip,BillingAddress,BillingAddress2,BillingCity,BillingState,BillingZip,PayToAddress,PayToAddress2,PayToCity,PayToState,PayToZip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsMonthlyLimit,IsMedicalOnly,UseBillAddrOnClaims,Region) VALUES(";
+			command+="Description,Address,Address2,City,State,Zip,BillingAddress,BillingAddress2,BillingCity,BillingState,BillingZip,PayToAddress,PayToAddress2,PayToCity,PayToState,PayToZip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsMonthlyLimit,IsMedicalOnly,UseBillAddrOnClaims,Region,ItemOrder) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(clinic.ClinicNum)+",";
 			}
@@ -218,7 +221,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.Double(clinic.SmsMonthlyLimit)+"',"
 				+    POut.Bool  (clinic.IsMedicalOnly)+","
 				+    POut.Bool  (clinic.UseBillAddrOnClaims)+","
-				+    POut.Long  (clinic.Region)+")";
+				+    POut.Long  (clinic.Region)+","
+				+    POut.Int   (clinic.ItemOrder)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -251,7 +255,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ClinicNum,";
 			}
-			command+="Description,Address,Address2,City,State,Zip,BillingAddress,BillingAddress2,BillingCity,BillingState,BillingZip,PayToAddress,PayToAddress2,PayToCity,PayToState,PayToZip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsMonthlyLimit,IsMedicalOnly,UseBillAddrOnClaims,Region) VALUES(";
+			command+="Description,Address,Address2,City,State,Zip,BillingAddress,BillingAddress2,BillingCity,BillingState,BillingZip,PayToAddress,PayToAddress2,PayToCity,PayToState,PayToZip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsMonthlyLimit,IsMedicalOnly,UseBillAddrOnClaims,Region,ItemOrder) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(clinic.ClinicNum)+",";
 			}
@@ -283,7 +287,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.Double(clinic.SmsMonthlyLimit)+"',"
 				+    POut.Bool  (clinic.IsMedicalOnly)+","
 				+    POut.Bool  (clinic.UseBillAddrOnClaims)+","
-				+    POut.Long  (clinic.Region)+")";
+				+    POut.Long  (clinic.Region)+","
+				+    POut.Int   (clinic.ItemOrder)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -323,7 +328,8 @@ namespace OpenDentBusiness.Crud{
 				+"SmsMonthlyLimit    = '"+POut.Double(clinic.SmsMonthlyLimit)+"', "
 				+"IsMedicalOnly      =  "+POut.Bool  (clinic.IsMedicalOnly)+", "
 				+"UseBillAddrOnClaims=  "+POut.Bool  (clinic.UseBillAddrOnClaims)+", "
-				+"Region             =  "+POut.Long  (clinic.Region)+" "
+				+"Region             =  "+POut.Long  (clinic.Region)+", "
+				+"ItemOrder          =  "+POut.Int   (clinic.ItemOrder)+" "
 				+"WHERE ClinicNum = "+POut.Long(clinic.ClinicNum);
 			Db.NonQ(command);
 		}
@@ -443,6 +449,10 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="Region = "+POut.Long(clinic.Region)+"";
 			}
+			if(clinic.ItemOrder != oldClinic.ItemOrder) {
+				if(command!=""){ command+=",";}
+				command+="ItemOrder = "+POut.Int(clinic.ItemOrder)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -539,6 +549,9 @@ namespace OpenDentBusiness.Crud{
 			if(clinic.Region != oldClinic.Region) {
 				return true;
 			}
+			if(clinic.ItemOrder != oldClinic.ItemOrder) {
+				return true;
+			}
 			return false;
 		}
 
@@ -547,6 +560,76 @@ namespace OpenDentBusiness.Crud{
 			string command="DELETE FROM clinic "
 				+"WHERE ClinicNum = "+POut.Long(clinicNum);
 			Db.NonQ(command);
+		}
+
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.  Returns true if db changes were made.</summary>
+		public static bool Sync(List<Clinic> listNew,List<Clinic> listDB) {
+			//Adding items to lists changes the order of operation. All inserts are completed first, then updates, then deletes.
+			List<Clinic> listIns    =new List<Clinic>();
+			List<Clinic> listUpdNew =new List<Clinic>();
+			List<Clinic> listUpdDB  =new List<Clinic>();
+			List<Clinic> listDel    =new List<Clinic>();
+			listNew.Sort((Clinic x,Clinic y) => { return x.ClinicNum.CompareTo(y.ClinicNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
+			listDB.Sort((Clinic x,Clinic y) => { return x.ClinicNum.CompareTo(y.ClinicNum); });//Anonymous function, sorts by compairing PK.  Lambda expressions are not allowed, this is the one and only exception.  JS approved.
+			int idxNew=0;
+			int idxDB=0;
+			int rowsUpdatedCount=0;
+			Clinic fieldNew;
+			Clinic fieldDB;
+			//Because both lists have been sorted using the same criteria, we can now walk each list to determine which list contians the next element.  The next element is determined by Primary Key.
+			//If the New list contains the next item it will be inserted.  If the DB contains the next item, it will be deleted.  If both lists contain the next item, the item will be updated.
+			while(idxNew<listNew.Count || idxDB<listDB.Count) {
+				fieldNew=null;
+				if(idxNew<listNew.Count) {
+					fieldNew=listNew[idxNew];
+				}
+				fieldDB=null;
+				if(idxDB<listDB.Count) {
+					fieldDB=listDB[idxDB];
+				}
+				//begin compare
+				if(fieldNew!=null && fieldDB==null) {//listNew has more items, listDB does not.
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew==null && fieldDB!=null) {//listDB has more items, listNew does not.
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				else if(fieldNew.ClinicNum<fieldDB.ClinicNum) {//newPK less than dbPK, newItem is 'next'
+					listIns.Add(fieldNew);
+					idxNew++;
+					continue;
+				}
+				else if(fieldNew.ClinicNum>fieldDB.ClinicNum) {//dbPK less than newPK, dbItem is 'next'
+					listDel.Add(fieldDB);
+					idxDB++;
+					continue;
+				}
+				//Both lists contain the 'next' item, update required
+				listUpdNew.Add(fieldNew);
+				listUpdDB.Add(fieldDB);
+				idxNew++;
+				idxDB++;
+			}
+			//Commit changes to DB
+			for(int i=0;i<listIns.Count;i++) {
+				Insert(listIns[i]);
+			}
+			for(int i=0;i<listUpdNew.Count;i++) {
+				if(Update(listUpdNew[i],listUpdDB[i])){
+					rowsUpdatedCount++;
+				}
+			}
+			for(int i=0;i<listDel.Count;i++) {
+				Delete(listDel[i].ClinicNum);
+			}
+			if(rowsUpdatedCount>0 || listIns.Count>0 || listDel.Count>0) {
+				return true;
+			}
+			return false;
 		}
 
 	}

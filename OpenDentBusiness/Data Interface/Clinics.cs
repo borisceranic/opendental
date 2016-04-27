@@ -159,7 +159,13 @@ namespace OpenDentBusiness{
 		///<summary>Refresh all clinics.  Not actually part of official cache.</summary>
 		public static DataTable RefreshCache() {
 			//No need to check RemotingRole; Calls GetTableRemotelyIfNeeded().
-			string command="SELECT * FROM clinic";
+			string command="SELECT * FROM clinic ";
+			if(PrefC.GetBool(PrefName.ClinicListIsAlphabetical)) {
+				command+="ORDER BY Description";
+			}
+			else { 
+				command+="ORDER BY ItemOrder";
+			}
 			DataTable table=Cache.GetTableRemotelyIfNeeded(MethodBase.GetCurrentMethod(),command);
 			table.TableName="clinic";
 			FillCache(table);
@@ -362,6 +368,23 @@ namespace OpenDentBusiness{
 				listClinics.Add(GetClinic(listClinicNums[i]));
 			}
 			return listClinics;
+		}
+
+		///<summary>Pulls all clinics from cache.</summary>
+		public static List<Clinic> GetClinics() {
+			//No need to check to RemotingRole; no call to db.
+			List<Clinic> retVal=new List<Clinic>();
+			Clinic[] arrayClinics=GetList();
+			foreach(Clinic clinic in arrayClinics) {
+				retVal.Add(clinic);
+			}
+			return retVal;
+		}
+
+		///<summary>Syncs two supplied lists of Clinics.</summary>
+		public static bool Sync(List<Clinic> listNew,List<Clinic> listOld) {
+			//No need to check RemotingRole; no call to db.
+			return Crud.ClinicCrud.Sync(listNew,listOld);
 		}
 
 		///<summary>Returns the patient's clinic based on the recall passed in.

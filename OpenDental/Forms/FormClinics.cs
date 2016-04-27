@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using OpenDental.UI;
+using System.Collections.Generic;
 
 namespace OpenDental{
 	/// <summary>
@@ -18,13 +19,17 @@ namespace OpenDental{
 		/// </summary>
 		private System.ComponentModel.Container components = null;
 		private System.Windows.Forms.Label label1;
-		private bool changed;
 		private UI.ODGrid gridMain;
 		public bool IsSelectionMode;
 		public long SelectedClinicNum;
 		private UI.Button butOK;
-		///<summary>Set this array prior to loading this window to use a custom list of clinics.  Otherwise, uses the cache.</summary>
-		public Clinic[] ArrayClinics;
+		private UI.Button butDown;
+		private UI.Button butUp;
+		private CheckBox checkOrderAlphabetical;
+		///<summary>Set this list prior to loading this window to use a custom list of clinics.  Otherwise, uses the cache.</summary>
+		public List<Clinic> _listClinics;
+		///<summary>This list will be a copy of _listclinics and is used for syncing on window closed.</summary>
+		public List<Clinic> _listClinicsOld;
 
 		///<summary></summary>
 		public FormClinics()
@@ -64,6 +69,9 @@ namespace OpenDental{
 			this.butAdd = new OpenDental.UI.Button();
 			this.butClose = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.butDown = new OpenDental.UI.Button();
+			this.butUp = new OpenDental.UI.Button();
+			this.checkOrderAlphabetical = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -80,6 +88,7 @@ namespace OpenDental{
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasAddButton = false;
 			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(12, 37);
@@ -139,10 +148,56 @@ namespace OpenDental{
 			this.butOK.Visible = false;
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// butDown
+			// 
+			this.butDown.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butDown.Autosize = true;
+			this.butDown.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butDown.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butDown.CornerRadius = 4F;
+			this.butDown.Image = global::OpenDental.Properties.Resources.down;
+			this.butDown.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butDown.Location = new System.Drawing.Point(307, 234);
+			this.butDown.Name = "butDown";
+			this.butDown.Size = new System.Drawing.Size(80, 26);
+			this.butDown.TabIndex = 14;
+			this.butDown.Text = "Down";
+			this.butDown.Click += new System.EventHandler(this.butDown_Click);
+			// 
+			// butUp
+			// 
+			this.butUp.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butUp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butUp.Autosize = true;
+			this.butUp.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butUp.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butUp.CornerRadius = 4F;
+			this.butUp.Image = global::OpenDental.Properties.Resources.up;
+			this.butUp.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butUp.Location = new System.Drawing.Point(307, 202);
+			this.butUp.Name = "butUp";
+			this.butUp.Size = new System.Drawing.Size(80, 26);
+			this.butUp.TabIndex = 15;
+			this.butUp.Text = "Up";
+			this.butUp.Click += new System.EventHandler(this.butUp_Click);
+			// 
+			// checkOrderAlphabetical
+			// 
+			this.checkOrderAlphabetical.Location = new System.Drawing.Point(307, 159);
+			this.checkOrderAlphabetical.Name = "checkOrderAlphabetical";
+			this.checkOrderAlphabetical.Size = new System.Drawing.Size(88, 37);
+			this.checkOrderAlphabetical.TabIndex = 16;
+			this.checkOrderAlphabetical.Text = "Order Alphabetical";
+			this.checkOrderAlphabetical.UseVisualStyleBackColor = true;
+			this.checkOrderAlphabetical.Click += new System.EventHandler(this.checkOrderAlphabetical_Click);
+			// 
 			// FormClinics
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(399, 610);
+			this.Controls.Add(this.checkOrderAlphabetical);
+			this.Controls.Add(this.butUp);
+			this.Controls.Add(this.butDown);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.label1);
@@ -154,7 +209,6 @@ namespace OpenDental{
 			this.MinimumSize = new System.Drawing.Size(415, 271);
 			this.Name = "FormClinics";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Clinics";
 			this.Closing += new System.ComponentModel.CancelEventHandler(this.FormClinics_Closing);
 			this.Load += new System.EventHandler(this.FormClinics_Load);
@@ -164,14 +218,32 @@ namespace OpenDental{
 		#endregion
 
 		private void FormClinics_Load(object sender, System.EventArgs e) {
-			if(ArrayClinics==null) {
-				Clinics.RefreshCache();
-				ArrayClinics=Clinics.GetList();
+			_listClinicsOld=new List<Clinic>();
+			if(_listClinics==null) {
+				_listClinics=Clinics.GetClinics();
+				foreach(Clinic clinic in _listClinics) {
+					_listClinicsOld.Add(clinic.Copy());
+				}
 			}
+			checkOrderAlphabetical.Checked=PrefC.GetBool(PrefName.ClinicListIsAlphabetical);
 			if(IsSelectionMode) {
 				butAdd.Visible=false;
 				butOK.Visible=true;
+				butUp.Visible=false;
+				butDown.Visible=false;
+				checkOrderAlphabetical.Visible=false;
 			}
+			else {
+				if(checkOrderAlphabetical.Checked) {
+					butUp.Enabled=false;
+					butDown.Enabled=false;
+				}
+				else {
+					butUp.Enabled=true;
+					butDown.Enabled=true;
+				}
+			}
+			
 			FillGrid();
 		}
 
@@ -182,10 +254,10 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<ArrayClinics.Length;i++) {
+			for(int i=0;i<_listClinics.Count;i++) {
 				row=new ODGridRow();
-				row.Tag=ArrayClinics[i];
-				row.Cells.Add(ArrayClinics[i].Description);
+				row.Tag=_listClinics[i];
+				row.Cells.Add(_listClinics[i].Description);
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
@@ -196,13 +268,13 @@ namespace OpenDental{
 			if(PrefC.GetBool(PrefName.PracticeIsMedicalOnly)) {
 				ClinicCur.IsMedicalOnly=true;
 			}
+			ClinicCur.ItemOrder=gridMain.Rows.Count;//Set it last in the last position.
 			FormClinicEdit FormCE=new FormClinicEdit(ClinicCur);
 			FormCE.IsNew=true;
-			FormCE.ShowDialog();
-			Clinics.RefreshCache();
-			ArrayClinics=Clinics.GetList();
+			if(FormCE.ShowDialog()==DialogResult.OK) {
+				_listClinics.Add(ClinicCur);
+			}
 			FillGrid();
-			changed=true;
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
@@ -214,12 +286,84 @@ namespace OpenDental{
 				DialogResult=DialogResult.OK;
 				return;
 			}
-			FormClinicEdit FormCE=new FormClinicEdit(ArrayClinics[e.Row]);
-			FormCE.ShowDialog();
-			Clinics.RefreshCache();
-			ArrayClinics=Clinics.GetList();
+			FormClinicEdit FormCE=new FormClinicEdit(_listClinics[e.Row].Copy());
+			if(FormCE.ShowDialog()==DialogResult.OK) {
+				if(FormCE.ClinicCur==null) {//Clinic was deleted
+					//Fix ItemOrders
+					for(int i=0;i<_listClinics.Count;i++) {
+						if(_listClinics[i].ItemOrder>_listClinics[e.Row].ItemOrder) {
+							_listClinics[i].ItemOrder--;//Fix item orders
+						}
+					}
+					_listClinics.Remove(_listClinics[e.Row]);
+				}
+				else { 
+					_listClinics[e.Row]=FormCE.ClinicCur;
+				}
+			}
+			FillGrid();			
+		}
+
+		private void butUp_Click(object sender,EventArgs e) {
+			if(gridMain.SelectedIndices.Length==0) {
+				MsgBox.Show(this,"Please select a clinic first.");
+				return;
+			}
+			//Already at the top of the list
+			if(gridMain.GetSelectedIndex()==0) {
+				return;
+			}
+			int selectedIdx=gridMain.GetSelectedIndex();
+			//Swap clinic ItemOrders
+			_listClinics[selectedIdx].ItemOrder--;
+			_listClinics[selectedIdx-1].ItemOrder++;
+			//Move selected clinic up
+			_listClinics.Reverse(selectedIdx-1,2);
 			FillGrid();
-			changed=true;
+			//Reselect the clinic that was moved
+			gridMain.SetSelected(selectedIdx-1,true);
+			gridMain.SetSelected(selectedIdx,false);
+		}
+
+		private void butDown_Click(object sender,EventArgs e) {
+			if(gridMain.SelectedIndices.Length==0) {
+				MsgBox.Show(this,"Please select a clinic first.");
+				return;
+			}
+			//Already at the bottom of the list
+			if(gridMain.GetSelectedIndex()==gridMain.Rows.Count-1) {
+				return;
+			}			
+			int selectedIdx=gridMain.GetSelectedIndex();
+			//Swap clinic ItemOrders
+			_listClinics[selectedIdx].ItemOrder++;
+			_listClinics[selectedIdx+1].ItemOrder--;
+			//Move selected clinic down
+			_listClinics.Reverse(selectedIdx,2);
+			FillGrid();
+			//Reselect the clinic that was moved
+			gridMain.SetSelected(selectedIdx+1,true);
+			gridMain.SetSelected(selectedIdx,false);
+		}
+
+		private void checkOrderAlphabetical_Click(object sender,EventArgs e) {
+			if(checkOrderAlphabetical.Checked) {
+				butUp.Enabled=false;
+				butDown.Enabled=false;
+			}
+			else {
+				butUp.Enabled=true;
+				butDown.Enabled=true;
+			}
+			_listClinics.Sort(ClinicSort);//Sorts based on the status of the checkbox.
+			FillGrid();
+		}
+
+		private int ClinicSort(Clinic x,Clinic y) {
+			if(checkOrderAlphabetical.Checked) {
+				return x.Description.CompareTo(y.Description);
+			}
+			return x.ItemOrder.CompareTo(y.ItemOrder);
 		}
 
 		private void butOK_Click(object sender,EventArgs e) {
@@ -236,16 +380,11 @@ namespace OpenDental{
 		}
 
 		private void FormClinics_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-			if(changed){
+			if(Clinics.Sync(_listClinics,_listClinicsOld) || Prefs.UpdateBool(PrefName.ClinicListIsAlphabetical,checkOrderAlphabetical.Checked)) {
 				DataValid.SetInvalid(InvalidType.Providers);
 			}
 		}
 
-		
-
-
-
-		
 	}
 }
 

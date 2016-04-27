@@ -36,7 +36,7 @@ namespace OpenDental{
 		private Label label9;
 		private Label label10;
 		private TextBox textEmail;
-		private Clinic ClinicCur;
+		public Clinic ClinicCur;
 		private Label label12;
 		private ComboBox comboDefaultProvider;
 		private UI.Button butPickDefaultProv;
@@ -1028,6 +1028,7 @@ namespace OpenDental{
 			}
 			try{
 				Clinics.Delete(ClinicCur);
+				ClinicCur=null;//Set ClinicCur to null so the calling form knows it was deleted.
 				DialogResult=DialogResult.OK;
 			}
 			catch(Exception ex){
@@ -1104,7 +1105,6 @@ namespace OpenDental{
 			}
 			ClinicCur.DefaultProv=_provNumDefaultSelected;
 			if(IsNew) {
-				Clinics.Insert(ClinicCur);
 				//for every new clinic, insert a set of program properties for PayConnect with the values from
 				//the 'Headquarters' or ClinicNum=0 set of properties
 				List<ProgramProperty> listProps=ProgramProperties.GetListForProgramAndClinic(Programs.GetProgramNum(ProgramName.PayConnect),0);
@@ -1115,9 +1115,6 @@ namespace OpenDental{
 					ProgramProperties.Insert(listProps[i]);//copy all values from the 0 clinic except ClinicNum and the primary key, insert will assign pri key
 				}
 				DataValid.SetInvalid(InvalidType.Programs);
-			}
-			else {
-				Clinics.Update(ClinicCur);
 			}
 			DialogResult=DialogResult.OK;
 		}

@@ -673,6 +673,33 @@ namespace OpenDentBusiness {
 				   command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ClaimSnapshotTriggerType','ClaimCreate')";
 				   Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE clinic ADD ItemOrder int NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE clinic ADD ItemOrder number(11)";
+					Db.NonQ(command);
+					command="UPDATE clinic SET ItemOrder = 0 WHERE ItemOrder IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE clinic MODIFY ItemOrder NOT NULL";
+					Db.NonQ(command);
+				}
+				command="SELECT * FROM clinic";
+				DataTable clinics=Db.GetTable(command);
+				for(int i=0;i<clinics.Rows.Count;i++) {
+					command="UPDATE clinic SET ItemOrder="+POut.Int(i)+" WHERE ClinicNum="+clinics.Rows[i]["ClinicNum"].ToString();
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference(PrefName,ValueString) VALUES ('ClinicListIsAlphabetical','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ClinicListIsAlphabetical','0')";
+					Db.NonQ(command);
+				}
+
 
 				command="UPDATE preference SET ValueString = '16.2.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
