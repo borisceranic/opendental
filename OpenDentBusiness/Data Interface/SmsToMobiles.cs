@@ -168,7 +168,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Surround with Try/Catch.  Sent as time sensitive message.</summary>
-		public static bool SendSmsSingle(long patNum,string wirelessPhone,string message,long clinicNum,SmsMessageSource smsMessageSource) {
+		public static bool SendSmsSingle(long patNum,string wirelessPhone,string message,long clinicNum,SmsMessageSource smsMessageSource,bool makeCommLog=true) {
 			double balance=SmsPhones.GetClinicBalance(clinicNum);
 			if(balance-0.04<0) {
 				throw new Exception("To send this message first increase spending limit for integrated texting from eServices Setup.");
@@ -186,7 +186,7 @@ namespace OpenDentBusiness{
 			smsToMobile.SmsStatus=SmsDeliveryStatus.Pending;
 			smsToMobile.DateTimeSent=DateTime.Now;
 			SmsToMobiles.Insert(smsToMobile);
-			if(patNum !=0) {  //No patient specified, do not make commlog.
+			if(patNum !=0 && makeCommLog) {  //Patient specified and calling code won't make commlog, make it here.
 				Commlogs.Insert(new Commlog() {
 					CommDateTime=smsToMobile.DateTimeSent,
 					Mode_=CommItemMode.Text,

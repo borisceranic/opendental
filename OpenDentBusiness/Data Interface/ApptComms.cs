@@ -383,7 +383,7 @@ namespace OpenDentBusiness{
 			message=FillMessage(PrefC.GetString(PrefName.ApptReminderDayMessage),pat,appt);
 			//}
 			try {
-				SmsToMobiles.SendSmsSingle(pat.PatNum,patPhone,message,pat.ClinicNum,SmsMessageSource.Reminder);
+				SmsToMobiles.SendSmsSingle(pat.PatNum,patPhone,message,pat.ClinicNum,SmsMessageSource.Reminder,false);
 			}
 			catch(Exception ex) {
 				return ex.Message+"  ";
