@@ -2598,7 +2598,7 @@ namespace OpenDental{
 			StartActionNeededThread();
 			Patient pat=Patients.GetPat(CurPatNum);
 			if(pat!=null && (_showForm=="popup" || _showForm=="popups") && myOutlookBar.SelectedIndex!=-1) {
-				FormPopupsForFam FormP=new FormPopupsForFam();
+				FormPopupsForFam FormP=new FormPopupsForFam(PopupEventList);
 				FormP.PatCur=pat;
 				FormP.ShowDialog();
 			}
@@ -3376,6 +3376,7 @@ namespace OpenDental{
 					PopupEvent popevent=new PopupEvent();
 					popevent.PopupNum=popList[i].PopupNum;
 					popevent.DisableUntil=DateTime.Now+TimeSpan.FromMinutes(FormP.MinutesDisabled);
+					popevent.LastViewed=DateTime.Now;
 					PopupEventList.Add(popevent);
 					PopupEventList.Sort();
 				}
@@ -3747,7 +3748,7 @@ namespace OpenDental{
 		}
 
 		private void OnPopups_Click() {
-			FormPopupsForFam FormPFF=new FormPopupsForFam();
+			FormPopupsForFam FormPFF=new FormPopupsForFam(PopupEventList);
 			FormPFF.PatCur=Patients.GetPat(CurPatNum);
 			FormPFF.ShowDialog();
 		}
@@ -7871,6 +7872,8 @@ namespace OpenDental{
 		public long PopupNum;
 		///<summary>Disable this popup until this time.</summary>
 		public DateTime DisableUntil;
+		///<summary>The last time that this popup popped up.</summary>
+		public DateTime LastViewed;
 
 		public int CompareTo(object obj) {
 			PopupEvent pop=(PopupEvent)obj;

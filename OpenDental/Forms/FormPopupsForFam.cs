@@ -1,21 +1,20 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
+using System.Linq;
 using System.Windows.Forms;
-using OpenDentBusiness;
 using OpenDental.UI;
+using OpenDentBusiness;
 
 namespace OpenDental {
 	public partial class FormPopupsForFam:ODForm {
 		public Patient PatCur;
-		private List<Popup> PopupList;
+		private List<PopupEvent> _listPopEvents;
+		private List<Popup> _listPopups;
 
-		public FormPopupsForFam() {
+		public FormPopupsForFam(List<PopupEvent> listPopEvents) {
 			InitializeComponent();
 			Lan.F(this);
+			_listPopEvents=listPopEvents;
 		}
 
 		private void FormPopupsForFam_Load(object sender,EventArgs e) {
@@ -25,10 +24,10 @@ namespace OpenDental {
 
 		private void FillGrid() {
 			if(checkDeleted.Checked) {
-				PopupList=Popups.GetDeletedForFamily(PatCur);
+				_listPopups=Popups.GetDeletedForFamily(PatCur);
 			}
 			else {
-				PopupList=Popups.GetForFamily(PatCur);
+				_listPopups=Popups.GetForFamily(PatCur);
 			}
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
@@ -38,6 +37,8 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TablePopupsForFamily","Disabled"),60,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("TablePopupsForFamily","Last Viewed"),80,HorizontalAlignment.Center);
+			gridMain.Columns.Add(col);
 			if(checkDeleted.Checked) {
 				col=new ODGridColumn(Lan.g("TablePopupsForFamily","Deleted"),60,HorizontalAlignment.Center);
 				gridMain.Columns.Add(col);
@@ -46,15 +47,22 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<PopupList.Count;i++) {
+			for(int i=0;i<_listPopups.Count;i++) {
 				row=new ODGridRow();
-				row.Cells.Add(Patients.GetPat(PopupList[i].PatNum).GetNameLF());
-				row.Cells.Add(Lan.g("enumEnumPopupLevel",PopupList[i].PopupLevel.ToString()));
-				row.Cells.Add(PopupList[i].IsDisabled?"X":"");
-				if(checkDeleted.Checked) {
-					row.Cells.Add(PopupList[i].IsArchived?"X":"");
+				row.Cells.Add(Patients.GetPat(_listPopups[i].PatNum).GetNameLF());
+				row.Cells.Add(Lan.g("enumEnumPopupLevel",_listPopups[i].PopupLevel.ToString()));
+				row.Cells.Add(_listPopups[i].IsDisabled?"X":"");
+				PopupEvent popEvent=_listPopEvents.FirstOrDefault(x => x.PopupNum==_listPopups[i].PopupNum);
+				if(popEvent!=null && popEvent.LastViewed.Year>1880) {
+					row.Cells.Add(popEvent.LastViewed.ToShortTimeString());
 				}
-				row.Cells.Add(PopupList[i].Description);
+				else {
+					row.Cells.Add("");
+				}
+				if(checkDeleted.Checked) {
+					row.Cells.Add(_listPopups[i].IsArchived?"X":"");
+				}
+				row.Cells.Add(_listPopups[i].Description);
 				row.Tag=i;
 				gridMain.Rows.Add(row);
 			}
@@ -64,7 +72,7 @@ namespace OpenDental {
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			FormPopupEdit FormPE=new FormPopupEdit();
 			int rowIndex=(int)gridMain.Rows[e.Row].Tag;
-			FormPE.PopupCur=PopupList[rowIndex];
+			FormPE.PopupCur=_listPopups[rowIndex];
 			FormPE.ShowDialog();
 			if(FormPE.DialogResult==DialogResult.OK) {
 				FillGrid();

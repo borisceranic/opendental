@@ -38,7 +38,7 @@ namespace OpenDental{
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(500, 354);
+			this.butClose.Location = new System.Drawing.Point(579, 354);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 24);
 			this.butClose.TabIndex = 2;
@@ -50,11 +50,13 @@ namespace OpenDental{
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasAddButton = false;
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(24, 12);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
-			this.gridMain.Size = new System.Drawing.Size(551, 325);
+			this.gridMain.Size = new System.Drawing.Size(630, 325);
 			this.gridMain.TabIndex = 4;
 			this.gridMain.Title = "Popups";
 			this.gridMain.TranslationName = null;
@@ -80,7 +82,7 @@ namespace OpenDental{
 			// checkDeleted
 			// 
 			this.checkDeleted.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkDeleted.Location = new System.Drawing.Point(302, 357);
+			this.checkDeleted.Location = new System.Drawing.Point(381, 358);
 			this.checkDeleted.Name = "checkDeleted";
 			this.checkDeleted.Size = new System.Drawing.Size(192, 20);
 			this.checkDeleted.TabIndex = 21;
@@ -92,14 +94,13 @@ namespace OpenDental{
 			// FormPopupsForFam
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(600, 391);
+			this.ClientSize = new System.Drawing.Size(679, 391);
 			this.Controls.Add(this.checkDeleted);
 			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butAdd);
 			this.Controls.Add(this.butClose);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormPopupsForFam";
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Popups for Family";
 			this.Load += new System.EventHandler(this.FormPopupsForFam_Load);
 			this.ResumeLayout(false);
