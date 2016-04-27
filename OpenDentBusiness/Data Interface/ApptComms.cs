@@ -416,7 +416,7 @@ namespace OpenDentBusiness{
 				return Lans.g("ApptComms","Default texting clinic not setup.");
 			}
 			try {
-				SmsToMobiles.SendSmsSingle(pat.PatNum,patPhone,message,clinicNum,SmsMessageSource.Reminder);
+				SmsToMobiles.SendSmsSingle(pat.PatNum,patPhone,message,clinicNum,SmsMessageSource.Reminder,false);
 			}
 			catch(Exception ex) {
 				return ex.Message+"  ";
