@@ -1609,20 +1609,15 @@ namespace OpenDental
 			if(IsProc){
 				textFee.Text=(proc.ProcFee*(proc.BaseUnits+proc.UnitQty)).ToString("f");
 				InsPlan plan=InsPlans.GetPlan(ClaimProcCur.PlanNum,PlanList);
-				long insFeeSch = Fees.GetFeeSched(PatCur, PlanList, PatPlanList,SubList);
-				long standFeeSch = Providers.GetProv(Patients.GetProvNum(PatCur)).FeeSched;
-				if(plan.PlanType=="p"){//if ppo
-					double insFee=Fees.GetAmount0(proc.CodeNum, insFeeSch,proc.ClinicNum,proc.ProvNum);
-					double standardfee=Fees.GetAmount0(proc.CodeNum,Providers.GetProv(Patients.GetProvNum(PatCur)).FeeSched,proc.ClinicNum,proc.ProvNum);
-					if(insFee>standardfee) {//if ppo fee is higher than the standard fee (unusual)
-						textFeeSched.Text=FeeScheds.GetDescription(insFeeSch);
+				long insFeeSchedNum=Fees.GetFeeSched(PatCur,PlanList,PatPlanList,SubList,proc.ProvNum);
+				textFeeSched.Text=FeeScheds.GetDescription(insFeeSchedNum);//show ins fee sched, unless PPO plan and standard fee is greater, checked below
+				if(plan.PlanType=="p") {//if ppo
+					double insFee=Fees.GetAmount0(proc.CodeNum,insFeeSchedNum,proc.ClinicNum,proc.ProvNum);
+					long standFeeSchedNum=Providers.GetProv(Patients.GetProvNum(PatCur)).FeeSched;
+					double standardfee=Fees.GetAmount0(proc.CodeNum,standFeeSchedNum,proc.ClinicNum,proc.ProvNum);
+					if(standardfee>insFee) {//if standard fee is greater than ins fee for a PPO plan, show standard fee sched
+						textFeeSched.Text=FeeScheds.GetDescription(standFeeSchedNum);
 					}
-					else{// show the standard fee schedule
-						textFeeSched.Text=FeeScheds.GetDescription(standFeeSch);
-					}
-				}
-				else{//otherwise, show the plan fee schedule
-					textFeeSched.Text=FeeScheds.GetDescription(insFeeSch);
 				}
 				string stringProcCode=ProcedureCodes.GetStringProcCode(proc.CodeNum);
 				//int codeNum=proc.CodeNum;
@@ -1990,10 +1985,6 @@ namespace OpenDental
 				labelDateEntry.Visible=false;
 				textDateEntry.Visible=false;
 			}
-		}
-
-		private void listStatus_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e) {
-			
 		}
 
 		private void checkNoBillIns_Click(object sender, System.EventArgs e) {

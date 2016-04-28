@@ -3105,46 +3105,22 @@ namespace OpenDental{
 			long priPlanNum=prisub.PlanNum;
 			InsPlan priplan=InsPlans.GetPlan(priPlanNum,InsPlanList);//can handle a plannum=0
 			double standardfee;
-			double insfee;
 			List<ClaimProc> claimProcList=ClaimProcs.RefreshForTP(PatCur.PatNum);
 			for(int i=0;i<ProcListTP.Length;i++) {
 				procCur=ProcListTP[i];
 				//procOld=procCur.Clone();
-				//first the fees
-				//Check if it's a medical procedure.
-				bool isMed=false;
-				if(procCur.MedicalCode != null && procCur.MedicalCode != "") {
-					isMed=true;
-				}
-				//Get fee schedule for medical or dental.
-				long feeSch;
-				if(isMed) {
-					feeSch=Fees.GetMedFeeSched(PatCur,InsPlanList,PatPlanList,SubList);
+				//Get the fee schedule and fee amount for medical or dental.
+				if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && !string.IsNullOrEmpty(procCur.MedicalCode)) {
+					long feeSch=Fees.GetMedFeeSched(PatCur,InsPlanList,PatPlanList,SubList,procCur.ProvNum);
+					procCur.ProcFee=Fees.GetAmount0(ProcedureCodes.GetProcCode(procCur.MedicalCode).CodeNum,feeSch,procCur.ClinicNum,procCur.ProvNum);
 				}
 				else {
-					feeSch=Fees.GetFeeSched(PatCur,InsPlanList,PatPlanList,SubList);
+					long feeSch=Fees.GetFeeSched(PatCur,InsPlanList,PatPlanList,SubList,procCur.ProvNum);
+					procCur.ProcFee=Fees.GetAmount0(procCur.CodeNum,feeSch,procCur.ClinicNum,procCur.ProvNum);
 				}
-				//Get the fee amount for medical or dental.
-				if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && isMed) {
-					insfee=Fees.GetAmount0(ProcedureCodes.GetProcCode(procCur.MedicalCode).CodeNum,feeSch,procCur.ClinicNum,procCur.ProvNum);
-				}
-				else {
-					insfee=Fees.GetAmount0(procCur.CodeNum,feeSch,procCur.ClinicNum,procCur.ProvNum);
-				}
-				if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && isMed){
-					procCur.ProcFee=insfee;
-				}
-				else if(priplan!=null && priplan.PlanType=="p") {//PPO
+				if(priplan!=null && priplan.PlanType=="p") {//PPO
 					standardfee=Fees.GetAmount0(procCur.CodeNum,Providers.GetProv(Patients.GetProvNum(PatCur)).FeeSched,procCur.ClinicNum,procCur.ProvNum);
-					if(standardfee>insfee) {
-						procCur.ProcFee=standardfee;
-					}
-					else {
-						procCur.ProcFee=insfee;
-					}
-				}
-				else {
-					procCur.ProcFee=insfee;
+					procCur.ProcFee=Math.Max(procCur.ProcFee,standardfee);
 				}
 				Procedures.ComputeEstimates(procCur,PatCur.PatNum,claimProcList,false,InsPlanList,PatPlanList,BenefitList,PatCur.Age,SubList);
 				Procedures.UpdateFee(procCur.ProcNum,procCur.ProcFee);

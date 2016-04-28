@@ -3106,12 +3106,14 @@ namespace OpenDental {
 			// 
 			this.textTreatmentNotes.AcceptsTab = true;
 			this.textTreatmentNotes.BackColor = System.Drawing.SystemColors.Window;
+			this.textTreatmentNotes.DetectLinksEnabled = false;
 			this.textTreatmentNotes.DetectUrls = false;
 			this.textTreatmentNotes.Location = new System.Drawing.Point(0, 334);
 			this.textTreatmentNotes.Name = "textTreatmentNotes";
 			this.textTreatmentNotes.QuickPasteType = OpenDentBusiness.QuickPasteType.ChartTreatment;
 			this.textTreatmentNotes.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textTreatmentNotes.Size = new System.Drawing.Size(411, 71);
+			this.textTreatmentNotes.SpellCheckIsEnabled = false;
 			this.textTreatmentNotes.TabIndex = 187;
 			this.textTreatmentNotes.Text = "";
 			this.textTreatmentNotes.TextChanged += new System.EventHandler(this.textTreatmentNotes_TextChanged);
@@ -7475,207 +7477,101 @@ namespace OpenDental {
 		}
 
 		///<summary>Sets many fields for a new procedure, then displays it for editing before inserting it into the db.  No need to worry about ProcOld
-		///because it's an insert, not an update.  The regions in AddProcedure and AddQuick should be in the same order. In version 15.3 a bug was     
-		///introduced because the order of the regions changed and no longer matched.</summary>
+		///because it's an insert, not an update.  AddProcedure and AddQuick both call AddProcHelper, where most of the logic for setting the fields for
+		///a new procedure is located.</summary>
 		private void AddProcedure(Procedure ProcCur){
-			//procnum
-			ProcCur.PatNum=PatCur.PatNum;
-			//aptnum
-			//proccode
-			//ProcCur.CodeNum=ProcedureCodes.GetProcCode(ProcCur.OldCode).CodeNum;//already set
-			if(newStatus==ProcStat.EO){
-				ProcCur.ProcDate=DateTime.MinValue;
-			}
-			else if(textDate.Text=="" || textDate.errorProvider1.GetError(textDate)!=""){
-				ProcCur.ProcDate=DateTimeOD.Today;
-			}
-			else{
-				ProcCur.ProcDate=PIn.Date(textDate.Text);
-			}
-			ProcCur.DateTP=ProcCur.ProcDate;
-			#region ProvNum
-			long provPri=PatCur.PriProv;
-			long provSec=PatCur.SecProv;
-			for(int i=0;i<ApptList.Length;i++) {
-				if(ApptList[i].AptDateTime.Date==DateTime.Today && ApptList[i].AptStatus!=ApptStatus.Planned) {
-					provPri=ApptList[i].ProvNum;
-					provSec=ApptList[i].ProvHyg;
-					break;
-				}
-			}
-			if(ProcedureCodes.GetProcCode(ProcCur.CodeNum).IsHygiene && provSec != 0) {
-				ProcCur.ProvNum=provSec;
-			}
-			else {
-				ProcCur.ProvNum=provPri;
-			}
-			if(ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault!=0) {//override provnum if there is a default for this proc
-				ProcCur.ProvNum=ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault;
-			}
-			#endregion ProvNum
-			if(newStatus==ProcStat.C) {
-				ProcCur.Note=ProcCodeNotes.GetNote(ProcCur.ProvNum,ProcCur.CodeNum);
-			}
-			else {
-				ProcCur.Note="";
-			}
-			ProcCur.ClinicNum=PatCur.ClinicNum;
-			if(newStatus==ProcStat.R || newStatus==ProcStat.EO || newStatus==ProcStat.EC) {
-				ProcCur.ProcFee=0;
-			}
-			else {
-				//int totUnits = ProcCur.BaseUnits + ProcCur.UnitQty;
-				InsPlan insPlanPrimary=null;
-				InsSub insSubPrimary=null;
-				if(PatPlanList.Count>0) {
-					insSubPrimary=InsSubs.GetSub(PatPlanList[0].InsSubNum,SubList);
-					insPlanPrimary=InsPlans.GetPlan(insSubPrimary.PlanNum,PlanList);
-				}
-				//Check if it is also a medical procedure.
-				double procFee;
-				bool hasMedCode = false;
-				ProcCur.MedicalCode=ProcedureCodes.GetProcCode(ProcCur.CodeNum).MedicalCode;
-				if(ProcCur.MedicalCode != null && ProcCur.MedicalCode != "") {
-					hasMedCode = true;
-				}
-				//Get fee schedule for medical or dental.
-				long feeSch;
-				if(hasMedCode) {
-					feeSch=Fees.GetMedFeeSched(PatCur,PlanList,PatPlanList,SubList);
-				}
-				else {
-					feeSch=Fees.GetFeeSched(PatCur,PlanList,PatPlanList,SubList);
-				}
-				//Get the fee amount for medical or dental.
-				if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && hasMedCode) {
-					procFee=Fees.GetAmount0(ProcedureCodes.GetProcCode(ProcCur.MedicalCode).CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
-				}
-				else {
-					procFee=Fees.GetAmount0(ProcCur.CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
-				}
-				if(insPlanPrimary!=null && insPlanPrimary.PlanType=="p" && !(hasMedCode && insPlanPrimary.IsMedical)) {//PPO
-					double provFee=Fees.GetAmount0(ProcCur.CodeNum,Providers.GetProv(Patients.GetProvNum(PatCur)).FeeSched,ProcCur.ClinicNum,ProcCur.ProvNum);
-					if(provFee>procFee) {
-						ProcCur.ProcFee=provFee;
-					}
-					else {
-						ProcCur.ProcFee=procFee;
-					}
-				}
-				else {
-					ProcCur.ProcFee=procFee;
-				}
-			}
-			//ProcCur.OverridePri=-1;
-			//ProcCur.OverrideSec=-1;
-			//surf
-			//ToothNum
-			//Procedures.Cur.ToothRange
-			//ProcCur.NoBillIns=ProcedureCodes.GetProcCode(ProcCur.ProcCode).NoBillIns;
-			if(comboPriority.SelectedIndex==0) {
-				ProcCur.Priority=0;
-			}
-			else {
-				ProcCur.Priority=DefC.Short[(int)DefCat.TxPriorities][comboPriority.SelectedIndex-1].DefNum;
-			}
-			ProcCur.ProcStatus=newStatus;
-			if(listDx.SelectedIndex!=-1) {
-				ProcCur.Dx=DefC.Short[(int)DefCat.Diagnosis][listDx.SelectedIndex].DefNum;
-			}
-			if(comboPrognosis.SelectedIndex==0) {
-				ProcCur.Prognosis=0;
-			}
-			else {
-				ProcCur.Prognosis=DefC.Short[(int)DefCat.Prognosis][comboPrognosis.SelectedIndex-1].DefNum;
-			}
-			//nextaptnum
-			ProcCur.DateEntryC=DateTime.Now;
-			ProcCur.BaseUnits=ProcedureCodes.GetProcCode(ProcCur.CodeNum).BaseUnits;
-			ProcCur.SiteNum=PatCur.SiteNum;
-			ProcCur.RevCode=ProcedureCodes.GetProcCode(ProcCur.CodeNum).RevenueCodeDefault;
-			ProcCur.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
-			if(Userods.IsUserCpoe(Security.CurUser)) {
-				//This procedure is considered CPOE because the provider is the one that has added it.
-				ProcCur.IsCpoe=true;
-			}
-			ProcCur.ProcNum=Procedures.Insert(ProcCur);
-			if(newStatus==ProcStat.TP) {
-				AttachProcToTPs(ProcCur);
-			}
-			if((ProcCur.ProcStatus==ProcStat.C || ProcCur.ProcStatus==ProcStat.EC || ProcCur.ProcStatus==ProcStat.EO)
-				&& ProcedureCodes.GetProcCode(ProcCur.CodeNum).PaintType==ToothPaintingType.Extraction) {
-				//if an extraction, then mark previous procs hidden
-				//Procedures.SetHideGraphical(ProcCur);//might not matter anymore
-				ToothInitials.SetValue(PatCur.PatNum,ProcCur.ToothNum,ToothInitialType.Missing);
-			}
-			Procedures.ComputeEstimates(ProcCur,PatCur.PatNum,new List<ClaimProc>(),true,PlanList,PatPlanList,BenefitList,PatCur.Age,SubList);
+			AddProcHelper(ProcCur);
 			FormProcEdit FormPE=new FormProcEdit(ProcCur,PatCur.Copy(),FamCur);
 			FormPE.IsNew=true;
 			FormPE.ShowDialog();
 			if(FormPE.DialogResult==DialogResult.Cancel){
-				//any created claimprocs are automatically deleted from within procEdit window.
 				try{
 					Procedures.Delete(ProcCur.ProcNum);//also deletes the claimprocs
 				}
 				catch(Exception ex){
 					MessageBox.Show(ex.Message);
 				}
+				return;//cancelled insert
 			}
-			else if(UsingEcwTight()) {
-				//do not synch recall.  Too slow
+			if(newStatus==ProcStat.C) {//User didn't cancel (delete) in FormProcEdit
+				Encounters.InsertDefaultEncounter(ProcCur.PatNum,ProcCur.ProvNum,ProcCur.ProcDate);//Auto-insert default encounter
 			}
-			else if(Programs.UsingOrion){
-				//No need to synch with Orion mode.
-			}
-			else if(newStatus==ProcStat.C 
-				|| newStatus==ProcStat.EC 
-				|| newStatus==ProcStat.EO) 
-			{//only run Recalls for completed, existing current, or existing other
-				//Auto-insert default encounter for provider.
-				if(newStatus==ProcStat.C) {
-					Encounters.InsertDefaultEncounter(ProcCur.PatNum,ProcCur.ProvNum,ProcCur.ProcDate);
-				}
+			if(!UsingEcwTightOrFull() //no need to synch with eCW
+				&& !Programs.UsingOrion //no need to synch with Orion
+				&& new[] { ProcStat.C,ProcStat.EC,ProcStat.EO }.Contains(newStatus)) //only run Recalls for completed, existing current, or existing other
+			{
 				Recalls.Synch(PatCur.PatNum);
 			}
+			logComplCreate(ProcCur);
 		}
 
-		///<summary>No user dialog is shown.  This only works for some kinds of procedures.  Set the codeNum first.  
-		///The regions in AddProcedure and AddQuick should be in the same order.  In version 15.3 a bug was introduced because the order of the regions
-		///changed and no longer matched.</summary>
-		private void AddQuick(Procedure ProcCur){
+		///<summary>No user dialog is shown.  This only works for some kinds of procedures.  Set the codeNum first.  AddProcedure and AddQuick both call
+		///AddProcHelper, where most of the logic for setting the fields for a new procedure is located.</summary>
+		private void AddQuick(Procedure ProcCur) {
 			Plugins.HookAddCode(this,"ContrChart.AddQuick_begin",ProcCur);
+			AddProcHelper(ProcCur);
+			FormProcEdit FormP=null;
+			if(Programs.UsingOrion) {//Orion requires a DPC to be set. Force the proc edit window open so they can set it.
+				FormP=new FormProcEdit(ProcCur,PatCur.Copy(),FamCur);
+				FormP.IsNew=true;
+				FormP.OrionProvNum=Providers.GetOrionProvNum(ProcCur.ProvNum);
+				FormP.ShowDialog();
+				if(FormP.DialogResult==DialogResult.Cancel) {
+					try {
+						Procedures.Delete(ProcCur.ProcNum);//also deletes the claimprocs
+					}
+					catch(Exception ex) {
+						MessageBox.Show(ex.Message);
+					}
+					return;//cancelled insert
+				}
+			}
+			if(newStatus==ProcStat.C) {//either not using Orion, or user didn't cancel (delete) in FormProcEdit
+				Encounters.InsertDefaultEncounter(ProcCur.PatNum,ProcCur.ProvNum,ProcCur.ProcDate);//Auto-insert default encounter
+			}
+			if(!UsingEcwTightOrFull() && !Programs.UsingOrion //no need to synch with eCW or Orion
+				&& new[] { ProcStat.C,ProcStat.EC,ProcStat.EO }.Contains(newStatus)) //only run Recalls for completed, existing current, or existing other
+			{
+				Recalls.Synch(PatCur.PatNum);
+			}
+			logComplCreate(ProcCur);
+		}
+
+		///<summary>Called by AddProcedure and AddQuick.  Both methods contained versions of this code and a bug was introduced in version 15.3 because
+		///the order of the regions changed in the two methods and no longer matched.  This helper method prevents bugs caused by trying to keep duplicate
+		///code blocks synced.</summary>
+		private void AddProcHelper(Procedure ProcCur) {
 			//procnum
 			ProcCur.PatNum=PatCur.PatNum;
 			//aptnum
 			//ProcCur.CodeNum=ProcedureCodes.GetProcCode(ProcCur.OldCode).CodeNum;//already set
-			if(newStatus==ProcStat.EO){
+			if(newStatus==ProcStat.EO) {
 				ProcCur.ProcDate=DateTime.MinValue;
 			}
-			else if(textDate.Text=="" || textDate.errorProvider1.GetError(textDate)!=""){
+			else if(textDate.Text=="" || textDate.errorProvider1.GetError(textDate)!="") {
 				ProcCur.ProcDate=DateTimeOD.Today;
 			}
-			else{
+			else {
 				ProcCur.ProcDate=PIn.Date(textDate.Text);
 			}
 			ProcCur.DateTP=ProcCur.ProcDate;
+			ProcedureCode procCodeCur=ProcedureCodes.GetProcCode(ProcCur.CodeNum);
 			#region ProvNum
-			long provPri=PatCur.PriProv;
-			long provSec=PatCur.SecProv;
-			for(int i=0;i<ApptList.Length;i++) {
-				if(ApptList[i].AptDateTime.Date==DateTime.Today && ApptList[i].AptStatus!=ApptStatus.Planned) {
-					provPri=ApptList[i].ProvNum;
-					provSec=ApptList[i].ProvHyg;
-					break;
+			ProcCur.ProvNum=procCodeCur.ProvNumDefault;//use proc default prov if set
+			if(ProcCur.ProvNum==0) {//no proc default prov set, check for appt prov, then use pri prov
+				long provPri=PatCur.PriProv;
+				long provSec=PatCur.SecProv;
+				Appointment[] aptTodayArray=ApptList.Where(x => x.AptDateTime.Date==DateTime.Today && x.AptStatus!=ApptStatus.Planned).ToArray();
+				if(aptTodayArray.Length>0) {
+					provPri=aptTodayArray[0].ProvNum;
+					provSec=aptTodayArray[0].ProvHyg;
 				}
-			}
-			if(ProcedureCodes.GetProcCode(ProcCur.CodeNum).IsHygiene && provSec != 0) {
-				ProcCur.ProvNum=provSec;
-			}
-			else {
-				ProcCur.ProvNum=provPri;
-			}
-			if(ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault!=0) {//override provnum if there is a default for this proc
-				ProcCur.ProvNum=ProcedureCodes.GetProcCode(ProcCur.CodeNum).ProvNumDefault;
+				if(procCodeCur.IsHygiene && provSec!=0) {
+					ProcCur.ProvNum=provSec;
+				}
+				else {
+					ProcCur.ProvNum=provPri;
+				}
 			}
 			#endregion ProvNum
 			if(newStatus==ProcStat.C) {
@@ -7695,44 +7591,23 @@ namespace OpenDental {
 					insSubPrimary=InsSubs.GetSub(PatPlanList[0].InsSubNum,SubList);
 					insPlanPrimary=InsPlans.GetPlan(insSubPrimary.PlanNum,PlanList);
 				}
-				//Check if it is also a medical procedure.
-				double procFee;
-				bool hasMedCode = false;
-				ProcCur.MedicalCode=ProcedureCodes.GetProcCode(ProcCur.CodeNum).MedicalCode;
-				if(ProcCur.MedicalCode != null && ProcCur.MedicalCode != "") {
-					hasMedCode = true;
-				}
-				//Get fee schedule for medical or dental.
-				long feeSch;
-				if(hasMedCode) {
-					feeSch=Fees.GetMedFeeSched(PatCur,PlanList,PatPlanList,SubList);
+				ProcCur.MedicalCode=procCodeCur.MedicalCode;
+				//Get fee schedule and fee amount for medical or dental.
+				if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && !string.IsNullOrEmpty(ProcCur.MedicalCode)) {
+					long feeSch=Fees.GetMedFeeSched(PatCur,PlanList,PatPlanList,SubList,ProcCur.ProvNum);
+					ProcCur.ProcFee=Fees.GetAmount0(ProcedureCodes.GetProcCode(ProcCur.MedicalCode).CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
 				}
 				else {
-					feeSch=Fees.GetFeeSched(PatCur,PlanList,PatPlanList,SubList);
+					long feeSch=Fees.GetFeeSched(PatCur,PlanList,PatPlanList,SubList,ProcCur.ProvNum);
+					ProcCur.ProcFee=Fees.GetAmount0(ProcCur.CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
 				}
-				//Get the fee amount for medical or dental.
-				if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && hasMedCode) {
-					procFee=Fees.GetAmount0(ProcedureCodes.GetProcCode(ProcCur.MedicalCode).CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
-				}
-				else {
-					procFee=Fees.GetAmount0(ProcCur.CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
-				}
-				if(insPlanPrimary!=null && insPlanPrimary.PlanType=="p" && !(hasMedCode && insPlanPrimary.IsMedical)) {//PPO
+				if(insPlanPrimary!=null && insPlanPrimary.PlanType=="p") {//PPO
 					double provFee=Fees.GetAmount0(ProcCur.CodeNum,Providers.GetProv(Patients.GetProvNum(PatCur)).FeeSched,ProcCur.ClinicNum,ProcCur.ProvNum);
-					if(provFee>procFee) {
-						ProcCur.ProcFee=provFee;
-					}
-					else {
-						ProcCur.ProcFee=procFee;
-					}
-				}
-				else {
-					ProcCur.ProcFee=procFee;
+					ProcCur.ProcFee=Math.Max(ProcCur.ProcFee,provFee);
 				}
 			}
 			//surf
 			//toothnum
-			//ToothRange
 			if(comboPriority.SelectedIndex==0) {
 				ProcCur.Priority=0;
 			}
@@ -7749,10 +7624,9 @@ namespace OpenDental {
 			else {
 				ProcCur.Prognosis=DefC.Short[(int)DefCat.Prognosis][comboPrognosis.SelectedIndex-1].DefNum;
 			}
-			ProcCur.BaseUnits=ProcedureCodes.GetProcCode(ProcCur.CodeNum).BaseUnits;
+			ProcCur.BaseUnits=procCodeCur.BaseUnits;
 			ProcCur.SiteNum=PatCur.SiteNum;
-			ProcCur.RevCode=ProcedureCodes.GetProcCode(ProcCur.CodeNum).RevenueCodeDefault;
-			//nextaptnum
+			ProcCur.RevCode=procCodeCur.RevenueCodeDefault;
 			ProcCur.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
 			if(Userods.IsUserCpoe(Security.CurUser)) {
 				//This procedure is considered CPOE because the provider is the one that has added it.
@@ -7763,49 +7637,12 @@ namespace OpenDental {
 				AttachProcToTPs(ProcCur);
 			}
 			if((ProcCur.ProcStatus==ProcStat.C || ProcCur.ProcStatus==ProcStat.EC || ProcCur.ProcStatus==ProcStat.EO)
-				&& ProcedureCodes.GetProcCode(ProcCur.CodeNum).PaintType==ToothPaintingType.Extraction) {
+				&& procCodeCur.PaintType==ToothPaintingType.Extraction) {
 				//if an extraction, then mark previous procs hidden
 				//Procedures.SetHideGraphical(ProcCur);//might not matter anymore
 				ToothInitials.SetValue(PatCur.PatNum,ProcCur.ToothNum,ToothInitialType.Missing);
 			}
-			if(UsingEcwTight()) {
-				//do not synch recall.  Too slow
-			}
-			else if(Programs.UsingOrion){
-				//No need to synch with Orion mode.
-			}
-			else if(newStatus==ProcStat.C 
-				|| newStatus==ProcStat.EC 
-				|| newStatus==ProcStat.EO)
-			{//only run Recalls for completed, existing current, or existing other
-				//Auto-insert default encounter
-				if(newStatus==ProcStat.C) {
-					Encounters.InsertDefaultEncounter(ProcCur.PatNum,ProcCur.ProvNum,ProcCur.ProcDate);
-				}
-				Recalls.Synch(PatCur.PatNum);
-			}
 			Procedures.ComputeEstimates(ProcCur,PatCur.PatNum,new List<ClaimProc>(),true,PlanList,PatPlanList,BenefitList,PatCur.Age,SubList);
-			if(Programs.UsingOrion){//Orion requires a DPC to be set. Force the proc edit window open so they can set it.
-				FormProcEdit FormP=new FormProcEdit(ProcCur,PatCur.Copy(),FamCur);
-				FormP.IsNew=true;
-				FormP.OrionProvNum=Providers.GetOrionProvNum(ProcCur.ProvNum);
-				FormP.ShowDialog();
-				if(FormP.DialogResult==DialogResult.Cancel){
-					//any created claimprocs are automatically deleted from within procEdit window.
-					try{
-						Procedures.Delete(ProcCur.ProcNum);//also deletes the claimprocs
-					}
-					catch(Exception ex){
-						MessageBox.Show(ex.Message);
-						return;
-					}
-				}
-				else{
-					//Do not synch. Recalls based on ScheduleByDate reports in Orion mode.
-					//Recalls.Synch(PatCur.PatNum);
-				}
-			}
-			logComplCreate(ProcCur);
 		}
 
 		private void butAddProc_Click(object sender,System.EventArgs e) {

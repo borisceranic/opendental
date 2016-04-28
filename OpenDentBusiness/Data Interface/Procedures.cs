@@ -229,28 +229,17 @@ namespace OpenDentBusiness {
 				insSubPrimary=InsSubs.GetSub(patPlanList[0].InsSubNum,subList);
 				insPlanPrimary=InsPlans.GetPlan(insSubPrimary.PlanNum,insPlanList);
 			}
-			//Check if it is also a medical procedure.
-			double procFee;
-			//Get fee schedule for dental.
-			long feeSch;
-			feeSch=Fees.GetFeeSched(pat,insPlanList,patPlanList,subList);
-			//Get the fee amount for medical or dental.
-			procFee=Fees.GetAmount0(proc.CodeNum,feeSch,proc.ClinicNum,provNum);
+			//Get fee schedule and fee amount for dental or medical.
+			long feeSch=Fees.GetFeeSched(pat,insPlanList,patPlanList,subList,provNum);
+			proc.ProcFee=Fees.GetAmount0(proc.CodeNum,feeSch,proc.ClinicNum,provNum);
 			if(insPlanPrimary!=null && insPlanPrimary.PlanType=="p") {//PPO
 				double provFee=Fees.GetAmount0(proc.CodeNum,Providers.GetProv(provNum).FeeSched,proc.ClinicNum,provNum);
-				if(provFee>procFee) {
-					proc.ProcFee=provFee;
-				}
-				else {
-					proc.ProcFee=procFee;
-				}
+				proc.ProcFee=Math.Max(proc.ProcFee,provFee);//use greater of standard fee or ins fee
 			}
-			else {
-				proc.ProcFee=procFee;
-			}
-			proc.BaseUnits=ProcedureCodes.GetProcCode(proc.CodeNum).BaseUnits;
+			ProcedureCode procCodeCur=ProcedureCodes.GetProcCode(proc.CodeNum);
+			proc.BaseUnits=procCodeCur.BaseUnits;
 			proc.SiteNum=pat.SiteNum;
-			proc.RevCode=ProcedureCodes.GetProcCode(proc.CodeNum).RevenueCodeDefault;
+			proc.RevCode=procCodeCur.RevenueCodeDefault;
 			proc.DateEntryC=DateTime.Now;
 			proc.ProcNum=Procedures.Insert(proc);
 			Procedures.ComputeEstimates(proc,pat.PatNum,new List<ClaimProc>(),true,insPlanList,patPlanList,benefitList,pat.Age,subList);

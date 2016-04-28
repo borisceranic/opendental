@@ -399,51 +399,31 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
-		///<summary>Gets the fee schedule from the first insplan, the patient, or the provider in that order.  Either returns a fee schedule (fk to definition.DefNum) or 0.</summary>
-		public static long GetFeeSched(Patient pat,List<InsPlan> planList,List<PatPlan> patPlans,List<InsSub> subList) {
+		///<summary>Gets the fee sched from the first insplan, the patient, or the provider in that order.  Uses procProvNum if>0, otherwise pat.PriProv.
+		///Either returns a fee schedule (fk to definition.DefNum) or 0.</summary>
+		public static long GetFeeSched(Patient pat,List<InsPlan> planList,List<PatPlan> patPlans,List<InsSub> subList,long procProvNum) {
 			//No need to check RemotingRole; no call to db.
 			//there's not really a good place to put this function, so it's here.
-			long retVal=0;
-			//First, try getting the fee schedule from the insplan.
-			if(PatPlans.GetInsSubNum(patPlans,1)!=0){
-				InsSub SubCur=InsSubs.GetSub(PatPlans.GetInsSubNum(patPlans,1),subList);
-				InsPlan PlanCur=InsPlans.GetPlan(SubCur.PlanNum,planList);
-				if(PlanCur==null){
-					retVal=0;
-				}
-				else{
-					retVal=PlanCur.FeeSched;
+			long priPlanFeeSched=0;
+			if(patPlans.Any(x => x.Ordinal==1)) {
+				InsPlan planCur=InsPlans.GetPlan(InsSubs.GetSub(patPlans.First(x => x.Ordinal==1).InsSubNum,subList).PlanNum,planList);
+				if(planCur!=null) {
+					priPlanFeeSched=planCur.FeeSched;
 				}
 			}
-			if(retVal==0){//Ins plan did not have a fee sched, check the patient.
-				if(pat.FeeSched!=0){
-					retVal=pat.FeeSched;
-				}
-				else {//Patient did not have a fee sched, check the provider.
-					List<Provider> listProvs=ProviderC.GetListLong();
-					if(pat.PriProv!=0 && listProvs.Count>0) {
-						retVal=listProvs[Providers.GetIndexLong(pat.PriProv,listProvs)].FeeSched;//Guaranteed to work because ProviderC.ListLong has at least one provider in the list.
-					}
-				}
-			}
-			return retVal;
+			return GetFeeSched(priPlanFeeSched,pat.FeeSched,procProvNum!=0?procProvNum:pat.PriProv);//use procProvNum, but if 0 then default to pat.PriProv
 		}
 
-		///<summary>A simpler version of the same function above.  The required numbers can be obtained in a fairly simple query.  Might return a 0 if the primary provider does not have a fee schedule set.</summary>
-		public static long GetFeeSched(long priPlanFeeSched,long patFeeSched,long patPriProvNum) {
+		///<summary>A simpler version of the same function above.  The required numbers can be obtained in a fairly simple query.
+		///Might return a 0 if the primary provider does not have a fee schedule set.</summary>
+		public static long GetFeeSched(long priPlanFeeSched,long patFeeSched,long provNum) {
 			//No need to check RemotingRole; no call to db.
-			if(priPlanFeeSched!=0){
-				return priPlanFeeSched;
-			}
-			if(patFeeSched!=0){
-				return patFeeSched;
-			}
-			List<Provider> listProvs=ProviderC.GetListLong();
-			return listProvs[Providers.GetIndexLong(patPriProvNum,listProvs)].FeeSched;
+			long provFeeSched=(ProviderC.GetListLong().FirstOrDefault(x => x.ProvNum==provNum)??new Provider()).FeeSched;//defaults to 0
+			return new[] { priPlanFeeSched,patFeeSched,provFeeSched }.FirstOrDefault(x => x>0);//defaults to 0 if all fee scheds are 0
 		}
 
 		///<summary>Gets the fee schedule from the primary MEDICAL insurance plan, the first insurance plan, the patient, or the provider in that order.</summary>
-		public static long GetMedFeeSched(Patient pat,List<InsPlan> planList,List<PatPlan> patPlans,List<InsSub> subList) {
+		public static long GetMedFeeSched(Patient pat,List<InsPlan> planList,List<PatPlan> patPlans,List<InsSub> subList,long procProvNum) {
 			//No need to check RemotingRole; no call to db.
 			long retVal = 0;
 			if(PatPlans.GetInsSubNum(patPlans,1) != 0){
@@ -459,7 +439,7 @@ namespace OpenDentBusiness{
 					}
 				}
 				if(!hasMedIns) { //If this patient doesn't have medical insurance (under ordinal 10)
-					return GetFeeSched(pat,planList,patPlans,subList);  //Use dental insurance fee schedule
+					return GetFeeSched(pat,planList,patPlans,subList,procProvNum);  //Use dental insurance fee schedule
 				}
 				subCur=InsSubs.GetSub(PatPlans.GetInsSubNum(patPlans,planOrdinal),subList);
 				InsPlan PlanCur=InsPlans.GetPlan(subCur.PlanNum, planList);

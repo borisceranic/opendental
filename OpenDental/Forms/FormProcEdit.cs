@@ -4069,18 +4069,10 @@ namespace OpenDental{
 			InsSub prisub=InsSubs.GetSub(priSubNum,SubList);//can handle an inssubnum=0
 			//long priPlanNum=PatPlans.GetPlanNum(PatPlanList,1);
 			InsPlan priplan=InsPlans.GetPlan(prisub.PlanNum,PlanList);//can handle a plannum=0
-			double insfee=Fees.GetAmount0(ProcCur.CodeNum,Fees.GetFeeSched(PatCur,PlanList,PatPlanList,SubList),ProcCur.ClinicNum,ProcCur.ProvNum);
+			ProcCur.ProcFee=Fees.GetAmount0(ProcCur.CodeNum,Fees.GetFeeSched(PatCur,PlanList,PatPlanList,SubList,ProcCur.ProvNum),ProcCur.ClinicNum,ProcCur.ProvNum);
 			if(priplan!=null && priplan.PlanType=="p") {//PPO
 				double standardfee=Fees.GetAmount0(ProcCur.CodeNum,Providers.GetProv(Patients.GetProvNum(PatCur)).FeeSched,ProcCur.ClinicNum,ProcCur.ProvNum);
-				if(standardfee>insfee) {
-					ProcCur.ProcFee=standardfee;
-				}
-				else {
-					ProcCur.ProcFee=insfee;
-				}
-			}
-			else {
-				ProcCur.ProcFee=insfee;
+				ProcCur.ProcFee=Math.Max(ProcCur.ProcFee,standardfee);
 			}
 			switch(ProcedureCode2.TreatArea){ 
 				case TreatmentArea.Quad:
@@ -4138,25 +4130,14 @@ namespace OpenDental{
 			if(comboProcStatus.SelectedIndex==0) {//fee starts out 0 if EO, EC, etc.  This updates fee if changing to TP so it won't stay 0.
 				ProcCur.ProcStatus=ProcStat.TP;
 				if(ProcCur.ProcFee==0) {
-					double insfee=0;
-					bool isMed=false;
-					if(ProcCur.MedicalCode!=null && ProcCur.MedicalCode!="") {
-						isMed=true;
-					}
-					//Get fee schedule for medical or dental.
-					long feeSch;
-					if(isMed) {
-						feeSch=Fees.GetMedFeeSched(PatCur,PlanList,PatPlanList,SubList);
+					//Get the fee sched and fee amount for medical or dental.
+					if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && !string.IsNullOrEmpty(ProcCur.MedicalCode)) {
+						long feeSch=Fees.GetMedFeeSched(PatCur,PlanList,PatPlanList,SubList,ProcCur.ProvNum);
+						ProcCur.ProcFee=Fees.GetAmount0(ProcedureCodes.GetProcCode(ProcCur.MedicalCode).CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
 					}
 					else {
-						feeSch=Fees.GetFeeSched(PatCur,PlanList,PatPlanList,SubList);
-					}
-					//Get the fee amount for medical or dental.
-					if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && isMed) {
-						insfee=Fees.GetAmount0(ProcedureCodes.GetProcCode(ProcCur.MedicalCode).CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
-					}
-					else {
-						insfee=Fees.GetAmount0(ProcCur.CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
+						long feeSch=Fees.GetFeeSched(PatCur,PlanList,PatPlanList,SubList,ProcCur.ProvNum);
+						ProcCur.ProcFee=Fees.GetAmount0(ProcCur.CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
 					}
 					InsPlan priplan=null;
 					InsSub prisub=null;
@@ -4166,15 +4147,7 @@ namespace OpenDental{
 					}
 					if(priplan!=null && priplan.PlanType=="p") {//PPO
 						double standardfee=Fees.GetAmount0(ProcCur.CodeNum,Providers.GetProv(Patients.GetProvNum(PatCur)).FeeSched,ProcCur.ClinicNum,ProcCur.ProvNum);
-						if(standardfee>insfee) {
-							ProcCur.ProcFee=standardfee;
-						}
-						else {
-							ProcCur.ProcFee=insfee;
-						}
-					}
-					else {
-						ProcCur.ProcFee=insfee;
+						ProcCur.ProcFee=Math.Max(ProcCur.ProcFee,standardfee);
 					}
 					textProcFee.Text=ProcCur.ProcFee.ToString("f");
 				}
@@ -5708,20 +5681,11 @@ namespace OpenDental{
 					prisub=InsSubs.GetSub(PatPlanList[0].InsSubNum,SubList);
 					priplan=InsPlans.GetPlan(prisub.PlanNum,PlanList);
 				}
-				double insfee=Fees.GetAmount0(ProcCur.CodeNum,Fees.GetFeeSched(PatCur,PlanList,PatPlanList,SubList),ProcCur.ClinicNum,ProcCur.ProvNum);
+				ProcCur.ProcFee=Fees.GetAmount0(ProcCur.CodeNum,Fees.GetFeeSched(PatCur,PlanList,PatPlanList,SubList,ProcCur.ProvNum),ProcCur.ClinicNum,ProcCur.ProvNum);
 				if(priplan!=null && priplan.PlanType=="p") {//PPO
 					double standardfee=Fees.GetAmount0(ProcCur.CodeNum,Providers.GetProv(Patients.GetProvNum(PatCur)).FeeSched,ProcCur.ClinicNum,ProcCur.ProvNum);
-					if(standardfee>insfee) {
-						ProcCur.ProcFee=standardfee;
-					}
-					else {
-						ProcCur.ProcFee=insfee;
-					}
+					ProcCur.ProcFee=Math.Max(ProcCur.ProcFee,standardfee);
 				}
-				else {
-					ProcCur.ProcFee=insfee;
-				}
-				//ProcCur.ProcFee=Fees.GetAmount0(ProcedureCode2.CodeNum,Fees.GetFeeSched(PatCur,PlanList,PatPlanList));
 				Procedures.Update(ProcCur,ProcOld);
 				Recalls.Synch(ProcCur.PatNum);
 				if(ProcCur.ProcStatus==ProcStat.C){

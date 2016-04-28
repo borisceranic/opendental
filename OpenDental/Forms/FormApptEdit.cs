@@ -2036,8 +2036,7 @@ namespace OpenDental{
 			if(FormP.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			Procedure proc;
-			proc=new Procedure();//going to be an insert, so no need to set Procedures.CurOld
+			Procedure proc=new Procedure();//going to be an insert, so no need to set Procedures.CurOld
 			proc.CodeNum=FormP.SelectedCodeNum;
 			proc.PatNum=AptCur.PatNum;
 			proc.ProcDate=DateTimeOD.Today;
@@ -2050,60 +2049,44 @@ namespace OpenDental{
 				primarySub=InsSubs.GetSub(listPatPlans[0].InsSubNum,SubList);
 				primaryPlan=InsPlans.GetPlan(primarySub.PlanNum,PlanList);
 			}
-			//Check if it's a medical procedure.
-			double insfee;
-			bool isMed=false;
-			proc.MedicalCode=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).MedicalCode;
-			if(proc.MedicalCode!=null && proc.MedicalCode!="") {
-				isMed=true;
-			}
-			//Get fee schedule for medical or dental.
-			long feeSch;
-			if(isMed) {
-				feeSch=Fees.GetMedFeeSched(pat,PlanList,listPatPlans,SubList);
-			}
-			else {
-				feeSch=Fees.GetFeeSched(pat,PlanList,listPatPlans,SubList);
-			}
 			//surf
 			proc.Priority=0;
 			proc.ProcStatus=ProcStat.TP;
-			//Set ProvNum, may be overridden below by procCodeOverride or Hyg override.
+			ProcedureCode procCodeCur=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum);
+			#region ProvNum
 			proc.ProvNum=_selectedProvNum;
-			if(ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).ProvNumDefault!=0) {//Override provider for procedures with a default provider
+			if(procCodeCur.ProvNumDefault!=0) {//Override provider for procedures with a default provider
 				//This provider might be restricted to a different clinic than this user.
-				proc.ProvNum=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).ProvNumDefault;
+				proc.ProvNum=procCodeCur.ProvNumDefault;
 			}
-			else if(ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).IsHygiene && _selectedProvHygNum!=0) {
+			else if(procCodeCur.IsHygiene && _selectedProvHygNum!=0) {
 				proc.ProvNum=_selectedProvHygNum;
 			}
+			#endregion ProvNum
 			proc.ClinicNum=AptCur.ClinicNum;
-			//Get the fee amount for medical or dental.
-			if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && isMed) {
-				insfee=Fees.GetAmount0(ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).CodeNum,feeSch,proc.ClinicNum,proc.ProvNum);
+			proc.MedicalCode=procCodeCur.MedicalCode;
+			#region ProcFee
+			//Get the fee sched and fee amount for medical or dental.
+			if(!string.IsNullOrEmpty(proc.MedicalCode) && PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs)) {//use medical fee
+				long feeSch=Fees.GetMedFeeSched(pat,PlanList,listPatPlans,SubList,proc.ProvNum);
+				proc.ProcFee=Fees.GetAmount0(ProcedureCodes.GetProcCode(proc.MedicalCode).CodeNum,feeSch,proc.ClinicNum,proc.ProvNum);
 			}
-			else {
-				insfee=Fees.GetAmount0(proc.CodeNum,feeSch,proc.ClinicNum,proc.ProvNum);
+			else {//use dental fee
+				long feeSch=Fees.GetFeeSched(pat,PlanList,listPatPlans,SubList,proc.ProvNum);
+				proc.ProcFee=Fees.GetAmount0(proc.CodeNum,feeSch,proc.ClinicNum,proc.ProvNum);
 			}
 			if(primaryPlan!=null && primaryPlan.PlanType=="p") {//PPO
 				double standardfee=Fees.GetAmount0(proc.CodeNum,Providers.GetProv(Patients.GetProvNum(pat),_listProvidersAll).FeeSched,proc.ClinicNum,proc.ProvNum);
-				if(standardfee>insfee) {
-					proc.ProcFee=standardfee;
-				}
-				else {
-					proc.ProcFee=insfee;
-				}
+				proc.ProcFee=Math.Max(standardfee,proc.ProcFee);//use the greater of the ins fee or standard fee for PPO plans
 			}
-			else {
-				proc.ProcFee=insfee;
-			}
+			#endregion ProcFee
 			proc.Note="";
 			//dx
 			//nextaptnum
 			proc.DateEntryC=DateTime.Now;
-			proc.BaseUnits=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).BaseUnits;
+			proc.BaseUnits=procCodeCur.BaseUnits;
 			proc.SiteNum=pat.SiteNum;
-			proc.RevCode=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).RevenueCodeDefault;
+			proc.RevCode=procCodeCur.RevenueCodeDefault;
 			proc.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
 			if(Userods.IsUserCpoe(Security.CurUser)) {
 				//This procedure is considered CPOE because the provider is the one that has added it.
@@ -2376,7 +2359,8 @@ namespace OpenDental{
 				if(AptCur.AptStatus!=ApptStatus.Planned) {
 					proc.AptNum=AptCur.AptNum;
 				}
-				proc.CodeNum=ProcedureCodes.GetProcCode(codes[i]).CodeNum;
+				ProcedureCode procCodeCur=ProcedureCodes.GetProcCode(codes[i]);
+				proc.CodeNum=procCodeCur.CodeNum;
 				proc.ProcDate=AptCur.AptDateTime.Date;
 				proc.DateTP=DateTimeOD.Today;
 				InsPlan priplan=null;
@@ -2385,47 +2369,33 @@ namespace OpenDental{
 					prisub=InsSubs.GetSub(PatPlanList[0].InsSubNum,SubList);
 					priplan=InsPlans.GetPlan(prisub.PlanNum,PlanList);
 				}
-				//Check if it's a medical procedure.
-				double insfee;
-				bool isMed = false;
-				proc.MedicalCode=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).MedicalCode;
-				if(proc.MedicalCode != null && proc.MedicalCode != "") {
-					isMed = true;
+				#region ProvNum
+				proc.ProvNum=_selectedProvNum;
+				if(procCodeCur.ProvNumDefault!=0) {//Override provider for procedures with a default provider
+					//This provider might be restricted to a different clinic than this user.
+					proc.ProvNum=procCodeCur.ProvNumDefault;
 				}
-				//Get fee schedule for medical or dental.
-				long feeSch;
-				if(isMed) {
-					feeSch=Fees.GetMedFeeSched(pat,PlanList,PatPlanList,SubList);
+				else if(procCodeCur.IsHygiene && _selectedProvHygNum!=0) {
+					proc.ProvNum=_selectedProvHygNum;
 				}
-				else {
-					feeSch=Fees.GetFeeSched(pat,PlanList,PatPlanList,SubList);
-				}
-				if(ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).ProvNumDefault==0) {//Override ProvNum if there is a default provider for this proc
-					proc.ProvNum=_selectedProvNum;//Normal behavior
-				}
-				else {
-					proc.ProvNum=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).ProvNumDefault;//New behavior for procs with default provider
-				}
+				#endregion ProvNum
 				proc.ClinicNum=AptCur.ClinicNum;
-				//Get the fee amount for medical or dental.
-				if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && isMed) {
-					insfee=Fees.GetAmount0(ProcedureCodes.GetProcCode(proc.MedicalCode).CodeNum,feeSch,proc.ClinicNum,proc.ProvNum);
+				proc.MedicalCode=procCodeCur.MedicalCode;
+				#region ProcFee
+				//Get the fee sched and fee amount for medical or dental.
+				if(!string.IsNullOrEmpty(proc.MedicalCode) && PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs)) {//medical
+					long feeSch=Fees.GetMedFeeSched(pat,PlanList,PatPlanList,SubList,proc.ProvNum);
+					proc.ProcFee=Fees.GetAmount0(ProcedureCodes.GetProcCode(proc.MedicalCode).CodeNum,feeSch,proc.ClinicNum,proc.ProvNum);
 				}
-				else {
-					insfee=Fees.GetAmount0(proc.CodeNum,feeSch,proc.ClinicNum,proc.ProvNum);
+				else {//dental
+					long feeSch=Fees.GetFeeSched(pat,PlanList,PatPlanList,SubList,proc.ProvNum);
+					proc.ProcFee=Fees.GetAmount0(proc.CodeNum,feeSch,proc.ClinicNum,proc.ProvNum);
 				}
 				if(priplan!=null && priplan.PlanType=="p") {//PPO
 					double standardfee=Fees.GetAmount0(proc.CodeNum,Providers.GetProv(Patients.GetProvNum(pat),_listProvidersAll).FeeSched,proc.ClinicNum,proc.ProvNum);
-					if(standardfee>insfee) {
-						proc.ProcFee=standardfee;
-					}
-					else {
-						proc.ProcFee=insfee;
-					}
+					proc.ProcFee=Math.Max(standardfee,proc.ProcFee);//use the greater of the ins fee or standard fee for PPO plans
 				}
-				else {
-					proc.ProcFee=insfee;
-				}
+				#endregion ProcFee
 				//surf
 				//toothnum
 				//toothrange
@@ -2434,11 +2404,11 @@ namespace OpenDental{
 				//procnote
 				//Dx
 				proc.SiteNum=pat.SiteNum;
-				proc.RevCode=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).RevenueCodeDefault;
+				proc.RevCode=procCodeCur.RevenueCodeDefault;
 				if(_isPlanned) {
 					proc.PlannedAptNum=AptCur.AptNum;
 				}
-				proc.BaseUnits=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).BaseUnits;
+				proc.BaseUnits=procCodeCur.BaseUnits;
 				proc.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
 				if(Userods.IsUserCpoe(Security.CurUser)) {
 					//This procedure is considered CPOE because the provider is the one that has added it.

@@ -1776,12 +1776,12 @@ namespace OpenDentBusiness.HL7 {
 			procCur.ProcDate=dateProc;
 			procCur.DateTP=dateProc;
 			procCur.ProcStatus=ProcStat.TP;
-			procCur.ProvNum=pat.PriProv;
-			if(procCode.ProvNumDefault!=0) {
-				procCur.ProvNum=procCode.ProvNumDefault;
-			}
-			else if(procCode.IsHygiene && pat.SecProv!=0) {
-				procCur.ProvNum=pat.SecProv;
+			procCur.ProvNum=procCode.ProvNumDefault;//use default prov if one is set
+			if(procCur.ProvNum==0) {//if no proc default prov, use pat's pri or sec prov
+				procCur.ProvNum=pat.PriProv;
+				if(procCode.IsHygiene && pat.SecProv!=0) {
+					procCur.ProvNum=pat.SecProv;
+				}
 			}
 			procCur.Note="";
 			procCur.ClinicNum=pat.ClinicNum;
@@ -1792,47 +1792,24 @@ namespace OpenDentBusiness.HL7 {
 			List<PatPlan> listPatPlan=PatPlans.Refresh(pat.PatNum);
 			List<Benefit> listBen=Benefits.Refresh(listPatPlan,new List<InsSub>());
 			#region Set ProcFee From Fee Schedule
-			//check if it's a medical procedure
-			bool isMed=false;
 			procCur.MedicalCode=procCode.MedicalCode;
-			if(procCur.MedicalCode!=null && procCur.MedicalCode!="") {
-				isMed=true;
-			}
-			//Get fee schedule for medical or dental
-			long feeSch;
-			if(isMed) {
-				feeSch=Fees.GetMedFeeSched(pat,new List<InsPlan>(),listPatPlan,new List<InsSub>());
+			//Get fee schedule and fee amount for medical or dental
+			if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && !string.IsNullOrEmpty(procCur.MedicalCode)) {
+				long feeSch=Fees.GetMedFeeSched(pat,new List<InsPlan>(),listPatPlan,new List<InsSub>(),procCur.ProvNum);
+				procCur.ProcFee=Fees.GetAmount0(ProcedureCodes.GetCodeNum(procCur.MedicalCode),feeSch,procCur.ClinicNum,procCur.ProvNum);
 			}
 			else {
-				feeSch=Fees.GetFeeSched(pat,new List<InsPlan>(),listPatPlan,new List<InsSub>());
-			}
-			//Get the fee amount for medical or dental
-			double insfee;
-			if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && isMed) {
-				insfee=Fees.GetAmount0(ProcedureCodes.GetCodeNum(procCur.MedicalCode),feeSch,procCur.ClinicNum,procCur.ProvNum);
-			}
-			else {
-				insfee=Fees.GetAmount0(procCode.CodeNum,feeSch,procCur.ClinicNum,procCur.ProvNum);
+				long feeSch=Fees.GetFeeSched(pat,new List<InsPlan>(),listPatPlan,new List<InsSub>(),procCur.ProvNum);
+				procCur.ProcFee=Fees.GetAmount0(procCode.CodeNum,feeSch,procCur.ClinicNum,procCur.ProvNum);
 			}
 			InsPlan priplan=null;
 			if(listPatPlan.Count>0) {
 				priplan=InsPlans.GetPlan(InsSubs.GetSub(listPatPlan[0].InsSubNum,new List<InsSub>()).PlanNum,new List<InsPlan>());
 			}
-			if(priplan!=null && priplan.PlanType=="p" && !isMed) {//PPO
-				Provider patProv=Providers.GetProv(pat.PriProv);
-				if(patProv==null) {
-					patProv=Providers.GetProv(PrefC.GetLong(PrefName.PracticeDefaultProv));
-				}
+			if(priplan!=null && priplan.PlanType=="p" && string.IsNullOrEmpty(procCur.MedicalCode)) {//PPO
+				Provider patProv=Providers.GetProv(Patients.GetProvNum(pat),ProviderC.ListLong);
 				double standardFee=Fees.GetAmount0(procCode.CodeNum,patProv.FeeSched,procCur.ClinicNum,procCur.ProvNum);
-				if(standardFee>insfee) {
-					procCur.ProcFee=standardFee;
-				}
-				else {
-					procCur.ProcFee=insfee;
-				}
-			}
-			else {
-				procCur.ProcFee=insfee;
+				procCur.ProcFee=Math.Max(procCur.ProcFee,standardFee);
 			}
 			#endregion Set ProcFee From Fee Schedule
 			procCur.ProcNum=Procedures.Insert(procCur);
