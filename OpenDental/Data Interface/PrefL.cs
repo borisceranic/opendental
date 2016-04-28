@@ -132,11 +132,25 @@ namespace OpenDental {
 			if(maxAllowedPacket==0) {
 				maxAllowedPacket=defaultMaxAllowedPacketSize;
 			}
+			//Now we need to break up the memory stream into a Base64 string but each payload needs to be small enough to send to MySQL.
+			//Each character in Base64 represents 6 bits.  Therefore, 4 chars are used to represent 3 bytes
+			//Therefore we have to read an amout of bytes per loop that must be divisible by 3. 
+			//Also, we want to 'buffer' a few KB for MySQL because the query itself and the parameter information will take up some bytes (unknown).
+			int charsPerPayload=maxAllowedPacket-8192;//Arbitrarily subtracted 8KB from max allowed bytes for MySQL "header" information.
+			charsPerPayload-=(charsPerPayload % 3);//Use the closest amount of bytes divisible by 3.
+			//When we try and send over ~40MB of data, MySQL can drop our connection randomly giving a "MySQL server has gone away" error.
+			//Use a maximum of ~10MB payloads so that the likelyhood of this error is less.
+			charsPerPayload=Math.Min(charsPerPayload,10485759);//This number is divisible by 3.
 			#endregion
-			using(ZipFile zipFile=new ZipFile())
-			using(MemoryStream memStream=new MemoryStream()) {
-				try {
-					#region Compress New Update Files
+			#region Insert Update Files Into Database
+			MemoryStream memStream=null;
+			try {
+				//Clear and prep the current UpdateFiles row in the documentmisc table for the updated binaries.
+				ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Deleting old update files...")));
+				DocumentMiscs.SetUpdateFilesZip();
+				memStream=new MemoryStream();
+				using(ZipFile zipFile=new ZipFile()) {
+					//Take the entire directory in the temp dir that we just created and zip it up.
 					ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Compressing new update files...")));
 					try {
 						zipFile.AddDirectory(folderTempUpdateFiles);
@@ -146,92 +160,57 @@ namespace OpenDental {
 						EventLog.WriteEntry("OpenDental","Error compressing UpdateFiles:\r\n"+ex.Message,EventLogEntryType.Error);
 						throw ex;
 					}
-					StringBuilder strBuilder=new StringBuilder();
-					byte[] zipFileBytes=new byte[memStream.Length];
-					int readBytes=0;
-					memStream.Position=0;//Start at the beginning of the stream.
-					ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Converting new update files...")));
-					try {
-						while((readBytes=memStream.Read(zipFileBytes,0,zipFileBytes.Length))>0) {
-							strBuilder.Append(Convert.ToBase64String(zipFileBytes,0,readBytes));
-						}
-					}
-					catch(Exception ex) {
-						EventLog.WriteEntry("OpenDental","Error converting UpdateFiles to Base64:\r\n"+ex.Message,EventLogEntryType.Error);
-						throw ex;
-					}
-					#endregion
-					#region Break Up New Update Files
-					//Now we need to break up the Base64 string into payloads that are small enough to send to MySQL.
-					//Each character in Base64 represents 6 bits.  Therefore, 4 chars are used to represent 3 bytes
-					//However, MySQL doesn't know that we are sending over a Base64 string so lets assume 1 char = 1 byte.
-					//Also, we want to 'buffer' a few KB for MySQL because the query itself and the parameter information will take up some bytes (unknown).
-					int charsPerPayload=maxAllowedPacket-8192;//Arbitrarily subtracted 8KB from max allowed bytes for MySQL "header" information.
-					List<string> listRawBase64s=new List<string>();
-					string strBase64=strBuilder.ToString();
-					ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Creating new update file payloads...")));
-					try {
-						for(int i=0;i<strBase64.Length;i+=charsPerPayload) {
-							listRawBase64s.Add(strBase64.Substring(i,Math.Min(charsPerPayload,strBase64.Length-i)));
-						}
-					}
-					catch(Exception ex) {
-						EventLog.WriteEntry("OpenDental","Error creating UpdateFile payloads:\r\n"+ex.Message,EventLogEntryType.Error);
-						throw ex;
-					}
-					#endregion
-					#region Insert New Update Files Into Db
-					//Now we have a list of Base64 strings each of which are guaranteed to successfully send to MySQL under the max_packet_allowed limitation.
-					//Clear and prep the current UpdateFiles row in the documentmisc table for the updated binaries.
-					long docNum=DocumentMiscs.SetUpdateFilesZip();
-					ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Inserting new update files into database...")));
-					try {
-						foreach(string rawBase64 in listRawBase64s) {
-							DocumentMiscs.AppendRawBase64ForUpdateFiles(rawBase64);
-						}
-					}
-					catch(Exception ex) {
-						EventLog.WriteEntry("OpenDental","Error inserting UpdateFiles into database:"
-							+"\r\n"+ex.Message
-							+"\r\n  docNum: "+docNum
-							+"\r\n  maxAllowedPacket: "+maxAllowedPacket
-							+"\r\n  charsPerPayload: "+charsPerPayload
-							+"\r\n  strBase64.Length: "+strBase64.Length
-							+"\r\n  listRawBase64s.Count: "+listRawBase64s.Count,EventLogEntryType.Error);
-						throw ex;
-					}
-					#endregion
 				}
-				catch(Exception) {
-					ODEvent.Fire(new ODEventArgs("RecopyProgress","DEFCON 1"));
-					if(isSilent) {
-						FormOpenDental.ExitCode=303;//Failed inserting update files into the database.
-						Application.Exit();
-						return false;
+				byte[] zipFileBytes=new byte[charsPerPayload];
+				memStream.Position=0;//Start at the beginning of the stream.
+				//Convert the zipped up bytes into Base64 and instantly insert it into the database little by little.
+				ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Inserting new update files into database...")));
+				try {
+					while((memStream.Read(zipFileBytes,0,zipFileBytes.Length))>0) {
+						ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Inserting new update files into database...")));
+						DocumentMiscs.AppendRawBase64ForUpdateFiles(Convert.ToBase64String(zipFileBytes));
 					}
-					string errorStr=Lan.g("Prefs","Failed inserting update files into the database."
-						+"\r\nPlease call us or have your IT admin increase the max_allowed_packet to 40MB in the my.ini file.");
-					try {
-						string innoDBTableNames=InnoDb.GetInnodbTableNames();
-						if(innoDBTableNames!="") {
-							//Starting in MySQL 5.6 you can specify innodb_log_file_size in the my.ini and it typicaly needs to be set higher than 48 MB (default).
-							//There is danger in manipulating this value so we should not do it for the customer but have their IT do it.
-							//Since the innodb_log_size variable only exists in MySQL 5.6 and greater, if the user adds this setting to their my.ini file for an
-							//older version, then MySQL will fail to start.  
-							//An alternative solution would be to convert their tables over to MyISAM instead of letting them continue with InnoDB (if possible).
-							//The following message to the user is vague on purpose to avoid listing version numbers.
-							errorStr+="\r\n"+Lan.g("Prefs","InnoDB tables have been detected, you may need to increase the innodb_log_file_size variable.");
-						}
-					}
-					catch(Exception) {
-						//Do not add the additional InnoDB warning because it will often times just confuse our typical users (odds are they are using MyISAM).
-					}
-					MessageBox.Show(errorStr);
+					ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Done...")));
+				}
+				catch(Exception ex) {
+					EventLog.WriteEntry("OpenDental","Error inserting UpdateFiles into database:"
+						+"\r\n"+ex.Message
+						+"\r\n  maxAllowedPacket: "+maxAllowedPacket
+						+"\r\n  charsPerPayload: "+charsPerPayload
+						+"\r\n  memStream.Length: "+memStream.Length,EventLogEntryType.Error);
+					throw ex;
+				}
+			}
+			catch(Exception) {
+				ODEvent.Fire(new ODEventArgs("RecopyProgress","DEFCON 1"));
+				if(isSilent) {
+					FormOpenDental.ExitCode=303;//Failed inserting update files into the database.
+					Application.Exit();
 					return false;
 				}
-				ODEvent.Fire(new ODEventArgs("RecopyProgress","DEFCON 1"));
-				return true;//Inserting a compressed version of the files in the current installation directory into the database was successful.
+				string errorStr=Lan.g("Prefs","Failed inserting update files into the database."
+					+"\r\nPlease call us or have your IT admin increase the max_allowed_packet to 40MB in the my.ini file.");
+				try {
+					string innoDBTableNames=InnoDb.GetInnodbTableNames();
+					if(innoDBTableNames!="") {
+						//Starting in MySQL 5.6 you can specify innodb_log_file_size in the my.ini and it typicaly needs to be set higher than 48 MB (default).
+						//There is danger in manipulating this value so we should not do it for the customer but have their IT do it.
+						//Since the innodb_log_size variable only exists in MySQL 5.6 and greater, if the user adds this setting to their my.ini file for an
+						//older version, then MySQL will fail to start.  
+						//An alternative solution would be to convert their tables over to MyISAM instead of letting them continue with InnoDB (if possible).
+						//The following message to the user is vague on purpose to avoid listing version numbers.
+						errorStr+="\r\n"+Lan.g("Prefs","InnoDB tables have been detected, you may need to increase the innodb_log_file_size variable.");
+					}
+				}
+				catch(Exception) {
+					//Do not add the additional InnoDB warning because it will often times just confuse our typical users (odds are they are using MyISAM).
+				}
+				MessageBox.Show(errorStr);
+				return false;
 			}
+			#endregion
+			ODEvent.Fire(new ODEventArgs("RecopyProgress","DEFCON 1"));
+			return true;//Inserting a compressed version of the files in the current installation directory into the database was successful.
 		}
 
 		///<summary>Creates the directory passed in and copies the files in the current installation directory to the specified folder path.
