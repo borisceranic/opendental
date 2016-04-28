@@ -138,46 +138,27 @@ namespace OpenDental {
 				prisub=InsSubs.GetSub(patPlanList[0].InsSubNum,subList);
 				priplan=InsPlans.GetPlan(prisub.PlanNum,planList);
 			}
-			//Check if it's a medical procedure.
-			double insfee;
-			bool isMed = false;
-			ProcCur.MedicalCode=ProcedureCodes.GetProcCode(ProcCur.CodeNum).MedicalCode;
-			if(ProcCur.MedicalCode != null && ProcCur.MedicalCode != "") {
-				isMed = true;
-			}
-			//Get fee schedule for medical or dental.
-			long feeSch;
-			if(isMed) {
-				feeSch=Fees.GetMedFeeSched(pat,planList,patPlanList,subList);
-			}
-			else {
-				feeSch=Fees.GetFeeSched(pat,planList,patPlanList,subList);
-			}
-			if(ProcedureCodes.GetProcCode(ProcCur.CodeNum).IsHygiene && pat.SecProv != 0) {
+			ProcedureCode procCodeCur=ProcedureCodes.GetProcCode(ProcCur.CodeNum);
+			ProcCur.MedicalCode=procCodeCur.MedicalCode;
+			if(procCodeCur.IsHygiene && pat.SecProv!=0) {
 				ProcCur.ProvNum=pat.SecProv;
 			}
 			else {
 				ProcCur.ProvNum=pat.PriProv;
 			}
 			ProcCur.ClinicNum=pat.ClinicNum;
-			//Get the fee amount for medical or dental.
-			if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && isMed) {
-				insfee=Fees.GetAmount0(ProcedureCodes.GetProcCode(ProcCur.MedicalCode).CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
+			//Get fee schedule and fee for medical or dental.
+			if(PrefC.GetBool(PrefName.MedicalFeeUsedForNewProcs) && !string.IsNullOrEmpty(ProcCur.MedicalCode)) {
+				long feeSch=Fees.GetMedFeeSched(pat,planList,patPlanList,subList,ProcCur.ProvNum);
+				ProcCur.ProcFee=Fees.GetAmount0(ProcedureCodes.GetProcCode(ProcCur.MedicalCode).CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
 			}
 			else {
-				insfee=Fees.GetAmount0(ProcCur.CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
+				long feeSch=Fees.GetFeeSched(pat,planList,patPlanList,subList,ProcCur.ProvNum);
+				ProcCur.ProcFee=Fees.GetAmount0(ProcCur.CodeNum,feeSch,ProcCur.ClinicNum,ProcCur.ProvNum);
 			}
 			if(priplan!=null && priplan.PlanType=="p") {//PPO
 				double standardfee=Fees.GetAmount0(ProcCur.CodeNum,Providers.GetProv(Patients.GetProvNum(pat)).FeeSched,ProcCur.ClinicNum,ProcCur.ProvNum);
-				if(standardfee>insfee) {
-					ProcCur.ProcFee=standardfee;
-				}
-				else {
-					ProcCur.ProcFee=insfee;
-				}
-			}
-			else {
-				ProcCur.ProcFee=insfee;
+				ProcCur.ProcFee=Math.Max(ProcCur.ProcFee,standardfee);
 			}
 			//surf
 			//ToothNum
@@ -189,9 +170,9 @@ namespace OpenDental {
 			//dx
 			//nextaptnum
 			ProcCur.DateEntryC=DateTime.Now;
-			ProcCur.BaseUnits=ProcedureCodes.GetProcCode(ProcCur.CodeNum).BaseUnits;
+			ProcCur.BaseUnits=procCodeCur.BaseUnits;
 			ProcCur.SiteNum=pat.SiteNum;
-			ProcCur.RevCode=ProcedureCodes.GetProcCode(ProcCur.CodeNum).RevenueCodeDefault;
+			ProcCur.RevCode=procCodeCur.RevenueCodeDefault;
 			ProcCur.DiagnosticCode=PrefC.GetString(PrefName.ICD9DefaultForNewProcs);
 			if(Userods.IsUserCpoe(Security.CurUser)) {
 				//This procedure is considered CPOE because the provider is the one that has added it.
