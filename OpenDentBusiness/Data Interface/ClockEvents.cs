@@ -68,9 +68,9 @@ namespace OpenDentBusiness{
 
 
 		///<summary>Validates list and throws exceptions.  Returns a list of clock events (not breaks) within the date range for employee. No option for breaks because this is just used in summing for time card report; use GetTimeCardRule instead.</summary>
-		public static List<ClockEvent> GetListForTimeCardManage(long empNum,DateTime fromDate,DateTime toDate) {
+		public static List<ClockEvent> GetListForTimeCardManage(long empNum,long clinicNum,DateTime fromDate,DateTime toDate,bool isAll) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<ClockEvent>>(MethodBase.GetCurrentMethod(),empNum,fromDate,toDate);
+				return Meth.GetObject<List<ClockEvent>>(MethodBase.GetCurrentMethod(),empNum,clinicNum,fromDate,toDate,isAll);
 			}
 			List<ClockEvent> retVal=new List<ClockEvent>();
 			string errors="";
@@ -79,8 +79,11 @@ namespace OpenDentBusiness{
 				"SELECT * FROM clockevent WHERE"
 				+" EmployeeNum = '"+POut.Long(empNum)+"'"
 				+" AND TimeDisplayed1 >= "+POut.Date(fromDate)
-				+" AND TimeDisplayed1 < "+POut.Date(toDate.AddDays(1))//adding a day takes it to midnight of the specified toDate
-				+" AND (ClockStatus = 0 OR ClockStatus = 1)"
+				+" AND TimeDisplayed1 < "+POut.Date(toDate.AddDays(1));//adding a day takes it to midnight of the specified toDate
+				if(!isAll) {
+					command+=" AND ClinicNum = '"+POut.Long(clinicNum)+"'";
+				}
+				command+=" AND (ClockStatus = 0 OR ClockStatus = 1)"
 				+" ORDER BY TimeDisplayed1";
 			retVal=Crud.ClockEventCrud.SelectMany(command);
 			//Validate Pay Period------------------------------------------------------------------------------------------------------------------
@@ -191,6 +194,7 @@ namespace OpenDentBusiness{
 				clockEvent=new ClockEvent();
 				clockEvent.EmployeeNum=employeeNum;
 				clockEvent.ClockStatus=TimeClockStatus.Home;
+				clockEvent.ClinicNum=Clinics.ClinicNum;
 				ClockEvents.Insert(clockEvent);//times handled
 			}
 			else if(clockEvent.ClockStatus==TimeClockStatus.Break) {//only incomplete breaks will have been returned.
@@ -213,6 +217,7 @@ namespace OpenDentBusiness{
 					clockEvent=new ClockEvent();
 					clockEvent.EmployeeNum=employeeNum;
 					clockEvent.ClockStatus=tcs;
+					clockEvent.ClinicNum=Clinics.ClinicNum;
 					ClockEvents.Insert(clockEvent);//times handled
 				}
 			}
@@ -236,9 +241,11 @@ namespace OpenDentBusiness{
 			//clocked in.
 			if(clockStatus==TimeClockStatus.Break) {//clocking out on break
 				//leave the half-finished event alone and start a new one
+				long clinicNum=clockEvent.ClinicNum;
 				clockEvent=new ClockEvent();
 				clockEvent.EmployeeNum=employeeNum;
 				clockEvent.ClockStatus=TimeClockStatus.Break;
+				clockEvent.ClinicNum=clinicNum;
 				ClockEvents.Insert(clockEvent);//times handled
 			}
 			else {//finish the existing event
@@ -471,23 +478,11 @@ namespace OpenDentBusiness{
 			retVal.Columns.Add("rate1OTHours");
 			retVal.Columns.Add("rate2Hours");
 			retVal.Columns.Add("rate2OTHours");
-			//retVal.Columns.Add("ClockEventAdjustTotal");
-			//retVal.Columns.Add("TimeAdjust");//adjustments to regular time from timeAdjust entries. Not a net zero effect on total hours worked.
-			//retVal.Columns.Add("TimeAdjustOT");//OT adjustments from timeAdjust entries. OT time adjust has net zero effect. Non-OT time adjust alters total hours worked.
-			//retVal.Columns.Add("PaidBreakTime");//paid breaks. Is adjusted by pressing calcDaily.
 			retVal.Columns.Add("Note");
 			//Loop through employees.  Each employee adds one row to table --------------------------------------------------------------------------------
-			List<ClockEvent> listClockEventsAllPlusPevWeek			=new List<ClockEvent>();
-			List<ClockEvent> listClockEventsBreakAllPlusPrevWeek=new List<ClockEvent>();
-			List<TimeAdjust> listTimeAdjustAllPlusPrevWeek			=new List<TimeAdjust>();
 			List<Employee> listEmployees;
-			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
-				listEmployees=Employees.GetForTimeCard();
-			}
-			else {
-				listEmployees=Employees.GetEmpsForClinic(clinicNum,isAll);
-				listEmployees.Sort(new Employees.EmployeeComparer(Employees.EmployeeComparer.SortBy.LFName));
-			}
+			listEmployees=Employees.GetForTimeCard();//Gets all non-hidden employees
+			List<Employee> listEmpsForClinic=Employees.GetEmpsForClinic(clinicNum);
 			for(int e=0;e<listEmployees.Count;e++) {
 				string employeeErrors="";
 				string note="";
@@ -504,14 +499,27 @@ namespace OpenDentBusiness{
 				List<TimeSpan> listTsRegularHoursWeekly			=new List<TimeSpan>();//Total non-overtime hours.  Used for calculation, not displayed or part of dataTable.
 				List<TimeSpan> listTsOTHoursWeekly					=new List<TimeSpan>();//Total overtime hours.  Used for calculation, not displayed or part of dataTable.
 				List<TimeSpan> listTsDifferentialHoursWeekly=new List<TimeSpan>();//Not included in total hours worked.  tsDifferentialHours is differant than r2Hours and r2OTHours
-				//TimeSpan tsClockEventNetAdjust    =new TimeSpan();
-				//TimeSpan tsTimeAdjust             =new TimeSpan();
-				//TimeSpan tsTimeAdjustOT           =new TimeSpan();
-				//TimeSpan tsPaidBreakTime          =new TimeSpan();
-				List<ClockEvent> listClockEvents	=new List<ClockEvent>();
-				List<TimeAdjust> listTimeAdjusts	=new List<TimeAdjust>();
-				try {listClockEvents=ClockEvents.GetListForTimeCardManage(listEmployees[e].EmployeeNum,startDate,stopDate);}catch(Exception ex) {employeeErrors+=ex.Message;}
-				try {listTimeAdjusts=TimeAdjusts.GetListForTimeCardManage(listEmployees[e].EmployeeNum,startDate,stopDate);}catch(Exception ex) {employeeErrors+=ex.Message;}
+				List<ClockEvent> listClockEvents	=new List<ClockEvent>();//per clinic
+				List<TimeAdjust> listTimeAdjusts	=new List<TimeAdjust>();//per clinic
+				try {
+					listClockEvents=ClockEvents.GetListForTimeCardManage(listEmployees[e].EmployeeNum,clinicNum,startDate,stopDate,isAll);
+				}
+				catch(Exception ex) {
+					employeeErrors+=ex.Message;
+				}
+				try {
+					listTimeAdjusts=TimeAdjusts.GetListForTimeCardManage(listEmployees[e].EmployeeNum,clinicNum,startDate,stopDate,isAll);
+				}
+				catch(Exception ex) {
+					employeeErrors+=ex.Message;
+				}
+				//If there are no clock events, nor time adjusts, and the current employee isn't "assigned" to the clinic passed in, skip.
+				if(listClockEvents.Count==0 //employee has no clock events for this clinic.
+					&& listTimeAdjusts.Count==0 //employee has no time adjusts for this clinic.
+					&& (!isAll && listEmpsForClinic.Count(x => x.EmployeeNum==listEmployees[e].EmployeeNum)==0)) //employee not explicitly assigned to clinic
+				{
+					continue;
+				}
 				//report errors in note column and move to next employee.----------------------------------------------------------------
 				if(employeeErrors!="") {
 					dataRowCur["Note"]=employeeErrors.Trim();
@@ -605,7 +613,6 @@ namespace OpenDentBusiness{
 				dataRowCur["rate2OTHours"]=TimeSpan.FromHours(r2OTHours).ToString();
 				dataRowCur["Note"]=note;
 				retVal.Rows.Add(dataRowCur);
-				continue;
 			}
 			return retVal;
 		}
@@ -615,8 +622,8 @@ namespace OpenDentBusiness{
 			string errors="";
 			List<ClockEvent> listCE=new List<ClockEvent>();
 			List<TimeAdjust> listTA=new List<TimeAdjust>();
-			try { listCE=ClockEvents.GetListForTimeCardManage(employeeNum,startDate,endDate); }catch(Exception ex) {	errors+=ex.Message;	}
-			try { listTA=TimeAdjusts.GetListForTimeCardManage(employeeNum,startDate,endDate); }catch(Exception ex) { errors+=ex.Message; }
+			try { listCE=ClockEvents.GetListForTimeCardManage(employeeNum,0,startDate,endDate,true); }catch(Exception ex) {	errors+=ex.Message;	}
+			try { listTA=TimeAdjusts.GetListForTimeCardManage(employeeNum,0,startDate,endDate,true); }catch(Exception ex) { errors+=ex.Message; }
 			TimeSpan retVal=TimeSpan.Zero;
 			for(int i=0;i<listCE.Count;i++) {
 				retVal+=listCE[i].TimeDisplayed2-listCE[i].TimeDisplayed1;
@@ -635,8 +642,8 @@ namespace OpenDentBusiness{
 
 		/// <summary>Used to sum a partial weeks worth of OT hours from clock events and time spans.</summary>
 		private static TimeSpan prevWeekOTHoursHelper(long employeeNum,DateTime startDate,DateTime endDate) {
-			List<ClockEvent> listCE=ClockEvents.GetListForTimeCardManage(employeeNum,startDate,endDate);
-			List<TimeAdjust> listTA=TimeAdjusts.GetListForTimeCardManage(employeeNum,startDate,endDate);
+			List<ClockEvent> listCE=ClockEvents.GetListForTimeCardManage(employeeNum,0,startDate,endDate,true);
+			List<TimeAdjust> listTA=TimeAdjusts.GetListForTimeCardManage(employeeNum,0,startDate,endDate,true);
 			TimeSpan retVal=TimeSpan.Zero;
 			for(int i=0;i<listCE.Count;i++) {
 				if(listCE[i].OTimeHours!=TimeSpan.FromHours(-1)) {//Manual override
@@ -654,7 +661,7 @@ namespace OpenDentBusiness{
 
 		/// <summary>Used to sum a partial weeks worth of rate2 hours from clock events.</summary>
 		private static TimeSpan prevWeekDiffHoursHelper(long employeeNum,DateTime startDate,DateTime endDate) {
-			List<ClockEvent> listCE=ClockEvents.GetListForTimeCardManage(employeeNum,startDate,endDate);
+			List<ClockEvent> listCE=ClockEvents.GetListForTimeCardManage(employeeNum,0,startDate,endDate,true);
 			TimeSpan retVal=TimeSpan.Zero;
 			for(int i=0;i<listCE.Count;i++) {
 				if(listCE[i].Rate2Hours!=TimeSpan.FromHours(-1)) {//Manual override

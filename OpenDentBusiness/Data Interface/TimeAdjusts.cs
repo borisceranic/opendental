@@ -41,9 +41,9 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Validates and throws exceptions.  Deletes automatic adjustments that fall within the pay period.</summary>
-		public static List<TimeAdjust> GetListForTimeCardManage(long empNum,DateTime fromDate,DateTime toDate) {
+		public static List<TimeAdjust> GetListForTimeCardManage(long empNum,long clinicNum,DateTime fromDate,DateTime toDate,bool isAll) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<TimeAdjust>>(MethodBase.GetCurrentMethod(),empNum,fromDate,toDate);
+				return Meth.GetObject<List<TimeAdjust>>(MethodBase.GetCurrentMethod(),empNum,clinicNum,fromDate,toDate,isAll);
 			}
 			List<TimeAdjust> retVal=new List<TimeAdjust>();
 			//List<TimeAdjust> listTimeAdjusts=new List<TimeAdjust>();
@@ -51,8 +51,11 @@ namespace OpenDentBusiness{
 				"SELECT * FROM timeadjust WHERE "
 				+"EmployeeNum = "+POut.Long(empNum)+" "
 				+"AND "+DbHelper.DtimeToDate("TimeEntry")+" >= "+POut.Date(fromDate)+" "
-				+"AND "+DbHelper.DtimeToDate("TimeEntry")+" <= "+POut.Date(toDate)+" "
-				+"ORDER BY TimeEntry";
+				+"AND "+DbHelper.DtimeToDate("TimeEntry")+" <= "+POut.Date(toDate)+" ";
+			if(!isAll) {
+				command+="AND ClinicNum = "+POut.Long(clinicNum)+" ";
+			}
+			command+="ORDER BY TimeEntry";
 			//listTimeAdjusts=Crud.TimeAdjustCrud.SelectMany(command);
 			return Crud.TimeAdjustCrud.SelectMany(command);
 			//Delete automatic adjustments.------------------------------------------------------------------------------------------

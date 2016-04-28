@@ -53,6 +53,8 @@ namespace OpenDentBusiness{
 		[CrudColumn(SpecialType=CrudSpecialColType.TimeSpanNeg)]
 		[XmlIgnore]
 		public TimeSpan Rate2Auto;
+		///<summary>FK to clinic.ClinicNum.  The clinic the ClockEvent was entered at.</summary>
+		public long ClinicNum;
 
 		///<summary>Used only for serialization purposes</summary>
 		[XmlElement("OTimeHours",typeof(long))]

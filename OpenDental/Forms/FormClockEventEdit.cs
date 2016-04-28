@@ -4,6 +4,8 @@ using System.Collections;
 using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Collections.Generic;
+using CodeBase;
 
 namespace OpenDental{
 	/// <summary>
@@ -57,7 +59,11 @@ namespace OpenDental{
 		private GroupBox groupRate2;
 		private Label label18;
 		private ODtextBox textNote;
+		private Label labelClinic;
+		private ComboBox comboClinic;
 		private ClockEvent ClockEventCur;
+		private List<Clinic> _listClinics;
+		private long _selectedClinicNum;
 
 		///<summary></summary>
 		public FormClockEventEdit(ClockEvent clockEventCur)
@@ -136,6 +142,8 @@ namespace OpenDental{
 			this.groupRate2 = new System.Windows.Forms.GroupBox();
 			this.label18 = new System.Windows.Forms.Label();
 			this.textNote = new OpenDental.ODtextBox();
+			this.labelClinic = new System.Windows.Forms.Label();
+			this.comboClinic = new System.Windows.Forms.ComboBox();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.groupTimeSpans.SuspendLayout();
@@ -178,14 +186,14 @@ namespace OpenDental{
 			// 
 			// listStatus
 			// 
-			this.listStatus.Location = new System.Drawing.Point(179, 118);
+			this.listStatus.Location = new System.Drawing.Point(179, 135);
 			this.listStatus.Name = "listStatus";
 			this.listStatus.Size = new System.Drawing.Size(120, 43);
 			this.listStatus.TabIndex = 8;
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(72, 118);
+			this.label3.Location = new System.Drawing.Point(72, 135);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(105, 16);
 			this.label3.TabIndex = 9;
@@ -194,7 +202,7 @@ namespace OpenDental{
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(72, 309);
+			this.label4.Location = new System.Drawing.Point(72, 326);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(105, 16);
 			this.label4.TabIndex = 10;
@@ -208,7 +216,7 @@ namespace OpenDental{
 			this.groupBox1.Controls.Add(this.butNow1);
 			this.groupBox1.Controls.Add(this.label2);
 			this.groupBox1.Controls.Add(this.textTimeDisplayed1);
-			this.groupBox1.Location = new System.Drawing.Point(79, 12);
+			this.groupBox1.Location = new System.Drawing.Point(79, 29);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(267, 100);
 			this.groupBox1.TabIndex = 13;
@@ -237,7 +245,7 @@ namespace OpenDental{
 			this.groupBox2.Controls.Add(this.label6);
 			this.groupBox2.Controls.Add(this.butNow2);
 			this.groupBox2.Controls.Add(this.textTimeDisplayed2);
-			this.groupBox2.Location = new System.Drawing.Point(363, 12);
+			this.groupBox2.Location = new System.Drawing.Point(363, 29);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Size = new System.Drawing.Size(267, 100);
 			this.groupBox2.TabIndex = 14;
@@ -377,7 +385,7 @@ namespace OpenDental{
 			this.groupTimeSpans.Controls.Add(this.label9);
 			this.groupTimeSpans.Controls.Add(this.textOTimeHours);
 			this.groupTimeSpans.Controls.Add(this.textClockedTime);
-			this.groupTimeSpans.Location = new System.Drawing.Point(79, 164);
+			this.groupTimeSpans.Location = new System.Drawing.Point(79, 181);
 			this.groupTimeSpans.Name = "groupTimeSpans";
 			this.groupTimeSpans.Size = new System.Drawing.Size(267, 134);
 			this.groupTimeSpans.TabIndex = 30;
@@ -569,7 +577,7 @@ namespace OpenDental{
 			this.groupRate2.Controls.Add(this.label15);
 			this.groupRate2.Controls.Add(this.textTotalHours);
 			this.groupRate2.Controls.Add(this.label14);
-			this.groupRate2.Location = new System.Drawing.Point(352, 164);
+			this.groupRate2.Location = new System.Drawing.Point(352, 181);
 			this.groupRate2.Name = "groupRate2";
 			this.groupRate2.Size = new System.Drawing.Size(267, 134);
 			this.groupRate2.TabIndex = 31;
@@ -588,20 +596,42 @@ namespace OpenDental{
 			// textNote
 			// 
 			this.textNote.AcceptsTab = true;
+			this.textNote.DetectLinksEnabled = false;
 			this.textNote.DetectUrls = false;
-			this.textNote.Location = new System.Drawing.Point(179, 309);
+			this.textNote.Location = new System.Drawing.Point(179, 326);
 			this.textNote.Name = "textNote";
 			this.textNote.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
 			this.textNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textNote.Size = new System.Drawing.Size(317, 110);
+			this.textNote.SpellCheckIsEnabled = false;
 			this.textNote.TabIndex = 32;
 			this.textNote.Text = "";
 			// 
+			// labelClinic
+			// 
+			this.labelClinic.Location = new System.Drawing.Point(62, 7);
+			this.labelClinic.Name = "labelClinic";
+			this.labelClinic.Size = new System.Drawing.Size(117, 17);
+			this.labelClinic.TabIndex = 125;
+			this.labelClinic.Text = "Clinic";
+			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// comboClinic
+			// 
+			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboClinic.FormattingEnabled = true;
+			this.comboClinic.Location = new System.Drawing.Point(180, 5);
+			this.comboClinic.Name = "comboClinic";
+			this.comboClinic.Size = new System.Drawing.Size(166, 21);
+			this.comboClinic.TabIndex = 124;
+			this.comboClinic.SelectedIndexChanged += new System.EventHandler(this.comboClinic_SelectedIndexChanged);
+			// 
 			// FormClockEventEdit
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(669, 485);
+			this.Controls.Add(this.labelClinic);
 			this.Controls.Add(this.textNote);
+			this.Controls.Add(this.comboClinic);
 			this.Controls.Add(this.groupRate2);
 			this.Controls.Add(this.groupTimeSpans);
 			this.Controls.Add(this.groupBox2);
@@ -617,7 +647,6 @@ namespace OpenDental{
 			this.MinimizeBox = false;
 			this.Name = "FormClockEventEdit";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Clock Event";
 			this.Load += new System.EventHandler(this.FormClockEventEdit_Load);
 			this.groupBox1.ResumeLayout(false);
@@ -646,8 +675,31 @@ namespace OpenDental{
 				groupTimeSpans.Visible=false;
 				groupRate2.Visible=false;
 			}
+			if(PrefC.HasClinicsEnabled) {
+				_listClinics=Clinics.GetForUserod(Security.CurUser);
+				if(!Security.CurUser.ClinicIsRestricted || Security.CurUser.ClinicNum==0) {
+					//If they are not restricted or are assigned to HQ, add it as the top option.
+					Clinic hqClinic=new Clinic();
+					hqClinic.Description="Headquarters";
+					_listClinics.Insert(0,hqClinic);//Insert the "HQ clinic" so we don't have to mess with indices ever again. Has ClinicNum=0
+				}
+				_listClinics.ForEach(x=>comboClinic.Items.Add(x.Description));
+				_selectedClinicNum=ClockEventCur.ClinicNum;
+				comboClinic.IndexSelectOrSetText(_listClinics.FindIndex(x=>x.ClinicNum==_selectedClinicNum),()=> {return Clinics.GetDesc(_selectedClinicNum); });
+			}
+			else {
+				_listClinics=new List<Clinic>();
+				labelClinic.Visible=false;
+				comboClinic.Visible=false;
+			}
 			//Set Text Fields----------------
 			FillInitialControlsHelper();
+		}
+
+		private void comboClinic_SelectedIndexChanged(object sender,EventArgs e) {
+			if(comboClinic.SelectedIndex>-1) {
+				_selectedClinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
+			}
 		}
 
 		///<summary>Fills all controls based on the values of ClockEventCur, which is a copy of the object from the DB.</summary>
@@ -1026,14 +1078,11 @@ namespace OpenDental{
 			if(textRate2Hours.Text=="") {
 				ClockEventCur.Rate2Hours=TimeSpan.FromHours(-1);
 			}
-			//if(textAmountBonus.Text=="") {
-			//  ClockEventCur.AmountBonus=-1;
-			//}
-			//else {
-			//  ClockEventCur.AmountBonus=PIn.Double(textAmountBonus.Text);
-			//}
 			//The two auto fields are only set externally.
 			ClockEventCur.Note=textNote.Text;
+			if(PrefC.HasClinicsEnabled) {
+				ClockEventCur.ClinicNum=_selectedClinicNum;
+			}
 			ClockEvents.Update(ClockEventCur);
 			DialogResult=DialogResult.OK;
 		}
@@ -1041,6 +1090,5 @@ namespace OpenDental{
 		private void butCancel_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
-
 	}
 }

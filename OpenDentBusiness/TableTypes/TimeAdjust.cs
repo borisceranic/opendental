@@ -27,6 +27,8 @@ namespace OpenDentBusiness{
 		public string Note;
 		///<summary>Set to true if this adjustment was automatically made by the system.  When the calc weekly OT tool is run, these types of adjustments are fair game for deletion.  Other adjustments are preserved.</summary>
 		public bool IsAuto;
+		///<summary>FK to clinic.ClinicNum.  The clinic the TimeAdjust was entered at.</summary>
+		public long ClinicNum;
 
 		///<summary>Used only for serialization purposes</summary>
 		[XmlElement("RegHours",typeof(long))]

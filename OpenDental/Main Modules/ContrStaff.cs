@@ -1076,7 +1076,12 @@ namespace OpenDental{
 			gridEmp.Columns.Add(col);
 			gridEmp.Rows.Clear();
 			UI.ODGridRow row;
-			_listEmployees=Employees.GetEmpsForClinic(Clinics.ClinicNum);
+			if(PrefC.HasClinicsEnabled) {
+				_listEmployees=Employees.GetEmpsForClinic(Clinics.ClinicNum,false,true);
+			}
+			else {
+				_listEmployees=Employees.GetListShort();
+			}
 			for(int i=0;i<_listEmployees.Count;i++) {
 				row=new OpenDental.UI.ODGridRow();
 				row.Cells.Add(Employees.GetNameFL(_listEmployees[i]));

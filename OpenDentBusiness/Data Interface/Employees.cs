@@ -242,10 +242,10 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Gets all the employees for a specific clinicNum, according to their associated user.  Pass in a clinicNum of 0 to get the list of unassigned or "all" employees (depending on isAll flag).  In addition to setting clinicNum to 0, set isAll true to get a list of all employees or false to get a list of employees that are not associated to any clinics.  Always gets the list of employees from the cache which is sorted by FName, LastName.</summary>
-		public static List<Employee> GetEmpsForClinic(long clinicNum,bool isAll) {
+		public static List<Employee> GetEmpsForClinic(long clinicNum,bool isAll,bool getUnassigned=false) {
 			//No need to check RemotingRole; no call to db.
 			List<Employee> listEmpsShort=Employees.GetListShort();
-			if(clinicNum==0 && isAll) {//Simply return all employees.
+			if(!PrefC.HasClinicsEnabled || (clinicNum==0 && isAll)) {//Simply return all employees.
 				return listEmpsShort;
 			}
 			List<Employee> listEmpsWithClinic=new List<Employee>();
@@ -273,6 +273,9 @@ namespace OpenDentBusiness{
 						listEmpsWithClinic.Add(empCur);
 					}
 				}
+			}
+			if(getUnassigned) {
+				return listEmpsUnassigned.Union(listEmpsWithClinic).OrderBy(x=> Employees.GetNameFL(x)).ToList();
 			}
 			//Returning the isAll employee list was handled above (all non-hidden emps, ListShort).
 			if(clinicNum==0) {//Return list of unassigned employees.  This is used for the 'Headquarters' clinic filter.

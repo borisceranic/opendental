@@ -61,6 +61,7 @@ namespace OpenDentBusiness.Crud{
 				clockEvent.AdjustIsOverridden= PIn.Bool  (row["AdjustIsOverridden"].ToString());
 				clockEvent.Rate2Hours        = PIn.TSpan (row["Rate2Hours"].ToString());
 				clockEvent.Rate2Auto         = PIn.TSpan (row["Rate2Auto"].ToString());
+				clockEvent.ClinicNum         = PIn.Long  (row["ClinicNum"].ToString());
 				retVal.Add(clockEvent);
 			}
 			return retVal;
@@ -87,6 +88,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("AdjustIsOverridden");
 			table.Columns.Add("Rate2Hours");
 			table.Columns.Add("Rate2Auto");
+			table.Columns.Add("ClinicNum");
 			foreach(ClockEvent clockEvent in listClockEvents) {
 				table.Rows.Add(new object[] {
 					POut.Long  (clockEvent.ClockEventNum),
@@ -104,6 +106,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Bool  (clockEvent.AdjustIsOverridden),
 					POut.Time  (clockEvent.Rate2Hours),
 					POut.Time  (clockEvent.Rate2Auto),
+					POut.Long  (clockEvent.ClinicNum),
 				});
 			}
 			return table;
@@ -144,7 +147,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ClockEventNum,";
 			}
-			command+="EmployeeNum,TimeEntered1,TimeDisplayed1,ClockStatus,Note,TimeEntered2,TimeDisplayed2,OTimeHours,OTimeAuto,Adjust,AdjustAuto,AdjustIsOverridden,Rate2Hours,Rate2Auto) VALUES(";
+			command+="EmployeeNum,TimeEntered1,TimeDisplayed1,ClockStatus,Note,TimeEntered2,TimeDisplayed2,OTimeHours,OTimeAuto,Adjust,AdjustAuto,AdjustIsOverridden,Rate2Hours,Rate2Auto,ClinicNum) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(clockEvent.ClockEventNum)+",";
 			}
@@ -162,7 +165,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.TSpan (clockEvent.AdjustAuto)+"',"
 				+    POut.Bool  (clockEvent.AdjustIsOverridden)+","
 				+"'"+POut.TSpan (clockEvent.Rate2Hours)+"',"
-				+"'"+POut.TSpan (clockEvent.Rate2Auto)+"')";
+				+"'"+POut.TSpan (clockEvent.Rate2Auto)+"',"
+				+    POut.Long  (clockEvent.ClinicNum)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -195,7 +199,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ClockEventNum,";
 			}
-			command+="EmployeeNum,TimeEntered1,TimeDisplayed1,ClockStatus,Note,TimeEntered2,TimeDisplayed2,OTimeHours,OTimeAuto,Adjust,AdjustAuto,AdjustIsOverridden,Rate2Hours,Rate2Auto) VALUES(";
+			command+="EmployeeNum,TimeEntered1,TimeDisplayed1,ClockStatus,Note,TimeEntered2,TimeDisplayed2,OTimeHours,OTimeAuto,Adjust,AdjustAuto,AdjustIsOverridden,Rate2Hours,Rate2Auto,ClinicNum) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(clockEvent.ClockEventNum)+",";
 			}
@@ -213,7 +217,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.TSpan (clockEvent.AdjustAuto)+"',"
 				+    POut.Bool  (clockEvent.AdjustIsOverridden)+","
 				+"'"+POut.TSpan (clockEvent.Rate2Hours)+"',"
-				+"'"+POut.TSpan (clockEvent.Rate2Auto)+"')";
+				+"'"+POut.TSpan (clockEvent.Rate2Auto)+"',"
+				+    POut.Long  (clockEvent.ClinicNum)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -239,7 +244,8 @@ namespace OpenDentBusiness.Crud{
 				+"AdjustAuto        = '"+POut.TSpan (clockEvent.AdjustAuto)+"', "
 				+"AdjustIsOverridden=  "+POut.Bool  (clockEvent.AdjustIsOverridden)+", "
 				+"Rate2Hours        = '"+POut.TSpan (clockEvent.Rate2Hours)+"', "
-				+"Rate2Auto         = '"+POut.TSpan (clockEvent.Rate2Auto)+"' "
+				+"Rate2Auto         = '"+POut.TSpan (clockEvent.Rate2Auto)+"', "
+				+"ClinicNum         =  "+POut.Long  (clockEvent.ClinicNum)+" "
 				+"WHERE ClockEventNum = "+POut.Long(clockEvent.ClockEventNum);
 			Db.NonQ(command);
 		}
@@ -300,6 +306,10 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="Rate2Auto = '"+POut.TSpan (clockEvent.Rate2Auto)+"'";
 			}
+			if(clockEvent.ClinicNum != oldClockEvent.ClinicNum) {
+				if(command!=""){ command+=",";}
+				command+="ClinicNum = "+POut.Long(clockEvent.ClinicNum)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -350,6 +360,9 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			if(clockEvent.Rate2Auto != oldClockEvent.Rate2Auto) {
+				return true;
+			}
+			if(clockEvent.ClinicNum != oldClockEvent.ClinicNum) {
 				return true;
 			}
 			return false;

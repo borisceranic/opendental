@@ -53,6 +53,7 @@ namespace OpenDentBusiness.Crud{
 				timeAdjust.OTimeHours   = PIn.TSpan (row["OTimeHours"].ToString());
 				timeAdjust.Note         = PIn.String(row["Note"].ToString());
 				timeAdjust.IsAuto       = PIn.Bool  (row["IsAuto"].ToString());
+				timeAdjust.ClinicNum    = PIn.Long  (row["ClinicNum"].ToString());
 				retVal.Add(timeAdjust);
 			}
 			return retVal;
@@ -71,6 +72,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("OTimeHours");
 			table.Columns.Add("Note");
 			table.Columns.Add("IsAuto");
+			table.Columns.Add("ClinicNum");
 			foreach(TimeAdjust timeAdjust in listTimeAdjusts) {
 				table.Rows.Add(new object[] {
 					POut.Long  (timeAdjust.TimeAdjustNum),
@@ -80,6 +82,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Time  (timeAdjust.OTimeHours),
 					            timeAdjust.Note,
 					POut.Bool  (timeAdjust.IsAuto),
+					POut.Long  (timeAdjust.ClinicNum),
 				});
 			}
 			return table;
@@ -120,7 +123,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="TimeAdjustNum,";
 			}
-			command+="EmployeeNum,TimeEntry,RegHours,OTimeHours,Note,IsAuto) VALUES(";
+			command+="EmployeeNum,TimeEntry,RegHours,OTimeHours,Note,IsAuto,ClinicNum) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(timeAdjust.TimeAdjustNum)+",";
 			}
@@ -130,7 +133,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.TSpan (timeAdjust.RegHours)+"',"
 				+"'"+POut.TSpan (timeAdjust.OTimeHours)+"',"
 				+"'"+POut.String(timeAdjust.Note)+"',"
-				+    POut.Bool  (timeAdjust.IsAuto)+")";
+				+    POut.Bool  (timeAdjust.IsAuto)+","
+				+    POut.Long  (timeAdjust.ClinicNum)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -163,7 +167,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="TimeAdjustNum,";
 			}
-			command+="EmployeeNum,TimeEntry,RegHours,OTimeHours,Note,IsAuto) VALUES(";
+			command+="EmployeeNum,TimeEntry,RegHours,OTimeHours,Note,IsAuto,ClinicNum) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(timeAdjust.TimeAdjustNum)+",";
 			}
@@ -173,7 +177,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.TSpan (timeAdjust.RegHours)+"',"
 				+"'"+POut.TSpan (timeAdjust.OTimeHours)+"',"
 				+"'"+POut.String(timeAdjust.Note)+"',"
-				+    POut.Bool  (timeAdjust.IsAuto)+")";
+				+    POut.Bool  (timeAdjust.IsAuto)+","
+				+    POut.Long  (timeAdjust.ClinicNum)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -191,7 +196,8 @@ namespace OpenDentBusiness.Crud{
 				+"RegHours     = '"+POut.TSpan (timeAdjust.RegHours)+"', "
 				+"OTimeHours   = '"+POut.TSpan (timeAdjust.OTimeHours)+"', "
 				+"Note         = '"+POut.String(timeAdjust.Note)+"', "
-				+"IsAuto       =  "+POut.Bool  (timeAdjust.IsAuto)+" "
+				+"IsAuto       =  "+POut.Bool  (timeAdjust.IsAuto)+", "
+				+"ClinicNum    =  "+POut.Long  (timeAdjust.ClinicNum)+" "
 				+"WHERE TimeAdjustNum = "+POut.Long(timeAdjust.TimeAdjustNum);
 			Db.NonQ(command);
 		}
@@ -223,6 +229,10 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="IsAuto = "+POut.Bool(timeAdjust.IsAuto)+"";
 			}
+			if(timeAdjust.ClinicNum != oldTimeAdjust.ClinicNum) {
+				if(command!=""){ command+=",";}
+				command+="ClinicNum = "+POut.Long(timeAdjust.ClinicNum)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -251,6 +261,9 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			if(timeAdjust.IsAuto != oldTimeAdjust.IsAuto) {
+				return true;
+			}
+			if(timeAdjust.ClinicNum != oldTimeAdjust.ClinicNum) {
 				return true;
 			}
 			return false;

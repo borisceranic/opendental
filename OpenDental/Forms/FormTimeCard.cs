@@ -708,6 +708,10 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g(this,"Weekly"),50,HorizontalAlignment.Right);
 			gridMain.Columns.Add(col);
+			if(PrefC.HasClinicsEnabled) {
+				col=new ODGridColumn(Lan.g(this,"Clinic"),100);
+				gridMain.Columns.Add(col);
+			}
 			col=new ODGridColumn(Lan.g(this,"Note"),5);
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
@@ -910,6 +914,10 @@ namespace OpenDental{
 						//row.Cells.Add(ClockEvents.Format(weekSpan));
 						row.Cells.Add("");
 					}
+					//Clinic-----------------------------------------
+					if(PrefC.HasClinicsEnabled) {
+						row.Cells.Add(Clinics.GetDesc(clock.ClinicNum));
+					}
 					//Note-----------------------------------------
 					row.Cells.Add(clock.Note);
 				}
@@ -975,6 +983,10 @@ namespace OpenDental{
 					}
 					else {
 						row.Cells.Add("");
+					}
+					//Clinic-----------------------------------------
+					if(PrefC.HasClinicsEnabled) {
+						row.Cells.Add(Clinics.GetDesc(adjust.ClinicNum));
 					}
 					//Note-----------------------------------------
 					row.Cells.Add(adjust.Note);

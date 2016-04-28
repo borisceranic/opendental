@@ -10,6 +10,9 @@ using System.Linq;
 namespace OpenDentBusiness{
 	///<summary></summary>
 	public class TimeCardRules{
+		///<summary>Tracks overtime by clinic. Reset for every week. Consider narrowing scope and moving to the function(s) that use this variable.</summary>
+		private static Dictionary<long,TimeSpan> _dictClinicOvertimes;
+
 		#region CachePattern
 		//This region can be eliminated if this is not a table type with cached data.
 		//If leaving this region in place, be sure to add RefreshCache and FillCache 
@@ -839,18 +842,33 @@ namespace OpenDentBusiness{
 					continue;
 				}
 				//found a weekly total over 40 hours
-				TimeAdjust adjust=new TimeAdjust();
-				adjust.IsAuto=true;
-				adjust.EmployeeNum=EmployeeCur.EmployeeNum;
-				adjust.TimeEntry=GetDateForRowHelper(mergedAL[i]).AddHours(20);//puts it at 8pm on the same day.
-				adjust.OTimeHours=WeeklyTotals[i]-TimeSpan.FromHours(40);
-				adjust.RegHours=-adjust.OTimeHours;
-				TimeAdjusts.Insert(adjust);
+				if(_dictClinicOvertimes.Count(x=>x.Value!=TimeSpan.Zero)>0) {
+					foreach(KeyValuePair<long,TimeSpan> kvp in _dictClinicOvertimes.Where(x=>x.Value!=TimeSpan.Zero)) {
+						TimeAdjust adjust=new TimeAdjust();
+						adjust.IsAuto=true;
+						adjust.EmployeeNum=EmployeeCur.EmployeeNum;
+						adjust.TimeEntry=GetDateForRowHelper(mergedAL[i]).AddHours(20);
+						adjust.OTimeHours=kvp.Value;
+						adjust.RegHours=-adjust.OTimeHours;
+						adjust.ClinicNum=kvp.Key;
+						TimeAdjusts.Insert(adjust);
+					}
+				}
+				else {
+					TimeAdjust adjust=new TimeAdjust();
+					adjust.IsAuto=true;
+					adjust.EmployeeNum=EmployeeCur.EmployeeNum;
+					adjust.TimeEntry=GetDateForRowHelper(mergedAL[i]).AddHours(20);//puts it at 8pm on the same day.
+					adjust.OTimeHours=WeeklyTotals[i]-TimeSpan.FromHours(40);
+					adjust.RegHours=-adjust.OTimeHours;
+					TimeAdjusts.Insert(adjust);
+				}
 			}
 		}
 
 		/// <summary>This was originally analogous to the FormTimeCard.FillGrid(), before this logic was moved to the business layer.</summary>
 		private static List<TimeSpan> FillWeeklyTotalsHelper(bool fromDB,Employee EmployeeCur,ArrayList mergedAL) {
+			_dictClinicOvertimes=new Dictionary<long, TimeSpan>();
 			List<TimeSpan> retVal = new List<TimeSpan>();
 			TimeSpan[] WeeklyTotals=new TimeSpan[mergedAL.Count];
 			TimeSpan alteredSpan=new TimeSpan(0);//used to display altered times
@@ -862,7 +880,7 @@ namespace OpenDentBusiness{
 			if(mergedAL.Count>0) {
 				weekSpan=ClockEvents.GetWeekTotal(EmployeeCur.EmployeeNum,GetDateForRowHelper(mergedAL[0]));
 			}
-			TimeSpan periodSpan=new TimeSpan(0);//used to add up totals for entire page.
+			TimeSpan periodSpan=new TimeSpan(0);//used to add up totals for entire page. (Not used. Left over from when this code existed in the UI.)
 			TimeSpan otspan=new TimeSpan(0);//overtime for the entire period
 			Calendar cal=CultureInfo.CurrentCulture.Calendar;
 			CalendarWeekRule rule=CalendarWeekRule.FirstFullWeek;// CultureInfo.CurrentCulture.DateTimeFormat.CalendarWeekRule;
@@ -879,12 +897,28 @@ namespace OpenDentBusiness{
 					clock=(ClockEvent)mergedAL[i];
 					curDate=clock.TimeDisplayed1.Date;
 					if(clock.TimeDisplayed2.Year<1880) {
+						//ignore clock event where user has not clocked out yet.
 					}
 					else {
 						oneSpan=clock.TimeDisplayed2-clock.TimeDisplayed1;
 						daySpan+=oneSpan;
 						weekSpan+=oneSpan;
 						periodSpan+=oneSpan;
+						//
+						if(weekSpan>TimeSpan.FromHours(40) && oneSpan!=TimeSpan.Zero) {
+							TimeSpan otTime=new TimeSpan();
+							if(weekSpan-oneSpan<TimeSpan.FromHours(40)) {//oneSpan caused weekSpan to go over 40 hours.  Find out what portion of it is over 40.
+								otTime=weekSpan-TimeSpan.FromHours(40);
+							}
+							else {//oneSpan is fully in OT
+								otTime=oneSpan;
+							}
+							//Add OT span to the weekly OT tracking dictionary
+							if(!_dictClinicOvertimes.ContainsKey(clock.ClinicNum)) {
+								_dictClinicOvertimes[clock.ClinicNum]=TimeSpan.Zero;
+							}
+							_dictClinicOvertimes[clock.ClinicNum]=_dictClinicOvertimes[clock.ClinicNum].Add(otTime);
+						}
 					}
 					//Adjust---------------------------------
 					oneAdj=TimeSpan.Zero;
@@ -897,6 +931,19 @@ namespace OpenDentBusiness{
 					daySpan+=oneAdj;
 					weekSpan+=oneAdj;
 					periodSpan+=oneAdj;
+					if(weekSpan>TimeSpan.FromHours(40) && oneAdj>TimeSpan.FromHours(0)) {
+						TimeSpan otTime=new TimeSpan();
+						if(weekSpan-oneAdj<TimeSpan.FromHours(40)) {//oneSpan caused weekSpan to go over 40 hours.  Find out what portion of it is over 40.
+							otTime=weekSpan-TimeSpan.FromHours(40);
+						}
+						else {//oneSpan is fully in OT
+							otTime=oneAdj;
+						}
+						if(!_dictClinicOvertimes.ContainsKey(clock.ClinicNum)) {
+							_dictClinicOvertimes[clock.ClinicNum]=TimeSpan.Zero;
+						}
+						_dictClinicOvertimes[clock.ClinicNum]=_dictClinicOvertimes[clock.ClinicNum].Add(otTime);
+					}
 					//Overtime------------------------------
 					oneOT=TimeSpan.Zero;
 					if(clock.OTimeHours!=TimeSpan.FromHours(-1)) {//overridden
@@ -971,8 +1018,6 @@ namespace OpenDentBusiness{
 			}
 			return DateTime.MinValue;
 		}
-
-
 
 	}
 }
