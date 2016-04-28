@@ -2924,14 +2924,6 @@ namespace OpenDental{
 					}
 					else{
 						butInvalidate.Visible=false;
-						//because islocked overrides security:
-						if(!Security.IsAuthorized(Permissions.ProcComplEdit,ProcCur.DateEntryC)){
-							butOK.Enabled=false;//use this state to cascade permission to any form opened from here
-							butDelete.Enabled=false;
-							butChange.Enabled=false;
-							butEditAnyway.Enabled=false;
-							butSetComplete.Enabled=false;
-						}
 					}
 				}
 			}
@@ -3079,6 +3071,7 @@ namespace OpenDental{
 			IsStartingUp=true;
 			FillControlsOnStartup();
 			SetControlsUpperLeft();
+			SetControlsEnabled(false);
 			FillReferral();
 			FillIns(false);
 			FillPayments();
@@ -3628,6 +3621,60 @@ namespace OpenDental{
 					break;
 			}//end switch
 			textProcFee.Text=ProcCur.ProcFee.ToString("n");
+		}
+
+		///<summary>Enable/disable controls based on permissions ProcComplEdit and ProcComplEditLimited.</summary>
+		private void SetControlsEnabled(bool isSilent) {
+			if(ProcCur.ProcStatus!=ProcStat.C) {
+				return;
+			}
+			if(!Security.IsAuthorized(Permissions.ProcComplEditLimited,ProcCur.DateEntryC,isSilent)) {//user doesn't have limited or full proc complete edit permission
+				List<Control> listControls=Controls.OfType<Control>().Where(x => x!=butCancel && x!=butSearch).ToList();//leave the cancel and search buttons enabled
+				listControls.AddRange(tabControl.TabPages.OfType<TabPage>().SelectMany(x => x.Controls.OfType<Control>()).ToList());
+				foreach(Control cCur in listControls) {
+					if(cCur is TextBox || cCur is ValidDate || cCur is ValidDouble) {
+						((TextBox)cCur).ReadOnly=true;
+						cCur.BackColor=SystemColors.Control;
+					}
+					else if(cCur is ODtextBox) {
+						((ODtextBox)cCur).ReadOnly=true;
+						cCur.BackColor=SystemColors.Control;
+					}
+					else if(cCur is UI.Button || cCur is ComboBox || cCur is CheckBox || cCur is GroupBox || cCur is Panel || cCur is SignatureBoxWrapper) {
+						cCur.Enabled=false;
+					}
+				}
+			}
+			else if(!Security.IsAuthorized(Permissions.ProcComplEdit,ProcCur.DateEntryC,isSilent)) {
+				//list of controls enabled for those with ProcComplEditLimited permission
+				List<Control> listControlsEnabled=new List<Control>() {
+					panel1,panelSurfaces,groupArch,listBoxTeeth,listBoxTeeth2,textTooth,textSurfaces,//controls enabled within panel1
+					checkHideGraphics,comboDx,groupProsth,textClaimNote,checkNoBillIns,//controls enabled below panel1 and on tabControl
+					butSearch,butCancel,butOK,butEditAnyway,butAddAdjust//buttons enabled
+				};
+				//list of all controls on the form that will be disabled since user doesn't have ProcComplEdit (full) permission
+				List<Control> listControlsDisabled=Controls.OfType<Control>().ToList();
+				//add all controls on the tabControl.TabPages except for the Misc and Medical tabs
+				listControlsDisabled.AddRange(tabControl.TabPages.OfType<TabPage>().Where(x => x!=tabPageMisc && x!=tabPageMedical)
+					.SelectMany(x => x.Controls.OfType<Control>()));
+				//add panel1's (upper left corner panel) controls
+				listControlsDisabled.AddRange(panel1.Controls.OfType<Control>());
+				//now remove any of the controls in the enabled list
+				listControlsDisabled.RemoveAll(x => listControlsEnabled.Contains(x));
+				foreach(Control cCur in listControlsDisabled) {
+					if(cCur is TextBox || cCur is ValidDate || cCur is ValidDouble) {
+						((TextBox)cCur).ReadOnly=true;
+						cCur.BackColor=SystemColors.Control;
+					}
+					else if(cCur is ODtextBox) {
+						((ODtextBox)cCur).ReadOnly=true;
+						cCur.BackColor=SystemColors.Control;
+					}
+					else if(cCur is UI.Button || cCur is ComboBox || cCur is CheckBox || cCur is GroupBox || cCur is Panel || cCur is SignatureBoxWrapper) {
+						cCur.Enabled=false;
+					}
+				}
+			}
 		}//end SetControls
 
 		private void FillReferral() {
@@ -3807,7 +3854,7 @@ namespace OpenDental{
 
 		private void gridIns_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			FormClaimProc FormC=new FormClaimProc(ClaimProcsForProc[e.Row],ProcCur,FamCur,PatCur,PlanList,HistList,ref LoopList,PatPlanList,true,SubList);
-			if(!butOK.Enabled){
+			if(ProcCur.IsLocked || (ProcCur.ProcStatus==ProcStat.C && !Security.IsAuthorized(Permissions.ProcComplEdit,ProcCur.DateEntryC))) {
 				FormC.NoPermissionProc=true;
 			}
 			FormC.ShowDialog();
@@ -4110,6 +4157,7 @@ namespace OpenDental{
 			checkNoBillIns.Enabled=true;
 			butDelete.Enabled=true;
 			butSetComplete.Enabled=true;
+			SetControlsEnabled(true);//enables/disables controls based on whether or not the user has permission (limited and/or full) to edit completed procs
 			//butChange.Enabled=true;//No. We no longer allow this because part of "change" is to delete all the claimprocs.  This is a terrible idea for a completed proc attached to a claim.
 			//checkIsCovIns.Enabled=true;
 		}
@@ -5056,13 +5104,13 @@ namespace OpenDental{
 			}
 			else if(!IsNew){//an old procedure
 				if(ProcOld.ProcStatus==ProcStat.C){//that was already complete
-					//It's not possible for the user to get to this point unless they have permission for ProcComplEdit based on the DateEntryC.
+					//It's not possible for the user to get to this point unless they have permission for ProcComplEditLimited based on the DateEntryC.
 					//The following 2 checks are not redundant because they check different dates.
-					if(!Security.IsAuthorized(Permissions.ProcComplEdit,ProcOld.ProcDate)){//block old date
+					if(!Security.IsAuthorized(Permissions.ProcComplEditLimited,ProcOld.ProcDate)){//block old date
 						return false;
 					}
 					if(ProcCur.ProcStatus==ProcStat.C){//if it's still complete
-						if(!Security.IsAuthorized(Permissions.ProcComplEdit,PIn.Date(textDate.Text))){//block new date, too
+						if(!Security.IsAuthorized(Permissions.ProcComplEditLimited,PIn.Date(textDate.Text))){//block new date, too
 							return false;
 						}
 					}
@@ -5656,7 +5704,7 @@ namespace OpenDental{
 				verifyCode=AutoCodeItems.VerifyCode
 					(ProcedureCode2.CodeNum,ProcCur.ToothNum,claimSurf,false,PatCur.PatNum,PatCur.Age,out AutoCodeCur);
 			}
-			if(ProcedureCode2.CodeNum!=verifyCode){
+			if(Security.IsAuthorized(Permissions.ProcComplEdit,ProcCur.DateEntryC,true) && ProcedureCode2.CodeNum!=verifyCode){
 				string desc=ProcedureCodes.GetProcCode(verifyCode).Descript;
 				FormAutoCodeLessIntrusive FormA=new FormAutoCodeLessIntrusive();
 				FormA.mainText=ProcedureCodes.GetProcCode(verifyCode).ProcCode

@@ -122,7 +122,7 @@ namespace OpenDental{
 			this.treePermissions.SelectedImageIndex = 0;
 			this.treePermissions.ShowPlusMinus = false;
 			this.treePermissions.ShowRootLines = false;
-			this.treePermissions.Size = new System.Drawing.Size(362, 637);
+			this.treePermissions.Size = new System.Drawing.Size(402, 637);
 			this.treePermissions.TabIndex = 6;
 			this.treePermissions.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treePermissions_AfterSelect);
 			this.treePermissions.DoubleClick += new System.EventHandler(this.treePermissions_DoubleClick);
@@ -138,6 +138,7 @@ namespace OpenDental{
 			// 
 			// labelPerm
 			// 
+			this.labelPerm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.labelPerm.Location = new System.Drawing.Point(522, 7);
 			this.labelPerm.Name = "labelPerm";
 			this.labelPerm.Size = new System.Drawing.Size(285, 19);
@@ -298,6 +299,7 @@ namespace OpenDental{
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasAddButton = false;
 			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = true;
 			this.gridMain.Location = new System.Drawing.Point(8, 29);
@@ -401,7 +403,7 @@ namespace OpenDental{
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(812, 672);
+			this.butClose.Location = new System.Drawing.Point(852, 672);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 24);
 			this.butClose.TabIndex = 12;
@@ -423,8 +425,7 @@ namespace OpenDental{
 			// 
 			// FormSecurity
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(894, 700);
+			this.ClientSize = new System.Drawing.Size(934, 700);
 			this.Controls.Add(this.checkDisableBackupReminder);
 			this.Controls.Add(this.labelGlobalDateLockDisabled);
 			this.Controls.Add(this.checkUserNameManualEntry);
@@ -453,9 +454,8 @@ namespace OpenDental{
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
-			this.MinimumSize = new System.Drawing.Size(875, 337);
+			this.MinimumSize = new System.Drawing.Size(920, 337);
 			this.Name = "FormSecurity";
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Security";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormSecurity_FormClosing);
 			this.Load += new System.EventHandler(this.FormSecurity_Load);
@@ -638,6 +638,8 @@ namespace OpenDental{
 					node3=SetNode(Permissions.ProcComplCreate);
 						node2.Nodes.Add(node3);
 					node3=SetNode(Permissions.ProcComplEdit);
+						node2.Nodes.Add(node3);
+					node3=SetNode(Permissions.ProcComplEditLimited);
 						node2.Nodes.Add(node3);
 					node3=SetNode(Permissions.ProcEditShowFee);
 						node2.Nodes.Add(node3);
@@ -992,6 +994,25 @@ namespace OpenDental{
 						return;
 					}
 				}
+				if(perm.PermType==Permissions.ProcComplEdit) {
+					GroupPermission permLimited=GroupPermissions.GetPerm(SelectedGroupNum,Permissions.ProcComplEditLimited);
+					if(permLimited==null) {
+						GroupPermissions.RefreshCache();//refresh NewerDays/Date to add the same for ProcComplEditLimited
+						perm=GroupPermissions.GetPerm(SelectedGroupNum,Permissions.ProcComplEdit);
+						permLimited=new GroupPermission();
+						permLimited.NewerDate=perm.NewerDate;
+						permLimited.NewerDays=perm.NewerDays;
+						permLimited.UserGroupNum=perm.UserGroupNum;
+						permLimited.PermType=Permissions.ProcComplEditLimited;
+						try {
+							GroupPermissions.Insert(permLimited);
+						}
+						catch(Exception ex) {
+							MessageBox.Show(ex.Message);
+							return;
+						}
+					}
+				}
 			}
 			else if(clickedPermNode.ImageIndex==2){//checked, so need to delete the perm
 				try{
@@ -1000,6 +1021,17 @@ namespace OpenDental{
 				catch(Exception ex){
 					MessageBox.Show(ex.Message);
 					return;
+				}
+				if((Permissions)clickedPermNode.Tag==Permissions.ProcComplEditLimited
+					&& GroupPermissions.HasPermission(SelectedGroupNum,Permissions.ProcComplEdit))
+				{
+					try {
+						GroupPermissions.RemovePermission(SelectedGroupNum,Permissions.ProcComplEdit);
+					}
+					catch(Exception ex) {
+						MessageBox.Show(ex.Message);
+						return;
+					}
 				}
 			}
 			FillTreePerm();

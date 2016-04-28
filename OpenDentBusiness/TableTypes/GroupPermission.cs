@@ -272,7 +272,10 @@ namespace OpenDentBusiness{
 		///<summary>115 - Allows users to be assigned Insurance Verifications.</summary>
 		InsPlanVerifyList,
 		///<summary>116 - Allows users to bypass the global lock date to add paysplits.</summary>
-		SplitCreatePastLockDate
+		SplitCreatePastLockDate,
+		///<summary>117 - Uses date restrictions.  Covers editing some fields of completed procs.  Limited list includes treatment area, diagnosis,
+		///add adjustment, Do Not Bill To Ins, Hide Graphics, Misc tab, Medical tab, E-claim note, and the Prosthesis Replacement group box.</summary>
+		ProcComplEditLimited
 	}
 
 	

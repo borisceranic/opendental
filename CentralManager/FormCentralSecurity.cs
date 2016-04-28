@@ -171,6 +171,8 @@ namespace CentralManager {
 						node2.Nodes.Add(node3);
 					node3=SetNode(Permissions.ProcComplEdit);
 						node2.Nodes.Add(node3);
+					node3=SetNode(Permissions.ProcComplEditLimited);
+						node2.Nodes.Add(node3);
 					node3=SetNode(Permissions.ProcEditShowFee);
 						node2.Nodes.Add(node3);
 					node3=SetNode(Permissions.ProcDelete);
@@ -409,6 +411,26 @@ namespace CentralManager {
 						return;
 					}
 				}
+				if(perm.PermType==Permissions.ProcComplEdit) {
+					GroupPermission permLimited=GroupPermissions.GetPerm(_selectedGroupNum,Permissions.ProcComplEditLimited);
+					if(permLimited==null) {
+						GroupPermissions.RefreshCache();//refresh NewerDays/Date to add the same for ProcComplEditLimited
+						perm=GroupPermissions.GetPerm(_selectedGroupNum,Permissions.ProcComplEdit);
+						permLimited=new GroupPermission() {
+							NewerDate=perm.NewerDate,
+							NewerDays=perm.NewerDays,
+							UserGroupNum=perm.UserGroupNum,
+							PermType=Permissions.ProcComplEditLimited
+						};
+						try {
+							GroupPermissions.Insert(permLimited);
+						}
+						catch(Exception ex) {
+							MessageBox.Show(ex.Message);
+							return;
+						}
+					}
+				}
 			}
 			else if(_clickedPermNode.ImageIndex==2) {//checked, so need to delete the perm
 				try {
@@ -417,6 +439,17 @@ namespace CentralManager {
 				catch(Exception ex) {
 					MessageBox.Show(ex.Message);
 					return;
+				}
+				if((Permissions)_clickedPermNode.Tag==Permissions.ProcComplEditLimited
+					&& GroupPermissions.HasPermission(_selectedGroupNum,Permissions.ProcComplEdit))
+				{
+					try {
+						GroupPermissions.RemovePermission(_selectedGroupNum,Permissions.ProcComplEdit);
+					}
+					catch(Exception ex) {
+						MessageBox.Show(ex.Message);
+						return;
+					}
 				}
 			}
 			FillTreePerm();

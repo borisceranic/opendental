@@ -54,8 +54,7 @@
 			// 
 			// treePermissions
 			// 
-			this.treePermissions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+			this.treePermissions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.treePermissions.HideSelection = false;
 			this.treePermissions.ImageIndex = 0;
@@ -66,7 +65,7 @@
 			this.treePermissions.SelectedImageIndex = 0;
 			this.treePermissions.ShowPlusMinus = false;
 			this.treePermissions.ShowRootLines = false;
-			this.treePermissions.Size = new System.Drawing.Size(386, 305);
+			this.treePermissions.Size = new System.Drawing.Size(402, 305);
 			this.treePermissions.TabIndex = 61;
 			this.treePermissions.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treePermissions_AfterSelect);
 			this.treePermissions.DoubleClick += new System.EventHandler(this.treePermissions_DoubleClick);
@@ -82,6 +81,7 @@
 			// 
 			// labelPerm
 			// 
+			this.labelPerm.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.labelPerm.Location = new System.Drawing.Point(252, 9);
 			this.labelPerm.Name = "labelPerm";
 			this.labelPerm.Size = new System.Drawing.Size(285, 15);
@@ -92,12 +92,12 @@
 			// butSyncAll
 			// 
 			this.butSyncAll.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butSyncAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butSyncAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butSyncAll.Autosize = true;
 			this.butSyncAll.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSyncAll.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSyncAll.CornerRadius = 4F;
-			this.butSyncAll.Location = new System.Drawing.Point(566, 443);
+			this.butSyncAll.Location = new System.Drawing.Point(582, 443);
 			this.butSyncAll.Name = "butSyncAll";
 			this.butSyncAll.Size = new System.Drawing.Size(75, 24);
 			this.butSyncAll.TabIndex = 67;
@@ -107,7 +107,7 @@
 			// butSetAll
 			// 
 			this.butSetAll.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butSetAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butSetAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butSetAll.Autosize = true;
 			this.butSetAll.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSetAll.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -127,7 +127,7 @@
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(566, 592);
+			this.butClose.Location = new System.Drawing.Point(582, 592);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 24);
 			this.butClose.TabIndex = 65;
@@ -137,7 +137,7 @@
 			// butAddUser
 			// 
 			this.butAddUser.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAddUser.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butAddUser.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butAddUser.Autosize = true;
 			this.butAddUser.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAddUser.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
@@ -166,8 +166,11 @@
 			// 
 			// gridMain
 			// 
-			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasAddButton = false;
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HasAddButton = false;
 			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
@@ -184,6 +187,7 @@
 			// 
 			// groupBox1
 			// 
+			this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.groupBox1.Controls.Add(this.label1);
 			this.groupBox1.Controls.Add(this.label6);
 			this.groupBox1.Controls.Add(this.checkAdmin);
@@ -289,7 +293,7 @@
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(566, 562);
+			this.butOK.Location = new System.Drawing.Point(582, 562);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 107;
@@ -299,12 +303,12 @@
 			// butSyncUsers
 			// 
 			this.butSyncUsers.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butSyncUsers.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butSyncUsers.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butSyncUsers.Autosize = true;
 			this.butSyncUsers.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSyncUsers.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSyncUsers.CornerRadius = 4F;
-			this.butSyncUsers.Location = new System.Drawing.Point(566, 473);
+			this.butSyncUsers.Location = new System.Drawing.Point(582, 473);
 			this.butSyncUsers.Name = "butSyncUsers";
 			this.butSyncUsers.Size = new System.Drawing.Size(75, 24);
 			this.butSyncUsers.TabIndex = 108;
@@ -314,12 +318,12 @@
 			// butSyncLocks
 			// 
 			this.butSyncLocks.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butSyncLocks.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butSyncLocks.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butSyncLocks.Autosize = true;
 			this.butSyncLocks.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butSyncLocks.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butSyncLocks.CornerRadius = 4F;
-			this.butSyncLocks.Location = new System.Drawing.Point(566, 503);
+			this.butSyncLocks.Location = new System.Drawing.Point(582, 503);
 			this.butSyncLocks.Name = "butSyncLocks";
 			this.butSyncLocks.Size = new System.Drawing.Size(75, 24);
 			this.butSyncLocks.TabIndex = 109;
@@ -348,7 +352,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(653, 628);
+			this.ClientSize = new System.Drawing.Size(669, 628);
 			this.Controls.Add(this.label5);
 			this.Controls.Add(this.textSyncCode);
 			this.Controls.Add(this.butSyncLocks);
@@ -363,9 +367,10 @@
 			this.Controls.Add(this.butEditGroup);
 			this.Controls.Add(this.treePermissions);
 			this.Controls.Add(this.gridMain);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
-			this.MinimumSize = new System.Drawing.Size(593, 341);
+			this.MinimumSize = new System.Drawing.Size(669, 393);
 			this.Name = "FormCentralSecurity";
 			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;

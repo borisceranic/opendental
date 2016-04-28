@@ -733,6 +733,32 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX timeadjust_ClinicNum ON timeadjust (ClinicNum)";
 					Db.NonQ(command);
 				}
+				//Users with ProcComplEdit permission will be granted ProcComplEditLimited permission with the same days/date restriction.
+				command="SELECT NewerDate,NewerDays,UserGroupNum FROM grouppermission WHERE PermType=10"; //ProcComplEdit
+				table=Db.GetTable(command);
+				DateTime newerDate;
+				int newerDays;
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					foreach(DataRow row in table.Rows) {
+						newerDate=PIn.Date(row["NewerDate"].ToString());
+						newerDays=PIn.Int(row["NewerDays"].ToString());
+						groupNum=PIn.Long(row["UserGroupNum"].ToString());
+						command="INSERT INTO grouppermission (NewerDate,NewerDays,UserGroupNum,PermType) "
+							+"VALUES("+POut.Date(newerDate)+","+POut.Int(newerDays)+","+POut.Long(groupNum)+",117)";//117 - ProcComplEditLimited
+						Db.NonQ(command);
+					}
+				}
+				else {//oracle
+					foreach(DataRow row in table.Rows) {
+						newerDate=PIn.Date(row["NewerDate"].ToString());
+						newerDays=PIn.Int(row["NewerDays"].ToString());
+						groupNum=PIn.Long(row["UserGroupNum"].ToString());
+						command="INSERT INTO grouppermission (GroupPermNum,NewerDate,NewerDays,UserGroupNum,PermType) "
+							+"VALUES((SELECT MAX(GroupPermNum)+1 FROM grouppermission),"+POut.Date(newerDate)+","+POut.Int(newerDays)+","
+							+POut.Long(groupNum)+",117)";//117 - ProcComplEditLimited
+						Db.NonQ(command);
+					}
+				}
 
 				command="UPDATE preference SET ValueString = '16.2.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);

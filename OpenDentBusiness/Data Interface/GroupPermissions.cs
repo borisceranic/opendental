@@ -308,7 +308,8 @@ namespace OpenDentBusiness{
 				case Permissions.InsPlanVerifyList:
 				//case Permissions.SheetEdit:
 				//case Permissions.SplitCreatePastLockDate:
-					return false;//Does not have audit Trail if uncommented.
+				//case Permissions.ProcComplEditLimited:
+				return false;//Does not have audit Trail if uncommented.
 			}
 			return true;
 		}
@@ -454,7 +455,9 @@ namespace OpenDentBusiness{
 				case Permissions.ProcDelete:
 					return Lans.g("enumPermissions","TP Procedure Delete");
 				case Permissions.ProcComplEdit:
-					return Lans.g("enumPermissions","Edit Completed Procedure");
+					return Lans.g("enumPermissions","Edit Completed Procedure (full)");
+				case Permissions.ProcComplEditLimited:
+					return Lans.g("enumPermissions","Edit Completed Procedure (limited)");
 				case Permissions.ProcEditShowFee:
 					return Lans.g("enumPermissions","Show Procedure Fee");
 				case Permissions.Providers:
@@ -539,6 +542,7 @@ namespace OpenDentBusiness{
 				|| permType==Permissions.PaymentEdit
 				|| permType==Permissions.PerioEdit
 				|| permType==Permissions.ProcComplEdit
+				|| permType==Permissions.ProcComplEditLimited
 				|| permType==Permissions.ProcDelete
 				|| permType==Permissions.SheetEdit
 				|| permType==Permissions.TimecardDeleteEntry

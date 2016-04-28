@@ -45,12 +45,14 @@ namespace OpenDental{
 			// 
 			// grid
 			// 
+			this.grid.HasAddButton = false;
+			this.grid.HasMultilineHeaders = false;
 			this.grid.HScrollVisible = false;
 			this.grid.Location = new System.Drawing.Point(8, 21);
 			this.grid.Name = "grid";
 			this.grid.ScrollValue = 0;
 			this.grid.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.grid.Size = new System.Drawing.Size(888, 602);
+			this.grid.Size = new System.Drawing.Size(889, 602);
 			this.grid.TabIndex = 2;
 			this.grid.Title = "Audit Trail";
 			this.grid.TranslationName = "TableAudit";
@@ -69,17 +71,14 @@ namespace OpenDental{
 			// 
 			// FormAuditOneType
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(905, 634);
 			this.Controls.Add(this.labelDisclaimer);
 			this.Controls.Add(this.grid);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.KeyPreview = true;
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
 			this.Name = "FormAuditOneType";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Audit Trail";
 			this.Load += new System.EventHandler(this.FormAuditOneType_Load);
 			this.ResumeLayout(false);
@@ -122,9 +121,9 @@ namespace OpenDental{
 			grid.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableAudit","User"),70);
 			grid.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableAudit","Permission"),110);
+			col=new ODGridColumn(Lan.g("TableAudit","Permission"),170);
 			grid.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableAudit","Log Text"),569);
+			col=new ODGridColumn(Lan.g("TableAudit","Log Text"),510);
 			grid.Columns.Add(col);
 			grid.Rows.Clear();
 			ODGridRow row;
