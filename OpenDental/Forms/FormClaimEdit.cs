@@ -19,6 +19,7 @@ using OpenDental.UI;
 using CodeBase;
 using OpenDental.Eclaims;
 using OpenDentBusiness;
+using System.Linq;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -319,8 +320,6 @@ namespace OpenDental{
 		public bool IsFromBatchWindow;
 		private UI.Button butPickProvBill;
 		private UI.Button butPickProvTreat;
-		private long _provNumOrderingSelected;
-		private long _provNumBillSelected;
 		private ValidNum textOrthoTotalM;
 		private Label label96;
 		private TabPage tabHistory;
@@ -354,7 +353,18 @@ namespace OpenDental{
 		private Label label74;
 		private ValidDouble textShareOfCost;
 		private ErrorProvider _recalcErrorProvider;
-		private long _provNumTreatSelected;
+		///<summary>Cached list of clinics available to user. Also includes a dummy Clinic at index 0 for "none".</summary>
+		private List<Clinic> _listClinics;
+		///<summary>Filtered list of providers based on which clinic is selected. If no clinic is selected displays all providers. Also includes a dummy clinic at index 0 for "none"</summary>
+		private List<Provider> _listProviders;
+		///<summary>Used to keep track of the current clinic selected. This is because it may be a clinic that is not in _listClinics.</summary>
+		private long _selectedClinicNum;
+		///<summary>Instead of relying on _listProviders[comboProv.SelectedIndex] to determine the selected Provider we use this variable to store it explicitly.</summary>
+		private long _selectedProvBillNum;
+		///<summary>Instead of relying on _listProviders[comboProvHyg.SelectedIndex] to determine the selected Provider we use this variable to store it explicitly.</summary>
+		private long _selectedProvTreatNum;
+		///<summary>Instead of relying on _listProviders[comboProvHyg.SelectedIndex] to determine the selected Provider we use this variable to store it explicitly.</summary>
+		private long _selectedProvOrderNum;
 
 		///<summary></summary>
 		public FormClaimEdit(Claim claimCur, Patient patCur,Family famCur){
@@ -979,21 +989,23 @@ namespace OpenDental{
 			// 
 			// comboProvBill
 			// 
+			this.comboProvBill.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboProvBill.Location = new System.Drawing.Point(351, 74);
 			this.comboProvBill.MaxDropDownItems = 30;
 			this.comboProvBill.Name = "comboProvBill";
 			this.comboProvBill.Size = new System.Drawing.Size(150, 21);
 			this.comboProvBill.TabIndex = 97;
-			this.comboProvBill.SelectionChangeCommitted += new System.EventHandler(this.comboProvBill_SelectionChangeCommitted);
+			this.comboProvBill.SelectedIndexChanged += new System.EventHandler(this.comboProvBill_SelectedIndexChanged);
 			// 
 			// comboProvTreat
 			// 
+			this.comboProvTreat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboProvTreat.Location = new System.Drawing.Point(351, 95);
 			this.comboProvTreat.MaxDropDownItems = 30;
 			this.comboProvTreat.Name = "comboProvTreat";
 			this.comboProvTreat.Size = new System.Drawing.Size(150, 21);
 			this.comboProvTreat.TabIndex = 99;
-			this.comboProvTreat.SelectionChangeCommitted += new System.EventHandler(this.comboProvTreat_SelectionChangeCommitted);
+			this.comboProvTreat.SelectedIndexChanged += new System.EventHandler(this.comboProvTreat_SelectedIndexChanged);
 			// 
 			// label2
 			// 
@@ -1118,6 +1130,7 @@ namespace OpenDental{
 			this.comboClinic.Name = "comboClinic";
 			this.comboClinic.Size = new System.Drawing.Size(170, 21);
 			this.comboClinic.TabIndex = 121;
+			this.comboClinic.SelectedIndexChanged += new System.EventHandler(this.comboClinic_SelectedIndexChanged);
 			// 
 			// labelClinic
 			// 
@@ -1883,6 +1896,7 @@ namespace OpenDental{
 			// 
 			this.textNote.AcceptsTab = true;
 			this.textNote.BackColor = System.Drawing.SystemColors.Window;
+			this.textNote.DetectLinksEnabled = false;
 			this.textNote.DetectUrls = false;
 			this.textNote.Location = new System.Drawing.Point(619, 22);
 			this.textNote.MaxLength = 255;
@@ -1890,6 +1904,7 @@ namespace OpenDental{
 			this.textNote.QuickPasteType = OpenDentBusiness.QuickPasteType.Claim;
 			this.textNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textNote.Size = new System.Drawing.Size(319, 68);
+			this.textNote.SpellCheckIsEnabled = false;
 			this.textNote.TabIndex = 118;
 			this.textNote.Text = "";
 			// 
@@ -2679,7 +2694,7 @@ namespace OpenDental{
 			this.comboProvNumOrdering.Name = "comboProvNumOrdering";
 			this.comboProvNumOrdering.Size = new System.Drawing.Size(254, 21);
 			this.comboProvNumOrdering.TabIndex = 280;
-			this.comboProvNumOrdering.SelectionChangeCommitted += new System.EventHandler(this.comboProvNumOrdering_SelectionChangeCommitted);
+			this.comboProvNumOrdering.SelectedIndexChanged += new System.EventHandler(this.comboProvNumOrdering_SelectedIndexChanged);
 			// 
 			// label95
 			// 
@@ -3478,9 +3493,9 @@ namespace OpenDental{
 			this.butPickProvTreat.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPickProvTreat.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPickProvTreat.CornerRadius = 2F;
-			this.butPickProvTreat.Location = new System.Drawing.Point(503, 95);
+			this.butPickProvTreat.Location = new System.Drawing.Point(501, 95);
 			this.butPickProvTreat.Name = "butPickProvTreat";
-			this.butPickProvTreat.Size = new System.Drawing.Size(18, 21);
+			this.butPickProvTreat.Size = new System.Drawing.Size(20, 21);
 			this.butPickProvTreat.TabIndex = 262;
 			this.butPickProvTreat.Text = "...";
 			this.butPickProvTreat.Click += new System.EventHandler(this.butPickProvTreat_Click);
@@ -3492,9 +3507,9 @@ namespace OpenDental{
 			this.butPickProvBill.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPickProvBill.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPickProvBill.CornerRadius = 2F;
-			this.butPickProvBill.Location = new System.Drawing.Point(503, 74);
+			this.butPickProvBill.Location = new System.Drawing.Point(501, 74);
 			this.butPickProvBill.Name = "butPickProvBill";
-			this.butPickProvBill.Size = new System.Drawing.Size(18, 21);
+			this.butPickProvBill.Size = new System.Drawing.Size(20, 21);
 			this.butPickProvBill.TabIndex = 261;
 			this.butPickProvBill.Text = "...";
 			this.butPickProvBill.Click += new System.EventHandler(this.butPickProvBill_Click);
@@ -3794,7 +3809,6 @@ namespace OpenDental{
 			// 
 			// FormClaimEdit
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.AutoScroll = true;
 			this.ClientSize = new System.Drawing.Size(974, 832);
 			this.ControlBox = false;
@@ -3861,7 +3875,6 @@ namespace OpenDental{
 			this.MinimizeBox = false;
 			this.Name = "FormClaimEdit";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Claim";
 			this.Closing += new System.ComponentModel.CancelEventHandler(this.FormClaimEdit_Closing);
 			this.Load += new System.EventHandler(this.FormClaimEdit_Load);
@@ -4067,47 +4080,28 @@ namespace OpenDental{
 			//medical data
 			ListClaimValCodes=ClaimValCodeLogs.GetForClaim(ClaimCur.ClaimNum);
 			ClaimCondCodeLogCur=ClaimCondCodeLogs.GetByClaimNum(ClaimCur.ClaimNum);
-			_provNumOrderingSelected=ClaimCur.ProvOrderOverride;
-			comboProvNumOrdering.Items.Clear();
-			for(int i=0;i<ProviderC.ListShort.Count;i++) {
-				comboProvNumOrdering.Items.Add(ProviderC.ListShort[i].GetLongDesc());//Only visible provs added to combobox.
-				if(ProviderC.ListShort[i].ProvNum==ClaimCur.ProvOrderOverride) {
-					comboProvNumOrdering.SelectedIndex=i;//Sets combo text too.
-				}
+			//Fill Clinics
+			_listClinics=new List<Clinic>() { new Clinic() { Description=Lan.g(this,"none") } };
+			_listClinics.AddRange(Clinics.GetForUserod(Security.CurUser));
+			_listClinics=_listClinics.OrderBy(x => x.ClinicNum>0).ThenBy(x => x.Description).ToList();
+			//Set selected Nums
+			_selectedClinicNum=ClaimCur.ClinicNum;
+			_selectedProvOrderNum=ClaimCur.ProvOrderOverride;
+			_selectedProvBillNum=ClaimCur.ProvBill;
+			if(_selectedProvBillNum==0) {
+				_selectedProvBillNum=ProviderC.ListShort[0].ProvNum;//old 16.1 behavior to select a default provider for billing.
 			}
-			//ComboProvBill
-			_provNumBillSelected=ClaimCur.ProvBill;
-			comboProvBill.Items.Clear();
-			for(int i=0;i<ProviderC.ListShort.Count;i++) {
-				comboProvBill.Items.Add(ProviderC.ListShort[i].Abbr);//Only visible provs added to combobox.
-				if(ProviderC.ListShort[i].ProvNum==ClaimCur.ProvBill) {
-					comboProvBill.SelectedIndex=i;//Sets combo text too.
-				}
+			_selectedProvTreatNum=ClaimCur.ProvTreat;
+			if(_selectedProvTreatNum==0) {
+				_selectedProvTreatNum=ProviderC.ListShort[0].ProvNum;//old 16.1 behavior to select a default provider for treating.
 			}
-			if(_provNumBillSelected==0) {//Is new (exclude this block of code if provider selection is optional)
-				comboProvBill.SelectedIndex=0;
-				_provNumBillSelected=ProviderC.ListShort[0].ProvNum;
-			}
-			if(comboProvBill.SelectedIndex==-1) {//The provider exists but is hidden (exclude this block of code if provider selection is optional)
-				comboProvBill.Text=Providers.GetProv(_provNumBillSelected).GetAbbr();//Appends "(hidden)" to the end of the abbr.
-			}
-			//ComboProvTreat
-			_provNumTreatSelected=ClaimCur.ProvTreat;
-			comboProvTreat.Items.Clear();
-			for(int i=0;i<ProviderC.ListShort.Count;i++) {
-				comboProvTreat.Items.Add(ProviderC.ListShort[i].Abbr);//Only visible provs added to combobox.
-				if(ProviderC.ListShort[i].ProvNum==ClaimCur.ProvTreat) {
-					comboProvTreat.SelectedIndex=i;//Sets combo text too.
-				}
-			}
-			if(_provNumTreatSelected==0) {//Is new (exclude this block of code if provider selection is optional)
-				comboProvTreat.SelectedIndex=0;
-				_provNumTreatSelected=ProviderC.ListShort[0].ProvNum;
-			}
-			if(comboProvTreat.SelectedIndex==-1) {//The provider exists but is hidden (exclude this block of code if provider selection is optional)
-				comboProvTreat.Text=Providers.GetProv(_provNumTreatSelected).GetAbbr();//Appends "(hidden)" to the end of the abbr.
-			}
-			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
+			//Set combo SelectedIndex to -1 so that fillComboBillTreatOrder works properly.
+			comboProvNumOrdering.SelectedIndex=-1;
+			comboProvBill.SelectedIndex=-1;
+			comboProvTreat.SelectedIndex=-1;
+			comboClinic.IndexSelectOrSetText(_listClinics.FindIndex(x => x.ClinicNum==_selectedClinicNum),() => { return Clinics.GetDesc(_selectedClinicNum); });
+			fillComboBillTreatOrder();
+			if(Clinics.IsMedicalPracticeOrClinic(_selectedClinicNum)) {
 				groupProsth.Visible=false;
 				groupOrtho.Visible=false;
 				labelOralImages.Visible=false;
@@ -4118,6 +4112,97 @@ namespace OpenDental{
 			FillForm();
 			FillCanadian();
 		}
+
+		#region Provider Controls
+		private void comboClinic_SelectedIndexChanged(object sender,EventArgs e) {
+			if(comboClinic.SelectedIndex>-1) {
+				_selectedClinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
+			}
+			fillComboBillTreatOrder();
+		}
+
+		private void comboProvBill_SelectedIndexChanged(object sender,EventArgs e) {
+			if(comboProvBill.SelectedIndex>-1) {
+				_selectedProvBillNum=_listProviders[comboProvBill.SelectedIndex].ProvNum;
+			}
+		}
+
+		private void comboProvTreat_SelectedIndexChanged(object sender,EventArgs e) {
+			if(comboProvTreat.SelectedIndex>-1) {
+				_selectedProvTreatNum=_listProviders[comboProvTreat.SelectedIndex].ProvNum;
+			}
+		}
+
+		private void comboProvNumOrdering_SelectedIndexChanged(object sender,EventArgs e) {
+			if(comboProvNumOrdering.SelectedIndex>-1) {
+				_selectedProvOrderNum=_listProviders[comboProvNumOrdering.SelectedIndex].ProvNum;
+			}
+		}
+
+		private void butPickProvOrdering_Click(object sender,EventArgs e) {
+			FormProviderPick formP = new FormProviderPick(_listProviders);
+			formP.SelectedProvNum=_selectedProvOrderNum;
+			formP.ShowDialog();
+			if(formP.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			_selectedProvOrderNum=formP.SelectedProvNum;
+			comboProvNumOrdering.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvOrderNum),() => { return Providers.GetAbbr(_selectedProvOrderNum); });
+		}
+
+		private void butNoneProvOrdering_Click(object sender,EventArgs e) {
+			_selectedProvOrderNum=0;
+			comboProvNumOrdering.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvOrderNum),() => { return Providers.GetAbbr(_selectedProvOrderNum); });
+		}
+
+		private void butPickProvBill_Click(object sender,EventArgs e) {
+			FormProviderPick formP = new FormProviderPick(_listProviders);
+			formP.SelectedProvNum=_selectedProvBillNum;
+			formP.ShowDialog();
+			if(formP.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			_selectedProvBillNum=formP.SelectedProvNum;
+			comboProvBill.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvBillNum),() => { return Providers.GetAbbr(_selectedProvBillNum); });
+		}
+
+		private void butPickProvTreat_Click(object sender,EventArgs e) {
+			FormProviderPick formP = new FormProviderPick(_listProviders);
+			formP.SelectedProvNum=_selectedProvTreatNum;
+			formP.ShowDialog();
+			if(formP.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			_selectedProvTreatNum=formP.SelectedProvNum;
+			comboProvTreat.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvTreatNum),() => { return Providers.GetAbbr(_selectedProvTreatNum); });
+		}
+
+		///<summary>Fills combo provider based on which clinic is selected and attempts to preserve provider selection if any.</summary>
+		private void fillComboBillTreatOrder() {
+			if(comboProvBill.SelectedIndex>-1) {//valid prov selected, non none or nothing.
+				_selectedProvBillNum = _listProviders[comboProvBill.SelectedIndex].ProvNum;
+			}
+			if(comboProvTreat.SelectedIndex>-1) {
+				_selectedProvTreatNum = _listProviders[comboProvTreat.SelectedIndex].ProvNum;
+			}
+			if(comboProvNumOrdering.SelectedIndex>-1) {
+				_selectedProvOrderNum=_listProviders[comboProvNumOrdering.SelectedIndex].ProvNum;
+			}
+			_listProviders=Providers.GetProvsForClinic(_selectedClinicNum).OrderBy(x => x.ProvNum>0).ThenBy(x => x.Abbr).ToList();//order list properly, None first
+			//Billing Provider
+			comboProvBill.Items.Clear();
+			_listProviders.ForEach(x => comboProvBill.Items.Add(x.Abbr));
+			comboProvBill.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvBillNum),() => { return Providers.GetAbbr(_selectedProvBillNum); });
+			//Treating Provider
+			comboProvTreat.Items.Clear();
+			_listProviders.ForEach(x => comboProvTreat.Items.Add(x.Abbr));
+			comboProvTreat.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvTreatNum),() => { return Providers.GetAbbr(_selectedProvTreatNum); });
+			//Ordering Override Provider
+			comboProvNumOrdering.Items.Clear();
+			_listProviders.ForEach(x => comboProvNumOrdering.Items.Add(x.Abbr));
+			comboProvNumOrdering.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvOrderNum),() => { return Providers.GetAbbr(_selectedProvOrderNum); });
+		}
+		#endregion Provider Controls
 
 		///<summary></summary>
 		public void FillForm(){
@@ -5664,28 +5749,6 @@ namespace OpenDental{
 			}
 		}
 
-		private void comboProvNumOrdering_SelectionChangeCommitted(object sender,EventArgs e) {
-			_provNumOrderingSelected=ProviderC.ListShort[comboProvNumOrdering.SelectedIndex].ProvNum;
-		}
-
-		private void butPickProvOrdering_Click(object sender,EventArgs e) {
-			FormProviderPick formP=new FormProviderPick();
-			if(comboProvNumOrdering.SelectedIndex > -1) {//Initial formP selection if selected prov is not hidden.
-				formP.SelectedProvNum=_provNumOrderingSelected;
-			}
-			formP.ShowDialog();
-			if(formP.DialogResult!=DialogResult.OK) {
-				return;
-			}
-			comboProvNumOrdering.SelectedIndex=Providers.GetIndex(formP.SelectedProvNum);
-			_provNumOrderingSelected=formP.SelectedProvNum;
-		}
-
-		private void butNoneProvOrdering_Click(object sender,EventArgs e) {
-			_provNumOrderingSelected=0;
-			comboProvNumOrdering.SelectedIndex=-1;
-		}
-
 		private void butMissingTeethHelp_Click(object sender,EventArgs e) {
 			MessageBox.Show("As explained in the manual, extracted teeth are pulled from the procedure history.  Any extraction with a status of Complete, Existing Current, or Existing Other will be included.  But the extraction must also have a valid date.  So to add an extracted tooth to this list, go to the Chart module, and add an extraction with a status of EO and a date that is as accurate as possible.  Furthermore, extracted teeth will only show here if at least one of the fields for initial placement upper or lower is marked Yes.\r\n\r\nMissing teeth are not pulled from procedure history, but from the missing teeth tab of the Chart module.  Teeth can be marked missing without having an extraction date.");
 		}
@@ -5874,40 +5937,6 @@ namespace OpenDental{
 			Cursor=Cursors.Default;
 		}
 
-		private void comboProvBill_SelectionChangeCommitted(object sender,EventArgs e) {
-			_provNumBillSelected=ProviderC.ListShort[comboProvBill.SelectedIndex].ProvNum;
-		}
-
-		private void butPickProvBill_Click(object sender,EventArgs e) {
-			FormProviderPick formP=new FormProviderPick();
-			if(comboProvBill.SelectedIndex > -1) {//Initial formP selection if selected prov is not hidden.
-				formP.SelectedProvNum=_provNumBillSelected;
-			}
-			formP.ShowDialog();
-			if(formP.DialogResult!=DialogResult.OK) {
-				return;
-			}
-			comboProvBill.SelectedIndex=Providers.GetIndex(formP.SelectedProvNum);
-			_provNumBillSelected=formP.SelectedProvNum;
-		}
-
-		private void comboProvTreat_SelectionChangeCommitted(object sender,EventArgs e) {
-			_provNumTreatSelected=ProviderC.ListShort[comboProvTreat.SelectedIndex].ProvNum;
-		}
-
-		private void butPickProvTreat_Click(object sender,EventArgs e) {
-			FormProviderPick formP=new FormProviderPick();
-			if(comboProvTreat.SelectedIndex > -1) {//Initial formP selection if selected prov is not hidden.
-				formP.SelectedProvNum=_provNumTreatSelected;
-			}
-			formP.ShowDialog();
-			if(formP.DialogResult!=DialogResult.OK) {
-				return;
-			}
-			comboProvTreat.SelectedIndex=Providers.GetIndex(formP.SelectedProvNum);
-			_provNumTreatSelected=formP.SelectedProvNum;
-		}
-
 		private void comboCustomTracking_SelectionChangeCommitted(object sender,EventArgs e) {
 			if(comboCustomTracking.SelectedIndex < 1) {
 				return;
@@ -5930,166 +5959,6 @@ namespace OpenDental{
 			long defNum=DefC.Long[(int)DefCat.ClaimCustomTracking][comboCustomTracking.SelectedIndex-1].DefNum;
 			SecurityLogs.MakeLogEntry(Permissions.ClaimHistoryEdit,ClaimCur.PatNum,inputBox.textResult.Text,ClaimCur.ClaimNum,LogSources.None,defNum);
 			FillStatusHistory();
-		}
-
-		private void butDelete_Click(object sender, System.EventArgs e) {
-			if(IsNew){
-				DialogResult=DialogResult.Cancel;//jump straight to Closing, where the claimprocs will be changed
-				return;
-			}
-			if(!ClaimIsValid()){
-				return;
-			}
-			UpdateClaim();
-			bool paymentIsAttached=false;
-			for(int i=0;i<_listClaimProcsForClaim.Count;i++){
-				if(_listClaimProcsForClaim[i].ClaimPaymentNum>0){
-					paymentIsAttached=true;
-				}
-			}
-			if(paymentIsAttached){
-				MessageBox.Show(Lan.g(this,"You cannot delete this claim while any insurance checks are attached.  You will have to detach all insurance checks first."));
-				return;
-			}
-			if(ClaimCur.ClaimStatus=="R"){
-				MessageBox.Show(Lan.g(this,"You cannot delete this claim while status is Received.  You will have to change the status first."));
-				return;
-			}
-      if(ClaimCur.ClaimType=="PreAuth"){
-				if(MessageBox.Show(Lan.g(this,"Delete PreAuthorization?"),"",MessageBoxButtons.OKCancel)!=DialogResult.OK){
-					return;
-				}
-			}
-			else{
-				if(MessageBox.Show(Lan.g(this,"Delete Claim?"),"",MessageBoxButtons.OKCancel)!=DialogResult.OK){
-					return;
-				}
-			}
-			Procedure proc;
-			if(ClaimCur.ClaimType=="PreAuth"//all preauth claimprocs are just duplicates
-				|| ClaimCur.ClaimType=="Cap"){//all cap claimprocs are just duplicates
-				for(int i=0;i<_listClaimProcsForClaim.Count;i++){
-					//ClaimProcs.Cur=ClaimProcs.ForClaim[i];
-					ClaimProcs.Delete(_listClaimProcsForClaim[i]);
-				}
-			}
-			else{//all other claim types use original estimate claimproc.
-				List<Benefit> benList=Benefits.Refresh(PatPlanList,SubList);
-				InsPlan plan=InsPlans.GetPlan(ClaimCur.PlanNum,PlanList);
-				for(int i=0;i<_listClaimProcsForClaim.Count;i++){
-					//ClaimProcs.Cur=ClaimProcs.ForClaim[i];
-					if(_listClaimProcsForClaim[i].Status==ClaimProcStatus.Supplemental//supplementals are duplicate
-						|| _listClaimProcsForClaim[i].ProcNum==0)//total payments get deleted
-					{
-						ClaimProcs.Delete(_listClaimProcsForClaim[i]);
-						continue;
-					}
-					//so only changed back to estimate if attached to a proc
-					_listClaimProcsForClaim[i].Status=ClaimProcStatus.Estimate;
-					_listClaimProcsForClaim[i].ClaimNum=0;
-					//already handled the case where claimproc.ProcNum=0 for payments etc. above
-					proc=Procedures.GetProcFromList(ProcList,_listClaimProcsForClaim[i].ProcNum);
-					//We're not going to bother to also get paidOtherInsBaseEst:
-					double paidOtherInsTotal=ClaimProcs.GetPaidOtherInsTotal(_listClaimProcsForClaim[i],PatPlanList);
-					double writeOffOtherIns=ClaimProcs.GetWriteOffOtherIns(_listClaimProcsForClaim[i],PatPlanList);
-					if(ClaimCur.ClaimType=="P" && PatPlanList.Count>0){
-						ClaimProcs.ComputeBaseEst(_listClaimProcsForClaim[i],proc,plan,PatPlanList[0].PatPlanNum,benList,null,null,PatPlanList,0,0,PatCur.Age,0);
-					}
-					else if(ClaimCur.ClaimType=="S" && PatPlanList.Count>1){
-						ClaimProcs.ComputeBaseEst(_listClaimProcsForClaim[i],proc,plan,PatPlanList[1].PatPlanNum,benList,null,null,PatPlanList,paidOtherInsTotal,paidOtherInsTotal,PatCur.Age,writeOffOtherIns);
-					}
-					_listClaimProcsForClaim[i].InsPayEst=0;
-					ClaimProcs.Update(_listClaimProcsForClaim[i]);
-				}
-			}
-      Claims.Delete(ClaimCur);
-			SecurityLogs.MakeLogEntry(Permissions.ClaimSentEdit,ClaimCur.PatNum,
-				Lan.g(this,"Delete Claim")+", "+PatCur.GetNameLF()+""
-				+Lan.g(this,"Date of service: ")+ClaimCur.DateService.ToShortDateString());
-      DialogResult=DialogResult.OK;
-		}
-
-		private void butOK_Click(object sender, System.EventArgs e) {
-			if(!ClaimIsValid()){
-				return;
-			}
-			//if status is received, all claimprocs must also be received.
-			if(comboClaimStatus.SelectedIndex==5){
-				bool allReceived=true;
-				for(int i=0;i<_listClaimProcsForClaim.Count;i++){
-					if(((ClaimProc)_listClaimProcsForClaim[i]).Status==ClaimProcStatus.NotReceived){
-						allReceived=false;
-					}
-				}
-				if(!allReceived){
-					if(!MsgBox.Show(this,true,"All items will be marked received.  Continue?")){
-						return;
-					}
-					for(int i=0;i<_listClaimProcsForClaim.Count;i++){
-						if(_listClaimProcsForClaim[i].Status==ClaimProcStatus.NotReceived){
-							//ClaimProcs.Cur=(ClaimProc)ClaimProcs.ForClaim[i];
-							_listClaimProcsForClaim[i].Status=ClaimProcStatus.Received;
-							//We set the DateCP to Today's date when the user presses the buttons By Total, By Proc or Supplemental.
-							//When there is a no payment claim, the user might simply change the claim status to received and press OK instead of entering payments the normal way, since there is no check.
-							//Logically, we are changing claimproc status to received, and the claimproc will now be treated as a payment in the reports.
-							//If we did not update DateCP, then DateCP for a zero payment claim would still be the procedure treatment planned date as much as a year ago, so the claimproc writeoffs (if present) would be accidentally back dated.
-							_listClaimProcsForClaim[i].DateCP=DateTimeOD.Today;
-							_listClaimProcsForClaim[i].DateEntry=DateTime.Now;//date it was set rec'd
-							ClaimProcs.Update(_listClaimProcsForClaim[i]);
-						}
-					}
-				}
-			}
-			else{//claim is any status except received
-				bool anyReceived=false;
-				for(int i=0;i<_listClaimProcsForClaim.Count;i++){
-					if(((ClaimProc)_listClaimProcsForClaim[i]).Status==ClaimProcStatus.Received){
-						anyReceived=true;
-					}
-				}
-				if(anyReceived){
-					//Too dangerous to automatically set items not received because I would have to check for attachments to checks, etc.
-					//Also too annoying to block user.
-					//So just warn user.
-					if(!MsgBox.Show(this,true,"Some of the items are marked received.  This is not a good idea since it will cause them to show in the Account as a 'payment'.  Continue anyway?")){
-						return;
-					}
-				}
-			}
-			//if status is received and there is no received date
-			if(comboClaimStatus.SelectedIndex==5 && textDateRec.Text==""){
-				textDateRec.Text=DateTime.Today.ToShortDateString();
-			}
-			UpdateClaim();
-			if(comboClaimStatus.SelectedIndex==2){//waiting to send
-				ClaimSendQueueItem[] listQueue=Claims.GetQueueList(ClaimCur.ClaimNum,ClaimCur.ClinicNum,0);
-				if(listQueue[0].NoSendElect) {
-					DialogResult=DialogResult.OK;
-					return;
-				}
-				//string warnings;
-				//string missingData=
-				Clearinghouse clearinghouseHq=ClearinghouseL.GetClearinghouseHq(listQueue[0].ClearinghouseNum);
-				Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clinics.ClinicNum);
-				Eclaims.Eclaims.GetMissingData(clearinghouseClin,listQueue[0]);//,out warnings);
-				if(listQueue[0].MissingData!="") {
-					if(MessageBox.Show(Lan.g(this,"Cannot send claim until missing data is fixed:")+"\r\n"+listQueue[0].MissingData+"\r\n\r\nContinue anyway?",
-						"",MessageBoxButtons.OKCancel)==DialogResult.OK)
-					{
-						DialogResult=DialogResult.OK;
-					}
-					return;
-				}
-				//if(MsgBox.Show(this,true,"Send electronic claim immediately?")){
-				//	List<ClaimSendQueueItem> queueItems=new List<ClaimSendQueueItem>();
-				//	queueItems.Add(listQueue[0]);
-				//	Eclaims.Eclaims.SendBatches(queueItems);//this also calls SetClaimSentOrPrinted which creates the etrans entry.
-				//}
-			}
-			if(comboClaimStatus.SelectedIndex==5) {//Received
-				ShowProviderTransferWindow();
-			}
-			DialogResult=DialogResult.OK;
 		}
 		
 		/// <summary>Also handles Canadian warnings.</summary>
@@ -6386,7 +6255,7 @@ namespace OpenDental{
 			//patRelats will always be selected
 			ClaimCur.PatRelat=(Relat)comboPatRelat.SelectedIndex;
 			ClaimCur.PatRelat2=(Relat)comboPatRelat2.SelectedIndex;
-			ClaimCur.ProvTreat=_provNumTreatSelected;
+			ClaimCur.ProvTreat=_selectedProvTreatNum;
 			ClaimCur.PriorAuthorizationNumber=textPriorAuth.Text;
 			ClaimCur.PreAuthString=textPredeterm.Text;
 			//isprosthesis handled earlier
@@ -6394,7 +6263,7 @@ namespace OpenDental{
 			ClaimCur.ReasonUnderPaid=textReasonUnder.Text;
 			ClaimCur.ClaimNote=textNote.Text;
 			//ispreauth
-			ClaimCur.ProvBill=_provNumBillSelected;
+			ClaimCur.ProvBill=_selectedProvBillNum;
 			ClaimCur.IsOrtho=checkIsOrtho.Checked;
 			ClaimCur.OrthoTotalM=PIn.Byte(textOrthoTotalM.Text);
 			ClaimCur.OrthoRemainM=PIn.Byte(textOrthoRemainM.Text);
@@ -6418,12 +6287,7 @@ namespace OpenDental{
 			}
 			//AccidentDate is further down
 			ClaimCur.AccidentST=textAccidentST.Text;
-			if(comboClinic.SelectedIndex==0){//none
-				ClaimCur.ClinicNum=0;
-			}
-			else{
-				ClaimCur.ClinicNum=Clinics.List[comboClinic.SelectedIndex-1].ClinicNum;
-			}
+			ClaimCur.ClinicNum=_selectedClinicNum;
 			ClaimCur.DateResent=PIn.Date(textDateResent.Text);
 			ClaimCur.CorrectionType=(ClaimCorrectionType)Enum.GetValues(typeof(ClaimCorrectionType)).GetValue(comboCorrectionType.SelectedIndex);
 			ClaimCur.ClaimIdentifier=textClaimIdentifier.Text;
@@ -6545,7 +6409,7 @@ namespace OpenDental{
 			ClaimCur.AdmissionTypeCode=textAdmissionType.Text;
 			ClaimCur.AdmissionSourceCode=textAdmissionSource.Text;
 			ClaimCur.PatientStatusCode=textPatientStatus.Text;
-			ClaimCur.ProvOrderOverride=_provNumOrderingSelected;
+			ClaimCur.ProvOrderOverride=_selectedProvOrderNum;
 			Claims.Update(ClaimCur);
 			if(ListClaimValCodes!=null) {
 				GetValCodes(ListClaimValCodes,0,ClaimCur.ClaimNum,textVC0Code,textVC0Amount);
@@ -6620,6 +6484,166 @@ namespace OpenDental{
 			}
 		}
 
+		private void butDelete_Click(object sender, System.EventArgs e) {
+			if(IsNew){
+				DialogResult=DialogResult.Cancel;//jump straight to Closing, where the claimprocs will be changed
+				return;
+			}
+			if(!ClaimIsValid()){
+				return;
+			}
+			UpdateClaim();
+			bool paymentIsAttached=false;
+			for(int i=0;i<_listClaimProcsForClaim.Count;i++){
+				if(_listClaimProcsForClaim[i].ClaimPaymentNum>0){
+					paymentIsAttached=true;
+				}
+			}
+			if(paymentIsAttached){
+				MessageBox.Show(Lan.g(this,"You cannot delete this claim while any insurance checks are attached.  You will have to detach all insurance checks first."));
+				return;
+			}
+			if(ClaimCur.ClaimStatus=="R"){
+				MessageBox.Show(Lan.g(this,"You cannot delete this claim while status is Received.  You will have to change the status first."));
+				return;
+			}
+      if(ClaimCur.ClaimType=="PreAuth"){
+				if(MessageBox.Show(Lan.g(this,"Delete PreAuthorization?"),"",MessageBoxButtons.OKCancel)!=DialogResult.OK){
+					return;
+				}
+			}
+			else{
+				if(MessageBox.Show(Lan.g(this,"Delete Claim?"),"",MessageBoxButtons.OKCancel)!=DialogResult.OK){
+					return;
+				}
+			}
+			Procedure proc;
+			if(ClaimCur.ClaimType=="PreAuth"//all preauth claimprocs are just duplicates
+				|| ClaimCur.ClaimType=="Cap"){//all cap claimprocs are just duplicates
+				for(int i=0;i<_listClaimProcsForClaim.Count;i++){
+					//ClaimProcs.Cur=ClaimProcs.ForClaim[i];
+					ClaimProcs.Delete(_listClaimProcsForClaim[i]);
+				}
+			}
+			else{//all other claim types use original estimate claimproc.
+				List<Benefit> benList=Benefits.Refresh(PatPlanList,SubList);
+				InsPlan plan=InsPlans.GetPlan(ClaimCur.PlanNum,PlanList);
+				for(int i=0;i<_listClaimProcsForClaim.Count;i++){
+					//ClaimProcs.Cur=ClaimProcs.ForClaim[i];
+					if(_listClaimProcsForClaim[i].Status==ClaimProcStatus.Supplemental//supplementals are duplicate
+						|| _listClaimProcsForClaim[i].ProcNum==0)//total payments get deleted
+					{
+						ClaimProcs.Delete(_listClaimProcsForClaim[i]);
+						continue;
+					}
+					//so only changed back to estimate if attached to a proc
+					_listClaimProcsForClaim[i].Status=ClaimProcStatus.Estimate;
+					_listClaimProcsForClaim[i].ClaimNum=0;
+					//already handled the case where claimproc.ProcNum=0 for payments etc. above
+					proc=Procedures.GetProcFromList(ProcList,_listClaimProcsForClaim[i].ProcNum);
+					//We're not going to bother to also get paidOtherInsBaseEst:
+					double paidOtherInsTotal=ClaimProcs.GetPaidOtherInsTotal(_listClaimProcsForClaim[i],PatPlanList);
+					double writeOffOtherIns=ClaimProcs.GetWriteOffOtherIns(_listClaimProcsForClaim[i],PatPlanList);
+					if(ClaimCur.ClaimType=="P" && PatPlanList.Count>0){
+						ClaimProcs.ComputeBaseEst(_listClaimProcsForClaim[i],proc,plan,PatPlanList[0].PatPlanNum,benList,null,null,PatPlanList,0,0,PatCur.Age,0);
+					}
+					else if(ClaimCur.ClaimType=="S" && PatPlanList.Count>1){
+						ClaimProcs.ComputeBaseEst(_listClaimProcsForClaim[i],proc,plan,PatPlanList[1].PatPlanNum,benList,null,null,PatPlanList,paidOtherInsTotal,paidOtherInsTotal,PatCur.Age,writeOffOtherIns);
+					}
+					_listClaimProcsForClaim[i].InsPayEst=0;
+					ClaimProcs.Update(_listClaimProcsForClaim[i]);
+				}
+			}
+      Claims.Delete(ClaimCur);
+			SecurityLogs.MakeLogEntry(Permissions.ClaimSentEdit,ClaimCur.PatNum,
+				Lan.g(this,"Delete Claim")+", "+PatCur.GetNameLF()+""
+				+Lan.g(this,"Date of service: ")+ClaimCur.DateService.ToShortDateString());
+      DialogResult=DialogResult.OK;
+		}
+
+		private void butOK_Click(object sender, System.EventArgs e) {
+			if(!ClaimIsValid()){
+				return;
+			}
+			//if status is received, all claimprocs must also be received.
+			if(comboClaimStatus.SelectedIndex==5){
+				bool allReceived=true;
+				for(int i=0;i<_listClaimProcsForClaim.Count;i++){
+					if(((ClaimProc)_listClaimProcsForClaim[i]).Status==ClaimProcStatus.NotReceived){
+						allReceived=false;
+					}
+				}
+				if(!allReceived){
+					if(!MsgBox.Show(this,true,"All items will be marked received.  Continue?")){
+						return;
+					}
+					for(int i=0;i<_listClaimProcsForClaim.Count;i++){
+						if(_listClaimProcsForClaim[i].Status==ClaimProcStatus.NotReceived){
+							//ClaimProcs.Cur=(ClaimProc)ClaimProcs.ForClaim[i];
+							_listClaimProcsForClaim[i].Status=ClaimProcStatus.Received;
+							//We set the DateCP to Today's date when the user presses the buttons By Total, By Proc or Supplemental.
+							//When there is a no payment claim, the user might simply change the claim status to received and press OK instead of entering payments the normal way, since there is no check.
+							//Logically, we are changing claimproc status to received, and the claimproc will now be treated as a payment in the reports.
+							//If we did not update DateCP, then DateCP for a zero payment claim would still be the procedure treatment planned date as much as a year ago, so the claimproc writeoffs (if present) would be accidentally back dated.
+							_listClaimProcsForClaim[i].DateCP=DateTimeOD.Today;
+							_listClaimProcsForClaim[i].DateEntry=DateTime.Now;//date it was set rec'd
+							ClaimProcs.Update(_listClaimProcsForClaim[i]);
+						}
+					}
+				}
+			}
+			else{//claim is any status except received
+				bool anyReceived=false;
+				for(int i=0;i<_listClaimProcsForClaim.Count;i++){
+					if(((ClaimProc)_listClaimProcsForClaim[i]).Status==ClaimProcStatus.Received){
+						anyReceived=true;
+					}
+				}
+				if(anyReceived){
+					//Too dangerous to automatically set items not received because I would have to check for attachments to checks, etc.
+					//Also too annoying to block user.
+					//So just warn user.
+					if(!MsgBox.Show(this,true,"Some of the items are marked received.  This is not a good idea since it will cause them to show in the Account as a 'payment'.  Continue anyway?")){
+						return;
+					}
+				}
+			}
+			//if status is received and there is no received date
+			if(comboClaimStatus.SelectedIndex==5 && textDateRec.Text==""){
+				textDateRec.Text=DateTime.Today.ToShortDateString();
+			}
+			UpdateClaim();
+			if(comboClaimStatus.SelectedIndex==2){//waiting to send
+				ClaimSendQueueItem[] listQueue=Claims.GetQueueList(ClaimCur.ClaimNum,ClaimCur.ClinicNum,0);
+				if(listQueue[0].NoSendElect) {
+					DialogResult=DialogResult.OK;
+					return;
+				}
+				//string warnings;
+				//string missingData=
+				Clearinghouse clearinghouseHq=ClearinghouseL.GetClearinghouseHq(listQueue[0].ClearinghouseNum);
+				Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clinics.ClinicNum);
+				Eclaims.Eclaims.GetMissingData(clearinghouseClin,listQueue[0]);//,out warnings);
+				if(listQueue[0].MissingData!="") {
+					if(MessageBox.Show(Lan.g(this,"Cannot send claim until missing data is fixed:")+"\r\n"+listQueue[0].MissingData+"\r\n\r\nContinue anyway?",
+						"",MessageBoxButtons.OKCancel)==DialogResult.OK)
+					{
+						DialogResult=DialogResult.OK;
+					}
+					return;
+				}
+				//if(MsgBox.Show(this,true,"Send electronic claim immediately?")){
+				//	List<ClaimSendQueueItem> queueItems=new List<ClaimSendQueueItem>();
+				//	queueItems.Add(listQueue[0]);
+				//	Eclaims.Eclaims.SendBatches(queueItems);//this also calls SetClaimSentOrPrinted which creates the etrans entry.
+				//}
+			}
+			if(comboClaimStatus.SelectedIndex==5) {//Received
+				ShowProviderTransferWindow();
+			}
+			DialogResult=DialogResult.OK;
+		}
+
 		//cancel does not cancel in some circumstances because cur gets updated in some areas.
 		private void butCancel_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
@@ -6663,58 +6687,5 @@ namespace OpenDental{
 			}
 			Claims.Delete(ClaimCur);//does not do any validation.  Also deletes the claimcanadian.
 		}
-
-	
-
-		
-	
-
-		
-
-	
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-
 	}
 }

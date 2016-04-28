@@ -5,6 +5,8 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using System.Collections.Generic;
+using System.Linq;
+using CodeBase;
 
 namespace OpenDental{
 	/// <summary></summary>
@@ -40,6 +42,16 @@ namespace OpenDental{
 		private UI.Button butPickProv;
 		private UI.Button butPickHyg;
 		public List<Operatory> ListOps;
+		///<summary>Cached list of clinics available to user. Also includes a dummy Clinic at index 0 for "none".</summary>
+		private List<Clinic> _listClinics;
+		///<summary>Filtered list of providers based on which clinic is selected. If no clinic is selected displays all providers. Also includes a dummy clinic at index 0 for "none"</summary>
+		private List<Provider> _listProviders;
+		///<summary>Used to keep track of the current clinic selected. This is because it may be a clinic that is not in _listClinics.</summary>
+		private long _selectedClinicNum;
+		///<summary>Instead of relying on _listProviders[comboProv.SelectedIndex] to determine the selected Provider we use this variable to store it explicitly.</summary>
+		private long _selectedProvNum;
+		///<summary>Instead of relying on _listProviders[comboProvHyg.SelectedIndex] to determine the selected Provider we use this variable to store it explicitly.</summary>
+		private long _selectedProvHygNum;
 
 		///<summary></summary>
 		public FormOperatoryEdit(Operatory opCur)
@@ -153,6 +165,7 @@ namespace OpenDental{
 			this.comboHyg.Name = "comboHyg";
 			this.comboHyg.Size = new System.Drawing.Size(252, 21);
 			this.comboHyg.TabIndex = 5;
+			this.comboHyg.SelectedIndexChanged += new System.EventHandler(this.comboHyg_SelectedIndexChanged);
 			// 
 			// comboProv
 			// 
@@ -162,6 +175,7 @@ namespace OpenDental{
 			this.comboProv.Name = "comboProv";
 			this.comboProv.Size = new System.Drawing.Size(252, 21);
 			this.comboProv.TabIndex = 4;
+			this.comboProv.SelectedIndexChanged += new System.EventHandler(this.comboProv_SelectedIndexChanged);
 			// 
 			// label6
 			// 
@@ -216,6 +230,7 @@ namespace OpenDental{
 			this.comboClinic.Name = "comboClinic";
 			this.comboClinic.Size = new System.Drawing.Size(252, 21);
 			this.comboClinic.TabIndex = 3;
+			this.comboClinic.SelectedIndexChanged += new System.EventHandler(this.comboClinic_SelectedIndexChanged);
 			// 
 			// labelClinic
 			// 
@@ -338,7 +353,6 @@ namespace OpenDental{
 			// 
 			// FormOperatoryEdit
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(574, 266);
 			this.Controls.Add(this.butPickHyg);
 			this.Controls.Add(this.butPickProv);
@@ -368,7 +382,6 @@ namespace OpenDental{
 			this.MinimizeBox = false;
 			this.Name = "FormOperatoryEdit";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Operatory";
 			this.Load += new System.EventHandler(this.FormOperatoryEdit_Load);
 			this.ResumeLayout(false);
@@ -386,76 +399,95 @@ namespace OpenDental{
 				comboClinic.Visible=false;
 				butPickClin.Visible=false;
 			}
-			comboClinic.Items.Add(Lan.g(this,"none"));
-			comboClinic.SelectedIndex=0;
-			for(int i=0;i<Clinics.List.Length;i++){
-				comboClinic.Items.Add(Clinics.List[i].Description);
-				if(Clinics.List[i].ClinicNum==OpCur.ClinicNum)
-					comboClinic.SelectedIndex=i+1;
-			}
-			comboProv.Items.Add(Lan.g(this,"none"));
-			comboProv.SelectedIndex=0;
-			for(int i=0;i<ProviderC.ListShort.Count;i++){
-				comboProv.Items.Add(ProviderC.ListShort[i].Abbr);
-				if(ProviderC.ListShort[i].ProvNum==OpCur.ProvDentist)
-					comboProv.SelectedIndex=i+1;
-			}
-			comboHyg.Items.Add(Lan.g(this,"none"));
-			comboHyg.SelectedIndex=0;
-			for(int i=0;i<ProviderC.ListShort.Count;i++){
-				comboHyg.Items.Add(ProviderC.ListShort[i].Abbr);
-				if(ProviderC.ListShort[i].ProvNum==OpCur.ProvHygienist)
-					comboHyg.SelectedIndex=i+1;
-			}
+			_listClinics=new List<Clinic>() { new Clinic() {Description=Lan.g(this,"none") } } //Seed with "None"
+				.Concat(Clinics.GetForUserod(Security.CurUser)) //Add clinics for user
+				.OrderBy(x => x.ClinicNum>0).ThenBy(x => x.Description).ToList();//Order list properly
+			_listClinics.ForEach(x => comboClinic.Items.Add(x.Description));//Add to UI control
+			//Set Selected nums
+			_selectedClinicNum=OpCur.ClinicNum;//can be 0
+			_selectedProvNum=OpCur.ProvDentist;
+			_selectedProvHygNum=OpCur.ProvHygienist;
+			//Set comboindexes for compatibility with fillComboProvHyg
+			comboProv.SelectedIndex=-1;
+			comboHyg.SelectedIndex=-1;
+			comboClinic.IndexSelectOrSetText(_listClinics.FindIndex(x => x.ClinicNum==_selectedClinicNum),() => { return Clinics.GetDesc(_selectedClinicNum); });
+			fillComboProvHyg();
 			checkIsHygiene.Checked=OpCur.IsHygiene;
 			checkSetProspective.Checked=OpCur.SetProspective;
 			checkIsWebSched.Checked=OpCur.IsWebSched;
 		}
 
 		private void butPickClin_Click(object sender,EventArgs e) {
-			FormClinics FormC=new FormClinics();
+			FormClinics FormC = new FormClinics() { ListClinics=_listClinics };
 			FormC.IsSelectionMode=true;
 			FormC.ShowDialog();
 			if(FormC.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			Clinic[] arrayClinics=Clinics.GetList();
-			for(int i=0;i<arrayClinics.Length;i++) {
-				if(arrayClinics[i].ClinicNum!=FormC.SelectedClinicNum) {
-					continue;
-				}
-				comboClinic.SelectedIndex=i+1;
-			}
+			_selectedClinicNum=FormC.SelectedClinicNum;
+			comboClinic.IndexSelectOrSetText(_listClinics.FindIndex(x => x.ClinicNum==_selectedClinicNum),() => { return Clinics.GetDesc(_selectedClinicNum); });
 		}
 
 		private void butPickProv_Click(object sender,EventArgs e) {
-			FormProviderPick FormPP=new FormProviderPick();
+			FormProviderPick FormPP=new FormProviderPick(_listProviders);
+			FormPP.SelectedProvNum=_selectedProvNum;
 			FormPP.ShowDialog();
 			if(FormPP.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			List<Provider> listProvs=ProviderC.ListShort;
-			for(int i=0;i<listProvs.Count;i++) {
-				if(listProvs[i].ProvNum!=FormPP.SelectedProvNum) {
-					continue;
-				}
-				comboProv.SelectedIndex=i+1;
-			}
+			_selectedProvNum=FormPP.SelectedProvNum;
+			comboProv.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvNum),() => { return Providers.GetAbbr(_selectedProvNum); });
 		}
 
 		private void butPickHyg_Click(object sender,EventArgs e) {
-			FormProviderPick FormPP=new FormProviderPick();
+			FormProviderPick FormPP=new FormProviderPick(_listProviders);
+			FormPP.SelectedProvNum=_selectedProvHygNum;
 			FormPP.ShowDialog();
 			if(FormPP.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			List<Provider> listProvs=ProviderC.ListShort;
-			for(int i=0;i<listProvs.Count;i++) {
-				if(listProvs[i].ProvNum!=FormPP.SelectedProvNum) {
-					continue;
-				}
-				comboHyg.SelectedIndex=i+1;
+			_selectedProvHygNum =FormPP.SelectedProvNum;
+			comboHyg.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvHygNum),() => { return Providers.GetAbbr(_selectedProvHygNum); });
+		}
+
+		private void comboClinic_SelectedIndexChanged(object sender,EventArgs e) {
+			if(comboClinic.SelectedIndex>-1) {
+				_selectedClinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
 			}
+			fillComboProvHyg();
+		}
+
+		private void comboProv_SelectedIndexChanged(object sender,EventArgs e) {
+			if(comboProv.SelectedIndex>-1) {
+				_selectedProvNum=_listProviders[comboProv.SelectedIndex].ProvNum;
+			}
+		}
+
+		private void comboHyg_SelectedIndexChanged(object sender,EventArgs e) {
+			if(comboHyg.SelectedIndex>-1) {
+				_selectedProvHygNum=_listProviders[comboHyg.SelectedIndex].ProvNum;
+			}
+		}
+
+		///<summary>Fills combo provider based on which clinic is selected and attempts to preserve provider selection if any.</summary>
+		private void fillComboProvHyg() {
+			if(comboProv.SelectedIndex>-1) {//valid prov selected, non none or nothing.
+				_selectedProvNum = _listProviders[comboProv.SelectedIndex].ProvNum;
+			}
+			if(comboHyg.SelectedIndex>-1) {
+				_selectedProvHygNum = _listProviders[comboHyg.SelectedIndex].ProvNum;
+			}
+			_listProviders=new List<Provider>() { new Provider() { Abbr="none" } };
+			_listProviders.AddRange(Providers.GetProvsForClinic(_selectedClinicNum));
+			_listProviders=_listProviders.OrderBy(x => x.ProvNum>0).ThenBy(x => x.Abbr).ToList();//order list properly, None first
+			//fill comboProv
+			comboProv.Items.Clear();
+			_listProviders.ForEach(x => comboProv.Items.Add(x.Abbr));
+			comboProv.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvNum),() => { return Providers.GetAbbr(_selectedProvNum); });
+			//Fill comboHyg
+			comboHyg.Items.Clear();
+			_listProviders.ForEach(x => comboHyg.Items.Add(x.Abbr));
+			comboHyg.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvHygNum),() => { return Providers.GetAbbr(_selectedProvHygNum); });
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
@@ -471,18 +503,9 @@ namespace OpenDental{
 			OpCur.OpName=textOpName.Text;
 			OpCur.Abbrev=textAbbrev.Text;
 			OpCur.IsHidden=checkIsHidden.Checked;
-			if(comboClinic.SelectedIndex==0)//none
-				OpCur.ClinicNum=0;
-			else
-				OpCur.ClinicNum=Clinics.List[comboClinic.SelectedIndex-1].ClinicNum;
-			if(comboProv.SelectedIndex==0)//none
-				OpCur.ProvDentist=0;
-			else
-				OpCur.ProvDentist=ProviderC.ListShort[comboProv.SelectedIndex-1].ProvNum;
-			if(comboHyg.SelectedIndex==0)//none
-				OpCur.ProvHygienist=0;
-			else
-				OpCur.ProvHygienist=ProviderC.ListShort[comboHyg.SelectedIndex-1].ProvNum;
+			OpCur.ClinicNum=_selectedClinicNum;
+			OpCur.ProvDentist=_selectedProvNum;
+			OpCur.ProvHygienist=_selectedProvHygNum;
 			OpCur.IsHygiene=checkIsHygiene.Checked;
 			OpCur.SetProspective=checkSetProspective.Checked;
 			OpCur.IsWebSched=checkIsWebSched.Checked;
@@ -498,7 +521,9 @@ namespace OpenDental{
 		private void butCancel_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
+
 	}
+
 }
 
 

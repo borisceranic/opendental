@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using CodeBase;
 
 namespace OpenDental{
 	/// <summary>
@@ -44,7 +45,6 @@ namespace OpenDental{
 		private UI.Button butPickInsBillingProv;
 		private List<Provider> _listProv;
 		private UI.Button butNone;
-		private long _provNumDefaultSelected;
 		private CheckBox checkIsMedicalOnly;
 		private GroupBox groupBox1;
 		private TextBox textCity;
@@ -80,7 +80,12 @@ namespace OpenDental{
 		private CheckBox checkUseBillingAddressOnClaims;
 		private Label label22;
 		private ComboBox comboRegion;
-		private long _provNumBillingSelected;
+		///<summary>Filtered list of providers based on which clinic is selected. If no clinic is selected displays all providers. Also includes a dummy clinic at index 0 for "none"</summary>
+		private List<Provider> _listProviders;
+		///<summary>Instead of relying on _listProviders[comboProv.SelectedIndex] to determine the selected Provider we use this variable to store it explicitly.</summary>
+		private long _selectedProvBillNum;
+		///<summary>Instead of relying on _listProviders[comboProvHyg.SelectedIndex] to determine the selected Provider we use this variable to store it explicitly.</summary>
+		private long _selectedProvDefNum;
 
 		///<summary></summary>
 		public FormClinicEdit(Clinic clinicCur)
@@ -299,7 +304,7 @@ namespace OpenDental{
 			this.comboInsBillingProv.Name = "comboInsBillingProv";
 			this.comboInsBillingProv.Size = new System.Drawing.Size(212, 21);
 			this.comboInsBillingProv.TabIndex = 4;
-			this.comboInsBillingProv.SelectionChangeCommitted += new System.EventHandler(this.comboInsBillingProv_SelectionChangeCommitted);
+			this.comboInsBillingProv.SelectedIndexChanged += new System.EventHandler(this.comboInsBillingProv_SelectedIndexChanged);
 			// 
 			// radioInsBillingProvSpecific
 			// 
@@ -392,7 +397,7 @@ namespace OpenDental{
 			this.comboDefaultProvider.Name = "comboDefaultProvider";
 			this.comboDefaultProvider.Size = new System.Drawing.Size(212, 21);
 			this.comboDefaultProvider.TabIndex = 12;
-			this.comboDefaultProvider.SelectionChangeCommitted += new System.EventHandler(this.comboDefaultProvider_SelectionChangeCommitted);
+			this.comboDefaultProvider.SelectedIndexChanged += new System.EventHandler(this.comboDefaultProvider_SelectedIndexChanged);
 			// 
 			// checkIsMedicalOnly
 			// 
@@ -809,7 +814,6 @@ namespace OpenDental{
 			// 
 			// FormClinicEdit
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(650, 696);
 			this.Controls.Add(this.comboRegion);
 			this.Controls.Add(this.label22);
@@ -848,7 +852,6 @@ namespace OpenDental{
 			this.MinimumSize = new System.Drawing.Size(666, 496);
 			this.Name = "FormClinicEdit";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Edit Clinic";
 			this.Load += new System.EventHandler(this.FormClinicEdit_Load);
 			this.groupBox4.ResumeLayout(false);
@@ -907,21 +910,12 @@ namespace OpenDental{
 			comboPlaceService.Items.Clear();
 			comboPlaceService.Items.AddRange(Enum.GetNames(typeof(PlaceOfService)));
 			comboPlaceService.SelectedIndex=(int)ClinicCur.DefaultPlaceService;
-			_listProv=ProviderC.GetListShort();
-			_provNumDefaultSelected=ClinicCur.DefaultProv;
-			_provNumBillingSelected=ClinicCur.InsBillingProv;
-			comboInsBillingProv.Items.Clear();
-			comboDefaultProvider.Items.Clear();
-			for(int i=0;i<_listProv.Count;i++) {
-				comboInsBillingProv.Items.Add(_listProv[i].GetLongDesc());//Only visible provs added to combobox.
-				comboDefaultProvider.Items.Add(_listProv[i].GetLongDesc());
-				if(_listProv[i].ProvNum==ClinicCur.InsBillingProv) {
-					comboInsBillingProv.SelectedIndex=i;
-				}
-				if(_listProv[i].ProvNum==ClinicCur.DefaultProv) {
-					comboDefaultProvider.SelectedIndex=i;
-				}
-			}
+			_selectedProvBillNum=ClinicCur.InsBillingProv;
+			_selectedProvDefNum=ClinicCur.DefaultProv;
+			comboDefaultProvider.SelectedIndex=-1;
+			comboInsBillingProv.SelectedIndex=-1;
+			_listProviders=Providers.GetProvsForClinic(ClinicCur.ClinicNum);
+			fillComboProviders();
 			comboRegion.Items.Clear();
 			comboRegion.Items.Add(Lan.g(this,"none"));
 			comboRegion.SelectedIndex=0;
@@ -939,15 +933,62 @@ namespace OpenDental{
 				radioInsBillingProvTreat.Checked=true;//treat=-1
 			}
 			else{
-				if(comboInsBillingProv.SelectedIndex==-1) {//The provider exists but is hidden (exclude this block of code if provider selection is optional)
-					comboInsBillingProv.Text=Providers.GetLongDesc(_provNumBillingSelected);//Appends "(hidden)" to the end of the long description.
-				}
 				radioInsBillingProvSpecific.Checked=true;//specific=any number >0. Foreign key to ProvNum
 			}
 			EmailAddress emailAddress=EmailAddresses.GetOne(ClinicCur.EmailAddressNum);
 			if(emailAddress!=null) {
 				textEmail.Text=emailAddress.EmailUsername;
 			}
+		}
+
+		private void comboInsBillingProv_SelectedIndexChanged(object sender,EventArgs e) {
+			if(comboInsBillingProv.SelectedIndex>-1) {
+				_selectedProvBillNum=_listProviders[comboInsBillingProv.SelectedIndex].ProvNum;
+			}
+		}
+
+		private void comboDefaultProvider_SelectedIndexChanged(object sender,EventArgs e) {
+			if(comboDefaultProvider.SelectedIndex>-1) {
+				_selectedProvDefNum=_listProviders[comboDefaultProvider.SelectedIndex].ProvNum;
+			}
+		}
+
+		private void butPickInsBillingProv_Click(object sender,EventArgs e) {
+			FormProviderPick FormPP = new FormProviderPick(_listProviders);
+			FormPP.SelectedProvNum=_selectedProvBillNum;
+			FormPP.ShowDialog();
+			if(FormPP.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			_selectedProvBillNum=FormPP.SelectedProvNum;
+			comboInsBillingProv.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvBillNum),() => { return Providers.GetAbbr(_selectedProvBillNum); });
+		}
+
+		private void butPickDefaultProv_Click(object sender,EventArgs e) {
+			FormProviderPick FormPP = new FormProviderPick(_listProviders);
+			FormPP.SelectedProvNum=_selectedProvDefNum;
+			FormPP.ShowDialog();
+			if(FormPP.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			_selectedProvDefNum=FormPP.SelectedProvNum;
+			comboDefaultProvider.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvDefNum),() => { return Providers.GetAbbr(_selectedProvDefNum); });
+		}
+
+		private void butNone_Click(object sender,EventArgs e) {
+			_selectedProvDefNum=0;
+			comboDefaultProvider.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvDefNum),() => { return Providers.GetAbbr(_selectedProvDefNum); });
+		}
+
+		private void fillComboProviders() {
+			//Fill comboInsBillingProvider
+			comboInsBillingProv.Items.Clear();
+			_listProviders.ForEach(x => comboInsBillingProv.Items.Add(x.Abbr));
+			comboInsBillingProv.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvBillNum),() => { return Providers.GetAbbr(_selectedProvBillNum); });
+			//Fill comboDefaultProvider
+			comboDefaultProvider.Items.Clear();
+			_listProviders.ForEach(x => comboDefaultProvider.Items.Add(x.Abbr));
+			comboDefaultProvider.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvDefNum),() => { return Providers.GetAbbr(_selectedProvDefNum); });
 		}
 
 		private void textPhone_TextChanged(object sender,System.EventArgs e) {
@@ -979,45 +1020,6 @@ namespace OpenDental{
 			textEmail.Text=EmailAddresses.GetOne(FormEA.EmailAddressNum).EmailUsername;
 		}
 
-		private void butPickInsBillingProv_Click(object sender,EventArgs e) {
-			FormProviderPick FormPP=new FormProviderPick();
-			if(comboInsBillingProv.SelectedIndex>-1) {
-				FormPP.SelectedProvNum=_listProv[comboInsBillingProv.SelectedIndex].ProvNum;
-			}
-			FormPP.ShowDialog();
-			if(FormPP.DialogResult!=DialogResult.OK) {
-				return;
-			}
-			comboInsBillingProv.SelectedIndex=Providers.GetIndex(FormPP.SelectedProvNum);
-			_provNumBillingSelected=FormPP.SelectedProvNum;
-		}
-
-		private void butPickDefaultProv_Click(object sender,EventArgs e) {
-			FormProviderPick FormPP=new FormProviderPick();
-			if(comboDefaultProvider.SelectedIndex>-1) {
-				FormPP.SelectedProvNum=_listProv[comboDefaultProvider.SelectedIndex].ProvNum;
-			}
-			FormPP.ShowDialog();
-			if(FormPP.DialogResult!=DialogResult.OK) {
-				return;
-			}
-			comboDefaultProvider.SelectedIndex=Providers.GetIndex(FormPP.SelectedProvNum);
-			_provNumDefaultSelected=FormPP.SelectedProvNum;
-		}
-
-		private void comboDefaultProvider_SelectionChangeCommitted(object sender,EventArgs e) {
-			_provNumDefaultSelected=_listProv[comboDefaultProvider.SelectedIndex].ProvNum;
-		}
-
-		private void comboInsBillingProv_SelectionChangeCommitted(object sender,EventArgs e) {
-			_provNumBillingSelected=_listProv[comboInsBillingProv.SelectedIndex].ProvNum;
-		}
-
-		private void butNone_Click(object sender,EventArgs e) {
-			_provNumDefaultSelected=0;
-			comboDefaultProvider.SelectedIndex=-1;
-		}
-
 		private void butDelete_Click(object sender, System.EventArgs e) {
 			if(IsNew){
 				DialogResult=DialogResult.Cancel;
@@ -1041,7 +1043,7 @@ namespace OpenDental{
 				MessageBox.Show(Lan.g(this,"Description cannot be blank."));
 				return;
 			}
-			if(radioInsBillingProvSpecific.Checked && comboInsBillingProv.SelectedIndex==-1){
+			if(radioInsBillingProvSpecific.Checked && _selectedProvBillNum==0){
 				MsgBox.Show(this,"You must select a provider.");
 				return;
 			}
@@ -1101,9 +1103,9 @@ namespace OpenDental{
 				ClinicCur.InsBillingProv=-1;
 			}
 			else{
-				ClinicCur.InsBillingProv=_provNumBillingSelected;
+				ClinicCur.InsBillingProv=_selectedProvBillNum;
 			}
-			ClinicCur.DefaultProv=_provNumDefaultSelected;
+			ClinicCur.DefaultProv=_selectedProvDefNum;
 			if(IsNew) {
 				//for every new clinic, insert a set of program properties for PayConnect with the values from
 				//the 'Headquarters' or ClinicNum=0 set of properties
@@ -1122,14 +1124,6 @@ namespace OpenDental{
 		private void butCancel_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
-
-
-		
-
-		
-
-		
-
 
 	}
 }

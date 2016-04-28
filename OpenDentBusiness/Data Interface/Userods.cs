@@ -77,6 +77,13 @@ namespace OpenDentBusiness {
 			}
 			return retVal;
 		}
+
+		///<summary>Returns a list of all non-hidden users.  Does not include CEMT users.</summary>
+		public static List<Userod> GetUsersByClinic(long clinicNum) {
+			return UserodC.GetListt().FindAll(x => !x.IsHidden)//all non-hidden users
+				.FindAll(x => !x.ClinicIsRestricted || x.ClinicNum==clinicNum); //for the given clinic or unassigned to clinic
+				//CEMT user filter not required. CEMT users SHOULD be unrestricted to a clinic.
+		}
 		
 		///<summary>Returns a list of all users without using the local cache.  Useful for multithreaded connections.</summary>
 		public static List<Userod> GetUsersNoCache() {

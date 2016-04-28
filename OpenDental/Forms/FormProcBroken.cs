@@ -2,15 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Linq;
+using CodeBase;
 
 namespace OpenDental {
 	public partial class FormProcBroken:ODForm {
 		public bool IsNew;
 		private Procedure _procCur;
 		private Procedure _procOld;
-		private long _provNumSelected;
-		private List<Provider> _listProvs;
-		private Clinic[] _listClinics;
+		///<summary>Cached list of clinics available to user. Also includes a dummy Clinic at index 0 for "none".</summary>
+		private List<Clinic> _listClinics;
+		///<summary>Filtered list of providers based on which clinic is selected. If no clinic is selected displays all providers. Also includes a dummy clinic at index 0 for "none"</summary>
+		private List<Provider> _listProviders;
+		///<summary>Used to keep track of the current clinic selected. This is because it may be a clinic that is not in _listClinics.</summary>
+		private long _selectedClinicNum;
+		///<summary>Instead of relying on _listProviders[comboProv.SelectedIndex] to determine the selected Provider we use this variable to store it explicitly.</summary>
+		private long _selectedProvNum;
 
 		public FormProcBroken(Procedure proc) {
 			_procCur=proc;
@@ -23,62 +30,62 @@ namespace OpenDental {
 			textDateEntry.Text=_procCur.DateEntryC.ToShortDateString();
 			textProcDate.Text=_procCur.ProcDate.ToShortDateString();
 			textAmount.Text=_procCur.ProcFee.ToString("f");
-			_listProvs=ProviderC.GetListShort();
-			_provNumSelected=_procCur.ProvNum;
-			comboProvNum.Items.Clear();
-			for(int i=0;i<_listProvs.Count;i++) {
-				comboProvNum.Items.Add(_listProvs[i].GetLongDesc());//Only visible provs added to combobox.
-				if(_listProvs[i].ProvNum==_procCur.ProvNum) {
-					comboProvNum.SelectedIndex=i;//Sets combo text too.
-				}
-			}
-			if(comboProvNum.SelectedIndex==-1) {//The provider exists but is hidden, or selection is optional.
-				comboProvNum.Text=Providers.GetLongDesc(_provNumSelected);//Appends "(hidden)" to the end of the long description.
-			}
 			if(PrefC.HasClinicsEnabled) {
-				comboClinic.Items.Add("none");
-				comboClinic.SelectedIndex=0;
-				_listClinics=Clinics.List;
-				for(int i=0;i<_listClinics.Length;i++) {
-					comboClinic.Items.Add(_listClinics[i].Description);
-					if(_listClinics[i].ClinicNum==_procCur.ClinicNum) {
-						comboClinic.SelectedIndex=i+1;
-					}
-				}
+				_listClinics=new List<Clinic>() { new Clinic() { Description="none" } };
+				_listClinics.AddRange(Clinics.GetForUserod(Security.CurUser));
+				_listClinics=_listClinics.OrderBy(x => x.ClinicNum>0).ThenBy(x => x.Description).ToList();
+				_selectedClinicNum=_procCur.ClinicNum;
+				//Fill comboClinic
+				comboClinic.Items.Clear();
+				_listClinics.ForEach(x => comboClinic.Items.Add(x.Description));
+				comboClinic.IndexSelectOrSetText(_listClinics.FindIndex(x => x.ClinicNum==_selectedClinicNum),() => { return Clinics.GetDesc(_selectedClinicNum); });
 			}
 			else {
-				comboClinic.Visible=false;
 				labelClinic.Visible=false;
+				comboClinic.Visible=false;
 			}
+			_selectedProvNum=_procCur.ProvNum;
+			comboProv.SelectedIndex=-1;//initializes to 0; must be -1 for fillComboProv
+			fillComboProv();
 			textUser.Text=Userods.GetName(_procCur.UserNum);
 			textChartNotes.Text=_procCur.Note;
 			textAccountNotes.Text=_procCur.BillingNote;
 		}
 
-		private void comboProvNum_SelectionChangeCommitted(object sender,EventArgs e) {
-			_provNumSelected=_listProvs[comboProvNum.SelectedIndex].ProvNum;
+		private void comboClinic_SelectedIndexChanged(object sender,EventArgs e) {
+			if(comboClinic.SelectedIndex>-1) {
+				_selectedClinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
+			}
+			fillComboProv();
+		}
+
+		private void comboProv_SelectedIndexChanged(object sender,EventArgs e) {
+			if(comboProv.SelectedIndex>-1) {
+				_selectedProvNum=_listProviders[comboProv.SelectedIndex].ProvNum;
+			}
 		}
 
 		private void butPickProv_Click(object sender,EventArgs e) {
-			FormProviderPick FormP=new FormProviderPick();
-			if(comboProvNum.SelectedIndex>-1) {//Initial FormP selection if selected prov is not hidden.
-				FormP.SelectedProvNum=_provNumSelected;
-			}
+			FormProviderPick FormP = new FormProviderPick(_listProviders);
+			FormP.SelectedProvNum=_selectedProvNum;
 			FormP.ShowDialog();
 			if(FormP.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			comboProvNum.SelectedIndex=Providers.GetIndexLong(FormP.SelectedProvNum,_listProvs);
-			_provNumSelected=FormP.SelectedProvNum;
+			_selectedProvNum=FormP.SelectedProvNum;
+			comboProv.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvNum),() => { return Providers.GetLongDesc(_selectedProvNum); });
 		}
 
-		private void comboClinic_SelectionChangeCommitted(object sender,EventArgs e) {
-			if(comboClinic.SelectedIndex==0) {//User selected "none"
-				_procCur.ClinicNum=0;
+		///<summary>Fills combo provider based on which clinic is selected and attempts to preserve provider selection if any.</summary>
+		private void fillComboProv() {
+			if(comboProv.SelectedIndex>-1) {//valid prov selected, non none or nothing.
+				_selectedProvNum = _listProviders[comboProv.SelectedIndex].ProvNum;
 			}
-			else {
-				_procCur.ClinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;
-			}
+			_listProviders=Providers.GetProvsForClinic(_selectedClinicNum);
+			//Fill comboProv
+			comboProv.Items.Clear();
+			_listProviders.ForEach(x => comboProv.Items.Add(x.Abbr));
+			comboProv.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvNum),() => { return Providers.GetLongDesc(_selectedProvNum); });
 		}
 
 		private void butAutoNoteChart_Click(object sender,EventArgs e) {
@@ -116,7 +123,8 @@ namespace OpenDental {
 			_procCur.ProcFee=PIn.Double(textAmount.Text);
 			_procCur.Note=textChartNotes.Text;
 			_procCur.BillingNote=textAccountNotes.Text;
-			_procCur.ProvNum=_provNumSelected;
+			_procCur.ProvNum=_selectedProvNum;
+			_procCur.ClinicNum=_selectedClinicNum;
 			Procedures.Update(_procCur,_procOld);
 			ProcedureCode procedureCode=ProcedureCodes.GetProcCode(_procCur.CodeNum);
 			string logText=procedureCode.ProcCode+", "+Lan.g(this,"Fee")+": "+_procCur.ProcFee.ToString("c")+", "+procedureCode.Descript;

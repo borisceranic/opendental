@@ -1889,7 +1889,7 @@ namespace OpenDental{
 		private int GetClinicIndexFromPicker() {
 			FormClinics FormC=new FormClinics();
 			FormC.IsSelectionMode=true;
-			FormC._listClinics=_arrayClinics.ToList();
+			FormC.ListClinics=_arrayClinics.ToList();
 			FormC.ShowDialog();
 			return Array.FindIndex(_arrayClinics,x => x.ClinicNum==FormC.SelectedClinicNum);//Returns index of the found element or -1.
 		}

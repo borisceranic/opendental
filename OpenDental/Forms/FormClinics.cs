@@ -27,9 +27,9 @@ namespace OpenDental{
 		private UI.Button butUp;
 		private CheckBox checkOrderAlphabetical;
 		///<summary>Set this list prior to loading this window to use a custom list of clinics.  Otherwise, uses the cache.</summary>
-		public List<Clinic> _listClinics;
+		public List<Clinic> ListClinics;
 		///<summary>This list will be a copy of _listclinics and is used for syncing on window closed.</summary>
-		public List<Clinic> _listClinicsOld;
+		public List<Clinic> ListClinicsOld;
 
 		///<summary></summary>
 		public FormClinics()
@@ -218,11 +218,11 @@ namespace OpenDental{
 		#endregion
 
 		private void FormClinics_Load(object sender, System.EventArgs e) {
-			_listClinicsOld=new List<Clinic>();
-			if(_listClinics==null) {
-				_listClinics=Clinics.GetClinics();
-				foreach(Clinic clinic in _listClinics) {
-					_listClinicsOld.Add(clinic.Copy());
+			ListClinicsOld=new List<Clinic>();
+			if(ListClinics==null) {
+				ListClinics=Clinics.GetClinics();
+				foreach(Clinic clinic in ListClinics) {
+					ListClinicsOld.Add(clinic.Copy());
 				}
 			}
 			checkOrderAlphabetical.Checked=PrefC.GetBool(PrefName.ClinicListIsAlphabetical);
@@ -254,10 +254,10 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<_listClinics.Count;i++) {
+			for(int i=0;i<ListClinics.Count;i++) {
 				row=new ODGridRow();
-				row.Tag=_listClinics[i];
-				row.Cells.Add(_listClinics[i].Description);
+				row.Tag=ListClinics[i];
+				row.Cells.Add(ListClinics[i].Description);
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
@@ -272,7 +272,7 @@ namespace OpenDental{
 			FormClinicEdit FormCE=new FormClinicEdit(ClinicCur);
 			FormCE.IsNew=true;
 			if(FormCE.ShowDialog()==DialogResult.OK) {
-				_listClinics.Add(ClinicCur);
+				ListClinics.Add(ClinicCur);
 			}
 			FillGrid();
 		}
@@ -286,19 +286,19 @@ namespace OpenDental{
 				DialogResult=DialogResult.OK;
 				return;
 			}
-			FormClinicEdit FormCE=new FormClinicEdit(_listClinics[e.Row].Copy());
+			FormClinicEdit FormCE=new FormClinicEdit(ListClinics[e.Row].Copy());
 			if(FormCE.ShowDialog()==DialogResult.OK) {
 				if(FormCE.ClinicCur==null) {//Clinic was deleted
 					//Fix ItemOrders
-					for(int i=0;i<_listClinics.Count;i++) {
-						if(_listClinics[i].ItemOrder>_listClinics[e.Row].ItemOrder) {
-							_listClinics[i].ItemOrder--;//Fix item orders
+					for(int i=0;i<ListClinics.Count;i++) {
+						if(ListClinics[i].ItemOrder>ListClinics[e.Row].ItemOrder) {
+							ListClinics[i].ItemOrder--;//Fix item orders
 						}
 					}
-					_listClinics.Remove(_listClinics[e.Row]);
+					ListClinics.Remove(ListClinics[e.Row]);
 				}
 				else { 
-					_listClinics[e.Row]=FormCE.ClinicCur;
+					ListClinics[e.Row]=FormCE.ClinicCur;
 				}
 			}
 			FillGrid();			
@@ -315,10 +315,10 @@ namespace OpenDental{
 			}
 			int selectedIdx=gridMain.GetSelectedIndex();
 			//Swap clinic ItemOrders
-			_listClinics[selectedIdx].ItemOrder--;
-			_listClinics[selectedIdx-1].ItemOrder++;
+			ListClinics[selectedIdx].ItemOrder--;
+			ListClinics[selectedIdx-1].ItemOrder++;
 			//Move selected clinic up
-			_listClinics.Reverse(selectedIdx-1,2);
+			ListClinics.Reverse(selectedIdx-1,2);
 			FillGrid();
 			//Reselect the clinic that was moved
 			gridMain.SetSelected(selectedIdx-1,true);
@@ -336,10 +336,10 @@ namespace OpenDental{
 			}			
 			int selectedIdx=gridMain.GetSelectedIndex();
 			//Swap clinic ItemOrders
-			_listClinics[selectedIdx].ItemOrder++;
-			_listClinics[selectedIdx+1].ItemOrder--;
+			ListClinics[selectedIdx].ItemOrder++;
+			ListClinics[selectedIdx+1].ItemOrder--;
 			//Move selected clinic down
-			_listClinics.Reverse(selectedIdx,2);
+			ListClinics.Reverse(selectedIdx,2);
 			FillGrid();
 			//Reselect the clinic that was moved
 			gridMain.SetSelected(selectedIdx+1,true);
@@ -355,7 +355,7 @@ namespace OpenDental{
 				butUp.Enabled=true;
 				butDown.Enabled=true;
 			}
-			_listClinics.Sort(ClinicSort);//Sorts based on the status of the checkbox.
+			ListClinics.Sort(ClinicSort);//Sorts based on the status of the checkbox.
 			FillGrid();
 		}
 
@@ -380,7 +380,7 @@ namespace OpenDental{
 		}
 
 		private void FormClinics_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
-			if(Clinics.Sync(_listClinics,_listClinicsOld) || Prefs.UpdateBool(PrefName.ClinicListIsAlphabetical,checkOrderAlphabetical.Checked)) {
+			if(Clinics.Sync(ListClinics,ListClinicsOld) || Prefs.UpdateBool(PrefName.ClinicListIsAlphabetical,checkOrderAlphabetical.Checked)) {
 				DataValid.SetInvalid(InvalidType.Providers);
 			}
 		}

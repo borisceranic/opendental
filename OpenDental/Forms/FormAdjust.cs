@@ -10,6 +10,8 @@ using System.Reflection;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using System.Collections.Generic;
+using System.Linq;
+using CodeBase;
 
 namespace OpenDental{
 	///<summary></summary>
@@ -83,8 +85,18 @@ namespace OpenDental{
 		private double _procPrevPaid;
 		private double _procPaidHere;
 		private decimal _remainAmt;
-		//<summary>Keeps track of current server time so that user cannot bypass security by altering workstation clock.  Sometimes we compare to nowDate, but sometimes, we're just interested in the date of the adjustment.</summary>
-		//private DateTime nowDate;
+		///<summary>All positive adjustment defs.</summary>
+		private List<Def> _listAdjPosCats;
+		///<summary>All negative adjustment defs.</summary>
+		private List<Def> _listAdjNegCats;
+		///<summary>Cached list of clinics available to user. Also includes a dummy Clinic at index 0 for "none".</summary>
+		private List<Clinic> _listClinics;
+		///<summary>Filtered list of providers based on which clinic is selected. If no clinic is selected displays all providers. Also includes a dummy clinic at index 0 for "none"</summary>
+		private List<Provider> _listProviders;
+		///<summary>Used to keep track of the current clinic selected. This is because it may be a clinic that is not in _listClinics.</summary>
+		private long _selectedClinicNum;
+		///<summary>Instead of relying on _listProviders[comboProv.SelectedIndex] to determine the selected Provider we use this variable to store it explicitly.</summary>
+		private long _selectedProvNum;
 
 		///<summary></summary>
 		public FormAdjust(Patient patCur,Adjustment adjustmentCur){
@@ -346,6 +358,7 @@ namespace OpenDental{
 			this.comboProv.Name = "comboProv";
 			this.comboProv.Size = new System.Drawing.Size(158, 21);
 			this.comboProv.TabIndex = 1;
+			this.comboProv.SelectedIndexChanged += new System.EventHandler(this.comboProv_SelectedIndexChanged);
 			// 
 			// comboClinic
 			// 
@@ -355,7 +368,7 @@ namespace OpenDental{
 			this.comboClinic.Name = "comboClinic";
 			this.comboClinic.Size = new System.Drawing.Size(177, 21);
 			this.comboClinic.TabIndex = 2;
-			this.comboClinic.SelectionChangeCommitted += new System.EventHandler(this.comboClinic_SelectionChangeCommitted);
+			this.comboClinic.SelectedIndexChanged += new System.EventHandler(this.comboClinic_SelectedIndexChanged);
 			// 
 			// labelClinic
 			// 
@@ -738,43 +751,73 @@ namespace OpenDental{
 			else{//neg
 				textAmount.Text=(-AdjustmentCur.AdjAmt).ToString("F");//shows without the neg sign
 			}
-			for(int i=0;i<ProviderC.ListShort.Count;i++){
-				comboProv.Items.Add(ProviderC.ListShort[i].GetLongDesc());
-				if(ProviderC.ListShort[i].ProvNum==AdjustmentCur.ProvNum) {
-					comboProv.SelectedIndex=i;
-				}
-			}
 			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
 				labelClinic.Visible=false;
 				comboClinic.Visible=false;
 			}
-			else {
-				comboClinic.Items.Add("none");
-				comboClinic.SelectedIndex=0;
-				for(int i=0;i<Clinics.List.Length;i++) {
-					comboClinic.Items.Add(Clinics.List[i].Description);
-					if(Clinics.List[i].ClinicNum==AdjustmentCur.ClinicNum) {
-						comboClinic.SelectedIndex=i+1;
-					}
-				}
-			}
-			for(int i=0;i<DefC.Short[1].Length;i++){//temp.AdjType
-				if(DefC.Short[1][i].ItemValue=="+"){
-					PosIndex.Add(i);
-					listTypePos.Items.Add(DefC.Short[1][i].ItemName);
-					if(DefC.Short[1][i].DefNum==AdjustmentCur.AdjType)
-						listTypePos.SelectedIndex=PosIndex.Count-1;
-				}
-				else if(DefC.Short[1][i].ItemValue=="-"){
-					NegIndex.Add(i);
-					listTypeNeg.Items.Add(DefC.Short[1][i].ItemName);
-					if(DefC.Short[1][i].DefNum==AdjustmentCur.AdjType)
-						listTypeNeg.SelectedIndex=NegIndex.Count-1;
-				}
-			}
+			_listClinics=new List<Clinic>() { new Clinic() { Description=Lan.g(this,"none") } };
+			_listClinics.AddRange(Clinics.GetForUserod(Security.CurUser));
+			_listClinics=_listClinics.OrderBy(x => x.ClinicNum>0).ThenBy(x => x.Description).ToList();
+			_listClinics.ForEach(x => comboClinic.Items.Add(x.Description));
+			_selectedClinicNum=AdjustmentCur.ClinicNum;
+			_selectedProvNum=AdjustmentCur.ProvNum;
+			comboProv.SelectedIndex=-1;
+			comboClinic.IndexSelectOrSetText(_listClinics.FindIndex(x => x.ClinicNum==_selectedClinicNum),() => { return Clinics.GetDesc(_selectedClinicNum); });
+			fillComboProvHyg();
+			List<Def> adjCat = DefC.Short[(int)DefCat.AdjTypes].ToList();
+			//Positive adjustment types
+			_listAdjPosCats = adjCat.FindAll(x => x.ItemValue=="+");
+			_listAdjPosCats.ForEach(x => listTypePos.Items.Add(x.ItemName));
+			listTypePos.SelectedIndex=_listAdjPosCats.FindIndex(x => x.DefNum==AdjustmentCur.AdjType);//can be -1
+			//Negative adjustment types
+			_listAdjNegCats = adjCat.FindAll(x => x.ItemValue=="-");
+			_listAdjNegCats.ForEach(x => listTypeNeg.Items.Add(x.ItemName));
+			listTypeNeg.SelectedIndex=_listAdjNegCats.FindIndex(x => x.DefNum==AdjustmentCur.AdjType);//can be -1
 			FillProcedure();
-			//this.listProvNum.SelectedIndex=(int)temp.ProvNum;
 			this.textNote.Text=AdjustmentCur.AdjNote;
+		}
+
+		private void listTypePos_SelectedIndexChanged(object sender,System.EventArgs e) {
+			if(listTypePos.SelectedIndex!=-1) listTypeNeg.SelectedIndex=-1;
+		}
+
+		private void listTypeNeg_SelectedIndexChanged(object sender,System.EventArgs e) {
+			if(listTypeNeg.SelectedIndex!=-1) listTypePos.SelectedIndex=-1;
+		}
+
+		private void butPickProv_Click(object sender,EventArgs e) {
+			FormProviderPick FormPP = new FormProviderPick(_listProviders);
+			FormPP.SelectedProvNum=_selectedProvNum;
+			FormPP.ShowDialog();
+			if(FormPP.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			_selectedProvNum=FormPP.SelectedProvNum;
+			comboProv.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvNum),() => { return Providers.GetAbbr(_selectedProvNum); });
+		}
+
+		private void comboClinic_SelectedIndexChanged(object sender,EventArgs e) {
+			if(comboClinic.SelectedIndex>-1) {
+				_selectedClinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
+			}
+			fillComboProvHyg();
+		}
+
+		private void comboProv_SelectedIndexChanged(object sender,EventArgs e) {
+			if(comboProv.SelectedIndex>-1) {
+				_selectedProvNum=_listProviders[comboProv.SelectedIndex].ProvNum;
+			}
+		}
+
+		///<summary>Fills combo provider based on which clinic is selected and attempts to preserve provider selection if any.</summary>
+		private void fillComboProvHyg() {
+			if(comboProv.SelectedIndex>-1) {//valid prov selected, non none or nothing.
+				_selectedProvNum = _listProviders[comboProv.SelectedIndex].ProvNum;
+			}
+			_listProviders=Providers.GetProvsForClinic(_selectedClinicNum);
+			comboProv.Items.Clear();
+			_listProviders.ForEach(x => comboProv.Items.Add(x.Abbr));
+			comboProv.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvNum),() => { return Providers.GetAbbr(_selectedProvNum); });
 		}
 
 		private void FillProcedure(){
@@ -874,40 +917,6 @@ namespace OpenDental{
 			labelProcRemain.Text=_remainAmt.ToString("c");
 		}
 
-		private void listTypePos_SelectedIndexChanged(object sender, System.EventArgs e) {
-			if(listTypePos.SelectedIndex!=-1) listTypeNeg.SelectedIndex=-1;
-		}
-
-		private void listTypeNeg_SelectedIndexChanged(object sender, System.EventArgs e) {
-			if(listTypeNeg.SelectedIndex!=-1)	listTypePos.SelectedIndex=-1;
-		}
-
-		private void butPickProv_Click(object sender,EventArgs e) {
-			FormProviderPick formp=new FormProviderPick();
-			if(comboProv.SelectedIndex > -1) {
-				formp.SelectedProvNum=ProviderC.ListShort[comboProv.SelectedIndex].ProvNum;
-			}
-			formp.ShowDialog();
-			if(formp.DialogResult!=DialogResult.OK) {
-				return;
-			}
-			comboProv.SelectedIndex=Providers.GetIndex(formp.SelectedProvNum);
-			//ProcCur.ProvNum=formp.SelectedProvNum;
-		}
-
-		private void comboClinic_SelectionChangeCommitted(object sender,EventArgs e) {
-			/*
-			if(comboClinic.SelectedIndex==0) {
-				ProcCur.ClinicNum=0;
-			}
-			else {
-				ProcCur.ClinicNum=Clinics.List[comboClinic.SelectedIndex-1].ClinicNum;
-			}
-			for(int i=0;i<ClaimProcsForProc.Count;i++) {
-				ClaimProcsForProc[i].ClinicNum=ProcCur.ClinicNum;
-			}*/
-		}
-
 		private void butAttachProc_Click(object sender, System.EventArgs e) {
 			FormProcSelect FormPS=new FormProcSelect(AdjustmentCur.PatNum);
 			FormPS.ShowDialog();
@@ -959,60 +968,38 @@ namespace OpenDental{
 			//DateEntry not allowed to change
 			AdjustmentCur.AdjDate=PIn.Date(textAdjDate.Text);
 			AdjustmentCur.ProcDate=PIn.Date(textProcDate.Text);
-			if(comboProv.SelectedIndex==-1) {//might be a hidden provider, so don't change.
-				//	AdjustmentCur.ProvNum=PatCur.PriProv;
-			}
-			else{
-				AdjustmentCur.ProvNum=ProviderC.ListShort[comboProv.SelectedIndex].ProvNum;
-			}
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				if(comboClinic.SelectedIndex==0) {
-					AdjustmentCur.ClinicNum=0;
-				}
-				else {
-					AdjustmentCur.ClinicNum=Clinics.List[comboClinic.SelectedIndex-1].ClinicNum;
-				}
-			}
-			if(listTypePos.SelectedIndex!=-1){
-				AdjustmentCur.AdjType=DefC.Short[(int)DefCat.AdjTypes][(int)PosIndex[listTypePos.SelectedIndex]].DefNum;
-			}
-			if(listTypeNeg.SelectedIndex!=-1){
-				AdjustmentCur.AdjType=DefC.Short[(int)DefCat.AdjTypes][(int)NegIndex[listTypeNeg.SelectedIndex]].DefNum;
-			}
-			if(DefC.GetValue(DefCat.AdjTypes,AdjustmentCur.AdjType)=="+"){//pos
+			AdjustmentCur.ProvNum=_selectedProvNum;
+			AdjustmentCur.ClinicNum=_selectedClinicNum;
+			if(listTypePos.SelectedIndex!=-1) {
+				AdjustmentCur.AdjType=_listAdjPosCats[listTypePos.SelectedIndex].DefNum;
 				AdjustmentCur.AdjAmt=PIn.Double(textAmount.Text);
 			}
-			else{//neg
+			if(listTypeNeg.SelectedIndex!=-1) {
+				AdjustmentCur.AdjType=_listAdjNegCats[listTypeNeg.SelectedIndex].DefNum;
 				AdjustmentCur.AdjAmt=-PIn.Double(textAmount.Text);
 			}
-			if(_checkZeroAmount) {
-				if(AdjustmentCur.AdjAmt!=0) {
-					MsgBox.Show(this,"Amount has to be 0.00 due to security permission.");
-					return;
-				}
+			if(_checkZeroAmount && AdjustmentCur.AdjAmt!=0) {
+				MsgBox.Show(this,"Amount has to be 0.00 due to security permission.");
+				return;
 			}
 			AdjustmentCur.AdjNote=textNote.Text;
 			try{
 				if(IsNew) {
 					Adjustments.Insert(AdjustmentCur);
+					SecurityLogs.MakeLogEntry(Permissions.AdjustmentCreate,AdjustmentCur.PatNum,
+						Patients.GetLim(AdjustmentCur.PatNum).GetNameLF()+", "
+						+AdjustmentCur.AdjAmt.ToString("c"));
 				}
 				else {
 					Adjustments.Update(AdjustmentCur);
+					SecurityLogs.MakeLogEntry(Permissions.AdjustmentEdit,AdjustmentCur.PatNum,
+						Patients.GetLim(AdjustmentCur.PatNum).GetNameLF()+", "
+						+AdjustmentCur.AdjAmt.ToString("c"));
 				}
 			}
 			catch(Exception ex){//even though it doesn't currently throw any exceptions
 				MessageBox.Show(ex.Message);
 				return;
-			}
-			if(IsNew){
-				SecurityLogs.MakeLogEntry(Permissions.AdjustmentCreate,AdjustmentCur.PatNum,
-					Patients.GetLim(AdjustmentCur.PatNum).GetNameLF()+", "
-					+AdjustmentCur.AdjAmt.ToString("c"));
-			}
-			else{
-				SecurityLogs.MakeLogEntry(Permissions.AdjustmentEdit,AdjustmentCur.PatNum,
-					Patients.GetLim(AdjustmentCur.PatNum).GetNameLF()+", "
-					+AdjustmentCur.AdjAmt.ToString("c"));
 			}
 			DialogResult=DialogResult.OK;
 		}
@@ -1034,9 +1021,6 @@ namespace OpenDental{
 		private void butCancel_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
-
-		
-
 	}
 
 	///<summary></summary>

@@ -111,7 +111,7 @@ namespace OpenDental{
 		private Label label16;
 		private List <Benefit> BenefitList;
 		private bool SigChanged;
-		private ComboBox comboProvNum;
+		private ComboBox comboProv;
 		private ComboBox comboDx;
 		private ComboBox comboPriority;
 		private TextBox textUser;
@@ -262,7 +262,6 @@ namespace OpenDental{
 		private Label label11;
 		private ODGrid gridAdj;
 		private ODGrid gridPay;
-		private long _provNumOrderingSelected;
 		private SignatureBoxWrapper signatureBoxWrapper;
 		private UI.Button butChangeUser;
 		private bool _isQuickAdd=false;
@@ -272,6 +271,16 @@ namespace OpenDental{
 
 		///<summary>True if the user clicked the Change User button.</summary>
 		private bool _hasUserChanged;
+		///<summary>Cached list of clinics available to user. Also includes a dummy Clinic at index 0 for "none".</summary>
+		private List<Clinic> _listClinics;
+		///<summary>Filtered list of providers based on which clinic is selected. If no clinic is selected displays all providers. Also includes a dummy clinic at index 0 for "none"</summary>
+		private List<Provider> _listProviders;
+		///<summary>Used to keep track of the current clinic selected. This is because it may be a clinic that is not in _listClinics.</summary>
+		private long _selectedClinicNum;
+		///<summary>Instead of relying on _listProviders[comboProv.SelectedIndex] to determine the selected Provider we use this variable to store it explicitly.</summary>
+		private long _selectedProvNum;
+		///<summary>Instead of relying on _listProviders[comboProvHyg.SelectedIndex] to determine the selected Provider we use this variable to store it explicitly.</summary>
+		private long _selectedProvOrderNum;
 
 		///<summary>Inserts are not done within this dialog, but must be done ahead of time from outside.  You must specify a procedure to edit, and only the changes that are made in this dialog get saved.  Only used when double click in Account, Chart, TP, and in ContrChart.AddProcedure().  The procedure may be deleted if new, and user hits Cancel.</summary>
 		public FormProcEdit(Procedure proc,Patient patCur,Family famCur,bool isQuickAdd=false){
@@ -396,7 +405,7 @@ namespace OpenDental{
 			this.label16 = new System.Windows.Forms.Label();
 			this.comboPriority = new System.Windows.Forms.ComboBox();
 			this.comboDx = new System.Windows.Forms.ComboBox();
-			this.comboProvNum = new System.Windows.Forms.ComboBox();
+			this.comboProv = new System.Windows.Forms.ComboBox();
 			this.textUser = new System.Windows.Forms.TextBox();
 			this.comboBillingTypeTwo = new System.Windows.Forms.ComboBox();
 			this.labelBillingTypeTwo = new System.Windows.Forms.Label();
@@ -917,7 +926,7 @@ namespace OpenDental{
 			// label9
 			// 
 			this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label9.Location = new System.Drawing.Point(5, 199);
+			this.label9.Location = new System.Drawing.Point(5, 221);
 			this.label9.Name = "label9";
 			this.label9.Size = new System.Drawing.Size(100, 14);
 			this.label9.TabIndex = 45;
@@ -1425,16 +1434,16 @@ namespace OpenDental{
 			// comboClinic
 			// 
 			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboClinic.Location = new System.Drawing.Point(106, 217);
+			this.comboClinic.Location = new System.Drawing.Point(106, 196);
 			this.comboClinic.MaxDropDownItems = 30;
 			this.comboClinic.Name = "comboClinic";
 			this.comboClinic.Size = new System.Drawing.Size(177, 21);
 			this.comboClinic.TabIndex = 74;
-			this.comboClinic.SelectionChangeCommitted += new System.EventHandler(this.comboClinic_SelectionChangeCommitted);
+			this.comboClinic.SelectedIndexChanged += new System.EventHandler(this.comboClinic_SelectedIndexChanged);
 			// 
 			// labelClinic
 			// 
-			this.labelClinic.Location = new System.Drawing.Point(5, 219);
+			this.labelClinic.Location = new System.Drawing.Point(5, 200);
 			this.labelClinic.Name = "labelClinic";
 			this.labelClinic.Size = new System.Drawing.Size(99, 16);
 			this.labelClinic.TabIndex = 75;
@@ -1488,14 +1497,13 @@ namespace OpenDental{
 			// 
 			// comboProvNum
 			// 
-			this.comboProvNum.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboProvNum.Location = new System.Drawing.Point(106, 195);
-			this.comboProvNum.MaxDropDownItems = 30;
-			this.comboProvNum.Name = "comboProvNum";
-			this.comboProvNum.Size = new System.Drawing.Size(158, 21);
-			this.comboProvNum.TabIndex = 100;
-			this.comboProvNum.SelectionChangeCommitted += new System.EventHandler(this.comboProvNum_SelectionChangeCommitted);
-			this.comboProvNum.KeyUp += new System.Windows.Forms.KeyEventHandler(this.comboProvNum_KeyUp);
+			this.comboProv.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboProv.Location = new System.Drawing.Point(106, 217);
+			this.comboProv.MaxDropDownItems = 30;
+			this.comboProv.Name = "comboProvNum";
+			this.comboProv.Size = new System.Drawing.Size(158, 21);
+			this.comboProv.TabIndex = 100;
+			this.comboProv.SelectedIndexChanged += new System.EventHandler(this.comboProv_SelectedIndexChanged);
 			// 
 			// textUser
 			// 
@@ -2127,7 +2135,7 @@ namespace OpenDental{
 			this.comboProvNumOrdering.Name = "comboProvNumOrdering";
 			this.comboProvNumOrdering.Size = new System.Drawing.Size(272, 21);
 			this.comboProvNumOrdering.TabIndex = 284;
-			this.comboProvNumOrdering.SelectionChangeCommitted += new System.EventHandler(this.comboProvNumOrdering_SelectionChangeCommitted);
+			this.comboProvNumOrdering.SelectedIndexChanged += new System.EventHandler(this.comboProvNumOrdering_SelectedIndexChanged);
 			// 
 			// label95
 			// 
@@ -2613,7 +2621,7 @@ namespace OpenDental{
 			this.butPickProv.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPickProv.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPickProv.CornerRadius = 2F;
-			this.butPickProv.Location = new System.Drawing.Point(265, 195);
+			this.butPickProv.Location = new System.Drawing.Point(265, 217);
 			this.butPickProv.Name = "butPickProv";
 			this.butPickProv.Size = new System.Drawing.Size(18, 21);
 			this.butPickProv.TabIndex = 161;
@@ -2785,7 +2793,7 @@ namespace OpenDental{
 			this.Controls.Add(this.textReferral);
 			this.Controls.Add(this.label13);
 			this.Controls.Add(this.comboProcStatus);
-			this.Controls.Add(this.comboProvNum);
+			this.Controls.Add(this.comboProv);
 			this.Controls.Add(this.checkHideGraphics);
 			this.Controls.Add(this.butPickProv);
 			this.Controls.Add(this.buttonUseAutoNote);
@@ -2850,12 +2858,6 @@ namespace OpenDental{
 			ClaimProcsForProc=new List<ClaimProc>();
 			//Set the title bar to show the patient's name much like the main screen does.
 			this.Text+=" - "+PatCur.GetNameLF();
-			//richTextBox1.Text="This is a test of the functions of a rich text box.";
-			//webBrowser1.
-			//richTextBox1.Select(10,4);
-			//richTextBox1.SelectionFont=new Font(FontFamily.GenericMonospace,8);
-			//richTextBox1.Select(22,9);
-			//richTextBox1.SelectionFont=new Font(FontFamily.GenericMonospace,8,FontStyle.Underline);
 			textDateEntry.Text=ProcCur.DateEntryC.ToShortDateString();
 			if(PrefC.GetBool(PrefName.EasyHidePublicHealth)){
 				labelPlaceService.Visible=false;
@@ -3064,14 +3066,16 @@ namespace OpenDental{
 				radioS5.Text="07";//Sextant 5 in the United States is sextant 07 in Canada.
 				radioS6.Text="08";//Sextant 6 in the United States is sextant 08 in Canada.
 			}
-			_provNumOrderingSelected=ProcCur.ProvOrderOverride;
-			comboProvNumOrdering.Items.Clear();
-			for(int i=0;i<ProviderC.ListShort.Count;i++) {
-				comboProvNumOrdering.Items.Add(ProviderC.ListShort[i].GetLongDesc());//Only visible provs added to combobox.
-				if(ProviderC.ListShort[i].ProvNum==ProcCur.ProvOrderOverride) {
-					comboProvNumOrdering.SelectedIndex=i;//Sets combo text too.
-				}
-			}
+			//Set Selected Nums
+			_selectedClinicNum=ProcCur.ClinicNum;
+			_selectedProvNum=ProcCur.ProvNum;
+			_selectedProvOrderNum=ProcCur.ProvOrderOverride;
+			//Prep Selected Indexs
+			comboClinic.SelectedIndex=-1;
+			comboProv.SelectedIndex=-1;
+			comboProvNumOrdering.SelectedIndex=-1;
+			//Fill comboClinic, which subsequently fills comboProv and comboOverride
+			FillClinicCombo();
 			IsStartingUp=true;
 			FillControlsOnStartup();
 			SetControlsUpperLeft();
@@ -3094,6 +3098,93 @@ namespace OpenDental{
 			}
 		}
 
+		private void FillClinicCombo() {
+			int idxOld = comboClinic.SelectedIndex;
+			if(comboClinic.SelectedIndex>-1) {
+				_selectedClinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
+			}
+			_listClinics=new List<Clinic>() { new Clinic() { Description="none" } };
+			_listClinics.AddRange(Clinics.GetForUserod(_curUser));//Not Security.CurUser
+			_listClinics=_listClinics.OrderBy(x => x.ClinicNum>0).ThenBy(x => x.Description).ToList();
+			//Fill comboClinic
+			comboClinic.Items.Clear();
+			_listClinics.ForEach(x => comboClinic.Items.Add(x.Description));
+			comboClinic.IndexSelectOrSetText(_listClinics.FindIndex(x => x.ClinicNum==_selectedClinicNum),() => { return Clinics.GetDesc(_selectedClinicNum); });
+			if(idxOld==-1 && comboClinic.SelectedIndex==-1) {
+				fillCombosForProviders();//because the comboClinic_SelectedIndexChanged will not fire.
+			}
+		}
+
+		private void comboClinic_SelectedIndexChanged(object sender,EventArgs e) {
+			if(comboClinic.SelectedIndex>-1) {
+				_selectedClinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
+			}
+			ProcCur.ClinicNum=_selectedClinicNum;//legacy code support. We should move all "saving" behavior to ok click
+			ClaimProcsForProc.ForEach(x => x.ClinicNum=_selectedClinicNum);
+			fillCombosForProviders();
+		}
+
+		private void comboProv_SelectedIndexChanged(object sender,EventArgs e) {
+			if(comboProv.SelectedIndex>-1) {
+				_selectedProvNum=_listProviders[comboProv.SelectedIndex].ProvNum;
+			}
+			ProcCur.ProvNum=_selectedProvNum;//legacy code support. We should move all "saving" behavior to ok click
+			ClaimProcsForProc.ForEach(x => x.ProvNum=_selectedProvNum);
+		}
+
+		private void butPickProv_Click(object sender,EventArgs e) {
+			FormProviderPick formp = new FormProviderPick(_listProviders);
+			formp.SelectedProvNum=_selectedProvNum;
+			formp.ShowDialog();
+			if(formp.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			_selectedProvNum=formp.SelectedProvNum;
+			ProcCur.ProvNum=_selectedProvNum;//should this line be move to OK click?
+			ClaimProcsForProc.ForEach(x => x.ProvNum=_selectedProvNum);
+			comboProv.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvNum),() => { return Providers.GetAbbr(_selectedProvNum); });
+		}
+
+		private void comboProvNumOrdering_SelectedIndexChanged(object sender,EventArgs e) {
+			if(comboProvNumOrdering.SelectedIndex>-1) {
+				_selectedProvOrderNum=_listProviders[comboProvNumOrdering.SelectedIndex].ProvNum;
+			}
+		}
+
+		private void butPickProvOrdering_Click(object sender,EventArgs e) {
+			FormProviderPick formP = new FormProviderPick(_listProviders);
+			formP.SelectedProvNum=_selectedProvOrderNum;
+			formP.ShowDialog();
+			if(formP.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			_selectedProvOrderNum=formP.SelectedProvNum;
+			comboProvNumOrdering.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvOrderNum),() => { return Providers.GetAbbr(_selectedProvOrderNum); });
+		}
+
+		private void butNoneProvOrdering_Click(object sender,EventArgs e) {
+			_selectedProvOrderNum=0;
+			comboProvNumOrdering.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvOrderNum),() => { return Providers.GetAbbr(_selectedProvOrderNum); });
+		}
+
+		///<summary>Fills combo provider based on which clinic is selected and attempts to preserve provider selection if any.</summary>
+		private void fillCombosForProviders() {
+			if(comboProv.SelectedIndex>-1) {//valid prov selected, non none or nothing.
+				_selectedProvNum = _listProviders[comboProv.SelectedIndex].ProvNum;
+			}
+			if(comboProvNumOrdering.SelectedIndex>-1) {
+				_selectedProvOrderNum= _listProviders[comboProvNumOrdering.SelectedIndex].ProvNum;
+			}
+			_listProviders=Providers.GetProvsForClinic(_selectedClinicNum).OrderBy(x => x.ProvNum>0).ThenBy(x => x.Abbr).ToList();//order list properly, None first
+			//Provider
+			comboProv.Items.Clear();
+			_listProviders.ForEach(x => comboProv.Items.Add(x.Abbr));
+			comboProv.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvNum),() => { return Providers.GetAbbr(_selectedProvNum); });
+			//Ordering Override Provider
+			comboProvNumOrdering.Items.Clear();
+			_listProviders.ForEach(x => comboProvNumOrdering.Items.Add(x.Abbr));
+			comboProvNumOrdering.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvOrderNum),() => { return Providers.GetAbbr(_selectedProvOrderNum); });
+		}
 
 		///<summary>ONLY run on startup. Fills the basic controls, except not the ones in the upper left panel which are handled in SetControlsUpperLeft.</summary>
 		private void FillControlsOnStartup(){
@@ -3164,15 +3255,10 @@ namespace OpenDental{
 			}
 			checkHideGraphics.Checked=ProcCur.HideGraphics;
 			if(Programs.UsingOrion && this.IsNew && !OrionDentist){
-				ProcCur.ProvNum=Providers.GetOrionProvNum(ProcCur.ProvNum);//Returns 0 if logged in as non provider.
+				_selectedProvNum=Providers.GetOrionProvNum(ProcCur.ProvNum);
+				ProcCur.ProvNum=_selectedProvNum;//Returns 0 if logged in as non provider.
+				fillCombosForProviders();//Second time this is called, but only if using Orion.
 			}//ProvNum of 0 will be required to change before closing form.
-			comboProvNum.Items.Clear();
-			for(int i=0;i<ProviderC.ListShort.Count;i++){
-				comboProvNum.Items.Add(ProviderC.ListShort[i].Abbr);
-				if(ProviderC.ListShort[i].ProvNum==ProcCur.ProvNum) {
-					comboProvNum.SelectedIndex=i;
-				}
-			}
 			comboPriority.Items.Clear();
 			comboPriority.Items.Add(Lan.g(this,"no priority"));
 			comboPriority.SelectedIndex=0;
@@ -3211,16 +3297,6 @@ namespace OpenDental{
 			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
 				comboClinic.Visible=false;
 				labelClinic.Visible=false;
-			}
-			else {
-				comboClinic.Items.Add("none");
-				comboClinic.SelectedIndex=0;
-				for(int i=0;i<Clinics.List.Length;i++) {
-					comboClinic.Items.Add(Clinics.List[i].Description);
-					if(Clinics.List[i].ClinicNum==ProcCur.ClinicNum) {
-						comboClinic.SelectedIndex=i+1;
-					}
-				}
 			}
 			textSite.Text=Sites.GetDescription(ProcCur.SiteNum);
 			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
@@ -4205,9 +4281,7 @@ namespace OpenDental{
 				//Procedures.SetHideGraphical(ProcCur);//might not matter anymore
 				ToothInitials.SetValue(ProcCur.PatNum,ProcCur.ToothNum,ToothInitialType.Missing);
 			}
-			//long provNum=ProviderC.List[comboProvNum.SelectedIndex].ProvNum;
-			long provNum=ProcCur.ProvNum;
-			textNotes.Text+=ProcCodeNotes.GetNote(provNum,ProcCur.CodeNum);
+			textNotes.Text+=ProcCodeNotes.GetNote(_selectedProvNum,ProcCur.CodeNum);
 			Plugins.HookAddCode(this,"FormProcEdit.butSetComplete_Click_end",ProcCur,ProcOld,textNotes);
 			comboProcStatus.SelectedIndex=-1;
 			//radioStatusC.Checked=true;
@@ -4743,40 +4817,6 @@ namespace OpenDental{
 			textSite.Text=Sites.GetDescription(ProcCur.SiteNum);
 		}
 
-		private void butPickProv_Click(object sender,EventArgs e) {
-			FormProviderPick formp=new FormProviderPick();
-			if(comboProvNum.SelectedIndex > -1) {
-				formp.SelectedProvNum=ProviderC.ListShort[comboProvNum.SelectedIndex].ProvNum;
-			}
-			formp.ShowDialog();
-			if(formp.DialogResult!=DialogResult.OK) {
-				return;
-			}
-			comboProvNum.SelectedIndex=Providers.GetIndex(formp.SelectedProvNum);
-			ProcCur.ProvNum=formp.SelectedProvNum;
-		}
-
-		private void comboProvNum_SelectionChangeCommitted(object sender,EventArgs e) {
-			ProcCur.ProvNum=ProviderC.ListShort[comboProvNum.SelectedIndex].ProvNum;
-			UpdateClaimProcsProv();//This seems unnecessary here.  Should probably move to OK click.
-		}
-
-		///<summary>Changes provider if user uses key shortcuts to change the dropdown.</summary>
-		private void comboProvNum_KeyUp(object sender,KeyEventArgs e) {
-			if(comboProvNum.SelectedIndex==-1) { //If loaded with a provider not in the list, and the provider wasn't changed
-				return;
-			}
-			ProcCur.ProvNum=ProviderC.ListShort[comboProvNum.SelectedIndex].ProvNum;
-			UpdateClaimProcsProv();//This seems unnecessary here.  Should probably move to OK click.
-		}
-
-		///<summary>Updates all claim procs for procedure based on ProcCur.ProvNum.</summary>
-		private void UpdateClaimProcsProv() {
-			for(int i=0;i<ClaimProcsForProc.Count;i++) {
-				ClaimProcsForProc[i].ProvNum=ProcCur.ProvNum;
-			}
-		}
-
 		///<summary>This button is only visible if 1. Pref ProcLockingIsAllowed is true, 2. Proc isn't already locked, 3. Proc status is C.</summary>
 		private void butLock_Click(object sender,EventArgs e) {
 			if(!EntriesAreValid()) {
@@ -4818,18 +4858,6 @@ namespace OpenDental{
 				return;
 			}
 			DialogResult=DialogResult.OK;//exit out of this window.  Change already saved, and OK button is disabled in this window, anyway.
-		}
-
-		private void comboClinic_SelectionChangeCommitted(object sender,EventArgs e) {
-			if(comboClinic.SelectedIndex==0) {
-				ProcCur.ClinicNum=0;
-			}
-			else {
-				ProcCur.ClinicNum=Clinics.List[comboClinic.SelectedIndex-1].ClinicNum;
-			}
-			for(int i=0;i<ClaimProcsForProc.Count;i++) {
-				ClaimProcsForProc[i].ClinicNum=ProcCur.ClinicNum;
-			}
 		}
 
 		private void butSnomedBodySiteSelect_Click(object sender,EventArgs e) {
@@ -4908,28 +4936,6 @@ namespace OpenDental{
 
 		private void butNoneDiagnosisCode4_Click(object sender,EventArgs e) {
 			textDiagnosticCode4.Text="";
-		}
-
-		private void comboProvNumOrdering_SelectionChangeCommitted(object sender,EventArgs e) {
-			_provNumOrderingSelected=ProviderC.ListShort[comboProvNumOrdering.SelectedIndex].ProvNum;
-		}
-
-		private void butPickProvOrdering_Click(object sender,EventArgs e) {
-			FormProviderPick formP=new FormProviderPick();
-			if(comboProvNumOrdering.SelectedIndex > -1) {//Initial formP selection if selected prov is not hidden.
-				formP.SelectedProvNum=_provNumOrderingSelected;
-			}
-			formP.ShowDialog();
-			if(formP.DialogResult!=DialogResult.OK) {
-				return;
-			}
-			comboProvNumOrdering.SelectedIndex=Providers.GetIndex(formP.SelectedProvNum);
-			_provNumOrderingSelected=formP.SelectedProvNum;
-		}
-
-		private void butNoneProvOrdering_Click(object sender,EventArgs e) {
-			_provNumOrderingSelected=0;
-			comboProvNumOrdering.SelectedIndex=-1;
 		}
 
 		private void butDelete_Click(object sender, System.EventArgs e) {
@@ -5019,7 +5025,7 @@ namespace OpenDental{
 				MsgBox.Show(this,"Qty not valid.  Typical value is 1.");
 				return false;
 			}
-			if(ProcCur.ProvNum==0){//this works because ProvNum gets set when the user changes the combobox.
+			if(ProcCur.ProvNum==0){//this works because ProvNum gets set when the user changes the combobox. (Can use _selectedProvNum I think.)
 				MsgBox.Show(this,"You must select a provider first.");
 				return false;
 			}
@@ -5205,7 +5211,7 @@ namespace OpenDental{
 				ProcCur.DiagnosticCode4=diagnosticCodes[3];
 			}
 			ProcCur.IsPrincDiag=checkIsPrincDiag.Checked;
-			ProcCur.ProvOrderOverride=_provNumOrderingSelected;
+			ProcCur.ProvOrderOverride=_selectedProvOrderNum;
 			ProcCur.CodeMod1 = textCodeMod1.Text;
 			ProcCur.CodeMod2 = textCodeMod2.Text;
 			ProcCur.CodeMod3 = textCodeMod3.Text;
@@ -5305,9 +5311,6 @@ namespace OpenDental{
 			}
 			ProcCur.HideGraphics=checkHideGraphics.Checked;
 			//provnum already handled.
-			//if(comboProvNum.SelectedIndex!=-1) {
-			//	ProcCur.ProvNum=ProviderC.List[comboProvNum.SelectedIndex].ProvNum;
-			//}
 			//clinicNum already handled.
 			if(comboDx.SelectedIndex!=-1) {
 				ProcCur.Dx=DefC.Short[(int)DefCat.Diagnosis][comboDx.SelectedIndex].DefNum;
@@ -5325,12 +5328,6 @@ namespace OpenDental{
 				ProcCur.Priority=DefC.Short[(int)DefCat.TxPriorities][comboPriority.SelectedIndex-1].DefNum;
 			}
 			ProcCur.PlaceService=(PlaceOfService)comboPlaceService.SelectedIndex;
-			//if(comboClinic.SelectedIndex==0){
-			//	ProcCur.ClinicNum=0;
-			//}
-			//else{
-			//	ProcCur.ClinicNum=Clinics.List[comboClinic.SelectedIndex-1].ClinicNum;
-			//}
 			//site set when user picks from list.
 			if(comboBillingTypeOne.SelectedIndex==0){
 				ProcCur.BillingTypeOne=0;
@@ -5593,9 +5590,8 @@ namespace OpenDental{
 				#endregion
 				Appointments.Update(apt,aptOld);
 			}
-			for(int i=0;i<ClaimProcsForProc.Count;i++) {
-				ClaimProcsForProc[i].ClinicNum=ProcCur.ClinicNum;
-			}
+			ClaimProcsForProc.ForEach(x => x.ProvNum=_selectedProvNum);//Where are these changes saved to the DB?
+			ClaimProcsForProc.ForEach(x => x.ClinicNum=_selectedClinicNum);//Where are these changes saved to the DB?
 			//Recall synch--------------------------------------------------------------------------------------------------------------------------------------
 			Recalls.Synch(ProcCur.PatNum);
 			//Auto-insert default encounter ---------------------------------------------------------------------------------------------------------------------------
@@ -5747,6 +5743,7 @@ namespace OpenDental{
 			FormChangeUser.ShowDialog();
 			if(FormChangeUser.DialogResult==DialogResult.OK) { //if successful
 				_curUser=FormChangeUser.CurUserSimpleSwitch; //assign temp user
+				FillClinicCombo();//update clinics and providers if needed
 				signatureBoxWrapper.ClearSignature(); //clear sig
 				textUser.Text=_curUser.UserName; //update user textbox.
 				SigChanged=true;
@@ -5820,15 +5817,10 @@ namespace OpenDental{
 			}
 			if(DialogResult==DialogResult.OK) {
 				//this catches date,prov,fee,status,etc for all claimProcs attached to this proc.
-				if(!StartedAttachedToClaim
-					&& Procedures.IsAttachedToClaim(ProcCur.ProcNum)) 
-				{
-					return;//unless they got attached to a claim while this window was open.  Then it doesn't touch them.
-				}
-				if(StartedAttachedToClaim
-					&& !Procedures.IsAttachedToClaim(ProcCur.ProcNum)) 
-				{
-					return;//We don't want to allow ComputeEstimates to reattach the procedure to the old claim which could have deleted.
+				if(StartedAttachedToClaim!=Procedures.IsAttachedToClaim(ProcCur.ProcNum)) {
+					//unless they got attached to a claim while this window was open.  Then it doesn't touch them.
+					//We don't want to allow ComputeEstimates to reattach the procedure to the old claim which could have deleted.
+					return;
 				}
 				//Now we have to double check that every single claimproc is attached to the same claim that they were originally attached to.
 				if(ClaimProcs.IsAttachedToDifferentClaim(ProcCur.ProcNum,ClaimProcsForProc)) {
@@ -5846,5 +5838,6 @@ namespace OpenDental{
 				}
 			}
 		}
+
 	}
 }

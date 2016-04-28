@@ -14,6 +14,7 @@ using OpenDentBusiness;
 using OpenDentBusiness.HL7;
 using System.Diagnostics;
 using System.Linq;
+using CodeBase;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -188,7 +189,6 @@ namespace OpenDental{
 		private TextBox textReferredFrom;
 		private UI.Button butReferredFrom;
 		private Label labelReferredFrom;
-		private List<Clinic> _listClinics;
 		private ToolTip _referredFromToolTip;
 		private TextBox textMedicaidState;
 		private Label labelRequiredField;
@@ -207,6 +207,18 @@ namespace OpenDental{
 		private CheckBox checkSuperBilling;
 		private CheckBox checkSameForSuperFam;
 		private bool _isValidating=false;
+		///<summary>Cached list of clinics available to user. Also includes a dummy Clinic at index 0 for "none".</summary>
+		private List<Clinic> _listClinics;
+		///<summary>Filtered list of providers based on which clinic is selected. If no clinic is selected displays all providers. Does not include a "none" option.</summary>
+		private List<Provider> _listProviders;
+		///<summary>Filtered list of providers based on which clinic is selected. If no clinic is selected displays all providers. Also includes a dummy clinic at index 0 for "none"</summary>
+		private List<Provider> _listProvHygs;
+		///<summary>Used to keep track of the current clinic selected. This is because it may be a clinic that is, rarely, not in _listClinics.</summary>
+		private long _selectedClinicNum;
+		///<summary>Instead of relying on _listProviders[comboProv.SelectedIndex] to determine the selected Provider we use this variable to store it explicitly.</summary>
+		private long _selectedProvNum;
+		///<summary>Instead of relying on _listProviders[comboProvHyg.SelectedIndex] to determine the selected Provider we use this variable to store it explicitly.</summary>
+		private long _selectedProvHygNum;
 
 		///<summary></summary>
 		public FormPatientEdit(Patient patCur,Family famCur){
@@ -1045,6 +1057,7 @@ namespace OpenDental{
 			// 
 			this.textAddrNotes.AcceptsTab = true;
 			this.textAddrNotes.BackColor = System.Drawing.SystemColors.Window;
+			this.textAddrNotes.DetectLinksEnabled = false;
 			this.textAddrNotes.DetectUrls = false;
 			this.textAddrNotes.Location = new System.Drawing.Point(161, 32);
 			this.textAddrNotes.Name = "textAddrNotes";
@@ -1421,6 +1434,7 @@ namespace OpenDental{
 			this.comboClinic.Name = "comboClinic";
 			this.comboClinic.Size = new System.Drawing.Size(226, 21);
 			this.comboClinic.TabIndex = 24;
+			this.comboClinic.SelectedIndexChanged += new System.EventHandler(this.comboClinic_SelectedIndexChanged);
 			this.comboClinic.SelectionChangeCommitted += new System.EventHandler(this.ComboBox_SelectionChangeCommited);
 			// 
 			// textTrophyFolder
@@ -1939,6 +1953,7 @@ namespace OpenDental{
 			this.comboPriProv.Name = "comboPriProv";
 			this.comboPriProv.Size = new System.Drawing.Size(198, 21);
 			this.comboPriProv.TabIndex = 42;
+			this.comboPriProv.SelectedIndexChanged += new System.EventHandler(this.comboPriProv_SelectedIndexChanged);
 			this.comboPriProv.SelectionChangeCommitted += new System.EventHandler(this.ComboBox_SelectionChangeCommited);
 			// 
 			// comboFeeSched
@@ -1963,6 +1978,7 @@ namespace OpenDental{
 			this.comboSecProv.Name = "comboSecProv";
 			this.comboSecProv.Size = new System.Drawing.Size(198, 21);
 			this.comboSecProv.TabIndex = 44;
+			this.comboSecProv.SelectedIndexChanged += new System.EventHandler(this.comboSecProv_SelectedIndexChanged);
 			this.comboSecProv.SelectionChangeCommitted += new System.EventHandler(this.ComboBox_SelectionChangeCommited);
 			// 
 			// textReferredFrom
@@ -2297,47 +2313,6 @@ namespace OpenDental{
 					comboLanguage.SelectedIndex=i+1;
 				}
 			}
-			if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
-				comboPriProv.Items.Add(Lan.g(this,"Select Provider"));
-				comboPriProv.SelectedIndex=0;//"Select Provider'
-			}
-			for(int i=0;i<ProviderC.ListShort.Count;i++){
-				if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
-					comboPriProv.Items.Add(ProviderC.ListShort[i].GetLongDesc());
-				}
-				else {
-					comboPriProv.Items.Add(ProviderC.ListShort[i].Abbr);
-				}
-				if(ProviderC.ListShort[i].ProvNum==PatCur.PriProv) {
-					comboPriProv.SelectedIndex=i;
-					if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
-						comboPriProv.SelectedIndex++;//Plus 1 to account for 'Select Provider'
-					}
-				}
-			}
-			/*Provider should not automatically change.  So may end up with no provider selected.
-			if(comboPriProv.SelectedIndex==-1){
-				int defaultindex=Providers.GetIndex(PrefC.GetLong(PrefName.PracticeDefaultProv));
-				if(defaultindex==-1) {//default provider hidden
-					comboPriProv.SelectedIndex=0;
-				}
-				else {
-					comboPriProv.SelectedIndex=defaultindex;
-				}
-			}*/
-			comboSecProv.Items.Clear();
-			comboSecProv.Items.Add(Lan.g(this,"none"));
-			comboSecProv.SelectedIndex=0;
-			for(int i=0;i<ProviderC.ListShort.Count;i++){
-				if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
-					comboSecProv.Items.Add(ProviderC.ListShort[i].GetLongDesc());
-				}
-				else {
-					comboSecProv.Items.Add(ProviderC.ListShort[i].Abbr);
-				}
-				if(ProviderC.ListShort[i].ProvNum==PatCur.SecProv)
-					comboSecProv.SelectedIndex=i+1;
-			}
 			comboFeeSched.Items.Clear();
 			comboFeeSched.Items.Add(Lan.g(this,"none"));
 			comboFeeSched.SelectedIndex=0;
@@ -2361,16 +2336,20 @@ namespace OpenDental{
 				}
 				comboBillType.SelectedIndex=0;
 			}
-			_listClinics=Clinics.GetForUserod(Security.CurUser);
+			_listClinics=new List<Clinic>() { new Clinic() { Description=Lan.g(this,"Unassigned") } };
+			_listClinics.AddRange(Clinics.GetForUserod(Security.CurUser));
+			_listClinics=_listClinics.OrderBy(x => x.ClinicNum>0).ThenBy(x => x.Description).ToList();
 			comboClinic.Items.Clear();
-			comboClinic.Items.Add(Lan.g(this,"Unassigned"));
-			comboClinic.SelectedIndex=0;
-			for(int i=0;i<_listClinics.Count;i++) {
-				comboClinic.Items.Add(_listClinics[i].Description);
-				if(_listClinics[i].ClinicNum==PatCur.ClinicNum) {
-					comboClinic.SelectedIndex=i+1;
-				}
-			}
+			_listClinics.ForEach(x => comboClinic.Items.Add(x.Description));
+			//Set Selected Nums
+			_selectedClinicNum=PatCur.ClinicNum;
+			_selectedProvNum=PatCur.PriProv;
+			_selectedProvHygNum=PatCur.SecProv;
+			//Set selected indexes to -1 for compatibility with fillComboProvHyg
+			comboPriProv.SelectedIndex=-1;
+			comboSecProv.SelectedIndex=-1;
+			comboClinic.IndexSelectOrSetText(_listClinics.FindIndex(x => x.ClinicNum==_selectedClinicNum),() => { return Clinics.GetDesc(_selectedClinicNum); });
+			fillComboProvHyg();
 			switch(PatCur.StudentStatus){
 				case "N"://non
 				case "":
@@ -2403,7 +2382,7 @@ namespace OpenDental{
 				textMedicaidID.Visible=false;
 				textMedicaidState.Visible=false;
 			}
-			if(PrefC.GetBool(PrefName.EasyNoClinics)){
+			if(!PrefC.HasClinicsEnabled){
 				comboClinic.Visible=false;
 				labelClinic.Visible=false;
 			}
@@ -2599,6 +2578,95 @@ namespace OpenDental{
 			SetRequiredFields();
 			_isLoad=false;
 			Plugins.HookAddCode(this,"FormPatientEdit.Load_end",PatCur);
+		}
+
+		private void comboClinic_SelectedIndexChanged(object sender,EventArgs e) {
+			if(comboClinic.SelectedIndex>-1) {
+				_selectedClinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
+			}
+			fillComboProvHyg();
+		}
+
+		private void comboPriProv_SelectedIndexChanged(object sender,EventArgs e) {
+			if(comboPriProv.SelectedIndex>-1) {
+				_selectedProvNum=_listProviders[comboPriProv.SelectedIndex].ProvNum;
+			}
+		}
+
+		private void comboSecProv_SelectedIndexChanged(object sender,EventArgs e) {
+			if(comboSecProv.SelectedIndex>-1) {
+				_selectedProvHygNum=_listProvHygs[comboSecProv.SelectedIndex].ProvNum;
+			}
+		}
+
+		private void butPickPrimary_Click(object sender,EventArgs e) {
+			FormProviderPick formp = new FormProviderPick(_listProviders);
+			formp.SelectedProvNum=_selectedProvNum;
+			formp.ShowDialog();
+			if(formp.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			_selectedProvNum=formp.SelectedProvNum;
+			comboPriProv.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvNum),
+				() => { return PrefC.GetBool(PrefName.EasyHideDentalSchools) ? Providers.GetAbbr(_selectedProvNum) : Providers.GetLongDesc(_selectedProvNum); });
+		}
+
+		private void butPickSecondary_Click(object sender,EventArgs e) {
+			FormProviderPick formp = new FormProviderPick(_listProvHygs);
+			formp.SelectedProvNum=_selectedProvHygNum;
+			formp.ShowDialog();
+			if(formp.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			_selectedProvHygNum=formp.SelectedProvNum;
+			comboSecProv.IndexSelectOrSetText(_listProvHygs.FindIndex(x => x.ProvNum==_selectedProvHygNum),
+				() => { return PrefC.GetBool(PrefName.EasyHideDentalSchools) ? Providers.GetAbbr(_selectedProvHygNum) : Providers.GetLongDesc(_selectedProvHygNum); });
+		}
+
+		///<summary>Fills combo provider based on which clinic is selected and attempts to preserve provider selection if any.</summary>
+		private void fillComboProvHyg() {
+			if(comboPriProv.SelectedIndex>-1) {//valid prov selected, non none or nothing.
+				_selectedProvNum = _listProviders[comboPriProv.SelectedIndex].ProvNum;
+			}
+			if(comboSecProv.SelectedIndex>-1) {
+				_selectedProvHygNum = _listProvHygs[comboSecProv.SelectedIndex].ProvNum;
+			}
+			//Fill List Providers
+			_listProviders=Providers.GetProvsForClinic(_selectedClinicNum).OrderBy(x => x.Abbr).ToList();
+			if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
+				_listProviders.Add(new Provider() { Abbr=Lan.g(this,"Select Provider") });
+			}
+			//Fill List Hyg
+			_listProvHygs=Providers.GetProvsForClinic(_selectedClinicNum);
+			_listProvHygs.Add(new Provider() { Abbr="none" });
+			if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
+				_listProviders=_listProviders.OrderBy(x => x.ProvNum>0).ThenBy(x => x.GetLongDesc()).ToList();
+				_listProvHygs=_listProvHygs.OrderBy(x => x.ProvNum>0).ThenBy(x => x.GetLongDesc()).ToList();
+			}
+			else {
+				_listProviders=_listProviders.OrderBy(x => x.ProvNum>0).ThenBy(x => x.Abbr).ToList();
+				_listProvHygs=_listProvHygs.OrderBy(x => x.ProvNum>0).ThenBy(x => x.Abbr).ToList();
+			}				
+			//Fill ComboProv
+			comboPriProv.Items.Clear();
+			if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
+				_listProviders.ForEach(x => comboPriProv.Items.Add(x.GetLongDesc()));
+			}
+			else {
+				_listProviders.ForEach(x => comboPriProv.Items.Add(x.Abbr));
+			}
+			comboPriProv.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvNum), 
+				()=> { return PrefC.GetBool(PrefName.EasyHideDentalSchools) ? Providers.GetAbbr(_selectedProvNum) : Providers.GetLongDesc(_selectedProvNum); });
+			//Fill ComboSecProv
+			comboSecProv.Items.Clear();
+			if(!PrefC.GetBool(PrefName.EasyHideDentalSchools)) {
+				_listProvHygs.ForEach(x => comboSecProv.Items.Add(x.GetLongDesc()));
+			}
+			else {
+				_listProvHygs.ForEach(x => comboSecProv.Items.Add(x.Abbr));
+			}
+			comboSecProv.IndexSelectOrSetText(_listProvHygs.FindIndex(x => x.ProvNum==_selectedProvHygNum),
+				() => { return PrefC.GetBool(PrefName.EasyHideDentalSchools) ? Providers.GetAbbr(_selectedProvHygNum) : Providers.GetLongDesc(_selectedProvHygNum); });
 		}
 
 		private void FillComboZip(){
@@ -2956,14 +3024,7 @@ namespace OpenDental{
 							areConditionsMet=true;
 							break;
 						}
-						//Conditions of type Clinic store the ClinicNum as the ConditionValue. If that value is "0", it represents 'Unassigned'.
-						if(comboClinic.SelectedIndex==0) {
-							areConditionsMet=ConditionComparerHelper("0",i,listConditions);//"0" for 'Unassigned'
-						}
-						else {
-							areConditionsMet=ConditionComparerHelper(_listClinics[comboClinic.SelectedIndex-1].ClinicNum.ToString(),//Minus 1 for 'Unassigned'
-								i,listConditions);
-						}		
+						areConditionsMet=ConditionComparerHelper(_selectedClinicNum.ToString(),i,listConditions);//includes none clinic
 						break;								
 					case RequiredFieldName.DateTimeDeceased:
 						if(!PrefC.GetBool(PrefName.ShowFeatureEhr)) {
@@ -2994,7 +3055,7 @@ namespace OpenDental{
 							areConditionsMet=true;
 							break;
 						}
-						//The only possible value for ConditionValue is 'Blank'
+						//The only possible value for ConditionValue is '' (an empty string)
 						if((listConditions[i].Operator==ConditionOperator.Equals && textMedicaidState.Text=="")
 							|| (listConditions[i].Operator==ConditionOperator.NotEquals && textMedicaidState.Text!="")) {
 							areConditionsMet=true;
@@ -3008,14 +3069,7 @@ namespace OpenDental{
 						break;
 					case RequiredFieldName.PrimaryProvider:
 						//Conditions of type PrimaryProvider store the ProvNum as the ConditionValue.
-						int provIdx=comboPriProv.SelectedIndex;
-						if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
-							provIdx--;//To account for 'Select Provider'
-						}
-						if(provIdx<0) {
-							break;
-						}
-						areConditionsMet=ConditionComparerHelper(ProviderC.ListShort[provIdx].ProvNum.ToString(),i,listConditions);
+						areConditionsMet=ConditionComparerHelper(_selectedProvNum.ToString(),i,listConditions);
 						break;							
 					case RequiredFieldName.StudentStatus:
 						areConditionsMet=CheckStudentStatusConditions(i,listConditions);
@@ -3029,19 +3083,15 @@ namespace OpenDental{
 		///<summary>Returns true if the operator is Equals and the value is in the list of conditions or if the operator is NotEquals and the value is 
 		///not in the list of conditions.</summary>
 		private bool ConditionComparerHelper(string val,int condCurIndex,List<RequiredFieldCondition> listConds) {
-			if(listConds[condCurIndex].Operator==ConditionOperator.Equals 
-				&& listConds.FindAll(x => x.ConditionType==listConds[condCurIndex].ConditionType)
-						.Any(x => x.ConditionValue==val)) 
-			{
-				return true;
+			RequiredFieldCondition conditionCur = listConds[condCurIndex];//Variable for convenience
+			switch(conditionCur.Operator) {
+				case ConditionOperator.Equals:
+					return listConds.Any(x => x.ConditionType==conditionCur.ConditionType && x.ConditionValue==val);
+				case ConditionOperator.NotEquals:
+					return !listConds.Any(x => x.ConditionType==conditionCur.ConditionType && x.ConditionValue==val);
+				default:
+					return false;
 			}
-			if(listConds[condCurIndex].Operator==ConditionOperator.NotEquals 
-				&& !listConds.FindAll(x => x.ConditionType==listConds[condCurIndex].ConditionType)
-						 .Any(x => x.ConditionValue==val)) 
-			{
-				return true;
-			}
-			return false;
 		}
 
 		///<summary>Returns true if the conditions for this date condition are true.</summary>
@@ -4194,41 +4244,6 @@ namespace OpenDental{
 			}
 			FillGuardians();
 		}
-
-		private void butPickPrimary_Click(object sender,EventArgs e) {
-			FormProviderPick formp=new FormProviderPick();
-			if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
-				if(comboPriProv.SelectedIndex>0) {
-					formp.SelectedProvNum=ProviderC.ListShort[comboPriProv.SelectedIndex-1].ProvNum;//Minus 1 to account for 'Select Provider'
-				}
-			}
-			else {
-				if(comboPriProv.SelectedIndex>-1) {
-					formp.SelectedProvNum=ProviderC.ListShort[comboPriProv.SelectedIndex].ProvNum;
-				}
-			}
-			formp.ShowDialog();
-			if(formp.DialogResult!=DialogResult.OK) {
-				return;
-			}
-			int indexOffset=Providers.GetIndex(formp.SelectedProvNum);
-			if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
-				indexOffset++;//Plus 1 to account for 'Select Provider'
-			}
-			comboPriProv.SelectedIndex=indexOffset;
-		}
-
-		private void butPickSecondary_Click(object sender,EventArgs e) {
-			FormProviderPick formp=new FormProviderPick();
-			if(comboSecProv.SelectedIndex>0) {
-				formp.SelectedProvNum=ProviderC.ListShort[comboSecProv.SelectedIndex-1].ProvNum;
-			}
-			formp.ShowDialog();
-			if(formp.DialogResult!=DialogResult.OK) {
-				return;
-			}
-			comboSecProv.SelectedIndex=Providers.GetIndex(formp.SelectedProvNum)+1;
-		}
 		
 		private void comboBoxMultiRace_SelectionChangeCommitted(object sender,EventArgs e) {
 			RemoveIllogicalRaceCombinations();
@@ -4441,8 +4456,8 @@ namespace OpenDental{
 			bool CDSinterventionCheckRequired=false;//checks selected values
 			if(  textBirthdate.errorProvider1.GetError(textBirthdate)!=""
 				|| textDateFirstVisit.errorProvider1.GetError(textDateFirstVisit)!=""
-				|| textAdmitDate.errorProvider1.GetError(textAdmitDate)!=""
-				){
+				|| textAdmitDate.errorProvider1.GetError(textAdmitDate)!="")
+			{
 				MsgBox.Show(this,"Please fix data entry errors first.");
 				return;
 			}
@@ -4509,20 +4524,14 @@ namespace OpenDental{
 				MsgBox.Show(this,"Cannot change the status of a patient in a reseller family.");
 				return;
 			}
-			int selectedProvIndex=comboPriProv.SelectedIndex;
-			if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
-				selectedProvIndex--;//Minus 1 to account for 'Select Provider'
-			}
-			if(selectedProvIndex<0) {
-				if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv) || PatCur.PriProv==0) {//selected index could be -1 if the provider was selected and then hidden
-					MsgBox.Show(this,"Primary provider must be set.");
-					_isValidating=true;
-					SetRequiredFields();
-					return;
-				}
+			if(_selectedProvNum==0) {//selected index could be -1 if the provider was selected and then hidden
+				MsgBox.Show(this,"Primary provider must be set.");
+				_isValidating=true;
+				SetRequiredFields();
+				return;
 			}
 			else {
-				PatCur.PriProv=ProviderC.ListShort[selectedProvIndex].ProvNum;
+				PatCur.PriProv=_selectedProvNum;
 			}
 			if(_isMissingRequiredFields) {
 				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Required fields are missing or incorrect.  Click OK to save anyway or Cancel to return and "
@@ -4622,12 +4631,7 @@ namespace OpenDental{
 			PatCur.AddrNote=textAddrNotes.Text;
 			PatCur.DateFirstVisit=PIn.Date(textDateFirstVisit.Text);
 			PatCur.AskToArriveEarly=PIn.Int(textAskToArriveEarly.Text);
-			if(comboSecProv.SelectedIndex==0){
-				PatCur.SecProv=0;
-			}
-			else{
-				PatCur.SecProv=ProviderC.ListShort[comboSecProv.SelectedIndex-1].ProvNum;
-			}
+			PatCur.SecProv=_selectedProvHygNum;
 			if(comboFeeSched.SelectedIndex==0){
 				PatCur.FeeSched=0;
 			}
@@ -4637,12 +4641,7 @@ namespace OpenDental{
 			if(comboBillType.SelectedIndex!=-1){
 				PatCur.BillingType=DefC.Short[(int)DefCat.BillingTypes][comboBillType.SelectedIndex].DefNum;
 			}
-			if(comboClinic.SelectedIndex==0) {
-				PatCur.ClinicNum=0;
-			}
-			else {
-				PatCur.ClinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;
-			}
+			PatCur.ClinicNum=_selectedClinicNum;
 			List<PatRace> listPatRaces=new List<PatRace>();
 			for(int i=0;i<comboBoxMultiRace.SelectedIndices.Count;i++) {
 				int selectedIdx=(int)comboBoxMultiRace.SelectedIndices[i];
@@ -4873,45 +4872,6 @@ namespace OpenDental{
 			//revert any changes to the guardian list for all family members
 			Guardians.Sync(_listGuardiansForFamOld,FamCur.ListPats.Select(x => x.PatNum).ToList());
 		}
-
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
 
 	}
 }

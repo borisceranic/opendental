@@ -11,6 +11,8 @@ using System.Windows.Forms;
 using OpenDental.ReportingComplex;
 using OpenDental.UI;
 using OpenDentBusiness;
+using System.Linq;
+using CodeBase;
 
 namespace OpenDental{
 	/// <summary>
@@ -112,6 +114,14 @@ namespace OpenDental{
 		private List<PaySplit> _listPaySplits;
 		private string _payPlanNote;
 		int _roundDec=CultureInfo.CurrentCulture.NumberFormat.NumberDecimalDigits;
+		///<summary>Cached list of clinics available to user. Also includes a dummy Clinic at index 0 for "none".</summary>
+		private List<Clinic> _listClinics;
+		///<summary>Filtered list of providers based on which clinic is selected. If no clinic is selected displays all providers. Also includes a dummy clinic at index 0 for "none"</summary>
+		private List<Provider> _listProviders;
+		///<summary>Used to keep track of the current clinic selected. This is because it may be a clinic that is not in _listClinics.</summary>
+		private long _selectedClinicNum;
+		///<summary>Instead of relying on _listProviders[comboProv.SelectedIndex] to determine the selected Provider we use this variable to store it explicitly.</summary>
+		private long _selectedProvNum;
 
 		///<summary>The supplied payment plan should already have been saved in the database.</summary>
 		public FormPayPlan(Patient patCur,PayPlan payPlanCur){
@@ -376,12 +386,12 @@ namespace OpenDental{
 			this.textPeriodPayment.TabIndex = 2;
 			this.textPeriodPayment.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textPeriodPayment_KeyPress);
 			// 
-			// textTerm
+			// textPaymentCount
 			// 
 			this.textPaymentCount.Location = new System.Drawing.Point(133, 17);
 			this.textPaymentCount.MaxVal = 255;
 			this.textPaymentCount.MinVal = 0;
-			this.textPaymentCount.Name = "textTerm";
+			this.textPaymentCount.Name = "textPaymentCount";
 			this.textPaymentCount.Size = new System.Drawing.Size(47, 20);
 			this.textPaymentCount.TabIndex = 1;
 			this.textPaymentCount.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textPaymentCount_KeyPress);
@@ -581,24 +591,26 @@ namespace OpenDental{
 			// comboProv
 			// 
 			this.comboProv.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboProv.Location = new System.Drawing.Point(142, 14);
+			this.comboProv.Location = new System.Drawing.Point(142, 37);
 			this.comboProv.MaxDropDownItems = 30;
 			this.comboProv.Name = "comboProv";
 			this.comboProv.Size = new System.Drawing.Size(177, 21);
 			this.comboProv.TabIndex = 1;
+			this.comboProv.SelectedIndexChanged += new System.EventHandler(this.comboProv_SelectedIndexChanged);
 			// 
 			// comboClinic
 			// 
 			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboClinic.Location = new System.Drawing.Point(142, 39);
+			this.comboClinic.Location = new System.Drawing.Point(142, 12);
 			this.comboClinic.MaxDropDownItems = 30;
 			this.comboClinic.Name = "comboClinic";
 			this.comboClinic.Size = new System.Drawing.Size(177, 21);
 			this.comboClinic.TabIndex = 3;
+			this.comboClinic.SelectedIndexChanged += new System.EventHandler(this.comboClinic_SelectedIndexChanged);
 			// 
 			// labelClinic
 			// 
-			this.labelClinic.Location = new System.Drawing.Point(44, 41);
+			this.labelClinic.Location = new System.Drawing.Point(43, 17);
 			this.labelClinic.Name = "labelClinic";
 			this.labelClinic.Size = new System.Drawing.Size(96, 16);
 			this.labelClinic.TabIndex = 0;
@@ -607,7 +619,7 @@ namespace OpenDental{
 			// 
 			// label16
 			// 
-			this.label16.Location = new System.Drawing.Point(41, 18);
+			this.label16.Location = new System.Drawing.Point(41, 41);
 			this.label16.Name = "label16";
 			this.label16.Size = new System.Drawing.Size(100, 16);
 			this.label16.TabIndex = 0;
@@ -618,9 +630,9 @@ namespace OpenDental{
 			// 
 			this.groupBox1.Controls.Add(this.comboClinic);
 			this.groupBox1.Controls.Add(this.butPickProv);
-			this.groupBox1.Controls.Add(this.label16);
 			this.groupBox1.Controls.Add(this.comboProv);
 			this.groupBox1.Controls.Add(this.labelClinic);
+			this.groupBox1.Controls.Add(this.label16);
 			this.groupBox1.Location = new System.Drawing.Point(4, 76);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Size = new System.Drawing.Size(349, 65);
@@ -635,11 +647,12 @@ namespace OpenDental{
 			this.butPickProv.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPickProv.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPickProv.CornerRadius = 2F;
-			this.butPickProv.Location = new System.Drawing.Point(321, 14);
+			this.butPickProv.Location = new System.Drawing.Point(321, 37);
 			this.butPickProv.Name = "butPickProv";
 			this.butPickProv.Size = new System.Drawing.Size(18, 21);
 			this.butPickProv.TabIndex = 2;
 			this.butPickProv.Text = "...";
+			this.butPickProv.Click += new System.EventHandler(this.butPickProv_Click);
 			// 
 			// textInterest
 			// 
@@ -667,6 +680,8 @@ namespace OpenDental{
 			this.gridCharges.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridCharges.HasAddButton = false;
+			this.gridCharges.HasMultilineHeaders = false;
 			this.gridCharges.HScrollVisible = false;
 			this.gridCharges.Location = new System.Drawing.Point(401, 9);
 			this.gridCharges.Name = "gridCharges";
@@ -781,12 +796,14 @@ namespace OpenDental{
 			// textNote
 			// 
 			this.textNote.AcceptsTab = true;
+			this.textNote.DetectLinksEnabled = false;
 			this.textNote.DetectUrls = false;
 			this.textNote.Location = new System.Drawing.Point(12, 528);
 			this.textNote.Name = "textNote";
 			this.textNote.QuickPasteType = OpenDentBusiness.QuickPasteType.PayPlan;
 			this.textNote.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textNote.Size = new System.Drawing.Size(380, 121);
+			this.textNote.SpellCheckIsEnabled = false;
 			this.textNote.TabIndex = 3;
 			this.textNote.TabStop = false;
 			this.textNote.Text = "";
@@ -907,7 +924,6 @@ namespace OpenDental{
 			// 
 			// FormPayPlan
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(974, 696);
 			this.Controls.Add(this.textDue);
 			this.Controls.Add(this.textBalance);
@@ -957,7 +973,6 @@ namespace OpenDental{
 			this.MinimumSize = new System.Drawing.Size(990, 734);
 			this.Name = "FormPayPlan";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Payment Plan";
 			this.Closing += new System.ComponentModel.CancelEventHandler(this.FormPayPlan_Closing);
 			this.Load += new System.EventHandler(this.FormPayPlan_Load);
@@ -982,32 +997,6 @@ namespace OpenDental{
 				textPeriodPayment.Text=PayPlanCur.PayAmt.ToString("f");
 			}
 			textDownPayment.Text=PayPlanCur.DownPayment.ToString("f");
-			for(int i=0;i<ProviderC.ListShort.Count;i++) {
-				comboProv.Items.Add(ProviderC.ListShort[i].GetLongDesc());
-				if(IsNew && ProviderC.ListShort[i].ProvNum==PatCur.PriProv) {//new payment plans default to pri prov
-					comboProv.SelectedIndex=i;
-				}
-				//but if not new, then the provider will be selected in FillCharges().
-			}
-			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
-				labelClinic.Visible=false;
-				comboClinic.Visible=false;
-			}
-			else {
-				comboClinic.Items.Add("none");
-				if(IsNew) {
-					comboClinic.SelectedIndex=0;//this is for patients with no clinic assigned, an unusual situation.
-				}
-				else {
-					//we don't want to do this.  The -1 indicates to pull clinic from charges on first loop in FillCharges().
-				}
-				for(int i=0;i<Clinics.List.Length;i++) {
-					comboClinic.Items.Add(Clinics.List[i].Description);
-					if(IsNew && Clinics.List[i].ClinicNum==PatCur.ClinicNum) {//new payment plans default to pat clinic
-						comboClinic.SelectedIndex=i+1;
-					}
-				}
-			}
 			textDate.Text=PayPlanCur.PayPlanDate.ToShortDateString();
 			if(IsNew) {
 				textAmount.Text=TotalAmt.ToString("f");//it won't get filled in FillCharges because there are no charges yet
@@ -1020,6 +1009,34 @@ namespace OpenDental{
 			else {
 				_listPayPlanCharges=PayPlanCharges.GetForPayPlan(PayPlanCur.PayPlanNum);
 			}
+			if(PrefC.GetBool(PrefName.EasyNoClinics)) {
+				labelClinic.Visible=false;
+				comboClinic.Visible=false;
+			}
+			else {
+				_listClinics=new List<Clinic>() { new Clinic() { Description=Lan.g(this,"none") } };
+				_listClinics.AddRange(Clinics.GetForUserod(Security.CurUser));
+				_listClinics=_listClinics.OrderBy(x => x.ClinicNum>0).ThenBy(x => x.Description).ToList();
+				_listClinics.ForEach(x => comboClinic.Items.Add(x.Description));
+				if(IsNew) {
+					_selectedClinicNum=PatCur.ClinicNum;
+				}
+				else if(_listPayPlanCharges.Count==0) {
+					_selectedClinicNum=0;
+				}
+				else {
+					_selectedClinicNum=_listPayPlanCharges[0].ClinicNum;
+				}
+				comboClinic.IndexSelectOrSetText(_listClinics.FindIndex(x => x.ClinicNum==_selectedClinicNum),() => { return Clinics.GetDesc(_selectedClinicNum); });
+			}
+			if(_listPayPlanCharges.Count>0) {
+				_selectedProvNum=_listPayPlanCharges[0].ProvNum;
+			}
+			else {
+				_selectedProvNum=PatCur.PriProv;
+			}
+			comboProv.SelectedIndex=-1;
+			fillComboProv();			
 			textAPR.Text=PayPlanCur.APR.ToString();
 			AmtPaid=PayPlans.GetAmtPaid(PayPlanCur.PayPlanNum);//Only counts amount paid for Patient Payment Plans and not Insurance Payment Plans.  Could be changed in the future
 			textAmtPaid.Text=AmtPaid.ToString("f");
@@ -1050,6 +1067,42 @@ namespace OpenDental{
 				butRecalculate.Enabled=false;//Don't allow a plan that hasn't started to be recalculated.
 			}
 			FillCharges();
+		}
+
+		private void comboClinic_SelectedIndexChanged(object sender,EventArgs e) {
+			if(comboClinic.SelectedIndex>-1) {
+				_selectedClinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
+			}
+			fillComboProv();
+		}
+
+		private void comboProv_SelectedIndexChanged(object sender,EventArgs e) {
+			if(comboProv.SelectedIndex>-1) {
+				_selectedProvNum=_listProviders[comboProv.SelectedIndex].ProvNum;
+			}
+		}
+
+		private void butPickProv_Click(object sender,EventArgs e) {
+			FormProviderPick formp = new FormProviderPick(_listProviders);
+			formp.SelectedProvNum=_selectedProvNum;
+			formp.ShowDialog();
+			if(formp.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			_selectedProvNum=formp.SelectedProvNum;
+			comboProv.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvNum),() => { return Providers.GetLongDesc(_selectedProvNum); });
+		}
+
+		///<summary>Fills combo provider based on which clinic is selected and attempts to preserve provider selection if any.</summary>
+		private void fillComboProv() {
+			if(comboProv.SelectedIndex>-1) {
+				_selectedProvNum = _listProviders[comboProv.SelectedIndex].ProvNum;
+			}
+			_listProviders=Providers.GetProvsForClinic(_selectedClinicNum).OrderBy(x => x.GetLongDesc()).ToList();
+			//Select Provider
+			comboProv.Items.Clear();
+			_listProviders.ForEach(x => comboProv.Items.Add(x.GetLongDesc()));
+			comboProv.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvNum),() => { return Providers.GetLongDesc(_selectedProvNum); });
 		}
 
 		/// <summary>Called 5 times.  This also fills prov and clinic based on the first charge if not new.</summary>
@@ -1165,19 +1218,6 @@ namespace OpenDental{
 			}
 			textAccumulatedDue.Text=PayPlans.GetAccumDue(PayPlanCur.PayPlanNum,_listPayPlanCharges).ToString("f");
 			textPrincPaid.Text=PayPlans.GetPrincPaid(AmtPaid,PayPlanCur.PayPlanNum,_listPayPlanCharges).ToString("f");
-			if(!IsNew && _listPayPlanCharges.Count>0) {
-				if(comboProv.SelectedIndex==-1) {//This avoids resetting the combo every time FillCharges is run.
-					comboProv.SelectedIndex=Providers.GetIndex(_listPayPlanCharges[0].ProvNum);//could still be -1
-				}
-				if(!PrefC.GetBool(PrefName.EasyNoClinics) && comboClinic.SelectedIndex==-1) {
-					if(_listPayPlanCharges[0].ClinicNum==0){
-						comboClinic.SelectedIndex=0;
-					}
-					else{
-						comboClinic.SelectedIndex=Clinics.GetIndex(_listPayPlanCharges[0].ClinicNum)+1;
-					}
-				}
-			}
 		}
 
 		private ODGridRow CreateRowForPayPlanCharge(PayPlanCharge payPlanCharge,int payPlanChargeOrdinal) {
@@ -1663,15 +1703,13 @@ namespace OpenDental{
 				MsgBox.Show(this,"An amortization schedule must be created first.");
 				return false;
 			}
-			if(comboProv.SelectedIndex==-1) {
+			if(_selectedProvNum==0) {
 				MsgBox.Show(this,"A provider must be selected first.");
 				return false;
 			}
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				if(comboClinic.SelectedIndex==-1) {
-					MsgBox.Show(this,"A clinic must be selected first.");
-					return false;
-				}
+			if(PrefC.HasClinicsEnabled && _selectedClinicNum==0) {
+				MsgBox.Show(this,"A clinic must be selected first.");
+				return false;
 			}
 			if(textAPR.Text==""){
 				textAPR.Text="0";
@@ -1689,19 +1727,9 @@ namespace OpenDental{
 			PayPlanCur.CompletedAmt=PIn.Double(textCompletedAmt.Text);
 			//PlanNum set already
 			PayPlans.Update(PayPlanCur);//always saved to db before opening this form
-			long provNum=ProviderC.ListShort[comboProv.SelectedIndex].ProvNum;//already verified that there's a provider selected
-			long clinicNum=0;
-			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
-				if(comboClinic.SelectedIndex==0) {
-					clinicNum=0;
-				}
-				else {
-					clinicNum=Clinics.List[comboClinic.SelectedIndex-1].ClinicNum;
-				}
-			}
-			for(int i=0;i<_listPayPlanCharges.Count;i++) {
-				_listPayPlanCharges[i].ClinicNum=clinicNum;
-				_listPayPlanCharges[i].ProvNum=provNum;
+			foreach(PayPlanCharge charge in _listPayPlanCharges) {
+				charge.ClinicNum=_selectedClinicNum;
+				charge.ProvNum=_selectedProvNum;
 			}
 			PayPlanCharges.Sync(_listPayPlanCharges,PayPlanCur.PayPlanNum);
 			return true;
@@ -2064,70 +2092,5 @@ namespace OpenDental{
 			}
 		}
 
-		
-
-		
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-	
-
-		
-
-		
-
-
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -481,6 +481,9 @@ namespace OpenDentBusiness{
 
 		///<summary>Returns a list of clinics the curUser has permission to access.  If the user is not restricted, the list will contain all of the clinics.</summary>
 		public static List<Clinic> GetForUserod(Userod curUser) {
+			if(!PrefC.HasClinicsEnabled) {//clinics not enabled, return all clinics. Counter-intuitive, but required for offices that had clinics enabled and then turned them off.
+				return GetList().ToList();
+			}
 			List<Clinic> listClinics=GetList().ToList();
 			if(curUser.ClinicIsRestricted && curUser.ClinicNum!=0) {//User is restricted, return clinics the person has permission for.
 				List<UserClinic> listUserClinics=UserClinics.GetForUser(curUser.UserNum);

@@ -523,6 +523,23 @@ namespace OpenDentBusiness{
 			return PIn.Int(table.Rows[0][0].ToString())+1;
 		}*/
 
+			///<summary>Returns list of providers that are either not restricted to a clinic, or are restricted to the ClinicNum provided. 
+			///Passing ClinicNum=0 returns all unrestricted providers. Ordered by provider.Abbr.</summary>
+		public static List<Provider> GetProvsForClinic(long clinicNum) {
+			//No need to check RemotingRole; no call to db.
+			if(!PrefC.HasClinicsEnabled) {
+				return ProviderC.GetListShort();//if clinics not enabled, return all visible providers.
+			}
+			Dictionary<long,List<long>> dictUserClinics = UserodC.Listt.ToDictionary(x => x.UserNum,x => UserClinics.GetListt().FindAll(y => y.UserNum==x.UserNum).Select(y=>y.ClinicNum).ToList());
+			Dictionary<long,List<long>> dictProvUsers = UserodC.GetListt().FindAll(x => x.ProvNum>0).GroupBy(x => x.ProvNum).ToDictionary(x => x.Key,x => x.Select(y => y.UserNum).ToList());
+			return ProviderC.GetListShort().FindAll(x => 
+				!dictProvUsers.ContainsKey(x.ProvNum) //provider not associated to any users.
+				|| dictProvUsers[x.ProvNum].Any(y=>dictUserClinics[y].Count==0) //provider associated with user not restricted to any clinics
+				|| dictProvUsers[x.ProvNum].Any(y=>dictUserClinics[y].Contains(clinicNum)) //provider associated to user restricted to clinic at hand
+				).OrderBy(x=>x.Abbr).ToList();
+		}
+
+
 		///<Summary>Used once in the Provider Select window to warn user of duplicate Abbrs.</Summary>
 		public static string GetDuplicateAbbrs(){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

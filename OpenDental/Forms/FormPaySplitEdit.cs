@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
+using System.Linq;
+using CodeBase;
 
 namespace OpenDental
 {
@@ -101,10 +103,14 @@ namespace OpenDental
 		private TextBox textPrePaidElsewhere;
 		private Label label21;
 
-		///<summary>Local cache of all of the clinic nums the current user has permission to access at the time the form loads.  Filled at the same time
-		///as comboClinic and is used to set paysplit.ClinicNum when saving.</summary>
-		private List<long> _listUserClinicNums;
-
+		///<summary>Cached list of clinics available to user. Also includes a dummy Clinic at index 0 for "none".</summary>
+		private List<Clinic> _listClinics;
+		///<summary>Filtered list of providers based on which clinic is selected. If no clinic is selected displays all providers. Also includes a dummy clinic at index 0 for "none"</summary>
+		private List<Provider> _listProviders;
+		///<summary>Used to keep track of the current clinic selected. This is because it may be a clinic that is not in _listClinics.</summary>
+		private long _selectedClinicNum;
+		///<summary>Instead of relying on _listProviders[comboProv.SelectedIndex] to determine the selected Provider we use this variable to store it explicitly.</summary>
+		private long _selectedProvNum;
 
 		///<summary></summary>
 		public FormPaySplitEdit(Family famCur){//PaySplit paySplitCur,Family famCur){
@@ -210,7 +216,7 @@ namespace OpenDental
 			// 
 			// label5
 			// 
-			this.label5.Location = new System.Drawing.Point(33, 144);
+			this.label5.Location = new System.Drawing.Point(33, 169);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(95, 16);
 			this.label5.TabIndex = 10;
@@ -704,11 +710,11 @@ namespace OpenDental
 			// 
 			this.comboProvider.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboProvider.FormattingEnabled = true;
-			this.comboProvider.Location = new System.Drawing.Point(129, 143);
+			this.comboProvider.Location = new System.Drawing.Point(129, 168);
 			this.comboProvider.Name = "comboProvider";
 			this.comboProvider.Size = new System.Drawing.Size(145, 21);
 			this.comboProvider.TabIndex = 118;
-			this.comboProvider.SelectionChangeCommitted += new System.EventHandler(this.comboProvider_SelectionChangeCommitted);
+			this.comboProvider.SelectedIndexChanged += new System.EventHandler(this.comboProvider_SelectedIndexChanged);
 			// 
 			// butPickProv
 			// 
@@ -717,7 +723,7 @@ namespace OpenDental
 			this.butPickProv.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPickProv.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPickProv.CornerRadius = 2F;
-			this.butPickProv.Location = new System.Drawing.Point(276, 143);
+			this.butPickProv.Location = new System.Drawing.Point(276, 168);
 			this.butPickProv.Name = "butPickProv";
 			this.butPickProv.Size = new System.Drawing.Size(18, 20);
 			this.butPickProv.TabIndex = 158;
@@ -728,14 +734,15 @@ namespace OpenDental
 			// 
 			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboClinic.FormattingEnabled = true;
-			this.comboClinic.Location = new System.Drawing.Point(129, 168);
+			this.comboClinic.Location = new System.Drawing.Point(129, 143);
 			this.comboClinic.Name = "comboClinic";
 			this.comboClinic.Size = new System.Drawing.Size(165, 21);
 			this.comboClinic.TabIndex = 160;
+			this.comboClinic.SelectedIndexChanged += new System.EventHandler(this.comboClinic_SelectedIndexChanged);
 			// 
 			// labelClinic
 			// 
-			this.labelClinic.Location = new System.Drawing.Point(3, 171);
+			this.labelClinic.Location = new System.Drawing.Point(3, 146);
 			this.labelClinic.Name = "labelClinic";
 			this.labelClinic.Size = new System.Drawing.Size(124, 16);
 			this.labelClinic.TabIndex = 159;
@@ -903,8 +910,6 @@ namespace OpenDental
 			// 
 			this.ClientSize = new System.Drawing.Size(801, 541);
 			this.Controls.Add(this.groupBox1);
-			this.Controls.Add(this.comboClinic);
-			this.Controls.Add(this.labelClinic);
 			this.Controls.Add(this.butPickProv);
 			this.Controls.Add(this.comboProvider);
 			this.Controls.Add(this.comboUnearnedTypes);
@@ -926,6 +931,8 @@ namespace OpenDental
 			this.Controls.Add(this.labelAmount);
 			this.Controls.Add(this.label5);
 			this.Controls.Add(this.labelRemainder);
+			this.Controls.Add(this.comboClinic);
+			this.Controls.Add(this.labelClinic);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Location = new System.Drawing.Point(0, 400);
 			this.MaximizeBox = false;
@@ -959,15 +966,24 @@ namespace OpenDental
 					comboUnearnedTypes.SelectedIndex=i+1;
 				}
 			}
-			comboProvider.Items.Add(Lan.g(this,"None"));
-			for(int i=0;i<ProviderC.ListShort.Count;i++){
-				comboProvider.Items.Add(ProviderC.ListShort[i].Abbr);
-				if(ProviderC.ListShort[i].ProvNum==PaySplitCur.ProvNum) {
-					comboProvider.SelectedIndex=i+1;
-				}
+			if(PrefC.HasClinicsEnabled) {
+				_listClinics=new List<Clinic>() { new Clinic() { Description=Lan.g(this,"none") } };
+				_listClinics.AddRange(Clinics.GetForUserod(Security.CurUser));
+				_listClinics=_listClinics.OrderBy(x => x.ClinicNum>0).ThenBy(x => x.Description).ToList();
+				_listClinics.ForEach(x => comboClinic.Items.Add(x.Description));
+				_selectedClinicNum=PaySplitCur.ClinicNum;
+				comboClinic.IndexSelectOrSetText(_listClinics.FindIndex(x => x.ClinicNum==_selectedClinicNum),() => { return Clinics.GetDesc(_selectedClinicNum); });
 			}
+			else {
+				labelClinic.Visible=false;
+				comboClinic.Visible=false;
+			}
+			_selectedProvNum=PaySplitCur.ProvNum;
+			comboProvider.SelectedIndex=-1;
+			fillComboProv();
 			//Unearned "payments" should not be associated to specific providers because those providers have not done anything to earn that donation.
 			if(comboUnearnedTypes.SelectedIndex!=0) {
+				_selectedProvNum=0;
 				comboProvider.SelectedIndex=0;//None
 				comboProvider.Enabled=false;
 				butPickProv.Enabled=false;
@@ -975,25 +991,6 @@ namespace OpenDental
 			else if(comboProvider.SelectedIndex!=0) {
 				comboUnearnedTypes.SelectedIndex=0;
 				comboUnearnedTypes.Enabled=false;
-			}
-			_listUserClinicNums=new List<long>();
-			if(PrefC.HasClinicsEnabled) {
-				List<Clinic> listClinics=Clinics.GetForUserod(Security.CurUser);
-				comboClinic.Items.Clear();
-				comboClinic.Items.Add(Lan.g(this,"None"));
-				_listUserClinicNums.Add(0);//this way both lists have the same number of items in it
-				comboClinic.SelectedIndex=0;
-				for(int i=0;i<listClinics.Count;i++) {
-					comboClinic.Items.Add(listClinics[i].Description);
-					_listUserClinicNums.Add(listClinics[i].ClinicNum);
-					if(listClinics[i].ClinicNum==PaySplitCur.ClinicNum) {
-						comboClinic.SelectedIndex=i+1;
-					}
-				}
-			}
-			else {//clinics not enabled
-				labelClinic.Visible=false;
-				comboClinic.Visible=false;
 			}
 			if(PaySplitCur.ProvNum==0) {
 				comboProvider.SelectedIndex=0;
@@ -1004,7 +1001,7 @@ namespace OpenDental
 			else{
 				checkPayPlan.Checked=true;
 			}
-			if(Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
+			if(Clinics.IsMedicalPracticeOrClinic(_selectedClinicNum)) {
 				textProcTooth.Visible=false;
 				labelProcTooth.Visible=false;
 			}
@@ -1017,6 +1014,51 @@ namespace OpenDental
 			}
 			FillPatient();
 			FillProcedure();
+		}
+
+		private void comboClinic_SelectedIndexChanged(object sender,EventArgs e) {
+			if(comboClinic.SelectedIndex>-1) {
+				_selectedClinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
+			}
+			fillComboProv();
+		}
+
+		private void comboProvider_SelectedIndexChanged(object sender,EventArgs e) {
+			if(comboProvider.SelectedIndex>-1) {
+				_selectedProvNum=_listProviders[comboProvider.SelectedIndex].ProvNum;
+			}
+			if(_selectedProvNum>0) {
+				comboUnearnedTypes.SelectedIndex=0;
+				comboUnearnedTypes.Enabled=false;
+			}
+			else {
+				comboUnearnedTypes.Enabled=true;
+			}
+		}
+
+		private void butPickProv_Click(object sender,EventArgs e) {
+			FormProviderPick formp = new FormProviderPick(_listProviders);
+			formp.SelectedProvNum=_selectedProvNum;
+			formp.ShowDialog();
+			if(formp.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			_selectedProvNum=formp.SelectedProvNum;
+			comboProvider.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvNum),() => { return Providers.GetAbbr(_selectedProvNum); });
+		}
+
+		///<summary>Fills combo provider based on which clinic is selected and attempts to preserve provider selection if any.</summary>
+		private void fillComboProv() {
+			if(comboProvider.SelectedIndex>-1) {//valid prov selected, non none or nothing.
+				_selectedProvNum = _listProviders[comboProvider.SelectedIndex].ProvNum;
+			}
+			_listProviders=new List<Provider>() { new Provider() { Abbr=Lan.g(this,"none") } };
+			_listProviders.AddRange(Providers.GetProvsForClinic(_selectedClinicNum));
+			_listProviders=_listProviders.OrderBy(x => x.ProvNum>0).ThenBy(x => x.Abbr).ToList();
+			//Fill comboProv
+			comboProvider.Items.Clear();
+			_listProviders.ForEach(x => comboProvider.Items.Add(x.Abbr));
+			comboProvider.IndexSelectOrSetText(_listProviders.FindIndex(x => x.ProvNum==_selectedProvNum),() => { return Providers.GetAbbr(_selectedProvNum); });
 		}
 
 		private void butRemainder_Click(object sender, System.EventArgs e) {
@@ -1288,6 +1330,7 @@ namespace OpenDental
 
 		private void comboUnearnedTypes_SelectionChangeCommitted(object sender,EventArgs e) {
 			if(comboUnearnedTypes.SelectedIndex>0) {//If they use an unearned type the provnum must be zero.
+				_selectedProvNum=0;
 				comboProvider.SelectedIndex=0;
 				comboProvider.Enabled=false;
 				butPickProv.Enabled=false;
@@ -1299,28 +1342,6 @@ namespace OpenDental
 				butPickProv.Enabled=true;
 				checkPayPlan.Enabled=true;
 			}
-		}
-
-		private void comboProvider_SelectionChangeCommitted(object sender,EventArgs e) {
-			if(comboProvider.SelectedIndex>0) {
-				comboUnearnedTypes.SelectedIndex=0;
-				comboUnearnedTypes.Enabled=false;
-			}
-			else {
-				comboUnearnedTypes.Enabled=true;
-			}
-		}
-
-		private void butPickProv_Click(object sender,EventArgs e) {
-			FormProviderPick formp=new FormProviderPick();
-			if(comboProvider.SelectedIndex>-1) {
-				formp.SelectedProvNum=ProviderC.ListShort[comboProvider.SelectedIndex].ProvNum;
-			}
-			formp.ShowDialog();
-			if(formp.DialogResult!=DialogResult.OK) {
-				return;
-			}
-			comboProvider.SelectedIndex=Providers.GetIndex(formp.SelectedProvNum);
 		}
 
 		private void butDelete_Click(object sender, System.EventArgs e) {
@@ -1367,8 +1388,8 @@ namespace OpenDental
 			PaySplitCur.ProcDate=procDate;
 			PaySplitCur.SplitAmt=amount;
 			//Provider and Unearned combos will be correct at this point, based on ProvNum or UnearnedType.
-			if(comboProvider.SelectedIndex > 0) {
-				PaySplitCur.ProvNum=ProviderC.ListShort[comboProvider.SelectedIndex-1].ProvNum;
+			if(_selectedProvNum>0) {
+				PaySplitCur.ProvNum=_selectedProvNum;
 				PaySplitCur.UnearnedType=0;
 			}
 			else {
@@ -1384,15 +1405,8 @@ namespace OpenDental
 				}
 			}
 			if(PrefC.HasClinicsEnabled) {
-				//_listUserClinicNums contains all clinics the user has access to as well as ClinicNum 0 for 'none'
-				PaySplitCur.ClinicNum=_listUserClinicNums[comboClinic.SelectedIndex];
+				PaySplitCur.ClinicNum=_selectedClinicNum;
 			}
-			//if(!checkPatOtherFam.Checked){
-				//This is still needed because it might be zero:
-			//	PaySplitCur.PatNum=FamCur.List[listPatient.SelectedIndex].PatNum;
-			//}
-			//PayPlanNum already handled
-			//PaySplitCur.InsertOrUpdate(IsNew);
 			DialogResult=DialogResult.OK;
 		}
 

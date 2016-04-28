@@ -31,7 +31,7 @@ namespace OpenDental{
 			this.label5 = new System.Windows.Forms.Label();
 			this.label4 = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
-			this.comboProvNum = new System.Windows.Forms.ComboBox();
+			this.comboProv = new System.Windows.Forms.ComboBox();
 			this.label7 = new System.Windows.Forms.Label();
 			this.comboClinic = new System.Windows.Forms.ComboBox();
 			this.labelClinic = new System.Windows.Forms.Label();
@@ -112,20 +112,21 @@ namespace OpenDental{
 			this.label1.Text = "Procedure Date";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// comboProvNum
+			// comboProv
 			// 
-			this.comboProvNum.ItemHeight = 13;
-			this.comboProvNum.Location = new System.Drawing.Point(126, 74);
-			this.comboProvNum.MaxDropDownItems = 30;
-			this.comboProvNum.Name = "comboProvNum";
-			this.comboProvNum.Size = new System.Drawing.Size(179, 21);
-			this.comboProvNum.TabIndex = 2;
-			this.comboProvNum.SelectionChangeCommitted += new System.EventHandler(this.comboProvNum_SelectionChangeCommitted);
+			this.comboProv.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboProv.ItemHeight = 13;
+			this.comboProv.Location = new System.Drawing.Point(126, 97);
+			this.comboProv.MaxDropDownItems = 30;
+			this.comboProv.Name = "comboProv";
+			this.comboProv.Size = new System.Drawing.Size(179, 21);
+			this.comboProv.TabIndex = 2;
+			this.comboProv.SelectedIndexChanged += new System.EventHandler(this.comboProv_SelectedIndexChanged);
 			// 
 			// label7
 			// 
 			this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.label7.Location = new System.Drawing.Point(25, 78);
+			this.label7.Location = new System.Drawing.Point(25, 101);
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(100, 14);
 			this.label7.TabIndex = 261;
@@ -135,16 +136,16 @@ namespace OpenDental{
 			// comboClinic
 			// 
 			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboClinic.Location = new System.Drawing.Point(126, 97);
+			this.comboClinic.Location = new System.Drawing.Point(126, 74);
 			this.comboClinic.MaxDropDownItems = 30;
 			this.comboClinic.Name = "comboClinic";
 			this.comboClinic.Size = new System.Drawing.Size(179, 21);
 			this.comboClinic.TabIndex = 4;
-			this.comboClinic.SelectionChangeCommitted += new System.EventHandler(this.comboClinic_SelectionChangeCommitted);
+			this.comboClinic.SelectedIndexChanged += new System.EventHandler(this.comboClinic_SelectedIndexChanged);
 			// 
 			// labelClinic
 			// 
-			this.labelClinic.Location = new System.Drawing.Point(24, 99);
+			this.labelClinic.Location = new System.Drawing.Point(24, 76);
 			this.labelClinic.Name = "labelClinic";
 			this.labelClinic.Size = new System.Drawing.Size(102, 16);
 			this.labelClinic.TabIndex = 265;
@@ -158,7 +159,7 @@ namespace OpenDental{
 			this.butPickProv.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPickProv.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPickProv.CornerRadius = 2F;
-			this.butPickProv.Location = new System.Drawing.Point(307, 74);
+			this.butPickProv.Location = new System.Drawing.Point(307, 97);
 			this.butPickProv.Name = "butPickProv";
 			this.butPickProv.Size = new System.Drawing.Size(18, 21);
 			this.butPickProv.TabIndex = 3;
@@ -211,12 +212,14 @@ namespace OpenDental{
 			// textChartNotes
 			// 
 			this.textChartNotes.AcceptsTab = true;
+			this.textChartNotes.DetectLinksEnabled = false;
 			this.textChartNotes.DetectUrls = false;
 			this.textChartNotes.Location = new System.Drawing.Point(126, 155);
 			this.textChartNotes.Name = "textChartNotes";
 			this.textChartNotes.QuickPasteType = OpenDentBusiness.QuickPasteType.Procedure;
 			this.textChartNotes.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textChartNotes.Size = new System.Drawing.Size(361, 140);
+			this.textChartNotes.SpellCheckIsEnabled = false;
 			this.textChartNotes.TabIndex = 6;
 			this.textChartNotes.Text = "";
 			// 
@@ -239,12 +242,14 @@ namespace OpenDental{
 			// textAccountNotes
 			// 
 			this.textAccountNotes.AcceptsTab = true;
+			this.textAccountNotes.DetectLinksEnabled = false;
 			this.textAccountNotes.DetectUrls = false;
 			this.textAccountNotes.Location = new System.Drawing.Point(126, 323);
 			this.textAccountNotes.Name = "textAccountNotes";
 			this.textAccountNotes.QuickPasteType = OpenDentBusiness.QuickPasteType.Adjustment;
 			this.textAccountNotes.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textAccountNotes.Size = new System.Drawing.Size(361, 140);
+			this.textAccountNotes.SpellCheckIsEnabled = false;
 			this.textAccountNotes.TabIndex = 8;
 			this.textAccountNotes.Text = "";
 			// 
@@ -279,7 +284,7 @@ namespace OpenDental{
 			this.ClientSize = new System.Drawing.Size(548, 508);
 			this.Controls.Add(this.comboClinic);
 			this.Controls.Add(this.labelClinic);
-			this.Controls.Add(this.comboProvNum);
+			this.Controls.Add(this.comboProv);
 			this.Controls.Add(this.butPickProv);
 			this.Controls.Add(this.label7);
 			this.Controls.Add(this.button1);
@@ -302,7 +307,6 @@ namespace OpenDental{
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MinimumSize = new System.Drawing.Size(527, 488);
 			this.Name = "FormProcBroken";
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Broken Appointment Procedure";
 			this.Load += new System.EventHandler(this.FormProcBroken_Load);
 			this.ResumeLayout(false);
@@ -328,7 +332,7 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label4;
 		private System.Windows.Forms.Label label1;
 		private UI.Button button1;
-		private System.Windows.Forms.ComboBox comboProvNum;
+		private System.Windows.Forms.ComboBox comboProv;
 		private UI.Button butPickProv;
 		private System.Windows.Forms.Label label7;
 		private System.Windows.Forms.ComboBox comboClinic;

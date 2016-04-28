@@ -49,16 +49,16 @@ namespace OpenDental{
 		private int pagesPrinted;
 		private int headingPrintH;
 		private Label labelClinic;
-		private ComboBox comboClinic;
 		bool changed;
 		private List<Clinic> _listClinics;
-		private List<Provider> _listProvs;
+		private List<Provider> _listProviders;
 		private TabControl tabControl1;
 		private TabPage tabPageProv;
 		private TabPage tabPageEmp;
 		private CheckBox checkClinicNotes;
 		private List<Employee> _listEmps;
 		private DataTable _tableScheds;
+		private ComboBox comboClinic;
 		private bool _isResizing;
 
 		///<summary></summary>
@@ -112,7 +112,6 @@ namespace OpenDental{
 			this.butRepeat = new OpenDental.UI.Button();
 			this.butPaste = new OpenDental.UI.Button();
 			this.labelClinic = new System.Windows.Forms.Label();
-			this.comboClinic = new System.Windows.Forms.ComboBox();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabPageProv = new System.Windows.Forms.TabPage();
 			this.tabPageEmp = new System.Windows.Forms.TabPage();
@@ -123,6 +122,7 @@ namespace OpenDental{
 			this.textDateFrom = new OpenDental.ValidDate();
 			this.butRefresh = new OpenDental.UI.Button();
 			this.gridMain = new OpenDental.UI.ODGrid();
+			this.comboClinic = new System.Windows.Forms.ComboBox();
 			this.groupCopy.SuspendLayout();
 			this.groupPaste.SuspendLayout();
 			this.tabControl1.SuspendLayout();
@@ -150,10 +150,11 @@ namespace OpenDental{
 			// 
 			// listProv
 			// 
-			this.listProv.Location = new System.Drawing.Point(0, 6);
+			this.listProv.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.listProv.Location = new System.Drawing.Point(3, 3);
 			this.listProv.Name = "listProv";
 			this.listProv.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listProv.Size = new System.Drawing.Size(191, 277);
+			this.listProv.Size = new System.Drawing.Size(186, 253);
 			this.listProv.TabIndex = 23;
 			this.listProv.Click += new System.EventHandler(this.listProv_Click);
 			this.listProv.SelectedIndexChanged += new System.EventHandler(this.listProv_SelectedIndexChanged);
@@ -259,10 +260,11 @@ namespace OpenDental{
 			// 
 			// listEmp
 			// 
-			this.listEmp.Location = new System.Drawing.Point(0, 45);
+			this.listEmp.Dock = System.Windows.Forms.DockStyle.Fill;
+			this.listEmp.Location = new System.Drawing.Point(3, 3);
 			this.listEmp.Name = "listEmp";
 			this.listEmp.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
-			this.listEmp.Size = new System.Drawing.Size(191, 238);
+			this.listEmp.Size = new System.Drawing.Size(186, 253);
 			this.listEmp.TabIndex = 30;
 			this.listEmp.Click += new System.EventHandler(this.listEmp_Click);
 			this.listEmp.SelectedIndexChanged += new System.EventHandler(this.listEmp_SelectedIndexChanged);
@@ -322,31 +324,21 @@ namespace OpenDental{
 			// 
 			// labelClinic
 			// 
-			this.labelClinic.Location = new System.Drawing.Point(9, 5);
+			this.labelClinic.Location = new System.Drawing.Point(5, 120);
 			this.labelClinic.Name = "labelClinic";
-			this.labelClinic.Size = new System.Drawing.Size(58, 13);
+			this.labelClinic.Size = new System.Drawing.Size(43, 13);
 			this.labelClinic.TabIndex = 34;
 			this.labelClinic.Text = "Clinic";
-			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-			// 
-			// comboClinic
-			// 
-			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboClinic.Location = new System.Drawing.Point(8, 20);
-			this.comboClinic.MaxDropDownItems = 30;
-			this.comboClinic.Name = "comboClinic";
-			this.comboClinic.Size = new System.Drawing.Size(170, 21);
-			this.comboClinic.TabIndex = 35;
-			this.comboClinic.SelectionChangeCommitted += new System.EventHandler(this.comboClinic_SelectionChangeCommitted);
+			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// tabControl1
 			// 
 			this.tabControl1.Controls.Add(this.tabPageProv);
 			this.tabControl1.Controls.Add(this.tabPageEmp);
-			this.tabControl1.Location = new System.Drawing.Point(1, 117);
+			this.tabControl1.Location = new System.Drawing.Point(1, 144);
 			this.tabControl1.Name = "tabControl1";
 			this.tabControl1.SelectedIndex = 0;
-			this.tabControl1.Size = new System.Drawing.Size(200, 312);
+			this.tabControl1.Size = new System.Drawing.Size(200, 285);
 			this.tabControl1.TabIndex = 36;
 			// 
 			// tabPageProv
@@ -355,7 +347,7 @@ namespace OpenDental{
 			this.tabPageProv.Location = new System.Drawing.Point(4, 22);
 			this.tabPageProv.Name = "tabPageProv";
 			this.tabPageProv.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPageProv.Size = new System.Drawing.Size(192, 286);
+			this.tabPageProv.Size = new System.Drawing.Size(192, 259);
 			this.tabPageProv.TabIndex = 0;
 			this.tabPageProv.Text = "Providers (0)";
 			this.tabPageProv.UseVisualStyleBackColor = true;
@@ -363,12 +355,10 @@ namespace OpenDental{
 			// tabPageEmp
 			// 
 			this.tabPageEmp.Controls.Add(this.listEmp);
-			this.tabPageEmp.Controls.Add(this.comboClinic);
-			this.tabPageEmp.Controls.Add(this.labelClinic);
 			this.tabPageEmp.Location = new System.Drawing.Point(4, 22);
 			this.tabPageEmp.Name = "tabPageEmp";
 			this.tabPageEmp.Padding = new System.Windows.Forms.Padding(3);
-			this.tabPageEmp.Size = new System.Drawing.Size(192, 286);
+			this.tabPageEmp.Size = new System.Drawing.Size(192, 259);
 			this.tabPageEmp.TabIndex = 1;
 			this.tabPageEmp.Text = "Employees (0)";
 			this.tabPageEmp.UseVisualStyleBackColor = true;
@@ -465,10 +455,22 @@ namespace OpenDental{
 			this.gridMain.TranslationName = null;
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			// 
+			// comboClinic
+			// 
+			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboClinic.Location = new System.Drawing.Point(50, 117);
+			this.comboClinic.MaxDropDownItems = 30;
+			this.comboClinic.Name = "comboClinic";
+			this.comboClinic.Size = new System.Drawing.Size(147, 21);
+			this.comboClinic.TabIndex = 35;
+			this.comboClinic.SelectionChangeCommitted += new System.EventHandler(this.comboClinic_SelectionChangeCommitted);
+			// 
 			// FormSchedule
 			// 
 			this.ClientSize = new System.Drawing.Size(974, 695);
 			this.Controls.Add(this.checkClinicNotes);
+			this.Controls.Add(this.comboClinic);
+			this.Controls.Add(this.labelClinic);
 			this.Controls.Add(this.tabControl1);
 			this.Controls.Add(this.groupCopy);
 			this.Controls.Add(this.groupPaste);
@@ -548,7 +550,7 @@ namespace OpenDental{
 		///<summary>Fills the employee box based on what clinic is selected.  Set selectAll to true to have all employees in the list box selected by default.</summary>
 		private void FillEmployeesAndProviders() {
 			tabPageEmp.Text=Lan.g(this,"Employees")+" (0)";
-			//tabPageProv.Text=Lan.g(this,"Providers")+" (0)";
+			tabPageProv.Text=Lan.g(this,"Providers")+" (0)";
 			if(PrefC.HasClinicsEnabled) {
 				long clinicNum=0;
 				if(Security.CurUser.ClinicIsRestricted) {
@@ -559,25 +561,23 @@ namespace OpenDental{
 				}
 				//clinicNum will be 0 for unrestricted users with HQ selected in which case this will get only emps/provs not assigned to a clinic
 				_listEmps=Employees.GetEmpsForClinic(clinicNum);
-				//_listProvs=Providers.GetProvsForClinic(clinicNum);//Do NOT filter providers by clinic yet.  This will be implemented in phase 2.
-				_listProvs=ProviderC.GetListShort();
+				_listProviders=Providers.GetProvsForClinic(clinicNum);
 			}
 			else {//Not using clinics
 				_listEmps=Employees.GetListShort();
-				_listProvs=ProviderC.GetListShort();
+				_listProviders=ProviderC.GetListShort();
 			}
-			listEmp.Items.Clear();//clearing the items from the list does not trigger the selected index changed event, reset manually
-			foreach(Employee empCur in _listEmps) {
-				listEmp.Items.Add(empCur.FName);
-				listEmp.SetSelected(listEmp.Items.Count-1,true);//select the item just added
+			//Employee Listbox
+			listEmp.Items.Clear();
+			_listEmps.ForEach(x => listEmp.Items.Add(x.FName));
+			for(int i = 0;i<listEmp.Items.Count;i++) {
+				listEmp.SetSelected(i,true);
 			}
-			//if the list has already been filled, no need to refill since we are not filtering by clinic, prevents an unnecessary flicker
-			//listProv.Items.Clear();//add this line when we start to filter provs by clinic and remove the if list is empty check
-			if(listProv.Items.Count==0) {
-				foreach(Provider provCur in _listProvs) {
-					listProv.Items.Add(provCur.Abbr);
-					listProv.SetSelected(listProv.Items.Count-1,true);//select the item just added
-				}
+			//Provider Listbox
+			listProv.Items.Clear();
+			_listProviders.ForEach(x => listProv.Items.Add(x.Abbr));
+			for(int i = 0;i<listProv.Items.Count;i++) {
+				listProv.SetSelected(i,true);
 			}
 		}
 
@@ -599,7 +599,7 @@ namespace OpenDental{
 			_provsChanged=false;
 			List<long> provNums=new List<long>();
 			for(int i=0;i<listProv.SelectedIndices.Count;i++){
-				provNums.Add(_listProvs[listProv.SelectedIndices[i]].ProvNum);
+				provNums.Add(_listProviders[listProv.SelectedIndices[i]].ProvNum);
 			}
 			List<long> empNums=new List<long>();
 			for(int i=0;i<listEmp.SelectedIndices.Count;i++){
@@ -800,14 +800,8 @@ namespace OpenDental{
 			else {
 				dateSelectedEnd=dateSelectedStart.AddDays(4);
 			}
-			List<long> provNums=new List<long>();
-			for(int i=0;i<listProv.SelectedIndices.Count;i++) {
-				provNums.Add(_listProvs[listProv.SelectedIndices[i]].ProvNum);
-			}
-			List<long> empNums=new List<long>();
-			for(int i=0;i<listEmp.SelectedIndices.Count;i++) {
-				empNums.Add(_listEmps[listEmp.SelectedIndices[i]].EmployeeNum);
-			}
+			List<long> provNums = listProv.SelectedIndices.OfType<int>().Select(x => _listProviders[x].ProvNum).ToList();
+			List<long> empNums = listEmp.SelectedIndices.OfType<int>().Select(x => _listEmps[x].EmployeeNum).ToList();
 			long clinicNum=0;
 			if(PrefC.HasClinicsEnabled) {
 				if(Security.CurUser.ClinicIsRestricted) {
@@ -915,7 +909,7 @@ namespace OpenDental{
 				MsgBox.Show(this,"Not allowed to paste back onto the same date as is on the clipboard.");
 				return;
 			}
-			List<long> provNums=listProv.SelectedIndices.OfType<int>().Select(x => _listProvs[x].ProvNum).ToList();
+			List<long> provNums=listProv.SelectedIndices.OfType<int>().Select(x => _listProviders[x].ProvNum).ToList();
 			List<long> empNums=listEmp.SelectedIndices.OfType<int>().Select(x => _listEmps[x].EmployeeNum).ToList();
 			long clinicNum=0;
 			if(PrefC.HasClinicsEnabled) {
@@ -1029,14 +1023,8 @@ namespace OpenDental{
 			//	MsgBox.Show(this,"Not allowed to paste back onto the same date as is on the clipboard.");
 			//	return;
 			//}
-			List<long> provNums=new List<long>();
-			for(int i=0;i<listProv.SelectedIndices.Count;i++) {
-				provNums.Add(_listProvs[listProv.SelectedIndices[i]].ProvNum);
-			}
-			List<long> empNums=new List<long>();
-			for(int i=0;i<listEmp.SelectedIndices.Count;i++) {
-				empNums.Add(_listEmps[listEmp.SelectedIndices[i]].EmployeeNum);
-			}
+			List<long> provNums = listProv.SelectedIndices.OfType<int>().Select(x => _listProviders[x].ProvNum).ToList();
+			List<long> empNums = listEmp.SelectedIndices.OfType<int>().Select(x => _listEmps[x].EmployeeNum).ToList();
 			long clinicNum=0;
 			if(PrefC.HasClinicsEnabled) {
 				if(Security.CurUser.ClinicIsRestricted) {

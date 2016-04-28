@@ -141,6 +141,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Utilities\ODThread.cs" />
+    <Compile Include="Utilities\ODUIExtentions.cs" />
     <Compile Include="Utilities\TopazWrapper.cs" />
   </ItemGroup>
   <ItemGroup>
