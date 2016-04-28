@@ -1966,6 +1966,10 @@ namespace OpenDental{
 				MsgBox.Show(this,"Both status options at the bottom must be set.");
 				return; 
 			}
+			if(string.IsNullOrWhiteSpace(textMessageText.Text)) {
+				MsgBox.Show(this,"Appointment reminder text message cannot be blank.");
+				return;
+			}
 			//End of Validation
 			if(Prefs.UpdateString(PrefName.RecallPostcardsPerSheet,textPostcardsPerSheet.Text)) {
 				if(textPostcardsPerSheet.Text=="1"){
