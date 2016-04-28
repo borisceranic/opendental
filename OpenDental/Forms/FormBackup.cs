@@ -393,6 +393,7 @@ namespace OpenDental{
 			this.pictureCDS.Size = new System.Drawing.Size(83, 24);
 			this.pictureCDS.TabIndex = 16;
 			this.pictureCDS.TextNullImage = null;
+			this.pictureCDS.Click += new System.EventHandler(this.pictureCDS_Click);
 			// 
 			// groupManagedBackups
 			// 
@@ -979,8 +980,7 @@ namespace OpenDental{
 
 		private void pictureCDS_Click(object sender,EventArgs e) {
 			CDS.ShowPage();
-		}		
-
+		}
 	}
 
 	///<summary>Backing up can fail at two points, when backing up the database or the A to Z images.  This delegate lets the backup thread manipulate a local variable so that we can let the user know at what point the backup failed.</summary>
