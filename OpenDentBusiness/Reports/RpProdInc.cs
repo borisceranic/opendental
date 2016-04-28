@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Reflection;
 using System.Text;
+using System.Linq;
 
 namespace OpenDentBusiness {
 	public class RpProdInc {
@@ -359,6 +360,234 @@ namespace OpenDentBusiness {
 			}
 			return ds;
 		}
+		
+		///<summary></summary>
+		public static DataSet GetProviderPayrollDataForClinics(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics,bool isDetailed,bool showUnearned) {
+			if(listClinics.Count>0) {
+				_hasClinics=true;
+			}
+			DataSet dataSet=GetProviderPayrollDataSet(dateFrom,dateTo,listProvs,listClinics,writeOffPay,hasAllProvs,hasAllClinics,showUnearned);
+			DataTable tableProduction=dataSet.Tables["tableProduction"];
+			DataTable tableInsWOEst=dataSet.Tables["tableInsWOEst"];
+			DataTable tableAdj=dataSet.Tables["tableAdj"];
+			DataTable tableInsWriteOff=dataSet.Tables["tableInsWriteOff"];
+			DataTable tableAllocatedPatInc=dataSet.Tables["tableAllocatedPatInc"];
+			DataTable tableUnallocatedPatInc=dataSet.Tables["tableUnallocatedPatInc"];
+			DataTable tableInsIncome=dataSet.Tables["tableInsIncome"];
+			DataTable tableInsIncomeNotFinalized=dataSet.Tables["tableInsIncomeNotFinalized"];
+			decimal production=0;
+			decimal insWriteoffEst=0;
+			decimal adjust=0;
+			decimal insWriteoffEstMinusWriteoff=0;
+			decimal netProduction=0;
+			decimal ptIncomeAllocated=0;
+			decimal ptIncomeUnallocated=0;
+			decimal insIncome=0;
+			decimal insIncomeNotFinalized=0;
+			decimal netIncome=0;
+			DataTable dt=new DataTable("Total");
+			dt.Columns.Add(new DataColumn("Date"));
+			dt.Columns.Add(new DataColumn("Day"));
+			if(isDetailed) {
+				dt.Columns.Add(new DataColumn("Patient"));
+			}
+			dt.Columns.Add(new DataColumn("UCR Poduction"));
+			dt.Columns.Add(new DataColumn("Original Est Writeoff"));
+			dt.Columns.Add(new DataColumn("Prod Adj"));
+			dt.Columns.Add(new DataColumn("Est Minus Actual Writeoff Adjs"));
+			dt.Columns.Add(new DataColumn("Net Prod (NPR)"));
+			dt.Columns.Add(new DataColumn("Allocated Patient Income"));
+			dt.Columns.Add(new DataColumn("Unallocated Patient Income"));
+			dt.Columns.Add(new DataColumn("Ins Income"));
+			dt.Columns.Add(new DataColumn("Ins Not Finalized"));
+			dt.Columns.Add(new DataColumn("Net Income"));
+			List<long> listPatNums=new List<long>();
+			List<ProviderPayrollRow> listProduction=new List<ProviderPayrollRow>();
+			List<ProviderPayrollRow> listInsWOEst=new List<ProviderPayrollRow>();
+			List<ProviderPayrollRow> listAdj=new List<ProviderPayrollRow>();
+			List<ProviderPayrollRow> listInsWriteOff=new List<ProviderPayrollRow>();
+			List<ProviderPayrollRow> listAllocatedPatInc=new List<ProviderPayrollRow>();
+			List<ProviderPayrollRow> listUnallocatedPatInc=new List<ProviderPayrollRow>();
+			List<ProviderPayrollRow> listInsIncome=new List<ProviderPayrollRow>();
+			List<ProviderPayrollRow> listInsIncomeNotFinalized=new List<ProviderPayrollRow>();
+			foreach(DataRow row in tableProduction.Rows) {
+				listProduction.Add(ProviderPayrollRow.DataRowToPayrollRow(row,false));
+			}
+			foreach(DataRow row in tableInsWOEst.Rows) {
+				listInsWOEst.Add(ProviderPayrollRow.DataRowToPayrollRow(row,false));
+			}
+			foreach(DataRow row in tableAdj.Rows) {
+				listAdj.Add(ProviderPayrollRow.DataRowToPayrollRow(row,false));
+			}
+			foreach(DataRow row in tableInsWriteOff.Rows) {
+				listInsWriteOff.Add(ProviderPayrollRow.DataRowToPayrollRow(row,true));
+			}
+			foreach(DataRow row in tableAllocatedPatInc.Rows) {
+				listAllocatedPatInc.Add(ProviderPayrollRow.DataRowToPayrollRow(row,false));
+			}
+			foreach(DataRow row in tableUnallocatedPatInc.Rows) {
+				listUnallocatedPatInc.Add(ProviderPayrollRow.DataRowToPayrollRow(row,false));
+			}
+			foreach(DataRow row in tableInsIncome.Rows) {
+				listInsIncome.Add(ProviderPayrollRow.DataRowToPayrollRow(row,false));
+			}
+			foreach(DataRow row in tableInsIncomeNotFinalized.Rows) {
+				listInsIncomeNotFinalized.Add(ProviderPayrollRow.DataRowToPayrollRow(row,false));
+			}
+			if(isDetailed) {
+				for(int i=0;i<tableProduction.Rows.Count;i++) {
+					AddPatNumToListIfNeeded(listPatNums,PIn.Long(tableProduction.Rows[i]["PatNum"].ToString()));
+				}
+				for(int i=0;i<tableInsWOEst.Rows.Count;i++) {
+					AddPatNumToListIfNeeded(listPatNums,PIn.Long(tableInsWOEst.Rows[i]["PatNum"].ToString()));
+				}
+				for(int i=0;i<tableAdj.Rows.Count;i++) {
+					AddPatNumToListIfNeeded(listPatNums,PIn.Long(tableAdj.Rows[i]["PatNum"].ToString()));
+				}
+				for(int i=0;i<tableInsWriteOff.Rows.Count;i++) {
+					AddPatNumToListIfNeeded(listPatNums,PIn.Long(tableInsWriteOff.Rows[i]["PatNum"].ToString()));
+				}
+				for(int i=0;i<tableAllocatedPatInc.Rows.Count;i++) {
+					AddPatNumToListIfNeeded(listPatNums,PIn.Long(tableAllocatedPatInc.Rows[i]["PatNum"].ToString()));
+				}
+				for(int i=0;i<tableUnallocatedPatInc.Rows.Count;i++) {
+					AddPatNumToListIfNeeded(listPatNums,PIn.Long(tableUnallocatedPatInc.Rows[i]["PatNum"].ToString()));
+				}
+				for(int i=0;i<tableInsIncome.Rows.Count;i++) {
+					AddPatNumToListIfNeeded(listPatNums,PIn.Long(tableInsIncome.Rows[i]["PatNum"].ToString()));
+				}
+				for(int i=0;i<tableInsIncomeNotFinalized.Rows.Count;i++) {
+					AddPatNumToListIfNeeded(listPatNums,PIn.Long(tableInsIncomeNotFinalized.Rows[i]["PatNum"].ToString()));
+				}
+			}
+			for(DateTime dayCur=dateFrom;dayCur<=dateTo;dayCur=dayCur.AddDays(1)) {
+				if(isDetailed) {
+					List<Patient> listPatientsForReport=Patients.GetMultPats(listPatNums).ToList();
+					foreach(Patient patCur in listPatientsForReport) {
+						DataRow rowCur=dt.NewRow();
+						production=0;
+						insWriteoffEst=0;
+						adjust=0;
+						insWriteoffEstMinusWriteoff=0;
+						netProduction=0;
+						ptIncomeAllocated=0;
+						ptIncomeUnallocated=0;
+						insIncome=0;
+						insIncomeNotFinalized=0;
+						netIncome=0;
+						listProduction.FindAll(x => x.Date==dayCur && x.PatNum==patCur.PatNum).ForEach(x => production+=x.Amount);
+						listProduction.RemoveAll(x => x.Date==dayCur && x.PatNum==patCur.PatNum);
+						listInsWOEst.FindAll(x => x.Date==dayCur && x.PatNum==patCur.PatNum).ForEach(x => insWriteoffEst+=x.Amount);
+						listInsWOEst.RemoveAll(x => x.Date==dayCur && x.PatNum==patCur.PatNum);
+						listAdj.FindAll(x => x.Date==dayCur && x.PatNum==patCur.PatNum).ForEach(x => adjust+=x.Amount);
+						listAdj.RemoveAll(x => x.Date==dayCur && x.PatNum==patCur.PatNum);
+						listInsWriteOff.FindAll(x => x.Date==dayCur && x.PatNum==patCur.PatNum).ForEach(x => insWriteoffEstMinusWriteoff+=(x.WriteOffEst-x.WriteOff));
+						listInsWriteOff.RemoveAll(x => x.Date==dayCur && x.PatNum==patCur.PatNum);
+						listAllocatedPatInc.FindAll(x => x.Date==dayCur && x.PatNum==patCur.PatNum).ForEach(x => ptIncomeAllocated+=x.Amount);
+						listAllocatedPatInc.RemoveAll(x => x.Date==dayCur && x.PatNum==patCur.PatNum);
+						listUnallocatedPatInc.FindAll(x => x.Date==dayCur && x.PatNum==patCur.PatNum).ForEach(x => ptIncomeUnallocated+=x.Amount);
+						listUnallocatedPatInc.RemoveAll(x => x.Date==dayCur && x.PatNum==patCur.PatNum);
+						listInsIncome.FindAll(x => x.Date==dayCur && x.PatNum==patCur.PatNum).ForEach(x => insIncome+=x.Amount);
+						listInsIncome.RemoveAll(x => x.Date==dayCur && x.PatNum==patCur.PatNum);
+						listInsIncomeNotFinalized.FindAll(x => x.Date==dayCur && x.PatNum==patCur.PatNum).ForEach(x => insIncomeNotFinalized+=x.Amount);
+						listInsIncomeNotFinalized.RemoveAll(x => x.Date==dayCur && x.PatNum==patCur.PatNum);
+						netProduction=production+insWriteoffEst+adjust+insWriteoffEstMinusWriteoff;
+						netIncome=ptIncomeAllocated+insIncome;
+						rowCur[0]=dayCur.ToShortDateString();
+						rowCur[1]=patCur.GetNameLFnoPref();
+						rowCur[2]=production.ToString("n");
+						rowCur[3]=insWriteoffEst.ToString("n");
+						rowCur[4]=adjust.ToString("n");
+						rowCur[5]=insWriteoffEstMinusWriteoff.ToString("n");
+						rowCur[6]=netProduction.ToString("n");
+						rowCur[7]=ptIncomeAllocated.ToString("n");
+						rowCur[8]=ptIncomeUnallocated.ToString("n");
+						rowCur[9]=insIncome.ToString("n");
+						rowCur[10]=insIncomeNotFinalized.ToString("n");
+						rowCur[11]=netIncome.ToString("n");
+						if(production!=0 
+							|| insWriteoffEst!=0 
+							|| adjust!=0 
+							|| insWriteoffEstMinusWriteoff!=0 
+							|| netProduction!=0 
+							|| ptIncomeAllocated!=0 
+							|| ptIncomeUnallocated!=0 
+							|| insIncome!=0 
+							|| insIncomeNotFinalized!=0 
+							|| netIncome!=0) 
+						{//Only add a row that has data and that data doesn't equate to a row full of '0's
+							dt.Rows.Add(rowCur);
+						}
+					}
+				}
+				else {
+					DataRow rowCur=dt.NewRow();
+					production=0;
+					insWriteoffEst=0;
+					adjust=0;
+					insWriteoffEstMinusWriteoff=0;
+					netProduction=0;
+					ptIncomeAllocated=0;
+					ptIncomeUnallocated=0;
+					insIncome=0;
+					insIncomeNotFinalized=0;
+					netIncome=0;
+					listProduction.FindAll(x => x.Date==dayCur).ForEach(x => production+=x.Amount);
+					listProduction.RemoveAll(x => x.Date==dayCur);
+					listInsWOEst.FindAll(x => x.Date==dayCur).ForEach(x => insWriteoffEst+=x.Amount);
+					listInsWOEst.RemoveAll(x => x.Date==dayCur);
+					listAdj.FindAll(x => x.Date==dayCur).ForEach(x => adjust+=x.Amount);
+					listAdj.RemoveAll(x => x.Date==dayCur);
+					listInsWriteOff.FindAll(x => x.Date==dayCur).ForEach(x => insWriteoffEstMinusWriteoff+=(x.WriteOffEst-x.WriteOff));
+					listInsWriteOff.RemoveAll(x => x.Date==dayCur);
+					listAllocatedPatInc.FindAll(x => x.Date==dayCur).ForEach(x => ptIncomeAllocated+=x.Amount);
+					listAllocatedPatInc.RemoveAll(x => x.Date==dayCur);
+					listUnallocatedPatInc.FindAll(x => x.Date==dayCur).ForEach(x => ptIncomeUnallocated+=x.Amount);
+					listUnallocatedPatInc.RemoveAll(x => x.Date==dayCur);
+					listInsIncome.FindAll(x => x.Date==dayCur).ForEach(x => insIncome+=x.Amount);
+					listInsIncome.RemoveAll(x => x.Date==dayCur);
+					listInsIncomeNotFinalized.FindAll(x => x.Date==dayCur).ForEach(x => insIncomeNotFinalized+=x.Amount);
+					listInsIncomeNotFinalized.RemoveAll(x => x.Date==dayCur);
+					netProduction=production+insWriteoffEst+adjust+insWriteoffEstMinusWriteoff;
+					netIncome=ptIncomeAllocated+insIncome;
+					rowCur[0]=dayCur.ToShortDateString();
+					rowCur[1]=dayCur.DayOfWeek.ToString();
+					rowCur[2]=production.ToString("n");
+					rowCur[3]=insWriteoffEst.ToString("n");
+					rowCur[4]=adjust.ToString("n");
+					rowCur[5]=insWriteoffEstMinusWriteoff.ToString("n");
+					rowCur[6]=netProduction.ToString("n");
+					rowCur[7]=ptIncomeAllocated.ToString("n");
+					rowCur[8]=ptIncomeUnallocated.ToString("n");
+					rowCur[9]=insIncome.ToString("n");
+					rowCur[10]=insIncomeNotFinalized.ToString("n");
+					rowCur[11]=netIncome.ToString("n");
+					if(production!=0 
+						|| insWriteoffEst!=0 
+						|| adjust!=0 
+						|| insWriteoffEstMinusWriteoff!=0 
+						|| netProduction!=0 
+						|| ptIncomeAllocated!=0 
+						|| ptIncomeUnallocated!=0 
+						|| insIncome!=0 
+						|| insIncomeNotFinalized!=0 
+						|| netIncome!=0) 
+					{//Only add a row that has data and that data doesn't equate to a row full of '0's
+						dt.Rows.Add(rowCur);
+					}
+				}
+			}
+			DataSet ds=null;
+			ds=new DataSet("ProviderPayrollData");
+			ds.Tables.Add(dt);
+			return ds;
+		}
+
+		private static void AddPatNumToListIfNeeded(List<long> listPatNums, long patNum) {
+			if(!listPatNums.Contains(patNum)) {
+				listPatNums.Add(patNum);
+			}
+		}
 
 		///<summary>Returns a dataset that contains 5 tables used to generate the daily report.  If not using clinics then simply supply an empty list of clinicNums.  Also used for the CEMT Provider P and I report</summary>
 		public static DataSet GetDailyProdIncDataSet(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics,bool showUnearned) {
@@ -554,6 +783,216 @@ namespace OpenDentBusiness {
 			return dataSet;
 		}
 		#endregion
+
+		///<summary>Returns a dataset that contains 5 tables used to generate the provider payroll report.  If not using clinics then simply supply an empty list of clinicNums.</summary>
+		public static DataSet GetProviderPayrollDataSet(DateTime dateFrom,DateTime dateTo,List<Provider> listProvs,List<Clinic> listClinics,bool writeOffPay,bool hasAllProvs,bool hasAllClinics,bool showUnearned) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetDS(MethodBase.GetCurrentMethod(),dateFrom,dateTo,listProvs,listClinics,writeOffPay,hasAllProvs,hasAllClinics,showUnearned);
+			}
+			DataTable tableProduction;
+			DataTable tableInsWOEst;
+			DataTable tableAdj;
+			DataTable tableInsWriteOff;
+			DataTable tableAllocatedPatInc;
+			DataTable tableUnallocatedPatInc;
+			DataTable tableInsIncome;
+			DataTable tableInsIncomeNotFinalized;
+			string tableProductionName="tableProduction";
+			string tableInsWOEstName="tableInsWOEst";
+			string tableAdjName="tableAdj";
+			string tableInsWriteOffName="tableInsWriteOff";
+			string tableAllocatedPatIncName="tableAllocatedPatInc";
+			string tableUnallocatedPatIncName="tableUnallocatedPatInc";
+			string tableInsIncomeName="tableInsIncome";
+			string tableInsIncomeNotFinalizedName="tableInsIncomeNotFinalized";
+			List<long> listProvNums=new List<long>();
+			for(int i=0;i<listProvs.Count;i++) {
+				listProvNums.Add(listProvs[i].ProvNum);
+			}
+			if(!hasAllProvs && showUnearned) {
+				listProvNums.Add(0);//ProvNum=0 is unearned
+			}
+			List<long> listClinicNums=new List<long>();
+			for(int i=0;i<listClinics.Count;i++) {
+				listClinicNums.Add(listClinics[i].ClinicNum);
+			}
+			string writeOffDate="claimproc.DateCP";
+			List<int> listClaimProcStatuses=new List<int>();
+			listClaimProcStatuses.Add((int)ClaimProcStatus.Received);
+			listClaimProcStatuses.Add((int)ClaimProcStatus.Supplemental);
+			if(!writeOffPay) {
+				writeOffDate="claimproc.ProcDate";
+				listClaimProcStatuses.Add((int)ClaimProcStatus.NotReceived);//WO by ProcDate include NotReceived claimprocs.
+			}
+			string whereProv="";
+			string whereClin="";
+			string command="";
+			bool hasProvs=false;
+			bool hasClinics=false;
+			if(!hasAllProvs && listProvNums.Count>0) {
+				hasProvs=true;
+			}
+			if(!hasAllClinics && listClinicNums.Count>0) {
+				hasClinics=true;
+			}
+			//Production-------------------------------------------------------
+			if(hasProvs) {
+				whereProv="AND procedurelog.ProvNum IN ("+String.Join(",",listProvNums)+") ";
+			}
+			if(hasClinics) {
+				whereClin="AND procedurelog.ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
+			}
+			command="SELECT procedurelog.PatNum, procedurelog.ProvNum, procedurelog.ClinicNum, procedurelog.ProcDate TranDate, "
+				+"procedurelog.ProcFee*(procedurelog.UnitQty+procedurelog.BaseUnits) Amount,0 as WriteOff,0 as WriteOffEst "
+				+"FROM procedurelog "
+				+"LEFT JOIN claimproc ON claimproc.ProcNum=procedurelog.ProcNum "
+					+"AND claimproc.Status="+POut.Int((int)ClaimProcStatus.CapComplete)+" "
+				+"WHERE procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+" "
+				+whereProv
+				+whereClin
+				+"AND procedurelog.ProcDate BETWEEN "+POut.Date(dateFrom)+" AND "+POut.Date(dateTo)+" ";
+			tableProduction=Db.GetTable(command);
+			tableProduction.TableName=tableProductionName;
+			//Insurance WriteOff Estimates----------------------------------------------------------------------------
+			if(hasProvs) {
+				whereProv="AND procedurelog.ProvNum IN ("+String.Join(",",listProvNums)+") ";
+			}
+			if(hasClinics) {
+				whereClin="AND procedurelog.ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
+			}
+			command="SELECT procedurelog.PatNum, procedurelog.ProvNum, procedurelog.ClinicNum, "+writeOffDate+" TranDate, "
+				+"-("+DbHelper.IfNull("NULLIF(claimsnapshot.WriteOff, -1)",
+					"(CASE WHEN claimproc.WriteOffEstOverride!=-1 THEN claimproc.WriteOffEstOverride ELSE claimproc.WriteOffEst END)",false)+") Amount,0 as WriteOff,0 as WriteOffEst "
+				+"FROM procedurelog "
+				+"LEFT JOIN claimproc ON claimproc.ProcNum=procedurelog.ProcNum "
+					+"AND (claimproc.WriteOffEst!=-1 OR claimproc.WriteOffEstOverride!=-1) "
+				+"LEFT JOIN claimsnapshot ON claimsnapshot.ClaimProcNum=claimproc.ClaimProcNum "
+				+"WHERE procedurelog.ProcStatus="+POut.Int((int)ProcStat.C)+" "
+				+"AND procedurelog.ProcFee!=0 "
+				+whereProv
+				+whereClin
+				+"AND "+writeOffDate+" BETWEEN "+POut.Date(dateFrom)+" AND "+POut.Date(dateTo)+" ";
+			tableInsWOEst=Db.GetTable(command);
+			tableInsWOEst.TableName=tableInsWOEstName;
+			//Adjustments----------------------------------------------------------------------------
+			if(hasProvs) {
+				whereProv="AND adjustment.ProvNum IN ("+String.Join(",",listProvNums)+") ";
+			}
+			if(hasClinics) {
+				whereClin="AND adjustment.ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
+			}
+			string listBadDebtAdj=PrefC.GetString(PrefName.BadDebtAdjustmentTypes);
+			if(String.IsNullOrEmpty(listBadDebtAdj)) {
+				listBadDebtAdj="0";
+			}
+			if(!hasAllClinics && listClinicNums.Count>0) {
+				whereClin="AND adjustment.ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
+			}
+			command="SELECT adjustment.PatNum, adjustment.ProvNum, adjustment.ClinicNum, adjustment.DateEntry TranDate,adjustment.AdjAmt Amount,0 as WriteOff,0 as WriteOffEst "
+				+"FROM adjustment "
+				+"WHERE adjustment.AdjType NOT IN("+listBadDebtAdj+") "
+				+whereProv
+				+whereClin
+				+"AND adjustment.DateEntry BETWEEN "+POut.Date(dateFrom)+" AND "+POut.Date(dateTo)+" ";
+			tableAdj=Db.GetTable(command);
+			tableAdj.TableName=tableAdjName;
+			//InsWriteoff--------------------------------------------------------------------------
+			if(hasProvs) {
+				whereProv="AND claimproc.ProvNum IN ("+String.Join(",",listProvNums)+") ";
+			}
+			if(hasClinics) {
+				whereClin="AND claimproc.ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
+			}
+			command="SELECT claimproc.PatNum, claimproc.ProvNum, claimproc.ClinicNum, "+writeOffDate+" TranDate,0 as Amount, -claimproc.WriteOff WriteOff, "
+				+"-"+DbHelper.IfNull("NULLIF(claimsnapshot.WriteOff, -1)",
+					"(CASE WHEN claimproc.WriteOffEstOverride!=-1 THEN claimproc.WriteOffEstOverride ELSE claimproc.WriteOffEst END)",false)+" WriteoffEst "
+				+"FROM claimproc "
+				+"LEFT JOIN claimsnapshot ON claimsnapshot.ClaimProcNum=claimproc.ClaimProcNum "
+				+"WHERE claimproc.Status IN("+String.Join(",",listClaimProcStatuses)+") "
+				+whereProv
+				+whereClin
+				+"AND claimproc.WriteOff>'.0001' "
+				+"AND "+writeOffDate+" BETWEEN "+POut.Date(dateFrom)+" AND "+POut.Date(dateTo)+" ";
+			tableInsWriteOff=Db.GetTable(command);
+			tableInsWriteOff.TableName=tableInsWriteOffName;
+			//AllocatedPtIncome--------------------------------------------------------------------------------
+			if(hasProvs) {
+				whereProv="AND paysplit.ProvNum IN ("+String.Join(",",listProvNums)+") ";
+			}
+			if(hasClinics) {
+				whereClin=" AND paysplit.ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
+			}
+			command="SELECT paysplit.PatNum, paysplit.ProvNum, paysplit.ClinicNum, paysplit.DateEntry TranDate,paysplit.SplitAmt Amount,0 as WriteOff,0 as WriteOffEst "
+				+"FROM paysplit "
+				+"WHERE paysplit.IsDiscount=0 "
+				+whereProv
+				+whereClin
+				+"AND paysplit.ProcNum!=0 "
+				+"AND paysplit.DatePay BETWEEN "+POut.Date(dateFrom)+" AND "+POut.Date(dateTo)+" ";
+			tableAllocatedPatInc=Db.GetTable(command);
+			tableAllocatedPatInc.TableName=tableAllocatedPatIncName;
+			//UnallocatedPtIncome--------------------------------------------------------------------------------
+			if(hasProvs) {
+				whereProv="AND paysplit.ProvNum IN ("+String.Join(",",listProvNums)+") ";
+			}
+			if(hasClinics) {
+				whereClin=" AND paysplit.ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
+			}
+			command="SELECT paysplit.PatNum, paysplit.ProvNum, paysplit.ClinicNum, paysplit.DateEntry TranDate,paysplit.SplitAmt Amount,0 as WriteOff,0 as WriteOffEst "
+				+"FROM paysplit "
+				+"WHERE paysplit.IsDiscount=0 "
+				+whereProv
+				+whereClin
+				+"AND paysplit.ProcNum=0 "
+				+"AND paysplit.DatePay BETWEEN "+POut.Date(dateFrom)+" AND "+POut.Date(dateTo)+" ";
+			tableUnallocatedPatInc=Db.GetTable(command);
+			tableUnallocatedPatInc.TableName=tableUnallocatedPatIncName;
+			//InsIncome---------------------------------------------------------------------------------
+			if(hasProvs) {
+				whereProv="AND claimproc.ProvNum IN ("+String.Join(",",listProvNums)+") ";
+			}
+			if(hasClinics) {
+				whereClin=" AND claimproc.ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
+			}
+			command="SELECT claimproc.PatNum, claimproc.ProvNum, claimproc.ClinicNum, claimproc.DateEntry TranDate,claimproc.InsPayAmt Amount,0 as WriteOff,0 as WriteOffEst "
+				+"FROM claimproc "
+				+"INNER JOIN claimpayment ON claimpayment.ClaimPaymentNum=claimproc.ClaimPaymentNum "
+				+"WHERE claimpayment.IsPartial=0 "
+				+whereProv
+				+whereClin
+				+"AND claimproc.Status IN ("+POut.Int((int)ClaimProcStatus.Received)+","+POut.Int((int)ClaimProcStatus.Supplemental)+") "
+				+"AND claimproc.DateEntry BETWEEN "+POut.Date(dateFrom)+" AND "+POut.Date(dateTo)+" ";
+			tableInsIncome=Db.GetTable(command);
+			tableInsIncome.TableName=tableInsIncomeName;
+			//InsIncomeNotFinalized---------------------------------------------------------------------------------
+			if(hasProvs) {
+				whereProv="AND claimproc.ProvNum IN ("+String.Join(",",listProvNums)+") ";
+			}
+			if(hasClinics) {
+				whereClin=" AND claimproc.ClinicNum IN ("+String.Join(",",listClinicNums)+") ";
+			}
+			command="SELECT claimproc.PatNum, claimproc.ProvNum, claimproc.ClinicNum, claimproc.DateEntry TranDate,claimproc.InsPayAmt Amount,0 as WriteOff,0 as WriteOffEst "
+				+"FROM claimproc "
+				+"LEFT JOIN claimpayment ON claimpayment.ClaimPaymentNum=claimproc.ClaimPaymentNum "
+				+"WHERE "+DbHelper.IfNull("claimpayment.CheckDate","claimproc.DateEntry",false)+" BETWEEN "+POut.Date(dateFrom)+" AND "+POut.Date(dateTo)+" "
+				+whereProv
+				+whereClin
+				+"AND claimpayment.IsPartial=1 OR (claimpayment.ClaimPaymentNum IS NULL AND claimproc.InsPayAmt!=0 "
+					+"AND claimproc.Status IN("+POut.Int((int)ClaimProcStatus.Received)+","+POut.Int((int)ClaimProcStatus.Supplemental)+","+POut.Int((int)ClaimProcStatus.CapClaim)+")) "
+				+"AND claimproc.Status IN ("+POut.Int((int)ClaimProcStatus.Received)+","+POut.Int((int)ClaimProcStatus.Supplemental)+") ";//Received or Supplemental
+			tableInsIncomeNotFinalized=Db.GetTable(command);
+			tableInsIncomeNotFinalized.TableName=tableInsIncomeNotFinalizedName;
+			DataSet dataSet=new DataSet();
+			dataSet.Tables.Add(tableProduction);
+			dataSet.Tables.Add(tableInsWOEst);
+			dataSet.Tables.Add(tableAdj);
+			dataSet.Tables.Add(tableInsWriteOff);
+			dataSet.Tables.Add(tableAllocatedPatInc);
+			dataSet.Tables.Add(tableUnallocatedPatInc);
+			dataSet.Tables.Add(tableInsIncome);
+			dataSet.Tables.Add(tableInsIncomeNotFinalized);
+			return dataSet;
+		}
 
 		#region Monthly P&I Report
 		///<summary>If not using clinics then supply an empty list of clinics.</summary>
@@ -1352,6 +1791,45 @@ namespace OpenDentBusiness {
 			}
 			return 0;
 		}
+		
+		///<summary>This class is only used for the Provider Payroll report.  It is to be able to use Linq to cut down on processing time.</summary>
+		private class ProviderPayrollRow {
+			public DateTime Date;
+			public long PatNum;
+			public decimal Amount;
+			///<summary>Only used by the InsWriteOff table</summary>
+			public decimal WriteOff;
+			///<summary>Only used by the InsWriteOff table</summary>
+			public decimal WriteOffEst;
+			
+			///<summary>Used by all tabled except the InsWriteOff table</summary>
+			public ProviderPayrollRow(DateTime date,decimal amount,long patNum) {
+				Date=date;
+				Amount=amount;
+				PatNum=patNum;
+			}
+			
+			///<summary>Only used by the InsWriteOff table</summary>
+			public ProviderPayrollRow(DateTime date,decimal writeOffAmt,decimal writeOffEst,long patNum) {
+				Date=date;
+				WriteOff=writeOffAmt;
+				WriteOffEst=writeOffEst;
+				PatNum=patNum;
+			}
 
+			public static ProviderPayrollRow DataRowToPayrollRow(DataRow row,bool isWriteOffTable) {
+				DateTime date=PIn.Date(row["TranDate"].ToString());
+				decimal amount=PIn.Decimal(row["Amount"].ToString());
+				decimal writeOffAmt=PIn.Decimal(row["WriteOff"].ToString());
+				decimal writeOffEst=PIn.Decimal(row["WriteOffEst"].ToString());
+				long patNum=PIn.Long(row["PatNum"].ToString());
+				if(isWriteOffTable) {
+					return new ProviderPayrollRow(date,writeOffAmt,writeOffEst,patNum);
+				}
+				else {
+					return new ProviderPayrollRow(date,amount,patNum);
+				}
+			}
+		}
 	}
 }

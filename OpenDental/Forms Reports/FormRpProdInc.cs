@@ -41,7 +41,7 @@ namespace OpenDental{
 		public string DailyMonthlyAnnual;
 		///<summary>If set externally, then this sets the date on startup.</summary>
 		public DateTime DateStart;
-		private GroupBox groupBox3;
+		private GroupBox groupShowInsWriteoffs;
 		private RadioButton radioWriteoffPay;
 		private RadioButton radioWriteoffProc;
 		private Label label5;
@@ -53,7 +53,12 @@ namespace OpenDental{
 		private CheckBox checkClinicBreakdown;
     private CheckBox checkClinicInfo;
 		private CheckBox checkShowUnearned;
+		private RadioButton radioProviderPayroll;
+		private GroupBox groupPayrollReportType;
+		private RadioButton radioDetailedReport;
+		private RadioButton radioSimpleReport;
 		private List<Clinic> _listClinics;
+		private int _selectedPayPeriodIdx=-1;
 
 		///<summary></summary>
 		public FormRpProdInc(){
@@ -84,6 +89,7 @@ namespace OpenDental{
 			this.radioMonthly = new System.Windows.Forms.RadioButton();
 			this.radioDaily = new System.Windows.Forms.RadioButton();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.radioProviderPayroll = new System.Windows.Forms.RadioButton();
 			this.radioProvider = new System.Windows.Forms.RadioButton();
 			this.radioAnnual = new System.Windows.Forms.RadioButton();
 			this.label2 = new System.Windows.Forms.Label();
@@ -98,7 +104,7 @@ namespace OpenDental{
 			this.butLeft = new OpenDental.UI.Button();
 			this.listClin = new System.Windows.Forms.ListBox();
 			this.labelClin = new System.Windows.Forms.Label();
-			this.groupBox3 = new System.Windows.Forms.GroupBox();
+			this.groupShowInsWriteoffs = new System.Windows.Forms.GroupBox();
 			this.label5 = new System.Windows.Forms.Label();
 			this.radioWriteoffProc = new System.Windows.Forms.RadioButton();
 			this.radioWriteoffPay = new System.Windows.Forms.RadioButton();
@@ -109,14 +115,18 @@ namespace OpenDental{
 			this.butOK = new OpenDental.UI.Button();
 			this.checkClinicInfo = new System.Windows.Forms.CheckBox();
 			this.checkShowUnearned = new System.Windows.Forms.CheckBox();
+			this.groupPayrollReportType = new System.Windows.Forms.GroupBox();
+			this.radioDetailedReport = new System.Windows.Forms.RadioButton();
+			this.radioSimpleReport = new System.Windows.Forms.RadioButton();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
-			this.groupBox3.SuspendLayout();
+			this.groupShowInsWriteoffs.SuspendLayout();
+			this.groupPayrollReportType.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(35, 128);
+			this.label1.Location = new System.Drawing.Point(35, 138);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(104, 16);
 			this.label1.TabIndex = 29;
@@ -125,7 +135,7 @@ namespace OpenDental{
 			// 
 			// listProv
 			// 
-			this.listProv.Location = new System.Drawing.Point(37, 165);
+			this.listProv.Location = new System.Drawing.Point(37, 175);
 			this.listProv.Name = "listProv";
 			this.listProv.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
 			this.listProv.Size = new System.Drawing.Size(154, 186);
@@ -138,7 +148,7 @@ namespace OpenDental{
 			this.radioMonthly.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.radioMonthly.Location = new System.Drawing.Point(14, 40);
 			this.radioMonthly.Name = "radioMonthly";
-			this.radioMonthly.Size = new System.Drawing.Size(104, 17);
+			this.radioMonthly.Size = new System.Drawing.Size(134, 17);
 			this.radioMonthly.TabIndex = 33;
 			this.radioMonthly.TabStop = true;
 			this.radioMonthly.Text = "Monthly";
@@ -149,13 +159,14 @@ namespace OpenDental{
 			this.radioDaily.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.radioDaily.Location = new System.Drawing.Point(14, 21);
 			this.radioDaily.Name = "radioDaily";
-			this.radioDaily.Size = new System.Drawing.Size(104, 17);
+			this.radioDaily.Size = new System.Drawing.Size(134, 17);
 			this.radioDaily.TabIndex = 34;
 			this.radioDaily.Text = "Daily";
 			this.radioDaily.Click += new System.EventHandler(this.radioDaily_Click);
 			// 
 			// groupBox1
 			// 
+			this.groupBox1.Controls.Add(this.radioProviderPayroll);
 			this.groupBox1.Controls.Add(this.radioProvider);
 			this.groupBox1.Controls.Add(this.radioAnnual);
 			this.groupBox1.Controls.Add(this.radioDaily);
@@ -163,17 +174,27 @@ namespace OpenDental{
 			this.groupBox1.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.groupBox1.Location = new System.Drawing.Point(37, 13);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(123, 101);
+			this.groupBox1.Size = new System.Drawing.Size(154, 122);
 			this.groupBox1.TabIndex = 35;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Report Type";
+			// 
+			// radioProviderPayroll
+			// 
+			this.radioProviderPayroll.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.radioProviderPayroll.Location = new System.Drawing.Point(14, 97);
+			this.radioProviderPayroll.Name = "radioProviderPayroll";
+			this.radioProviderPayroll.Size = new System.Drawing.Size(134, 17);
+			this.radioProviderPayroll.TabIndex = 37;
+			this.radioProviderPayroll.Text = "Provider Payroll";
+			this.radioProviderPayroll.Click += new System.EventHandler(this.radioProviderPayroll_Click);
 			// 
 			// radioProvider
 			// 
 			this.radioProvider.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.radioProvider.Location = new System.Drawing.Point(14, 78);
 			this.radioProvider.Name = "radioProvider";
-			this.radioProvider.Size = new System.Drawing.Size(104, 17);
+			this.radioProvider.Size = new System.Drawing.Size(134, 17);
 			this.radioProvider.TabIndex = 36;
 			this.radioProvider.Text = "Provider";
 			this.radioProvider.Click += new System.EventHandler(this.radioProvider_Click);
@@ -183,7 +204,7 @@ namespace OpenDental{
 			this.radioAnnual.FlatStyle = System.Windows.Forms.FlatStyle.System;
 			this.radioAnnual.Location = new System.Drawing.Point(14, 59);
 			this.radioAnnual.Name = "radioAnnual";
-			this.radioAnnual.Size = new System.Drawing.Size(104, 17);
+			this.radioAnnual.Size = new System.Drawing.Size(134, 17);
 			this.radioAnnual.TabIndex = 35;
 			this.radioAnnual.Text = "Annual";
 			this.radioAnnual.Click += new System.EventHandler(this.radioAnnual_Click);
@@ -208,7 +229,7 @@ namespace OpenDental{
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(356, 66);
+			this.label4.Location = new System.Drawing.Point(356, 29);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(127, 20);
 			this.label4.TabIndex = 41;
@@ -217,7 +238,7 @@ namespace OpenDental{
 			// 
 			// textToday
 			// 
-			this.textToday.Location = new System.Drawing.Point(485, 64);
+			this.textToday.Location = new System.Drawing.Point(485, 27);
 			this.textToday.Name = "textToday";
 			this.textToday.ReadOnly = true;
 			this.textToday.Size = new System.Drawing.Size(100, 20);
@@ -233,7 +254,7 @@ namespace OpenDental{
 			this.groupBox2.Controls.Add(this.label3);
 			this.groupBox2.Controls.Add(this.butLeft);
 			this.groupBox2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox2.Location = new System.Drawing.Point(390, 90);
+			this.groupBox2.Location = new System.Drawing.Point(390, 53);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Size = new System.Drawing.Size(281, 144);
 			this.groupBox2.TabIndex = 43;
@@ -298,7 +319,7 @@ namespace OpenDental{
 			// 
 			// listClin
 			// 
-			this.listClin.Location = new System.Drawing.Point(215, 165);
+			this.listClin.Location = new System.Drawing.Point(215, 175);
 			this.listClin.Name = "listClin";
 			this.listClin.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
 			this.listClin.Size = new System.Drawing.Size(154, 186);
@@ -307,28 +328,28 @@ namespace OpenDental{
 			// 
 			// labelClin
 			// 
-			this.labelClin.Location = new System.Drawing.Point(212, 128);
+			this.labelClin.Location = new System.Drawing.Point(212, 138);
 			this.labelClin.Name = "labelClin";
 			this.labelClin.Size = new System.Drawing.Size(104, 16);
 			this.labelClin.TabIndex = 44;
 			this.labelClin.Text = "Clinics";
 			this.labelClin.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
 			// 
-			// groupBox3
+			// groupShowInsWriteoffs
 			// 
-			this.groupBox3.Controls.Add(this.label5);
-			this.groupBox3.Controls.Add(this.radioWriteoffProc);
-			this.groupBox3.Controls.Add(this.radioWriteoffPay);
-			this.groupBox3.Location = new System.Drawing.Point(390, 256);
-			this.groupBox3.Name = "groupBox3";
-			this.groupBox3.Size = new System.Drawing.Size(281, 95);
-			this.groupBox3.TabIndex = 46;
-			this.groupBox3.TabStop = false;
-			this.groupBox3.Text = "Show Insurance Writeoffs";
+			this.groupShowInsWriteoffs.Controls.Add(this.label5);
+			this.groupShowInsWriteoffs.Controls.Add(this.radioWriteoffProc);
+			this.groupShowInsWriteoffs.Controls.Add(this.radioWriteoffPay);
+			this.groupShowInsWriteoffs.Location = new System.Drawing.Point(390, 198);
+			this.groupShowInsWriteoffs.Name = "groupShowInsWriteoffs";
+			this.groupShowInsWriteoffs.Size = new System.Drawing.Size(281, 101);
+			this.groupShowInsWriteoffs.TabIndex = 46;
+			this.groupShowInsWriteoffs.TabStop = false;
+			this.groupShowInsWriteoffs.Text = "Show Insurance Writeoffs";
 			// 
 			// label5
 			// 
-			this.label5.Location = new System.Drawing.Point(6, 71);
+			this.label5.Location = new System.Drawing.Point(6, 75);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(269, 17);
 			this.label5.TabIndex = 2;
@@ -337,7 +358,7 @@ namespace OpenDental{
 			// radioWriteoffProc
 			// 
 			this.radioWriteoffProc.CheckAlign = System.Drawing.ContentAlignment.TopLeft;
-			this.radioWriteoffProc.Location = new System.Drawing.Point(9, 41);
+			this.radioWriteoffProc.Location = new System.Drawing.Point(9, 47);
 			this.radioWriteoffProc.Name = "radioWriteoffProc";
 			this.radioWriteoffProc.Size = new System.Drawing.Size(244, 23);
 			this.radioWriteoffProc.TabIndex = 1;
@@ -349,7 +370,7 @@ namespace OpenDental{
 			// 
 			this.radioWriteoffPay.CheckAlign = System.Drawing.ContentAlignment.TopLeft;
 			this.radioWriteoffPay.Checked = true;
-			this.radioWriteoffPay.Location = new System.Drawing.Point(9, 20);
+			this.radioWriteoffPay.Location = new System.Drawing.Point(9, 22);
 			this.radioWriteoffPay.Name = "radioWriteoffPay";
 			this.radioWriteoffPay.Size = new System.Drawing.Size(244, 23);
 			this.radioWriteoffPay.TabIndex = 0;
@@ -363,7 +384,7 @@ namespace OpenDental{
 			this.checkAllProv.Checked = true;
 			this.checkAllProv.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkAllProv.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkAllProv.Location = new System.Drawing.Point(38, 146);
+			this.checkAllProv.Location = new System.Drawing.Point(38, 156);
 			this.checkAllProv.Name = "checkAllProv";
 			this.checkAllProv.Size = new System.Drawing.Size(95, 16);
 			this.checkAllProv.TabIndex = 47;
@@ -373,7 +394,7 @@ namespace OpenDental{
 			// checkAllClin
 			// 
 			this.checkAllClin.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkAllClin.Location = new System.Drawing.Point(215, 146);
+			this.checkAllClin.Location = new System.Drawing.Point(215, 156);
 			this.checkAllClin.Name = "checkAllClin";
 			this.checkAllClin.Size = new System.Drawing.Size(95, 16);
 			this.checkAllClin.TabIndex = 48;
@@ -383,7 +404,7 @@ namespace OpenDental{
 			// checkClinicBreakdown
 			// 
 			this.checkClinicBreakdown.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkClinicBreakdown.Location = new System.Drawing.Point(215, 371);
+			this.checkClinicBreakdown.Location = new System.Drawing.Point(215, 381);
 			this.checkClinicBreakdown.Name = "checkClinicBreakdown";
 			this.checkClinicBreakdown.Size = new System.Drawing.Size(191, 16);
 			this.checkClinicBreakdown.TabIndex = 49;
@@ -397,7 +418,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(710, 365);
+			this.butCancel.Location = new System.Drawing.Point(710, 367);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 26);
 			this.butCancel.TabIndex = 4;
@@ -412,7 +433,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(710, 330);
+			this.butOK.Location = new System.Drawing.Point(710, 332);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 26);
 			this.butOK.TabIndex = 3;
@@ -422,7 +443,7 @@ namespace OpenDental{
 			// checkClinicInfo
 			// 
 			this.checkClinicInfo.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkClinicInfo.Location = new System.Drawing.Point(215, 353);
+			this.checkClinicInfo.Location = new System.Drawing.Point(215, 363);
 			this.checkClinicInfo.Name = "checkClinicInfo";
 			this.checkClinicInfo.Size = new System.Drawing.Size(169, 16);
 			this.checkClinicInfo.TabIndex = 51;
@@ -434,21 +455,57 @@ namespace OpenDental{
 			this.checkShowUnearned.Checked = true;
 			this.checkShowUnearned.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkShowUnearned.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkShowUnearned.Location = new System.Drawing.Point(38, 353);
+			this.checkShowUnearned.Location = new System.Drawing.Point(96, 156);
 			this.checkShowUnearned.Name = "checkShowUnearned";
 			this.checkShowUnearned.Size = new System.Drawing.Size(95, 16);
 			this.checkShowUnearned.TabIndex = 52;
 			this.checkShowUnearned.Text = "Show Unearned";
 			// 
+			// groupPayrollReportType
+			// 
+			this.groupPayrollReportType.Controls.Add(this.radioDetailedReport);
+			this.groupPayrollReportType.Controls.Add(this.radioSimpleReport);
+			this.groupPayrollReportType.Location = new System.Drawing.Point(390, 300);
+			this.groupPayrollReportType.Name = "groupPayrollReportType";
+			this.groupPayrollReportType.Size = new System.Drawing.Size(281, 61);
+			this.groupPayrollReportType.TabIndex = 53;
+			this.groupPayrollReportType.TabStop = false;
+			this.groupPayrollReportType.Text = "Payroll Report Type";
+			// 
+			// radioDetailedReport
+			// 
+			this.radioDetailedReport.CheckAlign = System.Drawing.ContentAlignment.TopLeft;
+			this.radioDetailedReport.Location = new System.Drawing.Point(9, 36);
+			this.radioDetailedReport.Name = "radioDetailedReport";
+			this.radioDetailedReport.Size = new System.Drawing.Size(244, 23);
+			this.radioDetailedReport.TabIndex = 3;
+			this.radioDetailedReport.Text = "Detailed Report";
+			this.radioDetailedReport.TextAlign = System.Drawing.ContentAlignment.TopLeft;
+			this.radioDetailedReport.UseVisualStyleBackColor = true;
+			// 
+			// radioSimpleReport
+			// 
+			this.radioSimpleReport.CheckAlign = System.Drawing.ContentAlignment.TopLeft;
+			this.radioSimpleReport.Checked = true;
+			this.radioSimpleReport.Location = new System.Drawing.Point(9, 17);
+			this.radioSimpleReport.Name = "radioSimpleReport";
+			this.radioSimpleReport.Size = new System.Drawing.Size(244, 23);
+			this.radioSimpleReport.TabIndex = 2;
+			this.radioSimpleReport.TabStop = true;
+			this.radioSimpleReport.Text = "Simple Report";
+			this.radioSimpleReport.TextAlign = System.Drawing.ContentAlignment.TopLeft;
+			this.radioSimpleReport.UseVisualStyleBackColor = true;
+			// 
 			// FormRpProdInc
 			// 
-			this.ClientSize = new System.Drawing.Size(818, 417);
+			this.ClientSize = new System.Drawing.Size(818, 419);
+			this.Controls.Add(this.groupPayrollReportType);
 			this.Controls.Add(this.checkShowUnearned);
 			this.Controls.Add(this.checkClinicInfo);
 			this.Controls.Add(this.checkClinicBreakdown);
 			this.Controls.Add(this.checkAllClin);
 			this.Controls.Add(this.checkAllProv);
-			this.Controls.Add(this.groupBox3);
+			this.Controls.Add(this.groupShowInsWriteoffs);
 			this.Controls.Add(this.listClin);
 			this.Controls.Add(this.labelClin);
 			this.Controls.Add(this.groupBox2);
@@ -469,13 +526,15 @@ namespace OpenDental{
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox2.ResumeLayout(false);
 			this.groupBox2.PerformLayout();
-			this.groupBox3.ResumeLayout(false);
+			this.groupShowInsWriteoffs.ResumeLayout(false);
+			this.groupPayrollReportType.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
 		}
 		#endregion
 		private void FormProduction_Load(object sender, System.EventArgs e) {
+			groupPayrollReportType.Visible=false;
 			textToday.Text=DateTime.Today.ToShortDateString();
 			for(int i=0;i<ProviderC.ListShort.Count;i++){
 				listProv.Items.Add(ProviderC.ListShort[i].GetLongDesc());
@@ -585,8 +644,13 @@ namespace OpenDental{
 			SetDates();
 		}
 
+		private void radioProviderPayroll_Click(object sender,EventArgs e) {
+			SetDates();
+		}
+
 		private void SetDates(){
-      if(radioDaily.Checked) {
+			groupPayrollReportType.Visible=false;
+			if(radioDaily.Checked) {
 				if(PrefC.HasClinicsEnabled) {
 					checkClinicInfo.Visible=true;
 					if(checkClinicInfo.Checked) {
@@ -598,19 +662,30 @@ namespace OpenDental{
 						checkClinicBreakdown.Visible=false;
 					}
 				}
-        textDateFrom.Text=DateTime.Today.ToShortDateString();
-        textDateTo.Text=DateTime.Today.ToShortDateString();
-        butThis.Text=Lan.g(this,"Today");
-      }
-      else if(radioProvider.Checked) {
+				textDateFrom.Text=DateTime.Today.ToShortDateString();
+				textDateTo.Text=DateTime.Today.ToShortDateString();
+				butThis.Text=Lan.g(this,"Today");
+			}
+			else if(radioProvider.Checked) {
 				if(PrefC.HasClinicsEnabled) {
 					checkClinicInfo.Visible=false;
 					checkClinicBreakdown.Visible=true;
 				}
-        textDateFrom.Text=DateTime.Today.ToShortDateString();
-        textDateTo.Text=DateTime.Today.ToShortDateString();
-        butThis.Text=Lan.g(this,"Today");
-      }
+				textDateFrom.Text=DateTime.Today.ToShortDateString();
+				textDateTo.Text=DateTime.Today.ToShortDateString();
+				butThis.Text=Lan.g(this,"Today");
+			}
+			else if(radioProviderPayroll.Checked) {
+				groupPayrollReportType.Visible=true;
+				if(PrefC.HasClinicsEnabled) {
+					checkClinicInfo.Visible=false;
+					checkClinicBreakdown.Visible=false;
+				}
+				_selectedPayPeriodIdx=PayPeriods.GetForDate(DateTime.Today);
+				textDateFrom.Text=PayPeriods.List[_selectedPayPeriodIdx].DateStart.ToShortDateString();
+				textDateTo.Text=PayPeriods.List[_selectedPayPeriodIdx].DateStop.ToShortDateString();
+				butThis.Text=Lan.g(this,"This Period");
+			}
 			else if(radioMonthly.Checked) {
 				if(PrefC.HasClinicsEnabled) {
 					checkClinicInfo.Visible=false;
@@ -663,6 +738,13 @@ namespace OpenDental{
 						.ToShortDateString();
 				}
 			}
+			else if(radioProviderPayroll.Checked) {
+				if(_selectedPayPeriodIdx>0) {
+					_selectedPayPeriodIdx--;
+					textDateFrom.Text=PayPeriods.List[_selectedPayPeriodIdx].DateStart.ToShortDateString();
+					textDateTo.Text=PayPeriods.List[_selectedPayPeriodIdx].DateStop.ToShortDateString();
+				}
+			}
 			else{//annual
 				textDateFrom.Text=dateFrom.AddYears(-1).ToShortDateString();
 				textDateTo.Text=dateTo.AddYears(-1).ToShortDateString();
@@ -694,6 +776,13 @@ namespace OpenDental{
 					textDateTo.Text=new DateTime(dateTo.Year,dateTo.Month,
 						CultureInfo.CurrentCulture.Calendar.GetDaysInMonth(dateTo.Year,dateTo.Month))
 						.ToShortDateString();
+				}
+			}
+			else if(radioProviderPayroll.Checked) {
+				if(_selectedPayPeriodIdx<PayPeriods.List.Length-1) {
+					_selectedPayPeriodIdx++;
+					textDateFrom.Text=PayPeriods.List[_selectedPayPeriodIdx].DateStart.ToShortDateString();
+					textDateTo.Text=PayPeriods.List[_selectedPayPeriodIdx].DateStop.ToShortDateString();
 				}
 			}
 			else{//annual
@@ -1342,6 +1431,120 @@ namespace OpenDental{
 			//DialogResult=DialogResult.OK;//Allow running multiple reports.
 		}
 
+		private void RunProviderPayroll() {
+			if(checkAllProv.Checked) {
+				for(int i=0;i<listProv.Items.Count;i++) {
+					listProv.SetSelected(i,true);
+				}
+			}
+			if(checkAllClin.Checked) {
+				for(int i=0;i<listClin.Items.Count;i++) {
+					listClin.SetSelected(i,true);
+				}
+			}
+			dateFrom=PIn.Date(textDateFrom.Text);
+			dateTo=PIn.Date(textDateTo.Text);
+			List<Provider> listProvs=new List<Provider>();
+			for(int i=0;i<listProv.SelectedIndices.Count;i++) {
+				listProvs.Add(ProviderC.ListShort[listProv.SelectedIndices[i]]);
+			}
+			List<Clinic> listClinics=new List<Clinic>();
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				for(int i=0;i<listClin.SelectedIndices.Count;i++) {
+					if(Security.CurUser.ClinicIsRestricted) {
+						listClinics.Add(_listClinics[listClin.SelectedIndices[i]]);//we know that the list is a 1:1 to _listClinics
+					}
+					else {
+						if(listClin.SelectedIndices[i]==0) {
+							Clinic unassigned=new Clinic();
+							unassigned.ClinicNum=0;
+							unassigned.Description="Unassigned";
+							listClinics.Add(unassigned);
+						}
+						else {
+							listClinics.Add(_listClinics[listClin.SelectedIndices[i]-1]);//Minus 1 from the selected index
+						}
+					}
+				}
+			}
+			DataSet ds=RpProdInc.GetProviderPayrollDataForClinics(dateFrom,dateTo,listProvs,listClinics,radioWriteoffPay.Checked,checkAllProv.Checked,checkAllClin.Checked,radioDetailedReport.Checked,checkShowUnearned.Checked);
+			ReportComplex report=new ReportComplex(true,true);
+			report.ReportName="Provider Payroll P&I";
+			report.AddTitle("Title",Lan.g(this,"Provider Payroll Production and Income"));
+			report.AddSubTitle("PracName",PrefC.GetString(PrefName.PracticeTitle));
+			report.AddSubTitle("Date",dateFrom.ToShortDateString()+" - "+dateTo.ToShortDateString());
+			if(checkAllProv.Checked) {
+				report.AddSubTitle("Providers",Lan.g(this,"All Providers"));
+			}
+			else {
+				string str="";
+				for(int i=0;i<listProv.SelectedIndices.Count;i++) {
+					if(i>0) {
+						str+=", ";
+					}
+					str+=ProviderC.ListShort[listProv.SelectedIndices[i]].Abbr;
+				}
+				report.AddSubTitle("Providers",str);
+			}
+			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
+				if(checkAllClin.Checked) {
+					report.AddSubTitle("Clinics",Lan.g(this,"All Clinics"));
+				}
+				else {
+					string clinNames="";
+					for(int i=0;i<listClin.SelectedIndices.Count;i++) {
+						if(i>0) {
+							clinNames+=", ";
+						}
+						if(Security.CurUser.ClinicIsRestricted) {
+							clinNames+=_listClinics[listClin.SelectedIndices[i]].Description;
+						}
+						else {
+							if(listClin.SelectedIndices[i]==0) {
+								clinNames+=Lan.g(this,"Unassigned");
+							}
+							else {
+								clinNames+=_listClinics[listClin.SelectedIndices[i]-1].Description;//Minus 1 from the selected index
+							}
+						}
+					}
+					report.AddSubTitle("Clinics",clinNames);
+				}
+			}
+			//setup query
+			QueryObject query;
+			DataTable dt=ds.Tables["Total"].Copy();
+			query=report.AddQuery(dt,"","",SplitByKind.None,1,true);
+			// add columns to report
+			Font font=new Font("Tahoma",8,FontStyle.Regular);
+			query.AddColumn("Date",70,FieldValueType.String,font);
+			if(radioDetailedReport.Checked) {
+				query.AddColumn("Patient",160,FieldValueType.String,font);
+			}
+			else {
+				query.AddColumn("Day",70,FieldValueType.String,font);
+			}
+			query.AddColumn("UCR Production",90,FieldValueType.Number,font);
+			query.AddColumn("Est Writeoff",80,FieldValueType.Number,font);
+			query.AddColumn("Prod Adj",80,FieldValueType.Number,font);
+			query.AddColumn("Change in Writeoff",100,FieldValueType.Number,font);
+			query.AddColumn("Net Prod(NPR)",80,FieldValueType.Number,font);
+			query.AddColumn("Pat Inc Alloc",80,FieldValueType.Number,font);
+			query.AddColumn("Pat Inc Unalloc",80,FieldValueType.Number,font);
+			query.AddColumn("Ins Income",80,FieldValueType.Number,font);
+			query.AddColumn("Ins Not Final",80,FieldValueType.Number,font);
+			query.AddColumn("Net Income",80,FieldValueType.Number,font);
+			report.AddPageNum();
+			// execute query
+			if(!report.SubmitQueries()) {//Does not actually submit queries because we use datatables in the central management tool.
+				return;
+			}
+			// display the report
+			FormReportComplex FormR=new FormReportComplex(report);
+			FormR.ShowDialog();
+			//DialogResult=DialogResult.OK;//Allow running multiple reports.
+		}
+
 		private void butOK_Click(object sender, System.EventArgs e) {
 			if(  textDateFrom.errorProvider1.GetError(textDateFrom)!=""
 				|| textDateTo.errorProvider1.GetError(textDateTo)!=""
@@ -1374,8 +1577,11 @@ namespace OpenDental{
 			else if(radioAnnual.Checked) {
 				RunAnnual();
 			}
-			else {//Provider
+			else if(radioProvider.Checked) {
 				RunProvider();
+			}
+			else {//Provider Payroll
+				RunProviderPayroll();
 			}
 			//DialogResult=DialogResult.OK;//Stay here so that a series of similar reports can be run
 		}
@@ -1383,21 +1589,6 @@ namespace OpenDental{
 		private void butCancel_Click(object sender, System.EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
-
-	
-
-	
-
-		
-
-		
-
-		
-
-		
-
-
-		
 	}
 }
 

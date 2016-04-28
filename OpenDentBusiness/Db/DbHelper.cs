@@ -532,7 +532,7 @@ namespace OpenDentBusiness {
 			return retval;
 		}
 
-		///<summary>Helper for Oracle that will return equivalent of MySQL ISNULL().</summary>
+		///<summary>Helper for Oracle that will return equivalent of MySQL IFNULL().</summary>
 		public static string IfNull(string expr,int valWhenNull) {
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
 				return "CASE WHEN ("+expr+") IS NULL THEN "+valWhenNull+" ELSE "+expr+" END";
@@ -540,12 +540,20 @@ namespace OpenDentBusiness {
 			return "IFNULL("+expr+","+valWhenNull+")";
 		}
 
-		///<summary>Helper for Oracle that will return equivalent of MySQL ISNULL().  Automatically adds single quotes around valWhenNull so that it is treated as text in the query.</summary>
+		///<summary>Helper for Oracle that will return equivalent of MySQL IFNULL().  Automatically adds single quotes around valWhenNull so that it is treated as text in the query.</summary>
 		public static string IfNull(string expr,string valWhenNull) {
-			if(DataConnection.DBtype==DatabaseType.Oracle) {
-				return "CASE WHEN ("+expr+") IS NULL THEN '"+valWhenNull+"' ELSE "+expr+" END";
+			return IfNull(expr,valWhenNull,true);
+		}
+
+		///<summary>Helper for Oracle that will return equivalent of MySQL IFNULL(). Boolean to decide whether or not to encapsulate the value when null.</summary>
+		public static string IfNull(string expr,string valWhenNull,bool isValEncapsulated) {
+			if(isValEncapsulated) {
+				valWhenNull="'"+valWhenNull+"'";
 			}
-			return "IFNULL("+expr+",'"+valWhenNull+"')";
+			if(DataConnection.DBtype==DatabaseType.Oracle) {
+				return "CASE WHEN ("+expr+") IS NULL THEN "+valWhenNull+" ELSE "+expr+" END";
+			}
+			return "IFNULL("+expr+","+valWhenNull+")";
 		}
 
 	}
