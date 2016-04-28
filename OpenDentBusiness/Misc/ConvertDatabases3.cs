@@ -11,7 +11,7 @@ using CodeBase;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("15.4.46.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("15.4.50.0");//This value must be changed when a new conversion is to be triggered.
 
 		#region Helper Functions
 
@@ -11737,9 +11737,25 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString='15.4.46.0' WHERE PrefName='DataBaseVersion'";
 				Db.NonQ(command);
 			}
-			//To15_4_X();
+			To15_4_50();
 		}
 
+		///<summary>This conversion script run in versions 15.4.50, and 16.1.20</summary>
+		private static void To15_4_50() {
+			if(FromVersion<new Version("15.4.50.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 15.4.50.0"));//No translation in convert script.
+				//Enable TP charting for all views if no views are enabled. Do nothing if mixed case. Oracle and MySQL compatible
+				string command="SELECT COUNT(*) FROM chartview WHERE IsTpCharting=1";
+				string result=Db.GetScalar(command);
+				if(result=="0") {
+					command="UPDATE chartview SET IsTpCharting=1";
+					Db.NonQ(command);
+				}
+				command="UPDATE preference SET ValueString='15.4.50.0' WHERE PrefName='DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			//To15_4_X();
+		}
 
 	}
 }

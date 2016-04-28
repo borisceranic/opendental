@@ -299,6 +299,7 @@ namespace OpenDental {
 		private Label label4;
 		private ListBox listPriorities;
 		private UI.Button butNewTP;
+		private CheckBox checkTPChart;
 		private bool IsDistributorKey;
 		[DllImport("wininet.dll",CharSet = CharSet.Auto,SetLastError = true)]
 		static extern bool InternetSetCookie(string lpszUrlName,string lbszCookieName,string lpszCookieData);
@@ -576,6 +577,7 @@ namespace OpenDental {
 			this.ToolBarMain = new OpenDental.UI.ODToolBar();
 			this.button1 = new OpenDental.UI.Button();
 			this.textTreatmentNotes = new OpenDental.ODtextBox();
+			this.checkTPChart = new System.Windows.Forms.CheckBox();
 			this.groupBox2.SuspendLayout();
 			this.tabControlImages.SuspendLayout();
 			this.panelImages.SuspendLayout();
@@ -814,7 +816,7 @@ namespace OpenDental {
 			// checkAudit
 			// 
 			this.checkAudit.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkAudit.Location = new System.Drawing.Point(154, 170);
+			this.checkAudit.Location = new System.Drawing.Point(154, 163);
 			this.checkAudit.Name = "checkAudit";
 			this.checkAudit.Size = new System.Drawing.Size(73, 13);
 			this.checkAudit.TabIndex = 17;
@@ -826,7 +828,7 @@ namespace OpenDental {
 			this.checkComm.Checked = true;
 			this.checkComm.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkComm.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkComm.Location = new System.Drawing.Point(10, 33);
+			this.checkComm.Location = new System.Drawing.Point(10, 31);
 			this.checkComm.Name = "checkComm";
 			this.checkComm.Size = new System.Drawing.Size(102, 13);
 			this.checkComm.TabIndex = 16;
@@ -836,7 +838,7 @@ namespace OpenDental {
 			// checkShowTeeth
 			// 
 			this.checkShowTeeth.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkShowTeeth.Location = new System.Drawing.Point(154, 154);
+			this.checkShowTeeth.Location = new System.Drawing.Point(154, 148);
 			this.checkShowTeeth.Name = "checkShowTeeth";
 			this.checkShowTeeth.Size = new System.Drawing.Size(104, 13);
 			this.checkShowTeeth.TabIndex = 15;
@@ -861,7 +863,7 @@ namespace OpenDental {
 			this.checkRx.Checked = true;
 			this.checkRx.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkRx.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkRx.Location = new System.Drawing.Point(10, 114);
+			this.checkRx.Location = new System.Drawing.Point(10, 109);
 			this.checkRx.Name = "checkRx";
 			this.checkRx.Size = new System.Drawing.Size(102, 13);
 			this.checkRx.TabIndex = 8;
@@ -1414,6 +1416,7 @@ namespace OpenDental {
 			// tabShow
 			// 
 			this.tabShow.BackColor = System.Drawing.Color.White;
+			this.tabShow.Controls.Add(this.checkTPChart);
 			this.tabShow.Controls.Add(this.butShowDateRange);
 			this.tabShow.Controls.Add(this.textShowDateRange);
 			this.tabShow.Controls.Add(this.listProcStatusCodes);
@@ -1439,7 +1442,7 @@ namespace OpenDental {
 			// textShowDateRange
 			// 
 			this.textShowDateRange.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.textShowDateRange.Location = new System.Drawing.Point(144, 188);
+			this.textShowDateRange.Location = new System.Drawing.Point(144, 194);
 			this.textShowDateRange.Name = "textShowDateRange";
 			this.textShowDateRange.ReadOnly = true;
 			this.textShowDateRange.Size = new System.Drawing.Size(125, 19);
@@ -1466,7 +1469,7 @@ namespace OpenDental {
 			this.labelCustView.AutoSize = true;
 			this.labelCustView.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.labelCustView.ForeColor = System.Drawing.Color.Red;
-			this.labelCustView.Location = new System.Drawing.Point(160, 211);
+			this.labelCustView.Location = new System.Drawing.Point(160, 215);
 			this.labelCustView.Name = "labelCustView";
 			this.labelCustView.Size = new System.Drawing.Size(96, 16);
 			this.labelCustView.TabIndex = 43;
@@ -1485,7 +1488,7 @@ namespace OpenDental {
 			this.groupBox7.Controls.Add(this.checkComm);
 			this.groupBox7.Location = new System.Drawing.Point(144, 4);
 			this.groupBox7.Name = "groupBox7";
-			this.groupBox7.Size = new System.Drawing.Size(125, 148);
+			this.groupBox7.Size = new System.Drawing.Size(125, 141);
 			this.groupBox7.TabIndex = 19;
 			this.groupBox7.TabStop = false;
 			this.groupBox7.Text = "Object Types";
@@ -1495,7 +1498,7 @@ namespace OpenDental {
 			this.checkSheets.Checked = true;
 			this.checkSheets.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkSheets.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkSheets.Location = new System.Drawing.Point(10, 130);
+			this.checkSheets.Location = new System.Drawing.Point(10, 124);
 			this.checkSheets.Name = "checkSheets";
 			this.checkSheets.Size = new System.Drawing.Size(102, 13);
 			this.checkSheets.TabIndex = 219;
@@ -1507,7 +1510,7 @@ namespace OpenDental {
 			this.checkTasks.Checked = true;
 			this.checkTasks.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkTasks.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkTasks.Location = new System.Drawing.Point(10, 66);
+			this.checkTasks.Location = new System.Drawing.Point(10, 62);
 			this.checkTasks.Name = "checkTasks";
 			this.checkTasks.Size = new System.Drawing.Size(102, 13);
 			this.checkTasks.TabIndex = 218;
@@ -1519,7 +1522,7 @@ namespace OpenDental {
 			this.checkEmail.Checked = true;
 			this.checkEmail.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkEmail.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkEmail.Location = new System.Drawing.Point(10, 82);
+			this.checkEmail.Location = new System.Drawing.Point(10, 78);
 			this.checkEmail.Name = "checkEmail";
 			this.checkEmail.Size = new System.Drawing.Size(102, 13);
 			this.checkEmail.TabIndex = 217;
@@ -1531,7 +1534,7 @@ namespace OpenDental {
 			this.checkCommFamily.Checked = true;
 			this.checkCommFamily.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkCommFamily.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkCommFamily.Location = new System.Drawing.Point(26, 49);
+			this.checkCommFamily.Location = new System.Drawing.Point(26, 46);
 			this.checkCommFamily.Name = "checkCommFamily";
 			this.checkCommFamily.Size = new System.Drawing.Size(88, 13);
 			this.checkCommFamily.TabIndex = 20;
@@ -1543,7 +1546,7 @@ namespace OpenDental {
 			this.checkAppt.Checked = true;
 			this.checkAppt.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkAppt.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkAppt.Location = new System.Drawing.Point(10, 17);
+			this.checkAppt.Location = new System.Drawing.Point(10, 16);
 			this.checkAppt.Name = "checkAppt";
 			this.checkAppt.Size = new System.Drawing.Size(102, 13);
 			this.checkAppt.TabIndex = 20;
@@ -1555,7 +1558,7 @@ namespace OpenDental {
 			this.checkLabCase.Checked = true;
 			this.checkLabCase.CheckState = System.Windows.Forms.CheckState.Checked;
 			this.checkLabCase.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkLabCase.Location = new System.Drawing.Point(10, 98);
+			this.checkLabCase.Location = new System.Drawing.Point(10, 93);
 			this.checkLabCase.Name = "checkLabCase";
 			this.checkLabCase.Size = new System.Drawing.Size(102, 13);
 			this.checkLabCase.TabIndex = 17;
@@ -2974,7 +2977,7 @@ namespace OpenDental {
 			this.butShowDateRange.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butShowDateRange.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butShowDateRange.CornerRadius = 4F;
-			this.butShowDateRange.Location = new System.Drawing.Point(273, 186);
+			this.butShowDateRange.Location = new System.Drawing.Point(273, 192);
 			this.butShowDateRange.Name = "butShowDateRange";
 			this.butShowDateRange.Size = new System.Drawing.Size(24, 22);
 			this.butShowDateRange.TabIndex = 47;
@@ -3110,6 +3113,16 @@ namespace OpenDental {
 			this.textTreatmentNotes.Text = "";
 			this.textTreatmentNotes.TextChanged += new System.EventHandler(this.textTreatmentNotes_TextChanged);
 			this.textTreatmentNotes.Leave += new System.EventHandler(this.textTreatmentNotes_Leave);
+			// 
+			// checkTPChart
+			// 
+			this.checkTPChart.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkTPChart.Location = new System.Drawing.Point(154,178);
+			this.checkTPChart.Name = "checkTPChart";
+			this.checkTPChart.Size = new System.Drawing.Size(99,13);
+			this.checkTPChart.TabIndex = 66;
+			this.checkTPChart.Text = "Is TP View";
+			this.checkTPChart.Click += new System.EventHandler(this.checkTPChart_Click);
 			// 
 			// ContrChart
 			// 
@@ -5842,6 +5855,7 @@ namespace OpenDental {
 					checkShowTeeth.Checked=ChartViewCurDisplay.SelectedTeethOnly;
 					checkNotes.Checked=ChartViewCurDisplay.ShowProcNotes;
 					checkAudit.Checked=ChartViewCurDisplay.IsAudit;
+					checkTPChart.Checked=ChartViewCurDisplay.IsTpCharting;
 					SetDateRange();
 					FillDateRange();
 					gridChartViews.SetSelected(ChartViewCurDisplay.ItemOrder,true);
@@ -10804,6 +10818,9 @@ namespace OpenDental {
 			if(checkShowCn.Checked) {
 				FormChartAdd.ChartViewCur.ProcStatuses+=64;
 			}
+			if(FormChartAdd.ChartViewCur.IsNew) {
+				FormChartAdd.ChartViewCur.IsTpCharting=true;//default to TP view for new chart views
+			}
 			FormChartAdd.ChartViewCur.SelectedTeethOnly=checkShowTeeth.Checked;
 			FormChartAdd.ChartViewCur.ShowProcNotes=checkNotes.Checked;
 			FormChartAdd.ChartViewCur.IsAudit=checkAudit.Checked;
@@ -11593,6 +11610,14 @@ namespace OpenDental {
 		}
 		*/
 		#endregion
+
+		private void checkTPChart_Click(object sender,EventArgs e) {
+			if(gridChartViews.Rows.Count>0) {
+				labelCustView.Visible=true;
+			}
+			chartCustViewChanged=true;
+			FillProgNotes();
+		}
 	}//end class
 
 
