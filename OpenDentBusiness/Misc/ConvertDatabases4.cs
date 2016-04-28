@@ -759,6 +759,25 @@ namespace OpenDentBusiness {
 						Db.NonQ(command);
 					}
 				}
+				//Add ClaimDelete permission for everyone
+				command="SELECT DISTINCT UserGroupNum FROM grouppermission";
+				table=Db.GetTable(command);
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					foreach(DataRow row in table.Rows) {
+						groupNum=PIn.Long(row["UserGroupNum"].ToString());
+						command="INSERT INTO grouppermission (UserGroupNum,PermType) "
+							+"VALUES("+POut.Long(groupNum)+",118)";//118 - ClaimDelete
+						Db.NonQ(command);
+					}
+				}
+				else {//oracle
+					foreach(DataRow row in table.Rows) {
+						groupNum=PIn.Long(row["UserGroupNum"].ToString());
+						command="INSERT INTO grouppermission (GroupPermNum,UserGroupNum,PermType) "
+							+"VALUES((SELECT MAX(GroupPermNum)+1 FROM grouppermission),"+POut.Long(groupNum)+",118)";//118 - ClaimDelete
+						Db.NonQ(command);
+					}
+				}
 
 				command="UPDATE preference SET ValueString = '16.2.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);

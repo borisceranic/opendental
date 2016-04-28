@@ -309,6 +309,7 @@ namespace OpenDentBusiness{
 				//case Permissions.SheetEdit:
 				//case Permissions.SplitCreatePastLockDate:
 				//case Permissions.ProcComplEditLimited:
+				//case Permissions.ClaimDelete:
 				return false;//Does not have audit Trail if uncommented.
 			}
 			return true;
@@ -370,6 +371,8 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Carrier Create");
 				case Permissions.ChooseDatabase:
 					return Lans.g("enumPermissions","Choose Database");
+				case Permissions.ClaimDelete:
+					return Lans.g("enumPermissions","Claim Delete");
 				case Permissions.ClaimHistoryEdit:
 					return Lans.g("enumPermissions","Claim History Edit");
 				case Permissions.ClaimSend:
@@ -532,6 +535,7 @@ namespace OpenDentBusiness{
 			if(permType==Permissions.AccountingCreate//prevents backdating
 				|| permType==Permissions.AccountingEdit
 				|| permType==Permissions.AdjustmentEdit
+				|| permType==Permissions.ClaimDelete
 				|| permType==Permissions.ClaimSentEdit
 				|| permType==Permissions.CommlogEdit
 				|| permType==Permissions.DepositSlips//prevents backdating

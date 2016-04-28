@@ -3291,7 +3291,7 @@ namespace OpenDental {
 				}
 			}
 			Claim ClaimCur=new Claim();
-			Claims.Insert(ClaimCur);//to retreive a key for new Claim.ClaimNum
+			ClaimCur=Claims.GetClaim(Claims.Insert(ClaimCur));//Insert to retreive Claim.ClaimNum and GetClaim to retreive SecDateEntry for permission check
 			//now, all claimProcs have a valid value
 			//for any CapComplete, need to make a copy so that original doesn't get attached.
 			for(int i=0;i<claimProcs.Length;i++){

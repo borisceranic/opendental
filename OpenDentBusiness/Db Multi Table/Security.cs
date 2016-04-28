@@ -143,7 +143,8 @@ namespace OpenDentBusiness{
 			}
 			//Prevents certain bugs when 1/1/1 dates are passed in and compared----------------------------------------------
 			//Handling of min dates.  There might be others, but we have to handle them individually to avoid introduction of bugs.
-			if(perm==Permissions.ClaimSentEdit//no date sent was entered before setting claim received
+			if(perm==Permissions.ClaimDelete//older versions did not have SecDateEntry
+				|| perm==Permissions.ClaimSentEdit//no date sent was entered before setting claim received
 				|| perm==Permissions.ProcComplEdit//a completed procedure with a min date.
 				|| perm==Permissions.ProcComplEditLimited//because ProcComplEdit was in this list
 				|| perm==Permissions.InsPayEdit//a claim payment with no date.

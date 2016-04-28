@@ -600,9 +600,13 @@ namespace OpenDental{
 					node.Nodes.Add(node2);
 				treePermissions.Nodes.Add(node);
 			node=SetNode(Permissions.AccountModule);
-				node2=SetNode(Permissions.ClaimSend);
-					node.Nodes.Add(node2);
-				node2=SetNode(Permissions.ClaimSentEdit);
+				node2=SetNode("Claim");
+					node3=SetNode(Permissions.ClaimSend);
+						node2.Nodes.Add(node3);
+					node3=SetNode(Permissions.ClaimSentEdit);
+						node2.Nodes.Add(node3);
+					node3=SetNode(Permissions.ClaimDelete);
+						node2.Nodes.Add(node3);
 					node.Nodes.Add(node2);
 				node2=SetNode(Permissions.AccountProcsQuickAdd);
 					node.Nodes.Add(node2);

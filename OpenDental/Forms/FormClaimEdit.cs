@@ -3991,6 +3991,10 @@ namespace OpenDental{
 					//butCheckAdd.Enabled=false; //button was removed.
 				}
 			}
+			if(!Security.IsAuthorized(Permissions.ClaimDelete,ClaimCur.SecDateEntry)) {
+				//if authorized for ClaimSentEdit, then check the ClaimDelete permission.  notAuthorized means delete button already disabled.
+				butDelete.Enabled=false;
+			}
 			if(ClaimCur.ClaimType=="PreAuth"){
 				labelPredeterm.Visible=false;
 				textPredeterm.Visible=false;
@@ -6465,8 +6469,7 @@ namespace OpenDental{
 			}
 			if(wasSentOrReceived){
 				SecurityLogs.MakeLogEntry(Permissions.ClaimSentEdit,ClaimCur.PatNum,
-					PatCur.GetNameLF()+", "
-					+Lan.g(this,"Date of service: ")+ClaimCur.DateService.ToShortDateString());
+					PatCur.GetNameLF()+", "+Lan.g(this,"Date of service")+": "+ClaimCur.DateService.ToShortDateString());
 			}
 		}
 
@@ -6555,9 +6558,9 @@ namespace OpenDental{
 				}
 			}
       Claims.Delete(ClaimCur);
-			SecurityLogs.MakeLogEntry(Permissions.ClaimSentEdit,ClaimCur.PatNum,
-				Lan.g(this,"Delete Claim")+", "+PatCur.GetNameLF()+""
-				+Lan.g(this,"Date of service: ")+ClaimCur.DateService.ToShortDateString());
+			SecurityLogs.MakeLogEntry(Permissions.ClaimDelete,ClaimCur.PatNum,PatCur.GetNameLF()
+				+", "+Lan.g(this,"Date Entry")+": "+ClaimCur.SecDateEntry.ToShortDateString()
+				+", "+Lan.g(this,"Date of Service")+": "+ClaimCur.DateService.ToShortDateString());
       DialogResult=DialogResult.OK;
 		}
 

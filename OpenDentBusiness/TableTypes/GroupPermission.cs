@@ -275,7 +275,10 @@ namespace OpenDentBusiness{
 		SplitCreatePastLockDate,
 		///<summary>117 - Uses date restrictions.  Covers editing some fields of completed procs.  Limited list includes treatment area, diagnosis,
 		///add adjustment, Do Not Bill To Ins, Hide Graphics, Misc tab, Medical tab, E-claim note, and the Prosthesis Replacement group box.</summary>
-		ProcComplEditLimited
+		ProcComplEditLimited,
+		///<summary>118 - Uses date restrictions based on the SecDateEntry field as the claim date.  Covers deleting a claim of any status
+		///(Sent, Waiting to Send, Received, etc).</summary>
+		ClaimDelete
 	}
 
 	
