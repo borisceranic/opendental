@@ -13558,9 +13558,25 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString='16.1.16.0' WHERE PrefName='DataBaseVersion'";
 				Db.NonQ(command);
 			}
-			To16_2_0();
+			To16_1_20();
 		}
 
+		///<summary>This conversion script run in versions 15.4.50, and 16.1.20</summary>
+		private static void To16_1_20() {
+			if(FromVersion<new Version("16.1.20.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.1.20.0"));//No translation in convert script.
+				//Enable TP charting for all views if no views are enabled. Do nothing if mixed case. Oracle and MySQL compatible
+				string command="SELECT COUNT(*) FROM chartview WHERE IsTpCharting=1";
+				string result=Db.GetScalar(command);
+				if(result=="0")	{
+					command="UPDATE chartview SET IsTpCharting=1";
+					Db.NonQ(command);
+				}
+				command="UPDATE preference SET ValueString='16.1.20.0' WHERE PrefName='DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			To16_2_0();
+		}
 
 	}
 }
