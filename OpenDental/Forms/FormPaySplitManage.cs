@@ -546,6 +546,7 @@ namespace OpenDental {
 			paySplit.DateEntry=DateTime.Today;
 			paySplit.DatePay=DateTime.Today;
 			paySplit.PayNum=PaymentCur.PayNum;
+			paySplit.ProvNum=Patients.GetProvNum(PatCur);
 			FormPaySplitEdit FormPSE=new FormPaySplitEdit(FamCur);
 			FormPSE.PaySplitCur=paySplit;
 			if(FormPSE.ShowDialog()==DialogResult.OK) {
