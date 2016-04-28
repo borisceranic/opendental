@@ -331,6 +331,9 @@ namespace OpenDentBusiness.UI {
 					case "PatientNameF":
 						text=dataRoww["patientNameF"].ToString();
 						break;
+					case "PatientNamePref":
+						text=dataRoww["PatientNamePref"].ToString();
+						break;
 					case "PatNum":
 						text=dataRoww["patNum"].ToString();
 						break;

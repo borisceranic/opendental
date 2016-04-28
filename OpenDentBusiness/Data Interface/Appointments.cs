@@ -738,6 +738,7 @@ namespace OpenDentBusiness{
 			table.Columns.Add("Op");
 			table.Columns.Add("patientName");
 			table.Columns.Add("patientNameF");
+			table.Columns.Add("patientNamePref");
 			table.Columns.Add("PatNum");
 			table.Columns.Add("patNum");
 			table.Columns.Add("GuarNum");
@@ -1161,6 +1162,7 @@ namespace OpenDentBusiness{
 					row["patientNameF"]="NP-";
 				}
 				row["patientNameF"]+=raw.Rows[i]["patFName"].ToString();
+				row["patientNamePref"]+=raw.Rows[i]["patPreferred"].ToString();
 				row["PatNum"]=raw.Rows[i]["apptPatNum"].ToString();
 				row["patNum"]="PatNum: "+raw.Rows[i]["apptPatNum"].ToString();
 				row["GuarNum"]=raw.Rows[i]["patGuarantor"].ToString();
