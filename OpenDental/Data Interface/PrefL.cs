@@ -179,13 +179,13 @@ namespace OpenDental {
 			int charsPerPayload=maxAllowedPacket-8192;//Arbitrarily subtracted 8KB from max allowed bytes for MySQL "header" information.
 			charsPerPayload-=(charsPerPayload % 3);//Use the closest amount of bytes divisible by 3.
 			//When we try and send over ~40MB of data, MySQL can drop our connection randomly giving a "MySQL server has gone away" error.
-			//Use a maximum of ~10MB payloads so that the likelyhood of this error is less.
-			charsPerPayload=Math.Min(charsPerPayload,10485759);//This number is divisible by 3.
+			//Use a maximum of ~1MB payloads so that the likelyhood of this error is less.
+			charsPerPayload=Math.Min(charsPerPayload,1048575);//This number is divisible by 3.
 			MemoryStream memStream=null;
 			try {
 				//Clear and prep the current UpdateFiles row in the documentmisc table for the updated binaries.
 				ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Deleting old update files...")));
-				DocumentMiscs.SetUpdateFilesZip();
+				DocumentMiscs.DeleteAllForType(DocumentMiscType.UpdateFiles);
 				memStream=new MemoryStream();
 				using(ZipFile zipFile=new ZipFile()) {
 					//Take the entire directory in the temp dir that we just created and zip it up.
@@ -204,9 +204,14 @@ namespace OpenDental {
 				//Convert the zipped up bytes into Base64 and instantly insert it into the database little by little.
 				ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Inserting new update files into database...")));
 				try {
+					int count=1;
+					DocumentMisc docUpdateFilePart=new DocumentMisc();
+					docUpdateFilePart.DocMiscType=DocumentMiscType.UpdateFiles;
 					while((memStream.Read(zipFileBytes,0,zipFileBytes.Length))>0) {
-						ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Inserting new update files into database...")));
-						DocumentMiscs.AppendRawBase64ForUpdateFiles(Convert.ToBase64String(zipFileBytes));
+						docUpdateFilePart.FileName=count.ToString().PadLeft(4,'0');
+						docUpdateFilePart.RawBase64=Convert.ToBase64String(zipFileBytes);
+						DocumentMiscs.Insert(docUpdateFilePart);
+						count++;
 					}
 					ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Done...")));
 				}
@@ -422,18 +427,24 @@ namespace OpenDental {
 				if(Directory.Exists(folderUpdate)) {
 					Directory.Delete(folderUpdate,true);
 				}
-				DocumentMisc docmisc=DocumentMiscs.GetUpdateFilesZip();
-				if(docmisc!=null) {
-					byte[] rawBytes=Convert.FromBase64String(docmisc.RawBase64);
-					try {
-						using(ZipFile unzipped=ZipFile.Read(rawBytes)) {
-							unzipped.ExtractAll(folderUpdate);
-						}
+				StringBuilder strBuilder=new StringBuilder();
+				DocumentMisc docUpdateFilesPart=null;
+				int count=1;
+				string fileName=count.ToString().PadLeft(4,'0');
+				while((docUpdateFilesPart=DocumentMiscs.GetByTypeAndFileName(fileName,DocumentMiscType.UpdateFiles))!=null) {
+					strBuilder.Append(docUpdateFilesPart.RawBase64);
+					count++;
+					fileName=count.ToString().PadLeft(4,'0');
+				}
+				try {
+					byte[] rawBytes=Convert.FromBase64String(strBuilder.ToString());
+					using(ZipFile unzipped=ZipFile.Read(rawBytes)) {
+						unzipped.ExtractAll(folderUpdate);
 					}
-					catch(Exception) {
-						//fail silently
-					}
-				} 
+				}
+				catch(Exception) {
+					//fail silently
+				}
 				//look at the manifest to see if it's the version we need
 				string manifestVersion="";
 				try {
