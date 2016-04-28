@@ -303,11 +303,12 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please select at least one tool first.");
 				return;
 			}
-			Changed=true;
+			Changed=false;
 			int rowsInserted=0;
 			#region T Codes
 			if(checkTcodes.Checked){
 				ProcedureCodes.TcodesClear();
+				Changed=true;
 				//yes, this really does refresh before moving on.
 				DataValid.SetInvalid(InvalidType.Defs, InvalidType.ProcCodes, InvalidType.Fees);
 			}
@@ -320,6 +321,7 @@ namespace OpenDental{
 				catch(ApplicationException ex) {
 					MessageBox.Show(ex.Message);
 				}
+				Changed=true;
 				DataValid.SetInvalid(InvalidType.Defs, InvalidType.ProcCodes, InvalidType.Fees);
 				//fees are included because they are grouped by defs.
 			}
@@ -333,6 +335,7 @@ namespace OpenDental{
 						}
 					}
 					rowsInserted+=FormProcCodes.ImportProcCodes("",_codeList,"");
+					Changed=true;
 					int descriptionsFixed=ProcedureCodes.ResetADAdescriptions();
 					MessageBox.Show("Procedure code descriptions updated: "+descriptionsFixed.ToString());
 				}
@@ -348,31 +351,38 @@ namespace OpenDental{
 			#region Auto Codes
 			if(checkAutocodes.Checked) {
 				AutoCodes.SetToDefault();
+				Changed=true;
 				DataValid.SetInvalid(InvalidType.AutoCodes);
 			}
 			#endregion
 			#region Proc Buttons
 			if(checkProcButtons.Checked) {
 				ProcButtons.SetToDefault();
+				Changed=true;
 				DataValid.SetInvalid(InvalidType.ProcButtons, InvalidType.Defs);
 			}
 			#endregion
 			#region Appt Procs Quick Add
 			if(checkApptProcsQuickAdd.Checked) {
 				ProcedureCodes.ResetApptProcsQuickAdd();
+				Changed=true;
 				DataValid.SetInvalid(InvalidType.Defs);
 			}
 			#endregion
 			#region Recall Types
-			if(checkRecallTypes.Checked && RecallTypes.IsUsingManuallyAddedTypes()
-				&& MsgBox.Show(this,MsgBoxButtons.OKCancel,"This will delete all patient recalls for recall types which were manually added.  Continue?")) 
+			if(checkRecallTypes.Checked 
+				&& (!RecallTypes.IsUsingManuallyAddedTypes() //If they have any manually added types, ask them if they are sure they want to delete them.
+				|| MsgBox.Show(this,MsgBoxButtons.OKCancel,"This will delete all patient recalls for recall types which were manually added.  Continue?")))
 			{
 				RecallTypes.SetToDefault();
+				Changed=true;
 				DataValid.SetInvalid(InvalidType.RecallTypes,InvalidType.Prefs);
 			}
 			#endregion
-			MessageBox.Show(Lan.g(this,"Done."));
-			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"New Customer Procedure codes tool was run.");
+			if(Changed) {
+				MessageBox.Show(Lan.g(this,"Done."));
+				SecurityLogs.MakeLogEntry(Permissions.Setup,0,"New Customer Procedure codes tool was run.");
+			}
 		}
 
 		private void butClose_Click(object sender, System.EventArgs e) {
