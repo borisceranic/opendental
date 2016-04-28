@@ -11,7 +11,10 @@ namespace OpenDentBusiness{
 		public long DocMiscNum;
 		/// <summary>Date created.</summary>
 		public DateTime DateCreated;
-		/// <summary>The name the file would have if it was not in the database. Does not include any directory info.</summary>
+		///<summary>The name the file would have if it was not in the database. Does not include any directory info.
+		///DocumentMisc rows that store the contents of the UpdateFiles folder will set this column to an "item order".
+		///Due to severe limitations with sending large amounts of data all in one query we are going to store the UpdateFiles over several rows.
+		///The FileName column will store the order of which the UpdateFiles need to go back into when we try to reconstruct it.</summary>
 		public string FileName;
 		/// <summary>Enum:DocumentMiscType Corresponds to the same subfolder within AtoZ folder. eg. UpdateFiles</summary>
 		public DocumentMiscType DocMiscType;

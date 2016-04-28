@@ -11663,9 +11663,9 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				else {//oracle
-					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue) "
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ClinicNum) "
 						+"VALUES ((SELECT MAX(ProgramPropertyNum)+1 FROM programproperty),(SELECT ProgramNum FROM program WHERE ProgName='Planmeca'),"
-						+"'Birthdate format (usually dd/MM/yyyy or MM/dd/yyyy)','dd/MM/yyyy');";
+						+"'Birthdate format (usually dd/MM/yyyy or MM/dd/yyyy)','dd/MM/yyyy',0);";
 					Db.NonQ(command);
 				}
 				command="UPDATE preference SET ValueString = '15.4.45.0' WHERE PrefName = 'DataBaseVersion'";
