@@ -103,6 +103,7 @@ namespace OpenDentBusiness{
 				|| perm==Permissions.InsPayEdit
 				|| perm==Permissions.SheetEdit
 				|| perm==Permissions.CommlogEdit
+				|| perm==Permissions.ClaimDelete
 				)
 			{
 				//If the global lock is date-based:
