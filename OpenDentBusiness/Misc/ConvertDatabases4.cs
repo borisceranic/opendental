@@ -699,6 +699,8 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ClinicListIsAlphabetical','0')";
 					Db.NonQ(command);
 				}
+				command="UPDATE preference SET ValueString='1' WHERE PrefName='ClaimSnapshotEnabled'";
+				Db.NonQ(command);
 
 
 				command="UPDATE preference SET ValueString = '16.2.0.0' WHERE PrefName = 'DataBaseVersion'";
