@@ -3730,5 +3730,84 @@ namespace UnitTests {
 			return retVal;
 		}
 
+		///<summary>A patient has Medicaid/FlatCopay as secondary insurance. It should use its own fee schedule when calculating its coverage.</summary>
+		public static string TestSixtyFive(int specificTest) {
+			if(specificTest!=0 && specificTest!=65) {
+				return "";
+			}
+			//need one patient
+			//one office fee schedule
+			//crowns cost 1500
+			//one PPO ins fee sched
+			//crowns cost 1000
+			//one medicaid fee sched
+			//crowns cost 0.00
+			//one ppo insurance
+			//covers crowns at 50%
+			//annual max of 500
+			//one medicaid ins
+			//crown is charted
+			//output should be:
+			//PPO covers 500
+			//writeoff is 500
+			//Medicaid covers 0.00
+			//writeoff is 500.00
+			long officeFeeSchedNum=FeeSchedT.CreateFeeSched(FeeScheduleType.Normal,"Office");
+			long ppoFeeSchedNum=FeeSchedT.CreateFeeSched(FeeScheduleType.Normal,"PPO");
+			long medicaidFeeSchedNum=FeeSchedT.CreateFeeSched(FeeScheduleType.Normal,"Medicaid");
+			long copayFeeSchedNum=FeeSchedT.CreateFeeSched(FeeScheduleType.CoPay,"CoPay");
+			long codeNum=ProcedureCodes.GetCodeNum("D2750");
+			long provNum=ProviderT.CreateProvider("Prov","","",officeFeeSchedNum);
+			Patient pat=PatientT.CreatePatient("60",provNum);
+			FeeT.CreateFee(officeFeeSchedNum,codeNum,1500); //office fee is 1500.
+			FeeT.CreateFee(ppoFeeSchedNum,codeNum,1100); //ppo fee is 1100. writeoff should be 400
+			FeeT.CreateFee(medicaidFeeSchedNum,codeNum,30); //medicaid fee is 30.
+			FeeT.CreateFee(copayFeeSchedNum,codeNum,15); //copay is 15, so ins est should be 30 - 15 = 15.
+																									 //Carrier
+			Carrier ppoCarrier=CarrierT.CreateCarrier("PPO");
+			Carrier medicaidCarrier=CarrierT.CreateCarrier("Medicaid");
+			long planPPO=InsPlanT.CreateInsPlanPPO(ppoCarrier.CarrierNum,ppoFeeSchedNum).PlanNum;
+			long planMedi=InsPlanT.CreateInsPlanMediFlatCopay(medicaidCarrier.CarrierNum,medicaidFeeSchedNum,copayFeeSchedNum).PlanNum;
+			InsSub subPPO=InsSubT.CreateInsSub(pat.PatNum,planPPO);
+			long subNumPPO=subPPO.InsSubNum;
+			InsSub subMedi=InsSubT.CreateInsSub(pat.PatNum,planMedi);
+			long subNumMedi=subMedi.InsSubNum;
+			BenefitT.CreateCategoryPercent(planPPO,EbenefitCategory.Crowns,50);
+			BenefitT.CreateAnnualMax(planPPO,500);
+			PatPlanT.CreatePatPlan(1,pat.PatNum,subNumPPO);
+			PatPlanT.CreatePatPlan(2,pat.PatNum,subNumMedi);
+			Procedure proc=ProcedureT.CreateProcedure(pat,"D2750",ProcStat.TP,"14",Fees.GetAmount0(codeNum,officeFeeSchedNum));
+			long procNum=proc.ProcNum;
+			//Lists
+			List<ClaimProc> claimProcs=ClaimProcs.Refresh(pat.PatNum);
+			Family fam=Patients.GetFamily(pat.PatNum);
+			List<InsSub> subList=InsSubs.RefreshForFam(fam);
+			List<InsPlan> planList=InsPlans.RefreshForSubList(subList);
+			List<PatPlan> patPlans=PatPlans.Refresh(pat.PatNum);
+			List<Benefit> benefitList=Benefits.Refresh(patPlans,subList);
+			List<ClaimProcHist> histList=new List<ClaimProcHist>();
+			List<ClaimProcHist> loopList=new List<ClaimProcHist>();
+			//this is what's really being tested.
+			//must pass in the empty histList and loopList (instead of null) or annual max's don't get considered.
+			Procedures.ComputeEstimates(proc,pat.PatNum,ref claimProcs,true,planList,patPlans,benefitList,histList,loopList,true,pat.Age,subList);
+			List<ClaimProc> listResult=ClaimProcs.RefreshForProc(procNum);
+			ClaimProc ppoClaimProc=listResult.Where(x => x.PlanNum == planPPO).First();
+			ClaimProc medicaidClaimProc=listResult.Where(x => x.PlanNum == planMedi).First();
+			if(ppoClaimProc.InsEstTotal != 500 || medicaidClaimProc.InsEstTotal != 15
+				|| medicaidClaimProc.WriteOffEst !=-1 || ppoClaimProc.WriteOffEst != 400
+				|| medicaidClaimProc.CopayAmt != 15) {
+				throw new Exception("Incorrect Estimates returned. "
+					+"\r\nPPOClaimProc InsEst Total = "+ppoClaimProc.InsEstTotal+"; should be 500. "
+					+"\r\nPPOClaimProc Writeoff = "+ppoClaimProc.WriteOffEst+"; should be 400. "
+					+"\r\nMedicaidClaimProc InsEst Total = "+medicaidClaimProc.InsEstTotal+"; should be 15. "
+					+"\r\nMedicaidClaimProc Writeoff = "+medicaidClaimProc.WriteOffEst+"; should be -1. "
+					+"\r\nMedicaidClaimProc Copay = "+medicaidClaimProc.CopayAmt+"; should be 15. "
+					);
+			}
+			else {
+				return "65: Passed.  The secondary medicaid/flat copay insurance plan used its own fee schedule when calculating estimates.\r\n";
+			}
+		}
+
 	}
 }

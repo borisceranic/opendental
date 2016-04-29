@@ -5,13 +5,19 @@ using OpenDentBusiness;
 
 namespace UnitTests {
 	public class PatientT {
-		public static Patient CreatePatient(string suffix){
+		///<summary>Creates a patient.  Practice default provider and billing type.</summary>
+		public static Patient CreatePatient(string suffix,long priProvNum = 0) {
 			Patient pat=new Patient();
 			pat.IsNew=true;
 			pat.LName="LName"+suffix;
 			pat.FName="FName"+suffix;
 			pat.BillingType=PrefC.GetLong(PrefName.PracticeDefaultBillType);
-			pat.PriProv=PrefC.GetLong(PrefName.PracticeDefaultProv);//This causes standard fee sched to be 53.
+			if(priProvNum!=0) {
+				pat.PriProv=priProvNum;
+			}
+			else {
+				pat.PriProv=PrefC.GetLong(PrefName.PracticeDefaultProv);//This causes standard fee sched to be 53.
+			}
 			Patients.Insert(pat,false);
 			Patient oldPatient=pat.Copy();
 			pat.Guarantor=pat.PatNum;

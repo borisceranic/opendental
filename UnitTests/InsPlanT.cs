@@ -25,9 +25,9 @@ namespace UnitTests {
 		public static InsPlan CreateInsPlanPPO(long carrierNum,long feeSchedNum){
 			return CreateInsPlanPPO(carrierNum,feeSchedNum,EnumCobRule.Basic);
 		}
-		
-		///<summary>Creats an insurance plan with the default fee schedule of 53.</summary>
-		public static InsPlan CreateInsPlanPPO(long carrierNum,long feeSchedNum, EnumCobRule cobRule){
+
+		///<summary>Creates an insurance plan with the default fee schedule of 53.</summary>
+		public static InsPlan CreateInsPlanPPO(long carrierNum,long feeSchedNum,EnumCobRule cobRule) {
 			InsPlan plan=new InsPlan();
 			plan.CarrierNum=carrierNum;
 			plan.PlanType="p";
@@ -37,6 +37,17 @@ namespace UnitTests {
 			return plan;
 		}
 
+		///<summary>Creats a Medicaid/Flat Copay insurance plan.</summary>
+		public static InsPlan CreateInsPlanMediFlatCopay(long carrierNum,long feeSchedNum,long copayFeeSchedNum = 0) {
+			InsPlan plan=new InsPlan();
+			plan.CarrierNum=carrierNum;
+			plan.PlanType="f";
+			plan.FeeSched=feeSchedNum;
+			plan.CobRule=EnumCobRule.Standard;
+			plan.CopayFeeSched=copayFeeSchedNum;
+			InsPlans.Insert(plan);
+			return plan;
+		}
 
 	}
 }
