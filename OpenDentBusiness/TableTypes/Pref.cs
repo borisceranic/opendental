@@ -179,6 +179,10 @@ namespace OpenDentBusiness {
 		ClaimAttachExportPath,
 		ClaimFormTreatDentSaysSigOnFile,
 		ClaimMedTypeIsInstWhenInsPlanIsMedical,
+		///<summary>For the Procedures Not Billed to Insurance report.  If true, when creating new claims from the report window, will group procedures
+		///by clinic and site.  If false, will block user from creating claims if the selected procedures for a specific patient have different
+		///clinis or different sites.  Default value is true to encourage automation.</summary>
+		ClaimProcsNotBilledToInsAutoGroup,
 		///<summary>Blank by default.  Computer name to receive reports from automatically.</summary>
 		ClaimReportComputerName,
 		///<summary>Report receive interval.  5 by default.</summary>

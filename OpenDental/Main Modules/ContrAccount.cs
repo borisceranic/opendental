@@ -3048,7 +3048,11 @@ namespace OpenDental {
 		///The grid contains the procedures to be attached to the claim.  Procedures are attached based on selection.
 		///The table is the raw data which corresponds to the information showing in the grid.
 		///This function requires table to have the following columns (at minimum): ProcNum, chargesDouble</summary>
-		public static bool toolBarButIns_Click(bool isVerbose,Patient pat,Family fam,ODGrid grid,DataTable table) {
+		///Set flag hasPrimaryClaim to true if the primary claim has alrady been created and should not be recreated.
+		///Set flag hasSecondaryClaim to true if the secondary claim has alrady been created and should not be recreated.
+		public static bool toolBarButIns_Click(bool isVerbose,Patient pat,Family fam,ODGrid grid,DataTable table,bool hasPrimaryClaim=false,
+			bool hasSecondaryClaim=false)
+		{
 			ClaimErrorsCur="";
 			ClaimCreatedCount=0;
 			if(!CheckClearinghouseDefaults()) {
@@ -3117,42 +3121,46 @@ namespace OpenDental {
 			if(grid.SelectedIndices.Length<1){
 				return false;
 			}
-			string claimType="P";
-			//If they have medical insurance and no dental, make the claim type Medical.  This is to avoid the scenario of multiple med ins and no dental.
-			if(PatPlans.GetOrdinal(PriSecMed.Medical,PatPlanList,InsPlanList,SubList)>0
-				&& PatPlans.GetOrdinal(PriSecMed.Primary,PatPlanList,InsPlanList,SubList)==0
-				&& PatPlans.GetOrdinal(PriSecMed.Secondary,PatPlanList,InsPlanList,SubList)==0)
-			{
-				claimType="Med";
-			}
-			Claim ClaimCur=CreateClaim(claimType,PatPlanList,InsPlanList,ClaimProcList,procsForPat,SubList,isVerbose,pat,table,grid);
-			ClaimProcList=ClaimProcs.Refresh(pat.PatNum);
-			if(ClaimCur.ClaimNum==0){
-				return true;
-			}
-			ClaimCur.ClaimStatus="W";
-			ClaimCur.DateSent=DateTimeOD.Today;
-			ClaimL.CalculateAndUpdate(procsForPat,InsPlanList,ClaimCur,PatPlanList,BenefitList,pat.Age,SubList);
-			if(isVerbose) {//Only provide the user with the option to cancel the claim if attempting to create a single claim manually.
-				FormClaimEdit FormCE=new FormClaimEdit(ClaimCur,pat,fam);
-				FormCE.IsNew=true;//this causes it to delete the claim if cancelling.
-				FormCE.ShowDialog();
-				if(FormCE.DialogResult!=DialogResult.OK) {
-					return true;//will have already been deleted
+			if(!hasPrimaryClaim) {
+				string claimType="P";
+				//If they have medical insurance and no dental, make the claim type Medical.  This is to avoid the scenario of multiple med ins and no dental.
+				if(PatPlans.GetOrdinal(PriSecMed.Medical,PatPlanList,InsPlanList,SubList)>0
+					&& PatPlans.GetOrdinal(PriSecMed.Primary,PatPlanList,InsPlanList,SubList)==0
+					&& PatPlans.GetOrdinal(PriSecMed.Secondary,PatPlanList,InsPlanList,SubList)==0) 
+				{
+					claimType="Med";
 				}
-			}
-			if(PatPlans.GetOrdinal(PriSecMed.Secondary,PatPlanList,InsPlanList,SubList)>0 //if there exists a secondary plan
-				&& !CultureInfo.CurrentCulture.Name.EndsWith("CA"))//And not Canada (don't create secondary claim for Canada)
-			{
-				sub=InsSubs.GetSub(PatPlans.GetInsSubNum(PatPlanList,PatPlans.GetOrdinal(PriSecMed.Secondary,PatPlanList,InsPlanList,SubList)),SubList);
-				plan=InsPlans.GetPlan(sub.PlanNum,InsPlanList);
-				ClaimCur=CreateClaim("S",PatPlanList,InsPlanList,ClaimProcList,procsForPat,SubList,isVerbose,pat,table,grid);
+				Claim ClaimCur=CreateClaim(claimType,PatPlanList,InsPlanList,ClaimProcList,procsForPat,SubList,isVerbose,pat,table,grid);
+				ClaimProcList=ClaimProcs.Refresh(pat.PatNum);
 				if(ClaimCur.ClaimNum==0){
 					return true;
 				}
-				ClaimProcList=ClaimProcs.Refresh(pat.PatNum);
-				ClaimCur.ClaimStatus="H";
+				ClaimCur.ClaimStatus="W";
+				ClaimCur.DateSent=DateTimeOD.Today;
 				ClaimL.CalculateAndUpdate(procsForPat,InsPlanList,ClaimCur,PatPlanList,BenefitList,pat.Age,SubList);
+				if(isVerbose) {//Only provide the user with the option to cancel the claim if attempting to create a single claim manually.
+					FormClaimEdit FormCE=new FormClaimEdit(ClaimCur,pat,fam);
+					FormCE.IsNew=true;//this causes it to delete the claim if cancelling.
+					FormCE.ShowDialog();
+					if(FormCE.DialogResult!=DialogResult.OK) {
+						return true;//will have already been deleted
+					}
+				}
+			}
+			if(!hasSecondaryClaim) {
+				if(PatPlans.GetOrdinal(PriSecMed.Secondary,PatPlanList,InsPlanList,SubList)>0 //if there exists a secondary plan
+					&& !CultureInfo.CurrentCulture.Name.EndsWith("CA"))//And not Canada (don't create secondary claim for Canada)
+				{
+					sub=InsSubs.GetSub(PatPlans.GetInsSubNum(PatPlanList,PatPlans.GetOrdinal(PriSecMed.Secondary,PatPlanList,InsPlanList,SubList)),SubList);
+					plan=InsPlans.GetPlan(sub.PlanNum,InsPlanList);
+					Claim ClaimCur=CreateClaim("S",PatPlanList,InsPlanList,ClaimProcList,procsForPat,SubList,isVerbose,pat,table,grid);
+					if(ClaimCur.ClaimNum==0){
+						return true;
+					}
+					ClaimProcList=ClaimProcs.Refresh(pat.PatNum);
+					ClaimCur.ClaimStatus="H";
+					ClaimL.CalculateAndUpdate(procsForPat,InsPlanList,ClaimCur,PatPlanList,BenefitList,pat.Age,SubList);
+				}
 			}
 			return true;
 		}
@@ -3268,11 +3276,11 @@ namespace OpenDental {
 			PlaceOfService placeService=proc.PlaceService;
 			for(int i=1;i<listProcs.Count;i++){//skips 0
 				proc=listProcs[i];
-				if(clinicNum!=proc.ClinicNum){
+				if(PrefC.HasClinicsEnabled && clinicNum!=proc.ClinicNum){
 					LogClaimError(Lan.g("ContrAccount","All procedures do not have the same clinic."),isVerbose);
 					return new Claim();
 				}
-				if(proc.PlaceService!=placeService) {
+				if(!PrefC.GetBool(PrefName.EasyHidePublicHealth) && proc.PlaceService!=placeService) {
 					LogClaimError(Lan.g("ContrAccount","All procedures do not have the same place of service."),isVerbose);
 					return new Claim();
 				}

@@ -18,7 +18,8 @@ namespace OpenDentBusiness {
 			else {
 				query+=DbHelper.Concat("patient.LName","', '","patient.FName","' '","patient.MiddleI");
 			}
-			query+=" AS 'PatientName',procedurelog.ProcDate,procedurecode.Descript,procedurelog.ProcFee*(procedurelog.UnitQty+procedurelog.BaseUnits),procedurelog.ProcNum "
+			query+=" AS 'PatientName',procedurelog.ProcDate,procedurecode.Descript,procedurelog.ProcFee*(procedurelog.UnitQty+procedurelog.BaseUnits),"
+				+"procedurelog.ProcNum,procedurelog.ClinicNum "
 				+"FROM patient,procedurecode,procedurelog,claimproc,insplan "
 				+"WHERE claimproc.procnum=procedurelog.procnum "
 				+"AND patient.PatNum=procedurelog.PatNum "

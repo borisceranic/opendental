@@ -40,6 +40,10 @@ namespace OpenDental{
 		private const int _colWidthPatName=200;
 		private const int _colWidthProcDate=110;
 		private const int _colWidthAmount=90;
+		private const int _colWidthClinic=75;
+		private CheckBox checkAutoGroupProcs;
+		private DateTime _dateFromPrev=DateTime.MinValue;
+		private DateTime _dateToPrev=DateTime.MinValue;
 
 		///<summary></summary>
 		public FormRpProcNotBilledIns(){
@@ -83,11 +87,12 @@ namespace OpenDental{
 			this.comboBoxMultiClinics = new OpenDental.UI.ComboBoxMulti();
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butNewClaims = new OpenDental.UI.Button();
+			this.checkAutoGroupProcs = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// calendarTo
 			// 
-			this.calendarTo.Location = new System.Drawing.Point(251, 33);
+			this.calendarTo.Location = new System.Drawing.Point(251, 50);
 			this.calendarTo.Name = "calendarTo";
 			this.calendarTo.TabIndex = 2;
 			this.calendarTo.Visible = false;
@@ -95,7 +100,7 @@ namespace OpenDental{
 			// 
 			// calendarFrom
 			// 
-			this.calendarFrom.Location = new System.Drawing.Point(25, 33);
+			this.calendarFrom.Location = new System.Drawing.Point(25, 50);
 			this.calendarFrom.Name = "calendarFrom";
 			this.calendarFrom.TabIndex = 1;
 			this.calendarFrom.Visible = false;
@@ -110,7 +115,7 @@ namespace OpenDental{
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
 			this.butClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butClose.Location = new System.Drawing.Point(872, 666);
+			this.butClose.Location = new System.Drawing.Point(872, 662);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 26);
 			this.butClose.TabIndex = 4;
@@ -127,7 +132,7 @@ namespace OpenDental{
 			this.butPrint.CornerRadius = 4F;
 			this.butPrint.Image = global::OpenDental.Properties.Resources.butPrintSmall;
 			this.butPrint.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butPrint.Location = new System.Drawing.Point(25, 666);
+			this.butPrint.Location = new System.Drawing.Point(25, 662);
 			this.butPrint.Name = "butPrint";
 			this.butPrint.Size = new System.Drawing.Size(75, 26);
 			this.butPrint.TabIndex = 3;
@@ -137,9 +142,9 @@ namespace OpenDental{
 			// checkMedical
 			// 
 			this.checkMedical.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkMedical.Location = new System.Drawing.Point(730, 9);
+			this.checkMedical.Location = new System.Drawing.Point(720, 8);
 			this.checkMedical.Name = "checkMedical";
-			this.checkMedical.Size = new System.Drawing.Size(217, 21);
+			this.checkMedical.Size = new System.Drawing.Size(227, 21);
 			this.checkMedical.TabIndex = 11;
 			this.checkMedical.Text = "Include Medical Procedures";
 			this.checkMedical.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -149,7 +154,7 @@ namespace OpenDental{
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(47, 11);
+			this.label1.Location = new System.Drawing.Point(47, 28);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(48, 16);
 			this.label1.TabIndex = 61;
@@ -164,7 +169,7 @@ namespace OpenDental{
 			this.butDropFrom.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butDropFrom.CornerRadius = 4F;
 			this.butDropFrom.Image = global::OpenDental.Properties.Resources.arrowDownTriangle;
-			this.butDropFrom.Location = new System.Drawing.Point(177, 11);
+			this.butDropFrom.Location = new System.Drawing.Point(177, 28);
 			this.butDropFrom.Name = "butDropFrom";
 			this.butDropFrom.Size = new System.Drawing.Size(22, 18);
 			this.butDropFrom.TabIndex = 63;
@@ -173,11 +178,11 @@ namespace OpenDental{
 			// 
 			// textDateFrom
 			// 
-			this.textDateFrom.Location = new System.Drawing.Point(98, 10);
+			this.textDateFrom.Location = new System.Drawing.Point(98, 27);
 			this.textDateFrom.Name = "textDateFrom";
 			this.textDateFrom.Size = new System.Drawing.Size(102, 20);
 			this.textDateFrom.TabIndex = 62;
-			this.textDateFrom.Validated += new System.EventHandler(this.textDateFrom_Validated);
+			this.textDateFrom.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textDateFrom_KeyUp);
 			// 
 			// butDropTo
 			// 
@@ -187,7 +192,7 @@ namespace OpenDental{
 			this.butDropTo.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butDropTo.CornerRadius = 4F;
 			this.butDropTo.Image = global::OpenDental.Properties.Resources.arrowDownTriangle;
-			this.butDropTo.Location = new System.Drawing.Point(414, 10);
+			this.butDropTo.Location = new System.Drawing.Point(414, 27);
 			this.butDropTo.Name = "butDropTo";
 			this.butDropTo.Size = new System.Drawing.Size(22, 18);
 			this.butDropTo.TabIndex = 66;
@@ -196,7 +201,7 @@ namespace OpenDental{
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(289, 11);
+			this.label2.Location = new System.Drawing.Point(289, 28);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(45, 16);
 			this.label2.TabIndex = 64;
@@ -205,15 +210,15 @@ namespace OpenDental{
 			// 
 			// textDateTo
 			// 
-			this.textDateTo.Location = new System.Drawing.Point(335, 9);
+			this.textDateTo.Location = new System.Drawing.Point(335, 26);
 			this.textDateTo.Name = "textDateTo";
 			this.textDateTo.Size = new System.Drawing.Size(102, 20);
 			this.textDateTo.TabIndex = 65;
-			this.textDateTo.Validated += new System.EventHandler(this.textDateTo_Validated);
+			this.textDateTo.KeyUp += new System.Windows.Forms.KeyEventHandler(this.textDateTo_KeyUp);
 			// 
 			// labelClinic
 			// 
-			this.labelClinic.Location = new System.Drawing.Point(481, 10);
+			this.labelClinic.Location = new System.Drawing.Point(437, 28);
 			this.labelClinic.Name = "labelClinic";
 			this.labelClinic.Size = new System.Drawing.Size(87, 16);
 			this.labelClinic.TabIndex = 68;
@@ -226,7 +231,7 @@ namespace OpenDental{
 			this.comboBoxMultiClinics.BackColor = System.Drawing.SystemColors.Window;
 			this.comboBoxMultiClinics.DroppedDown = false;
 			this.comboBoxMultiClinics.Items = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiClinics.Items")));
-			this.comboBoxMultiClinics.Location = new System.Drawing.Point(569, 8);
+			this.comboBoxMultiClinics.Location = new System.Drawing.Point(525, 26);
 			this.comboBoxMultiClinics.Name = "comboBoxMultiClinics";
 			this.comboBoxMultiClinics.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiClinics.SelectedIndices")));
 			this.comboBoxMultiClinics.Size = new System.Drawing.Size(160, 21);
@@ -242,11 +247,11 @@ namespace OpenDental{
 			this.gridMain.HasAddButton = false;
 			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
-			this.gridMain.Location = new System.Drawing.Point(25, 33);
+			this.gridMain.Location = new System.Drawing.Point(25, 50);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
 			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridMain.Size = new System.Drawing.Size(922, 630);
+			this.gridMain.Size = new System.Drawing.Size(922, 609);
 			this.gridMain.TabIndex = 69;
 			this.gridMain.Title = "Procedures Not Billed";
 			this.gridMain.TranslationName = null;
@@ -260,7 +265,7 @@ namespace OpenDental{
 			this.butNewClaims.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butNewClaims.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butNewClaims.CornerRadius = 4F;
-			this.butNewClaims.Location = new System.Drawing.Point(450, 666);
+			this.butNewClaims.Location = new System.Drawing.Point(450, 662);
 			this.butNewClaims.Name = "butNewClaims";
 			this.butNewClaims.Size = new System.Drawing.Size(75, 26);
 			this.butNewClaims.TabIndex = 71;
@@ -268,11 +273,23 @@ namespace OpenDental{
 			this.butNewClaims.UseVisualStyleBackColor = true;
 			this.butNewClaims.Click += new System.EventHandler(this.butNewClaims_Click);
 			// 
+			// checkAutoGroupProcs
+			// 
+			this.checkAutoGroupProcs.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkAutoGroupProcs.Location = new System.Drawing.Point(720, 28);
+			this.checkAutoGroupProcs.Name = "checkAutoGroupProcs";
+			this.checkAutoGroupProcs.Size = new System.Drawing.Size(227, 21);
+			this.checkAutoGroupProcs.TabIndex = 72;
+			this.checkAutoGroupProcs.Text = "Automatically Group Procedures";
+			this.checkAutoGroupProcs.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkAutoGroupProcs.UseVisualStyleBackColor = true;
+			// 
 			// FormRpProcNotBilledIns
 			// 
 			this.AcceptButton = this.butPrint;
 			this.CancelButton = this.butClose;
 			this.ClientSize = new System.Drawing.Size(974, 696);
+			this.Controls.Add(this.checkAutoGroupProcs);
 			this.Controls.Add(this.butNewClaims);
 			this.Controls.Add(this.labelClinic);
 			this.Controls.Add(this.comboBoxMultiClinics);
@@ -293,6 +310,7 @@ namespace OpenDental{
 			this.Name = "FormRpProcNotBilledIns";
 			this.ShowInTaskbar = false;
 			this.Text = "Procedures Not Billed to Insurance";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormRpProcNotBilledIns_FormClosing);
 			this.Load += new System.EventHandler(this.FormProcNotAttach_Load);
 			this.ResumeLayout(false);
 			this.PerformLayout();
@@ -317,12 +335,18 @@ namespace OpenDental{
 				labelClinic.Visible=true;
 				FillClinics();
 			}
+			if(PrefC.GetBool(PrefName.ClaimProcsNotBilledToInsAutoGroup)) {
+				checkAutoGroupProcs.Checked=true;
+			}
 			FillGrid();
 		}
 
 		private void CreateOrResizeGridColumns() {
 			gridMain.BeginUpdate();
 			int colWidthVariable=gridMain.Width-_colWidthPatName-_colWidthProcDate-_colWidthAmount-10;//10 for scrollbar
+			if(PrefC.HasClinicsEnabled) {
+				colWidthVariable-=_colWidthClinic;
+			}
 			ODGridColumn col=null;
 			if(gridMain.Columns.Count==0) {
 				col=new ODGridColumn(Lan.g(this,"Patient Name"),_colWidthPatName);
@@ -331,6 +355,10 @@ namespace OpenDental{
 				gridMain.Columns.Add(col);
 				col=new ODGridColumn(Lan.g(this,"Procedure Descipion"),colWidthVariable);
 				gridMain.Columns.Add(col);
+				if(PrefC.HasClinicsEnabled) {
+					col=new ODGridColumn(Lan.g(this,"Clinic"),_colWidthClinic);
+					gridMain.Columns.Add(col);
+				}
 				col=new ODGridColumn(Lan.g(this,"Amount"),_colWidthAmount,HorizontalAlignment.Right);
 				gridMain.Columns.Add(col);
 			}
@@ -356,6 +384,15 @@ namespace OpenDental{
 					row.Cells.Add(queryObj.ReportTable.Rows[j][0].ToString());//Procedure Name
 					row.Cells.Add(PIn.Date(queryObj.ReportTable.Rows[j][1].ToString()).ToShortDateString());//Procedure Date
 					row.Cells.Add(queryObj.ReportTable.Rows[j][2].ToString());//Procedure Description
+					if(PrefC.HasClinicsEnabled) {
+						long clinicNum=PIn.Long(queryObj.ReportTable.Rows[j][5].ToString());
+						if(clinicNum==0) {
+							row.Cells.Add("Unassigned");
+						}
+						else {
+							row.Cells.Add(Clinics.GetDesc(clinicNum));
+						}
+					}
 					row.Cells.Add(PIn.Double(queryObj.ReportTable.Rows[j][3].ToString()).ToString("c"));//Amount
 					_procTotalAmt+=PIn.Decimal(queryObj.ReportTable.Rows[j][3].ToString());
 					row.Tag=PIn.Long(queryObj.ReportTable.Rows[j][4].ToString());//Tag set to ProcNum.  Used in butNewClaims_Click().
@@ -467,6 +504,7 @@ namespace OpenDental{
 
 		private void calendarFrom_DateSelected(object sender,DateRangeEventArgs e) {
 			textDateFrom.Text=calendarFrom.SelectionStart.ToShortDateString();
+			FillGrid();
 		}
 
 		private void butDropTo_Click(object sender,EventArgs e) {
@@ -475,6 +513,7 @@ namespace OpenDental{
 
 		private void calendarTo_DateSelected(object sender,DateRangeEventArgs e) {
 			textDateTo.Text=calendarTo.SelectionStart.ToShortDateString();
+			FillGrid();
 		}
 
 		private void ToggleCalendars() {
@@ -506,20 +545,28 @@ namespace OpenDental{
 			}
 		}
 
+		private DateTime GetDateFrom() {
+			try {
+				return DateTime.Parse(textDateFrom.Text);
+			}
+			catch{
+			}
+			return DateTime.MinValue;
+		}
+
+		private DateTime GetDateTo() {
+			try {
+				return DateTime.Parse(textDateTo.Text);
+			}
+			catch{
+			}
+			return DateTime.MinValue;
+		}
+
 		//Only called in RefreshReport().
 		private void ValidateFields() {
-			try {
-				_myReportDateFrom=DateTime.Parse(textDateFrom.Text);
-			}
-			catch{
-				_myReportDateFrom=DateTime.MinValue;
-			}
-			try {
-				_myReportDateTo=DateTime.Parse(textDateTo.Text);
-			}
-			catch{
-				_myReportDateTo=DateTime.MaxValue;
-			}
+			_myReportDateFrom=GetDateFrom();
+			_myReportDateTo=GetDateTo();
 			if(_myReportDateFrom>_myReportDateTo) {
 				_myReportDateFrom=DateTime.MinValue;
 				_myReportDateTo=DateTime.MaxValue;
@@ -532,15 +579,23 @@ namespace OpenDental{
 			}
 		}
 
-		private void comboBoxMultiClinics_SelectionChangeCommitted(object sender,EventArgs e) {
-			FillGrid();
-		}
-		
-		private void textDateTo_Validated(object sender,EventArgs e) {
-			FillGrid();
+		private void textDateFrom_KeyUp(object sender,KeyEventArgs e) {
+			DateTime dateFrom=GetDateFrom();
+			if(dateFrom!=_dateFromPrev) {
+				FillGrid();
+				_dateFromPrev=dateFrom;
+			}
 		}
 
-		private void textDateFrom_Validated(object sender,EventArgs e) {
+		private void textDateTo_KeyUp(object sender,KeyEventArgs e) {
+			DateTime dateTo=GetDateTo();
+			if(dateTo!=_dateToPrev) {
+				FillGrid();
+				_dateToPrev=dateTo;
+			}
+		}
+
+		private void comboBoxMultiClinics_SelectionChangeCommitted(object sender,EventArgs e) {
 			FillGrid();
 		}
 
@@ -563,39 +618,45 @@ namespace OpenDental{
 			//Generate List and Table----------------------------------------------------------------------------------------------------------------------
 			//List of all procedures being shown.
 			//Pulls procedures based off of the PatNum, if the row was selected in gridMain and if it has been attached to a claim.
-			List<PatNumWithProcNum> listProcWithIndices=new List<PatNumWithProcNum>();
+			List<ProcNotBilled> listNotBilledProcs=new List<ProcNotBilled>();
 			List<long> listPatNums=new List<long>();
-			//Table needs to be 1:1 with gridMain due to logic in ContrAccount.toolBarButIns_Click(...).
+			long patNumOld=0;
+			List<Claim> listPatClaims=new List<Claim>();
+			List<ClaimProc> listPatClaimProcs=new List<ClaimProc>();
+			List<ClaimProc> listCurClaimProcs=new List<ClaimProc>();
+			//Table rows need to be 1:1 with gridMain rows due to logic in ContrAccount.toolBarButIns_Click(...).
 			DataTable table=new DataTable();
 			//Required columns as mentioned by ContrAccount.toolBarButIns_Click().
 			table.Columns.Add("ProcNum");
 			table.Columns.Add("chargesDouble");
-			for(int i=0;i<gridMain.Rows.Count;i++) {
+			for(int i=0;i<gridMain.Rows.Count;i++) {//Loop through gridMain to construct listNotBilledProcs.
 				long procNumCur=PIn.Long(gridMain.Rows[i].Tag.ToString());//Tag is set to procNum in fillGrid().
 				Procedure procCur=Procedures.GetOneProc(procNumCur,false);
-				//TODO: If patient changed, use Claims.Refresh() to get claims for patient, and use ClaimProcs.Refresh() and ClaimProcs.GetForProc().
-				List<ClaimProc> listClaimProcs=ClaimProcs.RefreshForProc(procNumCur);
 				long patNumCur=procCur.PatNum;
-				bool isSelected=gridMain.SelectedIndices.Contains(i);
+				if(patNumOld!=patNumCur) {//Procedures in gridMain are ordered by patient, so when the patient changes, we know previous patient is complete.
+					listPatClaims=Claims.Refresh(patNumCur);
+					listPatClaimProcs=ClaimProcs.Refresh(patNumCur);
+					patNumOld=procCur.PatNum;
+				}
+				listCurClaimProcs=ClaimProcs.GetForProc(listPatClaimProcs,procNumCur);
 				bool hasPriClaim=false;
 				bool hasSecClaim=false;
-				if(Procedures.IsAttachedToClaim(procNumCur)) {
-					for(int j=0;j<listClaimProcs.Count;j++) {
-						ClaimProc claimProcCur=listClaimProcs[j];
-						if(claimProcCur.ClaimNum > 0 && claimProcCur.Status != ClaimProcStatus.Preauth) {
-							Claim claimCur=Claims.GetClaim(claimProcCur.ClaimNum);
-							switch(claimCur.ClaimType) {
-								case "P":
-									hasPriClaim=true;
-									break;
-								case "S":
-									hasSecClaim=true;
-									break;
-							}
+				for(int j=0;j<listCurClaimProcs.Count;j++) {
+					ClaimProc claimProcCur=listCurClaimProcs[j];
+					if(claimProcCur.ClaimNum > 0 && claimProcCur.Status!=ClaimProcStatus.Preauth && claimProcCur.Status!=ClaimProcStatus.Estimate) {
+						Claim claimCur=Claims.GetFromList(listPatClaims,claimProcCur.ClaimNum);
+						switch(claimCur.ClaimType) {
+							case "P":
+								hasPriClaim=true;
+								break;
+							case "S":
+								hasSecClaim=true;
+								break;
 						}
 					}
 				}
-				listProcWithIndices.Add(new PatNumWithProcNum(patNumCur,procNumCur,i,isSelected,hasPriClaim,hasSecClaim));
+				bool isSelected=gridMain.SelectedIndices.Contains(i);
+				listNotBilledProcs.Add(new ProcNotBilled(patNumCur,procNumCur,i,isSelected,hasPriClaim,hasSecClaim,procCur.ClinicNum,procCur.PlaceService));
 				DataRow row=table.NewRow();
 				row["ProcNum"]=procNumCur;
 				#region Calculate chargesDouble
@@ -604,7 +665,7 @@ namespace OpenDental{
 				if(qty==0){
 					qty=1;
 				}
-				double writeOffCapSum=listClaimProcs.Where(x => x.Status==ClaimProcStatus.CapComplete).Select(y => y.WriteOff).ToList().Sum();
+				double writeOffCapSum=listPatClaimProcs.Where(x => x.Status==ClaimProcStatus.CapComplete).Select(y => y.WriteOff).ToList().Sum();
 				row["chargesDouble"]=(procCur.ProcFee*qty)-writeOffCapSum;
 				#endregion Calculate chargesDouble
 				table.Rows.Add(row);
@@ -614,53 +675,68 @@ namespace OpenDental{
 				listPatNums.Add(patNumCur);
 			}
 			//Create Claims--------------------------------------------------------------------------------------------------------------------------------
+			Patient patCur=null;
+			List<PatPlan> listPatPlans=null;
+			List<InsSub> listInsSubs=null;
+			List<InsPlan> listInsPlans=null;
+			List<Procedure> listPatientProcs=null;
+			ProcNotBilled procNotBilled=new ProcNotBilled();//When automatically grouping,  this is used as the procedure to group by.
+			patNumOld=0;
 			string claimErrors="";
 			int claimCreatedCount=0;
-			long patNumOld=0;
+			int patIndex=0;
 			//The procedures show in the grid ordered by patient.  Also listPatNums contains unique patnums which are in the same order as the grid.
-			for(int i=0;i<listPatNums.Count;i++) {
-				List<PatNumWithProcNum> listProcs=listProcWithIndices.Where(x => x.PatNum == listPatNums[i] && x.IsRowSelected && !x.IsAttached).ToList();
-				//List<PatNumWithProcNum> listProcsNoClaims=listProcs.Where(x => x.HasPriClaim==false && x.HasSecClaim==false).ToList();
-				//List<PatNumWithProcNum> listProcsNoPrimary=listProcs.Where(x => x.HasPriClaim==false && x.HasSecClaim==true).ToList();
-				//List<PatNumWithProcNum> listProcsNoSecondary=listProcs.Where(x => x.HasPriClaim==true && x.HasSecClaim==false).ToList();
-				//List<PatNumWithProcNum> listProcsNoOther=listProcs.Where(x => x.HasPriClaim==true && x.HasSecClaim==true).ToList();
-				//IEnumerable<IGrouping<bool,PatNumWithProcNum>> listClaimComboGroups=listProcs.GroupBy(x => x.HasPriClaim);
-				//foreach(IGrouping<bool,PatNumWithProcNum> comboGroup in listClaimComboGroups) {
-				//	if(comboGroup.Key) {//Procedures that have a primary claim already, assume need to create secondary.
-
-				//	}
-				//	else {//Procedures that do not have a primary claim but may have a secondary claim.
-
-				//	}
-				//}
+			while(patIndex < listPatNums.Count) {
+				List<ProcNotBilled> listProcs=listNotBilledProcs.Where(x => x.PatNum==listPatNums[patIndex] && x.IsRowSelected && !x.IsAttached).ToList();
 				if(listProcs.Count==0) {
+					patNumOld=listPatNums[patIndex];
+					patIndex++;//No procedures were selected for this patient.
 					continue;
 				}
-				Patient patCur=Patients.GetPat(listPatNums[i]);
-				gridMain.SetSelected(false);//Need to deslect all rows each time so that ContrAccount.toolBarButIns_Click(...) only uses pertinent rows.
+				else {
+					//Maintain the same patient, in order to create one or more additional claims for the remaining procedures.
+					//Currently will only happen for specific instances; 
+					//--Canadian customers who are attempting to create a claim with over 7 procedures.
+					//--When checkAutoGroupProcs is checked and when there are multiple procedure groupings by GroupKey status, ClinicNum, and placeService.
+				}
+				if(patNumOld!=listPatNums[patIndex]) {//The patient could repeat if we had to group the procedures for the patinet into multiple claims.
+					patCur=Patients.GetPat(listPatNums[patIndex]);
+					listPatPlans=PatPlans.Refresh(patCur.PatNum);
+					listInsSubs=InsSubs.RefreshForFam(Patients.GetFamily(patCur.PatNum));
+					listInsPlans=InsPlans.RefreshForSubList(listInsSubs);
+					listPatientProcs=Procedures.Refresh(patCur.PatNum);
+				}
+				if(checkAutoGroupProcs.Checked) {//Automatically Group Procedures.
+					procNotBilled=listProcs[0];
+					//Update listProcs to reflect those that match the procNotBilled values.
+					listProcs=listProcs.FindAll(x => x.HasPriClaim==procNotBilled.HasPriClaim && x.HasSecClaim==procNotBilled.HasSecClaim);
+					if(PrefC.HasClinicsEnabled) {//Group by clinic only if clinics enabled.
+						listProcs=listProcs.FindAll(x => x.ClinicNum==procNotBilled.ClinicNum);
+					}
+					else if(!PrefC.GetBool(PrefName.EasyHidePublicHealth)) {//Group by Place of Service only if Public Health feature is enabled.
+						listProcs=listProcs.FindAll(x => x.PlaceService==procNotBilled.PlaceService);
+					}
+				}
+				GetUniqueDiagnosticCodes(listProcs,listPatientProcs,listPatPlans,listInsSubs,listInsPlans);
 				if(listProcs.Count>7 && CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 					listProcs=listProcs.Take(7).ToList();//Returns first 7 items of the list.
-					i--;//To maintain the same patient, in order to create one or more additional claims for the remaining procedures.
 				}
-				CheckUniqueDiagnosticCodes(listProcs);
-				if(listProcs.Count==0) {
-					continue;
-				}
+				gridMain.SetSelected(false);//Need to deslect all rows each time so that ContrAccount.toolBarButIns_Click(...) only uses pertinent rows.
 				for(int j=0;j<listProcs.Count;j++) {
-					//Select the pertinent rows so that they will be flagged to be attached to the claim below.
-					gridMain.SetSelected(listProcs[j].RowIndex,true);
+					gridMain.SetSelected(listProcs[j].RowIndex,true);//Select the pertinent rows so that they will be attached to the claim below.
 				}
-				ContrAccount.toolBarButIns_Click(false,patCur,Patients.GetFamily(patCur.PatNum),gridMain,table);
+				ContrAccount.toolBarButIns_Click(false,patCur,Patients.GetFamily(patCur.PatNum),gridMain,table,
+					procNotBilled.HasPriClaim,procNotBilled.HasSecClaim);
 				string errorTitle=patCur.PatNum+" "+patCur.GetNameLFnoPref()+" - ";
 				if(patNumOld==patCur.PatNum && !string.IsNullOrEmpty(ContrAccount.ClaimErrorsCur)){ 
 					claimErrors+="\t\t"+ContrAccount.ClaimErrorsCur+"\r\n";
 				}
 				else if(!string.IsNullOrEmpty(ContrAccount.ClaimErrorsCur)){
 					claimErrors+=errorTitle+ContrAccount.ClaimErrorsCur+"\r\n";
-					patNumOld=patCur.PatNum;
 				}
 				claimCreatedCount+=ContrAccount.ClaimCreatedCount;
 				listProcs.ForEach(x => x.IsAttached=true);//This way we can not attach procedures to multiple claims thanks to the logic above.
+				patNumOld=patCur.PatNum;
 			}
 			FillGrid();
 			if(!string.IsNullOrEmpty(claimErrors)) {
@@ -670,40 +746,46 @@ namespace OpenDental{
 			MessageBox.Show(Lan.g(this,"Number of claims created")+": "+claimCreatedCount);
 		}
 		
-		//Mimics ContrAccount.CreateClaim(...)
-		private void CheckUniqueDiagnosticCodes(List<PatNumWithProcNum> listProcs) {
-			//TODO: Consider getting all procedures for the patient ahead of time, and using that cache to get listProcedures to save a query.
-			List<Procedure> listProcedures=Procedures.GetManyProc(listProcs.Select(x => x.ProcNum).ToList(),false);
+		///<summary>Mimics ContrAccount.CreateClaim(...).  Removes items from listProcs until unique diagnosis code count is low enough.</summary>
+		private void GetUniqueDiagnosticCodes(List<ProcNotBilled> listProcs,List<Procedure> listPatProcs,List <PatPlan> listPatPlans,
+			List<InsSub> listInsSubs,List<InsPlan> listInsPlans)
+		{
+			List<Procedure> listProcedures=new List<Procedure>();
+			for(int i=0;i<listProcs.Count;i++) {
+				listProcedures.Add(Procedures.GetProcFromList(listPatProcs,listProcs[i].ProcNum));
+			}
 			//If they have medical insurance and no dental, make the claim type Medical.  This is to avoid the scenario of multiple med ins and no dental.
 			bool isMedical=false;
-			//TODO: Get plan info for patient further up, to reduce amount of queries.
-			List <PatPlan> listPatPlans=PatPlans.Refresh(listProcs[0].PatNum);
-			List<InsSub> listInsSubs=InsSubs.RefreshForFam(Patients.GetFamily(listProcs[0].PatNum));
-			List<InsPlan> listInsPlans=InsPlans.RefreshForSubList(listInsSubs);
 			if(PatPlans.GetOrdinal(PriSecMed.Medical,listPatPlans,listInsPlans,listInsSubs)>0
 				&& PatPlans.GetOrdinal(PriSecMed.Primary,listPatPlans,listInsPlans,listInsSubs)==0
 				&& PatPlans.GetOrdinal(PriSecMed.Secondary,listPatPlans,listInsPlans,listInsSubs)==0)
 			{
 				isMedical=true;
 			}
-			while(listProcs.Count > 0 && !isMedical && Procedures.GetUniqueDiagnosticCodes(listProcedures,false).Count > 4) {//dental
-				listProcedures.RemoveAt(listProcedures.Count-1);
-				listProcs.RemoveAt(listProcedures.Count-1);
+			while(!isMedical && Procedures.GetUniqueDiagnosticCodes(listProcedures,false).Count > 4) {//dental
+				int index=listProcedures.Count-1;
+				listProcedures.RemoveAt(index);
+				listProcs.RemoveAt(index);
 			}
-			while(listProcs.Count > 0 && isMedical && Procedures.GetUniqueDiagnosticCodes(listProcedures,true).Count > 12) {//medical
-				listProcedures.RemoveAt(listProcedures.Count-1);
-				listProcs.RemoveAt(listProcedures.Count-1);
+			while(isMedical && Procedures.GetUniqueDiagnosticCodes(listProcedures,true).Count > 12) {//medical
+				int index=listProcedures.Count-1;
+				listProcedures.RemoveAt(index);
+				listProcs.RemoveAt(index);
 			}
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
-	
+
+		private void FormRpProcNotBilledIns_FormClosing(object sender,FormClosingEventArgs e) {
+			Prefs.UpdateBool(PrefName.ClaimProcsNotBilledToInsAutoGroup,checkAutoGroupProcs.Checked);
+		}
+
 	}//end class FormRpProcNotBilledIns
 
 	///<summary>Used so that we can easily select pertinent procedures for a specific patient when creating claims.</summary>
-	internal class PatNumWithProcNum {
+	internal class ProcNotBilled {
 		public long PatNum;
 		public long ProcNum;
 		public int RowIndex;
@@ -713,8 +795,17 @@ namespace OpenDental{
 		public bool IsAttached;
 		public bool HasPriClaim;
 		public bool HasSecClaim;
+		public long ClinicNum;
+		public PlaceOfService PlaceService;
 
-		public PatNumWithProcNum(long patNum,long procNum,int rowIndex,bool isRowSelected,bool hasPriClaim,bool hasSecClaim) {
+		public ProcNotBilled() {
+			HasPriClaim=false;
+			HasSecClaim=false;
+		}
+
+		public ProcNotBilled(long patNum,long procNum,int rowIndex,bool isRowSelected,
+			bool hasPriClaim,bool hasSecClaim,long clinicNum,PlaceOfService placeService)
+		{
 			PatNum=patNum;
 			ProcNum=procNum;
 			RowIndex=rowIndex;
@@ -722,6 +813,9 @@ namespace OpenDental{
 			IsAttached=false;
 			HasPriClaim=hasPriClaim;
 			HasSecClaim=hasSecClaim;
+			ClinicNum=clinicNum;
+			PlaceService=placeService;
 		}
 	}
+
 }
