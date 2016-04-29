@@ -2336,10 +2336,8 @@ namespace OpenDental{
 				}
 				comboBillType.SelectedIndex=0;
 			}
-			_listClinics=new List<Clinic>() { new Clinic() { Description=Lan.g(this,"Unassigned") } };
-			_listClinics.AddRange(Clinics.GetForUserod(Security.CurUser));
-			_listClinics=_listClinics.OrderBy(x => x.ClinicNum>0).ThenBy(x => x.Description).ToList();
-			comboClinic.Items.Clear();
+			_listClinics=new List<Clinic>() { new Clinic() { Description=Lan.g(this,"Unassigned") } }; //Seed with "None"
+			Clinics.GetForUserod(Security.CurUser).ForEach(x => _listClinics.Add(x));//do not re-organize from cache. They could either be alphabetizeded or sorted by item order.
 			_listClinics.ForEach(x => comboClinic.Items.Add(x.Description));
 			//Set Selected Nums
 			_selectedClinicNum=PatCur.ClinicNum;

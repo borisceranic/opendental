@@ -487,9 +487,8 @@ namespace OpenDental{
 		#endregion
 
 		private void FormScheduleDay_Load(object sender,System.EventArgs e) {
-			_listClinics=new List<Clinic>() { new Clinic() { Description="Headquarters" } };
-			_listClinics.AddRange(Clinics.GetForUserod(Security.CurUser));
-			_listClinics=_listClinics.OrderBy(x => x.ClinicNum>0).ThenBy(x => x.Description).ToList();
+			_listClinics=new List<Clinic>() { new Clinic() { Description=Lan.g(this,"Headquarters") } }; //Seed with "Headquarters"
+			Clinics.GetForUserod(Security.CurUser).ForEach(x => _listClinics.Add(x));//do not re-organize from cache. They could either be alphabetizeded or sorted by item order.
 			_listClinics.ForEach(x => comboClinic.Items.Add(x.Description));
 			comboClinic.IndexSelectOrSetText(_listClinics.FindIndex(x => x.ClinicNum==_selectedClinicNum),() => { return Clinics.GetDesc(_selectedClinicNum); });
 			if(!PrefC.HasClinicsEnabled) {
@@ -510,12 +509,11 @@ namespace OpenDental{
 			if(comboClinic.SelectedIndex>-1) {
 				_selectedClinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
 			}
+			Text=Lan.g(this,"Edit Day")+" - "+_listClinics[comboClinic.SelectedIndex].Description;
 			if(comboClinic.SelectedIndex<1) {
-				Text=Lan.g(this,"Edit Day")+" - "+Lan.g(this,"Headquarters");
 				groupPractice.Text=Lan.g(this,"Practice");
 			}
 			else {
-				Text=Lan.g(this,"Edit Day")+" - "+_listClinics[comboClinic.SelectedIndex].Description;
 				groupPractice.Text=Lan.g(this,"Clinic");
 			}
 			FillProvsAndEmps();

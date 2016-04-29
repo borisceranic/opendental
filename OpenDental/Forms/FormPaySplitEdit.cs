@@ -967,9 +967,8 @@ namespace OpenDental
 				}
 			}
 			if(PrefC.HasClinicsEnabled) {
-				_listClinics=new List<Clinic>() { new Clinic() { Description=Lan.g(this,"none") } };
-				_listClinics.AddRange(Clinics.GetForUserod(Security.CurUser));
-				_listClinics=_listClinics.OrderBy(x => x.ClinicNum>0).ThenBy(x => x.Description).ToList();
+				_listClinics=new List<Clinic>() { new Clinic() { Description=Lan.g(this,"none") } }; //Seed with "None"
+				Clinics.GetForUserod(Security.CurUser).ForEach(x => _listClinics.Add(x));//do not re-organize from cache. They could either be alphabetizeded or sorted by item order.
 				_listClinics.ForEach(x => comboClinic.Items.Add(x.Description));
 				_selectedClinicNum=PaySplitCur.ClinicNum;
 				comboClinic.IndexSelectOrSetText(_listClinics.FindIndex(x => x.ClinicNum==_selectedClinicNum),() => { return Clinics.GetDesc(_selectedClinicNum); });

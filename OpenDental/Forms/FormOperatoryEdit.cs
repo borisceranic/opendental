@@ -399,9 +399,8 @@ namespace OpenDental{
 				comboClinic.Visible=false;
 				butPickClin.Visible=false;
 			}
-			_listClinics=new List<Clinic>() { new Clinic() {Description=Lan.g(this,"none") } } //Seed with "None"
-				.Concat(Clinics.GetForUserod(Security.CurUser)) //Add clinics for user
-				.OrderBy(x => x.ClinicNum>0).ThenBy(x => x.Description).ToList();//Order list properly
+			_listClinics=new List<Clinic>() { new Clinic() { Description=Lan.g(this,"none") } }; //Seed with "None"
+			Clinics.GetForUserod(Security.CurUser).ForEach(x => _listClinics.Add(x));//do not re-organize from cache. They could either be alphabetizeded or sorted by item order.
 			_listClinics.ForEach(x => comboClinic.Items.Add(x.Description));//Add to UI control
 			//Set Selected nums
 			_selectedClinicNum=OpCur.ClinicNum;//can be 0

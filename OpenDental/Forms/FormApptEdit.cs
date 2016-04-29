@@ -1367,9 +1367,8 @@ namespace OpenDental{
 				listQuickAdd.Items.Add(DefC.Short[(int)DefCat.ApptProcsQuickAdd][i].ItemName);
 			}
 			//Fill Clinics
-			_listClinics=Clinics.GetForUserod(Security.CurUser)
-				.Union(new[] { new Clinic() { Description="none" } })
-				.OrderBy(x=>x.ClinicNum>0).ThenBy(x=>x.Description).ToList();
+			_listClinics=new List<Clinic>() { new Clinic() { Description=Lan.g(this,"none") } }; //Seed with "None"
+			Clinics.GetForUserod(Security.CurUser).ForEach(x => _listClinics.Add(x));//do not re-organize from cache. They could either be alphabetizeded or sorted by item order.
 			_listClinics.ForEach(x => comboClinic.Items.Add(x.Description));
 			//Set Selected Nums
 			_selectedClinicNum=AptCur.ClinicNum;

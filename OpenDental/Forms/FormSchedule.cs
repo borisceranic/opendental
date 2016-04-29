@@ -523,19 +523,13 @@ namespace OpenDental{
 			textDateFrom.Text=dateFrom.ToShortDateString();
 			textDateTo.Text=dateFrom.AddMonths(12).AddDays(-1).ToShortDateString();
 			if(PrefC.HasClinicsEnabled) {
-				//Get available clinics and then filter the employee list box by those clinics.
-				_listClinics=Clinics.GetForUserod(Security.CurUser);
-				comboClinic.Items.Clear();
+				_listClinics=new List<Clinic>();
 				if(!Security.CurUser.ClinicIsRestricted) {
-					comboClinic.Items.Add(Lan.g(this,"Headquarters"));
-					comboClinic.SelectedIndex=0;
+					_listClinics.Add(new Clinic() { Description=Lan.g(this,"Headquarters") }); //Seed with "None")
 				}
-				for(int i=0;i<_listClinics.Count;i++) {
-					int curIndex=comboClinic.Items.Add(_listClinics[i].Description);
-					if(_listClinics[i].ClinicNum==Clinics.ClinicNum) {
-						comboClinic.SelectedIndex=curIndex;
-					}
-				}
+				Clinics.GetForUserod(Security.CurUser).ForEach(x => _listClinics.Add(x));//do not re-organize from cache. They could either be alphabetizeded or sorted by item order.
+				_listClinics.ForEach(x => comboClinic.Items.Add(x.Description));
+				comboClinic.SelectedIndex=_listClinics.FindIndex(x => x.ClinicNum==Clinics.ClinicNum);
 			}
 			else {//no clinics
 				labelClinic.Visible=false;
@@ -552,16 +546,9 @@ namespace OpenDental{
 			tabPageEmp.Text=Lan.g(this,"Employees")+" (0)";
 			tabPageProv.Text=Lan.g(this,"Providers")+" (0)";
 			if(PrefC.HasClinicsEnabled) {
-				long clinicNum=0;
-				if(Security.CurUser.ClinicIsRestricted) {
-					clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
-				}
-				else if(comboClinic.SelectedIndex>0) {
-					clinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;//Subtract 1, because Headquarters is the first option.
-				}
 				//clinicNum will be 0 for unrestricted users with HQ selected in which case this will get only emps/provs not assigned to a clinic
-				_listEmps=Employees.GetEmpsForClinic(clinicNum);
-				_listProviders=Providers.GetProvsForClinic(clinicNum);
+				_listEmps=Employees.GetEmpsForClinic(_listClinics[comboClinic.SelectedIndex].ClinicNum);
+				_listProviders=Providers.GetProvsForClinic(_listClinics[comboClinic.SelectedIndex].ClinicNum);
 			}
 			else {//Not using clinics
 				_listEmps=Employees.GetListShort();
@@ -607,12 +594,7 @@ namespace OpenDental{
 			}
 			long clinicNum=0;
 			if(PrefC.HasClinicsEnabled) {
-				if(Security.CurUser.ClinicIsRestricted) {
-					clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
-				}
-				else if(comboClinic.SelectedIndex>0) {
-					clinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;//Subtract 1, because Headquarters is the first option.
-				}
+				clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
 			}
 			if(isFromDb || this._tableScheds==null) {
 				_tableScheds=Schedules.GetPeriod(PIn.Date(textDateFrom.Text),PIn.Date(textDateTo.Text),provNums,empNums,checkPracticeNotes.Checked,
@@ -740,12 +722,9 @@ namespace OpenDental{
 				return;
 			}
 			//MessageBox.Show(selectedDate.ToShortDateString());
-			long clinicNum=0; 
-			if(Security.CurUser.ClinicIsRestricted) {
+			long clinicNum=0;
+			if(PrefC.HasClinicsEnabled) {
 				clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
-			}
-			else if(comboClinic.SelectedIndex > 0) {
-				clinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;//Subtract 1, because Headquarters is the first option.
 			}
 			FormScheduleDayEdit FormS=new FormScheduleDayEdit(selectedDate,clinicNum,checkPracticeNotes.Checked,checkClinicNotes.Checked);
 			FormS.ShowDialog();
@@ -804,12 +783,7 @@ namespace OpenDental{
 			List<long> empNums = listEmp.SelectedIndices.OfType<int>().Select(x => _listEmps[x].EmployeeNum).ToList();
 			long clinicNum=0;
 			if(PrefC.HasClinicsEnabled) {
-				if(Security.CurUser.ClinicIsRestricted) {
-					clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
-				}
-				else if(comboClinic.SelectedIndex>0) {
-					clinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;//Subtract 1, because Headquarters is the first option.
-				}
+				clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
 			}
 			Schedules.Clear(dateSelectedStart,dateSelectedEnd,provNums,empNums,checkPracticeNotes.Checked,checkClinicNotes.Checked,clinicNum);
 			FillGrid();
@@ -913,12 +887,7 @@ namespace OpenDental{
 			List<long> empNums=listEmp.SelectedIndices.OfType<int>().Select(x => _listEmps[x].EmployeeNum).ToList();
 			long clinicNum=0;
 			if(PrefC.HasClinicsEnabled) {
-				if(Security.CurUser.ClinicIsRestricted) {
-					clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
-				}
-				else if(comboClinic.SelectedIndex>0) {
-					clinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;//Subtract 1, HQ is the first option.
-				}
+				clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
 			}
 			if(checkReplace.Checked){
 				Schedules.Clear(dateSelectedStart,dateSelectedEnd,provNums,empNums,checkPracticeNotes.Checked,checkClinicNotes.Checked,clinicNum);
@@ -1027,12 +996,7 @@ namespace OpenDental{
 			List<long> empNums = listEmp.SelectedIndices.OfType<int>().Select(x => _listEmps[x].EmployeeNum).ToList();
 			long clinicNum=0;
 			if(PrefC.HasClinicsEnabled) {
-				if(Security.CurUser.ClinicIsRestricted) {
-					clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
-				}
-				else if(comboClinic.SelectedIndex>0) {
-					clinicNum=_listClinics[comboClinic.SelectedIndex-1].ClinicNum;//Subtract 1, because Headquarters is the first option.
-				}
+				clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
 			}
 			List<Schedule> SchedList=Schedules.RefreshPeriod(DateCopyStart,DateCopyEnd,provNums,empNums,checkPracticeNotes.Checked,
 				checkClinicNotes.Checked,clinicNum);
