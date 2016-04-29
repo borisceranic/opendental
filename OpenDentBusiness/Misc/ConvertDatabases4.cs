@@ -786,8 +786,104 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ClaimProcsNotBilledToInsAutoGroup','1')";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS xwebresponse";
+					Db.NonQ(command);
+					command=@"CREATE TABLE xwebresponse (
+						XWebResponseNum bigint NOT NULL auto_increment PRIMARY KEY,
+						PatNum bigint NOT NULL,
+						ProvNum bigint NOT NULL,
+						ClinicNum bigint NOT NULL,
+						PaymentNum bigint NOT NULL,
+						DateTEntry datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+						DateTUpdate datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+						TransactionStatus tinyint NOT NULL,
+						ResponseCode int NOT NULL,
+						XWebResponseCode varchar(255) NOT NULL,
+						ResponseDescription varchar(255) NOT NULL,
+						OTK varchar(255) NOT NULL,
+						HpfUrl text NOT NULL,
+						HpfExpiration datetime NOT NULL DEFAULT '0001-01-01 00:00:00',
+						TransactionID varchar(255) NOT NULL,
+						TransactionType varchar(255) NOT NULL,
+						Alias varchar(255) NOT NULL,
+						CardType varchar(255) NOT NULL,
+						CardBrand varchar(255) NOT NULL,
+						CardBrandShort varchar(255) NOT NULL,
+						MaskedAcctNum varchar(255) NOT NULL,
+						Amount double NOT NULL,
+						ApprovalCode varchar(255) NOT NULL,
+						CardCodeResponse varchar(255) NOT NULL,
+						ReceiptID int NOT NULL,
+						ExpDate varchar(255) NOT NULL,
+						EntryMethod varchar(255) NOT NULL,
+						ProcessorResponse varchar(255) NOT NULL,
+						BatchNum int NOT NULL,
+						BatchAmount double NOT NULL,
+						AccountExpirationDate date NOT NULL DEFAULT '0001-01-01',
+						DebugError text NOT NULL,
+						PayNote text NOT NULL,
+						INDEX(PatNum),
+						INDEX(ProvNum),
+						INDEX(ClinicNum),
+						INDEX(PaymentNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE xwebresponse'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE xwebresponse (
+						XWebResponseNum number(20) NOT NULL,
+						PatNum number(20) NOT NULL,
+						ProvNum number(20) NOT NULL,
+						ClinicNum number(20) NOT NULL,
+						PaymentNum number(20) NOT NULL,
+						DateTEntry date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						DateTUpdate date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						TransactionStatus number(3) NOT NULL,
+						ResponseCode number(11) NOT NULL,
+						XWebResponseCode varchar2(255),
+						ResponseDescription varchar2(255),
+						OTK varchar2(255),
+						HpfUrl clob,
+						HpfExpiration date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						TransactionID varchar2(255),
+						TransactionType varchar2(255),
+						Alias varchar2(255),
+						CardType varchar2(255),
+						CardBrand varchar2(255),
+						CardBrandShort varchar2(255),
+						MaskedAcctNum varchar2(255),
+						Amount number(38,8) NOT NULL,
+						ApprovalCode varchar2(255),
+						CardCodeResponse varchar2(255),
+						ReceiptID number(11) NOT NULL,
+						ExpDate varchar2(255),
+						EntryMethod varchar2(255),
+						ProcessorResponse varchar2(255),
+						BatchNum number(11) NOT NULL,
+						BatchAmount number(38,8) NOT NULL,
+						AccountExpirationDate date DEFAULT TO_DATE('0001-01-01','YYYY-MM-DD') NOT NULL,
+						DebugError clob,
+						PayNote clob,
+						CONSTRAINT xwebresponse_XWebResponseNum PRIMARY KEY (XWebResponseNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX xwebresponse_PatNum ON xwebresponse (PatNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX xwebresponse_ProvNum ON xwebresponse (ProvNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX xwebresponse_ClinicNum ON xwebresponse (ClinicNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX xwebresponse_PaymentNum ON xwebresponse (PaymentNum)";
+					Db.NonQ(command);
+				}
 
-				command="UPDATE preference SET ValueString = '16.2.0.0' WHERE PrefName = 'DataBaseVersion'";
+
+
+
+					command="UPDATE preference SET ValueString = '16.2.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			//To16_2_1();

@@ -87,6 +87,7 @@ namespace OpenDentBusiness.Crud{
 				xWebResponse.BatchAmount          = PIn.Double(row["BatchAmount"].ToString());
 				xWebResponse.AccountExpirationDate= PIn.Date  (row["AccountExpirationDate"].ToString());
 				xWebResponse.DebugError           = PIn.String(row["DebugError"].ToString());
+				xWebResponse.PayNote              = PIn.String(row["PayNote"].ToString());
 				retVal.Add(xWebResponse);
 			}
 			return retVal;
@@ -130,6 +131,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("BatchAmount");
 			table.Columns.Add("AccountExpirationDate");
 			table.Columns.Add("DebugError");
+			table.Columns.Add("PayNote");
 			foreach(XWebResponse xWebResponse in listXWebResponses) {
 				table.Rows.Add(new object[] {
 					POut.Long  (xWebResponse.XWebResponseNum),
@@ -164,6 +166,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Double(xWebResponse.BatchAmount),
 					POut.DateT (xWebResponse.AccountExpirationDate,false),
 					            xWebResponse.DebugError,
+					            xWebResponse.PayNote,
 				});
 			}
 			return table;
@@ -204,7 +207,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="XWebResponseNum,";
 			}
-			command+="PatNum,ProvNum,ClinicNum,PaymentNum,DateTEntry,DateTUpdate,TransactionStatus,ResponseCode,XWebResponseCode,ResponseDescription,OTK,HpfUrl,HpfExpiration,TransactionID,TransactionType,Alias,CardType,CardBrand,CardBrandShort,MaskedAcctNum,Amount,ApprovalCode,CardCodeResponse,ReceiptID,ExpDate,EntryMethod,ProcessorResponse,BatchNum,BatchAmount,AccountExpirationDate,DebugError) VALUES(";
+			command+="PatNum,ProvNum,ClinicNum,PaymentNum,DateTEntry,DateTUpdate,TransactionStatus,ResponseCode,XWebResponseCode,ResponseDescription,OTK,HpfUrl,HpfExpiration,TransactionID,TransactionType,Alias,CardType,CardBrand,CardBrandShort,MaskedAcctNum,Amount,ApprovalCode,CardCodeResponse,ReceiptID,ExpDate,EntryMethod,ProcessorResponse,BatchNum,BatchAmount,AccountExpirationDate,DebugError,PayNote) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(xWebResponse.XWebResponseNum)+",";
 			}
@@ -239,7 +242,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (xWebResponse.BatchNum)+","
 				+"'"+POut.Double(xWebResponse.BatchAmount)+"',"
 				+    POut.Date  (xWebResponse.AccountExpirationDate)+","
-				+    DbHelper.ParamChar+"paramDebugError)";
+				+    DbHelper.ParamChar+"paramDebugError,"
+				+    DbHelper.ParamChar+"paramPayNote)";
 			if(xWebResponse.HpfUrl==null) {
 				xWebResponse.HpfUrl="";
 			}
@@ -248,11 +252,15 @@ namespace OpenDentBusiness.Crud{
 				xWebResponse.DebugError="";
 			}
 			OdSqlParameter paramDebugError=new OdSqlParameter("paramDebugError",OdDbType.Text,xWebResponse.DebugError);
+			if(xWebResponse.PayNote==null) {
+				xWebResponse.PayNote="";
+			}
+			OdSqlParameter paramPayNote=new OdSqlParameter("paramPayNote",OdDbType.Text,xWebResponse.PayNote);
 			if(useExistingPK || PrefC.RandomKeys) {
-				Db.NonQ(command,paramHpfUrl,paramDebugError);
+				Db.NonQ(command,paramHpfUrl,paramDebugError,paramPayNote);
 			}
 			else {
-				xWebResponse.XWebResponseNum=Db.NonQ(command,true,paramHpfUrl,paramDebugError);
+				xWebResponse.XWebResponseNum=Db.NonQ(command,true,paramHpfUrl,paramDebugError,paramPayNote);
 			}
 			return xWebResponse.XWebResponseNum;
 		}
@@ -280,7 +288,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="XWebResponseNum,";
 			}
-			command+="PatNum,ProvNum,ClinicNum,PaymentNum,DateTEntry,DateTUpdate,TransactionStatus,ResponseCode,XWebResponseCode,ResponseDescription,OTK,HpfUrl,HpfExpiration,TransactionID,TransactionType,Alias,CardType,CardBrand,CardBrandShort,MaskedAcctNum,Amount,ApprovalCode,CardCodeResponse,ReceiptID,ExpDate,EntryMethod,ProcessorResponse,BatchNum,BatchAmount,AccountExpirationDate,DebugError) VALUES(";
+			command+="PatNum,ProvNum,ClinicNum,PaymentNum,DateTEntry,DateTUpdate,TransactionStatus,ResponseCode,XWebResponseCode,ResponseDescription,OTK,HpfUrl,HpfExpiration,TransactionID,TransactionType,Alias,CardType,CardBrand,CardBrandShort,MaskedAcctNum,Amount,ApprovalCode,CardCodeResponse,ReceiptID,ExpDate,EntryMethod,ProcessorResponse,BatchNum,BatchAmount,AccountExpirationDate,DebugError,PayNote) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(xWebResponse.XWebResponseNum)+",";
 			}
@@ -315,7 +323,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   (xWebResponse.BatchNum)+","
 				+"'"+POut.Double(xWebResponse.BatchAmount)+"',"
 				+    POut.Date  (xWebResponse.AccountExpirationDate)+","
-				+    DbHelper.ParamChar+"paramDebugError)";
+				+    DbHelper.ParamChar+"paramDebugError,"
+				+    DbHelper.ParamChar+"paramPayNote)";
 			if(xWebResponse.HpfUrl==null) {
 				xWebResponse.HpfUrl="";
 			}
@@ -324,11 +333,15 @@ namespace OpenDentBusiness.Crud{
 				xWebResponse.DebugError="";
 			}
 			OdSqlParameter paramDebugError=new OdSqlParameter("paramDebugError",OdDbType.Text,xWebResponse.DebugError);
+			if(xWebResponse.PayNote==null) {
+				xWebResponse.PayNote="";
+			}
+			OdSqlParameter paramPayNote=new OdSqlParameter("paramPayNote",OdDbType.Text,xWebResponse.PayNote);
 			if(useExistingPK || isRandomKeys) {
-				Db.NonQ(command,paramHpfUrl,paramDebugError);
+				Db.NonQ(command,paramHpfUrl,paramDebugError,paramPayNote);
 			}
 			else {
-				xWebResponse.XWebResponseNum=Db.NonQ(command,true,paramHpfUrl,paramDebugError);
+				xWebResponse.XWebResponseNum=Db.NonQ(command,true,paramHpfUrl,paramDebugError,paramPayNote);
 			}
 			return xWebResponse.XWebResponseNum;
 		}
@@ -366,7 +379,8 @@ namespace OpenDentBusiness.Crud{
 				+"BatchNum             =  "+POut.Int   (xWebResponse.BatchNum)+", "
 				+"BatchAmount          = '"+POut.Double(xWebResponse.BatchAmount)+"', "
 				+"AccountExpirationDate=  "+POut.Date  (xWebResponse.AccountExpirationDate)+", "
-				+"DebugError           =  "+DbHelper.ParamChar+"paramDebugError "
+				+"DebugError           =  "+DbHelper.ParamChar+"paramDebugError, "
+				+"PayNote              =  "+DbHelper.ParamChar+"paramPayNote "
 				+"WHERE XWebResponseNum = "+POut.Long(xWebResponse.XWebResponseNum);
 			if(xWebResponse.HpfUrl==null) {
 				xWebResponse.HpfUrl="";
@@ -376,7 +390,11 @@ namespace OpenDentBusiness.Crud{
 				xWebResponse.DebugError="";
 			}
 			OdSqlParameter paramDebugError=new OdSqlParameter("paramDebugError",OdDbType.Text,xWebResponse.DebugError);
-			Db.NonQ(command,paramHpfUrl,paramDebugError);
+			if(xWebResponse.PayNote==null) {
+				xWebResponse.PayNote="";
+			}
+			OdSqlParameter paramPayNote=new OdSqlParameter("paramPayNote",OdDbType.Text,xWebResponse.PayNote);
+			Db.NonQ(command,paramHpfUrl,paramDebugError,paramPayNote);
 		}
 
 		///<summary>Updates one XWebResponse in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
@@ -503,6 +521,10 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="DebugError = "+DbHelper.ParamChar+"paramDebugError";
 			}
+			if(xWebResponse.PayNote != oldXWebResponse.PayNote) {
+				if(command!=""){ command+=",";}
+				command+="PayNote = "+DbHelper.ParamChar+"paramPayNote";
+			}
 			if(command==""){
 				return false;
 			}
@@ -514,9 +536,13 @@ namespace OpenDentBusiness.Crud{
 				xWebResponse.DebugError="";
 			}
 			OdSqlParameter paramDebugError=new OdSqlParameter("paramDebugError",OdDbType.Text,xWebResponse.DebugError);
+			if(xWebResponse.PayNote==null) {
+				xWebResponse.PayNote="";
+			}
+			OdSqlParameter paramPayNote=new OdSqlParameter("paramPayNote",OdDbType.Text,xWebResponse.PayNote);
 			command="UPDATE xwebresponse SET "+command
 				+" WHERE XWebResponseNum = "+POut.Long(xWebResponse.XWebResponseNum);
-			Db.NonQ(command,paramHpfUrl,paramDebugError);
+			Db.NonQ(command,paramHpfUrl,paramDebugError,paramPayNote);
 			return true;
 		}
 
@@ -612,6 +638,9 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			if(xWebResponse.DebugError != oldXWebResponse.DebugError) {
+				return true;
+			}
+			if(xWebResponse.PayNote != oldXWebResponse.PayNote) {
 				return true;
 			}
 			return false;
