@@ -647,7 +647,12 @@ namespace OpenDental {
 			}
 			paymentCur.PayDate=GetPayDate(PIn.Date(table.Rows[gridMain.SelectedIndices[indexCur]]["LatestPayment"].ToString()),dateStart);
 			paymentCur.PatNum=patCur.PatNum;
-			paymentCur.ClinicNum=PIn.Long(table.Rows[gridMain.SelectedIndices[indexCur]]["ClinicNum"].ToString());
+			//Explicitly set ClinicNum=0, since a pat's ClinicNum will remain set if the user enabled clinics, assigned patients to clinics, and then
+			//disabled clinics because we use the ClinicNum to determine which PayConnect or XCharge/XWeb credentials to use for payments.
+			paymentCur.ClinicNum=0;
+			if(PrefC.HasClinicsEnabled) {
+				paymentCur.ClinicNum=PIn.Long(table.Rows[gridMain.SelectedIndices[indexCur]]["ClinicNum"].ToString());
+			}
 			//ClinicNum can be 0 for 'Headquarters' or clinics not enabled, PayType will be the 0 clinic or headquarters PayType if using PayConnect
 			paymentCur.PayType=PIn.Int(ProgramProperties.GetPropVal(_progCur.ProgramNum,"PaymentType",paymentCur.ClinicNum));
 			paymentCur.PayAmt=PIn.Double(table.Rows[gridMain.SelectedIndices[indexCur]]["ChargeAmt"].ToString());
