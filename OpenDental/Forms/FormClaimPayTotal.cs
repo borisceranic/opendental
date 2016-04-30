@@ -45,6 +45,9 @@ namespace OpenDental
 		private List<InsSub> SubList;
 		private List<Def> _listClaimPaymentTrackingDefs;
 		private List<ClaimProc> _listClaimProcsOld;
+		///<summary>True if the user has permission to edit WriteOffs based on the minimum proc.DateEntryC of the procedures to which the claimprocs
+		///in the ClaimProcsToEdit array are attached.</summary>
+		private bool _isWriteOffEditable;
 
 		///<summary></summary>
 		public FormClaimPayTotal(Patient patCur,Family famCur,List <InsPlan> planList,List<PatPlan> patPlanList,List<InsSub> subList){
@@ -311,6 +314,9 @@ namespace OpenDental
 				_listClaimProcsOld.Add(cp.Copy());
 			}
 			ProcList=Procedures.Refresh(PatCur.PatNum);
+			_isWriteOffEditable=Security.IsAuthorized(Permissions.InsWriteOffEdit,
+				ProcList.FindAll(x => ClaimProcsToEdit.Any(y => y.ProcNum==x.ProcNum)).Select(x => x.DateEntryC).Min());
+			butWriteOff.Enabled=_isWriteOffEditable;
 			if(!CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 				textLabFees.Visible=false;
 				textDedApplied.Location=textLabFees.Location;
@@ -372,7 +378,7 @@ namespace OpenDental
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableClaimProc","Ins Pay"),62,HorizontalAlignment.Right,true);
 			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableClaimProc","Writeoff"),62,HorizontalAlignment.Right,true);
+			col=new ODGridColumn(Lan.g("TableClaimProc","Writeoff"),62,HorizontalAlignment.Right,_isWriteOffEditable);
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lan.g("TableClaimProc","Status"),50,HorizontalAlignment.Center);
 			gridMain.Columns.Add(col);

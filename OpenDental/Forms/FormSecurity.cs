@@ -615,6 +615,8 @@ namespace OpenDental{
 						node2.Nodes.Add(node3);
 					node3=SetNode(Permissions.InsPayEdit);
 						node2.Nodes.Add(node3);
+					node3=SetNode(Permissions.InsWriteOffEdit);
+						node2.Nodes.Add(node3);
 					node.Nodes.Add(node2);
 				node2=SetNode("Payment");
 					node3=SetNode(Permissions.PaymentCreate);

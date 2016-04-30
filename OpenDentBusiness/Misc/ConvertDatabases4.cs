@@ -879,11 +879,30 @@ namespace OpenDentBusiness {
 					command=@"CREATE INDEX xwebresponse_PaymentNum ON xwebresponse (PaymentNum)";
 					Db.NonQ(command);
 				}
+				//Add InsWriteOffEdit permission for everyone
+				command="SELECT DISTINCT UserGroupNum FROM grouppermission";
+				table=Db.GetTable(command);
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					foreach(DataRow row in table.Rows) {
+						groupNum=PIn.Long(row["UserGroupNum"].ToString());
+						command="INSERT INTO grouppermission (UserGroupNum,PermType) "
+							+"VALUES("+POut.Long(groupNum)+",119)";//119 - InsWriteOffEdit
+						Db.NonQ(command);
+					}
+				}
+				else {//oracle
+					foreach(DataRow row in table.Rows) {
+						groupNum=PIn.Long(row["UserGroupNum"].ToString());
+						command="INSERT INTO grouppermission (GroupPermNum,UserGroupNum,PermType) "
+							+"VALUES((SELECT MAX(GroupPermNum)+1 FROM grouppermission),"+POut.Long(groupNum)+",119)";//119 - InsWriteOffEdit
+						Db.NonQ(command);
+					}
+				}
 
 
 
 
-					command="UPDATE preference SET ValueString = '16.2.0.0' WHERE PrefName = 'DataBaseVersion'";
+				command="UPDATE preference SET ValueString = '16.2.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			//To16_2_1();

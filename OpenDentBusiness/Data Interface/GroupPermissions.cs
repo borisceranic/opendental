@@ -310,6 +310,7 @@ namespace OpenDentBusiness{
 				//case Permissions.SplitCreatePastLockDate:
 				//case Permissions.ProcComplEditLimited:
 				//case Permissions.ClaimDelete:
+				//case Permissions.InsWriteOffEdit:
 				return false;//Does not have audit Trail if uncommented.
 			}
 			return true;
@@ -429,6 +430,8 @@ namespace OpenDentBusiness{
 					return Lans.g("enumPermissions","Insurance Plan Edit Subscriber");
 				case Permissions.InsPlanVerifyList:
 					return Lans.g("enumPermissions","Insurance Plan Verification List");
+				case Permissions.InsWriteOffEdit:
+					return Lans.g("enumPermissions","Insurance Write Off Edit");
 				case Permissions.ManageModule:
 					return Lans.g("enumPermissions","Manage Module");
 				case Permissions.MedicationMerge:
@@ -542,6 +545,7 @@ namespace OpenDentBusiness{
 				|| permType==Permissions.EquipmentDelete
 				|| permType==Permissions.ImageDelete
 				|| permType==Permissions.InsPayEdit
+				|| permType==Permissions.InsWriteOffEdit
 				|| permType==Permissions.OrthoChartEdit
 				|| permType==Permissions.PaymentEdit
 				|| permType==Permissions.PerioEdit

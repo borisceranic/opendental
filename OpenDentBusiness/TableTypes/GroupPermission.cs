@@ -278,7 +278,11 @@ namespace OpenDentBusiness{
 		ProcComplEditLimited,
 		///<summary>118 - Uses date restrictions based on the SecDateEntry field as the claim date.  Covers deleting a claim of any status
 		///(Sent, Waiting to Send, Received, etc).</summary>
-		ClaimDelete
+		ClaimDelete,
+		///<summary>119 - Covers editing the Write Off and Write Off Override fields for claimprocs as well as deleting/creating claimprocs.
+		///<para>Uses date/days restriction based on the attached proc.DateEntryC; unless it's a total payment, then uses claimproc.SecDateEntry.</para>
+		///<para>Applies to all plan types (i.e. PPO, Category%, Capitation, etc).</para></summary>
+		InsWriteOffEdit
 	}
 
 	

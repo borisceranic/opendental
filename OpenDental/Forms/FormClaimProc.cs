@@ -59,8 +59,6 @@ namespace OpenDental
 		private System.Windows.Forms.Label labelCodeSent;
 		private System.Windows.Forms.Label labelFeeBilled;
 		private System.Windows.Forms.Label labelRemarks;
-		///<summary>True if this is a procedure, and false if only a claim total.</summary>
-		private bool IsProc;
 		///<summary>Stores the procedure for this ClaimProc if applicable</summary>
 		//private Procedure procCur;
 		private ClaimProc ClaimProcCur;
@@ -71,8 +69,12 @@ namespace OpenDental
 		public ClaimProc ClaimProcInitial;
 		private OpenDental.ValidDouble textCopayOverride;
 		private System.Windows.Forms.Panel panelClaimExtras;
-		///<summary>The procedure to which this claimproc is attached.</summary>
+		///<summary>The procedure to which this claimproc is attached.  Sent in if this is launched from the Procedure Edit window,
+		///otherwise pulled from the db when form loads if ClaimProcCur.ProcNum>0, which also causes IsProc to be set to true.</summary>
 		private Procedure proc;
+		//Note: Consider removing IsProc. IsProc seems to be an unecessary bool since proc==null is equivalent to IsProc==false.
+		///<summary>True if this is a procedure, and false if only a claim total.  Private variable, name should be updated.</summary>
+		private bool IsProc;
 		private System.Windows.Forms.GroupBox groupClaim;
 		private OpenDental.ValidDate textProcDate;
 		private System.Windows.Forms.Label labelProcDate;
@@ -1389,6 +1391,18 @@ namespace OpenDental
 				}
 				textDescription.Text=ProcedureCodes.GetProcCode(proc.CodeNum).Descript;
 				textProcDate.ReadOnly=true;//user not allowed to edit ProcDate unless it's for a total payment
+			}
+			//get the date to use for checking whether the user has InsWriteOffEdit permission
+			DateTime writeOffSecDate=ClaimProcCur.SecDateEntry;//if this is a total payment, there is no proc so use ClaimProcCur.SecDateEntry
+			//if this is claimproc is attached to a proc, and the proc returned by GetOneProc (called above if proc was null) is a valid proc, use DateEntryC
+			if(IsProc && proc.ProcDate!=DateTime.MinValue) {
+				writeOffSecDate=proc.DateEntryC;
+			}
+			if(!Security.IsAuthorized(Permissions.InsWriteOffEdit,writeOffSecDate)) {//user not allowed to edit/create a writeoff
+				textWriteOff.ReadOnly=true;
+				textWriteOffEstOverride.ReadOnly=true;
+				//cannot edit the writeoff, so block deleting the claimproc, otherwise they could delete and recreate to bypass the date/days restriction
+				butDelete.Enabled=false;
 			}
 			if(ClaimProcCur.ClaimNum>0) {//attached to claim
 				radioClaim.Checked=true;

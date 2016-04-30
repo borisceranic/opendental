@@ -3625,6 +3625,12 @@ namespace OpenDental{
 
 		///<summary>Enable/disable controls based on permissions ProcComplEdit and ProcComplEditLimited.</summary>
 		private void SetControlsEnabled(bool isSilent) {
+			//Don't allow adding an estimate, since a new estimate could change the total writeoff amount for the proc.
+			//If the procedure is TP'd, Complete, or any status, use the DateEntryC to compare to the date/days newer restriction.
+			if(!Security.IsAuthorized(Permissions.InsWriteOffEdit,ProcCur.DateEntryC,isSilent)) {
+				butAddEstimate.Enabled=false;
+				checkNoBillIns.Enabled=false;
+			}
 			if(ProcCur.ProcStatus!=ProcStat.C) {
 				return;
 			}
