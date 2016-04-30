@@ -5513,8 +5513,8 @@ namespace OpenDental{
 			DialogResult=DialogResult.OK;
 		}
 
-		///<summary>Helper method that shows the payment window if the user has the "Show provider income transfer window after entering insurance payment" preference enabled.
-		///This method should always be called after an insurance payment has been made.</summary>
+		///<summary>Helper method that shows the payment window if the user has the "Show provider income transfer window after entering insurance payment"
+		///preference enabled.  This method should always be called after an insurance payment has been made.</summary>
 		private void ShowProviderTransferWindow() {
 			if(!PrefC.GetBool(PrefName.ProviderIncomeTransferShows)) {
 				return;
@@ -5522,7 +5522,12 @@ namespace OpenDental{
 			Payment PaymentCur=new Payment();
 			PaymentCur.PayDate=DateTimeOD.Today;
 			PaymentCur.PatNum=PatCur.PatNum;
-			PaymentCur.ClinicNum=PatCur.ClinicNum;
+			//Explicitly set ClinicNum=0, since a pat's ClinicNum will remain set if the user enabled clinics, assigned patients to clinics, and then
+			//disabled clinics because we use the ClinicNum to determine which PayConnect or XCharge/XWeb credentials to use for payments.
+			PaymentCur.ClinicNum=0;
+			if(PrefC.HasClinicsEnabled) {//if clinics aren't enabled default to 0
+				PaymentCur.ClinicNum=PatCur.ClinicNum;
+			}
 			PaymentCur.PayType=0;//txfr
 			PaymentCur.DateEntry=DateTimeOD.Today;//So that it will show properly in the new window.
 			PaymentCur.PaymentSource=CreditCardSource.None;
