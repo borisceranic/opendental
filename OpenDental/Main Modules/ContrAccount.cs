@@ -2949,11 +2949,16 @@ namespace OpenDental {
 			Payment PaymentCur=new Payment();
 			PaymentCur.PayDate=DateTimeOD.Today;
 			PaymentCur.PatNum=PatCur.PatNum;
-			if(PrefC.GetBool(PrefName.PaymentsUsePatientClinic)) {
-				PaymentCur.ClinicNum=PatCur.ClinicNum;
-			}
-			else {
-				PaymentCur.ClinicNum=Clinics.ClinicNum;
+			//Explicitly set ClinicNum=0, since a pat's ClinicNum will remain set if the user enabled clinics, assigned patients to clinics, and then
+			//disabled clinics because we use the ClinicNum to determine which PayConnect or XCharge/XWeb credentials to use for payments.
+			PaymentCur.ClinicNum=0;
+			if(PrefC.HasClinicsEnabled) {//if clinics aren't enabled default to 0
+				if(PrefC.GetBool(PrefName.PaymentsUsePatientClinic)) {
+					PaymentCur.ClinicNum=PatCur.ClinicNum;
+				}
+				else {
+					PaymentCur.ClinicNum=Clinics.ClinicNum;
+				}
 			}
 			PaymentCur.DateEntry=DateTimeOD.Today;//So that it will show properly in the new window.
 			if(DefC.Short[(int)DefCat.PaymentTypes].Length>0){
