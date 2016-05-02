@@ -1,16 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Globalization;
-using System.IO;
-using System.Text;
+using System.Linq;
 using System.Windows.Forms;
 using MigraDoc.DocumentObjectModel;
 using MigraDoc.DocumentObjectModel.Shapes;
 using MigraDoc.DocumentObjectModel.Tables;
 using OpenDental.UI;
 using OpenDentBusiness;
+using PdfSharp.Drawing;
+using PdfSharp.Pdf;
 
 namespace OpenDental {
 	///<summary>Used to add functionality to the MigraDoc framework.  Specifically, it helps with absolute positioning.</summary>
@@ -357,6 +357,9 @@ namespace OpenDental {
 			//format dummy cell?
 			MigraDoc.DocumentObjectModel.Font fontHead=new MigraDoc.DocumentObjectModel.Font("Arial",Unit.FromPoint(8.5));
 			fontHead.Bold=true;
+			PdfDocument pdfd=new PdfDocument();
+			PdfPage pg=pdfd.AddPage();
+			XGraphics gx=XGraphics.FromPdfPage(pg);//A dummy graphics object for measuring the text
 			for(int i=0;i<grid.Columns.Count;i++){
 				cell = row.Cells[i+1];
 				par=cell.AddParagraph();
@@ -394,7 +397,26 @@ namespace OpenDental {
 						color=grid.Rows[i].Cells[j].ColorText;
 					}
 					fontBody=CreateFont(8.5f,isBold,color);
-					par.AddFormattedText(grid.Rows[i].Cells[j].Text,fontBody);
+					XFont xFont;
+					if(isBold) {
+						xFont=new XFont("Arial",13.00);//Since we are using a dummy graphics object to measure the string, '13.00' is pretty much a guess-and-check
+																					 //value that looks about right.
+					}
+					else {
+						xFont=new XFont("Arial",11.65);//Yep, a guess-and-check value here too.
+					}
+					int colWidth=grid.Columns[j].ColWidth;
+					string cellText=grid.Rows[i].Cells[j].Text;
+					List<string> listWords=cellText.Split(new[] {" ","\t","\n","\r\n" },StringSplitOptions.RemoveEmptyEntries).ToList();
+					bool isAnyWordWiderThanColumn=listWords.Any(x => gx.MeasureString(x,xFont).Width>colWidth);
+					if(!isAnyWordWiderThanColumn) {
+						//Let MigraDoc format line breaks
+						par.AddFormattedText(cellText,fontBody);
+					}
+					else {
+						//Do our own line splitting and word splitting
+						DrawTextWithWordSplits(par,fontBody,colWidth,cellText,gx,xFont);						
+					}
 					if(grid.Columns[j].TextAlign==HorizontalAlignment.Center){
 						cell.Format.Alignment=ParagraphAlignment.Center;
 					}
@@ -425,5 +447,93 @@ namespace OpenDental {
 			table.SetEdge(1,0,grid.Columns.Count,edgeRows,Edge.Box,MigraDoc.DocumentObjectModel.BorderStyle.Single,1,Colors.Black);
 			section.Add(table);
 		}
+
+		///<summary>Draws the text and splits words that are too long for the column into multiple lines.</summary>
+		private static void DrawTextWithWordSplits(Paragraph par,MigraDoc.DocumentObjectModel.Font fontBody,int colWidth,string cellText,XGraphics gx,
+			XFont xFont) 
+		{			
+			string line="";
+			string word="";
+			//cellText=cellText.Replace("\r\n","\n").Replace("\n","\r\n");//Make sure all the line breaks are uniform
+			for(int c=0;c<cellText.Length;c++) {
+				char letter=cellText[c];
+				word+=letter;
+				if(c==cellText.Length-1 || (!char.IsWhiteSpace(letter) && char.IsWhiteSpace(cellText[c+1]))) {//We have reached the end of the word.
+					if((line+word).All(x => char.IsWhiteSpace(x))) {//Sometimes gx.MeasureString will throw an exception if the text is all whitespace.
+						par.AddFormattedText(line+word,fontBody);
+						line="";
+						word="";
+						continue;
+					}
+					if(DoesTextFit(line+word,colWidth,gx,xFont)) {
+						line+=word;
+						if(IsLastWord(c,cellText)) {
+							par.AddFormattedText(line,fontBody);
+						}
+					}
+					else {//The line plus the word do not fit.
+						if(line=="") {//The word by itself does not fit.
+							DrawWordChunkByChunk(word,colWidth,par,fontBody,gx,xFont);
+						}
+						else {
+							par.AddFormattedText(line,fontBody);
+							if(DoesTextFit(word,colWidth,gx,xFont)) {
+								if(IsLastWord(c,cellText)) {
+									par.AddFormattedText(word,fontBody);
+								}
+								line=word;
+							}
+							else {//The word by itself does not fit.
+								DrawWordChunkByChunk(word,colWidth,par,fontBody,gx,xFont);
+								line="";
+							}
+						}
+					}
+					word="";
+				}
+			}
+		}
+
+		///<summary>Draws the word on multiple lines if it is too long to fit on one line.</summary>
+		private static void DrawWordChunkByChunk(string word,int colWidth,Paragraph par,MigraDoc.DocumentObjectModel.Font fontBody,XGraphics gx,
+			XFont xFont) 
+		{
+			string chunk="";
+			for(int i=0;i<word.Length;i++) {
+				char letter=word[i];
+				if((chunk+letter).All(x => char.IsWhiteSpace(x))) {//Sometimes gx.MeasureString will throw an exception if the text is all whitespace.
+					par.AddFormattedText(chunk+letter,fontBody);
+					continue;
+				}
+				if(DoesTextFit(chunk+letter,colWidth,gx,xFont)) {
+					if(i==word.Length-1) {//Reached the end of the word
+						par.AddFormattedText(chunk+letter,fontBody);
+						return;
+					}
+					chunk+=letter;
+					continue;
+				}
+				par.AddFormattedText(chunk,fontBody);
+				chunk=""+letter;
+			}
+		}
+
+		///<summary>Returns true if there are no other words past the index. This will only work if the index is the last character in a previous word.
+		///</summary>
+		private static bool IsLastWord(int index,string cellText) {
+			for(int i=index+1;i<cellText.Length;i++) {
+				if(!char.IsWhiteSpace(cellText[i])) {
+					return false;
+				}
+			}
+			return true;
+		}
+	
+		///<summary>Returns true if the text fits in the specified width.</summary>
+		private static bool DoesTextFit(string text,int colWidth,XGraphics gx,XFont xFont) {
+			return gx.MeasureString(text,xFont).Width<colWidth;
+		}
+
+
 	}
 }
