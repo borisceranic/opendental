@@ -904,8 +904,9 @@ namespace OpenDentBusiness {
 			if(!codeSubstNone) {
 				substCodeNum=ProcedureCodes.GetSubstituteCodeNum(procCodeStr,toothNum);//for posterior composites
 			}
-			//PPO always returns the PPO fee for the code or substituted code.
-			if(planType=="p") {
+			//PPO always returns the PPO fee for the code or substituted code. 
+			//Flat copay insurances should only ever pay up to their fee schedule amount, regardless of what the procFee is.
+			if(planType=="p" || planType=="f") {
 				double allowedSub=Fees.GetAmount(substCodeNum,feeSched,clinicNum,provNum);
 				double allowedNoSub=Fees.GetAmount(codeNum,feeSched,clinicNum,provNum);
 				if(allowedSub==-1								//The fee for the substitution code is blank
