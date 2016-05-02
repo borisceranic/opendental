@@ -428,6 +428,74 @@ namespace OpenDental{
 				butDelete.Enabled=false;
 				butOK.Enabled=false;
 			}
+			CommItemSaveEvent.Fired+=CommItemSaveEvent_Fired;
+		}
+
+		private void CommItemSaveEvent_Fired(CodeBase.ODEventArgs e) {
+			if(e.Name!="CommItemSave") {
+				return;
+			}
+			//save comm item
+			SaveCommItem(false);
+		}
+
+		private bool SaveCommItem(bool showMsg) {
+			if(textDateTime.Text==""){
+				if(showMsg) {
+					MsgBox.Show(this,"Please enter a date first.");
+				}
+				return false;
+			}
+			try{
+				DateTime.Parse(textDateTime.Text);
+			}
+			catch{
+				if(showMsg) {
+					MsgBox.Show(this,"Date / Time invalid.");
+				}
+				return false;
+			}
+			if(textDateTimeEnd.Text!="") {
+				try {
+					DateTime.Parse(textDateTimeEnd.Text);
+				}
+				catch {
+					if(showMsg) {
+						MsgBox.Show(this,"End date and time invalid.");
+					}
+					return false;
+				}
+				CommlogCur.DateTimeEnd=PIn.DateT(textDateTimeEnd.Text);
+			}
+			CommlogCur.CommDateTime=PIn.DateT(textDateTime.Text);
+			//there may not be a commtype selected.
+			if(listType.SelectedIndex==-1){
+				CommlogCur.CommType=0;
+			}
+			else{
+				CommlogCur.CommType=DefC.Short[(int)DefCat.CommLogTypes][listType.SelectedIndex].DefNum;
+			}
+			CommlogCur.Mode_=(CommItemMode)listMode.SelectedIndex;
+			CommlogCur.SentOrReceived=(CommSentOrReceived)listSentOrReceived.SelectedIndex;
+			CommlogCur.Note=textNote.Text;
+			try {
+				SaveSignature();
+			}
+			catch(Exception ex){
+				if(showMsg) {
+					MessageBox.Show(Lan.g(this,"Error saving signature.")+"\r\n"+ex.Message);
+				}
+				return false;
+			}
+			if(IsNew){
+				Commlogs.Insert(CommlogCur);
+				SecurityLogs.MakeLogEntry(Permissions.CommlogEdit,CommlogCur.PatNum,"Insert");
+			}
+			else{
+				Commlogs.Update(CommlogCur);
+				SecurityLogs.MakeLogEntry(Permissions.CommlogEdit,CommlogCur.PatNum,"");
+			}
+			return true;
 		}
 
 		private void signatureBoxWrapper_SignatureChanged(object sender,EventArgs e) {
@@ -508,52 +576,8 @@ namespace OpenDental{
 
 		private void butOK_Click(object sender, System.EventArgs e) {
 			//button not enabled if no permission
-			if(textDateTime.Text==""){
-				MsgBox.Show(this,"Please enter a date first.");
+			if(!SaveCommItem(true)) {
 				return;
-			}
-			try{
-				DateTime.Parse(textDateTime.Text);
-			}
-			catch{
-				MsgBox.Show(this,"Date / Time invalid.");
-				return;
-			}
-			if(textDateTimeEnd.Text!="") {
-				try {
-					DateTime.Parse(textDateTimeEnd.Text);
-				}
-				catch {
-					MsgBox.Show(this,"End date and time invalid.");
-					return;
-				}
-				CommlogCur.DateTimeEnd=PIn.DateT(textDateTimeEnd.Text);
-			}
-			CommlogCur.CommDateTime=PIn.DateT(textDateTime.Text);
-			//there may not be a commtype selected.
-			if(listType.SelectedIndex==-1){
-				CommlogCur.CommType=0;
-			}
-			else{
-				CommlogCur.CommType=DefC.Short[(int)DefCat.CommLogTypes][listType.SelectedIndex].DefNum;
-			}
-			CommlogCur.Mode_=(CommItemMode)listMode.SelectedIndex;
-			CommlogCur.SentOrReceived=(CommSentOrReceived)listSentOrReceived.SelectedIndex;
-			CommlogCur.Note=textNote.Text;
-			try {
-				SaveSignature();
-			}
-			catch(Exception ex){
-				MessageBox.Show(Lan.g(this,"Error saving signature.")+"\r\n"+ex.Message);
-				return;
-			}
-			if(IsNew){
-				Commlogs.Insert(CommlogCur);
-				SecurityLogs.MakeLogEntry(Permissions.CommlogEdit,CommlogCur.PatNum,"Insert");
-			}
-			else{
-				Commlogs.Update(CommlogCur);
-				SecurityLogs.MakeLogEntry(Permissions.CommlogEdit,CommlogCur.PatNum,"");
 			}
 			DialogResult=DialogResult.OK;
 		}

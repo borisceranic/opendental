@@ -788,6 +788,8 @@
     <Compile Include="Mobile\TableTypes\Statementm.cs" />
     <Compile Include="Mobile\TableTypes\Userm.cs" />
     <Compile Include="Mobile\TableTypes\RxPatm.cs" />
+    <Compile Include="ODEvents\EmailSaveEvent.cs" />
+    <Compile Include="ODEvents\CommItemSaveEvent.cs" />
     <Compile Include="ODEvents\WikiSaveEvent.cs" />
     <Compile Include="ODEvents\DataConnectionEvent.cs" />
     <Compile Include="Remoting\ClientSL.cs" />

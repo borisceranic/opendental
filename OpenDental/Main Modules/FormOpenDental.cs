@@ -7516,6 +7516,12 @@ namespace OpenDental{
 				if(openForm.Name=="FormWikiEdit") {
 					WikiSaveEvent.Fire(new ODEventArgs("ForceSaveWiki"));
 				}
+				if(openForm.Name=="FormCommItem") {
+					CommItemSaveEvent.Fire(new ODEventArgs("CommItemSave"));
+				}
+				if(openForm.Name=="FormEmailMessageEdit") {
+					EmailSaveEvent.Fire(new ODEventArgs("EmailSave"));
+				}
 				if(isForceClose) {
 					openForm.Dispose();//Strictly disposing of a form will not perform the closing events.
 				}
