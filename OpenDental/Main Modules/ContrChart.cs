@@ -2883,6 +2883,7 @@ namespace OpenDental {
 			// gridProg
 			// 
 			this.gridProg.AllowSortingByColumn = true;
+			this.gridProg.ContextMenu = menuProgRight;
 			this.gridProg.HasAddButton = false;
 			this.gridProg.HasMultilineHeaders = false;
 			this.gridProg.HScrollVisible = true;
@@ -9755,8 +9756,8 @@ namespace OpenDental {
 					menuItemPrintDay.Visible=true;
 				}
 				Plugins.HookAddCode(this,"ContrChart.gridProg_MouseUp_end",menuProgRight,gridProg,PatCur);
-				gridProg.ContextMenu=menuProgRight;//set for WikiDetectLinks feature.
-				menuProgRight.Show(gridProg,new Point(e.X,e.Y));
+				//Do not show menu here, instead set the grid as the menu owner at it will automatically apear on the grid when clicked.
+				//menuProgRight.Show(gridProg,new Point(e.X,e.Y));
 			}
 		}
 
