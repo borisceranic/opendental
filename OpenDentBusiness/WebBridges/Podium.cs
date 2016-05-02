@@ -146,10 +146,12 @@ namespace OpenDentBusiness.WebBridges {
 						}
 					}
 				}
-				catch(Exception ex) {
-					if(ex is WebException) {
-						statusCode=(int)((HttpWebResponse)((WebException)ex).Response).StatusCode;
+				catch(WebException we) {
+					if(we.Response.GetType()==typeof(HttpWebResponse)) {
+						statusCode=(int)((HttpWebResponse)we.Response).StatusCode;
 					}
+				}
+				catch(Exception) {
 					//Do nothing because a verbose commlog will be made below if all phone numbers fail.
 				}
 			}
