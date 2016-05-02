@@ -150,9 +150,6 @@ namespace OpenDental{
 	///<summary>Handles a global event to keep local data synchronized.</summary>
 	public class DataValid{
 
-		///<summary></summary>
-		public static event OpenDental.ValidEventHandler BecameInvalid;	
-
 		/*
 		///<summary>Triggers an event that causes a signal to be sent to all other computers telling them what kind of locally stored data needs to be updated.  Either supply a set of flags for the types, or supply a date if the appointment screen needs to be refreshed.  Yes, this does immediately refresh the local data, too.  The AllLocal override does all types except appointment date for the local computer only, such as when starting up.</summary>
 		public static void SetInvalid(List<int> itypes){
@@ -166,13 +163,6 @@ namespace OpenDental{
 				itypeList.Add((int)itypes[i]);
 			}
 			FormOpenDental.S_DataValid_BecomeInvalid(new OpenDental.ValidEventArgs(DateTime.MinValue,itypeList,false,0));
-		}
-
-		///<summary>Triggers an event that causes a signal to be sent to all other computers telling them what kind of locally stored data needs to be updated.  Either supply a set of flags for the types, or supply a date if the appointment screen needs to be refreshed.  Yes, this does immediately refresh the local data, too, except Appointments.  The AllLocal override does all types except appointment date for the local computer only, such as when starting up.</summary>
-		public static void SetInvalid(DateTime date){
-			List<int> itypeList=new List<int>();
-			itypeList.Add((int)InvalidType.Date);
-			FormOpenDental.S_DataValid_BecomeInvalid(new OpenDental.ValidEventArgs(date,itypeList,false,0));
 		}
 
 		///<summary>Triggers an event that causes a signal to be sent to all other computers telling them what kind of locally stored data needs to be updated.  Either supply a set of flags for the types, or supply a date if the appointment screen needs to be refreshed.  Yes, this does immediately refresh the local data, too.  The AllLocal override does all types except appointment date for the local computer only, such as when starting up.</summary>

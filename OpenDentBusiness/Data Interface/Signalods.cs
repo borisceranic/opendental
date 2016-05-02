@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
 using CodeBase;
+using OpenDentBusiness.UI;
 
 namespace OpenDentBusiness {
 	///<summary></summary>
@@ -220,6 +221,90 @@ namespace OpenDentBusiness {
 			Insert(sig);
 		}
 
+		///<summary>Pass one or two appointments into this function to send 2 to 6 invalid signals depending on the changes made to the appointment.</summary>
+		/// <param name="apptNew">Required. If changes are made to an appointment or a new appointment is made, it should be passed in here.</param>
+		/// <param name="apptOld">Optional. Only used if changes are being made to an existing appointment.</param>
+		public static void SetInvalid(Appointment apptNew,Appointment apptOld = null) {
+			if(apptNew==null) {
+				return;//should never happen.
+			}
+			//The six possible signals are:
+			//  1.New Provider
+			//  2.New Hyg
+			//  3.New Op
+			//  4.Old Provider
+			//  5.Old Hyg
+			//  6.Old Op
+			//If there is no change between new and old, or if there is not an old appt provided, then fewer than 6 signals may be generated.
+			List<Signalod> listSignals = new List<Signalod>();
+			//  1.New Provider
+			listSignals.Add(
+				new Signalod() {
+					DateViewing=apptNew.AptDateTime,
+					ITypes=((int)InvalidType.Appointment).ToString(),
+					FKey=apptNew.ProvNum,
+					FKeyType=KeyType.Provider,
+					SigType=SignalType.Invalid				
+				});
+			//  2.New Hyg
+			if(apptNew.ProvHyg>0) {
+				listSignals.Add(
+					new Signalod() {
+						DateViewing=apptNew.AptDateTime,
+						ITypes=((int)InvalidType.Appointment).ToString(),
+						FKey=apptNew.ProvHyg,
+						FKeyType=KeyType.Provider,
+						SigType=SignalType.Invalid				
+					});
+			}
+			//  3.New Op
+			if(apptNew.Op>0) {
+				listSignals.Add(
+					new Signalod() {
+						DateViewing=apptNew.AptDateTime,
+						ITypes=((int)InvalidType.Appointment).ToString(),
+						FKey=apptNew.Op,
+						FKeyType=KeyType.Operatory,
+						SigType=SignalType.Invalid
+					});
+			}
+			//  4.Old Provider
+			if(apptOld!=null && apptOld.ProvNum>0 && (apptOld.AptDateTime.Date!=apptNew.AptDateTime.Date || apptOld.ProvNum!=apptNew.ProvNum)) {
+				listSignals.Add(
+					new Signalod() {
+						DateViewing=apptOld.AptDateTime,
+						ITypes=((int)InvalidType.Appointment).ToString(),
+						FKey=apptOld.ProvNum,
+						FKeyType=KeyType.Provider,
+						SigType=SignalType.Invalid
+					});
+			}
+			//  5.Old Hyg
+			if(apptOld!=null && apptOld.ProvHyg>0 && (apptOld.AptDateTime.Date!=apptNew.AptDateTime.Date || apptOld.ProvHyg!=apptNew.ProvHyg)) {
+				listSignals.Add(
+					new Signalod() {
+						DateViewing=apptOld.AptDateTime,
+						ITypes=((int)InvalidType.Appointment).ToString(),
+						FKey=apptOld.ProvHyg,
+						FKeyType=KeyType.Provider,
+						SigType=SignalType.Invalid
+					});
+			}
+			//  6.Old Op
+			if(apptOld!=null && apptOld.Op>0 && (apptOld.AptDateTime.Date!=apptNew.AptDateTime.Date || apptOld.Op!=apptNew.Op)) {
+				listSignals.Add(
+					new Signalod() {
+						DateViewing=apptOld.AptDateTime,
+						ITypes=((int)InvalidType.Appointment).ToString(),
+						FKey=apptOld.Op,
+						FKeyType=KeyType.Operatory,
+						SigType=SignalType.Invalid
+					});
+			}
+			listSignals.ForEach(x=>Insert(x));
+			BroadcastSignals(listSignals);//for immediate update. Signals will be processed again at next tick interval.
+		}
+
 		///<summary>Inserts a signal which tells all client machines to update the received unread SMS message count inside the Text button of the main toolbar.  To get the current count from the database, use SmsFromMobiles.GetSmsNotification().</summary>
 		public static long InsertSmsNotification(long smsReceivedUnreadCount) {
 			Signalod sig=new Signalod();
@@ -248,12 +333,16 @@ namespace OpenDentBusiness {
 		///<summary>After a refresh, this is used to determine whether the Appt Module needs to be refreshed.  Must supply the current date showing as well as the recently retrieved signal list.</summary>
 		public static bool ApptNeedsRefresh(List<Signalod> signalList,DateTime dateTimeShowing) {
 			//No need to check RemotingRole; no call to db.
-			List<string> iTypeList;
-			for(int i=0;i<signalList.Count;i++){
-				iTypeList=new List<string>(signalList[i].ITypes.Split(','));
-				if(iTypeList.Contains(((int)InvalidType.Date).ToString()) && signalList[i].DateViewing.Date==dateTimeShowing){
-					return true;
-				}
+			List<Signalod> listApptSignals = signalList.FindAll(x => x.ITypes==((int)InvalidType.Appointment).ToString() && x.DateViewing.Date==dateTimeShowing.Date);
+			if(listApptSignals.Count==0) {
+				return false;
+			}
+			List<long> visibleOps = ApptDrawing.VisOps.Select(x => x.OperatoryNum).ToList();
+			List<long> visibleProvs = ApptDrawing.VisProvs.Select(x => x.ProvNum).ToList();
+			if(listApptSignals.Any(x=> x.FKeyType==KeyType.Operatory && visibleOps.Contains(x.FKey))
+				|| listApptSignals.Any(x=> x.FKeyType==KeyType.Provider && visibleProvs.Contains(x.FKey))) 
+			{
+				return true;
 			}
 			return false;
 		}
@@ -303,9 +392,6 @@ namespace OpenDentBusiness {
 			string[] strArray;
 			for(int i=0;i<signalodList.Count;i++){
 				if(signalodList[i].SigType!=SignalType.Invalid){
-					continue;
-				}
-				if(signalodList[i].ITypes==((int)InvalidType.Date).ToString()){
 					continue;
 				}
 				if(signalodList[i].ITypes==((int)InvalidType.Task).ToString()){
@@ -478,7 +564,7 @@ namespace OpenDentBusiness {
 				SigElements.DeleteOrphaned();
 				Prefs.UpdateDateT(PrefName.SignalLastClearedDate,MiscData.GetNowDateTime());//Set Last cleared to now.
 			}
-			catch(Exception ex) {
+			catch(Exception) {
 				//fail silently
 			}
 		}

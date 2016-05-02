@@ -195,9 +195,6 @@ namespace OpenDental{
 		//private UserControlPhonePanel phonePanel;
 		///<summary>Command line args passed in when program starts.</summary>
 		public string[] CommandLineArgs;
-		//private Thread ThreadCommandLine;
-		///<summary>Listens for commands coming from other instances of Open Dental on this computer.</summary>
-		private TcpListener TcpListenerCommandLine;
 		///<summary>True if there is already a different instance of OD running.  This prevents attempting to start the listener.</summary>
 		public bool IsSecondInstance;
 		private UserControlTasks userControlTasks1;
@@ -2337,7 +2334,7 @@ namespace OpenDental{
 			ContrManage2.InitializeOnStartup();//so that when a signal is received, it can handle it.
 			//Lan.Refresh();//automatically skips if current culture is en-US
 			//LanguageForeigns.Refresh(CultureInfo.CurrentCulture);//automatically skips if current culture is en-US
-			DataValid.BecameInvalid += new OpenDental.ValidEventHandler(DataValid_BecameInvalid);
+			//DataValid.BecameInvalid += new OpenDental.ValidEventHandler(DataValid_BecameInvalid);
 			Signalods.SignalLastRefreshed=MiscData.GetNowDateTime();
 			if(PrefC.GetInt(PrefName.ProcessSigsIntervalInSecs)==0) {
 				timerSignals.Enabled=false;
@@ -2655,7 +2652,7 @@ namespace OpenDental{
 					//Reinitialize the tooth chart because the graphics mode was probably changed which should change the tooth chart appearence.
 					ContrChart2.InitializeOnStartup();
 				}
-				catch(Exception ex) {
+				catch(Exception) {
 					//The tooth chart will default to Simple2D mode if the above code fails for any reason.  This will at least get the user into the program.
 				}
 			}
@@ -3559,7 +3556,7 @@ namespace OpenDental{
 					try {
 						listServices[i].Start();
 					}
-					catch(Exception ex) {
+					catch(Exception) {
 						//An InvalidOperationException can get thrown if the service could not be started.  E.g. current user is not running Open Dental as an 
 						//administrator.	We do not want to halt the startup sequence here.  If we want to notify customers of a downed service, there needs to 
 						//be an additional monitoring service installed.
@@ -4128,7 +4125,7 @@ namespace OpenDental{
 				RefreshLocalData(InvalidType.AllLocal);//does local computer only
 				return;
 			}
-			if(!e.ITypes.Contains((int)InvalidType.Date) //local refresh for dates is handled within ContrAppt, not here
+			if(!e.ITypes.Contains((int)InvalidType.Appointment) //local refresh for dates is handled within ContrAppt, not here
 				&& !e.ITypes.Contains((int)InvalidType.Task)//Tasks are not "cached" data.
 				&& !e.ITypes.Contains((int)InvalidType.TaskPopup))
 			{
@@ -4157,12 +4154,6 @@ namespace OpenDental{
 			}
 			Signalod sig=new Signalod();
 			sig.ITypes=itypeString;
-			if(e.ITypes.Contains((int)InvalidType.Date)){
-				sig.DateViewing=e.DateViewing;
-			}
-			else{
-				sig.DateViewing=DateTime.MinValue;
-			}
 			sig.SigType=SignalType.Invalid;
 			if(e.ITypes.Contains((int)InvalidType.Task) || e.ITypes.Contains((int)InvalidType.TaskPopup)){
 				sig.TaskNum=e.TaskNum;
@@ -5007,7 +4998,7 @@ namespace OpenDental{
 			try {
 				EmailMessages.ReceiveFromInbox(0,emailAddress);
 			}
-			catch(Exception ex) {
+			catch(Exception) {
 				//Do not tell the user, because it would be annoying to see an error every 30 seconds (if the server was down for instance).
 				//Maybe we could log to the system EventViewer Application log someday if users complain. Keep in mind that the user can always manually go 
 				//to Manage | Email Inbox to see the error message.
@@ -6700,7 +6691,7 @@ namespace OpenDental{
 			try {
 				Process.Start("http://www.opendental.com/contact.html");
 			}
-			catch(Exception ex) {
+			catch(Exception) {
 				MessageBox.Show(Lan.g(this,"Could not find")+" http://www.opendental.com/contact.html" + "\r\n"
 					+Lan.g(this,"Please set up a default web browser."));
 			}

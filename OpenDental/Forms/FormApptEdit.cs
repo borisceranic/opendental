@@ -179,6 +179,14 @@ namespace OpenDental{
 			base.Dispose( disposing );
 		}
 
+		public Appointment GetAppointmentCur() {
+			return AptCur.Clone();
+		}
+
+		public Appointment GetAppointmentOld() {
+			return AptOld.Clone();
+		}
+
 		#region Windows Form Designer generated code
 		/// <summary>
 		/// Required method for Designer support - do not modify

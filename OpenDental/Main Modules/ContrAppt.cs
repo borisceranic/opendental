@@ -2047,11 +2047,6 @@ namespace OpenDental {
 			}
 		}
 
-		///<summary>Sets appointment data invalid on all other computers, causing them to refresh.  Does NOT refresh the data for this computer which must be done separately.</summary>
-		private void SetInvalid() {
-			DataValid.SetInvalid(AppointmentL.DateSelected);
-		}
-
 		///<summary>Clicked today.</summary>
 		private void butToday_Click(object sender,System.EventArgs e) {
 			AppointmentL.DateSelected=DateTimeOD.Today;
@@ -2904,11 +2899,12 @@ namespace OpenDental {
 			ContrApptSingle.SelectedAptNum=aptCur.AptNum;
 			RefreshModuleScreenPatient();
 			//RefreshModulePatient(PatCurNum);
-			RefreshPeriod();//date moving to for this computer
-			SetInvalid();//date moving to for other computers
-			AppointmentL.DateSelected=fromDate;
-			SetInvalid();//for date moved from for other computers.
+			RefreshPeriod();//date moving to for this computer; This line may not be needed
+			//SetInvalid();//date moving to for other computers
+			//AppointmentL.DateSelected=fromDate;
+			//SetInvalid();//for date moved from for other computers.
 			AppointmentL.DateSelected=aptCur.AptDateTime;
+			Signalods.SetInvalid(aptCur,aptOld);
 			mouseIsDown = false;
 			boolAptMoved=false;
 			List<string> procCodes=new List<string>();
@@ -3389,7 +3385,7 @@ namespace OpenDental {
 				//RefreshModulePatient(PatCurNum);
 				RefreshPeriod();
 				bubbleAptNum=0;
-				SetInvalid();
+				Signalods.SetInvalid(Appointments.GetOneApt(PIn.Long(TempApptSingle.DataRoww["AptNum"].ToString())));
 				return;
 			}
 			if((Math.Abs(e.X-mouseOrigin.X)<7)
@@ -3696,7 +3692,7 @@ namespace OpenDental {
 			FormOpenDental.S_Contr_PatientSelected(PatCur);
 			//RefreshModulePatient(PatCurNum);
 			RefreshPeriod();
-			SetInvalid();
+			Signalods.SetInvalid(apt,aptOld);
 			mouseIsDown = false;
 			boolAptMoved=false;
 			TempApptSingle.Dispose();
@@ -3799,7 +3795,7 @@ namespace OpenDental {
 									out patPict);
 							PicturePat.Image=patPict;
 						}
-						catch(ApplicationException ex) { }  //A customer called in and an exception got through.  Added exception parameter as attempted fix.
+						catch(ApplicationException) { }  //A customer called in and an exception got through.  Added exception parameter as attempted fix.
 					}
 				}
 				Font font=new Font(FontFamily.GenericSansSerif,9f);
@@ -4090,12 +4086,12 @@ namespace OpenDental {
 						}
 					}
 					ModuleSelected(patnum);//apt.PatNum);//apt might be null if user deleted appt.
-					SetInvalid();
+					Signalods.SetInvalid(apt,FormAE.GetAppointmentOld());//use old from form because aptOld is a clone of apt from DB.
 				}
 				else if(FormAE.DialogResult==DialogResult.Cancel && FormAE.HasProcsChangedAndCancel) { //If user canceled but changed the procs on appt first
 					//Refresh the grid, don't need to check length because it didn't change.  Plus user might not want to change length.
 					ModuleSelected(patnum);
-					SetInvalid();
+					Signalods.SetInvalid(FormAE.GetAppointmentOld());//use old here because they cancelled.
 				}
 			}
 			//not on apt, so trying to schedule an appointment---------------------------------------------------------------------
@@ -4204,7 +4200,7 @@ namespace OpenDental {
 								MessageBox.Show(ex.Message);
 							}
 							RefreshPeriod();
-							SetInvalid();
+							Signalods.SetInvalid(apt);//No need for old appt here. It is a new appt anyway.
 							return;//It's ok to skip the rest of the method here. The appointment is now on the pinboard and must be rescheduled
 						}
 						apt=Appointments.GetOneApt(apt.AptNum);  //Need to get appt from DB so we have the time pattern
@@ -4225,7 +4221,7 @@ namespace OpenDental {
 							}
 						}
 						RefreshPeriod();
-						SetInvalid();
+						Signalods.SetInvalid(apt);
 					}
 				}
 				else {//new patient not added
@@ -4264,7 +4260,7 @@ namespace OpenDental {
 							}
 						}
 						RefreshPeriod();
-						SetInvalid();
+						Signalods.SetInvalid(apt);//no need for old appt here.
 					}
 				}
 			}
@@ -4345,7 +4341,7 @@ namespace OpenDental {
 						}
 					}
 					RefreshPeriod();
-					SetInvalid();
+					Signalods.SetInvalid(apt);
 					break;
 				case OtherResult.GoTo:
 					ContrApptSingle.SelectedAptNum=FormAO.AptNumsSelected[0];
@@ -5028,7 +5024,7 @@ namespace OpenDental {
 			try {
 				Process.Start("http://www.opendental.com/manual/dentaltekinfo.html");
 			}
-			catch(Exception ex) {
+			catch(Exception) {
 				MessageBox.Show(Lan.g(this,"Could not find")+" http://www.opendental.com/contact.html" + "\r\n"
 							+Lan.g(this,"Please set up a default web browser."));
 			}
@@ -5257,7 +5253,7 @@ namespace OpenDental {
 				}
 			}
 			ModuleSelected(pat.PatNum);
-			SetInvalid();
+			Signalods.SetInvalid(apt);
 			Recalls.SynchScheduledApptFull(apt.PatNum);
 		}
 
@@ -5395,7 +5391,7 @@ namespace OpenDental {
 				FormCI.ShowDialog();
 			}
 			ModuleSelected(pat.PatNum);//Must be ran after the "D9986" break logic due to the addition of a completed procedure.
-			SetInvalid();
+			Signalods.SetInvalid(apt);
 			AutomationL.Trigger(AutomationTrigger.BreakAppointment,null,pat.PatNum);
 			Recalls.SynchScheduledApptFull(apt.PatNum);
 		}
@@ -5468,7 +5464,7 @@ namespace OpenDental {
 			}
 			Recalls.SynchScheduledApptFull(apt.PatNum);
 			ModuleSelected(pat.PatNum);
-			SetInvalid();
+			Signalods.SetInvalid(apt);
 		}
 
 		private void OnDelete_Click() {
@@ -5573,7 +5569,7 @@ namespace OpenDental {
 			else {
 				ModuleSelected(PatCur.PatNum);
 			}
-			SetInvalid();
+			Signalods.SetInvalid(apt);
 			Recalls.SynchScheduledApptFull(apt.PatNum);
 		}
 
@@ -5844,7 +5840,7 @@ namespace OpenDental {
 			long newStatus=DefC.Short[(int)DefCat.ApptConfirmed][listConfirmed.IndexFromPoint(e.X,e.Y)].DefNum;
 			Appointments.SetConfirmed(ContrApptSingle.SelectedAptNum,newStatus);
 			RefreshPeriod();
-			SetInvalid();
+			Signalods.SetInvalid(Appointments.GetOneApt(ContrApptSingle.SelectedAptNum));
 		}
 
 		private void butSearch_Click(object sender,System.EventArgs e) {

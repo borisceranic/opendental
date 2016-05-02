@@ -168,7 +168,7 @@ namespace OpenDentBusiness{
 	public enum InvalidType{
 		///<summary>0</summary>
 		None,
-		///<summary>1 Not used with any other flags</summary>
+		///<summary>1 Deprecated. Not used with any other flags</summary>
 		Date,
 		///<summary>2 Deprecated.  Inefficient.  All flags combined except Date and Tasks.</summary>
 		AllLocal,
@@ -301,7 +301,9 @@ namespace OpenDentBusiness{
 		///<summary>66</summary>
 		Ebills,
 		///<summary>67</summary>
-		UserClinics
+		UserClinics,
+		///<summary>68. Replaces the deprecated "Date" invalid type for more granularity on invalid signals.</summary>
+		Appointment
 	}
 	//<summary></summary>
 	/*public enum ButtonType{
