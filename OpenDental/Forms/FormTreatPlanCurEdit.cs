@@ -92,7 +92,7 @@ namespace OpenDental {
 				row=new ODGridRow();
 				ProcedureCode proccode=ProcedureCodes.GetProcCode(proc.CodeNum);
 				row.Cells.Add(proc.ProcStatus.ToString());
-				row.Cells.Add(proc.ToothNum);
+				row.Cells.Add(Tooth.ToInternat(proc.ToothNum));
 				row.Cells.Add(proc.Surf);
 				row.Cells.Add(proccode.ProcCode);
 				row.Cells.Add(ProcedureCodes.GetLaymanTerm(proc.CodeNum));
