@@ -1202,20 +1202,24 @@ namespace OpenDental
 			textPrePaidHere.Text="";
 			textPrePaidRemain.Text="";
 			textPrePaidElsewhere.Text="";
+			labelProcRemain.Text="";
+			textProcPaidHere.Text="";
 			if(PaySplitCur.PrepaymentNum!=0) {
 				PaySplit prepayment=PaySplits.GetOne(PaySplitCur.PrepaymentNum);
 				textPrePayDate.Text=prepayment.DatePay.ToShortDateString();
 				textPrePayType.Text=DefC.GetName(DefCat.PaySplitUnearnedType,prepayment.UnearnedType);
 				List<PaySplit> listPaySplits=PaySplits.GetSplitsForPrepay(new List<PaySplit>() { prepayment });
-				decimal paySplitTotal=0;//Will include the current paysplit we are viewing.
+				decimal paySplitTotal=0;//Will not include the current paysplit we are viewing.
 				foreach(PaySplit split in listPaySplits) {
-					paySplitTotal-=(decimal)split.SplitAmt;
+					if(split.SplitNum==PaySplitCur.SplitNum) {
+						continue;
+					}
+					paySplitTotal+=(decimal)split.SplitAmt;//Will be negative
 				}
 				textPrePayAmt.Text=prepayment.SplitAmt.ToString("F");
-				textPrePaidHere.Text=(0-PaySplitCur.SplitAmt).ToString("F");
-				//Add the negative SplitAmt of the currently viewed paysplit to the total so that we can show the amount from other paysplits.
-				textPrePaidElsewhere.Text=(paySplitTotal+(decimal)PaySplitCur.SplitAmt).ToString("F");
-				textPrePaidRemain.Text=((decimal)prepayment.SplitAmt-paySplitTotal).ToString("F");
+				textPrePaidHere.Text=(0-PIn.Decimal(textAmount.Text)).ToString("F");//textAmount should be negative, but display it on the bottom right as positive
+				textPrePaidElsewhere.Text=(0-paySplitTotal).ToString("F");//paySplitTotal will be negative, but show it as positive in the UI
+				textPrePaidRemain.Text=((decimal)prepayment.SplitAmt+paySplitTotal+PIn.Decimal(textAmount.Text)).ToString("F");
 				butAttachProc.Enabled=false;
 				butDetachProc.Enabled=false;
 			}
@@ -1284,6 +1288,8 @@ namespace OpenDental
 			butDetachProc.Enabled=false;
 			//For now there can only be one selected paysplit from the window.
 			PaySplitCur.PrepaymentNum=FormPSS.ListSelectedSplits[0].SplitNum;
+			comboProvider.SelectedIndex=0;
+			comboProvider.Enabled=false;
 			FillPrepayment();
 		}
 
@@ -1291,6 +1297,8 @@ namespace OpenDental
 			butAttachProc.Enabled=true;
 			butDetachProc.Enabled=true;
 			PaySplitCur.PrepaymentNum=0;
+			comboProvider.Enabled=true;
+			comboUnearnedTypes.Enabled=true;
 			FillPrepayment();
 		}
 
