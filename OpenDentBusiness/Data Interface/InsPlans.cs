@@ -819,6 +819,7 @@ namespace OpenDentBusiness {
 					sched.Description=carrierName;
 					sched.FeeSchedType=FeeScheduleType.OutNetwork;
 					//sched.IsNew=true;
+					sched.IsGlobal=true;
 					sched.ItemOrder=itemOrder;
 					sched.SecUserNumEntry=userNum;
 					FeeScheds.Insert(sched);
