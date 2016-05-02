@@ -4111,6 +4111,7 @@ namespace OpenDental{
 						sched.Description=CarrierCur.CarrierName;
 						sched.FeeSchedType=FeeScheduleType.OutNetwork;
 						//sched.IsNew=true;
+						sched.IsGlobal=true;
 						sched.ItemOrder=FeeSchedC.ListLong.Count;
 						FeeScheds.Insert(sched);
 						DataValid.SetInvalid(InvalidType.FeeScheds);
