@@ -1436,10 +1436,8 @@ namespace OpenDental{
 					//Set the patients primary provider to the practice default provider.
 					PatCur.PriProv=Providers.GetDefaultProvider().ProvNum;
 				}
-			}
-			if(PrefC.GetBool(PrefName.ShowFeatureEhr)) {
-				PatCur.Gender=PatientGender.Unknown;
-			}
+			}			
+			PatCur.Gender=PatientGender.Unknown;		
 			PatCur.ClinicNum=Clinics.ClinicNum;
 			Patients.Insert(PatCur,false);
 			SecurityLogs.MakeLogEntry(Permissions.PatientCreate,PatCur.PatNum,"Created from Select Patient window.");

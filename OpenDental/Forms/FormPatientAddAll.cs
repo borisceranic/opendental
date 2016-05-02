@@ -124,11 +124,11 @@ namespace OpenDental {
 				textBirthdate1.Text=Birthdate.ToShortDateString();
 			}
 			textBirthdate1_Validated(this,null);
-			listGender1.SelectedIndex=0;
-			listGender2.SelectedIndex=0;
-			listGender3.SelectedIndex=0;
-			listGender4.SelectedIndex=0;
-			listGender5.SelectedIndex=0;
+			listGender1.SelectedIndex=2;
+			listGender2.SelectedIndex=2;
+			listGender3.SelectedIndex=2;
+			listGender4.SelectedIndex=2;
+			listGender5.SelectedIndex=2;
 			listPosition1.SelectedIndex=1;
 			listPosition2.SelectedIndex=1;
 			if(PrefC.GetBool(PrefName.PriProvDefaultToSelectProv)) {
@@ -2345,38 +2345,5 @@ namespace OpenDental {
 		private void butCancel_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
-
-		
-
-		
-
-		
-
-		
-
-		
-
-		
-
-
-
-
-
-		
-
-		
-
-		
-
-		
-
-		
-
-
-
-
-	
-
-		
 	}
 }

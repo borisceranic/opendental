@@ -1114,6 +1114,7 @@ namespace OpenDental{
 			Patient tempPat=new Patient();
 			tempPat.LName      =PatCur.LName;
 			tempPat.PatStatus  =PatientStatus.Patient;
+			tempPat.Gender     =PatientGender.Unknown;
 			tempPat.Address    =PatCur.Address;
 			tempPat.Address2   =PatCur.Address2;
 			tempPat.City       =PatCur.City;

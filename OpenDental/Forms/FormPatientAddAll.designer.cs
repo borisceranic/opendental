@@ -203,7 +203,7 @@ namespace OpenDental {
 			// 
 			// labelBirthAge
 			// 
-			this.labelBirthAge.Location = new System.Drawing.Point(3, 102);
+			this.labelBirthAge.Location = new System.Drawing.Point(3, 116);
 			this.labelBirthAge.Name = "labelBirthAge";
 			this.labelBirthAge.Size = new System.Drawing.Size(118, 16);
 			this.labelBirthAge.TabIndex = 13;
@@ -235,10 +235,11 @@ namespace OpenDental {
 			// 
 			this.listGender1.Items.AddRange(new object[] {
             "Male",
-            "Female"});
+            "Female",
+            "Unknown"});
 			this.listGender1.Location = new System.Drawing.Point(121, 70);
 			this.listGender1.Name = "listGender1";
-			this.listGender1.Size = new System.Drawing.Size(61, 30);
+			this.listGender1.Size = new System.Drawing.Size(61, 43);
 			this.listGender1.TabIndex = 14;
 			this.listGender1.SelectedIndexChanged += new System.EventHandler(this.ListBox_SelectedIndexChanged);
 			// 
@@ -407,7 +408,7 @@ namespace OpenDental {
 			// 
 			// labelSecProv
 			// 
-			this.labelSecProv.Location = new System.Drawing.Point(3, 166);
+			this.labelSecProv.Location = new System.Drawing.Point(3, 180);
 			this.labelSecProv.Name = "labelSecProv";
 			this.labelSecProv.Size = new System.Drawing.Size(118, 16);
 			this.labelSecProv.TabIndex = 68;
@@ -416,7 +417,7 @@ namespace OpenDental {
 			// 
 			// labelPriProv
 			// 
-			this.labelPriProv.Location = new System.Drawing.Point(3, 144);
+			this.labelPriProv.Location = new System.Drawing.Point(3, 158);
 			this.labelPriProv.Name = "labelPriProv";
 			this.labelPriProv.Size = new System.Drawing.Size(118, 16);
 			this.labelPriProv.TabIndex = 67;
@@ -427,7 +428,7 @@ namespace OpenDental {
 			// 
 			this.comboSecProv1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboSecProv1.FormattingEnabled = true;
-			this.comboSecProv1.Location = new System.Drawing.Point(121, 164);
+			this.comboSecProv1.Location = new System.Drawing.Point(121, 178);
 			this.comboSecProv1.MaxDropDownItems = 30;
 			this.comboSecProv1.Name = "comboSecProv1";
 			this.comboSecProv1.Size = new System.Drawing.Size(149, 21);
@@ -438,7 +439,7 @@ namespace OpenDental {
 			// 
 			this.comboPriProv1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboPriProv1.FormattingEnabled = true;
-			this.comboPriProv1.Location = new System.Drawing.Point(121, 142);
+			this.comboPriProv1.Location = new System.Drawing.Point(121, 156);
 			this.comboPriProv1.MaxDropDownItems = 30;
 			this.comboPriProv1.Name = "comboPriProv1";
 			this.comboPriProv1.Size = new System.Drawing.Size(149, 21);
@@ -457,7 +458,7 @@ namespace OpenDental {
 			// checkInsOne1
 			// 
 			this.checkInsOne1.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkInsOne1.Location = new System.Drawing.Point(121, 121);
+			this.checkInsOne1.Location = new System.Drawing.Point(121, 135);
 			this.checkInsOne1.Name = "checkInsOne1";
 			this.checkInsOne1.Size = new System.Drawing.Size(37, 21);
 			this.checkInsOne1.TabIndex = 30;
@@ -467,7 +468,7 @@ namespace OpenDental {
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(3, 122);
+			this.label4.Location = new System.Drawing.Point(3, 136);
 			this.label4.Name = "label4";
 			this.label4.Size = new System.Drawing.Size(118, 16);
 			this.label4.TabIndex = 29;
@@ -477,7 +478,7 @@ namespace OpenDental {
 			// checkInsTwo1
 			// 
 			this.checkInsTwo1.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkInsTwo1.Location = new System.Drawing.Point(164, 121);
+			this.checkInsTwo1.Location = new System.Drawing.Point(164, 135);
 			this.checkInsTwo1.Name = "checkInsTwo1";
 			this.checkInsTwo1.Size = new System.Drawing.Size(37, 21);
 			this.checkInsTwo1.TabIndex = 32;
@@ -488,7 +489,7 @@ namespace OpenDental {
 			// checkInsTwo2
 			// 
 			this.checkInsTwo2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkInsTwo2.Location = new System.Drawing.Point(317, 121);
+			this.checkInsTwo2.Location = new System.Drawing.Point(317, 135);
 			this.checkInsTwo2.Name = "checkInsTwo2";
 			this.checkInsTwo2.Size = new System.Drawing.Size(37, 21);
 			this.checkInsTwo2.TabIndex = 40;
@@ -498,7 +499,7 @@ namespace OpenDental {
 			// checkInsOne2
 			// 
 			this.checkInsOne2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkInsOne2.Location = new System.Drawing.Point(274, 121);
+			this.checkInsOne2.Location = new System.Drawing.Point(274, 135);
 			this.checkInsOne2.Name = "checkInsOne2";
 			this.checkInsOne2.Size = new System.Drawing.Size(37, 21);
 			this.checkInsOne2.TabIndex = 39;
@@ -521,10 +522,11 @@ namespace OpenDental {
 			// 
 			this.listGender2.Items.AddRange(new object[] {
             "Male",
-            "Female"});
+            "Female",
+            "Unknown"});
 			this.listGender2.Location = new System.Drawing.Point(274, 70);
 			this.listGender2.Name = "listGender2";
-			this.listGender2.Size = new System.Drawing.Size(61, 30);
+			this.listGender2.Size = new System.Drawing.Size(61, 43);
 			this.listGender2.TabIndex = 36;
 			this.listGender2.SelectedIndexChanged += new System.EventHandler(this.ListBox_SelectedIndexChanged);
 			// 
@@ -551,7 +553,7 @@ namespace OpenDental {
 			// checkInsTwo3
 			// 
 			this.checkInsTwo3.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkInsTwo3.Location = new System.Drawing.Point(470, 121);
+			this.checkInsTwo3.Location = new System.Drawing.Point(470, 135);
 			this.checkInsTwo3.Name = "checkInsTwo3";
 			this.checkInsTwo3.Size = new System.Drawing.Size(37, 21);
 			this.checkInsTwo3.TabIndex = 48;
@@ -561,7 +563,7 @@ namespace OpenDental {
 			// checkInsOne3
 			// 
 			this.checkInsOne3.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkInsOne3.Location = new System.Drawing.Point(427, 121);
+			this.checkInsOne3.Location = new System.Drawing.Point(427, 135);
 			this.checkInsOne3.Name = "checkInsOne3";
 			this.checkInsOne3.Size = new System.Drawing.Size(37, 21);
 			this.checkInsOne3.TabIndex = 47;
@@ -572,10 +574,11 @@ namespace OpenDental {
 			// 
 			this.listGender3.Items.AddRange(new object[] {
             "Male",
-            "Female"});
+            "Female",
+            "Unknown"});
 			this.listGender3.Location = new System.Drawing.Point(427, 70);
 			this.listGender3.Name = "listGender3";
-			this.listGender3.Size = new System.Drawing.Size(61, 30);
+			this.listGender3.Size = new System.Drawing.Size(61, 43);
 			this.listGender3.TabIndex = 44;
 			this.listGender3.SelectedIndexChanged += new System.EventHandler(this.ListBox_SelectedIndexChanged);
 			// 
@@ -602,7 +605,7 @@ namespace OpenDental {
 			// checkInsTwo4
 			// 
 			this.checkInsTwo4.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkInsTwo4.Location = new System.Drawing.Point(623, 121);
+			this.checkInsTwo4.Location = new System.Drawing.Point(623, 135);
 			this.checkInsTwo4.Name = "checkInsTwo4";
 			this.checkInsTwo4.Size = new System.Drawing.Size(37, 21);
 			this.checkInsTwo4.TabIndex = 56;
@@ -612,7 +615,7 @@ namespace OpenDental {
 			// checkInsOne4
 			// 
 			this.checkInsOne4.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkInsOne4.Location = new System.Drawing.Point(580, 121);
+			this.checkInsOne4.Location = new System.Drawing.Point(580, 135);
 			this.checkInsOne4.Name = "checkInsOne4";
 			this.checkInsOne4.Size = new System.Drawing.Size(37, 21);
 			this.checkInsOne4.TabIndex = 55;
@@ -623,10 +626,11 @@ namespace OpenDental {
 			// 
 			this.listGender4.Items.AddRange(new object[] {
             "Male",
-            "Female"});
+            "Female",
+            "Unknown"});
 			this.listGender4.Location = new System.Drawing.Point(580, 70);
 			this.listGender4.Name = "listGender4";
-			this.listGender4.Size = new System.Drawing.Size(61, 30);
+			this.listGender4.Size = new System.Drawing.Size(61, 43);
 			this.listGender4.TabIndex = 52;
 			this.listGender4.SelectedIndexChanged += new System.EventHandler(this.ListBox_SelectedIndexChanged);
 			// 
@@ -643,7 +647,7 @@ namespace OpenDental {
 			// checkInsTwo5
 			// 
 			this.checkInsTwo5.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkInsTwo5.Location = new System.Drawing.Point(776, 121);
+			this.checkInsTwo5.Location = new System.Drawing.Point(776, 135);
 			this.checkInsTwo5.Name = "checkInsTwo5";
 			this.checkInsTwo5.Size = new System.Drawing.Size(37, 21);
 			this.checkInsTwo5.TabIndex = 64;
@@ -653,7 +657,7 @@ namespace OpenDental {
 			// checkInsOne5
 			// 
 			this.checkInsOne5.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkInsOne5.Location = new System.Drawing.Point(733, 121);
+			this.checkInsOne5.Location = new System.Drawing.Point(733, 135);
 			this.checkInsOne5.Name = "checkInsOne5";
 			this.checkInsOne5.Size = new System.Drawing.Size(37, 21);
 			this.checkInsOne5.TabIndex = 63;
@@ -664,10 +668,11 @@ namespace OpenDental {
 			// 
 			this.listGender5.Items.AddRange(new object[] {
             "Male",
-            "Female"});
+            "Female",
+            "Unknown"});
 			this.listGender5.Location = new System.Drawing.Point(733, 70);
 			this.listGender5.Name = "listGender5";
-			this.listGender5.Size = new System.Drawing.Size(61, 30);
+			this.listGender5.Size = new System.Drawing.Size(61, 43);
 			this.listGender5.TabIndex = 60;
 			this.listGender5.SelectedIndexChanged += new System.EventHandler(this.ListBox_SelectedIndexChanged);
 			// 
@@ -1056,7 +1061,7 @@ namespace OpenDental {
 			// 
 			// textAge1
 			// 
-			this.textAge1.Location = new System.Drawing.Point(204, 101);
+			this.textAge1.Location = new System.Drawing.Point(204, 115);
 			this.textAge1.Name = "textAge1";
 			this.textAge1.ReadOnly = true;
 			this.textAge1.Size = new System.Drawing.Size(50, 20);
@@ -1065,7 +1070,7 @@ namespace OpenDental {
 			// 
 			// textAge2
 			// 
-			this.textAge2.Location = new System.Drawing.Point(357, 101);
+			this.textAge2.Location = new System.Drawing.Point(357, 115);
 			this.textAge2.Name = "textAge2";
 			this.textAge2.ReadOnly = true;
 			this.textAge2.Size = new System.Drawing.Size(50, 20);
@@ -1074,7 +1079,7 @@ namespace OpenDental {
 			// 
 			// textAge3
 			// 
-			this.textAge3.Location = new System.Drawing.Point(510, 101);
+			this.textAge3.Location = new System.Drawing.Point(510, 115);
 			this.textAge3.Name = "textAge3";
 			this.textAge3.ReadOnly = true;
 			this.textAge3.Size = new System.Drawing.Size(50, 20);
@@ -1083,7 +1088,7 @@ namespace OpenDental {
 			// 
 			// textAge4
 			// 
-			this.textAge4.Location = new System.Drawing.Point(663, 101);
+			this.textAge4.Location = new System.Drawing.Point(663, 115);
 			this.textAge4.Name = "textAge4";
 			this.textAge4.ReadOnly = true;
 			this.textAge4.Size = new System.Drawing.Size(50, 20);
@@ -1092,7 +1097,7 @@ namespace OpenDental {
 			// 
 			// textAge5
 			// 
-			this.textAge5.Location = new System.Drawing.Point(816, 101);
+			this.textAge5.Location = new System.Drawing.Point(816, 115);
 			this.textAge5.Name = "textAge5";
 			this.textAge5.ReadOnly = true;
 			this.textAge5.Size = new System.Drawing.Size(50, 20);
@@ -1103,7 +1108,7 @@ namespace OpenDental {
 			// 
 			this.comboSecProv2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboSecProv2.FormattingEnabled = true;
-			this.comboSecProv2.Location = new System.Drawing.Point(274, 164);
+			this.comboSecProv2.Location = new System.Drawing.Point(274, 178);
 			this.comboSecProv2.MaxDropDownItems = 30;
 			this.comboSecProv2.Name = "comboSecProv2";
 			this.comboSecProv2.Size = new System.Drawing.Size(149, 21);
@@ -1114,7 +1119,7 @@ namespace OpenDental {
 			// 
 			this.comboPriProv2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboPriProv2.FormattingEnabled = true;
-			this.comboPriProv2.Location = new System.Drawing.Point(274, 142);
+			this.comboPriProv2.Location = new System.Drawing.Point(274, 156);
 			this.comboPriProv2.MaxDropDownItems = 30;
 			this.comboPriProv2.Name = "comboPriProv2";
 			this.comboPriProv2.Size = new System.Drawing.Size(149, 21);
@@ -1125,7 +1130,7 @@ namespace OpenDental {
 			// 
 			this.comboSecProv3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboSecProv3.FormattingEnabled = true;
-			this.comboSecProv3.Location = new System.Drawing.Point(427, 164);
+			this.comboSecProv3.Location = new System.Drawing.Point(427, 178);
 			this.comboSecProv3.MaxDropDownItems = 30;
 			this.comboSecProv3.Name = "comboSecProv3";
 			this.comboSecProv3.Size = new System.Drawing.Size(149, 21);
@@ -1136,7 +1141,7 @@ namespace OpenDental {
 			// 
 			this.comboPriProv3.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboPriProv3.FormattingEnabled = true;
-			this.comboPriProv3.Location = new System.Drawing.Point(427, 142);
+			this.comboPriProv3.Location = new System.Drawing.Point(427, 156);
 			this.comboPriProv3.MaxDropDownItems = 30;
 			this.comboPriProv3.Name = "comboPriProv3";
 			this.comboPriProv3.Size = new System.Drawing.Size(149, 21);
@@ -1147,7 +1152,7 @@ namespace OpenDental {
 			// 
 			this.comboSecProv4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboSecProv4.FormattingEnabled = true;
-			this.comboSecProv4.Location = new System.Drawing.Point(580, 164);
+			this.comboSecProv4.Location = new System.Drawing.Point(580, 178);
 			this.comboSecProv4.MaxDropDownItems = 30;
 			this.comboSecProv4.Name = "comboSecProv4";
 			this.comboSecProv4.Size = new System.Drawing.Size(149, 21);
@@ -1158,7 +1163,7 @@ namespace OpenDental {
 			// 
 			this.comboPriProv4.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboPriProv4.FormattingEnabled = true;
-			this.comboPriProv4.Location = new System.Drawing.Point(580, 142);
+			this.comboPriProv4.Location = new System.Drawing.Point(580, 156);
 			this.comboPriProv4.MaxDropDownItems = 30;
 			this.comboPriProv4.Name = "comboPriProv4";
 			this.comboPriProv4.Size = new System.Drawing.Size(149, 21);
@@ -1169,7 +1174,7 @@ namespace OpenDental {
 			// 
 			this.comboSecProv5.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboSecProv5.FormattingEnabled = true;
-			this.comboSecProv5.Location = new System.Drawing.Point(733, 164);
+			this.comboSecProv5.Location = new System.Drawing.Point(733, 178);
 			this.comboSecProv5.MaxDropDownItems = 30;
 			this.comboSecProv5.Name = "comboSecProv5";
 			this.comboSecProv5.Size = new System.Drawing.Size(149, 21);
@@ -1180,7 +1185,7 @@ namespace OpenDental {
 			// 
 			this.comboPriProv5.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboPriProv5.FormattingEnabled = true;
-			this.comboPriProv5.Location = new System.Drawing.Point(733, 142);
+			this.comboPriProv5.Location = new System.Drawing.Point(733, 156);
 			this.comboPriProv5.MaxDropDownItems = 30;
 			this.comboPriProv5.Name = "comboPriProv5";
 			this.comboPriProv5.Size = new System.Drawing.Size(149, 21);
@@ -1251,12 +1256,14 @@ namespace OpenDental {
 			// textAddrNotes
 			// 
 			this.textAddrNotes.AcceptsTab = true;
+			this.textAddrNotes.DetectLinksEnabled = false;
 			this.textAddrNotes.DetectUrls = false;
 			this.textAddrNotes.Location = new System.Drawing.Point(157, 386);
 			this.textAddrNotes.Name = "textAddrNotes";
 			this.textAddrNotes.QuickPasteType = OpenDentBusiness.QuickPasteType.PatAddressNote;
 			this.textAddrNotes.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textAddrNotes.Size = new System.Drawing.Size(275, 59);
+			this.textAddrNotes.SpellCheckIsEnabled = false;
 			this.textAddrNotes.TabIndex = 12;
 			this.textAddrNotes.TabStop = false;
 			this.textAddrNotes.Text = "";
@@ -1264,7 +1271,7 @@ namespace OpenDental {
 			// 
 			// textBirthdate5
 			// 
-			this.textBirthdate5.Location = new System.Drawing.Point(733, 101);
+			this.textBirthdate5.Location = new System.Drawing.Point(733, 115);
 			this.textBirthdate5.Name = "textBirthdate5";
 			this.textBirthdate5.Size = new System.Drawing.Size(82, 20);
 			this.textBirthdate5.TabIndex = 10;
@@ -1273,7 +1280,7 @@ namespace OpenDental {
 			// 
 			// textBirthdate4
 			// 
-			this.textBirthdate4.Location = new System.Drawing.Point(580, 101);
+			this.textBirthdate4.Location = new System.Drawing.Point(580, 115);
 			this.textBirthdate4.Name = "textBirthdate4";
 			this.textBirthdate4.Size = new System.Drawing.Size(82, 20);
 			this.textBirthdate4.TabIndex = 9;
@@ -1282,7 +1289,7 @@ namespace OpenDental {
 			// 
 			// textBirthdate3
 			// 
-			this.textBirthdate3.Location = new System.Drawing.Point(427, 101);
+			this.textBirthdate3.Location = new System.Drawing.Point(427, 115);
 			this.textBirthdate3.Name = "textBirthdate3";
 			this.textBirthdate3.Size = new System.Drawing.Size(82, 20);
 			this.textBirthdate3.TabIndex = 8;
@@ -1291,7 +1298,7 @@ namespace OpenDental {
 			// 
 			// textBirthdate2
 			// 
-			this.textBirthdate2.Location = new System.Drawing.Point(274, 101);
+			this.textBirthdate2.Location = new System.Drawing.Point(274, 115);
 			this.textBirthdate2.Name = "textBirthdate2";
 			this.textBirthdate2.Size = new System.Drawing.Size(82, 20);
 			this.textBirthdate2.TabIndex = 7;
@@ -1300,7 +1307,7 @@ namespace OpenDental {
 			// 
 			// textBirthdate1
 			// 
-			this.textBirthdate1.Location = new System.Drawing.Point(121, 101);
+			this.textBirthdate1.Location = new System.Drawing.Point(121, 115);
 			this.textBirthdate1.Name = "textBirthdate1";
 			this.textBirthdate1.Size = new System.Drawing.Size(82, 20);
 			this.textBirthdate1.TabIndex = 6;
