@@ -524,7 +524,16 @@ namespace OpenDental{
 			Cursor=Cursors.WaitCursor;
 			RefreshAll();
 			SetDefaultAutograph();
+			EmailSaveEvent.Fired+=EmailSaveEvent_Fired;
 			Cursor=Cursors.Default;
+		}
+
+		private void EmailSaveEvent_Fired(ODEventArgs e) {
+			if(e.Name!="EmailSave") {
+				return;
+			}
+			//save email
+			SaveMsg();//I think this is all we need
 		}
 
 		private void RefreshAll() {
