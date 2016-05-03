@@ -135,6 +135,7 @@ namespace OpenDental {
 				panelMain.Enabled=false;
 				butUnlock.Visible=true;
 			}
+			Plugins.HookAddCode(this, "FormSheetFillEdit_Load_End");
 		}
 
 		///<summary>Runs as the final step of loading the form, and also immediately after fields are moved down due to growth.</summary>
