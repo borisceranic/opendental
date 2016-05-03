@@ -451,7 +451,7 @@ namespace OpenDental{
 				}
 			}
 			Cursor=Cursors.WaitCursor;
-			if(!PrefL.CopyFromHereToUpdateFiles(versionCurrent)) {
+			if(!PrefL.CopyFromHereToUpdateFiles(versionCurrent,false,true,true)) {
 				Cursor=Cursors.Default;
 				return;
 			}

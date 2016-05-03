@@ -37,15 +37,17 @@ namespace OpenDental {
 			return ConvertDB(false,Application.ProductVersion);
 		}
 
-		///<summary>Copies the installation directory files into the database as well as the AtoZ share.
-		///Currently only called from FormUpdateSetup.</summary>
-		public static bool CopyFromHereToUpdateFiles(Version versionCurrent) {
-			//When we use the Recopy button we always want to save a copy into the AtoZ folder for backwards compatibility.
-			return CopyFromHereToUpdateFiles(versionCurrent,false,true);
-		}
-
-		///<summary>Copies the installation directory files into the database.  Set hasAtoZ to true to copy to the AtoZ share as well.</summary>
-		public static bool CopyFromHereToUpdateFiles(Version versionCurrent,bool isSilent,bool hasAtoZ) {
+		///<summary>Copies the installation directory files into the database.</summary>
+		///<param name="versionCurrent">The versioning information that will go into the Manifest.txt</param>
+		///<param name="isSilent">Set to true when upgrading silently.  No message boxes will show but errors will log and exit codes will be set.</param>
+		///<param name="hasAtoZ">Set to true when a copy of the update files needs to be made in the AtoZ share (for backwards compatibility).</param>
+		///<param name="hasConcatFiles">Set to true to also make one large concatenated row in the database (for backwards compatibility).
+		///This method will not return false if this particular option has problems executing.
+		///Making this singular row often times violates MySQL limitations which cause errors that cannot be easily avoided.
+		///Therefore, this method has the potential to log an error of the concat files failing yet the method can still return true.</param>
+		///<returns>Returns true if the update files were successfully copied into the database.</returns>
+		public static bool CopyFromHereToUpdateFiles(Version versionCurrent,bool isSilent,bool hasAtoZ,bool hasConcatFiles) {
+			#region Get Valid AtoZ path
 			if(hasAtoZ && PrefC.AtoZfolderUsed) {
 				string prefImagePath=ImageStore.GetPreferredAtoZpath();
 				if(prefImagePath==null || !Directory.Exists(prefImagePath)) {//AtoZ folder not found
@@ -62,11 +64,14 @@ namespace OpenDental {
 					}
 				}
 			}
+			#endregion
+			#region Start Notification Thread
 			if(!isSilent) {
 				ODThread odThreadRecopy=new ODThread(ShowRecopyProgress);
 				odThreadRecopy.Name="RecopyProgressThread";
 				odThreadRecopy.Start(true);
 			}
+			#endregion
 			#region Delete Old UpdateFiles Folders
 			string folderTempUpdateFiles=ODFileUtils.CombinePaths(GetTempFolderPath(),"UpdateFiles");
 			string folderAtoZUpdateFiles="";
@@ -98,7 +103,7 @@ namespace OpenDental {
 					Application.Exit();
 					return false;
 				}
-				MsgBox.Show("Prefs","Failed to copy the current installations files on this computer.\r\n"
+				MsgBox.Show("Prefs","Failed to copy the current installation files on this computer.\r\n"
 					+"This could be due to a lack of permissions, or file(s) in the installation directory are still in use.");
 				return false;
 			}
@@ -138,41 +143,82 @@ namespace OpenDental {
 			//Also, we want to 'buffer' a few KB for MySQL because the query itself and the parameter information will take up some bytes (unknown).
 			int charsPerPayload=maxAllowedPacket-8192;//Arbitrarily subtracted 8KB from max allowed bytes for MySQL "header" information.
 			charsPerPayload-=(charsPerPayload % 3);//Use the closest amount of bytes divisible by 3.
-			//When we try and send over ~40MB of data, MySQL can drop our connection randomly giving a "MySQL server has gone away" error.
-			//Use a maximum of ~1MB payloads so that the likelyhood of this error is less.
-			charsPerPayload=Math.Min(charsPerPayload,1048575);//This number is divisible by 3.
 			#endregion
-			#region Insert Update Files Into Database
-			MemoryStream memStream=null;
+			#region Zip Update Files Into Memory
+			MemoryStream memStream=new MemoryStream();
+			ZipFile zipFile=new ZipFile();
+			//Take the entire directory in the temp dir that we just created and zip it up.
+			ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Compressing new update files...")));
 			try {
-				//Clear and prep the current UpdateFiles row in the documentmisc table for the updated binaries.
-				ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Deleting old update files...")));
-				DocumentMiscs.DeleteAllForType(DocumentMiscType.UpdateFiles);
-				memStream=new MemoryStream();
-				using(ZipFile zipFile=new ZipFile()) {
-					//Take the entire directory in the temp dir that we just created and zip it up.
-					ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Compressing new update files...")));
-					try {
-						zipFile.AddDirectory(folderTempUpdateFiles);
-						zipFile.Save(memStream);
-					}
-					catch(Exception ex) {
-						EventLog.WriteEntry("OpenDental","Error compressing UpdateFiles:\r\n"+ex.Message,EventLogEntryType.Error);
-						throw ex;
+				zipFile.AddDirectory(folderTempUpdateFiles);
+				zipFile.Save(memStream);
+			}
+			catch(Exception ex) {
+				memStream.Dispose();
+				zipFile.Dispose();
+				ODEvent.Fire(new ODEventArgs("RecopyProgress","DEFCON 1"));
+				if(isSilent) {
+					FormOpenDental.ExitCode=304;//Error compressing UpdateFiles
+					Application.Exit();
+					return false;
+				}
+				MessageBox.Show(Lan.g("Prefs","Error compressing UpdateFiles:")+"\r\n"+ex.Message);
+				return false;
+			}
+			#endregion
+			#region Insert Update Files Into One Row
+			if(hasConcatFiles) {
+				//For backwards compatibility we have to try and store the entire UpdateFiles content into one row
+				//Everything within this section will be in a try catch because we found out that it can fail due to the amount of data being sent.
+				//The MySQL CONCAT command gives up on life after so much data and sets the column to 0 bytes but does not throw an exception.
+				//This is simply here to help reduce the number of offices that might have problems updating from older versions.
+				//E.g. buying a new workstation and using an old trial installer could require this single large Update Files column.
+				try {
+					//Converting the file to Base64String bloats the size by approximately 30% so we need to make sure that the chunk size is well below 40MB
+					//Old code used 15MB and that seemed to work very well for the majority of users.
+					charsPerPayload=Math.Min(charsPerPayload,15728640);//15728640 is divisible by 3 which is important for Base64 "appending" logic.
+					ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Deleting old update files row...")));
+					DocumentMiscs.DeleteAllForType(DocumentMiscType.UpdateFiles);
+					byte[] zipFileBytes=new byte[charsPerPayload];
+					memStream.Position=0;//Start at the beginning of the stream.
+					ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Inserting new update files into database row...")));
+					DocumentMisc docUpdateFiles=new DocumentMisc();
+					docUpdateFiles.DateCreated=DateTime.Today;
+					docUpdateFiles.DocMiscType=DocumentMiscType.UpdateFiles;
+					docUpdateFiles.FileName="UpdateFiles.zip";
+					DocumentMiscs.Insert(docUpdateFiles);
+					while((memStream.Read(zipFileBytes,0,zipFileBytes.Length))>0) {
+						DocumentMiscs.AppendRawBase64ForUpdateFiles(Convert.ToBase64String(zipFileBytes));
 					}
 				}
+				catch(Exception ex) {
+					//Only log the error, do not stop the update process.  The above code is known to fail for various reasons and we abandoned it.
+					ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Error inserting new update files into database row...")));
+					EventLog.WriteEntry("OpenDental","Error inserting new update files into database row:\r\n"+ex.Message,EventLogEntryType.Error);
+				}
+			}
+			#endregion
+			#region Insert Update Files Segments Into Many Rows
+			//When we try and send over ~40MB of data, MySQL can drop our connection randomly giving a "MySQL server has gone away" error.
+			//Use a maximum of ~1MB payloads so that the likelyhood of this error is less.
+			charsPerPayload=Math.Min(charsPerPayload,1048575);//1048575 is divisible by 3 which is important for Base64 "appending" logic.
+			try {
+				//Clear and prep the current UpdateFiles row in the documentmisc table for the updated binaries.
+				ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Deleting old update files segments...")));
+				DocumentMiscs.DeleteAllForType(DocumentMiscType.UpdateFilesSegment);
 				byte[] zipFileBytes=new byte[charsPerPayload];
 				memStream.Position=0;//Start at the beginning of the stream.
 				//Convert the zipped up bytes into Base64 and instantly insert it into the database little by little.
-				ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Inserting new update files into database...")));
+				ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Inserting new update files segments into database...")));
 				try {
 					int count=1;
-					DocumentMisc docUpdateFilePart=new DocumentMisc();
-					docUpdateFilePart.DocMiscType=DocumentMiscType.UpdateFiles;
+					DocumentMisc docUpdateFilesSegment=new DocumentMisc();
+					docUpdateFilesSegment.DateCreated=DateTime.Today;
+					docUpdateFilesSegment.DocMiscType=DocumentMiscType.UpdateFilesSegment;
 					while((memStream.Read(zipFileBytes,0,zipFileBytes.Length))>0) {
-						docUpdateFilePart.FileName=count.ToString().PadLeft(4,'0');
-						docUpdateFilePart.RawBase64=Convert.ToBase64String(zipFileBytes);
-						DocumentMiscs.Insert(docUpdateFilePart);
+						docUpdateFilesSegment.FileName=count.ToString().PadLeft(4,'0');
+						docUpdateFilesSegment.RawBase64=Convert.ToBase64String(zipFileBytes);
+						DocumentMiscs.Insert(docUpdateFilesSegment);
 						count++;
 					}
 					ODEvent.Fire(new ODEventArgs("RecopyProgress",Lan.g("Prefs","Done...")));
@@ -212,6 +258,14 @@ namespace OpenDental {
 				}
 				MessageBox.Show(errorStr);
 				return false;
+			}
+			finally {
+				if(memStream!=null) {
+					memStream.Dispose();
+				}
+				if(zipFile!=null) {
+					zipFile.Dispose();
+				}
 			}
 			#endregion
 			ODEvent.Fire(new ODEventArgs("RecopyProgress","DEFCON 1"));
@@ -362,6 +416,7 @@ namespace OpenDental {
 				//So attempt to stash all files that are in the Application directory.
 				//At this point we know that we are going to perform an update.
 				bool hasAtoZ=false;
+				bool hasConcatFiles=false;
 				//Check to see if the version we are coming from is prior to v15.3.
 				//If we are coming from an older version, we need to put a copy of the Update Files into the AtoZ share for backwards compatibility.
 				if(storedVersion<new Version("15.3.10")) {
@@ -369,7 +424,16 @@ namespace OpenDental {
 					//Any clients updating from a previous version still need the Update Files in the AtoZ because they look there instead of the db.
 					hasAtoZ=true;
 				}
-				if(!CopyFromHereToUpdateFiles(currentVersion,isSilent,hasAtoZ)) {
+				//Check to see if the version we are coming from is prior to v15.4.50 or between v16.1.0 and v16.1.20.
+				//If these scenarios are met, we need to insert the new Update Files as one big row using the old CONCAT methodology. 
+				if(storedVersion < new Version("15.4.50")
+					|| (storedVersion > new Version("16.1.0") && storedVersion < new Version("16.1.20"))) 
+				{
+					//Attempts to copy UpdateFiles into a single row in the database for backwards compatibility.
+					//If copying the entire UpdateFiles zip into one row fails, the update will go on because it has been proven to be unreliable. 
+					hasConcatFiles=true;
+				}
+				if(!CopyFromHereToUpdateFiles(currentVersion,isSilent,hasAtoZ,hasConcatFiles)) {
 					Application.Exit();
 					return false;
 				}
@@ -452,7 +516,7 @@ namespace OpenDental {
 				DocumentMisc docUpdateFilesPart=null;
 				int count=1;
 				string fileName=count.ToString().PadLeft(4,'0');
-				while((docUpdateFilesPart=DocumentMiscs.GetByTypeAndFileName(fileName,DocumentMiscType.UpdateFiles))!=null) {
+				while((docUpdateFilesPart=DocumentMiscs.GetByTypeAndFileName(fileName,DocumentMiscType.UpdateFilesSegment))!=null) {
 					strBuilder.Append(docUpdateFilesPart.RawBase64);
 					count++;
 					fileName=count.ToString().PadLeft(4,'0');
