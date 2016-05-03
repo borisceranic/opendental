@@ -1,22 +1,14 @@
-using System;
-using System.Data;
-using System.Diagnostics;
-using System.Drawing;
-using System.Collections;
-using System.ComponentModel;
-using System.IO;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using System.Xml;
-using System.Xml.Serialization;
-using System.Windows.Forms;
-using OpenDentBusiness;
-using CodeBase;
 using OpenDental.UI;
+using OpenDentBusiness;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
+using System.Xml;
 
-namespace OpenDental{
+namespace OpenDental {
 	/// <summary>
 	/// Summary description for FormBasicTemplate.
 	/// </summary>
@@ -335,6 +327,7 @@ namespace OpenDental{
 			//Process a valid return value------------------------------------------------------------------------------------------------
 			node=doc.SelectSingleNode("//ResultTable");
 			table=new ODDataTable(node.InnerXml);
+			table.Rows.Sort(FeatureRequestSort);//Sort user submited/voted features to the top. 
 			//Admin mode----------------------------------------------------------------------------------------------------------------
 			node=doc.SelectSingleNode("//IsAdminMode");
 			if(node.InnerText=="true"){
@@ -381,6 +374,15 @@ namespace OpenDental{
 				row.Cells.Add(table.Rows[i]["Weight"]);
 				row.Cells.Add(table.Rows[i]["approval"]);
 				row.Cells.Add(table.Rows[i]["Description"]);
+				//If they voted or pledged on this feature, mark it so they can see. Can be re-added when/if they need to be more visible.
+				if(table.Rows[i]["isMine"].ToString()!=""
+					&& table.Rows[i]["personalVotes"].ToString()=="0"
+					&& table.Rows[i]["personalCrit"].ToString()=="0"
+					&& table.Rows[i]["personalPledged"].ToString()=="0"
+					&& table.Rows[i]["approval"].ToString()!="Complete") 
+				{
+					row.ColorBackG=Color.FromArgb(255,255,230);//light yellow.
+				}
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
@@ -437,7 +439,59 @@ namespace OpenDental{
 			
 		}
 
-		
+		///<summary>For sorting FRs because we do not have access to the ApprovalEnum in Resuests.cs in the WebServiceCustomerUpdates solution.</summary>
+		private static List<string> _arrayApprovalEnumStrings=new List<string> {
+			"New",//0
+			"NeedsClarification",//1
+			"Redundant",//2
+			"TooBroad",//3
+			"NotARequest",//4
+			"AlreadyDone",//5
+			"Obsolete",//6
+			"Approved",//7
+			"InProgress",//8
+			"Complete"//9
+		};
+
+		///<summary>Used to sort feature requests for user to the top of the list.</summary>
+		private int FeatureRequestSort(ODDataRow x,ODDataRow y) {
+			//Sorting order
+			//  1) Complete items to the bottom
+			//  2) Mine items to top
+			//  3) Personal requests to top
+			//  4) Approval status in order of appearance in _arrayApprovalEnumStrings
+			//  5) Weight by magnitude
+			//  6) Request ID by magnitude
+			//Part 1; complete items to the bottom
+			int xIdx=_arrayApprovalEnumStrings.FindIndex(e=>e==x["approval"].ToString());
+			int yIdx=_arrayApprovalEnumStrings.FindIndex(e=>e==y["approval"].ToString());
+			if(xIdx!=yIdx && (xIdx==9||yIdx==9)) {// 9=="complete"
+				return (xIdx==9).CompareTo(yIdx==9);
+			}
+			//Part 2; Sort "Mine" entries above non-"Mine" entries.  "Mine" means any feature that this office has submitted.
+			if(x["isMine"].ToString()!=y["isMine"].ToString()) {//One is the customer's, the other isn't.
+				return -(x["isMine"].ToString().CompareTo(y["isMine"].ToString()));//It will either be "" or X, and "X" goes to the top
+			}
+			//Part 3
+			bool xIsPersonal=false;
+			bool yIsPersonal=false;
+			xIsPersonal=x["personalVotes"].ToString()!="0" || x["personalCrit"].ToString()!="0" || x["personalPledged"].ToString()!="0";
+			yIsPersonal=y["personalVotes"].ToString()!="0" || y["personalCrit"].ToString()!="0" || y["personalPledged"].ToString()!="0";
+			if(xIsPersonal!=yIsPersonal) {
+				return -xIsPersonal.CompareTo(yIsPersonal);//negative comparison to move personal items to top.
+			}
+			//Part 4
+			if(xIdx!=yIdx) //but only if at least one of them is complete.
+			{
+				return xIdx.CompareTo(yIdx);
+			}
+			//Part 5
+			if(x["Weight"].ToString()!=y["Weight"].ToString()) {
+				return -(PIn.Double(x["Weight"].ToString()).CompareTo(PIn.Double(y["Weight"].ToString())));//Larger number of votes go to the top
+			}
+			//Part 6
+			return PIn.Long(x["RequestId"].ToString()).CompareTo(PIn.Long(y["RequestId"].ToString()));
+		}
 
 	
 
