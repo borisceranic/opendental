@@ -20,6 +20,7 @@ using OpenDental.Bridges;
 using OpenDental.UI;
 using OpenDentBusiness;
 using CodeBase;
+using OpenDentBusiness.Crud;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -783,6 +784,7 @@ namespace OpenDental{
 			// 
 			this.textSubscNote.AcceptsTab = true;
 			this.textSubscNote.BackColor = System.Drawing.SystemColors.Window;
+			this.textSubscNote.DetectLinksEnabled = false;
 			this.textSubscNote.DetectUrls = false;
 			this.textSubscNote.Location = new System.Drawing.Point(57, 75);
 			this.textSubscNote.Name = "textSubscNote";
@@ -1791,6 +1793,7 @@ namespace OpenDental{
 			// 
 			this.textPlanNote.AcceptsTab = true;
 			this.textPlanNote.BackColor = System.Drawing.SystemColors.Window;
+			this.textPlanNote.DetectLinksEnabled = false;
 			this.textPlanNote.DetectUrls = false;
 			this.textPlanNote.Location = new System.Drawing.Point(14, 581);
 			this.textPlanNote.Name = "textPlanNote";
@@ -3424,6 +3427,7 @@ namespace OpenDental{
 		}
 
 		private void butDelete_Click(object sender,System.EventArgs e) {
+			string logText="";
 			//this is a dual purpose button.  It sometimes deletes subscribers (inssubs), and sometimes the plan itself. 
 			if(IsNewPlan) {
 				DialogResult=DialogResult.Cancel;//original plan will get deleted in closing event.
@@ -3453,6 +3457,9 @@ namespace OpenDental{
 						MessageBox.Show(ex.Message);
 						return;
 					}
+					logText=Lan.g(this,"The subscriber")+" "+Patients.GetPat(_subCur.Subscriber).GetNameFLnoPref()+" "
+						+Lan.g(this,"with the Subscriber ID")+" "+_subCur.SubscriberID+" "+Lan.g(this,"was deleted.");
+					SecurityLogs.MakeLogEntry(Permissions.InsPlanEdit,PatPlanCur.PatNum,logText);
 					DialogResult=DialogResult.OK;
 					return;
 				}
@@ -3471,6 +3478,8 @@ namespace OpenDental{
 				MessageBox.Show(ex.Message);
 				return;
 			}
+			logText=Lan.g(this,"The insurance plan for the carrier")+" "+Carriers.GetCarrier(PlanCur.CarrierNum).CarrierName+" "+Lan.g(this,"was deleted.");
+			SecurityLogs.MakeLogEntry(Permissions.InsPlanEdit,PatPlanCur.PatNum,logText);
 			DialogResult=DialogResult.OK;
 		}
 
@@ -3496,6 +3505,8 @@ namespace OpenDental{
 			PatPlans.Delete(PatPlanCur.PatPlanNum);//Estimates recomputed within Delete()
 			//PlanCur.ComputeEstimatesForCur();
 			_hasDropped=true;
+			string logText=Lan.g(this,"The insurance plan for the carrier")+" "+Carriers.GetCarrier(PlanCur.CarrierNum).CarrierName+" "+Lan.g(this,"was dropped.");
+			SecurityLogs.MakeLogEntry(Permissions.InsPlanEdit,PatPlanCur.PatNum,logText);
 			DialogResult=DialogResult.OK;
 		}
 
@@ -4629,6 +4640,17 @@ namespace OpenDental{
 					SecurityLogs.MakeLogEntry(Permissions.InsPlanChangeCarrierName,patNum,Lan.g(this,"Carrier name changed in Edit Insurance Plan window from")+" "
 					+carrierNameOrig+" "+Lan.g(this,"to")+" "+carrierNameNew,PlanCur.PlanNum);
 				}
+			}
+			Carrier carrierCur=Carriers.GetCarrier(PlanCur.CarrierNum);
+			if(PlanCurOriginal.FeeSched!=0 && PlanCurOriginal.FeeSched!=PlanCur.FeeSched) {
+				string feeSchedOld=FeeScheds.GetDescription(PlanCurOriginal.FeeSched);
+				string feeSchedNew=FeeScheds.GetDescription(PlanCur.FeeSched);
+				string logText=Lan.g(this,"The fee schedule for the carrier")+" "+carrierCur.CarrierName+" "+Lan.g(this,"was changed from")+" "+feeSchedOld+" "+Lan.g(this,"to")+" "+feeSchedNew;;
+				SecurityLogs.MakeLogEntry(Permissions.InsPlanEdit,PatPlanCur.PatNum,logText);
+			}
+			if(InsPlanCrud.UpdateComparison(PlanCurOriginal,PlanCur)) {
+				string logText=Lan.g(this,"The insurance plan for the carrier")+" "+carrierCur.CarrierName+" "+Lan.g(this,"has changed.");
+				SecurityLogs.MakeLogEntry(Permissions.InsPlanEdit,PatPlanCur.PatNum,logText);
 			}
 			DialogResult=DialogResult.OK;
 		}

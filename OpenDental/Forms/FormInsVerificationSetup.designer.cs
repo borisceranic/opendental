@@ -37,6 +37,8 @@ namespace OpenDental{
 			this.label1 = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.label4 = new System.Windows.Forms.Label();
+			this.checkInsVerifyExcludePatVerify = new System.Windows.Forms.CheckBox();
+			this.checkExcludePatientClones = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -48,7 +50,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(203, 164);
+			this.butOK.Location = new System.Drawing.Point(204, 203);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 3;
@@ -63,7 +65,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(284, 164);
+			this.butCancel.Location = new System.Drawing.Point(285, 203);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 2;
@@ -183,18 +185,40 @@ namespace OpenDental{
 			this.label4.Text = "days";
 			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
 			// 
+			// checkExcludePatsOfExcludedInsPlans
+			// 
+			this.checkInsVerifyExcludePatVerify.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkInsVerifyExcludePatVerify.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkInsVerifyExcludePatVerify.Location = new System.Drawing.Point(12, 142);
+			this.checkInsVerifyExcludePatVerify.Name = "checkExcludePatsOfExcludedInsPlans";
+			this.checkInsVerifyExcludePatVerify.Size = new System.Drawing.Size(346, 17);
+			this.checkInsVerifyExcludePatVerify.TabIndex = 232;
+			this.checkInsVerifyExcludePatVerify.Text = "Exclude patients with insurance plans marked as Do Not Verify";
+			this.checkInsVerifyExcludePatVerify.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// checkExcludePatientClones
+			// 
+			this.checkExcludePatientClones.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkExcludePatientClones.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkExcludePatientClones.Location = new System.Drawing.Point(12, 160);
+			this.checkExcludePatientClones.Name = "checkExcludePatientClones";
+			this.checkExcludePatientClones.Size = new System.Drawing.Size(346, 17);
+			this.checkExcludePatientClones.TabIndex = 233;
+			this.checkExcludePatientClones.Text = "Exclude Patient Clones";
+			this.checkExcludePatientClones.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormInsVerificationSetup
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(371, 200);
+			this.ClientSize = new System.Drawing.Size(372, 239);
+			this.Controls.Add(this.checkExcludePatientClones);
+			this.Controls.Add(this.checkInsVerifyExcludePatVerify);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.checkInsVerifyUseCurrentUser);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(100, 100);
 			this.Name = "FormInsVerificationSetup";
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Insurance Verification Setup";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormInsVerificationSetup_FormClosing);
 			this.Load += new System.EventHandler(this.FormInsVerificationSetup_Load);
@@ -219,5 +243,7 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.GroupBox groupBox1;
 		private System.Windows.Forms.Label label4;
+		private System.Windows.Forms.CheckBox checkInsVerifyExcludePatVerify;
+		private System.Windows.Forms.CheckBox checkExcludePatientClones;
 	}
 }

@@ -898,6 +898,34 @@ namespace OpenDentBusiness {
 						Db.NonQ(command);
 					}
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+				   command="INSERT INTO preference(PrefName,ValueString) VALUES('InsVerifyExcludePatientClones','0')";
+				   Db.NonQ(command);
+				}
+				else {//oracle
+				   command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'InsVerifyExcludePatientClones','0')";
+				   Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+				   command="INSERT INTO preference(PrefName,ValueString) VALUES('InsVerifyExcludePatVerify','0')";
+				   Db.NonQ(command);
+				}
+				else {//oracle
+				   command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'InsVerifyExcludePatVerify','0')";
+				   Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE clinic ADD IsInsVerifyExcluded tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE clinic ADD IsInsVerifyExcluded number(3)";
+					Db.NonQ(command);
+					command="UPDATE clinic SET IsInsVerifyExcluded = 0 WHERE IsInsVerifyExcluded IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE clinic MODIFY IsInsVerifyExcluded NOT NULL";
+					Db.NonQ(command);
+				}
 
 
 

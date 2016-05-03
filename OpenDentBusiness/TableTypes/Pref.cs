@@ -354,6 +354,10 @@ namespace OpenDentBusiness {
 		InsVerifyBenefitEligibilityDays,
 		///<summary>Boolean, false by default.  When true, defaults a filter to the current user instead of All when opening the InsVerifyList.</summary>
 		InsVerifyDefaultToCurrentUser,
+		///<summary>Boolean, false by default.  When true, excludes patient clones from the Insurance Verification List.</summary>
+		InsVerifyExcludePatientClones,
+		///<summary>Boolean, false by default.  When true, excludes patient plans associated to insurance plans that are marked "Do Not Verify" from the Insurance Verification List.</summary>
+		InsVerifyExcludePatVerify,
 		///<summary>30 by default.  Number of days before requiring patient plans to be verified.</summary>
 		InsVerifyPatientEnrollmentDays,
 		///<summary>Writeoff description displayed in the Account Module and on statements.  If blank, the default is "Writeoff".

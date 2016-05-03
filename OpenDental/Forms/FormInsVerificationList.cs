@@ -310,6 +310,9 @@ namespace OpenDental {
 			List<VerifyGridRow> listGridRows=new List<VerifyGridRow>();
 			List<long> listInsPlanVerifyNums=new List<long>();
 			List<InsVerify> insVerifiesForGrid=InsVerifies.GetAll();
+			bool hidePatPlanFromList=PrefC.GetBool(PrefName.InsVerifyExcludePatVerify);
+			bool hasPatientClonesEnabled=PrefC.GetBool(PrefName.ShowFeaturePatientClone);
+			bool hidePatientClonesFromList=PrefC.GetBool(PrefName.InsVerifyExcludePatientClones);
 			Dictionary<Tuple<long,VerifyTypes>,InsVerify> dictInsVerify=new Dictionary<Tuple<long,VerifyTypes>,InsVerify>();
 			foreach(InsVerify insVerifyCur in insVerifiesForGrid) {
 				//Add the Fkey and VerifyTypes combination as the key for the dictionary to get the InsVerify object.
@@ -327,6 +330,9 @@ namespace OpenDental {
 				string apptClinicName="";
 				if(clinicCur!=null) {
 					apptClinicName=clinicCur.Description;
+					if(clinicCur.IsInsVerifyExcluded) {
+						continue;
+					}
 				}
 				if(_clinicNumVerifyClinicsFilter==0 && apptCur.ClinicNum!=0) {
 					continue;
@@ -343,6 +349,15 @@ namespace OpenDental {
 				if(patCur==null) {//Should never happen.  This means the patnum is orphaned and we don't want to show it anyways.
 					continue;
 				}
+				Patient patClone;
+				Patient patNonClone;
+				List<Patient> listAmbiguousMatches;
+				Patients.GetCloneAndNonClone(patCur,out patClone,out patNonClone,out listAmbiguousMatches);
+				if(hasPatientClonesEnabled && hidePatientClonesFromList
+					&& (patClone!=null && (patClone.FName==patCur.FName || patClone.LName==patCur.LName))) 
+				{
+					continue;
+				}
 				List<PatPlan> listPatPlans=PatPlans.Refresh(patCur.PatNum);
 				foreach(PatPlan patPlanCur in listPatPlans) {
 					row=new VerifyGridRow();
@@ -352,6 +367,9 @@ namespace OpenDental {
 					}
 					InsPlan insPlanCur=InsPlans.GetPlan(insSubCur.PlanNum,null);
 					if(insPlanCur==null) {//Should never happen.  It means the inssub row was orphaned and we can't display this insurance.
+						continue;
+					}
+					if(insPlanCur.HideFromVerifyList && hidePatPlanFromList) {
 						continue;
 					}
 					Carrier carrierCur=Carriers.GetCarrier(insPlanCur.CarrierNum);
@@ -644,6 +662,9 @@ namespace OpenDental {
 		private List<AssignGridRow> GetRowsForAssignGrid() {
 			List<AssignGridRow> listGridRows=new List<AssignGridRow>();
 			List<InsVerify> insVerifiesForGrid=InsVerifies.GetAll();
+			bool hidePatPlanFromList=PrefC.GetBool(PrefName.InsVerifyExcludePatVerify);
+			bool hasPatientClonesEnabled=PrefC.GetBool(PrefName.ShowFeaturePatientClone);
+			bool hidePatientClonesFromList=PrefC.GetBool(PrefName.InsVerifyExcludePatientClones);
 			Dictionary<Tuple<long,VerifyTypes>,InsVerify> dictInsVerify=new Dictionary<Tuple<long,VerifyTypes>,InsVerify>();
 			foreach(InsVerify insVerifyCur in insVerifiesForGrid) {
 				//Add the Fkey and VerifyTypes combination as the key for the dictionary to get the InsVerify object.
@@ -661,6 +682,9 @@ namespace OpenDental {
 				string apptClinicName="";
 				if(clinicCur!=null) {
 					apptClinicName=clinicCur.Description;
+					if(clinicCur.IsInsVerifyExcluded) {
+						continue;
+					}
 				}
 				if(_clinicNumVerifyClinicsFilter==0 && apptCur.ClinicNum!=0) {
 					continue;
@@ -676,6 +700,15 @@ namespace OpenDental {
 				if(patCur==null) {//Should never happen.  This means the patnum is orphaned and we don't want to show it anyways.
 					continue;
 				}
+				Patient patClone;
+				Patient patNonClone;
+				List<Patient> listAmbiguousMatches;
+				Patients.GetCloneAndNonClone(patCur,out patClone,out patNonClone,out listAmbiguousMatches);
+				if(hasPatientClonesEnabled && hidePatientClonesFromList
+					&& (patClone==null || (patClone.FName==patCur.FName || patClone.LName==patCur.LName))) 
+				{
+					continue;
+				}
 				List<PatPlan> listPatPlans=PatPlans.Refresh(patCur.PatNum);
 				foreach(PatPlan patPlanCur in listPatPlans) {
 					InsSub insSubCur=InsSubs.GetOne(patPlanCur.InsSubNum);
@@ -684,6 +717,9 @@ namespace OpenDental {
 					}
 					InsPlan insPlanCur=InsPlans.GetPlan(insSubCur.PlanNum,null);
 					if(insPlanCur==null) {//Should never happen.  It means the inssub row was orphaned and we can't display this insurance.
+						continue;
+					}
+					if(insPlanCur.HideFromVerifyList && hidePatPlanFromList) {
 						continue;
 					}
 					Carrier carrierCur=Carriers.GetCarrier(insPlanCur.CarrierNum);

@@ -69,6 +69,8 @@ namespace OpenDentBusiness{
 		public long Region;
 		///<summary>0 based.  Clinics cache is sorted by ItemOrder if the preference ClinicListIsAlphabetical is false.</summary>
 		public int ItemOrder;
+		///<summary>True if this clinic should be excluded from showing up in the Insurance Verification List.</summary>
+		public bool IsInsVerifyExcluded;
 
 		///<summary>Returns a copy of this Clinic.</summary>
 		public Clinic Copy(){

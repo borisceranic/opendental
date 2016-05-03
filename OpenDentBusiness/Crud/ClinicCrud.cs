@@ -76,6 +76,7 @@ namespace OpenDentBusiness.Crud{
 				clinic.UseBillAddrOnClaims= PIn.Bool  (row["UseBillAddrOnClaims"].ToString());
 				clinic.Region             = PIn.Long  (row["Region"].ToString());
 				clinic.ItemOrder          = PIn.Int   (row["ItemOrder"].ToString());
+				clinic.IsInsVerifyExcluded= PIn.Bool  (row["IsInsVerifyExcluded"].ToString());
 				retVal.Add(clinic);
 			}
 			return retVal;
@@ -117,6 +118,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("UseBillAddrOnClaims");
 			table.Columns.Add("Region");
 			table.Columns.Add("ItemOrder");
+			table.Columns.Add("IsInsVerifyExcluded");
 			foreach(Clinic clinic in listClinics) {
 				table.Rows.Add(new object[] {
 					POut.Long  (clinic.ClinicNum),
@@ -149,6 +151,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Bool  (clinic.UseBillAddrOnClaims),
 					POut.Long  (clinic.Region),
 					POut.Int   (clinic.ItemOrder),
+					POut.Bool  (clinic.IsInsVerifyExcluded),
 				});
 			}
 			return table;
@@ -189,7 +192,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ClinicNum,";
 			}
-			command+="Description,Address,Address2,City,State,Zip,BillingAddress,BillingAddress2,BillingCity,BillingState,BillingZip,PayToAddress,PayToAddress2,PayToCity,PayToState,PayToZip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsMonthlyLimit,IsMedicalOnly,UseBillAddrOnClaims,Region,ItemOrder) VALUES(";
+			command+="Description,Address,Address2,City,State,Zip,BillingAddress,BillingAddress2,BillingCity,BillingState,BillingZip,PayToAddress,PayToAddress2,PayToCity,PayToState,PayToZip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsMonthlyLimit,IsMedicalOnly,UseBillAddrOnClaims,Region,ItemOrder,IsInsVerifyExcluded) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(clinic.ClinicNum)+",";
 			}
@@ -222,7 +225,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (clinic.IsMedicalOnly)+","
 				+    POut.Bool  (clinic.UseBillAddrOnClaims)+","
 				+    POut.Long  (clinic.Region)+","
-				+    POut.Int   (clinic.ItemOrder)+")";
+				+    POut.Int   (clinic.ItemOrder)+","
+				+    POut.Bool  (clinic.IsInsVerifyExcluded)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -255,7 +259,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ClinicNum,";
 			}
-			command+="Description,Address,Address2,City,State,Zip,BillingAddress,BillingAddress2,BillingCity,BillingState,BillingZip,PayToAddress,PayToAddress2,PayToCity,PayToState,PayToZip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsMonthlyLimit,IsMedicalOnly,UseBillAddrOnClaims,Region,ItemOrder) VALUES(";
+			command+="Description,Address,Address2,City,State,Zip,BillingAddress,BillingAddress2,BillingCity,BillingState,BillingZip,PayToAddress,PayToAddress2,PayToCity,PayToState,PayToZip,Phone,BankNumber,DefaultPlaceService,InsBillingProv,Fax,EmailAddressNum,DefaultProv,SmsContractDate,SmsMonthlyLimit,IsMedicalOnly,UseBillAddrOnClaims,Region,ItemOrder,IsInsVerifyExcluded) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(clinic.ClinicNum)+",";
 			}
@@ -288,7 +292,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Bool  (clinic.IsMedicalOnly)+","
 				+    POut.Bool  (clinic.UseBillAddrOnClaims)+","
 				+    POut.Long  (clinic.Region)+","
-				+    POut.Int   (clinic.ItemOrder)+")";
+				+    POut.Int   (clinic.ItemOrder)+","
+				+    POut.Bool  (clinic.IsInsVerifyExcluded)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -329,7 +334,8 @@ namespace OpenDentBusiness.Crud{
 				+"IsMedicalOnly      =  "+POut.Bool  (clinic.IsMedicalOnly)+", "
 				+"UseBillAddrOnClaims=  "+POut.Bool  (clinic.UseBillAddrOnClaims)+", "
 				+"Region             =  "+POut.Long  (clinic.Region)+", "
-				+"ItemOrder          =  "+POut.Int   (clinic.ItemOrder)+" "
+				+"ItemOrder          =  "+POut.Int   (clinic.ItemOrder)+", "
+				+"IsInsVerifyExcluded=  "+POut.Bool  (clinic.IsInsVerifyExcluded)+" "
 				+"WHERE ClinicNum = "+POut.Long(clinic.ClinicNum);
 			Db.NonQ(command);
 		}
@@ -453,6 +459,10 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="ItemOrder = "+POut.Int(clinic.ItemOrder)+"";
 			}
+			if(clinic.IsInsVerifyExcluded != oldClinic.IsInsVerifyExcluded) {
+				if(command!=""){ command+=",";}
+				command+="IsInsVerifyExcluded = "+POut.Bool(clinic.IsInsVerifyExcluded)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -550,6 +560,9 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			if(clinic.ItemOrder != oldClinic.ItemOrder) {
+				return true;
+			}
+			if(clinic.IsInsVerifyExcluded != oldClinic.IsInsVerifyExcluded) {
 				return true;
 			}
 			return false;
