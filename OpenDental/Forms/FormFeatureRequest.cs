@@ -457,9 +457,9 @@ namespace OpenDental {
 		private int FeatureRequestSort(ODDataRow x,ODDataRow y) {
 			//Sorting order
 			//  1) Complete items to the bottom
-			//  2) Mine items to top
-			//  3) Personal requests to top
-			//  4) Approval status in order of appearance in _arrayApprovalEnumStrings
+			//  2) Personal requests to top
+			//  3) Personal requests sorted by weight
+			//  4) Group by "Mine"
 			//  5) Weight by magnitude
 			//  6) Request ID by magnitude
 			//Part 1; complete items to the bottom
@@ -468,11 +468,7 @@ namespace OpenDental {
 			if(xIdx!=yIdx && (xIdx==9||yIdx==9)) {// 9=="complete"
 				return (xIdx==9).CompareTo(yIdx==9);
 			}
-			//Part 2; Sort "Mine" entries above non-"Mine" entries.  "Mine" means any feature that this office has submitted.
-			if(x["isMine"].ToString()!=y["isMine"].ToString()) {//One is the customer's, the other isn't.
-				return -(x["isMine"].ToString().CompareTo(y["isMine"].ToString()));//It will either be "" or X, and "X" goes to the top
-			}
-			//Part 3
+			//Part 2
 			bool xIsPersonal=false;
 			bool yIsPersonal=false;
 			xIsPersonal=x["personalVotes"].ToString()!="0" || x["personalCrit"].ToString()!="0" || x["personalPledged"].ToString()!="0";
@@ -480,10 +476,15 @@ namespace OpenDental {
 			if(xIsPersonal!=yIsPersonal) {
 				return -xIsPersonal.CompareTo(yIsPersonal);//negative comparison to move personal items to top.
 			}
-			//Part 4
-			if(xIdx!=yIdx) //but only if at least one of them is complete.
-			{
-				return xIdx.CompareTo(yIdx);
+			//Part 3
+			if(xIsPersonal && yIsPersonal) {
+				if(x["Weight"].ToString()!=y["Weight"].ToString()) {
+					return -(PIn.Double(x["Weight"].ToString()).CompareTo(PIn.Double(y["Weight"].ToString())));//Larger number of votes go to the top
+				}
+			}
+			//Part 4; Sort "Mine" entries above non-"Mine" entries.  "Mine" means any feature that this office has submitted.
+			if(x["isMine"].ToString()!=y["isMine"].ToString()) {//One is the customer's, the other isn't.
+				return -(x["isMine"].ToString().CompareTo(y["isMine"].ToString()));//It will either be "" or X, and "X" goes to the top
 			}
 			//Part 5
 			if(x["Weight"].ToString()!=y["Weight"].ToString()) {
