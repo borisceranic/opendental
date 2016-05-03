@@ -4,6 +4,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.IO;
+using System.Collections;
 
 namespace CodeBase {
 	///<summary>Used to log messages to our internal log file, or to other resources, such as message boxes.</summary>
@@ -29,6 +30,11 @@ namespace CodeBase {
 #else
 		public Severity level=Severity.NONE;
 #endif
+		#region WebCore Logger Copy
+		public static int MAX_FILE_SIZE_KB=1000;
+		private static Dictionary<string /*sub-directory, can be empty string (not null though)*/,object[]/*{StreamWriter, Create DateTime} the file currently linked to this sub-directory*/> _files=new Dictionary<string,object[]>();
+		private static object _lock=new object();
+		#endregion
 
 		public Logger(string pLogFile){
 				logFile=pLogFile;
@@ -163,6 +169,188 @@ namespace CodeBase {
 			}
 			return false;
 		}
+
+		#region WebCore Logger Copy
+		public static string GetDirectory(string subDirectory) {
+			string ret = ODFileUtils.CombinePaths(AppDomain.CurrentDomain.BaseDirectory,"Logger");
+			if(!string.IsNullOrEmpty(subDirectory)) {
+				ret=ODFileUtils.CombinePaths(ret,subDirectory);
+			}
+			return ret;
+		}
+
+		public static void WriteLine(string line,string subDirectory) {
+			WriteLine(line,subDirectory,false,true);
+		}
+
+		public static void WriteLine(string line,string subDirectory,bool singleFileOnly,bool includeTimestamp) {
+			lock (_lock) {
+				StreamWriter file = Open(subDirectory,singleFileOnly);
+				if(file==null) {
+					return;
+				}
+				string timeStamp = includeTimestamp ? (DateTime.Now.ToString()+"\t") : "";
+				file.WriteLine(timeStamp+line);
+			}
+		}
+
+		public static void WriteError(string line,string subDirectory) {
+			WriteLine("failed - "+line,subDirectory,false,true);
+		}
+
+		public static void WriteException(Exception e,string subDirectory) {
+			WriteError(e.Message+"\r\n"+e.StackTrace,subDirectory);
+		}
+
+		public static void CloseLogger() {
+			lock (_lock) {
+				while(_files.Count>=1) {
+					IEnumerator enumerator = _files.Keys.GetEnumerator();
+					if(enumerator==null||!enumerator.MoveNext()) {
+						break;
+					}
+					CloseFile((string)enumerator.Current);
+				}
+			}
+		}
+
+		private static void CloseFile(string subDirectory) {
+			try {
+				lock (_lock) {
+					StreamWriter file = null;
+					DateTime created = DateTime.Now;
+					if(!TryGetFile(subDirectory,out file,out created)) {
+						return;
+					}
+					file.Dispose();
+					_files.Remove(subDirectory);
+				}
+			}
+			catch { }
+		}
+
+		public static void ParseLogs(string directory) {
+			try {
+				DirectoryInfo di = new DirectoryInfo(directory);
+				if(!di.Exists) {
+					return;
+				}
+				using(StreamWriter sw = new StreamWriter(ODFileUtils.CombinePaths(AppDomain.CurrentDomain.BaseDirectory,"Errors - "+DateTime.Now.ToString("MM-dd-yy HH-mm-ss")+".txt"))) {
+					ParseDirectory(di,sw);
+					foreach(DirectoryInfo diSub in di.GetDirectories()) {
+						ParseDirectory(diSub,sw);
+					}
+				}
+			}
+			catch(Exception e) {
+				throw e;
+			}
+		}
+
+		private static void ParseDirectory(DirectoryInfo di,StreamWriter sw) {
+			FileInfo[] files = di.GetFiles("*.txt");
+			foreach(FileInfo fi in files) {
+				using(StreamReader sr = new StreamReader(fi.FullName)) {
+					string line = "";
+					string lower = "";
+					while(sr.Peek()>0) {
+						line=sr.ReadLine();
+						lower=line.ToLower();
+						if(!lower.Contains("failed")) {
+							continue;
+						}
+						sw.WriteLine(line);
+					}
+				}
+			}
+		}
+
+		public static bool SingleFileLoggerExists(string subDirectory) {
+			FileInfo fi = new FileInfo(ODFileUtils.CombinePaths(GetDirectory(subDirectory),subDirectory+".txt"));
+			return fi.Exists;
+		}
+
+		private static bool TryGetFile(string subDirectory,out StreamWriter file,out DateTime created) {
+			file=null;
+			created=DateTime.MinValue;
+			lock (_lock) {
+				object[] obj = null;
+				if(!_files.TryGetValue(subDirectory,out obj)) {
+					return false;
+				}
+				file=(StreamWriter)obj[0];
+				created=(DateTime)obj[1];
+				return true;
+			}
+		}
+
+		private static StreamWriter Open(string subDirectory,bool singleFileOnly) {
+			try {
+				lock (_lock) {
+					StreamWriter file = null;
+					DateTime created = DateTime.MinValue;
+					if(TryGetFile(subDirectory,out file,out created)) { //file has been created
+						if(singleFileOnly) {
+							return file;
+						}
+						if(DateTime.Today==created.Date) { //it was created today
+							if((file.BaseStream.Length/1024)<=MAX_FILE_SIZE_KB) { //it is within the acceptable size limit
+								return file;
+							}
+						}
+						CloseFile(subDirectory);
+					}
+					file=new StreamWriter(GetFileName(subDirectory,DateTime.Today,singleFileOnly),true);
+					file.AutoFlush=true;
+					_files[subDirectory]=new object[] { file,DateTime.Now };
+					return file;
+				}
+			}
+			catch {
+				return null;
+			}
+		}
+
+		private static string GetFileNameSingleFileOnly(string subDirectory) {
+			DirectoryInfo di = new DirectoryInfo(GetDirectory(subDirectory));
+			FileInfo fi = new FileInfo(ODFileUtils.CombinePaths(di.FullName,subDirectory+".txt"));
+			if(!di.Exists) {
+				di.Create();
+			}
+			return fi.FullName;
+		}
+
+		private static string GetFileName(string subDirectory,DateTime date,bool singleFileOnly) {
+			if(singleFileOnly) {
+				return GetFileNameSingleFileOnly(subDirectory);
+			}
+			string formattedDate = date.ToString("yy-MM-dd");
+			DirectoryInfo di = new DirectoryInfo(ODFileUtils.CombinePaths(GetDirectory(subDirectory),formattedDate));
+			if(!di.Exists) {
+				di.Create();
+			}
+			int fileNum = 1;
+			do {
+				FileInfo fi = new FileInfo(ODFileUtils.CombinePaths(di.FullName,formattedDate+" ("+fileNum.ToString("D3")+").txt"));
+				if(!fi.Exists) { //file doesn't exist yet
+					return fi.FullName;
+				}
+				if((fi.Length/1024)<=MAX_FILE_SIZE_KB) { //file is small enough to use
+					return fi.FullName;
+				}
+				if(++fileNum>=1000) { //only create 1000 files max
+					List<FileInfo> fileInfos = new List<FileInfo>(di.GetFiles(formattedDate+"*"));
+					fileInfos.Sort(SortFileByModifiedTimeDesc);
+					fileInfos[0].Delete();
+					return fileInfos[0].FullName;
+				}
+			} while(true);
+		}
+
+		private static int SortFileByModifiedTimeDesc(FileInfo x,FileInfo y) {
+			return x.LastWriteTime.CompareTo(y.LastWriteTime);
+		} 
+		#endregion
 
 	}
 }

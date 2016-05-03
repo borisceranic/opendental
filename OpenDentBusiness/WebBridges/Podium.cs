@@ -15,6 +15,7 @@ namespace OpenDentBusiness.WebBridges {
 		public static DateTime DateTimeLastRan=DateTime.MinValue;
 		///<summary>Amount of time to wait inbetween trying to send Podium review invitations.</summary>
 		public static int PodiumThreadIntervalMS=(int)TimeSpan.FromMinutes(5).TotalMilliseconds;
+		public static string LOG_DIRECTORY_PODIUM="Podium";
 
 		///<summary></summary>
 		public Podium() {

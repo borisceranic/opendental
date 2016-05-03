@@ -4651,7 +4651,7 @@ namespace OpenDental{
 
 		///<summary>The exception delegate for the Podium monitoring thread.</summary>
 		private void PodiumMonitoringException(Exception ex) {
-			//Currently we don't want to do anything if the Podium processing fails.  
+			Logger.WriteException(ex,Podium.LOG_DIRECTORY_PODIUM);
 		}
 
 		///<summary>Worker method for _odThreadEServices.  Call StartEServiceMonitoring() to start monitoring eService signals instead of calling this method directly.</summary>
