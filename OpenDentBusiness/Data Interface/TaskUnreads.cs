@@ -36,6 +36,9 @@ namespace OpenDentBusiness{
 			//if the task is done, don't add unreads
 			string command="SELECT TaskStatus,UserNum FROM task WHERE TaskNum = "+POut.Long(taskNum);
 			DataTable table=Db.GetTable(command);
+			if(table.Rows.Count==0) {
+				return;//only happens when a task was deleted by one user but left open on another user's computer.
+			}
 			TaskStatusEnum taskStatus=(TaskStatusEnum)PIn.Int(table.Rows[0]["TaskStatus"].ToString());
 			long userNumOwner=PIn.Long(table.Rows[0]["UserNum"].ToString());
 			if(taskStatus==TaskStatusEnum.Done) {//
