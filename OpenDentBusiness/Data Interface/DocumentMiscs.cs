@@ -27,6 +27,18 @@ namespace OpenDentBusiness{
 			return Crud.DocumentMiscCrud.Insert(documentMisc);
 		}
 
+		///<summary>Appends the passed in rawBase64 string to the RawBase64 column in the db for the UpdateFiles DocMiscType row.</summary>
+		public static void AppendRawBase64ForUpdateFiles(string rawBase64) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),rawBase64);
+				return;
+			}
+			string command="UPDATE documentmisc SET RawBase64=CONCAT("+DbHelper.IfNull("RawBase64","")+","+DbHelper.ParamChar+"paramRawBase64) "
+				+"WHERE DocMiscType="+POut.Int((int)DocumentMiscType.UpdateFiles);
+			OdSqlParameter paramRawBase64=new OdSqlParameter("paramRawBase64",OdDbType.Text,rawBase64);
+			Db.NonQ(command,paramRawBase64);
+		}
+
 		///<summary></summary>
 		public static void DeleteAllForType(DocumentMiscType docMiscType) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
