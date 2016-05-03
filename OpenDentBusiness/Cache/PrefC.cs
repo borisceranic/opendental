@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using OpenDentBusiness;
@@ -226,6 +227,16 @@ namespace OpenDentBusiness {
 				}
 			}
 			return CultureInfo.CurrentCulture;
+		}
+
+		///<summary>Returns true if a Patient Portal URL is entered and program properties required for XWeb are entered.</summary>
+		public static bool HasOnlinePaymentEnabled() {
+			List<ProgramProperty> listXChargeProps=ProgramProperties.GetListForProgram(Programs.GetProgramNum(ProgramName.Xcharge));
+			return GetString(PrefName.PatientPortalURL)!=""
+				&& Programs.IsEnabled(ProgramName.Xcharge)
+				&& listXChargeProps.Any(x => x.PropertyDesc=="XWebID" && x.PropertyValue!="")
+				&& listXChargeProps.Any(x => x.PropertyDesc=="AuthKey" && x.PropertyValue!="")
+				&& listXChargeProps.Any(x => x.PropertyDesc=="TerminalID" && x.PropertyValue!="");
 		}
 
 		///<summary>Used by an outside developer.</summary>

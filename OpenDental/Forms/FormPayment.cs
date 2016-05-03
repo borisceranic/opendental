@@ -115,6 +115,7 @@ namespace OpenDental {
 		///<summary>Set to a positive amount if there is an unearned amount for the patient and they want to use it.</summary>
 		public double UnearnedAmt;
 		private UI.Button butPrePay;
+		private CheckBox checkProcessed;
 		///<summary>Fill this list with procedures prior to loading that need to have paysplits created and attached.</summary>
 		public List<Procedure> ListProcs;
 
@@ -201,6 +202,7 @@ namespace OpenDental {
 			this.butDeleteAll = new OpenDental.UI.Button();
 			this.butAdd = new OpenDental.UI.Button();
 			this.butPrePay = new OpenDental.UI.Button();
+			this.checkProcessed = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -447,7 +449,7 @@ namespace OpenDental {
 			// 
 			// textDeposit
 			// 
-			this.textDeposit.Location = new System.Drawing.Point(694, 158);
+			this.textDeposit.Location = new System.Drawing.Point(694, 181);
 			this.textDeposit.Name = "textDeposit";
 			this.textDeposit.ReadOnly = true;
 			this.textDeposit.Size = new System.Drawing.Size(100, 20);
@@ -456,7 +458,7 @@ namespace OpenDental {
 			// labelDeposit
 			// 
 			this.labelDeposit.ForeColor = System.Drawing.Color.Firebrick;
-			this.labelDeposit.Location = new System.Drawing.Point(691, 139);
+			this.labelDeposit.Location = new System.Drawing.Point(691, 162);
 			this.labelDeposit.Name = "labelDeposit";
 			this.labelDeposit.Size = new System.Drawing.Size(199, 16);
 			this.labelDeposit.TabIndex = 126;
@@ -746,9 +748,19 @@ namespace OpenDental {
 			this.butPrePay.Text = "Prepay";
 			this.butPrePay.Click += new System.EventHandler(this.butPrePay_Click);
 			// 
+			// checkProcessed
+			// 
+			this.checkProcessed.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkProcessed.Location = new System.Drawing.Point(694, 136);
+			this.checkProcessed.Name = "checkProcessed";
+			this.checkProcessed.Size = new System.Drawing.Size(196, 18);
+			this.checkProcessed.TabIndex = 137;
+			this.checkProcessed.Text = "Mark as Processed";
+			// 
 			// FormPayment
 			// 
 			this.ClientSize = new System.Drawing.Size(974, 562);
+			this.Controls.Add(this.checkProcessed);
 			this.Controls.Add(this.butPrePay);
 			this.Controls.Add(this.butPrintReceipt);
 			this.Controls.Add(this.checkBalanceGroupByProv);
@@ -873,6 +885,12 @@ namespace OpenDental {
 				comboClinic.Visible=false;
 				labelClinic.Visible=false;
 				checkBalanceGroupByProv.Visible=false;
+			}
+			if(_paymentCur.ProcessStatus==ProcessStat.OfficeProcessed) {
+				checkProcessed.Visible=false;//This checkbox will only show if the payment originated online.
+			}
+			else if(_paymentCur.ProcessStatus==ProcessStat.OnlineProcessed) {
+				checkProcessed.Checked=true;
 			}
 			_listCreditCards=CreditCards.Refresh(_patCur.PatNum);
 			for(int i=0;i<_listCreditCards.Count;i++) {
@@ -2480,6 +2498,14 @@ namespace OpenDental {
 			catch(ApplicationException ex) {
 				MessageBox.Show(ex.Message);//not able to alter, so must not allow user to continue.
 				return false;
+			}
+			if(_paymentCur.ProcessStatus!=ProcessStat.OfficeProcessed) {
+				if(checkProcessed.Checked) {
+					_paymentCur.ProcessStatus=ProcessStat.OnlineProcessed;
+				}
+				else {
+					_paymentCur.ProcessStatus=ProcessStat.OnlinePending;
+				}
 			}
 			_paymentCur.PayAmt=PIn.Double(textAmount.Text);//handles blank
 			_paymentCur.PayDate=PIn.Date(textDate.Text);

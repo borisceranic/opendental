@@ -111,6 +111,30 @@ namespace OpenDentBusiness{
 			return Crud.PaymentCrud.SelectMany(command);
 		}
 
+		///<summary>Gets all payments that have a ProcessStatus of OnlinePending. Pass in an empty list to get payments for all clinics.</summary>
+		public static List<Payment> GetNeedingProcessed(List<long> clinicNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Payment>>(MethodBase.GetCurrentMethod(),clinicNums);
+			}
+			string command="SELECT * FROM payment WHERE ProcessStatus="+POut.Int((int)ProcessStat.OnlinePending)+" ";
+			if(clinicNums.Count>0) {
+				command+="AND payment.ClinicNum IN ("+string.Join(",",clinicNums)+") ";
+			}
+			return Crud.PaymentCrud.SelectMany(command);
+		}
+
+		///<summary>Gets all payments that have a ProcessStatus of OnlinePending for the clinic. Pass in a clinicNum of 0 to see all payments.</summary>
+		public static int CountNeedingProcessed(long clinicNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetInt(MethodBase.GetCurrentMethod(),clinicNum);
+			}
+			string command="SELECT COUNT(*) FROM payment WHERE ProcessStatus="+POut.Int((int)ProcessStat.OnlinePending)+" ";
+			if(clinicNum!=0) {
+				command+="AND payment.ClinicNum="+POut.Long(clinicNum);
+			}
+			return PIn.Int(Db.GetCount(command));
+		}
+
 		///<summary>Updates this payment.  Must make sure to update the datePay of all attached paysplits so that they are always in synch.  Also need to manually set IsSplit before here.  Will throw an exception if bad date, so surround by try-catch.  Set excludeDepositNum to true from FormPayment to prevent collision from another worksation that just deleted a deposit.</summary>
 		public static void Update(Payment pay,bool excludeDepositNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {

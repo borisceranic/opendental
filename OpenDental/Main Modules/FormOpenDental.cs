@@ -377,6 +377,12 @@ namespace OpenDental{
 		private MenuItem menuItemReportsStandard;
 		private MenuItem menuItemReportsGraphic;
 		private MenuItem menuItemReportsUserQuery;
+		private MenuItem menuItemPendingPayments;
+		private MenuItem menuItemAlerts;
+		private MenuItem menuItemNoAlerts;
+		private MenuItem menuItemAlertPendingPayments;
+		private System.Windows.Forms.Timer timerAlerts;
+
 		//consider rewriting this to use new FormOpenDental singleton method pattern.
 		[Category("Data"),Description("Occurs when a user has taken action on an item needing action taken.")]
 		public event ActionNeededEventHandler ActionTaken=null;
@@ -617,6 +623,7 @@ namespace OpenDental{
 			this.menuItemTranslation = new System.Windows.Forms.MenuItem();
 			this.menuItemMobileSetup = new System.Windows.Forms.MenuItem();
 			this.menuItemNewCropBilling = new System.Windows.Forms.MenuItem();
+			this.menuItemPendingPayments = new System.Windows.Forms.MenuItem();
 			this.menuItemScreening = new System.Windows.Forms.MenuItem();
 			this.menuItemRepeatingCharges = new System.Windows.Forms.MenuItem();
 			this.menuItemResellers = new System.Windows.Forms.MenuItem();
@@ -632,6 +639,9 @@ namespace OpenDental{
 			this.menuItemWebSched = new System.Windows.Forms.MenuItem();
 			this.menuItem14 = new System.Windows.Forms.MenuItem();
 			this.menuItemListenerService = new System.Windows.Forms.MenuItem();
+			this.menuItemAlerts = new System.Windows.Forms.MenuItem();
+			this.menuItemNoAlerts = new System.Windows.Forms.MenuItem();
+			this.menuItemAlertPendingPayments = new System.Windows.Forms.MenuItem();
 			this.menuItemHelp = new System.Windows.Forms.MenuItem();
 			this.menuItemRemote = new System.Windows.Forms.MenuItem();
 			this.menuItemHelpWindows = new System.Windows.Forms.MenuItem();
@@ -670,6 +680,7 @@ namespace OpenDental{
 			this.menuItemTextMessagesAll = new System.Windows.Forms.MenuItem();
 			this.menuItemTextMessagesReceived = new System.Windows.Forms.MenuItem();
 			this.menuItemTextMessagesSent = new System.Windows.Forms.MenuItem();
+			this.timerAlerts = new System.Windows.Forms.Timer(this.components);
 			this.lightSignalGrid1 = new OpenDental.UI.LightSignalGrid();
 			this.panelPhoneSmall.SuspendLayout();
 			this.SuspendLayout();
@@ -691,6 +702,7 @@ namespace OpenDental{
             this.menuItemTools,
             this.menuClinics,
             this.menuItemEServices,
+            this.menuItemAlerts,
             this.menuItemHelp,
             this.menuItemActionNeeded});
 			// 
@@ -1481,6 +1493,7 @@ namespace OpenDental{
             this.menuItemTranslation,
             this.menuItemMobileSetup,
             this.menuItemNewCropBilling,
+            this.menuItemPendingPayments,
             this.menuItemScreening,
             this.menuItemRepeatingCharges,
             this.menuItemResellers,
@@ -1678,40 +1691,46 @@ namespace OpenDental{
 			this.menuItemNewCropBilling.Text = "NewCrop Billing";
 			this.menuItemNewCropBilling.Click += new System.EventHandler(this.menuItemNewCropBilling_Click);
 			// 
+			// menuItemPendingPayments
+			// 
+			this.menuItemPendingPayments.Index = 17;
+			this.menuItemPendingPayments.Text = "Pending &Online Payments";
+			this.menuItemPendingPayments.Click += new System.EventHandler(this.menuItemPendingPayments_Click);
+			// 
 			// menuItemScreening
 			// 
-			this.menuItemScreening.Index = 17;
+			this.menuItemScreening.Index = 18;
 			this.menuItemScreening.Text = "Public Health Screening";
 			this.menuItemScreening.Click += new System.EventHandler(this.menuItemScreening_Click);
 			// 
 			// menuItemRepeatingCharges
 			// 
-			this.menuItemRepeatingCharges.Index = 18;
+			this.menuItemRepeatingCharges.Index = 19;
 			this.menuItemRepeatingCharges.Text = "Repeating Charges";
 			this.menuItemRepeatingCharges.Click += new System.EventHandler(this.menuItemRepeatingCharges_Click);
 			// 
 			// menuItemResellers
 			// 
-			this.menuItemResellers.Index = 19;
+			this.menuItemResellers.Index = 20;
 			this.menuItemResellers.Text = "Resellers";
 			this.menuItemResellers.Visible = false;
 			this.menuItemResellers.Click += new System.EventHandler(this.menuItemResellers_Click);
 			// 
 			// menuItemReqStudents
 			// 
-			this.menuItemReqStudents.Index = 20;
+			this.menuItemReqStudents.Index = 21;
 			this.menuItemReqStudents.Text = "Student Requirements";
 			this.menuItemReqStudents.Click += new System.EventHandler(this.menuItemReqStudents_Click);
 			// 
 			// menuItemWebForms
 			// 
-			this.menuItemWebForms.Index = 21;
+			this.menuItemWebForms.Index = 22;
 			this.menuItemWebForms.Text = "WebForms";
 			this.menuItemWebForms.Click += new System.EventHandler(this.menuItemWebForms_Click);
 			// 
 			// menuItemWiki
 			// 
-			this.menuItemWiki.Index = 22;
+			this.menuItemWiki.Index = 23;
 			this.menuItemWiki.Text = "Wiki";
 			this.menuItemWiki.Click += new System.EventHandler(this.menuItemWiki_Click);
 			// 
@@ -1780,9 +1799,30 @@ namespace OpenDental{
 			this.menuItemListenerService.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.menuItemEServices_DrawItem);
 			this.menuItemListenerService.MeasureItem += new System.Windows.Forms.MeasureItemEventHandler(this.menuItemListenerService_MeasureItem);
 			// 
+			// menuItemAlerts
+			// 
+			this.menuItemAlerts.Index = 9;
+			this.menuItemAlerts.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.menuItemNoAlerts,
+            this.menuItemAlertPendingPayments});
+			this.menuItemAlerts.Text = "&Alerts";
+			this.menuItemAlerts.Popup += new System.EventHandler(this.menuItemAlerts_Popup);
+			// 
+			// menuItemNoAlerts
+			// 
+			this.menuItemNoAlerts.Index = 0;
+			this.menuItemNoAlerts.Text = "No alerts";
+			// 
+			// menuItemAlertPendingPayments
+			// 
+			this.menuItemAlertPendingPayments.Index = 1;
+			this.menuItemAlertPendingPayments.Text = "&Pending Online Payments";
+			this.menuItemAlertPendingPayments.Visible = false;
+			this.menuItemAlertPendingPayments.Click += new System.EventHandler(this.menuItemAlertPendingPayments_Click);
+			// 
 			// menuItemHelp
 			// 
-			this.menuItemHelp.Index = 9;
+			this.menuItemHelp.Index = 10;
 			this.menuItemHelp.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
             this.menuItemRemote,
             this.menuItemHelpWindows,
@@ -1838,7 +1878,7 @@ namespace OpenDental{
 			// 
 			// menuItemActionNeeded
 			// 
-			this.menuItemActionNeeded.Index = 10;
+			this.menuItemActionNeeded.Index = 11;
 			this.menuItemActionNeeded.OwnerDraw = true;
 			this.menuItemActionNeeded.Text = "Action Needed";
 			this.menuItemActionNeeded.Visible = false;
@@ -2085,6 +2125,11 @@ namespace OpenDental{
 			this.menuItemTextMessagesSent.Index = 2;
 			this.menuItemTextMessagesSent.Text = "Text Messages Sent";
 			this.menuItemTextMessagesSent.Click += new System.EventHandler(this.menuItemTextMessagesSent_Click);
+			// 
+			// timerAlerts
+			// 
+			this.timerAlerts.Interval = 300000;
+			this.timerAlerts.Tick += new System.EventHandler(this.timerAlerts_Tick);
 			// 
 			// lightSignalGrid1
 			// 
@@ -2342,6 +2387,13 @@ namespace OpenDental{
 			else {
 				timerSignals.Interval=PrefC.GetInt(PrefName.ProcessSigsIntervalInSecs)*1000;
 				timerSignals.Enabled=true;
+			}
+			if(PrefC.HasOnlinePaymentEnabled()) {
+				timerAlerts.Enabled=true;
+				CheckAlerts();
+			}
+			else {
+				timerAlerts.Enabled=false;
 			}
 			timerTimeIndic.Enabled=true;
 			myOutlookBar.Buttons[0].Caption=Lan.g(this,"Appts");
@@ -2889,6 +2941,12 @@ namespace OpenDental{
 				}
 				else {
 					menuItemRepeatingCharges.Visible=true;
+				}
+				if(PrefC.HasOnlinePaymentEnabled()) {
+					menuItemPendingPayments.Visible=true;
+				}
+				else {
+					menuItemPendingPayments.Visible=false;
 				}
 				if(PrefC.GetString(PrefName.DistributorKey)=="") {
 					menuItemCustomerManage.Visible=false;
@@ -4386,6 +4444,38 @@ namespace OpenDental{
 			List<Signalod> listSignals=Signalods.SignalsTick(onShutdown);
 			if(listSignals.Exists(x => x.ITypes.Contains(((int)InvalidType.Programs).ToString()))) {
 				RefreshMenuReports();
+			}
+		}
+
+		///<summary>The goal is to deprecate this timer in 16.3. Once we have the alerts framework built up, we will move this to the signals timer.
+		///In the meantime, this timer will tick every five minutes.</summary>
+		private void timerAlerts_Tick(object sender,EventArgs e) {
+			CheckAlerts();
+		}
+
+		private void CheckAlerts() { 
+			int countAlerts=0;
+			int countPendingPayments=Payments.CountNeedingProcessed(Clinics.ClinicNum);
+			if(countPendingPayments>0) {
+				countAlerts++;
+				menuItemAlertPendingPayments.Visible=true;
+				if(countPendingPayments<100) {
+					menuItemAlertPendingPayments.Text=Lan.g(this,"Pending Online Payments")+" ("+countPendingPayments+")";
+				}
+				else {
+					menuItemAlertPendingPayments.Text=Lan.g(this,"Pending Online Payments")+" (99)";
+				}
+			}
+			else {
+				menuItemAlertPendingPayments.Visible=false;
+			}
+			if(countAlerts>0) {
+				menuItemNoAlerts.Visible=false;
+				menuItemAlerts.Text=Lan.g(this,"Alerts")+" ("+countAlerts+")";
+			}
+			else {
+				menuItemNoAlerts.Visible=true;
+				menuItemAlerts.Text=Lan.g(this,"Alerts");
 			}
 		}
 
@@ -6521,6 +6611,11 @@ namespace OpenDental{
 			FormN.ShowDialog();
 		}
 
+		private void menuItemPendingPayments_Click(object sender,EventArgs e) {
+			FormPendingPayments FormPP=new FormPendingPayments();
+			FormPP.Show();//Non-modal so the user can view the patient's account
+		}
+
 		private void menuItemRepeatingCharges_Click(object sender, System.EventArgs e) {
 			FormRepeatChargesUpdate FormR=new FormRepeatChargesUpdate();
 			FormR.ShowDialog();
@@ -6683,6 +6778,19 @@ namespace OpenDental{
 		}
 
 		#endregion
+
+		#region Alerts
+
+		private void menuItemAlertPendingPayments_Click(object sender,EventArgs e) {
+			FormPendingPayments FormPP=new FormPendingPayments();
+			FormPP.Show();//Non-modal so the user can view the patient's account
+		}
+
+		private void menuItemAlerts_Popup(object sender,EventArgs e) {
+			CheckAlerts();
+		}
+
+		#endregion Alerts
 
 		#region Help
 
