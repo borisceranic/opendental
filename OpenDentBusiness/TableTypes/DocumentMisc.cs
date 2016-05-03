@@ -31,7 +31,11 @@ namespace OpenDentBusiness{
 	///<summary>More types will be added to correspond to most of the subfolders inside the AtoZ folder.  But no point adding them until we implement.</summary>
 	public enum DocumentMiscType {
 		///<summary>0- There will just be zero or one row of this type.  It will contain a zipped archive.</summary>
-		UpdateFiles
+		UpdateFiles,
+		///<summary>1- Entries with this doc type hold segments of the UpdateFiles RawBase64 zip contents that will be pieced back together later.
+		///Storing the entire Update Files contents into one row was exceeding MySQL max_allowed_packet limitations so this new type is required.
+		///Each row of this type will contain ~1MB of RawBase64 data.</summary>
+		UpdateFilesSegment,
 	}
 	
 
