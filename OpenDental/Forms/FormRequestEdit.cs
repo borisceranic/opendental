@@ -200,6 +200,7 @@ namespace OpenDental {
 				textDetail.BackColor=colorDisabled;
 				textDetail.ReadOnly=true;
 			}
+			//Note: If the RegKey is in "Admin mode" the points allotted will always be 100 even though some may be used on other feature requests.
 			myPointsUsed=PIn.Int(row["myPointsUsed"]);
 			try {
 				myPointsAllotted=PIn.Int(row["myPointsAllotted"]);
