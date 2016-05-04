@@ -371,7 +371,7 @@ namespace OpenDental.ReportingComplex {
 		}
 		
 		///<summary>Submits the queries to the database and makes query objects for each query with the results.  Returns false if one of the queries failed.</summary>
-		public bool SubmitQueries(bool isShowMessage=true){
+		public bool SubmitQueries(bool isShowMessage=false){
 			bool hasRows=false;
 			Graphics grfx=Graphics.FromImage(new Bitmap(1,1));
 			string displayText;
