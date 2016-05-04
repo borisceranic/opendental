@@ -298,11 +298,16 @@ namespace OpenDental{
 					//CacheL.Refresh(InvalidType.Prefs);//or it won't know it has to update in the next line.
 					Prefs.UpdateBool(PrefName.CorruptedDatabase,false,true);//more forceful refresh in order to properly change flag
 				}
-				if(!isSilent) {
-					MsgBox.Show(this,"Database update successful");
+			Cache.Refresh(InvalidType.Prefs);
+			//ask if they would like to update to the new PayPlan version.
+			if(!isSilent) {
+				MsgBox.Show(this,"Database update successful");
+				if(FromVersion < new Version("16.2.0") && ToVersion >= new Version("16.2.0")) {//Checking build==0 works for debugging and for release.
+					FormPayPlanUpdate FormPPU=new FormPayPlanUpdate();
+					FormPPU.ShowDialog();
 				}
-				Cache.Refresh(InvalidType.Prefs);
-				return true;
+			}
+			return true;
 #if !DEBUG
 			}
 			catch(System.IO.FileNotFoundException e) {

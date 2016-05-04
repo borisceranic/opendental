@@ -180,6 +180,8 @@ namespace OpenDental {
 		private List<DisplayField> _patInfoDisplayFields;
 		///<summary>Used by FormRpProcNotBilledIns to determine what errors happened while trying to create claims.</summary>
 		public static string ClaimErrorsCur;
+		private CheckBox checkShowCompletePayPlans;
+
 		///<summary>Used by FormRpProcNotBilledIns to determine how many claims were created.</summary>
 		public static int ClaimCreatedCount;
 		#endregion UserVariables
@@ -278,6 +280,7 @@ namespace OpenDental {
 			this.gridAcctPat = new OpenDental.UI.ODGrid();
 			this.textFinNotes = new OpenDental.ODtextBox();
 			this.tabShow = new System.Windows.Forms.TabPage();
+			this.checkShowCompletePayPlans = new System.Windows.Forms.CheckBox();
 			this.checkShowFamilyComm = new System.Windows.Forms.CheckBox();
 			this.butToday = new OpenDental.UI.Button();
 			this.checkShowDetail = new System.Windows.Forms.CheckBox();
@@ -1051,6 +1054,7 @@ namespace OpenDental {
 			// 
 			this.textUrgFinNote.AcceptsTab = true;
 			this.textUrgFinNote.BackColor = System.Drawing.Color.White;
+			this.textUrgFinNote.DetectLinksEnabled = false;
 			this.textUrgFinNote.DetectUrls = false;
 			this.textUrgFinNote.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.textUrgFinNote.ForeColor = System.Drawing.Color.Red;
@@ -1083,6 +1087,7 @@ namespace OpenDental {
 			// textFinNotes
 			// 
 			this.textFinNotes.AcceptsTab = true;
+			this.textFinNotes.DetectLinksEnabled = false;
 			this.textFinNotes.DetectUrls = false;
 			this.textFinNotes.Location = new System.Drawing.Point(0, 337);
 			this.textFinNotes.Name = "textFinNotes";
@@ -1098,6 +1103,7 @@ namespace OpenDental {
 			// tabShow
 			// 
 			this.tabShow.BackColor = System.Drawing.Color.Transparent;
+			this.tabShow.Controls.Add(this.checkShowCompletePayPlans);
 			this.tabShow.Controls.Add(this.checkShowFamilyComm);
 			this.tabShow.Controls.Add(this.butToday);
 			this.tabShow.Controls.Add(this.checkShowDetail);
@@ -1117,12 +1123,21 @@ namespace OpenDental {
 			this.tabShow.Text = "Show";
 			this.tabShow.UseVisualStyleBackColor = true;
 			// 
+			// checkShowCompletePayPlans
+			// 
+			this.checkShowCompletePayPlans.Location = new System.Drawing.Point(8, 242);
+			this.checkShowCompletePayPlans.Name = "checkShowCompletePayPlans";
+			this.checkShowCompletePayPlans.Size = new System.Drawing.Size(164, 18);
+			this.checkShowCompletePayPlans.TabIndex = 222;
+			this.checkShowCompletePayPlans.Text = "Show Completed Pay Plans";
+			this.checkShowCompletePayPlans.UseVisualStyleBackColor = true;
+			this.checkShowCompletePayPlans.Click += new System.EventHandler(this.checkShowCompletePayPlans_Click);
+			// 
 			// checkShowFamilyComm
 			// 
-			this.checkShowFamilyComm.AutoSize = true;
-			this.checkShowFamilyComm.Location = new System.Drawing.Point(8, 220);
+			this.checkShowFamilyComm.Location = new System.Drawing.Point(8, 219);
 			this.checkShowFamilyComm.Name = "checkShowFamilyComm";
-			this.checkShowFamilyComm.Size = new System.Drawing.Size(152, 17);
+			this.checkShowFamilyComm.Size = new System.Drawing.Size(164, 18);
 			this.checkShowFamilyComm.TabIndex = 221;
 			this.checkShowFamilyComm.Text = "Show Family Comm Entries";
 			this.checkShowFamilyComm.UseVisualStyleBackColor = true;
@@ -1755,6 +1770,12 @@ namespace OpenDental {
 			_patInfoDisplayFields=DisplayFields.GetForCategory(DisplayFieldCategory.AccountPatientInformation);
 			LayoutPanels();
 			checkShowFamilyComm.Checked=PrefC.GetBoolSilent(PrefName.ShowAccountFamilyCommEntries,true);
+			if(PrefC.GetInt(PrefName.PayPlansVersion)==2){
+				checkShowCompletePayPlans.Checked=PrefC.GetBool(PrefName.AccountShowCompletedPaymentPlans);
+			}
+			else {
+				checkShowCompletePayPlans.Visible=false;
+			}
 			Plugins.HookAddCode(this,"ContrAccount.InitializeOnStartup_end");
 		}
 
@@ -2365,6 +2386,9 @@ namespace OpenDental {
 			UI.ODGridRow row;
 			UI.ODGridCell cell;
 			for(int i=0;i<table.Rows.Count;i++) {
+				if(!checkShowCompletePayPlans.Checked && table.Rows[i]["IsClosed"].ToString() == "1") {
+					continue;
+				}
 				row=new ODGridRow();
 				row.Cells.Add(table.Rows[i]["date"].ToString());
 				if(table.Rows[i]["InstallmentPlanNum"].ToString()!="0" && table.Rows[i]["PatNum"].ToString()!=PatCur.Guarantor.ToString()) {//Installment plan and not on guar
@@ -3684,7 +3708,12 @@ namespace OpenDental {
 			payPlan.PatNum=PatCur.PatNum;
 			payPlan.Guarantor=PatCur.Guarantor;
 			payPlan.PayPlanDate=DateTimeOD.Today;
-			payPlan.CompletedAmt=PatCur.EstBalance;
+			if(PrefC.GetInt(PrefName.PayPlansVersion)==1) {
+				payPlan.CompletedAmt=PatCur.EstBalance;
+			}
+			else {
+				payPlan.CompletedAmt=0;
+			}
 			PayPlans.Insert(payPlan);
 			FormPayPlan FormPP=new FormPayPlan(PatCur,payPlan);
 			FormPP.TotalAmt=PatCur.EstBalance;
@@ -5129,6 +5158,10 @@ namespace OpenDental {
 
 		private void checkShowFamilyComm_Click(object sender,EventArgs e) {
 			FillComm();
+		}
+		private void checkShowCompletePayPlans_Click(object sender,EventArgs e) {
+			Prefs.UpdateBool(PrefName.AccountShowCompletedPaymentPlans,checkShowCompletePayPlans.Checked);
+			FillPaymentPlans();
 		}
 
 		private void labelInsRem_MouseEnter(object sender,EventArgs e) {

@@ -1006,6 +1006,7 @@ namespace OpenDental{
 
 		///<Summary>DataSet should be prefilled with AccountModules.GetAccount() before calling this method.</Summary>
 		private static DataTable getTable_StatementEnclosed(DataSet dataSet,Statement stmt) {
+			int payPlanVersionCur=PrefC.GetInt(PrefName.PayPlansVersion);
 			DataTable tableMisc=dataSet.Tables["misc"];
 			string text="";
 			DataTable table=new DataTable();
@@ -1048,7 +1049,8 @@ namespace OpenDental{
 				}
 			}
 			for(int m=0;m<tableMisc.Rows.Count;m++) {
-				if(tableMisc.Rows[m]["descript"].ToString()=="payPlanDue") {
+				//only add payplandue value to total balance in version 1 (version 2+ already account for it when calculating aging)
+				if(tableMisc.Rows[m]["descript"].ToString()=="payPlanDue" && payPlanVersionCur==1) {
 					balTotal+=PIn.Double(tableMisc.Rows[m]["value"].ToString());
 					//payPlanDue;//PatGuar.PayPlanDue;
 				}

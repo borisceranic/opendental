@@ -56,6 +56,8 @@ namespace OpenDentBusiness.Crud{
 				payPlanCharge.Note            = PIn.String(row["Note"].ToString());
 				payPlanCharge.ProvNum         = PIn.Long  (row["ProvNum"].ToString());
 				payPlanCharge.ClinicNum       = PIn.Long  (row["ClinicNum"].ToString());
+				payPlanCharge.ChargeType      = (PayPlanChargeType)PIn.Int(row["ChargeType"].ToString());
+				payPlanCharge.ProcNum         = PIn.Long  (row["ProcNum"].ToString());
 				retVal.Add(payPlanCharge);
 			}
 			return retVal;
@@ -77,6 +79,8 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("Note");
 			table.Columns.Add("ProvNum");
 			table.Columns.Add("ClinicNum");
+			table.Columns.Add("ChargeType");
+			table.Columns.Add("ProcNum");
 			foreach(PayPlanCharge payPlanCharge in listPayPlanCharges) {
 				table.Rows.Add(new object[] {
 					POut.Long  (payPlanCharge.PayPlanChargeNum),
@@ -89,6 +93,8 @@ namespace OpenDentBusiness.Crud{
 					            payPlanCharge.Note,
 					POut.Long  (payPlanCharge.ProvNum),
 					POut.Long  (payPlanCharge.ClinicNum),
+					POut.Int   ((int)payPlanCharge.ChargeType),
+					POut.Long  (payPlanCharge.ProcNum),
 				});
 			}
 			return table;
@@ -129,7 +135,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="PayPlanChargeNum,";
 			}
-			command+="PayPlanNum,Guarantor,PatNum,ChargeDate,Principal,Interest,Note,ProvNum,ClinicNum) VALUES(";
+			command+="PayPlanNum,Guarantor,PatNum,ChargeDate,Principal,Interest,Note,ProvNum,ClinicNum,ChargeType,ProcNum) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(payPlanCharge.PayPlanChargeNum)+",";
 			}
@@ -142,7 +148,9 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.Double(payPlanCharge.Interest)+"',"
 				+"'"+POut.String(payPlanCharge.Note)+"',"
 				+    POut.Long  (payPlanCharge.ProvNum)+","
-				+    POut.Long  (payPlanCharge.ClinicNum)+")";
+				+    POut.Long  (payPlanCharge.ClinicNum)+","
+				+    POut.Int   ((int)payPlanCharge.ChargeType)+","
+				+    POut.Long  (payPlanCharge.ProcNum)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -175,7 +183,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="PayPlanChargeNum,";
 			}
-			command+="PayPlanNum,Guarantor,PatNum,ChargeDate,Principal,Interest,Note,ProvNum,ClinicNum) VALUES(";
+			command+="PayPlanNum,Guarantor,PatNum,ChargeDate,Principal,Interest,Note,ProvNum,ClinicNum,ChargeType,ProcNum) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(payPlanCharge.PayPlanChargeNum)+",";
 			}
@@ -188,7 +196,9 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.Double(payPlanCharge.Interest)+"',"
 				+"'"+POut.String(payPlanCharge.Note)+"',"
 				+    POut.Long  (payPlanCharge.ProvNum)+","
-				+    POut.Long  (payPlanCharge.ClinicNum)+")";
+				+    POut.Long  (payPlanCharge.ClinicNum)+","
+				+    POut.Int   ((int)payPlanCharge.ChargeType)+","
+				+    POut.Long  (payPlanCharge.ProcNum)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -209,7 +219,9 @@ namespace OpenDentBusiness.Crud{
 				+"Interest        = '"+POut.Double(payPlanCharge.Interest)+"', "
 				+"Note            = '"+POut.String(payPlanCharge.Note)+"', "
 				+"ProvNum         =  "+POut.Long  (payPlanCharge.ProvNum)+", "
-				+"ClinicNum       =  "+POut.Long  (payPlanCharge.ClinicNum)+" "
+				+"ClinicNum       =  "+POut.Long  (payPlanCharge.ClinicNum)+", "
+				+"ChargeType      =  "+POut.Int   ((int)payPlanCharge.ChargeType)+", "
+				+"ProcNum         =  "+POut.Long  (payPlanCharge.ProcNum)+" "
 				+"WHERE PayPlanChargeNum = "+POut.Long(payPlanCharge.PayPlanChargeNum);
 			Db.NonQ(command);
 		}
@@ -253,6 +265,14 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="ClinicNum = "+POut.Long(payPlanCharge.ClinicNum)+"";
 			}
+			if(payPlanCharge.ChargeType != oldPayPlanCharge.ChargeType) {
+				if(command!=""){ command+=",";}
+				command+="ChargeType = "+POut.Int   ((int)payPlanCharge.ChargeType)+"";
+			}
+			if(payPlanCharge.ProcNum != oldPayPlanCharge.ProcNum) {
+				if(command!=""){ command+=",";}
+				command+="ProcNum = "+POut.Long(payPlanCharge.ProcNum)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -290,6 +310,12 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			if(payPlanCharge.ClinicNum != oldPayPlanCharge.ClinicNum) {
+				return true;
+			}
+			if(payPlanCharge.ChargeType != oldPayPlanCharge.ChargeType) {
+				return true;
+			}
+			if(payPlanCharge.ProcNum != oldPayPlanCharge.ProcNum) {
 				return true;
 			}
 			return false;

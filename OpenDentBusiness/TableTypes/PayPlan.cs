@@ -33,6 +33,8 @@ namespace OpenDentBusiness{
 		public double PayAmt;
 		///<summary>The amount paid toward the payment plan when it was first opened.</summary>
 		public double DownPayment;
+		///<summary>True if this payment plan is closed.  Closed should not be edited.</summary>
+		public bool IsClosed;
 
 		///<summary></summary>
 		public PayPlan Copy(){

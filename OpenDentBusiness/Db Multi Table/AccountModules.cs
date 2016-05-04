@@ -103,8 +103,8 @@ namespace OpenDentBusiness {
 			DataRow row;
 			SetTableColumns(table);
 			List<DataRow> rows=new List<DataRow>();
-			string command="SELECT ChargeDate,Interest,Note,PayPlanChargeNum,Principal,ProvNum "
-				+"FROM payplancharge WHERE PayPlanNum="+POut.Long(payPlanNum);
+			string command="SELECT ChargeDate,Interest,Note,PayPlanChargeNum,Principal,ProvNum FROM payplancharge "
+				+"WHERE PayPlanNum="+POut.Long(payPlanNum)+" AND ChargeType="+POut.Int((int)PayPlanChargeType.Debit);//for v1, debits are the only ChargeType
 			DataTable rawCharge=dcon.GetTable(command);
 			DateTime dateT;
 			decimal principal;
@@ -1111,14 +1111,20 @@ namespace OpenDentBusiness {
 					rowRp["ProcNums_"]=string.Join(",",listPaySplitMatches.Select(x => x.ProcNum));
 				}
 			}
+			int payPlanVersionCur=PrefC.GetInt(PrefName.PayPlansVersion);
 			decimal payamt;
 			for(int i=0;i<rawPay.Rows.Count;i++){
 				if(isInvoice) {
 					break;
 				}
-				//do not add rows that are attached to payment plans
+				string strDescript="";
 				if(rawPay.Rows[i]["PayPlanNum"].ToString()!="0"){
-					continue;
+					if(payPlanVersionCur==1) {
+						continue;//in v1, do not add rows that are attached to payment plans
+					}
+					else {
+						strDescript=" "+Lans.g("ContrAccount","(Attached to payment plan)"); //in v2, add the rows and show that they are attached to a payplan.
+					}
 				}
 				row=table.NewRow();
 				row["AbbrDesc"]="";
@@ -1166,6 +1172,7 @@ namespace OpenDentBusiness {
 				if(PrefC.GetBool(PrefName.AccountShowPaymentNums)) {
 					row["description"]+="\r\n"+Lans.g("AccountModule","Payment Number: ")+rawPay.Rows[i]["PayNum"].ToString();
 				}
+				row["description"]+=strDescript;
 				string patname=fam.GetNameInFamFirst(PIn.Long(rawPay.Rows[i]["PatNum"].ToString()));
 				if(isReseller) {
 					patname=fam.GetNameInFamLF(PIn.Long(rawPay.Rows[i]["PatNum"].ToString()));
@@ -1479,16 +1486,19 @@ namespace OpenDentBusiness {
 			if(DataConnection.DBtype==DatabaseType.Oracle){
 				datesql="(SELECT CURRENT_DATE FROM dual)";
 			}
+			//for v1, debits are the only ChargeType, so limiting to Debits should have no effect.
+			//v2 still requires this information for displaying the payment plan in the payment plans grid.
+			string debitType=POut.Int((int)PayPlanChargeType.Debit);
 			command="SELECT "
-				+"(SELECT SUM(Principal) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum) principal_,"
-				+"(SELECT SUM(Interest) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum) interest_,"
-				+"(SELECT SUM(Principal) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum "
-					+"AND ChargeDate <= "+datesql+@") principalDue_,"
+				+"(SELECT SUM(Principal) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum AND ChargeType="+debitType+") principal_,"
+				+"(SELECT SUM(Interest) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum AND ChargeType="+debitType+") interest_,"
+				+"(SELECT SUM(Principal) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum AND ChargeType="+debitType+" "
+					+"AND ChargeDate <= "+datesql+@" AND ChargeType="+debitType+") principalDue_,"
 				+"(SELECT SUM(Interest) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum "
-					+"AND ChargeDate <= "+datesql+@") interestDue_,"
+					+"AND ChargeDate <= "+datesql+@" AND ChargeType="+debitType+") interestDue_,"
 				+"MAX(CarrierName) CarrierName,CompletedAmt,payplan.Guarantor,"
 				+"payplan.PatNum,PayPlanDate,payplan.PayPlanNum,"
-				+"payplan.PlanNum "
+				+"payplan.PlanNum, payplan.IsClosed "
 				+"FROM payplan "
 				+"LEFT JOIN insplan ON insplan.PlanNum=payplan.PlanNum "
 				+"LEFT JOIN carrier ON carrier.CarrierNum=insplan.CarrierNum "
@@ -1508,58 +1518,132 @@ namespace OpenDentBusiness {
 			}
 			command+="ORDER BY PayPlanDate";
 			DataTable rawPayPlan=dcon.GetTable(command);
-			for(int i=0;i<rawPayPlan.Rows.Count;i++){
-				//Skip payment plan rows for invoices.  In spite of this, the payment plans breakdown will still show at the top of invoices.
-				if(isInvoice) {
-					break;
+			if(payPlanVersionCur==1) {
+				for(int i=0;i<rawPayPlan.Rows.Count;i++){
+					//Skip payment plan rows for invoices.  In spite of this, the payment plans breakdown will still show at the top of invoices.
+					if(isInvoice) {
+						break;
+					}
+					row=table.NewRow();
+					row["AbbrDesc"]="";
+					row["AdjNum"]="0";
+					row["balance"]="";//fill this later
+					row["balanceDouble"]=0;//fill this later
+					row["chargesDouble"]=0;
+					row["charges"]="";
+					row["ClaimNum"]="0";
+					row["ClaimPaymentNum"]="0";
+					row["clinic"]="";
+					row["colorText"]=arrayDefs[(int)DefCat.AccountColors][6].ItemColor.ToArgb().ToString();
+					//amt=PIn.PDouble(rawPayPlan.Rows[i]["principal_"].ToString());
+					amt=PIn.Decimal(rawPayPlan.Rows[i]["CompletedAmt"].ToString());
+					row["creditsDouble"]=amt;
+					row["credits"]=((decimal)row["creditsDouble"]).ToString("n");
+					dateT=PIn.DateT(rawPayPlan.Rows[i]["PayPlanDate"].ToString());
+					row["DateTime"]=dateT;
+					row["date"]=dateT.ToString(Lans.GetShortDateTimeFormat());
+					if(rawPayPlan.Rows[i]["PlanNum"].ToString()=="0"){
+						row["description"]=Lans.g("ContrAccount","Payment Plan");
+					}
+					else{
+						row["description"]=Lans.g("ContrAccount","Expected payments from ")
+							+rawPayPlan.Rows[i]["CarrierName"].ToString();
+					}
+					//row["extraDetail"]="";
+					string patname=fam.GetNameInFamFirst(PIn.Long(rawPayPlan.Rows[i]["PatNum"].ToString()));
+					if(isReseller) {
+						patname=fam.GetNameInFamLF(PIn.Long(rawPayPlan.Rows[i]["PatNum"].ToString()));
+					}
+					row["patient"]=patname;
+					row["PatNum"]=rawPayPlan.Rows[i]["PatNum"].ToString();
+					row["PayNum"]="0";
+					row["PayPlanNum"]=rawPayPlan.Rows[i]["PayPlanNum"].ToString();
+					row["PayPlanChargeNum"]="0";
+					row["ProcCode"]=Lans.g("AccountModule","PayPln");
+					row["ProcNum"]="0";
+					row["ProcNumLab"]="";
+					row["procsOnObj"]="";
+					row["prov"]="";
+					row["StatementNum"]="0";
+					row["ToothNum"]="";
+					row["ToothRange"]="";
+					row["tth"]="";
+					rows.Add(row);
 				}
-				row=table.NewRow();
-				row["AbbrDesc"]="";
-				row["AdjNum"]="0";
-				row["balance"]="";//fill this later
-				row["balanceDouble"]=0;//fill this later
-				row["chargesDouble"]=0;
-				row["charges"]="";
-				row["ClaimNum"]="0";
-				row["ClaimPaymentNum"]="0";
-				row["clinic"]="";
-				row["colorText"]=arrayDefs[(int)DefCat.AccountColors][6].ItemColor.ToArgb().ToString();
-				//amt=PIn.PDouble(rawPayPlan.Rows[i]["principal_"].ToString());
-				amt=PIn.Decimal(rawPayPlan.Rows[i]["CompletedAmt"].ToString());
-				row["creditsDouble"]=amt;
-				row["credits"]=((decimal)row["creditsDouble"]).ToString("n");
-				dateT=PIn.DateT(rawPayPlan.Rows[i]["PayPlanDate"].ToString());
-				row["DateTime"]=dateT;
-				row["date"]=dateT.ToString(Lans.GetShortDateTimeFormat());
-				if(rawPayPlan.Rows[i]["PlanNum"].ToString()=="0"){
-					row["description"]=Lans.g("ContrAccount","Payment Plan");
-				}
-				else{
-					row["description"]=Lans.g("ContrAccount","Expected payments from ")
-						+rawPayPlan.Rows[i]["CarrierName"].ToString();
-				}
-				//row["extraDetail"]="";
-				string patname=fam.GetNameInFamFirst(PIn.Long(rawPayPlan.Rows[i]["PatNum"].ToString()));
-				if(isReseller) {
-					patname=fam.GetNameInFamLF(PIn.Long(rawPayPlan.Rows[i]["PatNum"].ToString()));
-				}
-				row["patient"]=patname;
-				row["PatNum"]=rawPayPlan.Rows[i]["PatNum"].ToString();
-				row["PayNum"]="0";
-				row["PayPlanNum"]=rawPayPlan.Rows[i]["PayPlanNum"].ToString();
-				row["PayPlanChargeNum"]="0";
-				row["ProcCode"]=Lans.g("AccountModule","PayPln");
-				row["ProcNum"]="0";
-				row["ProcNumLab"]="";
-				row["procsOnObj"]="";
-				row["prov"]="";
-				row["StatementNum"]="0";
-				row["ToothNum"]="";
-				row["ToothRange"]="";
-				row["tth"]="";
-				rows.Add(row);
 			}
 			#endregion Payment Plans
+			#region Payment Plans Version 2
+			if(payPlanVersionCur==2) { //this infomration is only required for v2
+				command="SELECT ChargeDate,payplancharge.PatNum,payplancharge.Guarantor,ProvNum,ClinicNum,payplancharge.Note,Principal,ChargeType,Interest,payplancharge.PayPlanNum,PayPlanChargeNum "
+					+"FROM payplancharge "
+					+"WHERE (";
+				for(int i=0;i<fam.ListPats.Length;i++) {
+					if(i!=0) {
+						command+="OR ";
+					}
+					command+="payplancharge.Guarantor="+POut.Long(fam.ListPats[i].PatNum)+" "
+						+"OR payplancharge.PatNum="+POut.Long(fam.ListPats[i].PatNum)+" ";
+				}
+				command+=") ";
+				command+="AND ChargeDate<="+DbHelper.Curdate();
+				command+="ORDER BY ChargeDate";
+				DataTable rawPayPlan2=dcon.GetTable(command);
+				for(int i=0;i<rawPayPlan2.Rows.Count;i++) {
+					//Skip payment plan rows for invoices.  In spite of this, the payment plans breakdown will still show at the top of invoices.
+					if(isInvoice) {
+						break;
+					}
+					row=table.NewRow();
+					row["AbbrDesc"]="";
+					row["AdjNum"]="0";
+					row["balance"]="";//fill this later
+					row["balanceDouble"]=0;//fill this later
+					row["chargesDouble"]=0;
+					int chargetype=PIn.Int(rawPayPlan2.Rows[i]["ChargeType"].ToString());
+					amt=0;
+					if(chargetype==(int)PayPlanChargeType.Debit) {//show principle amount as a charge if it's a debit chargeType.
+						amt=PIn.Decimal(rawPayPlan2.Rows[i]["Principal"].ToString());
+					}
+					row["chargesDouble"]=amt;
+					row["charges"]=((decimal)row["chargesDouble"]).ToString("n");
+					row["ClaimNum"]="0";
+					row["ClaimPaymentNum"]="0";
+					row["clinic"]="";
+					row["colorText"]=arrayDefs[(int)DefCat.AccountColors][6].ItemColor.ToArgb().ToString();
+					//amt=PIn.PDouble(rawPayPlan2.Rows[i]["principal_"].ToString());
+					amt=0;
+					if(chargetype==(int)PayPlanChargeType.Credit) {//show principle amount as a credit if it's a credit chargeType.
+						amt=PIn.Decimal(rawPayPlan2.Rows[i]["Principal"].ToString());
+					}
+					row["creditsDouble"]=amt;
+					row["credits"]=((decimal)row["creditsDouble"]).ToString("n");
+					dateT=PIn.DateT(rawPayPlan2.Rows[i]["ChargeDate"].ToString());
+					row["DateTime"]=dateT;
+					row["date"]=dateT.ToString(Lans.GetShortDateTimeFormat());
+					row["description"]=rawPayPlan2.Rows[i]["Note"].ToString();
+					//row["extraDetail"]="";
+					string patname=fam.GetNameInFamFirst(PIn.Long(rawPayPlan2.Rows[i]["PatNum"].ToString()));
+					if(isReseller) {
+						patname=fam.GetNameInFamLF(PIn.Long(rawPayPlan2.Rows[i]["PatNum"].ToString()));
+					}
+					row["patient"]=patname;
+					row["PatNum"]=rawPayPlan2.Rows[i]["PatNum"].ToString();
+					row["PayNum"]="0";
+					row["PayPlanNum"]=rawPayPlan2.Rows[i]["PayPlanNum"].ToString();
+					row["PayPlanChargeNum"]=rawPayPlan2.Rows[i]["PayPlanChargeNum"].ToString();
+					row["ProcCode"]=Lans.g("AccountModule","PayPln:")+" "+(PayPlanChargeType)(PIn.Int(rawPayPlan2.Rows[i]["ChargeType"].ToString()));
+					row["ProcNum"]="0";
+					row["ProcNumLab"]="";
+					row["procsOnObj"]="";
+					row["prov"]=Providers.GetAbbr(PIn.Int(rawPayPlan2.Rows[i]["ProvNum"].ToString()));
+					row["StatementNum"]="0";
+					row["ToothNum"]="";
+					row["ToothRange"]="";
+					row["tth"]="";
+					rows.Add(row);
+				}
+			}
+			#endregion Payment Plans Version 2
 			#region Installment Plans
 			//Installment plans----------------------------------------------------------------------------------
 			command="SELECT * FROM installmentplan WHERE ";
@@ -1786,6 +1870,7 @@ namespace OpenDentBusiness {
 			table.Columns.Add("due");
 			table.Columns.Add("guarantor");
 			table.Columns.Add("InstallmentPlanNum");
+			table.Columns.Add("IsClosed");
 			table.Columns.Add("paid");
 			table.Columns.Add("patient");
 			table.Columns.Add("PatNum");
@@ -1843,6 +1928,7 @@ namespace OpenDentBusiness {
 				row["due"]=due.ToString("n");
 				row["guarantor"]=fam.GetNameInFamLF(PIn.Long(rawPayPlan.Rows[i]["Guarantor"].ToString()));
 				row["InstallmentPlanNum"]="0";
+				row["IsClosed"]=rawPayPlan.Rows[i]["IsClosed"].ToString();
 				row["paid"]=paid.ToString("n");
 				row["patient"]=fam.GetNameInFamLF(PIn.Long(rawPayPlan.Rows[i]["PatNum"].ToString()));
 				row["PatNum"]=rawPayPlan.Rows[i]["PatNum"].ToString();

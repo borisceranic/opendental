@@ -654,7 +654,8 @@ namespace OpenDental{
 					balTotal-=PatGuar.InsEst;
 				}
 				for(int m=0;m<tableMisc.Rows.Count;m++){
-					if(tableMisc.Rows[m]["descript"].ToString()=="payPlanDue"){
+					//only add the payplandue value for version 1. (version 2+ already account for it when calculating aging)
+					if(tableMisc.Rows[m]["descript"].ToString()=="payPlanDue" && PrefC.GetInt(PrefName.PayPlansVersion)==1) {
 						balTotal+=PIn.Double(tableMisc.Rows[m]["value"].ToString());
 						//payPlanDue;//PatGuar.PayPlanDue;
 					}

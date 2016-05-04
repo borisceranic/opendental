@@ -926,6 +926,62 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE clinic MODIFY IsInsVerifyExcluded NOT NULL";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference (PrefName,ValueString) VALUES('PayPlansVersion','1')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference (PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'PayPlansVersion','1')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE payplancharge ADD ChargeType tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE payplancharge ADD ChargeType number(3)";
+					Db.NonQ(command);
+					command="UPDATE payplancharge SET ChargeType = 0 WHERE ChargeType IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE payplancharge MODIFY ChargeType NOT NULL";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE payplancharge ADD ProcNum bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE payplancharge ADD INDEX (ProcNum)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE payplancharge ADD ProcNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE payplancharge SET ProcNum = 0 WHERE ProcNum IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE payplancharge MODIFY ProcNum NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX payplancharge_ProcNum ON payplancharge (ProcNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference (PrefName,ValueString) VALUES('AccountShowCompletedPaymentPlans','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference (PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'AccountShowCompletedPaymentPlans','0')";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE payplan ADD IsClosed tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE payplan ADD IsClosed number(3)";
+					Db.NonQ(command);
+					command="UPDATE payplan SET IsClosed = 0 WHERE IsClosed IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE payplan MODIFY IsClosed NOT NULL";
+					Db.NonQ(command);
+				}
 
 
 

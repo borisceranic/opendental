@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Reflection;
 
 namespace OpenDentBusiness{
@@ -60,7 +61,7 @@ namespace OpenDentBusiness{
 			double amtPaid=PIn.Double(Db.GetScalar(command));
 			command="SELECT SUM(payplancharge.Principal+payplancharge.Interest) FROM payplancharge "
 				+"INNER JOIN payplan ON payplancharge.PayPlanNum=payplan.PayPlanNum "
-				+"WHERE payplan.PlanNum=0 "
+				+"WHERE payplancharge.ChargeType="+POut.Int((int)PayPlanChargeType.Debit)+" AND payplan.PlanNum=0 "
 				+"AND payplan.Guarantor="+POut.Long(guarNum);
 			double totalCost=PIn.Double(Db.GetScalar(command));
 			if(totalCost-amtPaid < .01) {
@@ -125,6 +126,78 @@ namespace OpenDentBusiness{
 				retval.Add(planCur);
 			}
 			return retval;
+		}
+
+		///<summary>Updates the TreatmentCompletedAmt field of the passed in payplans in the database.  
+		///Used when a procedure attached to a payment plan charge is set complete or deleted.
+		///The treatment completed amount only takes into account payplancharge credits that have already occured
+		///(no charges attached to TP'd procs).</summary>
+		public static void UpdateTreatmentCompletedAmt(List<PayPlan> listPayPlans) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listPayPlans);
+				return;
+			}
+			foreach(PayPlan payPlanCur in listPayPlans) {
+				double completedAmt=0;
+				List<PayPlanCharge> listCharges=PayPlanCharges.GetForPayPlan(payPlanCur.PayPlanNum);
+				completedAmt=listCharges.Where(x => x.ChargeType==PayPlanChargeType.Credit)
+					.Where(x => x.ChargeDate.Date <= DateTime.Today.Date)
+					.Select(x => x.Principal)
+					.Sum();
+				payPlanCur.CompletedAmt=completedAmt;
+				Update(payPlanCur);
+			}
+		}
+
+		///<summary>Executes a LINQ statement that returns the total amount of tx that is both completed and planned for the passed in payment plan.
+		///Only used for payplans v2.  Different from the TxCompletedAmt, which looks ONLY at PayPlanCharge credits that have already occurred. 
+		///Does not update or make any calls to the database, as TxTotalAmt is not a db column.</summary>
+		public static double GetTxTotalAmt(List<PayPlanCharge> listCharges) {
+			//no need to check RemotingRole; no call to db.
+			return listCharges.Where(x => x.ChargeType==PayPlanChargeType.Credit)
+				.Select(x => x.Principal)
+				.Sum();
+		}
+
+		///<summary>Updates the database preference "PayPlansVerion" and puts a payment plan credit into the ledger for all currently existing.
+		///Pass in the version to update to.  Currently you can only update from version 1 to version 2.
+		///Does NOT perform aging or generate the post-update changelog PDF.  (See FormPayPlanUpdate)</summary>
+		public static bool UpdatePayPlanVersion(int versionNumber) {
+			//No need to check RemotingRole; no call to db.
+			switch(versionNumber) {
+				case 2:					
+					List<PayPlan> listPayPlanAll=GetAll();//get all payment plans
+					foreach(PayPlan payPlanCur in listPayPlanAll) {//for each plan, create a new credit of the txCompletedAmt.
+						//it should not be possible to have an existing payment plan without at least one payplancharge.
+						List<PayPlanCharge> listPayPlanCharges=PayPlanCharges.GetForPayPlan(payPlanCur.PayPlanNum);
+						//add a credit to the list of payplancharges for each payplan
+						PayPlanCharge creditNew=new PayPlanCharge();
+						creditNew.ChargeDate=payPlanCur.PayPlanDate;
+						creditNew.ChargeType=PayPlanChargeType.Credit;
+						creditNew.ClinicNum=listPayPlanCharges[0].ClinicNum;//Because all payplancharges for a payment plan have the same ClinicNum.
+						creditNew.Guarantor=payPlanCur.Guarantor;
+						creditNew.Note=Lans.g("AccountModule","Payment Plan Credit");
+						creditNew.PatNum=payPlanCur.PatNum;
+						creditNew.PayPlanNum=payPlanCur.PayPlanNum;
+						creditNew.Principal=payPlanCur.CompletedAmt;
+						creditNew.ProvNum=listPayPlanCharges[0].ProvNum;//Because all payplancharges for a payment plan have the same ProvNum.
+						PayPlanCharges.Insert(creditNew);
+					}
+					Prefs.RefreshCache();//Because the prefs might not yet been refreshed in FormOpenDental if we are in the middle of updating.
+					Prefs.UpdateInt(PrefName.PayPlansVersion,2);
+					Prefs.RefreshCache();
+					break;
+				default:
+					throw new Exception("Version 2 is the highest Payment Plan version currently available.");
+		}
+			return true;
+		}
+
+		public static List<PayPlan> GetAll() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<PayPlan>>(MethodBase.GetCurrentMethod());
+			}
+			return Crud.PayPlanCrud.SelectMany("SELECT * FROM payplan");
 		}
 
 		///<summary></summary>
@@ -197,7 +270,7 @@ namespace OpenDentBusiness{
 				//+" GROUP BY paysplit.PayPlanNum";
 			double amtPaid=PIn.Double(Db.GetScalar(command));
 			command="SELECT SUM(Principal+Interest) FROM payplancharge "
-				+"WHERE PayPlanNum = "+POut.Long(payPlanNum);
+				+"WHERE ChargeType="+POut.Int((int)PayPlanChargeType.Debit)+" AND PayPlanNum="+POut.Long(payPlanNum);
 			double totalCost=PIn.Double(Db.GetScalar(command));
 			if(totalCost-amtPaid < .01) {
 				return true;
@@ -205,7 +278,9 @@ namespace OpenDentBusiness{
 			return false;
 		}
 
-		///<summary>Used from FormPayPlan, Account, and ComputeBal to get the accumulated amount due for a payment plan based on today's date.  Includes interest, but does not include payments made so far.  The chargelist must include all charges for this payplan, but it can include more as well.</summary>
+		///<summary>Used from FormPayPlan, Account, and ComputeBal to get the accumulated amount due for a payment plan based on today's date.  
+		///Includes interest, but does not include payments made so far.  The chargelist must include all charges for this payplan, 
+		///but it can include more as well.</summary>
 		public static double GetAccumDue(long payPlanNum, List<PayPlanCharge> chargeList){
 			//No need to check RemotingRole; no call to db.
 			double retVal=0;
@@ -216,18 +291,39 @@ namespace OpenDentBusiness{
 				if(chargeList[i].ChargeDate>DateTime.Today){//not due yet
 					continue;
 				}
+				if(chargeList[i].ChargeType!=PayPlanChargeType.Debit) { //for v1, debits are the only ChargeType.
+					continue;
+				}
 				retVal+=chargeList[i].Principal+chargeList[i].Interest;
 			}
 			return retVal;
 		}
 
-		/// <summary>Used from Account window to get the amount paid so far on one payment plan.  Must pass in the total amount paid and the returned value will not be more than this.  The chargelist must include all charges for this payplan, but it can include more as well.  It will loop sequentially through the charges to get just the principal portion.</summary>
+		public static List<PayPlan> GetAllForCharges(List<PayPlanCharge> listCharge) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<PayPlan>>(MethodBase.GetCurrentMethod(),listCharge);
+			}
+			if(listCharge.Count==0) {
+				return new List<PayPlan>();
+			}
+			string command="SELECT * FROM payplan "
+				+"WHERE PayPlanNum IN ("+String.Join(",",listCharge.Select(x => x.PayPlanNum))+")";
+			return Crud.PayPlanCrud.SelectMany(command);
+		}
+
+		/// <summary>Used from Account window to get the amount paid so far on one payment plan.  
+		/// Must pass in the total amount paid and the returned value will not be more than this.  
+		/// The chargelist must include all charges for this payplan, but it can include more as well.  
+		/// It will loop sequentially through the charges to get just the principal portion.</summary>
 		public static double GetPrincPaid(double amtPaid,long payPlanNum,List<PayPlanCharge> chargeList) {
 			//No need to check RemotingRole; no call to db.
 			//amtPaid gets reduced to 0 throughout this loop.
 			double retVal=0;
 			for(int i=0;i<chargeList.Count;i++){
 				if(chargeList[i].PayPlanNum!=payPlanNum){
+					continue;
+				}
+				if(chargeList[i].ChargeType!=PayPlanChargeType.Debit) { //for v1, debits are the only ChargeType.
 					continue;
 				}
 				//For this charge, first apply payment to interest
@@ -252,12 +348,16 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
-		/// <summary>Used from Account and ComputeBal to get the total amount of the original principal for one payment plan.  Does not include any interest.The chargelist must include all charges for this payplan, but it can include more as well.</summary>
+		/// <summary>Used from Account and ComputeBal to get the total amount of the original principal for one payment plan.
+		/// Does not include any interest. The chargelist must include all charges for this payplan, but it can include more as well.</summary>
 		public static double GetTotalPrinc(long payPlanNum,List<PayPlanCharge> chargeList) {
 			//No need to check RemotingRole; no call to db.
 			double retVal=0;
 			for(int i=0;i<chargeList.Count;i++){
 				if(chargeList[i].PayPlanNum!=payPlanNum){
+					continue;
+				}
+				if(chargeList[i].ChargeType!=PayPlanChargeType.Debit) { //for v1, debits are the only ChargeType.
 					continue;
 				}
 				retVal+=chargeList[i].Principal;
@@ -272,10 +372,10 @@ namespace OpenDentBusiness{
 			for(int i=0;i<list.Length;i++){
 				//one or both of these conditions may be met:
 				if(list[i].Guarantor==patNum){
-					retVal+=GetAccumDue(list[i].PayPlanNum,chargeList);
+					retVal+=GetAccumDue(list[i].PayPlanNum,chargeList);//Internally considers ChargeType
 				}
 				if(list[i].PatNum==patNum){
-					retVal-=GetTotalPrinc(list[i].PayPlanNum,chargeList);
+					retVal-=GetTotalPrinc(list[i].PayPlanNum,chargeList);//Internally considers ChargeType
 				}
 			}
 			return retVal;

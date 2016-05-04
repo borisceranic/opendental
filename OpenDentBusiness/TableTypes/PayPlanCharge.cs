@@ -18,30 +18,38 @@ namespace OpenDentBusiness{
 		public long PatNum;
 		///<summary>The date that the charge will show on the patient account.  Any charge with a future date will not show on the account yet and will not affect the balance.</summary>
 		public DateTime ChargeDate;
-		///<summary>The principal portion of this payment.</summary>
+		///<summary>For Debits, this is the principal charge amount.  For Credits (version 2 only), then this is the credit amount.</summary>
 		public double Principal;
-		///<summary>The interest portion of this payment.</summary>
+		///<summary>For Debits, this is the interest portion of this payment.  Always 0 for Credits.</summary>
 		public double Interest;
 		///<summary>Any note about this particular payment plan charge</summary>
 		public string Note;
-		///<summary>FK to provider.ProvNum.  Since there is no ProvNum field at the payplan level, the provider must be the same for all payplancharges.  It's initially assigned as the patient priProv.  Payments applied should be to this provnum, although the current user interface does not help with this.</summary>
+		///<summary>FK to provider.ProvNum.  Since there is no ProvNum field at the payplan level, the provider must be the same for all payplancharges.  
+		///It's initially assigned as the patient priProv.  Payments applied should be to this provnum, 
+		///although the current user interface does not help with this.</summary>
 		public long ProvNum;
 		///<summary>FK to clinic.ClinicNum.  Since there is no ClincNum field at the payplan level, the clinic must be the same for all payplancharges.  It's initially assigned using the patient clinic.  Payments applied should be to this clinic, although the current user interface does not help with this.</summary>
 		public long ClinicNum;
-		
+		///<summary>Enum: The charge type of the payment plan. 0 - Debit, 1 - Credit.  Only relevant for those on Payment Plan Version 2.</summary>
+		public PayPlanChargeType ChargeType;
+		///<summary>FK to procedurelog.ProcNum.  The procedure that this payplancharge is attached to.  Only applies to credits.
+		///Always 0 for debits.  Can be 0 for credits not attached to a procedure.</summary>
+		public long ProcNum;
+
 		///<summary></summary>
 		public PayPlanCharge Copy(){
 			return (PayPlanCharge)this.MemberwiseClone();
 		}
 
-	
+
 	}
+}
 
-	
-
-	
-
-
+public enum PayPlanChargeType {
+	///<summary>0 - Debit</summary>
+	Debit,
+	///<summary>1 - Credit</summary>
+	Credit
 }
 
 

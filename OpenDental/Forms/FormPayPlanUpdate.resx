@@ -117,12 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="pd2.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 17</value>
-  </metadata>
-  <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>26</value>
-  </metadata>
+  <data name="label6.Text" xml:space="preserve">
+    <value>Starting in Version 16.2, Payment Plans have changed.  In Payment Plans Version 2, all payment plan charges show up as individual line items in the Patient Account and are aged accordingly.  This may affect your aging reports and some of your Patient Account balances.  Click OK to update all of your current Payment Plans to Version 2, or click Cancel to continue using Payment Plans Version 1.  If you do not update now, you may update later from the Tools menu.</value>
+  </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>

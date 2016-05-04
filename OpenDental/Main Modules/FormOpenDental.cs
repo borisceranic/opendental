@@ -381,6 +381,7 @@ namespace OpenDental{
 		private MenuItem menuItemAlerts;
 		private MenuItem menuItemNoAlerts;
 		private MenuItem menuItemAlertPendingPayments;
+		private MenuItem menuItemPayPlanUpdate;
 		private System.Windows.Forms.Timer timerAlerts;
 
 		//consider rewriting this to use new FormOpenDental singleton method pattern.
@@ -624,6 +625,7 @@ namespace OpenDental{
 			this.menuItemMobileSetup = new System.Windows.Forms.MenuItem();
 			this.menuItemNewCropBilling = new System.Windows.Forms.MenuItem();
 			this.menuItemPendingPayments = new System.Windows.Forms.MenuItem();
+			this.menuItemPayPlanUpdate = new System.Windows.Forms.MenuItem();
 			this.menuItemScreening = new System.Windows.Forms.MenuItem();
 			this.menuItemRepeatingCharges = new System.Windows.Forms.MenuItem();
 			this.menuItemResellers = new System.Windows.Forms.MenuItem();
@@ -1494,6 +1496,7 @@ namespace OpenDental{
             this.menuItemMobileSetup,
             this.menuItemNewCropBilling,
             this.menuItemPendingPayments,
+            this.menuItemPayPlanUpdate,
             this.menuItemScreening,
             this.menuItemRepeatingCharges,
             this.menuItemResellers,
@@ -1697,40 +1700,46 @@ namespace OpenDental{
 			this.menuItemPendingPayments.Text = "Pending &Online Payments";
 			this.menuItemPendingPayments.Click += new System.EventHandler(this.menuItemPendingPayments_Click);
 			// 
+			// menuItemPayPlanUpdate
+			// 
+			this.menuItemPayPlanUpdate.Index = 18;
+			this.menuItemPayPlanUpdate.Text = "Payplan Version Update";
+			this.menuItemPayPlanUpdate.Click += new System.EventHandler(this.menuItemPayPlanUpdate_Click);
+			// 
 			// menuItemScreening
 			// 
-			this.menuItemScreening.Index = 18;
+			this.menuItemScreening.Index = 19;
 			this.menuItemScreening.Text = "Public Health Screening";
 			this.menuItemScreening.Click += new System.EventHandler(this.menuItemScreening_Click);
 			// 
 			// menuItemRepeatingCharges
 			// 
-			this.menuItemRepeatingCharges.Index = 19;
+			this.menuItemRepeatingCharges.Index = 20;
 			this.menuItemRepeatingCharges.Text = "Repeating Charges";
 			this.menuItemRepeatingCharges.Click += new System.EventHandler(this.menuItemRepeatingCharges_Click);
 			// 
 			// menuItemResellers
 			// 
-			this.menuItemResellers.Index = 20;
+			this.menuItemResellers.Index = 21;
 			this.menuItemResellers.Text = "Resellers";
 			this.menuItemResellers.Visible = false;
 			this.menuItemResellers.Click += new System.EventHandler(this.menuItemResellers_Click);
 			// 
 			// menuItemReqStudents
 			// 
-			this.menuItemReqStudents.Index = 21;
+			this.menuItemReqStudents.Index = 22;
 			this.menuItemReqStudents.Text = "Student Requirements";
 			this.menuItemReqStudents.Click += new System.EventHandler(this.menuItemReqStudents_Click);
 			// 
 			// menuItemWebForms
 			// 
-			this.menuItemWebForms.Index = 22;
+			this.menuItemWebForms.Index = 23;
 			this.menuItemWebForms.Text = "WebForms";
 			this.menuItemWebForms.Click += new System.EventHandler(this.menuItemWebForms_Click);
 			// 
 			// menuItemWiki
 			// 
-			this.menuItemWiki.Index = 23;
+			this.menuItemWiki.Index = 24;
 			this.menuItemWiki.Text = "Wiki";
 			this.menuItemWiki.Click += new System.EventHandler(this.menuItemWiki_Click);
 			// 
@@ -2709,6 +2718,9 @@ namespace OpenDental{
 				}
 			}
 			WikiPages.NavPageDelegate=S_WikiLoadPage;
+			if(PrefC.GetInt(PrefName.PayPlansVersion)==2) {
+				menuItemPayPlanUpdate.Visible=false;
+			}
 			Signalods.Subscribe(this);
 			Plugins.HookAddCode(this,"FormOpenDental.Load_end");
 		}
@@ -6614,6 +6626,13 @@ namespace OpenDental{
 		private void menuItemPendingPayments_Click(object sender,EventArgs e) {
 			FormPendingPayments FormPP=new FormPendingPayments();
 			FormPP.Show();//Non-modal so the user can view the patient's account
+		}
+
+		private void menuItemPayPlanUpdate_Click(object sender,EventArgs e) {
+			FormPayPlanUpdate FormPPU=new FormPayPlanUpdate();
+			if(FormPPU.ShowDialog()==DialogResult.OK) {
+				menuItemPayPlanUpdate.Visible=false;
+			}
 		}
 
 		private void menuItemRepeatingCharges_Click(object sender, System.EventArgs e) {

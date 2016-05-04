@@ -342,6 +342,16 @@ namespace OpenDental.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap close_door {
+            get {
+                object obj = ResourceManager.GetObject("close_door", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap commlog {
             get {
                 object obj = ResourceManager.GetObject("commlog", resourceCulture);

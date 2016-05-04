@@ -195,6 +195,7 @@ namespace OpenDental {
 		///<summary>Creates paysplits associated to the patient passed in for the current payment until the payAmt has been met.  
 		///Returns the list of new paysplits that have been created.  PaymentAmt will attempt to move towards 0 as paysplits are created.</summary>
 		private List<PaySplit> AutoSplitForPayment(long payNum,DateTime date,bool isTest) {
+			int payPlanVersionCur=PrefC.GetInt(PrefName.PayPlansVersion);
 			//Get the lists of items we'll be using to calculate with.
 			List<Procedure> listProcs=Procedures.GetCompleteForPats(listPatNums);
 			//listPayments should be empty, there isn't currently a way to make payments without at least one split.
@@ -242,7 +243,9 @@ namespace OpenDental {
 			#region Construct List of Charges
 			_listAccountCharges=new List<AccountEntry>();
 			for(int i=0;i<listPayPlanCharges.Count;i++) {
-				_listAccountCharges.Add(new AccountEntry(listPayPlanCharges[i]));
+				if(listPayPlanCharges[i].ChargeType==PayPlanChargeType.Debit) { //for v1, debits are the only ChargeType.
+					_listAccountCharges.Add(new AccountEntry(listPayPlanCharges[i]));
+				}
 			}
 			for(int i=0;i<listAdjustments.Count;i++) {
 				if(listAdjustments[i].AdjAmt>0 && listAdjustments[i].ProcNum==0) {
@@ -277,8 +280,17 @@ namespace OpenDental {
 			for(int i=0;i<listInsPayAsTotal.Count;i++) {			
 				creditTotal+=(decimal)listInsPayAsTotal[i].InsPayAmt;
 			}
-			for(int i=0;i<listPayPlans.Count;i++) {
-				creditTotal+=(decimal)listPayPlans[i].CompletedAmt;
+			if(payPlanVersionCur==1) {
+				for(int i=0;i<listPayPlans.Count;i++) {
+					creditTotal+=(decimal)listPayPlans[i].CompletedAmt;
+				}
+			}
+			else if(payPlanVersionCur==2) {
+				for(int i=0;i<listPayPlanCharges.Count;i++) {
+					if(listPayPlanCharges[i].ChargeType==PayPlanChargeType.Credit) {
+						creditTotal+=(decimal)listPayPlanCharges[i].Principal;
+					}
+				}
 			}
 			#endregion Construct List of Credits
 			#region Explicitly Link Credits

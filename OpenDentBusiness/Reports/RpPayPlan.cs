@@ -52,6 +52,7 @@ namespace OpenDentBusiness {
 			//Oracle TODO:  Either put entire query without GROUP BY in SUBSELECT and then GROUP BY outside, or rewrite query to use joins instead of subselects.
 			string command="SELECT FName,LName,MiddleI,PlanNum,Preferred,PlanNum, "
 				+"COALESCE((SELECT SUM(Principal+Interest) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum "
+				+"AND payplancharge.ChargeType="+POut.Int((int)PayPlanChargeType.Debit)+" "//for v1, debits are the only ChargeType.
 					+"AND ChargeDate <= "+datesql+@"),0) '_accumDue', ";
 			command+="COALESCE((SELECT SUM(SplitAmt) FROM paysplit WHERE paysplit.PayPlanNum=payplan.PayPlanNum AND paysplit.PayPlanNum!=0),0) '_paid', ";
 			command+="COALESCE((SELECT SUM(InsPayAmt) FROM claimproc WHERE claimproc.PayPlanNum=payplan.PayPlanNum "
@@ -60,7 +61,10 @@ namespace OpenDentBusiness {
 					+POut.Int((int)ClaimProcStatus.Supplemental)+","
 					+POut.Int((int)ClaimProcStatus.CapClaim)
 					+") AND claimproc.PayPlanNum!=0),0) '_insPaid', ";
-			command+="COALESCE((SELECT SUM(Principal) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum),0) '_principal', "
+			command+="COALESCE((SELECT SUM(Principal) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum "
+				+"AND payplancharge.ChargeType="+POut.Int((int)PayPlanChargeType.Debit)+"),0) '_principal', "//for v1, debits are the only ChargeType.
+				+"COALESCE((SELECT SUM(Principal) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum "
+				+"AND payplancharge.ChargeType="+POut.Int((int)PayPlanChargeType.Credit)+"),0) '_credits', "//for v1, will always be 0.
 				+"patient.PatNum PatNum, "
 				+"payplancharge.ProvNum ProvNum ";
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
@@ -70,6 +74,7 @@ namespace OpenDentBusiness {
 			//Then, after the query has run, we'll add the interest up until today with the total principal for the entire payment plan.
 			//For this reason, we cannot use _accumDue which only gets the principle up until today and not the entire payment plan principle.
 			command+=",COALESCE((SELECT SUM(Interest) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum "
+					+"AND payplancharge.ChargeType="+POut.Int((int)PayPlanChargeType.Debit)+" "//for v1, debits are the only ChargeType.
 					+"AND ChargeDate <= "+datesql+@"),0) '_interest' "
 				+"FROM payplan "
 				+"LEFT JOIN patient ON patient.PatNum=payplan.Guarantor "
@@ -90,9 +95,12 @@ namespace OpenDentBusiness {
 			else if(displayPayPlanType==DisplayPayPlanType.Both) {
 				//Do not filter the query at all which will show both insurance and patient payment plan types.
 			}
-			command+="GROUP BY FName,LName,MiddleI,Preferred,payplan.PayPlanNum ";
-			if(hideCompletedPlans) {
-				command+="HAVING _paid+_insPaid < _principal ";
+			if(hideCompletedPlans && PrefC.GetInt(PrefName.PayPlansVersion) == 2) { //version 2 hide completed payment plans
+				command+="AND payplan.IsClosed=0 ";
+			}
+				command+="GROUP BY FName,LName,MiddleI,Preferred,payplan.PayPlanNum ";
+			if(hideCompletedPlans && PrefC.GetInt(PrefName.PayPlansVersion) == 1) {//version 1 hide completed payment plans
+				command+="HAVING _credits!=_principal AND MAX(DATE(payplancharge.ChargeDate)) > "+DbHelper.Curdate();
 			}
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				command+="ORDER BY ClinicNum,LName,FName";

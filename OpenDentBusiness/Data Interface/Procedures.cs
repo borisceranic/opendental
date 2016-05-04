@@ -45,6 +45,17 @@ namespace OpenDentBusiness {
 			return Crud.ProcedureCrud.SelectMany(command);
 		}
 
+		///<summary>Gets all completed and TP procedures for a family.</summary>
+		public static List<Procedure> GetCompAndTpForPats(List<long> listPatNums) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<Procedure>>(MethodBase.GetCurrentMethod(),listPatNums);
+			}
+			string command="SELECT * from procedurelog WHERE PatNum IN("+String.Join(", ",listPatNums)+") "
+				+"AND ProcStatus IN("+(int)ProcStat.C+","+(int)ProcStat.TP+") "
+				+"ORDER BY ProcDate";
+			return Crud.ProcedureCrud.SelectMany(command);
+		}
+
 		///<summary></summary>
 		public static long Insert(Procedure procedure) {
 			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
@@ -77,10 +88,16 @@ namespace OpenDentBusiness {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetBool(MethodBase.GetCurrentMethod(),procedure,oldProcedure);
 			}
-			if(oldProcedure.ProcStatus!=ProcStat.C && procedure.ProcStatus==ProcStat.C && !procedure.Discount.IsZero()) {//Setting the procedure to complete
+			//Setting a discount procedure to complete.
+			if(oldProcedure.ProcStatus!=ProcStat.C && procedure.ProcStatus==ProcStat.C && !procedure.Discount.IsZero()) {
 				Adjustments.CreateAdjustmentForDiscount(procedure);
 			}
-			if(oldProcedure.ProcStatus==ProcStat.C && procedure.ProcStatus!=ProcStat.C) {//Setting a completed procedure to TP
+			//Setting the procedure to complete.
+			if(oldProcedure.ProcStatus!=ProcStat.C && procedure.ProcStatus==ProcStat.C) {
+				PayPlanCharges.UpdateAttachedPayPlanCharges(procedure);//does nothing if there are none.
+			}
+			//Setting a completed procedure to TP.
+			if(oldProcedure.ProcStatus==ProcStat.C && procedure.ProcStatus!=ProcStat.C) {
 				Adjustments.DeleteForProcedure(procedure.ProcNum);
 			}
 			if(procedure.ProcStatus==ProcStat.C && procedure.DateComplete.Year<1880) {
@@ -134,7 +151,9 @@ namespace OpenDentBusiness {
 			}
 		}
 
-		///<summary>If not allowed to delete, then it throws an exception, so surround it with a try catch.  Also deletes any claimProcs and adjustments.  This does not actually delete the procedure, but just changes the status to deleted.</summary>
+		///<summary>If not allowed to delete, then it throws an exception, so surround it with a try catch. 
+		///Also deletes any claimProcs, adjustments, and payplancharge credits.  
+		///This does not actually delete the procedure, but just changes the status to deleted.</summary>
 		public static void Delete(long procNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),procNum);
@@ -153,6 +172,7 @@ namespace OpenDentBusiness {
 			//detach procedure labs
 			command="UPDATE procedurelog SET ProcNumLab=0 WHERE ProcNumLab='"+POut.Long(procNum)+"'";
 			Db.NonQ(command);
+			PayPlanCharges.DeleteForProc(procNum);
 			//resynch appointment description-------------------------------------------------------------------------------------
 			command="SELECT AptNum,PlannedAptNum FROM procedurelog WHERE ProcNum = "+POut.Long(procNum);
 			DataTable table=Db.GetTable(command);
@@ -1650,6 +1670,9 @@ namespace OpenDentBusiness {
 				Plugins.HookAddCode(null,"Procedures.SetCompleteInAppt_procLoop",procCur,procOld);
 				if(isDbUpdate) {//if called from FormApptEdit, the update call is handled in the Procedures.Sync call on FormClosing
 					Update(procCur,procOld);
+				}
+				else {
+					PayPlanCharges.UpdateAttachedPayPlanCharges(procCur); //still want payplans to be updated even if Procedures.Update() isn't called.
 				}
 				ComputeEstimates(procCur,apt.PatNum,claimProcList,false,planList,patPlans,benefitList,patientAge,subList);
 				ClaimProcs.SetProvForProc(procCur,claimProcList);

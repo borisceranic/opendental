@@ -59,6 +59,7 @@ namespace OpenDentBusiness.Crud{
 				payPlan.NumberOfPayments= PIn.Int   (row["NumberOfPayments"].ToString());
 				payPlan.PayAmt          = PIn.Double(row["PayAmt"].ToString());
 				payPlan.DownPayment     = PIn.Double(row["DownPayment"].ToString());
+				payPlan.IsClosed        = PIn.Bool  (row["IsClosed"].ToString());
 				retVal.Add(payPlan);
 			}
 			return retVal;
@@ -83,6 +84,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("NumberOfPayments");
 			table.Columns.Add("PayAmt");
 			table.Columns.Add("DownPayment");
+			table.Columns.Add("IsClosed");
 			foreach(PayPlan payPlan in listPayPlans) {
 				table.Rows.Add(new object[] {
 					POut.Long  (payPlan.PayPlanNum),
@@ -98,6 +100,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Int   (payPlan.NumberOfPayments),
 					POut.Double(payPlan.PayAmt),
 					POut.Double(payPlan.DownPayment),
+					POut.Bool  (payPlan.IsClosed),
 				});
 			}
 			return table;
@@ -138,7 +141,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="PayPlanNum,";
 			}
-			command+="PatNum,Guarantor,PayPlanDate,APR,Note,PlanNum,CompletedAmt,InsSubNum,PaySchedule,NumberOfPayments,PayAmt,DownPayment) VALUES(";
+			command+="PatNum,Guarantor,PayPlanDate,APR,Note,PlanNum,CompletedAmt,InsSubNum,PaySchedule,NumberOfPayments,PayAmt,DownPayment,IsClosed) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(payPlan.PayPlanNum)+",";
 			}
@@ -154,7 +157,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)payPlan.PaySchedule)+","
 				+    POut.Int   (payPlan.NumberOfPayments)+","
 				+"'"+POut.Double(payPlan.PayAmt)+"',"
-				+"'"+POut.Double(payPlan.DownPayment)+"')";
+				+"'"+POut.Double(payPlan.DownPayment)+"',"
+				+    POut.Bool  (payPlan.IsClosed)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -187,7 +191,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="PayPlanNum,";
 			}
-			command+="PatNum,Guarantor,PayPlanDate,APR,Note,PlanNum,CompletedAmt,InsSubNum,PaySchedule,NumberOfPayments,PayAmt,DownPayment) VALUES(";
+			command+="PatNum,Guarantor,PayPlanDate,APR,Note,PlanNum,CompletedAmt,InsSubNum,PaySchedule,NumberOfPayments,PayAmt,DownPayment,IsClosed) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(payPlan.PayPlanNum)+",";
 			}
@@ -203,7 +207,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Int   ((int)payPlan.PaySchedule)+","
 				+    POut.Int   (payPlan.NumberOfPayments)+","
 				+"'"+POut.Double(payPlan.PayAmt)+"',"
-				+"'"+POut.Double(payPlan.DownPayment)+"')";
+				+"'"+POut.Double(payPlan.DownPayment)+"',"
+				+    POut.Bool  (payPlan.IsClosed)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -227,7 +232,8 @@ namespace OpenDentBusiness.Crud{
 				+"PaySchedule     =  "+POut.Int   ((int)payPlan.PaySchedule)+", "
 				+"NumberOfPayments=  "+POut.Int   (payPlan.NumberOfPayments)+", "
 				+"PayAmt          = '"+POut.Double(payPlan.PayAmt)+"', "
-				+"DownPayment     = '"+POut.Double(payPlan.DownPayment)+"' "
+				+"DownPayment     = '"+POut.Double(payPlan.DownPayment)+"', "
+				+"IsClosed        =  "+POut.Bool  (payPlan.IsClosed)+" "
 				+"WHERE PayPlanNum = "+POut.Long(payPlan.PayPlanNum);
 			Db.NonQ(command);
 		}
@@ -283,6 +289,10 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="DownPayment = '"+POut.Double(payPlan.DownPayment)+"'";
 			}
+			if(payPlan.IsClosed != oldPayPlan.IsClosed) {
+				if(command!=""){ command+=",";}
+				command+="IsClosed = "+POut.Bool(payPlan.IsClosed)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -329,6 +339,9 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			if(payPlan.DownPayment != oldPayPlan.DownPayment) {
+				return true;
+			}
+			if(payPlan.IsClosed != oldPayPlan.IsClosed) {
 				return true;
 			}
 			return false;

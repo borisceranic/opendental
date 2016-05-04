@@ -235,12 +235,17 @@ namespace OpenDentBusiness{
 						(guarantor==0?"":(" AND pl.PatNum IN "+familyPatNums))+";";
 			//Paysplits for the entire office history.
 			command+="INSERT INTO "+tempOdAgingTransTableName+" (PatNum,TranDate,TranAmount) "+
-				"SELECT ps.PatNum PatNum,"+
-						"ps.DatePay TranDate,"+
-						"-ps.SplitAmt TranAmount "+
-					"FROM paysplit ps "+
-					"WHERE ps.PayPlanNum=0 "+//Only splits not attached to payment plans.
-						(guarantor==0?"":(" AND ps.PatNum IN "+familyPatNums))+";";
+			"SELECT ps.PatNum PatNum,"+
+					"ps.DatePay TranDate,"+
+					"-ps.SplitAmt TranAmount "+
+				"FROM paysplit ps ";
+			int payPlanVersionCur=PrefC.GetInt(PrefName.PayPlansVersion);
+			if(payPlanVersionCur==1) {
+				command+="WHERE ps.PayPlanNum=0 "+(guarantor==0?"":(" AND ps.PatNum IN "+familyPatNums))+";";//v1: splits not attached to payment plans.
+			}
+			else if(payPlanVersionCur==2) {
+				command+=(guarantor==0?"":("WHERE ps.PatNum IN "+familyPatNums))+";";//v2: all splits for pat/fam.
+			}
 			//Get the adjustment dates and amounts for the entire office history.
 			command+="INSERT INTO "+tempOdAgingTransTableName+" (PatNum,TranDate,TranAmount) "+
 				"SELECT a.PatNum PatNum,"+
@@ -258,13 +263,24 @@ namespace OpenDentBusiness{
 					"WHERE cp.status IN (1,4,5,7) "+//received, supplemental, CapClaim or CapComplete.
 						(guarantor==0?"":(" AND cp.PatNum IN "+familyPatNums))+";";
 			//Payment plan principal for the entire office history.
-			command+="INSERT INTO "+tempOdAgingTransTableName+" (PatNum,TranDate,TranAmount) "+
-				"SELECT pp.PatNum PatNum,"+
-						"pp.PayPlanDate TranDate,"+
-						"-pp.CompletedAmt TranAmount "+
-					"FROM payplan pp "+
-					"WHERE pp.CompletedAmt<>0 "+
-					(guarantor==0?"":(" AND pp.PatNum IN "+familyPatNums))+";";
+			if(payPlanVersionCur==1) { //v1: aging the entire payment plan, not the payPlanCharges.
+				command+="INSERT INTO "+tempOdAgingTransTableName+" (PatNum,TranDate,TranAmount) "+
+					"SELECT pp.PatNum PatNum,"+
+							"pp.PayPlanDate TranDate,"+
+							"-pp.CompletedAmt TranAmount "+
+						"FROM payplan pp "+
+						"WHERE pp.CompletedAmt<>0 "+
+						(guarantor==0?"":(" AND pp.PatNum IN "+familyPatNums))+";";
+			}
+			else if(payPlanVersionCur==2) {//v2, we should be looking for payplancharges and aging those as patient debits/credits accordingly.
+				command+="INSERT INTO "+tempOdAgingTransTableName+" (PatNum,TranDate,TranAmount) "+
+					"SELECT pp.PatNum PatNum,"+
+							"pp.ChargeDate TranDate,"+
+							"IF(pp.ChargeType="+POut.Int((int)PayPlanChargeType.Debit)+",pp.Principal+pp.Interest,-pp.Principal) TranAmount "+
+						"FROM payplancharge pp "+
+						"WHERE ChargeDate <= "+POut.Date(AsOfDate)+
+						(guarantor==0?"":(" AND pp.PatNum IN "+familyPatNums))+";";
+			}
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
 				//The aging calculation buckets, insurance estimates, and payment plan due amounts are 
 				//not yet calculated for Oracle as they have not been needed yet. Just calculates 
@@ -356,6 +372,7 @@ namespace OpenDentBusiness{
 					"(SELECT ppc.Guarantor,IFNULL(SUM(ppc.Principal+ppc.Interest),0) PayPlanCharges "+
 					"FROM payplancharge ppc "+
 					"WHERE ppc.ChargeDate<="+DbHelper.DtimeToDate(billInAdvanceDate)+" "+//bill in adv. date accounts for historic vs current because of how it is set above.
+						"AND ppc.ChargeType="+POut.Int((int)PayPlanChargeType.Debit)+" "+
 					"GROUP BY ppc.Guarantor) c "+
 				"SET a.PayPlanDue=c.PayPlanCharges "+
 					"WHERE c.Guarantor=a.PatNum;";

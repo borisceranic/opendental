@@ -877,7 +877,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Useful when you expect to individually examine most of the patients in the database during a data import.  Excludes deleted patients.
-		///Saves time and database calls to call this method once and keep a short term cache than it is to run a services of select statements.</summary>
+		///Saves time and database calls to call this method once and keep a short term cache than it is to run a series of select statements.</summary>
 		public static List<Patient> GetAllPatients() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Patient>>(MethodBase.GetCurrentMethod());

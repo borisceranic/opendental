@@ -32,6 +32,8 @@ namespace OpenDentBusiness {
 		AccountingLockDate,
 		///<summary>Enum:AccountingSoftware 0=None, 1=Open Dental, 2=QuickBooks</summary>
 		AccountingSoftware,
+		///<summary>Defaulted to off, determines whether completed payment plans are visible in the account module.</summary>
+		AccountShowCompletedPaymentPlans,
 		AccountShowPaymentNums,
 		///<summary>Show questionnaire button in account module toolbar.  Set in FormShowFeatures.</summary>
 		AccountShowQuestionnaire,
@@ -447,6 +449,8 @@ namespace OpenDentBusiness {
 		///<summary>Boolean. True by default.  If false, Payment clinic will be determined by FormOpenDental.</summary>
 		PaymentsUsePatientClinic,
 		PayPlansBillInAdvanceDays,
+		///<summary>The Payment Plan version that the customer is using.  Value values are 1 and 2.  1 by default.</summary>
+		PayPlansVersion,
 		PerioColorCAL,
 		PerioColorFurcations,
 		PerioColorFurcationsRed,

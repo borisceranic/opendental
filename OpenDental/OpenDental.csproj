@@ -416,6 +416,12 @@
     <Compile Include="Forms\FormPendingPayments.designer.cs">
       <DependentUpon>FormPendingPayments.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormAddTxCredit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormAddTxCredit.designer.cs">
+      <DependentUpon>FormAddTxCredit.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormAdjustmentPicker.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -427,6 +433,15 @@
     </Compile>
     <Compile Include="Forms\FormDefinitionPicker.designer.cs">
       <DependentUpon>FormDefinitionPicker.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FormPayPlanTreatment.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormPayPlanUpdate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormPayPlanUpdate.designer.cs">
+      <DependentUpon>FormPayPlanUpdate.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\FormPaySplitSelect.cs">
       <SubType>Form</SubType>
@@ -4084,11 +4099,20 @@
     <EmbeddedResource Include="Forms\FormPendingPayments.resx">
       <DependentUpon>FormPendingPayments.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormAddTxCredit.resx">
+      <DependentUpon>FormAddTxCredit.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormAdjustmentPicker.resx">
       <DependentUpon>FormAdjustmentPicker.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormDefinitionPicker.resx">
       <DependentUpon>FormDefinitionPicker.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormPayPlanTreatment.resx">
+      <DependentUpon>FormPayPlanTreatment.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormPayPlanUpdate.resx">
+      <DependentUpon>FormPayPlanUpdate.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormPaySplitSelect.resx">
       <DependentUpon>FormPaySplitSelect.cs</DependentUpon>
@@ -7075,6 +7099,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\close_door.ico" />
     <None Include="Resources\Highlight_24x24.png" />
     <None Include="Resources\Bullets_24x24.png" />
     <None Include="Resources\Save_24x24.png" />
