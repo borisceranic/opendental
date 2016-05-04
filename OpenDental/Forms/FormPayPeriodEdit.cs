@@ -25,6 +25,7 @@ namespace OpenDental{
 		private ValidDate textDatePaycheck;
 		private Label label3;
 		private PayPeriod PayPeriodCur;
+		public bool IsSaveToDb=true;
 
 		///<summary></summary>
 		public FormPayPeriodEdit(PayPeriod payPeriodCur)
@@ -230,11 +231,13 @@ namespace OpenDental{
 			PayPeriodCur.DateStart=PIn.Date(textDateStart.Text);
 			PayPeriodCur.DateStop=PIn.Date(textDateStop.Text);
 			PayPeriodCur.DatePaycheck=PIn.Date(textDatePaycheck.Text);
-			if(IsNew){
-				PayPeriods.Insert(PayPeriodCur);
-			}
-			else{
-				PayPeriods.Update(PayPeriodCur);
+			if(IsSaveToDb) {
+				if(IsNew){
+					PayPeriods.Insert(PayPeriodCur);
+				}
+				else{
+					PayPeriods.Update(PayPeriodCur);
+				}
 			}
 			DialogResult=DialogResult.OK;
 		}

@@ -23,7 +23,15 @@ namespace OpenDentBusiness{
 
 
 	}
-
+	
+	public enum PayPeriodInterval {
+		///<summary>0</summary>
+		Weekly,
+		///<summary>1</summary>
+		BiWeekly,
+		///<summary>2</summary>
+		Monthly
+	}
 	
 }
 

@@ -448,6 +448,16 @@ namespace OpenDentBusiness {
 		PaymentsPromptForAutoSplit,
 		///<summary>Boolean. True by default.  If false, Payment clinic will be determined by FormOpenDental.</summary>
 		PaymentsUsePatientClinic,
+		///<summary>Int.  Represents PayPeriodInterval enum (Weekly, Bi-Weekly, Monthly). </summary>
+		PayPeriodIntervalSetting,
+		///<summary>Int.  If set, represents the number of days after the pay period the pay day is.</summary>
+		PayPeriodPayAfterNumberOfDays,
+		///<summary>Boolean.  True by default.  If true, pay days will fall before weekends.  If false, pay days will fall after weekends.</summary>
+		PayPeriodPayDateBeforeWeekend,
+		///<summary>Boolean.  True by default.  Pay Day cannot fall on weekend if true.</summary>
+		PayPeriodPayDateExcludesWeekends,
+		///<summary>Int. If set to 0, it's disabled, but any other number represents a day of the week. 1:Sunday, 2:Monday etc...</summary>
+		PayPeriodPayDay,
 		PayPlansBillInAdvanceDays,
 		///<summary>The Payment Plan version that the customer is using.  Value values are 1 and 2.  1 by default.</summary>
 		PayPlansVersion,

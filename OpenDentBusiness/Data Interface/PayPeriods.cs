@@ -89,11 +89,18 @@ namespace OpenDentBusiness{
 			return false;//if we can't find a match, return false;
 		}
 
+		///<summary>Returns the most recent payperiod object or null if none were found.</summary>
+		public static PayPeriod GetMostRecent() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<PayPeriod>(MethodBase.GetCurrentMethod());
+			}
+			string command="SELECT * FROM payperiod WHERE DateStop=(SELECT MAX(DateStop) FROM payperiod)";
+			return Crud.PayPeriodCrud.SelectOne(command);
+		}
 
 
 	}
 
-	
 }
 
 

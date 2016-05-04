@@ -29,6 +29,7 @@ namespace OpenDental{
 		private Label label2;
 		private TextBox textADPCompanyCode;
 		private CheckBox checkShowSeconds;
+		private UI.Button butGenerate;
 		private bool changed;
 
 		///<summary></summary>
@@ -75,6 +76,7 @@ namespace OpenDental{
 			this.butClose = new OpenDental.UI.Button();
 			this.label2 = new System.Windows.Forms.Label();
 			this.textADPCompanyCode = new System.Windows.Forms.TextBox();
+			this.butGenerate = new OpenDental.UI.Button();
 			this.groupBox1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -144,6 +146,7 @@ namespace OpenDental{
 			this.gridRules.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridRules.HasAddButton = false;
 			this.gridRules.HasMultilineHeaders = false;
 			this.gridRules.HScrollVisible = false;
 			this.gridRules.Location = new System.Drawing.Point(305, 12);
@@ -159,6 +162,7 @@ namespace OpenDental{
 			// 
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridMain.HasAddButton = false;
 			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(19, 12);
@@ -220,10 +224,27 @@ namespace OpenDental{
 			this.textADPCompanyCode.Size = new System.Drawing.Size(97, 20);
 			this.textADPCompanyCode.TabIndex = 16;
 			// 
+			// butGenerate
+			// 
+			this.butGenerate.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butGenerate.Autosize = true;
+			this.butGenerate.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butGenerate.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butGenerate.CornerRadius = 4F;
+			this.butGenerate.Image = global::OpenDental.Properties.Resources.Add;
+			this.butGenerate.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butGenerate.Location = new System.Drawing.Point(145, 494);
+			this.butGenerate.Name = "butGenerate";
+			this.butGenerate.Size = new System.Drawing.Size(146, 23);
+			this.butGenerate.TabIndex = 18;
+			this.butGenerate.Text = "Generate Pay Periods";
+			this.butGenerate.UseVisualStyleBackColor = true;
+			this.butGenerate.Click += new System.EventHandler(this.butGenerate_Click);
+			// 
 			// FormTimeCardSetup
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(822, 636);
+			this.Controls.Add(this.butGenerate);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.textADPCompanyCode);
 			this.Controls.Add(this.butAddRule);
@@ -237,7 +258,6 @@ namespace OpenDental{
 			this.MinimizeBox = false;
 			this.Name = "FormTimeCardSetup";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Time Card Setup";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormPayPeriods_FormClosing);
 			this.Load += new System.EventHandler(this.FormPayPeriods_Load);
@@ -346,6 +366,13 @@ namespace OpenDental{
 			changed=true;
 		}
 
+		private void butGenerate_Click(object sender,EventArgs e) {
+			//Automatically generate payperiods based on settings.
+			FormPayPeriodManager FormPPM=new FormPayPeriodManager();
+			FormPPM.ShowDialog();
+			FillGrid();
+		}
+
 		private void checkUseDecimal_Click(object sender,EventArgs e) {
 			if(Prefs.UpdateBool(PrefName.TimeCardsUseDecimalInsteadOfColon,checkUseDecimal.Checked)){
 				changed=true;
@@ -401,18 +428,6 @@ namespace OpenDental{
 				DataValid.SetInvalid(InvalidType.Employees,InvalidType.Prefs,InvalidType.TimeCardRules);
 			}
 		}
-
-		
-
-	
-
-		
-
-		
-
-		
-
-
 
 		
 	}

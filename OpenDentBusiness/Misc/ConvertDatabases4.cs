@@ -982,15 +982,35 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE payplan MODIFY IsClosed NOT NULL";
 					Db.NonQ(command);
 				}
-
-
-
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO preference (PrefName,ValueString) VALUES ('PayPeriodIntervalSetting','0')";
+					Db.NonQ(command);
+					command="INSERT INTO preference (PrefName,ValueString) VALUES('PayPeriodPayAfterNumberOfDays','5')";
+					Db.NonQ(command);
+					command="INSERT INTO preference (PrefName,ValueString) VALUES('PayPeriodPayDateBeforeWeekend','1')";
+					Db.NonQ(command);
+					command="INSERT INTO preference (PrefName,ValueString) VALUES('PayPeriodPayDateExcludesWeekends','1')";
+					Db.NonQ(command);
+					command="INSERT INTO preference (PrefName,ValueString) VALUES('PayPeriodPayDay','0')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO preference (PrefNum,PrefName,ValueString) VALUES ((SELECT MAX(PrefNum)+1 FROM preference),'PayPeriodIntervalSetting','0')";
+					Db.NonQ(command);
+					command="INSERT INTO preference (PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'PayPeriodPayAfterNumberOfDays','5')";
+					Db.NonQ(command);
+					command="INSERT INTO preference (PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'PayPeriodPayDateBeforeWeekend','1')";
+					Db.NonQ(command);
+					command="INSERT INTO preference (PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'PayPeriodPayDateExcludesWeekends','1')";
+					Db.NonQ(command);
+					command="INSERT INTO preference (PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'PayPeriodPayDay','0')";
+					Db.NonQ(command);
+				}
 
 				command="UPDATE preference SET ValueString = '16.2.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			//To16_2_1();
 		}
-
 	}
 }
