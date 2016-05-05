@@ -153,6 +153,8 @@ namespace CentralManager{
 			this.textMySqlPassword.Name = "textMySqlPassword";
 			this.textMySqlPassword.Size = new System.Drawing.Size(190, 20);
 			this.textMySqlPassword.TabIndex = 3;
+			this.textMySqlPassword.TextChanged += new System.EventHandler(this.textMySqlPassword_TextChanged);
+			this.textMySqlPassword.Leave += new System.EventHandler(this.textMySqlPassword_Leave);
 			// 
 			// label7
 			// 

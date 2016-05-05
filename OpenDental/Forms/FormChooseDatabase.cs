@@ -138,9 +138,10 @@ namespace OpenDental{
 			// 
 			this.textPassword.Location = new System.Drawing.Point(13, 181);
 			this.textPassword.Name = "textPassword";
-			this.textPassword.PasswordChar = '*';
 			this.textPassword.Size = new System.Drawing.Size(280, 20);
 			this.textPassword.TabIndex = 4;
+			this.textPassword.TextChanged += new System.EventHandler(this.textPassword_TextChanged);
+			this.textPassword.Leave += new System.EventHandler(this.textPassword_Leave);
 			// 
 			// label2
 			// 
@@ -397,7 +398,6 @@ namespace OpenDental{
 			// FormChooseDatabase
 			// 
 			this.AcceptButton = this.butOK;
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(716, 574);
 			this.Controls.Add(this.textConnectionString);
 			this.Controls.Add(this.label8);
@@ -412,7 +412,6 @@ namespace OpenDental{
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
 			this.Name = "FormChooseDatabase";
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Choose Database";
 			this.Closing += new System.ComponentModel.CancelEventHandler(this.FormConfig_Closing);
 			this.Load += new System.EventHandler(this.FormConfig_Load);
@@ -492,7 +491,7 @@ namespace OpenDental{
 				try {
 					sr=new StreamReader(filename);
 				}
-				catch {
+				catch(Exception) {
 				}
 				while(!sr.ReadLine().StartsWith("--")){
 					//The line just before the data looks like: --------------------------
@@ -515,7 +514,7 @@ namespace OpenDental{
 				retList.CopyTo(retArray);
 				return retArray;
 			}
-			catch{//it will always fail if not WinXP
+			catch(Exception) {//it will always fail if not WinXP
 				return new string[0];
 			}
 		}
@@ -529,15 +528,13 @@ namespace OpenDental{
 				return new string[0];//because SHOW DATABASES won't work
 			}
 			try{
-				OpenDentBusiness.DataConnection dcon;
+				DataConnection dcon;
 				//use the one table that we know exists
 				if(textUser.Text==""){
-					dcon=new OpenDentBusiness.DataConnection(comboComputerName.Text,"mysql","root",textPassword.Text,
-						DatabaseType.MySql);
+					dcon=new DataConnection(comboComputerName.Text,"mysql","root",textPassword.Text,DatabaseType.MySql);
 				}
 				else{
-					dcon=new OpenDentBusiness.DataConnection(comboComputerName.Text,"mysql",textUser.Text,textPassword.Text,
-						DatabaseType.MySql);
+					dcon=new DataConnection(comboComputerName.Text,"mysql",textUser.Text,textPassword.Text,DatabaseType.MySql);
 				}
 				string command="SHOW DATABASES";
 				//if this next step fails, table will simply have 0 rows
@@ -548,7 +545,7 @@ namespace OpenDental{
 				}
 				return dbNames;
 			}
-			catch{
+			catch(Exception) {
 				return new string[0];
 			}
 		}
@@ -611,7 +608,7 @@ namespace OpenDental{
 				try {
 					fs=File.Create(xmlPath);
 				}
-				catch {
+				catch(Exception) {
 					MessageBox.Show("The very first time that the program is run, it must be run as an Admin.  If using Vista, right click, run as Admin.");
 					Application.Exit();
 					return;
@@ -662,13 +659,22 @@ namespace OpenDental{
 					}
 					textUser.Text=nav.SelectSingleNode("User").Value;
 					textPassword.Text=nav.SelectSingleNode("Password").Value;
+					XPathNavigator encryptedPwdNode=nav.SelectSingleNode("MySQLPassHash");
+					//If the Password node is empty, but there is a value in the MySQLPassHash node, decrypt the node value and use that instead
+					string _decryptedPwd;
+					if(textPassword.Text==""
+						&& encryptedPwdNode!=null
+						&& encryptedPwdNode.Value!=""
+						&& CDT.Class1.Decrypt(encryptedPwdNode.Value,out _decryptedPwd))
+					{
+						//decrypted value could be an empty string, which means they don't have a password set, so textPassword will be an empty string
+						textPassword.Text=_decryptedPwd;
+					}
+					textPassword.PasswordChar=textPassword.Text==""?default(char):'*';//mask password if loaded from the config file
 					XPathNavigator noshownav=nav.SelectSingleNode("NoShowOnStartup");
-					if(noshownav!=null){
-						string noshow=noshownav.Value;
-						if(noshow=="True"){
-							NoShow=YN.Yes;
-							checkNoShow.Checked=true;
-						}
+					if(noshownav!=null && noshownav.Value=="True"){
+						NoShow=YN.Yes;
+						checkNoShow.Checked=true;
 					}
 					return;
 				}
@@ -685,12 +691,9 @@ namespace OpenDental{
 					groupDirect.Enabled=false;
 					textURI.Text=nav.SelectSingleNode("URI").Value;
 					XPathNavigator ecwnav=nav.SelectSingleNode("UsingEcw");
-					if(ecwnav!=null){
-						string usingecw=ecwnav.Value;
-						if(usingecw=="True"){
-							NoShow=YN.Yes;
-							checkUsingEcw.Checked=true;
-						}
+					if(ecwnav!=null && ecwnav.Value=="True"){
+						NoShow=YN.Yes;
+						checkUsingEcw.Checked=true;
 					}
 					textUser2.Select();
 					return;
@@ -741,6 +744,7 @@ namespace OpenDental{
 			}
 			if(MySqlPassword!="") {
 				textPassword.Text=MySqlPassword;
+				textPassword.PasswordChar='*';
 			}
 			if(NoShow==YN.No) {//but this shouldn't happen
 				checkNoShow.Checked=false;
@@ -776,7 +780,7 @@ namespace OpenDental{
 					RemotingClient.RemotingRole=RemotingRole.ClientWeb;
 					return true;
 				}
-				catch{
+				catch(Exception) {
 					return false;
 				}
 			}
@@ -787,13 +791,15 @@ namespace OpenDental{
 					dcon.SetDb(textConnectionString.Text,"",DataConnection.DBtype);
 				}
 				else{
+					//textPassword could be plain text password from the Password field of the config file, the decrypted password from the MySQLPassHash field
+					//of the config file, or password entered by the user and can be blank (empty string) in all cases
 					dcon.SetDb(comboComputerName.Text,comboDatabase.Text,textUser.Text,textPassword.Text,"","",DataConnection.DBtype);
 				}
 				//a direct connection does not utilize lower privileges.
 				RemotingClient.RemotingRole=RemotingRole.ClientDirect;
 				return true;
 			}
-			catch(Exception ex){
+			catch(Exception) {
 				return false;
 			}
 		}
@@ -815,6 +821,16 @@ namespace OpenDental{
 				//Common error: root element is missing
 				MessageBox.Show(ex.Message);
 			}
+		}
+
+		private void textPassword_TextChanged(object sender,EventArgs e) {
+			if(textPassword.Text=="") {
+				textPassword.PasswordChar=default(char);//if text is cleared, turn off password char mask
+			}
+		}
+
+		private void textPassword_Leave(object sender,EventArgs e) {
+			textPassword.PasswordChar=textPassword.Text==""?default(char):'*';//mask password if loaded from the config file
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
@@ -841,7 +857,7 @@ namespace OpenDental{
 					Security.PasswordTyped=password;//for ecw, this is already encrypted.//textPassword2.Text;
 					RemotingClient.RemotingRole=RemotingRole.ClientWeb;
 				}
-				catch(Exception ex){
+				catch(Exception ex) {
 					RemotingClient.ServerURI=originalURI;
 					MessageBox.Show(ex.Message);
 					return;
@@ -859,14 +875,15 @@ namespace OpenDental{
 					if(textConnectionString.Text.Length>0){
 						dcon.SetDb(textConnectionString.Text,"",DataConnection.DBtype);
 					}
-					else{
+					else {
+						//textPassword could be plain text password from the Password field of the config file, the decrypted password from the MySQLPassHash field
+						//of the config file, or password entered by the user and can be blank (empty string) in all cases
 						dcon.SetDb(comboComputerName.Text,comboDatabase.Text,textUser.Text,textPassword.Text,"","",DataConnection.DBtype);
 					}
 					//a direct connection does not utilize lower privileges.
 				}
-				catch(Exception ex){
-					MessageBox.Show(//Lan.g(this,"Could not establish connection to database."));
-						ex.Message);
+				catch(Exception ex) {
+					MessageBox.Show(ex.Message);//Lan.g(this,"Could not establish connection to database."));
 					return;
 				}
 				RemotingClient.RemotingRole=RemotingRole.ClientDirect;
@@ -893,8 +910,14 @@ namespace OpenDental{
 						writer.WriteStartElement("User");
 						writer.WriteString(textUser.Text);
 						writer.WriteEndElement();
+						string encryptedPwd;
+						CDT.Class1.Encrypt(textPassword.Text,out encryptedPwd);//sets encryptedPwd ot value or null
 						writer.WriteStartElement("Password");
-						writer.WriteString(textPassword.Text);
+						//If encryption fails, write plain text password to xml file; maintains old behavior.
+						writer.WriteString(string.IsNullOrEmpty(encryptedPwd)?textPassword.Text:"");
+						writer.WriteEndElement();
+						writer.WriteStartElement("MySQLPassHash");
+						writer.WriteString(encryptedPwd??"");
 						writer.WriteEndElement();
 						writer.WriteStartElement("NoShowOnStartup");
 						if(checkNoShow.Checked) {
@@ -933,7 +956,7 @@ namespace OpenDental{
 					writer.Flush();
 				}//using writer
 			}
-			catch{
+			catch(Exception) {
 				//data not saved.
 			}
 			//fyiReporting.RDL.DataSource.SetOpenDentalConnectionString(

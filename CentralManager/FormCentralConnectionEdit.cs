@@ -20,10 +20,21 @@ namespace CentralManager {
 			textDatabaseName.Text=CentralConnectionCur.DatabaseName;
 			textMySqlUser.Text=CentralConnectionCur.MySqlUser;
 			textMySqlPassword.Text=CentralConnections.Decrypt(CentralConnectionCur.MySqlPassword,FormCentralManager.EncryptionKey);
+			textMySqlPassword.PasswordChar=textMySqlPassword.Text==""?default(char):'*';//if password entered, mask it
 			textServiceURI.Text=CentralConnectionCur.ServiceURI;
 			checkWebServiceIsEcw.Checked=CentralConnectionCur.WebServiceIsEcw;
 			textItemOrder.Text=CentralConnectionCur.ItemOrder.ToString();
 			textNote.Text=CentralConnectionCur.Note;
+		}
+
+		private void textMySqlPassword_TextChanged(object sender,EventArgs e) {
+			if(textMySqlPassword.Text=="") {
+				textMySqlPassword.PasswordChar=default(char);//if text is cleared, turn off password char mask
+			}
+		}
+
+		private void textMySqlPassword_Leave(object sender,EventArgs e) {
+			textMySqlPassword.PasswordChar=textMySqlPassword.Text==""?default(char):'*';//mask password on leave
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {
@@ -53,6 +64,7 @@ namespace CentralManager {
 			CentralConnectionCur.Note=textNote.Text;
 			if(CentralConnectionCur.IsNew) {
 				CentralConnections.Insert(CentralConnectionCur);
+				CentralConnectionCur.IsNew=false;//so a double-click immediately in FormCentralConnections doesn't insert again
 			}
 			else {
 				CentralConnections.Update(CentralConnectionCur);
@@ -63,9 +75,5 @@ namespace CentralManager {
 		private void butCancel_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
-
-		
-
-
 	}
 }

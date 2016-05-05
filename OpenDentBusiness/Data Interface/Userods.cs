@@ -351,6 +351,11 @@ namespace OpenDentBusiness {
 				database=navConn.SelectSingleNode("Database").Value;
 				mysqlUser=navConn.SelectSingleNode("User").Value;
 				mysqlPassword=navConn.SelectSingleNode("Password").Value;
+				XPathNavigator encryptedPwdNode=navConn.SelectSingleNode("MySQLPassHash");
+				string decryptedPwd;
+				if(mysqlPassword=="" && encryptedPwdNode!=null && encryptedPwdNode.Value!="" && CDT.Class1.Decrypt(encryptedPwdNode.Value,out decryptedPwd)) {
+					mysqlPassword=decryptedPwd;
+				}
 				mysqlUserLow=navConn.SelectSingleNode("UserLow").Value;
 				mysqlPasswordLow=navConn.SelectSingleNode("PasswordLow").Value;
 			}

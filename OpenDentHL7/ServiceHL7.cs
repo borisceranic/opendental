@@ -79,6 +79,11 @@ namespace OpenDentHL7 {
 			string database=nav.SelectSingleNode("Database").Value;
 			string user=nav.SelectSingleNode("User").Value;
 			string password=nav.SelectSingleNode("Password").Value;
+			XPathNavigator encryptedPwdNode=nav.SelectSingleNode("MySQLPassHash");//only use the encrypted pwd node is the password node is empty
+			string decryptedPwd;
+			if(password=="" && encryptedPwdNode!=null && encryptedPwdNode.Value!="" && CDT.Class1.Decrypt(encryptedPwdNode.Value,out decryptedPwd)) {
+				password=decryptedPwd;//password will still be blank if a blank password was encrypted
+			}
 			XPathNavigator verboseNav=Navigator.SelectSingleNode("//HL7verbose");
 			if(verboseNav!=null && verboseNav.Value=="True") {
 				IsVerboseLogging=true;

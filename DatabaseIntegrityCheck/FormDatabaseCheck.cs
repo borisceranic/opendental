@@ -1,11 +1,7 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Text;
 using System.Windows.Forms;
 using System.Xml;
 using MySql.Data.MySqlClient;
@@ -30,6 +26,7 @@ namespace DatabaseIntegrityCheck {
 				textUser.Text="root";
 				return;
 			}
+			string passHash="";
 			try {
 				document.Load("FreeDentalConfig.xml");
 				XmlNodeReader reader=new XmlNodeReader(document);
@@ -52,17 +49,35 @@ namespace DatabaseIntegrityCheck {
 							case "Password":
 								textPassword.Text=reader.Value;
 								break;
+							case "MySQLPassHash":
+								passHash=reader.Value;
+								break;
 						}
 					}
 				}
 				reader.Close();
 			}
-			catch {//Exception e) {
+			catch(Exception) {
 				//MessageBox.Show(e.Message);
 				textComputerName.Text="localhost";
 				textDatabase.Text="opendental";
 				textUser.Text="root";
 			}
+			string decryptedPwd;
+			if(textPassword.Text=="" && passHash!="" && CDT.Class1.Decrypt(passHash,out decryptedPwd)) {
+				textPassword.Text=decryptedPwd;
+			}
+			textPassword.PasswordChar=textPassword.Text==""?default(char):'*';//mask password on leave
+		}
+
+		private void textPassword_TextChanged(object sender,EventArgs e) {
+			if(textPassword.Text=="") {
+				textPassword.PasswordChar=default(char);//if text is cleared, turn off password char mask
+			}
+		}
+
+		private void textPassword_Leave(object sender,EventArgs e) {
+			textPassword.PasswordChar=textPassword.Text==""?default(char):'*';//mask password on leave
 		}
 
 

@@ -101,6 +101,11 @@ namespace CentralManager {
 				database=nav.SelectSingleNode("Database").Value;
 				user=nav.SelectSingleNode("User").Value;
 				password=nav.SelectSingleNode("Password").Value;
+				XPathNavigator passHashNode=nav.SelectSingleNode("MySQLPassHash");
+				string decryptedPwd;
+				if(password=="" && passHashNode!=null && passHashNode.Value!="" && CDT.Class1.Decrypt(passHashNode.Value,out decryptedPwd)) {
+					password=decryptedPwd;
+				}
 				XPathNavigator nodeMT=nav.SelectSingleNode("MiddleTierAddr");
 				if(nodeMT!=null) {
 					middleTier=nodeMT.Value;

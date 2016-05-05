@@ -48,6 +48,7 @@ namespace ODR{
 			string database="";
 			string user="";
 			string password="";
+			string passHash="";
 			try {
 				document.Load(path);
 				XmlNodeReader reader=new XmlNodeReader(document);
@@ -70,6 +71,9 @@ namespace ODR{
 							case "Password":
 								password=reader.Value;
 								break;
+							case "MySQLPassHash":
+								passHash=reader.Value;
+								break;
 						}
 					}
 				}
@@ -77,6 +81,11 @@ namespace ODR{
 			}
 			catch {
 				return "";
+			}
+			string decryptedPwd;
+			if(password=="" && passHash!="" && CDT.Class1.Decrypt(passHash,out decryptedPwd)) {
+				//if plain text password is blank but encrypted pwd isn't and decryption is successful, use decryptedPwd
+				password=decryptedPwd;
 			}
 			//example:
 			//Server=localhost;Database=opendental;User ID=root;Password=;CharSet=utf8
@@ -99,6 +108,7 @@ namespace ODR{
 			string database="";
 			string user="";
 			string password="";
+			string passHash="";
 			try {
 				document.Load(path);
 				XmlNodeReader reader=new XmlNodeReader(document);
@@ -121,6 +131,9 @@ namespace ODR{
 							case "Password":
 								password=reader.Value;
 								break;
+							case "MySQLPassHash":
+								passHash=reader.Value;
+								break;
 						}
 					}
 				}
@@ -128,6 +141,11 @@ namespace ODR{
 			}
 			catch {
 				return "";
+			}
+			string decryptedPwd;
+			if(password=="" && passHash!="" && CDT.Class1.Decrypt(passHash,out decryptedPwd)) {
+				//if plain text password is blank but encrypted pwd isn't and decryption is successful, use decryptedPwd
+				password=decryptedPwd;
 			}
 			//example:
 			//Server=localhost;Database=opendental;User ID=root;Password=;CharSet=utf8

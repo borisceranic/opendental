@@ -181,8 +181,12 @@ namespace OpenDental {
 			nodeDatabase.InnerText=DataConnection.GetDatabaseName();
 			XmlNode nodeUser=document.CreateNode(XmlNodeType.Element,"User","");
 			nodeUser.InnerText=DataConnection.GetMysqlUser();
+			string encryptedPwd;
+			CDT.Class1.Encrypt(DataConnection.GetMysqlPass(),out encryptedPwd);
 			XmlNode nodePassword=document.CreateNode(XmlNodeType.Element,"Password","");
-			nodePassword.InnerText=DataConnection.GetMysqlPass();
+			nodePassword.InnerText=string.IsNullOrEmpty(encryptedPwd)?DataConnection.GetMysqlPass():"";//write plain text pwd if encryption failed
+			XmlNode nodePassHash=document.CreateNode(XmlNodeType.Element,"MySQLPassHash","");
+			nodePassHash.InnerText=encryptedPwd??"";//write encrypted password, if it's null then write an empty string
 			XmlNode nodeUserLow=document.CreateNode(XmlNodeType.Element,"UserLow","");
 			nodeUserLow.InnerText=DataConnection.GetMysqlUserLow();
 			XmlNode nodePasswordLow=document.CreateNode(XmlNodeType.Element,"PasswordLow","");
@@ -196,6 +200,7 @@ namespace OpenDental {
 			nodeDbeConn.AppendChild(nodeDatabase);
 			nodeDbeConn.AppendChild(nodeUser);
 			nodeDbeConn.AppendChild(nodePassword);
+			nodeDbeConn.AppendChild(nodePassHash);
 			nodeDbeConn.AppendChild(nodeUserLow);
 			nodeDbeConn.AppendChild(nodePasswordLow);
 			nodeDbeConn.AppendChild(nodeDbType);

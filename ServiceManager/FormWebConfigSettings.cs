@@ -30,6 +30,16 @@ namespace ServiceManager {
 				textDatabase.Text=nav.SelectSingleNode("Database").Value;
 				textUser.Text=nav.SelectSingleNode("User").Value;
 				textPassword.Text=nav.SelectSingleNode("Password").Value;
+				XPathNavigator encryptedPwdNode=nav.SelectSingleNode("MySQLPassHash");
+				string decryptedPwd;
+				if(textPassword.Text==""
+					&& encryptedPwdNode!=null
+					&& encryptedPwdNode.Value!=""
+					&& CDT.Class1.Decrypt(encryptedPwdNode.Value,out decryptedPwd))
+				{
+					textPassword.Text=decryptedPwd;
+				}
+				textPassword.PasswordChar=textPassword.Text==""?default(char):'*';//mask password
 				textUserLow.Text="";
 				textPasswordLow.Text="";
 				comboLogLevel.Items.AddRange(Enum.GetNames(typeof(LogLevel)));//Isn't included in FreeDentalConfig, but is needed for the web service.
@@ -45,6 +55,16 @@ namespace ServiceManager {
 				comboLogLevel.Items.AddRange(Enum.GetNames(typeof(LogLevel)));
 				comboLogLevel.SelectedItem=comboLogLevel.Items[0];
 			}
+		}
+
+		private void textPassword_TextChanged(object sender,EventArgs e) {
+			if(textPassword.Text=="") {
+				textPassword.PasswordChar=default(char);//if text is cleared, turn off password char mask
+			}
+		}
+
+		private void textPassword_Leave(object sender,EventArgs e) {
+			textPassword.PasswordChar=textPassword.Text==""?default(char):'*';//mask password on leave
 		}
 
 		private void butCancel_Click(object sender,EventArgs e) {
@@ -75,8 +95,12 @@ namespace ServiceManager {
 			database.InnerText=textDatabase.Text;
 			XmlNode user=document.CreateNode(XmlNodeType.Element,"User","");
 			user.InnerText=textUser.Text;
+			string encryptedPwd;
+			CDT.Class1.Encrypt(textPassword.Text,out encryptedPwd);
 			XmlNode password=document.CreateNode(XmlNodeType.Element,"Password","");
-			password.InnerText=textPassword.Text;
+			password.InnerText=string.IsNullOrEmpty(encryptedPwd)?textPassword.Text:"";//only write the mysql password in plain text if encryption fails
+			XmlNode mysqlPassHash=document.CreateNode(XmlNodeType.Element,"MySQLPassHash","");
+			mysqlPassHash.InnerText=encryptedPwd??"";//if encryptedPwd is null write empty string
 			XmlNode userLow=document.CreateNode(XmlNodeType.Element,"UserLow","");
 			userLow.InnerText=textUserLow.Text;
 			XmlNode passwordLow=document.CreateNode(XmlNodeType.Element,"PasswordLow","");
@@ -90,6 +114,7 @@ namespace ServiceManager {
 			databaseConnection.AppendChild(database);
 			databaseConnection.AppendChild(user);
 			databaseConnection.AppendChild(password);
+			databaseConnection.AppendChild(mysqlPassHash);
 			databaseConnection.AppendChild(userLow);
 			databaseConnection.AppendChild(passwordLow);
 			databaseConnection.AppendChild(dbType);

@@ -103,7 +103,7 @@ namespace CentralManager {
 			FormCentralConnectionEdit FormCCS=new FormCentralConnectionEdit();
 			FormCCS.CentralConnectionCur=conn;
 			if(FormCCS.ShowDialog()==DialogResult.OK) {//Will insert conn on OK.
-				ListConns.Add(FormCCS.CentralConnectionCur);
+				ListConns.Add(FormCCS.CentralConnectionCur);//IsNew will be false if inserted
 			}
 			FillGrid();//Refreshing the grid will show any new connections added.
 		}

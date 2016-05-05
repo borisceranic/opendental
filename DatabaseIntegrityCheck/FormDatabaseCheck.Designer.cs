@@ -37,9 +37,9 @@ namespace DatabaseIntegrityCheck {
 			// 
 			// butRun
 			// 
-			this.butRun.Location = new System.Drawing.Point(370,171);
+			this.butRun.Location = new System.Drawing.Point(370, 171);
 			this.butRun.Name = "butRun";
-			this.butRun.Size = new System.Drawing.Size(75,25);
+			this.butRun.Size = new System.Drawing.Size(75, 25);
 			this.butRun.TabIndex = 0;
 			this.butRun.Text = "Run";
 			this.butRun.UseVisualStyleBackColor = true;
@@ -47,73 +47,75 @@ namespace DatabaseIntegrityCheck {
 			// 
 			// textDatabase
 			// 
-			this.textDatabase.Location = new System.Drawing.Point(179,47);
+			this.textDatabase.Location = new System.Drawing.Point(179, 47);
 			this.textDatabase.Name = "textDatabase";
-			this.textDatabase.Size = new System.Drawing.Size(154,20);
+			this.textDatabase.Size = new System.Drawing.Size(154, 20);
 			this.textDatabase.TabIndex = 1;
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(59,50);
+			this.label1.Location = new System.Drawing.Point(59, 50);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(118,13);
+			this.label1.Size = new System.Drawing.Size(118, 13);
 			this.label1.TabIndex = 2;
 			this.label1.Text = "Database";
 			this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(59,24);
+			this.label2.Location = new System.Drawing.Point(59, 24);
 			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(118,13);
+			this.label2.Size = new System.Drawing.Size(118, 13);
 			this.label2.TabIndex = 4;
 			this.label2.Text = "Computer";
 			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textComputerName
 			// 
-			this.textComputerName.Location = new System.Drawing.Point(179,21);
+			this.textComputerName.Location = new System.Drawing.Point(179, 21);
 			this.textComputerName.Name = "textComputerName";
-			this.textComputerName.Size = new System.Drawing.Size(154,20);
+			this.textComputerName.Size = new System.Drawing.Size(154, 20);
 			this.textComputerName.TabIndex = 3;
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(59,76);
+			this.label3.Location = new System.Drawing.Point(59, 76);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(118,13);
+			this.label3.Size = new System.Drawing.Size(118, 13);
 			this.label3.TabIndex = 6;
 			this.label3.Text = "Username";
 			this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textUser
 			// 
-			this.textUser.Location = new System.Drawing.Point(179,73);
+			this.textUser.Location = new System.Drawing.Point(179, 73);
 			this.textUser.Name = "textUser";
-			this.textUser.Size = new System.Drawing.Size(154,20);
+			this.textUser.Size = new System.Drawing.Size(154, 20);
 			this.textUser.TabIndex = 5;
 			// 
 			// label4
 			// 
-			this.label4.Location = new System.Drawing.Point(59,102);
+			this.label4.Location = new System.Drawing.Point(59, 102);
 			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(118,13);
+			this.label4.Size = new System.Drawing.Size(118, 13);
 			this.label4.TabIndex = 8;
 			this.label4.Text = "Password";
 			this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// textPassword
 			// 
-			this.textPassword.Location = new System.Drawing.Point(179,99);
+			this.textPassword.Location = new System.Drawing.Point(179, 99);
 			this.textPassword.Name = "textPassword";
-			this.textPassword.Size = new System.Drawing.Size(154,20);
+			this.textPassword.Size = new System.Drawing.Size(154, 20);
 			this.textPassword.TabIndex = 7;
+			this.textPassword.TextChanged += new System.EventHandler(this.textPassword_TextChanged);
+			this.textPassword.Leave += new System.EventHandler(this.textPassword_Leave);
 			// 
 			// FormDatabaseCheck
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F,13F);
+			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(457,225);
+			this.ClientSize = new System.Drawing.Size(457, 225);
 			this.Controls.Add(this.label4);
 			this.Controls.Add(this.textPassword);
 			this.Controls.Add(this.label3);
