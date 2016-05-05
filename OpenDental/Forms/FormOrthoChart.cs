@@ -374,7 +374,7 @@ namespace OpenDental {
 				.FindAll(x => x.DateService==orthoDate && x.FieldName!=sigColumnName),orthoDate);
 			signatureBoxWrapper.FillSignature(sig.IsTopaz,keyData,sig.SigString);
 			if(signatureBoxWrapper.IsValid) {
-				gridMain.Rows[gridRow].ColorBackG=Color.FromArgb(175,0,250,158);//A lighter version of Color.MediumSpringGreen
+				gridMain.Rows[gridRow].ColorBackG=Color.FromArgb(0,245,165);//A lighter version of Color.MediumSpringGreen
 				gridMain.Rows[gridRow].Cells[_sigColIdx].Text=Lan.g(this,"Valid");
 			}
 			else {
