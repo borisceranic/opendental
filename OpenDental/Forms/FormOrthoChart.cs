@@ -214,7 +214,10 @@ namespace OpenDental {
 		private void signatureBoxWrapper_ClearSignatureClicked(object sender,EventArgs e) {
 			if(gridMain.SelectedCell.Y==-1) {
 				return;
-			}			
+			}
+			if(OrthoSignature.GetSigString(_tableOrtho.Rows[gridMain.SelectedCell.Y][_sigColIdx].ToString())!="") {
+				_hasChanged=true;
+			}
 			_tableOrtho.Rows[gridMain.SelectedCell.Y][_sigColIdx]="";
 			SetSignature(gridMain.SelectedCell.Y);
 			_prevRow=gridMain.SelectedCell.Y;
@@ -224,6 +227,9 @@ namespace OpenDental {
 		private void signatureBoxWrapper_SignTopazClicked(object sender,EventArgs e) {
 			if(gridMain.SelectedCell.Y==-1) {
 				return;
+			}
+			if(OrthoSignature.GetSigString(_tableOrtho.Rows[gridMain.SelectedCell.Y][_sigColIdx].ToString())!="") {
+				_hasChanged=true;
 			}
 			_tableOrtho.Rows[gridMain.SelectedCell.Y][_sigColIdx]="";
 			SetSignature(gridMain.SelectedCell.Y);
@@ -380,8 +386,10 @@ namespace OpenDental {
 			if(sig.IsTopaz && !_topazNeedsSaved) {
 				return;
 			}
-			_tableOrtho.Rows[gridRow][_sigColIdx]=sig.ToString();
-			_hasChanged=true;
+			if(OrthoSignature.GetSigString(_tableOrtho.Rows[gridRow][_sigColIdx].ToString())!=sig.SigString) {
+				_hasChanged=true;
+				_tableOrtho.Rows[gridRow][_sigColIdx]=sig.ToString();
+			}
 		}
 
 		private void gridPat_CellDoubleClick(object sender,ODGridClickEventArgs e) {
@@ -729,6 +737,15 @@ namespace OpenDental {
 			public OrthoSignature() {
 				IsTopaz=false;
 				SigString="";
+			}
+
+			///<summary>Gets the signature string from a string like "1:52222559445999975122111500485555". Passing in an empty string will return an empty
+			///string.</summary>
+			public static string GetSigString(string dbString) {
+				if(dbString.Length < 3) {
+					return "";
+				}
+				return dbString.Substring(2);
 			}
 
 			///<summary>Converts the object to a string like "0:ritwq/wV8vlrgUYahhK+RH5UeBFA6W4jCkZdo0cDWd63aZb1S/W3Z4eW5LmchqfgniG23". The 1st character
