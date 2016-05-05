@@ -23,6 +23,7 @@ namespace OpenDental{
 		/// the contents of this method with the code editor.
 		/// </summary>
 		private void InitializeComponent() {
+			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormOrthoChart));
 			this.signatureBoxWrapper = new OpenDental.UI.SignatureBoxWrapper();
 			this.butOK = new OpenDental.UI.Button();
@@ -32,13 +33,19 @@ namespace OpenDental{
 			this.butCancel = new OpenDental.UI.Button();
 			this.gridPat = new OpenDental.UI.ODGrid();
 			this.gridMain = new OpenDental.UI.ODGrid();
+			this.tabControl = new System.Windows.Forms.TabControl();
+			this.tabPage1 = new System.Windows.Forms.TabPage();
+			this.tabPage2 = new System.Windows.Forms.TabPage();
+			this.mainMenu1 = new System.Windows.Forms.MainMenu(this.components);
+			this.menuItemSetup = new System.Windows.Forms.MenuItem();
+			this.tabControl.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// signatureBoxWrapper
 			// 
 			this.signatureBoxWrapper.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.signatureBoxWrapper.BackColor = System.Drawing.SystemColors.ControlDark;
-			this.signatureBoxWrapper.Location = new System.Drawing.Point(562, 427);
+			this.signatureBoxWrapper.Location = new System.Drawing.Point(598, 427);
 			this.signatureBoxWrapper.Name = "signatureBoxWrapper";
 			this.signatureBoxWrapper.SignatureMode = OpenDental.UI.SignatureBoxWrapper.SigMode.OrthoChart;
 			this.signatureBoxWrapper.Size = new System.Drawing.Size(364, 81);
@@ -54,7 +61,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(770, 634);
+			this.butOK.Location = new System.Drawing.Point(806, 665);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 23);
 			this.butOK.TabIndex = 109;
@@ -70,7 +77,7 @@ namespace OpenDental{
 			this.butAudit.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAudit.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAudit.CornerRadius = 4F;
-			this.butAudit.Location = new System.Drawing.Point(473, 634);
+			this.butAudit.Location = new System.Drawing.Point(473, 665);
 			this.butAudit.Name = "butAudit";
 			this.butAudit.Size = new System.Drawing.Size(80, 23);
 			this.butAudit.TabIndex = 108;
@@ -114,7 +121,7 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(851, 634);
+			this.butCancel.Location = new System.Drawing.Point(887, 665);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 23);
 			this.butCancel.TabIndex = 7;
@@ -132,7 +139,7 @@ namespace OpenDental{
 			this.gridPat.Location = new System.Drawing.Point(10, 427);
 			this.gridPat.Name = "gridPat";
 			this.gridPat.ScrollValue = 0;
-			this.gridPat.Size = new System.Drawing.Size(371, 230);
+			this.gridPat.Size = new System.Drawing.Size(371, 261);
 			this.gridPat.TabIndex = 6;
 			this.gridPat.Title = "Patient Fields";
 			this.gridPat.TranslationName = "TablePatientFields";
@@ -145,11 +152,11 @@ namespace OpenDental{
 			this.gridMain.HasAddButton = false;
 			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = true;
-			this.gridMain.Location = new System.Drawing.Point(10, 12);
+			this.gridMain.Location = new System.Drawing.Point(10, 29);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
 			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.OneCell;
-			this.gridMain.Size = new System.Drawing.Size(916, 409);
+			this.gridMain.Size = new System.Drawing.Size(952, 392);
 			this.gridMain.TabIndex = 5;
 			this.gridMain.Title = "Ortho Chart";
 			this.gridMain.TranslationName = "TableOrthoChart";
@@ -158,10 +165,51 @@ namespace OpenDental{
 			this.gridMain.CellLeave += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellLeave);
 			this.gridMain.CellEnter += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellEnter);
 			// 
+			// tabControl
+			// 
+			this.tabControl.Controls.Add(this.tabPage1);
+			this.tabControl.Controls.Add(this.tabPage2);
+			this.tabControl.Location = new System.Drawing.Point(10, 4);
+			this.tabControl.Name = "tabControl";
+			this.tabControl.SelectedIndex = 0;
+			this.tabControl.Size = new System.Drawing.Size(954, 23);
+			this.tabControl.TabIndex = 111;
+			this.tabControl.TabIndexChanged += new System.EventHandler(this.tabControl_TabIndexChanged);
+			// 
+			// tabPage1
+			// 
+			this.tabPage1.Location = new System.Drawing.Point(4, 22);
+			this.tabPage1.Name = "tabPage1";
+			this.tabPage1.Size = new System.Drawing.Size(946, 0);
+			this.tabPage1.TabIndex = 0;
+			this.tabPage1.Text = "tabPage1";
+			this.tabPage1.UseVisualStyleBackColor = true;
+			// 
+			// tabPage2
+			// 
+			this.tabPage2.Location = new System.Drawing.Point(4, 22);
+			this.tabPage2.Name = "tabPage2";
+			this.tabPage2.Size = new System.Drawing.Size(946, 0);
+			this.tabPage2.TabIndex = 1;
+			this.tabPage2.Text = "tabPage2";
+			this.tabPage2.UseVisualStyleBackColor = true;
+			// 
+			// mainMenu1
+			// 
+			this.mainMenu1.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.menuItemSetup});
+			// 
+			// menuItemSetup
+			// 
+			this.menuItemSetup.Index = 0;
+			this.menuItemSetup.Text = "Setup";
+			this.menuItemSetup.Click += new System.EventHandler(this.menuItemSetup_Click);
+			// 
 			// FormOrthoChart
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(938, 665);
+			this.ClientSize = new System.Drawing.Size(974, 696);
+			this.Controls.Add(this.tabControl);
 			this.Controls.Add(this.signatureBoxWrapper);
 			this.Controls.Add(this.butOK);
 			this.Controls.Add(this.butAudit);
@@ -171,11 +219,12 @@ namespace OpenDental{
 			this.Controls.Add(this.gridPat);
 			this.Controls.Add(this.gridMain);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.Menu = this.mainMenu1;
 			this.Name = "FormOrthoChart";
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Ortho Chart";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormOrthoChart_FormClosing);
 			this.Load += new System.EventHandler(this.FormOrthoChart_Load);
+			this.tabControl.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
@@ -190,5 +239,10 @@ namespace OpenDental{
 		private UI.Button butAudit;
 		private UI.Button butOK;
 		private UI.SignatureBoxWrapper signatureBoxWrapper;
+		private System.Windows.Forms.TabControl tabControl;
+		private System.Windows.Forms.MainMenu mainMenu1;
+		private System.Windows.Forms.MenuItem menuItemSetup;
+		private System.Windows.Forms.TabPage tabPage1;
+		private System.Windows.Forms.TabPage tabPage2;
 	}
 }

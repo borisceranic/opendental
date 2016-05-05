@@ -343,6 +343,8 @@
     <Compile Include="Crud\OperatoryCrud.cs" />
     <Compile Include="Crud\OrionProcCrud.cs" />
     <Compile Include="Crud\OrthoChartCrud.cs" />
+    <Compile Include="Crud\OrthoChartTabCrud.cs" />
+    <Compile Include="Crud\OrthoChartTabLinkCrud.cs" />
     <Compile Include="Crud\PatFieldCrud.cs" />
     <Compile Include="Crud\PatFieldDefCrud.cs" />
     <Compile Include="Crud\PatientCrud.cs" />
@@ -443,6 +445,8 @@
     <Compile Include="Data Interface\InsVerifies.cs" />
     <Compile Include="Data Interface\InsVerifyHists.cs" />
     <Compile Include="Data Interface\JobLogs.cs" />
+    <Compile Include="Data Interface\OrthoChartTabLinks.cs" />
+    <Compile Include="Data Interface\OrthoChartTabs.cs" />
     <Compile Include="Data Interface\TreatPlanAttaches.cs" />
     <Compile Include="Data Interface\UpdateHistories.cs" />
     <Compile Include="Data Interface\UserOdPrefs.cs" />
@@ -1013,6 +1017,8 @@
     <Compile Include="Reports\RpProdInc.cs" />
     <Compile Include="Reports\RpRouting.cs" />
     <Compile Include="TableTypes\DisplayReport.cs" />
+    <Compile Include="TableTypes\OrthoChartTabLink.cs" />
+    <Compile Include="TableTypes\OrthoChartTab.cs" />
     <Compile Include="TableTypes\UpdateHistory.cs" />
     <Compile Include="TableTypes\ApptComm.cs" />
     <Compile Include="TableTypes\CDSPermission.cs" />

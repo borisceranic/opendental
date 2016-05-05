@@ -29,7 +29,7 @@ namespace OpenDental {
 		private bool _topazNeedsSaved;
 
 		public FormOrthoChart(Patient patCur) {
-			_patCur = patCur;
+			_patCur=patCur;
 			_prevRow=-1;
 			InitializeComponent();
 			Lan.F(this);
@@ -40,7 +40,7 @@ namespace OpenDental {
 			_tableOrtho=new DataTable("OrthoChartForPatient");
 			//define columns----------------------------------------------------------------------------------------------------------
 			_tableOrtho.Columns.Add("Date",typeof(DateTime));
-			_listOrthDisplayFields = DisplayFields.GetForCategory(DisplayFieldCategory.OrthoChart);
+			_listOrthDisplayFields=DisplayFields.GetForCategory(DisplayFieldCategory.OrthoChart);
 			_showSigBox=_listOrthDisplayFields.Any(x => x.InternalName=="Signature");//'Signature' is a field selected for display.
 			for(int i=0;i<_listOrthDisplayFields.Count;i++) {
 				_tableOrtho.Columns.Add((i+1).ToString());//named by number, but probably refer to by index
@@ -93,12 +93,33 @@ namespace OpenDental {
 			if(!_showSigBox) {
 				signatureBoxWrapper.Visible=false;
 			}
+			FillTabs();
 			FillGrid();
 			FillGridPat();
 		}
 
+		private void FillTabs() {
+			OrthoChartTab orthoChartTabSelected=null;
+			if(tabControl.SelectedIndex >= 0) {
+				orthoChartTabSelected=(OrthoChartTab)tabControl.TabPages[tabControl.SelectedIndex].Tag;
+			}
+			tabControl.TabPages.Clear();
+			for(int i=0;i<OrthoChartTabs.Listt.Count;i++) {
+				TabPage tabPage=new TabPage(OrthoChartTabs.Listt[i].TabName);
+				tabPage.Tag=OrthoChartTabs.Listt[i];
+				tabControl.TabPages.Add(tabPage);
+				if(orthoChartTabSelected!=null && OrthoChartTabs.Listt[i].OrthoChartTabNum==orthoChartTabSelected.OrthoChartTabNum) {
+					tabControl.SelectedIndex=i;
+				}
+			}
+			if(tabControl.SelectedIndex==-1) {
+				tabControl.SelectedIndex=0;
+			}
+		}
+
 		/// <summary>Clears the current grid and fills from datatable.  Do not call unless you have saved changes to database first.</summary>
 		private void FillGrid() {
+			Text=OrthoChartTabs.Listt[0].TabName;
 			int gridMainScrollValue=gridMain.ScrollValue;
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
@@ -198,6 +219,18 @@ namespace OpenDental {
 				gridPat.Rows.Add(row);
 			}
 			gridPat.EndUpdate();
+		}
+
+		private void menuItemSetup_Click(object sender,EventArgs e) {
+			FormDisplayFieldsOrthoChart form=new FormDisplayFieldsOrthoChart();
+			if(form.ShowDialog()==DialogResult.OK) {
+				FillTabs();
+				FillGrid();
+			}
+		}
+
+		private void tabControl_TabIndexChanged(object sender,EventArgs e) {
+			FillGrid();
 		}
 
 		private void gridMain_CellTextChanged(object sender,EventArgs e) {
@@ -737,5 +770,6 @@ namespace OpenDental {
 				return (IsTopaz ? "1" : "0")+":"+SigString;
 			}
 		}
+
 	}
 }

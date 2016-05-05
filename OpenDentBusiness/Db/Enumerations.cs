@@ -303,7 +303,9 @@ namespace OpenDentBusiness{
 		///<summary>67</summary>
 		UserClinics,
 		///<summary>68. Replaces the deprecated "Date" invalid type for more granularity on invalid signals.</summary>
-		Appointment
+		Appointment,
+		///<summary>69</summary>
+		OrthoChartTabs,
 	}
 	//<summary></summary>
 	/*public enum ButtonType{

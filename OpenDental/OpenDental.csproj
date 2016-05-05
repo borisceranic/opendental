@@ -422,6 +422,18 @@
     <Compile Include="Forms\FormAddTxCredit.designer.cs">
       <DependentUpon>FormAddTxCredit.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormOrthoChartSetup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormOrthoChartSetup.designer.cs">
+      <DependentUpon>FormOrthoChartSetup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FormOrthoChartTabEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormOrthoChartTabEdit.designer.cs">
+      <DependentUpon>FormOrthoChartTabEdit.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormAdjustmentPicker.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -442,6 +454,9 @@
     </Compile>
     <Compile Include="Forms\FormPayPlanUpdate.designer.cs">
       <DependentUpon>FormPayPlanUpdate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FormDisplayFieldsOrthoChart.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\FormPaySplitSelect.cs">
       <SubType>Form</SubType>
@@ -4105,6 +4120,12 @@
     <EmbeddedResource Include="Forms\FormAddTxCredit.resx">
       <DependentUpon>FormAddTxCredit.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormOrthoChartSetup.resx">
+      <DependentUpon>FormOrthoChartSetup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormOrthoChartTabEdit.resx">
+      <DependentUpon>FormOrthoChartTabEdit.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormAdjustmentPicker.resx">
       <DependentUpon>FormAdjustmentPicker.cs</DependentUpon>
     </EmbeddedResource>
@@ -4116,6 +4137,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormPayPlanUpdate.resx">
       <DependentUpon>FormPayPlanUpdate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormDisplayFieldsOrthoChart.resx">
+      <DependentUpon>FormDisplayFieldsOrthoChart.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormPaySplitSelect.resx">
       <DependentUpon>FormPaySplitSelect.cs</DependentUpon>

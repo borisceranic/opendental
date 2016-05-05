@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -1006,11 +1007,100 @@ namespace OpenDentBusiness {
 					command="INSERT INTO preference (PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'PayPeriodPayDay','0')";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS orthocharttab";
+					Db.NonQ(command);
+					command=@"CREATE TABLE orthocharttab (
+						OrthoChartTabNum bigint NOT NULL auto_increment PRIMARY KEY,
+						TabName varchar(255) NOT NULL,
+						ItemOrder int NOT NULL,
+						IsHidden tinyint NOT NULL
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE orthocharttab'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE orthocharttab (
+						OrthoChartTabNum number(20) NOT NULL,
+						TabName varchar2(255),
+						ItemOrder number(11) NOT NULL,
+						IsHidden number(3) NOT NULL,
+						CONSTRAINT orthocharttab_OrthoChartTabNum PRIMARY KEY (OrthoChartTabNum)
+						)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS orthocharttablink";
+					Db.NonQ(command);
+					command=@"CREATE TABLE orthocharttablink (
+						OrthoChartTabLinkNum bigint NOT NULL auto_increment PRIMARY KEY,
+						ItemOrder int NOT NULL,
+						OrthoChartTabNum bigint NOT NULL,
+						DisplayFieldNum bigint NOT NULL,
+						INDEX(OrthoChartTabNum),
+						INDEX(DisplayFieldNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE orthocharttablink'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE orthocharttablink (
+						OrthoChartTabLinkNum number(20) NOT NULL,
+						ItemOrder number(11) NOT NULL,
+						OrthoChartTabNum number(20) NOT NULL,
+						DisplayFieldNum number(20) NOT NULL,
+						CONSTRAINT orthocharttablink_TabLinkNum PRIMARY KEY (OrthoChartTabLinkNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX orthocharttablink_TabNum ON orthocharttablink (OrthoChartTabNum)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX orthocharttablink_DisplayField ON orthocharttablink (DisplayFieldNum)";
+					Db.NonQ(command);
+				}
+				string tabNameDefault="Ortho Chart";
+				if(!CultureInfo.CurrentCulture.Name.EndsWith("US")) {//Not United States
+					command="SELECT Translation FROM languageforeign "
+						+"WHERE ClassType='ContrChart' AND English='Ortho Chart' AND Culture='"+CultureInfo.CurrentCulture.Name+"'";
+					DataTable tableTrans=Db.GetTable(command);
+					if(tableTrans.Rows.Count > 0) {
+						tabNameDefault=tableTrans.Rows[0][0].ToString();
+					}
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO orthocharttab(TabName,ItemOrder,IsHidden) VALUES ('"+POut.String(tabNameDefault)+"',0,0)";
+				}
+				else {//oracle
+					command="INSERT INTO orthocharttab(OrthoChartTabNum,TabName,ItemOrder,IsHidden) "
+						+"VALUES ((SELECT COALESCE(MAX(OrthoChartTabNum),0)+1 FROM orthocharttab),'"+POut.String(tabNameDefault)+"',0,0)";					
+				}
+				long orthoChartTabNum=Db.NonQ(command,true);				
+				command="SELECT DisplayFieldNum FROM displayfield WHERE Category=8";//Ortho Chart display fields
+				table=Db.GetTable(command);
+				//Move all existing display fields into the default ortho chart tab.
+				for(int i=0;i<table.Rows.Count;i++) {
+					long displayFieldNum=PIn.Long(table.Rows[i]["DisplayFieldNum"].ToString());
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						command="INSERT INTO orthocharttablink (ItemOrder,OrthoChartTabNum,DisplayFieldNum) "
+							+"VALUES ("+POut.Int(i)+","+POut.Long(orthoChartTabNum)+","+POut.Long(displayFieldNum)+")";
+					}
+					else {//oracle
+						command="INSERT INTO orthocharttablink (OrthoChartTabLinkNum,ItemOrder,OrthoChartTabNum,DisplayFieldNum) "
+							+"VALUES ((SELECT COALESCE(MAX(OrthoChartTabLinkNum),0)+1 FROM orthocharttablink),"
+							+POut.Int(i)+","+POut.Long(orthoChartTabNum)+","+POut.Long(displayFieldNum)+")";
+					}
+					Db.NonQ(command);
+				}
+
+
+
 
 				command="UPDATE preference SET ValueString = '16.2.0.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			//To16_2_1();
 		}
+
 	}
 }

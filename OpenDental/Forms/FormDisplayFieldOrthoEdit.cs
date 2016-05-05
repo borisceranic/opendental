@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using OpenDentBusiness;
 
@@ -19,7 +20,8 @@ namespace OpenDental{
 		/// <summary>Required designer variable.</summary>
 		private System.ComponentModel.Container components = null;
 		public DisplayField FieldCur;
-		public List<DisplayField> ListShowing;
+		///<summary>Used to make sure the user is not adding a duplicate field.</summary>
+		public List<DisplayField> ListAllFields;
 		private Label labelLine;
 		private TextBox textPickList;
 		private UI.Button butDown;
@@ -419,6 +421,16 @@ namespace OpenDental{
 		private void butOK_Click(object sender, System.EventArgs e) {
 			if(textWidth.errorProvider1.GetError(textWidth)!="") {
 				MsgBox.Show(this,"Please fix data entry errors first.");
+				return;
+			}
+			if(textDescription.Text.Trim()=="") {
+				MsgBox.Show(this,"Description cannot be blank.");
+				return;
+			}
+			//Verify that the user did not change the field name to the same name as another field.
+			DisplayField displayFieldOther=ListAllFields.FirstOrDefault(x => x!=FieldCur && x.Description==FieldCur.Description);
+			if(displayFieldOther!=null) {
+				MsgBox.Show(this,"That field name already exists.");
 				return;
 			}
 			FieldCur.Description=textDescription.Text;

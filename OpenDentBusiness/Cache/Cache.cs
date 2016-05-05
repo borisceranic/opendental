@@ -182,6 +182,10 @@ namespace OpenDentBusiness {
 			if(itypes.Contains((int)InvalidType.Operatories) || isAll){
 				ds.Tables.Add(Operatories.RefreshCache());
 			}
+			if(itypes.Contains((int)InvalidType.OrthoChartTabs) || isAll){
+				ds.Tables.Add(OrthoChartTabs.RefreshCache());
+				ds.Tables.Add(OrthoChartTabLinks.RefreshCache());
+			}
 			if(itypes.Contains((int)InvalidType.PatFields) || isAll) {
 				ds.Tables.Add(PatFieldDefs.RefreshCache());
 				ds.Tables.Add(ApptFieldDefs.RefreshCache());
@@ -403,6 +407,10 @@ namespace OpenDentBusiness {
 			if(itypes.Contains((int)InvalidType.Operatories) || isAll) {
 				Operatories.FillCache(ds.Tables["Operatory"]);
 			}
+			if(itypes.Contains((int)InvalidType.OrthoChartTabs) || isAll) {
+				OrthoChartTabs.FillCache(ds.Tables["OrthoChartTab"]);
+				OrthoChartTabLinks.FillCache(ds.Tables["OrthoChartTabLink"]);
+			}
 			if(itypes.Contains((int)InvalidType.PatFields) || isAll) {
 				PatFieldDefs.FillCache(ds.Tables["PatFieldDef"]);
 				ApptFieldDefs.FillCache(ds.Tables["ApptFieldDef"]);
@@ -573,6 +581,8 @@ namespace OpenDentBusiness {
 			listInvalidTypes.Add(InvalidType.StateAbbrs);
 			listInvalidTypes.Add(InvalidType.RequiredFields);
 			listInvalidTypes.Add(InvalidType.Ebills);
+			listInvalidTypes.Add(InvalidType.UserClinics);
+			listInvalidTypes.Add(InvalidType.OrthoChartTabs);
 			return listInvalidTypes;
 		}
 
