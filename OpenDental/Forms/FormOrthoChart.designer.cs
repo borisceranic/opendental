@@ -36,15 +36,15 @@ namespace OpenDental{
 			// 
 			// gridPat
 			// 
-			this.gridPat.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridPat.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridPat.HasAddButton = false;
 			this.gridPat.HasMultilineHeaders = false;
 			this.gridPat.HScrollVisible = false;
-			this.gridPat.Location = new System.Drawing.Point(10, 427);
+			this.gridPat.Location = new System.Drawing.Point(12, 12);
 			this.gridPat.Name = "gridPat";
 			this.gridPat.ScrollValue = 0;
-			this.gridPat.Size = new System.Drawing.Size(371, 230);
+			this.gridPat.Size = new System.Drawing.Size(546, 201);
 			this.gridPat.TabIndex = 6;
 			this.gridPat.Title = "Patient Fields";
 			this.gridPat.TranslationName = null;
@@ -52,12 +52,13 @@ namespace OpenDental{
 			// 
 			// gridMain
 			// 
-			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridMain.HasAddButton = false;
 			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = true;
-			this.gridMain.Location = new System.Drawing.Point(10, 12);
+			this.gridMain.Location = new System.Drawing.Point(12, 219);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
 			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.OneCell;
@@ -74,7 +75,7 @@ namespace OpenDental{
 			// 
 			this.signatureBoxWrapper.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.signatureBoxWrapper.BackColor = System.Drawing.SystemColors.ControlDark;
-			this.signatureBoxWrapper.Location = new System.Drawing.Point(562, 427);
+			this.signatureBoxWrapper.Location = new System.Drawing.Point(564, 132);
 			this.signatureBoxWrapper.Name = "signatureBoxWrapper";
 			this.signatureBoxWrapper.SignatureMode = OpenDental.UI.SignatureBoxWrapper.SigMode.OrthoChart;
 			this.signatureBoxWrapper.Size = new System.Drawing.Size(364, 81);
@@ -101,12 +102,12 @@ namespace OpenDental{
 			// butAudit
 			// 
 			this.butAudit.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butAudit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butAudit.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
 			this.butAudit.Autosize = true;
 			this.butAudit.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAudit.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAudit.CornerRadius = 4F;
-			this.butAudit.Location = new System.Drawing.Point(473, 634);
+			this.butAudit.Location = new System.Drawing.Point(429, 634);
 			this.butAudit.Name = "butAudit";
 			this.butAudit.Size = new System.Drawing.Size(80, 23);
 			this.butAudit.TabIndex = 108;
@@ -116,11 +117,12 @@ namespace OpenDental{
 			// butUseAutoNote
 			// 
 			this.butUseAutoNote.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butUseAutoNote.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.butUseAutoNote.Autosize = false;
 			this.butUseAutoNote.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butUseAutoNote.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butUseAutoNote.CornerRadius = 4F;
-			this.butUseAutoNote.Location = new System.Drawing.Point(473, 427);
+			this.butUseAutoNote.Location = new System.Drawing.Point(96, 634);
 			this.butUseAutoNote.Name = "butUseAutoNote";
 			this.butUseAutoNote.Size = new System.Drawing.Size(80, 23);
 			this.butUseAutoNote.TabIndex = 107;
@@ -130,11 +132,12 @@ namespace OpenDental{
 			// butAdd
 			// 
 			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.butAdd.Autosize = false;
 			this.butAdd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAdd.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAdd.CornerRadius = 4F;
-			this.butAdd.Location = new System.Drawing.Point(387, 427);
+			this.butAdd.Location = new System.Drawing.Point(10, 634);
 			this.butAdd.Name = "butAdd";
 			this.butAdd.Size = new System.Drawing.Size(80, 23);
 			this.butAdd.TabIndex = 9;
@@ -171,6 +174,7 @@ namespace OpenDental{
 			this.Controls.Add(this.gridPat);
 			this.Controls.Add(this.gridMain);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.MinimumSize = new System.Drawing.Size(492, 446);
 			this.Name = "FormOrthoChart";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Ortho Chart";
