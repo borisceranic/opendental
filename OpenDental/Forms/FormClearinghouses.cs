@@ -4,6 +4,7 @@ using OpenDentBusiness;
 using System.Net;
 using System.Collections.Generic;
 using OpenDental.UI;
+using System.Globalization;
 
 namespace OpenDental{
 	/// <summary>
@@ -36,6 +37,7 @@ namespace OpenDental{
 		private List<Clearinghouse> _listClearinghousesClinicAll;
 		private long _selectedClinicNum;
 		private Label labelGuide;
+		private UI.Button butEligibility;
 		private List<Clinic> _listClinics;
 
 		///<summary></summary>
@@ -76,6 +78,7 @@ namespace OpenDental{
 		{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormClearinghouses));
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.butEligibility = new OpenDental.UI.Button();
 			this.butDefaultMedical = new OpenDental.UI.Button();
 			this.butDefaultDental = new OpenDental.UI.Button();
 			this.textReportCheckInterval = new System.Windows.Forms.TextBox();
@@ -96,14 +99,29 @@ namespace OpenDental{
 			// groupBox1
 			// 
 			this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.groupBox1.Controls.Add(this.butEligibility);
 			this.groupBox1.Controls.Add(this.butDefaultMedical);
 			this.groupBox1.Controls.Add(this.butDefaultDental);
 			this.groupBox1.Location = new System.Drawing.Point(6, 387);
 			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(97, 86);
+			this.groupBox1.Size = new System.Drawing.Size(97, 112);
 			this.groupBox1.TabIndex = 9;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Set Default";
+			// 
+			// butEligibility
+			// 
+			this.butEligibility.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butEligibility.Autosize = true;
+			this.butEligibility.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butEligibility.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butEligibility.CornerRadius = 4F;
+			this.butEligibility.Location = new System.Drawing.Point(15, 79);
+			this.butEligibility.Name = "butEligibility";
+			this.butEligibility.Size = new System.Drawing.Size(75, 24);
+			this.butEligibility.TabIndex = 3;
+			this.butEligibility.Text = "Eligibility";
+			this.butEligibility.Click += new System.EventHandler(this.butEligibility_Click);
 			// 
 			// butDefaultMedical
 			// 
@@ -223,7 +241,7 @@ namespace OpenDental{
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(807, 465);
+			this.butClose.Location = new System.Drawing.Point(805, 466);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(75, 24);
 			this.butClose.TabIndex = 0;
@@ -235,6 +253,7 @@ namespace OpenDental{
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasAddButton = false;
 			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(6, 39);
@@ -279,7 +298,6 @@ namespace OpenDental{
 			// 
 			// FormClearinghouses
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(891, 503);
 			this.Controls.Add(this.labelGuide);
 			this.Controls.Add(this.labelClinic);
@@ -298,7 +316,6 @@ namespace OpenDental{
 			this.MinimumSize = new System.Drawing.Size(850, 500);
 			this.Name = "FormClearinghouses";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "E-Claims";
 			this.Closing += new System.ComponentModel.CancelEventHandler(this.FormClearinghouses_Closing);
 			this.Load += new System.EventHandler(this.FormClearinghouses_Load);
@@ -320,6 +337,9 @@ namespace OpenDental{
 				comboClinic.Visible=true;
 				labelClinic.Visible=true;
 				FillClinics();
+			}
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {
+				butEligibility.Visible=false;
 			}
 			FillGrid();
 		}
@@ -371,6 +391,14 @@ namespace OpenDental{
 						s+=",";
 					}
 					s+="Med";
+				}
+				if(PrefC.GetLong(PrefName.ClearinghouseDefaultEligibility)==_listClearinghousesHq[i].ClearinghouseNum 
+					&& !CultureInfo.CurrentCulture.Name.EndsWith("CA")) //Canadian. en-CA or fr-CA
+				{
+					if(s!="") {
+						s+=",";
+					}
+					s+="Elig";
 				}
 				row.Cells.Add(s);
 				row.Cells.Add(clearinghouseCur.Payors);
@@ -463,7 +491,17 @@ namespace OpenDental{
 				MsgBox.Show(this,"The selected clearinghouse must first be set to a dental e-claim format.");
 				return;
 			}
+			bool isInvalid=false;
+			if(!CultureInfo.CurrentCulture.Name.EndsWith("CA") 
+				&& PrefC.GetLong(PrefName.ClearinghouseDefaultEligibility)==0
+				&& Prefs.UpdateLong(PrefName.ClearinghouseDefaultEligibility,ch.ClearinghouseNum)) 
+			{
+				isInvalid=true;
+			}
 			if(Prefs.UpdateLong(PrefName.ClearinghouseDefaultDent,ch.ClearinghouseNum)) {
+				isInvalid=true;
+			}
+			if(isInvalid) {
 				DataValid.SetInvalid(InvalidType.Prefs);
 			}
 			FillGrid();
@@ -474,12 +512,34 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please select a row first.");
 				return;
 			}
-			Clearinghouse clearinghouseHq=_listClearinghousesHq[gridMain.GetSelectedIndex()];
-			if(clearinghouseHq.Eformat!=ElectronicClaimFormat.x837_5010_med_inst){//anything except the med/inst format
+			Clearinghouse ch=_listClearinghousesHq[gridMain.GetSelectedIndex()];
+			if(ch.Eformat!=ElectronicClaimFormat.x837_5010_med_inst){//anything except the med/inst format
 				MsgBox.Show(this,"The selected clearinghouse must first be set to the med/inst e-claim format.");
 				return;
 			}
-			if(Prefs.UpdateLong(PrefName.ClearinghouseDefaultMed,clearinghouseHq.ClearinghouseNum)) {
+			bool isInvalid=false;
+			if(!CultureInfo.CurrentCulture.Name.EndsWith("CA") 
+				&& PrefC.GetLong(PrefName.ClearinghouseDefaultEligibility)==0
+				&& Prefs.UpdateLong(PrefName.ClearinghouseDefaultEligibility,ch.ClearinghouseNum)) 
+			{
+				isInvalid=true;
+			}
+			if(Prefs.UpdateLong(PrefName.ClearinghouseDefaultMed,ch.ClearinghouseNum)) {
+				isInvalid=true;
+			}
+			if(isInvalid) {
+				DataValid.SetInvalid(InvalidType.Prefs);
+			}
+			FillGrid();
+		}
+
+		private void butEligibility_Click(object sender,EventArgs e) {
+			if(gridMain.GetSelectedIndex()==-1){
+					MsgBox.Show(this,"Please select a row first.");
+					return;
+			}
+			Clearinghouse ch=_listClearinghousesHq[gridMain.GetSelectedIndex()];
+			if(Prefs.UpdateLong(PrefName.ClearinghouseDefaultEligibility,ch.ClearinghouseNum)) {
 				DataValid.SetInvalid(InvalidType.Prefs);
 			}
 			FillGrid();
@@ -552,12 +612,6 @@ namespace OpenDental{
 			_selectedClinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
 			FillGrid();
 		}
-
-
-
-
-
-
 
 	}
 }

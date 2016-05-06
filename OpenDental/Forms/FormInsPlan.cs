@@ -3706,7 +3706,7 @@ namespace OpenDental{
 				return;
 			}
 			//Visible for everyone.
-			Clearinghouse clearinghouseHq=Clearinghouses.GetDefaultDental();
+			Clearinghouse clearinghouseHq=Clearinghouses.GetDefaultEligibility();
 			if(clearinghouseHq==null){
 				MsgBox.Show(this,"No clearinghouse is set as default.");
 				return;

@@ -202,6 +202,9 @@ namespace OpenDentBusiness {
 		ClaimSnapshotTriggerType,
 		ClaimsValidateACN,
 		ClearinghouseDefaultDent,
+		///<summary>FK to clearinghouse.ClearingHouseNum.  Allows a different clearinghouse to be used for checking eligibility.
+		///Defaults to the current dental (or medical) clearinghouse which preserves old behavior.</summary>
+		ClearinghouseDefaultEligibility,
 		ClearinghouseDefaultMed,
 		///<summary>Boolean.  0 by default.  If enabled, lists clinics in alphabetical order.</summary>
 		ClinicListIsAlphabetical,

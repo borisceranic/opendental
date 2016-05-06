@@ -123,6 +123,12 @@ namespace OpenDentBusiness{
 			return listClearinghouses;
 		}
 
+		///<summary>Returns the HQ-level default clearinghouse.  You must manually override using OverrideFields if needed.  If no default present, returns null.</summary>
+		public static Clearinghouse GetDefaultEligibility() {
+			//No need to check RemotingRole; no call to db.
+			return GetClearinghouse(PrefC.GetLong(PrefName.ClearinghouseDefaultEligibility));
+		}
+
 		///<summary>Inserts one clearinghouse into the database.  Use this if you know that your clearinghouse will be inserted at the HQ-level.</summary>
 		public static long Insert(Clearinghouse clearinghouse){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
