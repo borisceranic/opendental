@@ -98,7 +98,10 @@ namespace OpenDental {
 			FillGridPat();
 		}
 
+		///<summary>Sets the title of the form to the TabName of the first tab in the cache and then refreshes the current tabs.</summary>
 		private void FillTabs() {
+			//Set the title of this form to the first tab in the list.  The button to launch the Ortho Chart from the Chart module will be the same.
+			Text=OrthoChartTabs.Listt[0].TabName;//It is considered database corruption if this fails.
 			OrthoChartTab orthoChartTabSelected=null;
 			if(tabControl.SelectedIndex >= 0) {
 				orthoChartTabSelected=(OrthoChartTab)tabControl.TabPages[tabControl.SelectedIndex].Tag;
@@ -117,9 +120,8 @@ namespace OpenDental {
 			}
 		}
 
-		/// <summary>Clears the current grid and fills from datatable.  Do not call unless you have saved changes to database first.</summary>
+		///<summary>Clears the current grid and fills from datatable.  Do not call unless you have saved changes to database first.</summary>
 		private void FillGrid() {
-			Text=OrthoChartTabs.Listt[0].TabName;
 			int gridMainScrollValue=gridMain.ScrollValue;
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();

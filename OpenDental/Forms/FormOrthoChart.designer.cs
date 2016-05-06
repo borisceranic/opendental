@@ -179,6 +179,7 @@ namespace OpenDental{
 			this.tabControl.SelectedIndex = 0;
 			this.tabControl.Size = new System.Drawing.Size(954, 23);
 			this.tabControl.TabIndex = 111;
+			this.tabControl.SelectedIndexChanged += new System.EventHandler(this.tabControl_TabIndexChanged);
 			this.tabControl.TabIndexChanged += new System.EventHandler(this.tabControl_TabIndexChanged);
 			// 
 			// tabPage1

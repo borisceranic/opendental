@@ -61,6 +61,7 @@ namespace OpenDental {
 			OrthoChartTab orthoChartTabTemp=_listNewOrthoChartTabs[index];
 			_listNewOrthoChartTabs[index]=_listNewOrthoChartTabs[index+1];
 			_listNewOrthoChartTabs[index+1]=orthoChartTabTemp;
+			FillGridTabNames();
 		}
 
 		private void butUp_Click(object sender,EventArgs e) {
@@ -74,6 +75,7 @@ namespace OpenDental {
 			OrthoChartTab orthoChartTabTemp=_listNewOrthoChartTabs[index];
 			_listNewOrthoChartTabs[index]=_listNewOrthoChartTabs[index-1];
 			_listNewOrthoChartTabs[index-1]=orthoChartTabTemp;
+			FillGridTabNames();
 		}
 
 		private void gridTabNames_CellDoubleClick(object sender,UI.ODGridClickEventArgs e) {
@@ -88,7 +90,7 @@ namespace OpenDental {
 			bool isVisible=false;
 			for(int i=0;i<_listNewOrthoChartTabs.Count;i++) {
 				_listNewOrthoChartTabs[i].ItemOrder=i;
-				if(!_listDbOrthoChartTabs[i].IsHidden) {
+				if(!_listNewOrthoChartTabs[i].IsHidden) {
 					isVisible=true;
 				}
 			}

@@ -31,6 +31,8 @@ namespace OpenDental{
 		private List<OrthoChartTabFields> _listTabDisplayFields=new List<OrthoChartTabFields>();
 		///<summary>The list of existing display fields which are not currently in use within the selected ortho chart tab.</summary>
 		private List <DisplayField> _listAvailableFields=null;
+		///<summary>All ortho chart display fields available which includes "orphaned" display fields.  Filled on load.</summary>
+		private List<DisplayField> _listAllDisplayFields=null;
 
 		public FormDisplayFieldsOrthoChart() {
 			InitializeComponent();
@@ -79,7 +81,7 @@ namespace OpenDental{
 			this.listAvailable.Name = "listAvailable";
 			this.listAvailable.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
 			this.listAvailable.Size = new System.Drawing.Size(158, 227);
-			this.listAvailable.TabIndex = 15;
+			this.listAvailable.TabIndex = 3;
 			this.listAvailable.Click += new System.EventHandler(this.listAvailable_Click);
 			// 
 			// labelAvailable
@@ -129,7 +131,7 @@ namespace OpenDental{
 			this.textCustomField.Location = new System.Drawing.Point(373, 339);
 			this.textCustomField.Name = "textCustomField";
 			this.textCustomField.Size = new System.Drawing.Size(158, 20);
-			this.textCustomField.TabIndex = 59;
+			this.textCustomField.TabIndex = 0;
 			this.textCustomField.Click += new System.EventHandler(this.textCustomField_Click);
 			// 
 			// butOK
@@ -143,7 +145,7 @@ namespace OpenDental{
 			this.butOK.Location = new System.Drawing.Point(566, 474);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
-			this.butOK.TabIndex = 56;
+			this.butOK.TabIndex = 8;
 			this.butOK.Text = "OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
@@ -158,7 +160,7 @@ namespace OpenDental{
 			this.butRight.Location = new System.Drawing.Point(320, 292);
 			this.butRight.Name = "butRight";
 			this.butRight.Size = new System.Drawing.Size(35, 24);
-			this.butRight.TabIndex = 55;
+			this.butRight.TabIndex = 1;
 			this.butRight.Click += new System.EventHandler(this.butRight_Click);
 			// 
 			// butLeft
@@ -172,7 +174,7 @@ namespace OpenDental{
 			this.butLeft.Location = new System.Drawing.Point(320, 252);
 			this.butLeft.Name = "butLeft";
 			this.butLeft.Size = new System.Drawing.Size(35, 24);
-			this.butLeft.TabIndex = 54;
+			this.butLeft.TabIndex = 2;
 			this.butLeft.Click += new System.EventHandler(this.butLeft_Click);
 			// 
 			// butDown
@@ -187,7 +189,7 @@ namespace OpenDental{
 			this.butDown.Location = new System.Drawing.Point(109, 507);
 			this.butDown.Name = "butDown";
 			this.butDown.Size = new System.Drawing.Size(82, 24);
-			this.butDown.TabIndex = 14;
+			this.butDown.TabIndex = 7;
 			this.butDown.Text = "&Down";
 			this.butDown.Click += new System.EventHandler(this.butDown_Click);
 			// 
@@ -203,7 +205,7 @@ namespace OpenDental{
 			this.butUp.Location = new System.Drawing.Point(12, 507);
 			this.butUp.Name = "butUp";
 			this.butUp.Size = new System.Drawing.Size(82, 24);
-			this.butUp.TabIndex = 13;
+			this.butUp.TabIndex = 6;
 			this.butUp.Text = "&Up";
 			this.butUp.Click += new System.EventHandler(this.butUp_Click);
 			// 
@@ -218,7 +220,7 @@ namespace OpenDental{
 			this.butCancel.Location = new System.Drawing.Point(566, 504);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
-			this.butCancel.TabIndex = 0;
+			this.butCancel.TabIndex = 9;
 			this.butCancel.Text = "Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
@@ -228,7 +230,7 @@ namespace OpenDental{
 			this.comboOrthoChartTabs.Location = new System.Drawing.Point(59, 51);
 			this.comboOrthoChartTabs.Name = "comboOrthoChartTabs";
 			this.comboOrthoChartTabs.Size = new System.Drawing.Size(160, 21);
-			this.comboOrthoChartTabs.TabIndex = 60;
+			this.comboOrthoChartTabs.TabIndex = 4;
 			this.comboOrthoChartTabs.SelectionChangeCommitted += new System.EventHandler(this.comboOrthoChartTabs_SelectionChangeCommitted);
 			// 
 			// label1
@@ -251,7 +253,7 @@ namespace OpenDental{
 			this.butSetupTabs.Location = new System.Drawing.Point(222, 49);
 			this.butSetupTabs.Name = "butSetupTabs";
 			this.butSetupTabs.Size = new System.Drawing.Size(82, 24);
-			this.butSetupTabs.TabIndex = 62;
+			this.butSetupTabs.TabIndex = 5;
 			this.butSetupTabs.Text = "Setup Tabs";
 			this.butSetupTabs.Click += new System.EventHandler(this.butSetupTabs_Click);
 			// 
@@ -297,8 +299,9 @@ namespace OpenDental{
 			OrthoChartTabs.RefreshCache();
 			OrthoChartTabLinks.RefreshCache();
 			DisplayFields.RefreshCache();
-			List <DisplayField> listAllDisplayFields=DisplayFields.GetAllAvailableList(DisplayFieldCategory.OrthoChart);
+			_listAllDisplayFields=DisplayFields.GetAllAvailableList(DisplayFieldCategory.OrthoChart);
 			_listTabDisplayFields=new List<OrthoChartTabFields>();
+			//Add all fields that are actively associated to a tab to our class wide list of tabs and fields.
 			for(int i=0;i<OrthoChartTabs.Listt.Count;i++) {
 				OrthoChartTabFields orthoChartTabFields=new OrthoChartTabFields();
 				orthoChartTabFields.OrthoChartTab=OrthoChartTabs.Listt[i];
@@ -306,13 +309,24 @@ namespace OpenDental{
 				List <OrthoChartTabLink> listOrthoChartTabLinks=OrthoChartTabLinks.List.FindAll(
 					x => x.OrthoChartTabNum==OrthoChartTabs.Listt[i].OrthoChartTabNum);
 				foreach(OrthoChartTabLink orthoChartTabLink in listOrthoChartTabLinks) {
-					orthoChartTabFields.ListDisplayFields.AddRange(listAllDisplayFields.FindAll(x => x.DisplayFieldNum==orthoChartTabLink.DisplayFieldNum));
+					orthoChartTabFields.ListDisplayFields.AddRange(_listAllDisplayFields.FindAll(x => x.DisplayFieldNum==orthoChartTabLink.DisplayFieldNum));
 				}
 				_listTabDisplayFields.Add(orthoChartTabFields);
+			}
+			//Add a dummy OrthoChartTabFields object to the list that represents available fields that are not part of any tab.
+			//These "display fields" were previously used at least once. A patient has info for this field, then the office removed the field from all tabs.
+			List<DisplayField> listOrphanedFields=_listAllDisplayFields.FindAll(x => x.DisplayFieldNum==0);
+			if(listOrphanedFields!=null && listOrphanedFields.Count > 0) {
+				OrthoChartTabFields orphanedFields=new OrthoChartTabFields();
+				orphanedFields.OrthoChartTab=null;//These are fields not associated to any tab.  Purposefully use null.
+				orphanedFields.ListDisplayFields=new List<DisplayField>();
+				orphanedFields.ListDisplayFields.AddRange(listOrphanedFields);
+				_listTabDisplayFields.Add(orphanedFields);
 			}
 		}
 
 		private void FillComboOrthoChartTabs() {
+			//We can't remember the previously selected tab (unless we did it by name?) so just refill the combo box and select the first item in the list.
 			comboOrthoChartTabs.Items.Clear();
 			for(int i=0;i<OrthoChartTabs.Listt.Count;i++) {
 				comboOrthoChartTabs.Items.Add(OrthoChartTabs.Listt[i].TabName);
@@ -348,10 +362,14 @@ namespace OpenDental{
 			}
 		}
 
-		///<summary>Get the list of all unique display fields accross all ortho chart tabs.</summary>
-		private List<DisplayField> GetAllFields() {
+		///<summary>Get the list of all unique display fields accross all ortho chart tabs.
+		///Set hasOrphanedFields to false to exclude any "available" fields that are not currently associated to a tab.</summary>
+		private List<DisplayField> GetAllFields(bool hasOrphanedFields=true) {
 			List <DisplayField> listDisplayFields=new List<DisplayField>();
 			foreach(OrthoChartTabFields orthoChartTabFields in _listTabDisplayFields) {
+				if(!hasOrphanedFields && orthoChartTabFields.OrthoChartTab==null) {
+					continue;//Do not include orphaned fields.
+				}
 				foreach(DisplayField df in orthoChartTabFields.ListDisplayFields) {
 					if(!listDisplayFields.Contains(df)) {
 						listDisplayFields.Add(df);
@@ -364,7 +382,7 @@ namespace OpenDental{
 		///<summary>Gets the currently selected tab information.</summary>
 		private OrthoChartTabFields GetSelectedFields() {
 			long orthoChartTabNum=OrthoChartTabs.Listt[comboOrthoChartTabs.SelectedIndex].OrthoChartTabNum;
-			return _listTabDisplayFields.FirstOrDefault(x => x.OrthoChartTab.OrthoChartTabNum==orthoChartTabNum);
+			return _listTabDisplayFields.FirstOrDefault(x => x.OrthoChartTab!=null && x.OrthoChartTab.OrthoChartTabNum==orthoChartTabNum);
 		}
 
 		private void comboOrthoChartTabs_SelectionChangeCommitted(object sender,EventArgs e) {
@@ -376,24 +394,34 @@ namespace OpenDental{
 			if(form.ShowDialog()!=DialogResult.OK) {
 				return;
 			}
-			List <OrthoChartTabFields> listOldTabDisplayFields=_listTabDisplayFields;
+			List<OrthoChartTabFields> listOldTabDisplayFields=_listTabDisplayFields;
 			_listTabDisplayFields=new List<OrthoChartTabFields>();
 			//The tab order may have changed.  Also new tabs may have been added.  Tabs were not removed, because they can only be hidden not deleted.
 			//If orthocharttabs order changed or new tabs were added, then the cache was updated in FormOrthoChartSetup in OK click.
 			for(int i=0;i<OrthoChartTabs.Listt.Count;i++) {
 				OrthoChartTab orthoChartTab=OrthoChartTabs.Listt[i];
 				OrthoChartTabFields orthoChartTabFieldsOld=listOldTabDisplayFields.FirstOrDefault(
-					x => x.OrthoChartTab.OrthoChartTabNum==orthoChartTab.OrthoChartTabNum);
+					x => x.OrthoChartTab!=null && x.OrthoChartTab.OrthoChartTabNum==orthoChartTab.OrthoChartTabNum);
 				OrthoChartTabFields orthoChartTabFields=new OrthoChartTabFields();
 				orthoChartTabFields.OrthoChartTab=orthoChartTab;
-				if(orthoChartTabFieldsOld==null) {//A new tab was added.						
+				if(orthoChartTabFieldsOld==null) {//Either a new tab was added or a hidden tab was un-hidden.
 					orthoChartTabFields.ListDisplayFields=new List<DisplayField>();
+					List<OrthoChartTabLink> listOrthoChartTabLinks=OrthoChartTabLinks.List.FindAll(
+						x => x.OrthoChartTabNum==OrthoChartTabs.Listt[i].OrthoChartTabNum);
+					foreach(OrthoChartTabLink orthoChartTabLink in listOrthoChartTabLinks) {
+						orthoChartTabFields.ListDisplayFields.AddRange(_listAllDisplayFields.FindAll(x => x.DisplayFieldNum==orthoChartTabLink.DisplayFieldNum));
+					}
 				}
 				else {//The tab already existed.  Maintain the display field names and order within the tab, especially if the tab order changed.
 					orthoChartTabFields.ListDisplayFields=orthoChartTabFieldsOld.ListDisplayFields;
 				}
 				_listTabDisplayFields.Add(orthoChartTabFields);
 			}
+			//Always add the orphaned OrthoChartTabFields back because they can not be affected from the Tab Setup window.
+			_listTabDisplayFields.AddRange(listOldTabDisplayFields.FindAll(x => x.OrthoChartTab==null));
+			//Refresh the combo box and the grid because there is a chance that the user was viewing a different tab than the first in the list.
+			FillComboOrthoChartTabs();
+			FillGrids();
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
@@ -526,7 +554,8 @@ namespace OpenDental{
 				DialogResult=DialogResult.OK;
 				return;
 			}
-			List <DisplayField> listAllFields=GetAllFields();
+			//Get all fields associated to a tab in order to sync with the database later.
+			List<DisplayField> listAllFields=GetAllFields(false);
 			if(listAllFields.Count(x=>x.InternalName=="Signature") > 1) {
 				MessageBox.Show(Lan.g(this,"Only one display field can be a signature field.  Fields that have the signature field checkbox checked:")+" "
 					+string.Join(", ",listAllFields.FindAll(x => x.InternalName=="Signature").Select(x => x.Description)));
@@ -547,7 +576,7 @@ namespace OpenDental{
 			for(int i=listOrthoChartTabLinks.Count-1;i>=0;i--) {
 				OrthoChartTabLink orthoChartTabLink=listOrthoChartTabLinks[i];
 				OrthoChartTabFields orthoChartTabFields=_listTabDisplayFields.FirstOrDefault(
-					x => x.OrthoChartTab.OrthoChartTabNum==orthoChartTabLink.OrthoChartTabNum);//Should never be null, since tabs cannot be deleted only hidden.
+					x => x.OrthoChartTab!=null && x.OrthoChartTab.OrthoChartTabNum==orthoChartTabLink.OrthoChartTabNum);
 				DisplayField df=orthoChartTabFields.ListDisplayFields.FirstOrDefault(x => x.DisplayFieldNum==orthoChartTabLink.DisplayFieldNum);
 				if(df==null) {//The tab link no longer exists (was removed).
 					listOrthoChartTabLinks.RemoveAt(i);
@@ -558,6 +587,10 @@ namespace OpenDental{
 			}
 			//Add new tab links which were just created.
 			foreach(OrthoChartTabFields orthoChartTabFields in _listTabDisplayFields) {
+				//Skip "orphaned" fields that just show in the available fields list.
+				if(orthoChartTabFields.OrthoChartTab==null) {
+					continue;
+				}
 				foreach(DisplayField df in orthoChartTabFields.ListDisplayFields) {
 					OrthoChartTabLink orthoChartTabLink=listOrthoChartTabLinks.FirstOrDefault(
 						x => x.OrthoChartTabNum==orthoChartTabFields.OrthoChartTab.OrthoChartTabNum && x.DisplayFieldNum==df.DisplayFieldNum);
@@ -583,6 +616,7 @@ namespace OpenDental{
 	}
 
 	internal class OrthoChartTabFields {
+		///<summary>Set or leave OrthoChartTab to null when storing the "orphaned" available fields (used in past and not associated to a tab).</summary>
 		public OrthoChartTab OrthoChartTab=null;
 		public List<DisplayField> ListDisplayFields=null;
 	}

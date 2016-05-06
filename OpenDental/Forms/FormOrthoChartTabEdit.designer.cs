@@ -42,7 +42,7 @@ namespace OpenDental{
 			this.butOK.Location = new System.Drawing.Point(148, 111);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
-			this.butOK.TabIndex = 3;
+			this.butOK.TabIndex = 2;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
@@ -57,13 +57,13 @@ namespace OpenDental{
 			this.butCancel.Location = new System.Drawing.Point(229, 111);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
-			this.butCancel.TabIndex = 2;
+			this.butCancel.TabIndex = 3;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
 			// label1
 			// 
-			this.label1.Location = new System.Drawing.Point(25, 32);
+			this.label1.Location = new System.Drawing.Point(22, 31);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(97, 20);
 			this.label1.TabIndex = 4;
@@ -75,7 +75,7 @@ namespace OpenDental{
 			this.textTabName.Location = new System.Drawing.Point(123, 32);
 			this.textTabName.Name = "textTabName";
 			this.textTabName.Size = new System.Drawing.Size(100, 20);
-			this.textTabName.TabIndex = 5;
+			this.textTabName.TabIndex = 0;
 			// 
 			// checkIsHidden
 			// 
@@ -84,7 +84,7 @@ namespace OpenDental{
 			this.checkIsHidden.Name = "checkIsHidden";
 			this.checkIsHidden.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
 			this.checkIsHidden.Size = new System.Drawing.Size(71, 17);
-			this.checkIsHidden.TabIndex = 6;
+			this.checkIsHidden.TabIndex = 1;
 			this.checkIsHidden.Text = "Is Hidden";
 			this.checkIsHidden.UseVisualStyleBackColor = true;
 			// 
@@ -99,6 +99,7 @@ namespace OpenDental{
 			this.Controls.Add(this.butCancel);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+			this.MinimumSize = new System.Drawing.Size(332, 186);
 			this.Name = "FormOrthoChartTabEdit";
 			this.Text = "Ortho Chart Tab Edit";
 			this.Load += new System.EventHandler(this.FormOrthoChartTabEdit_Load);

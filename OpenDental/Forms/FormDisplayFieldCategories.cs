@@ -179,9 +179,16 @@ namespace OpenDental{
 			if(selectedCategory==DisplayFieldCategory.None) {
 				return;//This could happen if a programmer added a new item to the list and didn't include it in the switch statement above.
 			}
-			FormDisplayFields FormF=new FormDisplayFields();
-			FormF.Category=selectedCategory;
-			FormF.ShowDialog();
+			//The ortho chart is a more complicated display field so it has its own window.
+			if(selectedCategory==DisplayFieldCategory.OrthoChart) {
+				FormDisplayFieldsOrthoChart FormDFOC=new FormDisplayFieldsOrthoChart();
+				FormDFOC.ShowDialog();
+			}
+			else {//All other display fields use the base display fields window.
+				FormDisplayFields FormF=new FormDisplayFields();
+				FormF.Category=selectedCategory;
+				FormF.ShowDialog();
+			}
 			Close();
 		}
 

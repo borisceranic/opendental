@@ -1076,7 +1076,7 @@ namespace OpenDentBusiness {
 						+"VALUES ((SELECT COALESCE(MAX(OrthoChartTabNum),0)+1 FROM orthocharttab),'"+POut.String(tabNameDefault)+"',0,0)";					
 				}
 				long orthoChartTabNum=Db.NonQ(command,true);				
-				command="SELECT DisplayFieldNum FROM displayfield WHERE Category=8";//Ortho Chart display fields
+				command="SELECT DisplayFieldNum FROM displayfield WHERE Category=8 ORDER BY ItemOrder";//Ortho Chart display fields
 				table=Db.GetTable(command);
 				//Move all existing display fields into the default ortho chart tab.
 				for(int i=0;i<table.Rows.Count;i++) {
