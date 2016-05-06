@@ -306,8 +306,9 @@ namespace OpenDental{
 				OrthoChartTabFields orthoChartTabFields=new OrthoChartTabFields();
 				orthoChartTabFields.OrthoChartTab=OrthoChartTabs.Listt[i];
 				orthoChartTabFields.ListDisplayFields=new List<DisplayField>();
-				List <OrthoChartTabLink> listOrthoChartTabLinks=OrthoChartTabLinks.List.FindAll(
+				List<OrthoChartTabLink> listOrthoChartTabLinks=OrthoChartTabLinks.List.FindAll(
 					x => x.OrthoChartTabNum==OrthoChartTabs.Listt[i].OrthoChartTabNum);
+				listOrthoChartTabLinks.OrderBy(x => x.ItemOrder);
 				foreach(OrthoChartTabLink orthoChartTabLink in listOrthoChartTabLinks) {
 					orthoChartTabFields.ListDisplayFields.AddRange(_listAllDisplayFields.FindAll(x => x.DisplayFieldNum==orthoChartTabLink.DisplayFieldNum));
 				}
@@ -365,7 +366,7 @@ namespace OpenDental{
 		///<summary>Get the list of all unique display fields accross all ortho chart tabs.
 		///Set hasOrphanedFields to false to exclude any "available" fields that are not currently associated to a tab.</summary>
 		private List<DisplayField> GetAllFields(bool hasOrphanedFields=true) {
-			List <DisplayField> listDisplayFields=new List<DisplayField>();
+			List<DisplayField> listDisplayFields=new List<DisplayField>();
 			foreach(OrthoChartTabFields orthoChartTabFields in _listTabDisplayFields) {
 				if(!hasOrphanedFields && orthoChartTabFields.OrthoChartTab==null) {
 					continue;//Do not include orphaned fields.
@@ -452,7 +453,7 @@ namespace OpenDental{
 					}
 				}
 				//Use available field if user typed in a "new" field name which matches an available field that is not already showing.
-				List <DisplayField> listAllFields=GetAllFields();
+				List<DisplayField> listAllFields=GetAllFields();
 				foreach(DisplayField df in listAllFields) {
 					if(textCustomField.Text==df.Description) {
 						orthoChartTabFields.ListDisplayFields.Add(df);
@@ -470,10 +471,15 @@ namespace OpenDental{
 				textCustomField.Text="";
 			}
 			else {//Add existing ortho chart field(s).
+				OrthoChartTabFields orphanedTab=_listTabDisplayFields.Find(x => x.OrthoChartTab==null);
 				for(int i=0;i<listAvailable.SelectedItems.Count;i++) {
 					DisplayField df=_listAvailableFields[listAvailable.SelectedIndices[i]];
 					df.ColumnWidth=100;
 					orthoChartTabFields.ListDisplayFields.Add(df);
+					if(orphanedTab!=null) {
+						//Remove the display field from the orphaned list if there is one.
+						orphanedTab.ListDisplayFields.Remove(df);
+					}
 				}
 			}
 			changed=true;
@@ -485,11 +491,39 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please select an item in the grid on the left first.");
 				return;
 			}
+			List<DisplayField> listRemovedFields=new List<DisplayField>();
 			OrthoChartTabFields orthoChartTabFields=GetSelectedFields();
-			for(int i=gridMain.SelectedIndices.Length-1;i>=0;i--){//go backwards
+			for(int i=gridMain.SelectedIndices.Length-1;i>=0;i--) {//go backwards
 				int index=gridMain.SelectedIndices[i];
 				DisplayField df=(DisplayField)gridMain.Rows[index].Tag;
+				listRemovedFields.Add(df);//Keep track of all display fields removed.
 				orthoChartTabFields.ListDisplayFields.Remove(df);
+			}
+			//Now we need to check all removed fields and see if any are still associated with a tab.
+			//If they are not associated with any tabs then we need to remove them from our list.
+			//They will show up in the available fields list if a patient in the database has a value for the field.
+			foreach(DisplayField field in listRemovedFields) {
+				bool isFieldOrphaned=true;
+				foreach(OrthoChartTabFields tabFields in _listTabDisplayFields) {
+					if(tabFields.ListDisplayFields.Exists(x => x.DisplayFieldNum==field.DisplayFieldNum)) {
+						isFieldOrphaned=false;
+						break;//The field that was removed is still associated with a different tab so no action needed.
+					}
+				}
+				if(!isFieldOrphaned) {
+					continue;
+				}
+				//No tab has this display field so move it to the list of fields associated with the null tab
+				OrthoChartTabFields orphanedTab=_listTabDisplayFields.Find(x => x.OrthoChartTab==null);
+				if(orphanedTab==null) {//An orphaned list doesn't exist yet so create one.
+					OrthoChartTabFields orphanedFields=new OrthoChartTabFields();
+					orphanedFields.OrthoChartTab=null;//These are fields not associated to any tab.  Purposefully use null.
+					orphanedFields.ListDisplayFields=new List<DisplayField>();
+					orphanedFields.ListDisplayFields.Add(field);
+				}
+				else {
+					orphanedTab.ListDisplayFields.Add(field);
+				}
 			}
 			FillGrids();
 			changed=true;
@@ -572,7 +606,7 @@ namespace OpenDental{
 			}
 			DataValid.SetInvalid(InvalidType.DisplayFields);
 			//Remove tab links which no longer exist.  Update tab link item order for tab links which still belong to the same tab.
-			List <OrthoChartTabLink> listOrthoChartTabLinks=new List<OrthoChartTabLink>(OrthoChartTabLinks.List);
+			List<OrthoChartTabLink> listOrthoChartTabLinks=OrthoChartTabLinks.GetList();
 			for(int i=listOrthoChartTabLinks.Count-1;i>=0;i--) {
 				OrthoChartTabLink orthoChartTabLink=listOrthoChartTabLinks[i];
 				OrthoChartTabFields orthoChartTabFields=_listTabDisplayFields.FirstOrDefault(
@@ -603,6 +637,15 @@ namespace OpenDental{
 					orthoChartTabLink.DisplayFieldNum=df.DisplayFieldNum;
 					listOrthoChartTabLinks.Add(orthoChartTabLink);
 				}
+			}
+			//Delete any display fields that have a valid PK and are in the "orphaned" list.  
+			//This is fine to do because the field will show back up in the available list of display fields if a patient is still using the field.
+			//This is because we link the ortho chart display fields by their name instead of by their PK.
+			OrthoChartTabFields orphanedTab=_listTabDisplayFields.Find(x => x.OrthoChartTab==null);
+			if(orphanedTab!=null) {//An orphaned list actually exists.
+				//Look for any display fields that have a valid PK (this means the user removed this field from every tab and we need to delete it).
+				List<DisplayField> listFieldsToDelete=orphanedTab.ListDisplayFields.FindAll(x => x.DisplayFieldNum!=0);
+				listFieldsToDelete.ForEach(x => DisplayFields.Delete(x.DisplayFieldNum));
 			}
 			OrthoChartTabLinks.Sync(listOrthoChartTabLinks,OrthoChartTabLinks.List);
 			DataValid.SetInvalid(InvalidType.OrthoChartTabs);	

@@ -36,63 +36,7 @@ namespace OpenDental {
 		}
 
 		private void FormOrthoChart_Load(object sender,EventArgs e) {
-			//define the table----------------------------------------------------------------------------------------------------------
-			_tableOrtho=new DataTable("OrthoChartForPatient");
-			//define columns----------------------------------------------------------------------------------------------------------
-			_tableOrtho.Columns.Add("Date",typeof(DateTime));
-			_listOrthDisplayFields=DisplayFields.GetForCategory(DisplayFieldCategory.OrthoChart);
-			_showSigBox=_listOrthDisplayFields.Any(x => x.InternalName=="Signature");//'Signature' is a field selected for display.
-			for(int i=0;i<_listOrthDisplayFields.Count;i++) {
-				_tableOrtho.Columns.Add((i+1).ToString());//named by number, but probably refer to by index
-			}
-			//define rows------------------------------------------------------------------------------------------------------------
 			_listOrthoCharts=OrthoCharts.GetAllForPatient(_patCur.PatNum);
-			List<DateTime> datesShowing=new List<DateTime>();
-			_listDisplayFieldNames=new List<string>();
-			for(int i=0;i<_listOrthDisplayFields.Count;i++) {//fill listDisplayFieldNames to be used in comparison
-				_listDisplayFieldNames.Add(_listOrthDisplayFields[i].Description);
-			}
-			//start adding dates starting with today's date
-			datesShowing.Add(DateTime.Today);
-			for(int i=0;i<_listOrthoCharts.Count;i++) {
-				if(!_listDisplayFieldNames.Contains(_listOrthoCharts[i].FieldName)) {//skip rows not in display fields
-					continue;
-				}
-				if(!datesShowing.Contains(_listOrthoCharts[i].DateService)) {//add dates not already in date list
-					datesShowing.Add(_listOrthoCharts[i].DateService);
-				}
-			}
-			datesShowing.Sort();
-			//We now have a list of dates.
-			//add all blank cells to each row except for the date.
-			DataRow row;
-			//create and add row for each date in date showing
-			for(int i=0;i<datesShowing.Count;i++) {
-				row=_tableOrtho.NewRow();
-				row[0]=datesShowing[i];
-				for(int j=0;j<_listOrthDisplayFields.Count;j++) {
-					row[j+1]="";//j+1 because first row is date field.
-				}
-				_tableOrtho.Rows.Add(row);
-			}
-			//We now have a table with all empty strings in cells except dates.
-			//Fill with data as necessary.
-			for(int i=0;i<_listOrthoCharts.Count;i++) {//loop
-				if(!datesShowing.Contains(_listOrthoCharts[i].DateService)){
-					continue;
-				}
-				if(!_listDisplayFieldNames.Contains(_listOrthoCharts[i].FieldName)){
-					continue;
-				}
-				for(int j=0;j<_tableOrtho.Rows.Count;j++) {
-					if(_listOrthoCharts[i].DateService==(DateTime)_tableOrtho.Rows[j][0]) {
-						_tableOrtho.Rows[j][_listDisplayFieldNames.IndexOf(_listOrthoCharts[i].FieldName)+1]=_listOrthoCharts[i].FieldValue;
-					}
-				}
-			}
-			if(!_showSigBox) {
-				signatureBoxWrapper.Visible=false;
-			}
 			FillTabs();
 			FillGrid();
 			FillGridPat();
@@ -122,6 +66,11 @@ namespace OpenDental {
 
 		///<summary>Clears the current grid and fills from datatable.  Do not call unless you have saved changes to database first.</summary>
 		private void FillGrid() {
+			if(tabControl.SelectedIndex==-1) {
+				return;//This happens when the tab pages are cleared (updating the selected index).
+			}
+			//Make _tableOrtho match up to the display fields designated to the selected tab.
+			FillDataTable();
 			int gridMainScrollValue=gridMain.ScrollValue;
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
@@ -129,14 +78,19 @@ namespace OpenDental {
 			//First column will always be the date.  gridMain_CellLeave() depends on this fact.
 			col=new ODGridColumn(Lan.g(this,"Date"),70);
 			gridMain.Columns.Add(col);
-			for(int i=0;i<_listOrthDisplayFields.Count;i++) {
-				if(!string.IsNullOrEmpty(_listOrthDisplayFields[i].PickList)) {
-					List<string> listComboOptions=_listOrthDisplayFields[i].PickList.Split(new string[] { "\r\n" },StringSplitOptions.None).ToList();
-					col=new ODGridColumn(_listOrthDisplayFields[i].Description,_listOrthDisplayFields[i].ColumnWidth,listComboOptions);
+			List<DisplayField> listTabSpecificDisplayFields=new List<DisplayField>();
+			//Get all the corresponding fields from the OrthoChartTabLink table that are associated to the currently selected ortho tab.
+			OrthoChartTab orthoChartTab=OrthoChartTabs.Listt[tabControl.SelectedIndex];
+			List<OrthoChartTabLink> listTabLinks=OrthoChartTabLinks.List.FindAll(x => x.OrthoChartTabNum==orthoChartTab.OrthoChartTabNum);
+			listTabSpecificDisplayFields=_listOrthDisplayFields.FindAll(x => listTabLinks.Exists(y => y.DisplayFieldNum==x.DisplayFieldNum));
+			for(int i=0;i<listTabSpecificDisplayFields.Count;i++) {
+				if(!string.IsNullOrEmpty(listTabSpecificDisplayFields[i].PickList)) {
+					List<string> listComboOptions=listTabSpecificDisplayFields[i].PickList.Split(new string[] { "\r\n" },StringSplitOptions.None).ToList();
+					col=new ODGridColumn(listTabSpecificDisplayFields[i].Description,listTabSpecificDisplayFields[i].ColumnWidth,listComboOptions);
 				}
 				else {
-					col=new ODGridColumn(_listOrthDisplayFields[i].Description,_listOrthDisplayFields[i].ColumnWidth,true);
-					if(_listOrthDisplayFields[i].InternalName=="Signature") {
+					col=new ODGridColumn(listTabSpecificDisplayFields[i].Description,listTabSpecificDisplayFields[i].ColumnWidth,true);
+					if(listTabSpecificDisplayFields[i].InternalName=="Signature") {
 						_sigColIdx=i+1;//Plus 1 because of the date column
 						col.TextAlign=HorizontalAlignment.Center;
 						col.IsEditable=false;
@@ -152,13 +106,13 @@ namespace OpenDental {
 				DateTime tempDate=(DateTime)_tableOrtho.Rows[i][0];
 				row.Cells.Add(tempDate.ToShortDateString());
 				row.Tag=tempDate;
-				for(int j=0;j<_listOrthDisplayFields.Count;j++) {
+				for(int j=0;j<listTabSpecificDisplayFields.Count;j++) {
 					string cellValue="";
-					if(_listOrthDisplayFields[j].InternalName != "Signature") {
+					if(listTabSpecificDisplayFields[j].InternalName != "Signature") {
 						cellValue=_tableOrtho.Rows[i][j+1].ToString();
 					}
-					if(!string.IsNullOrEmpty(_listOrthDisplayFields[j].PickList)) {
-						List<string> listComboOptions=_listOrthDisplayFields[j].PickList.Split(new string[] { "\r\n" },StringSplitOptions.None).ToList();
+					if(!string.IsNullOrEmpty(listTabSpecificDisplayFields[j].PickList)) {
+						List<string> listComboOptions=listTabSpecificDisplayFields[j].PickList.Split(new string[] { "\r\n" },StringSplitOptions.None).ToList();
 						int selectedIndex=listComboOptions.FindIndex(x => x==cellValue);
 						row.Cells.Add(cellValue,selectedIndex);
 					}
@@ -181,6 +135,63 @@ namespace OpenDental {
 					SetSignature(i);
 				}
 				signatureBoxWrapper.ClearSignature();
+			}
+		}
+
+		private void FillDataTable() {
+			//define the table----------------------------------------------------------------------------------------------------------
+			_tableOrtho=new DataTable("OrthoChartForPatient");
+			//define columns----------------------------------------------------------------------------------------------------------
+			_tableOrtho.Columns.Add("Date",typeof(DateTime));
+			_listOrthDisplayFields=DisplayFields.GetForCategory(DisplayFieldCategory.OrthoChart);
+			_showSigBox=_listOrthDisplayFields.Any(x => x.InternalName=="Signature");//'Signature' is a field selected for display.
+			_listDisplayFieldNames=new List<string>();
+			for(int i=0;i<_listOrthDisplayFields.Count;i++) {
+				_tableOrtho.Columns.Add((i+1).ToString());//named by number, but probably refer to by index
+				_listDisplayFieldNames.Add(_listOrthDisplayFields[i].Description);//fill listDisplayFieldNames to be used in comparison
+			}
+			//define rows------------------------------------------------------------------------------------------------------------
+			List<DateTime> datesShowing=new List<DateTime>();
+			//start adding dates starting with today's date
+			datesShowing.Add(DateTime.Today);
+			for(int i=0;i<_listOrthoCharts.Count;i++) {
+				if(!_listDisplayFieldNames.Contains(_listOrthoCharts[i].FieldName)) {//skip rows not in display fields
+					continue;
+				}
+				if(!datesShowing.Contains(_listOrthoCharts[i].DateService)) {//add dates not already in date list
+					datesShowing.Add(_listOrthoCharts[i].DateService);
+				}
+			}
+			datesShowing.Sort();
+			//We now have a list of dates.
+			//add all blank cells to each row except for the date.
+			DataRow row;
+			//create and add row for each date in date showing
+			for(int i=0;i<datesShowing.Count;i++) {
+				row=_tableOrtho.NewRow();
+				row[0]=datesShowing[i];
+				for(int j=0;j<_listOrthDisplayFields.Count;j++) {
+					row[j+1]="";//j+1 because first row is date field.
+				}
+				_tableOrtho.Rows.Add(row);
+			}
+			//We now have a table with all empty strings in cells except dates.
+			//Fill with data as necessary.
+			for(int i=0;i<_listOrthoCharts.Count;i++) {//loop
+				if(!datesShowing.Contains(_listOrthoCharts[i].DateService)) {
+					continue;
+				}
+				if(!_listDisplayFieldNames.Contains(_listOrthoCharts[i].FieldName)) {
+					continue;
+				}
+				for(int j=0;j<_tableOrtho.Rows.Count;j++) {
+					if(_listOrthoCharts[i].DateService==(DateTime)_tableOrtho.Rows[j][0]) {
+						_tableOrtho.Rows[j][_listDisplayFieldNames.IndexOf(_listOrthoCharts[i].FieldName)+1]=_listOrthoCharts[i].FieldValue;
+					}
+				}
+			}
+			if(!_showSigBox) {
+				signatureBoxWrapper.Visible=false;
 			}
 		}
 
@@ -486,7 +497,7 @@ namespace OpenDental {
 		}
 
 		private void butAdd_Click(object sender,EventArgs e) {
-			FormOrthoChartAddDate FormOCAD = new FormOrthoChartAddDate();
+			FormOrthoChartAddDate FormOCAD=new FormOrthoChartAddDate();
 			FormOCAD.ShowDialog();
 			if(FormOCAD.DialogResult!=DialogResult.OK) {
 				return;
@@ -630,7 +641,7 @@ namespace OpenDental {
 			List<OrthoChart> listNew=new List<OrthoChart>();
 			for(int r=0;r<_tableOrtho.Rows.Count;r++) {
 				for(int c=1;c<_tableOrtho.Columns.Count;c++) {//skip col 0
-					OrthoChart tempChart = new OrthoChart();
+					OrthoChart tempChart=new OrthoChart();
 					tempChart.DateService=(DateTime)_tableOrtho.Rows[r][0];
 					tempChart.FieldName=_listOrthDisplayFields[c-1].Description;
 					tempChart.FieldValue=_tableOrtho.Rows[r][c].ToString();

@@ -30,6 +30,15 @@ namespace OpenDentBusiness{
 			}
 		}
 
+		///<summary>Gets a deep copy of the current cached list.</summary>
+		public static List<OrthoChartTabLink> GetList() {
+			List<OrthoChartTabLink> retVal=new List<OrthoChartTabLink>();
+			foreach(OrthoChartTabLink link in List) {
+				retVal.Add(link.Copy());
+			}
+			return retVal;
+		}
+
 		///<summary></summary>
 		public static DataTable RefreshCache(){
 			//No need to check RemotingRole; Calls GetTableRemotelyIfNeeded().

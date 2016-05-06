@@ -44,6 +44,16 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary></summary>
+		public static void Delete(long displayFieldNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),displayFieldNum);
+				return;
+			}
+			string command="DELETE FROM displayfield WHERE DisplayFieldNum = "+POut.Long(displayFieldNum);
+			Db.NonQ(command);
+		}
+
+		///<summary></summary>
 		public static void DeleteForChartView(long chartViewNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),chartViewNum);
