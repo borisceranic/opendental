@@ -305,9 +305,13 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<long>>(MethodBase.GetCurrentMethod(),oldNote);
 			}
-			oldNote=oldNote.Replace("\r","").Replace("\n","\r\n");
-			string command="SELECT TreatPlanNum FROM treatplan WHERE Note='"+POut.String(oldNote)+"' "+
-				"AND TPStatus IN ("+POut.Int((int)TreatPlanStatus.Active)+","+POut.Int((int)TreatPlanStatus.Inactive)+")";
+			oldNote=oldNote.Replace("\r","");
+			//oldNote=oldNote.Replace("\r","").Replace("\n","\r\n");
+			//oldNote=oldNote.Replace("\r","").Replace("\n","*?");
+			string command="SELECT TreatPlanNum FROM treatplan WHERE REPLACE(Note,'\\r','')='"+POut.String(oldNote)+"' "+
+			"AND TPStatus IN ("+POut.Int((int)TreatPlanStatus.Active)+","+POut.Int((int)TreatPlanStatus.Inactive)+")";
+			//string command="SELECT TreatPlanNum FROM treatplan WHERE Note='"+POut.String(oldNote)+"' "+
+			//	"AND TPStatus IN ("+POut.Int((int)TreatPlanStatus.Active)+","+POut.Int((int)TreatPlanStatus.Inactive)+")";
 			return Db.GetListLong(command);
 		}
 
