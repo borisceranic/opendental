@@ -25,12 +25,12 @@ namespace OpenDental{
 		private void InitializeComponent() {
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormCreditCardManage));
 			this.butClose = new OpenDental.UI.Button();
-			this.listCreditCards = new System.Windows.Forms.ListBox();
 			this.butDown = new OpenDental.UI.Button();
 			this.butUp = new OpenDental.UI.Button();
 			this.butAdd = new OpenDental.UI.Button();
 			this.labelStoreCCNumWarning = new System.Windows.Forms.Label();
 			this.butMoveTo = new OpenDental.UI.Button();
+			this.gridMain = new OpenDental.UI.ODGrid();
 			this.SuspendLayout();
 			// 
 			// butClose
@@ -41,35 +41,24 @@ namespace OpenDental{
 			this.butClose.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butClose.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butClose.CornerRadius = 4F;
-			this.butClose.Location = new System.Drawing.Point(210, 172);
+			this.butClose.Location = new System.Drawing.Point(332, 172);
 			this.butClose.Name = "butClose";
 			this.butClose.Size = new System.Drawing.Size(82, 26);
 			this.butClose.TabIndex = 2;
 			this.butClose.Text = "&Close";
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
-			// listCreditCards
-			// 
-			this.listCreditCards.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-			this.listCreditCards.FormattingEnabled = true;
-			this.listCreditCards.IntegralHeight = false;
-			this.listCreditCards.Location = new System.Drawing.Point(12, 12);
-			this.listCreditCards.Name = "listCreditCards";
-			this.listCreditCards.Size = new System.Drawing.Size(175, 186);
-			this.listCreditCards.TabIndex = 4;
-			this.listCreditCards.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listCreditCards_MouseDoubleClick);
-			// 
 			// butDown
 			// 
 			this.butDown.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.butDown.Autosize = true;
 			this.butDown.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butDown.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butDown.CornerRadius = 4F;
 			this.butDown.Image = global::OpenDental.Properties.Resources.down;
 			this.butDown.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butDown.Location = new System.Drawing.Point(210, 113);
+			this.butDown.Location = new System.Drawing.Point(332, 113);
 			this.butDown.Name = "butDown";
 			this.butDown.Size = new System.Drawing.Size(82, 26);
 			this.butDown.TabIndex = 37;
@@ -79,13 +68,14 @@ namespace OpenDental{
 			// butUp
 			// 
 			this.butUp.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butUp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.butUp.Autosize = true;
 			this.butUp.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butUp.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butUp.CornerRadius = 4F;
 			this.butUp.Image = global::OpenDental.Properties.Resources.up;
 			this.butUp.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butUp.Location = new System.Drawing.Point(210, 84);
+			this.butUp.Location = new System.Drawing.Point(332, 84);
 			this.butUp.Name = "butUp";
 			this.butUp.Size = new System.Drawing.Size(82, 26);
 			this.butUp.TabIndex = 38;
@@ -95,13 +85,14 @@ namespace OpenDental{
 			// butAdd
 			// 
 			this.butAdd.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.butAdd.Autosize = true;
 			this.butAdd.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butAdd.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butAdd.CornerRadius = 4F;
 			this.butAdd.Image = global::OpenDental.Properties.Resources.Add;
 			this.butAdd.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butAdd.Location = new System.Drawing.Point(210, 12);
+			this.butAdd.Location = new System.Drawing.Point(332, 12);
 			this.butAdd.Name = "butAdd";
 			this.butAdd.Size = new System.Drawing.Size(82, 26);
 			this.butAdd.TabIndex = 36;
@@ -123,32 +114,49 @@ namespace OpenDental{
 			// butMoveTo
 			// 
 			this.butMoveTo.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butMoveTo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.butMoveTo.Autosize = true;
 			this.butMoveTo.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butMoveTo.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butMoveTo.CornerRadius = 4F;
-			this.butMoveTo.Location = new System.Drawing.Point(210, 41);
+			this.butMoveTo.Location = new System.Drawing.Point(332, 41);
 			this.butMoveTo.Name = "butMoveTo";
 			this.butMoveTo.Size = new System.Drawing.Size(82, 26);
 			this.butMoveTo.TabIndex = 40;
 			this.butMoveTo.Text = "Move To Pat";
 			this.butMoveTo.Click += new System.EventHandler(this.butMoveTo_Click);
 			// 
+			// gridMain
+			// 
+			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasAddButton = false;
+			this.gridMain.HasMultilineHeaders = false;
+			this.gridMain.HScrollVisible = false;
+			this.gridMain.Location = new System.Drawing.Point(12, 12);
+			this.gridMain.Name = "gridMain";
+			this.gridMain.ScrollValue = 0;
+			this.gridMain.Size = new System.Drawing.Size(314, 185);
+			this.gridMain.TabIndex = 41;
+			this.gridMain.Title = null;
+			this.gridMain.TranslationName = null;
+			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
+			// 
 			// FormCreditCardManage
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-			this.ClientSize = new System.Drawing.Size(304, 240);
+			this.ClientSize = new System.Drawing.Size(426, 240);
+			this.Controls.Add(this.gridMain);
 			this.Controls.Add(this.butMoveTo);
 			this.Controls.Add(this.labelStoreCCNumWarning);
 			this.Controls.Add(this.butDown);
 			this.Controls.Add(this.butUp);
 			this.Controls.Add(this.butAdd);
-			this.Controls.Add(this.listCreditCards);
 			this.Controls.Add(this.butClose);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.MinimumSize = new System.Drawing.Size(320, 278);
+			this.MinimumSize = new System.Drawing.Size(442, 278);
 			this.Name = "FormCreditCardManage";
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Credit Card Manage";
 			this.Load += new System.EventHandler(this.FormCreditCardManage_Load);
 			this.ResumeLayout(false);
@@ -158,11 +166,11 @@ namespace OpenDental{
 		#endregion
 
 		private OpenDental.UI.Button butClose;
-		private System.Windows.Forms.ListBox listCreditCards;
 		private UI.Button butDown;
 		private UI.Button butUp;
 		private UI.Button butAdd;
 		private System.Windows.Forms.Label labelStoreCCNumWarning;
 		private UI.Button butMoveTo;
+		private UI.ODGrid gridMain;
 	}
 }

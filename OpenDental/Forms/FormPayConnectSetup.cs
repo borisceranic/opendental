@@ -36,6 +36,8 @@ namespace OpenDental{
 		///<summary>List of PayConnect program properties for all clinics.
 		///Includes properties with ClinicNum=0, the headquarters props or props not assigned to a clinic.</summary>
 		private List<ProgramProperty> _listProgProps;
+		private CheckBox checkWebPayEnabled;
+
 		///<summary>Used to revert the slected index in the clinic drop down box if the user tries to change clinics
 		///and the payment type has not been set.</summary>
 		private int _indexClinicRevert;
@@ -84,6 +86,7 @@ namespace OpenDental{
 			this.comboClinic = new System.Windows.Forms.ComboBox();
 			this.labelClinic = new System.Windows.Forms.Label();
 			this.groupPaySettings = new System.Windows.Forms.GroupBox();
+			this.checkWebPayEnabled = new System.Windows.Forms.CheckBox();
 			this.labelClinicEnable = new System.Windows.Forms.Label();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
@@ -134,7 +137,7 @@ namespace OpenDental{
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(6, 48);
+			this.label2.Location = new System.Drawing.Point(6, 45);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(124, 16);
 			this.label2.TabIndex = 0;
@@ -143,14 +146,14 @@ namespace OpenDental{
 			// 
 			// textUsername
 			// 
-			this.textUsername.Location = new System.Drawing.Point(131, 46);
+			this.textUsername.Location = new System.Drawing.Point(131, 43);
 			this.textUsername.Name = "textUsername";
 			this.textUsername.Size = new System.Drawing.Size(175, 20);
 			this.textUsername.TabIndex = 5;
 			// 
 			// label3
 			// 
-			this.label3.Location = new System.Drawing.Point(6, 74);
+			this.label3.Location = new System.Drawing.Point(6, 68);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(124, 16);
 			this.label3.TabIndex = 0;
@@ -159,7 +162,7 @@ namespace OpenDental{
 			// 
 			// textPassword
 			// 
-			this.textPassword.Location = new System.Drawing.Point(131, 72);
+			this.textPassword.Location = new System.Drawing.Point(131, 66);
 			this.textPassword.Name = "textPassword";
 			this.textPassword.Size = new System.Drawing.Size(175, 20);
 			this.textPassword.TabIndex = 6;
@@ -187,18 +190,28 @@ namespace OpenDental{
 			// 
 			// groupPaySettings
 			// 
+			this.groupPaySettings.Controls.Add(this.checkWebPayEnabled);
 			this.groupPaySettings.Controls.Add(this.textPassword);
 			this.groupPaySettings.Controls.Add(this.label3);
 			this.groupPaySettings.Controls.Add(this.textUsername);
 			this.groupPaySettings.Controls.Add(this.label2);
 			this.groupPaySettings.Controls.Add(this.comboPaymentType);
 			this.groupPaySettings.Controls.Add(this.label1);
-			this.groupPaySettings.Location = new System.Drawing.Point(10, 127);
+			this.groupPaySettings.Location = new System.Drawing.Point(10, 122);
 			this.groupPaySettings.Name = "groupPaySettings";
-			this.groupPaySettings.Size = new System.Drawing.Size(312, 100);
+			this.groupPaySettings.Size = new System.Drawing.Size(355, 112);
 			this.groupPaySettings.TabIndex = 0;
 			this.groupPaySettings.TabStop = false;
 			this.groupPaySettings.Text = "Clinic Payment Settings";
+			// 
+			// checkWebPayEnabled
+			// 
+			this.checkWebPayEnabled.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkWebPayEnabled.Location = new System.Drawing.Point(131, 89);
+			this.checkWebPayEnabled.Name = "checkWebPayEnabled";
+			this.checkWebPayEnabled.Size = new System.Drawing.Size(218, 17);
+			this.checkWebPayEnabled.TabIndex = 8;
+			this.checkWebPayEnabled.Text = "Enable for patient portal payments";
 			// 
 			// labelClinicEnable
 			// 
@@ -213,12 +226,12 @@ namespace OpenDental{
 			// butOK
 			// 
 			this.butOK.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butOK.Autosize = true;
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(161, 242);
+			this.butOK.Location = new System.Drawing.Point(204, 247);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 26);
 			this.butOK.TabIndex = 7;
@@ -228,12 +241,12 @@ namespace OpenDental{
 			// butCancel
 			// 
 			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.butCancel.Autosize = true;
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(247, 242);
+			this.butCancel.Location = new System.Drawing.Point(290, 247);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 26);
 			this.butCancel.TabIndex = 8;
@@ -242,8 +255,7 @@ namespace OpenDental{
 			// 
 			// FormPayConnectSetup
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(332, 280);
+			this.ClientSize = new System.Drawing.Size(377, 285);
 			this.Controls.Add(this.labelClinicEnable);
 			this.Controls.Add(this.groupPaySettings);
 			this.Controls.Add(this.comboClinic);
@@ -255,10 +267,9 @@ namespace OpenDental{
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
-			this.MinimumSize = new System.Drawing.Size(348, 318);
+			this.MinimumSize = new System.Drawing.Size(393, 323);
 			this.Name = "FormPayConnectSetup";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "PayConnect Setup";
 			this.Load += new System.EventHandler(this.FormPayConnectSetup_Load);
 			this.groupPaySettings.ResumeLayout(false);
@@ -269,6 +280,9 @@ namespace OpenDental{
 		#endregion
 
 		private void FormPayConnectSetup_Load(object sender,EventArgs e) {
+			//This feature is not yet available for PayConnect.  The programproperty IsOnlinePaymentsEnabled has been added for PayConnect but the ability
+			//to use it in the patient portal has not yet been implemented.
+			checkWebPayEnabled.Visible=false;
 			_progCur=Programs.GetCur(ProgramName.PayConnect);
 			if(_progCur==null) {
 				MsgBox.Show(this,"The PayConnect entry is missing from the database.");//should never happen
@@ -324,6 +338,9 @@ namespace OpenDental{
 			textUsername.Text=ProgramProperties.GetPropValFromList(_listProgProps,"Username",clinicNum);
 			textPassword.Text=ProgramProperties.GetPropValFromList(_listProgProps,"Password",clinicNum);
 			string payTypeDefNum=ProgramProperties.GetPropValFromList(_listProgProps,"PaymentType",clinicNum);
+			//Patient portal payments with PayConnect are currently not supported, checkWebPayEnabled is never visible, so always set to 0,
+			//but we'll leave this here for future functionality
+			//checkWebPayEnabled.Checked=PIn.Bool(ProgramProperties.GetPropValFromList(_listProgProps,"IsOnlinePaymentsEnabled",clinicNum));
 			comboPaymentType.Items.Clear();
 			Def[] arrayPayTypes=DefC.Short[(int)DefCat.PaymentTypes];
 			for(int i=0;i<arrayPayTypes.Length;i++) {
@@ -366,6 +383,7 @@ namespace OpenDental{
 			string hqUsername=ProgramProperties.GetPropValFromList(_listProgProps,"Username",0);//HQ Username before updating to value in textbox
 			string hqPassword=ProgramProperties.GetPropValFromList(_listProgProps,"Password",0);//HQ Password before updating to value in textbox
 			string hqPayType=ProgramProperties.GetPropValFromList(_listProgProps,"PaymentType",0);//HQ PaymentType before updating to combo box selection
+			//IsOnlinePaymentsEnabled will not be synced with HQ, since some clinics may need to disable patient portal payments
 			string payTypeCur="";
 			if(comboPaymentType.SelectedIndex>-1) {
 				payTypeCur=DefC.Short[(int)DefCat.PaymentTypes][comboPaymentType.SelectedIndex].DefNum.ToString();
@@ -397,41 +415,6 @@ namespace OpenDental{
 		}
 
 		private void butOK_Click(object sender, System.EventArgs e) {
-			#region Check Credit Card Processor Mismatch
-			if(_progCur.Enabled && !checkEnabled.Checked) {
-				MsgBox.Show(this,"Warning: Changing credit card processing companies will require you to delete all cards stored with tokens."
-					+"  When you enable another processor you will be prompted to delete these credit cards.");
-			}
-			if(checkEnabled.Checked && Programs.IsEnabled(ProgramName.Xcharge)) {
-				MsgBox.Show(this,"X-Charge is currently enabled.  You cannot enable both PayConnect and X-Charge at the same time.");
-				return;
-			}
-			if(checkEnabled.Checked) {
-				List<CreditCard> xChargeCreditCards = CreditCards.GetCardsWithXChargeTokens();
-				if(xChargeCreditCards.Count>0) {
-					if(MessageBox.Show(Lan.g(this,"There are")+" "+xChargeCreditCards.Count.ToString()+" "+Lan.g(this,"credit cards using X-Charge tokens.  Enabling PayConnect will delete all of these credit cards and their authorized repeating charge information.  Continue?"),"",MessageBoxButtons.OKCancel)!=DialogResult.OK) {
-						return;
-					}
-					SecurityLogs.MakeLogEntry(Permissions.Setup,0,Lan.g(this,"Deleted all credit cards with X-Charge tokens"));
-					List<Patient> listPats=new List<Patient>();
-					foreach(CreditCard creditC in xChargeCreditCards) {
-						//Delete the card
-						CreditCards.Delete(creditC.CreditCardNum);
-						//Add patient to list to display for reference
-						if(listPats.Select(x => x.PatNum).Contains(creditC.PatNum)) {
-							continue;
-						}
-						listPats.Add(Patients.GetPat(creditC.PatNum));
-					}
-					string msg = Lan.g(this,"Credit Cards deleted for the following patients:");
-					listPats.OrderBy(x => x.LName)
-						.ThenBy(x => x.FName).ToList()
-						.ForEach(x => msg+="\r\n"+x.PatNum+" "+Patients.GetNameFL(x.LName,x.FName,x.Preferred,x.MiddleI));
-					MsgBoxCopyPaste msgBox = new MsgBoxCopyPaste(msg);
-					msgBox.ShowDialog();
-				}
-			}
-			#endregion Check Credit Card Processor Mismatch
 			#region Validation
 			//if clinics are not enabled and the PayConnect program link is enabled, make sure there is a username and password set
 			//if clinics are enabled, the program link can be enabled with blank username and/or password fields for some clinics
@@ -458,9 +441,16 @@ namespace OpenDental{
 				payTypeSelected=DefC.Short[(int)DefCat.PaymentTypes][comboPaymentType.SelectedIndex].DefNum.ToString();
 			}
 			//set the values in the list for this clinic
-			_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="Username").ForEach(x => x.PropertyValue=textUsername.Text);//always 1 item; null safe
-			_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="Password").ForEach(x => x.PropertyValue=textPassword.Text);//always 1 item; null safe
-			_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="PaymentType").ForEach(x => x.PropertyValue=payTypeSelected);//always 1 item; null safe
+			_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="Username")
+				.ForEach(x => x.PropertyValue=textUsername.Text);//always 1 item; null safe
+			_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="Password")
+				.ForEach(x => x.PropertyValue=textPassword.Text);//always 1 item; null safe
+			_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="PaymentType")
+				.ForEach(x => x.PropertyValue=payTypeSelected);//always 1 item; null safe
+			//Patient portal payments with PayConnect are currently not supported, checkWebPayEnabled is never visible, so always set to 0,
+			//but we'll leave this here for future functionality
+			//_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="IsOnlinePaymentsEnabled")
+			//	.ForEach(x => x.PropertyValue=POut.Bool(checkWebPayEnabled.Checked));//always 1 item; null safe
 			string payTypeCur;
 			//make sure any other clinics with PayConnect enabled also have a payment type selected
 			for(int i=0;i<_listUserClinicNums.Count;i++) {

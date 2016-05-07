@@ -52,14 +52,14 @@ namespace OpenDental {
 				if(_creditCardCur.Zip!="") {
 					textZipCode.Text=_creditCardCur.Zip;
 				}
-				textCardNumber.ReadOnly=true;
-				textExpDate.ReadOnly=true;
 				if(_creditCardCur.PayConnectToken!="" && _creditCardCur.PayConnectTokenExp>DateTime.MinValue) {
 					checkSaveToken.Checked=true;
 					checkSaveToken.Enabled=false;
 					textSecurityCode.ReadOnly=true;
 					textZipCode.ReadOnly=true;
 					textNameOnCard.ReadOnly=true;
+					textCardNumber.ReadOnly=true;
+					textExpDate.ReadOnly=true;
 				}
 			}
 		}
@@ -214,15 +214,24 @@ namespace OpenDental {
 					return false;
 				}
 			}
-			catch(Exception ex) {
+			catch(Exception) {
 				MsgBox.Show(this,"Expiration format invalid.");
 				return false;
 			}
 			if(_creditCardCur==null) {//if the user selected a new CC, verify through PayConnect
+				//using a new CC and the card number entered contains something other than digits
+				if(textCardNumber.Text.Any(x => !char.IsDigit(x))) {
+					MsgBox.Show(this,"Invalid card number.");
+					return false;
+				}
 				if(!Bridges.PayConnect.IsValidCardAndExp(textCardNumber.Text,expYear,expMonth)) {//if exception happens, a message box will show with the error
 					MsgBox.Show(this,"Card number or expiration date failed validation with PayConnect.");
 					return false;
 				}
+			}
+			else if(_creditCardCur.PayConnectToken=="" && Regex.IsMatch(textCardNumber.Text,@"X+[0-9]{4}")) {//using a stored CC
+				MsgBox.Show(this,"There is no saved PayConnect token for this credit card.  The card number and expiration must be re-entered.");
+				return false;
 			}
 			if(textNameOnCard.Text.Trim()==""){
 				MsgBox.Show(this,"Name On Card required.");
@@ -393,6 +402,16 @@ namespace OpenDental {
 				magData=_parser.Track2;
 			}
 			string cardNumber=textCardNumber.Text;
+			//if using a stored CC and there is an X-Charge token saved for the CC and the user enters the whole card number to get a PayConnect token
+			//and the number entered doesn't have the same last 4 digits and exp date, then assume it's not the same card and clear out the X-Charge token.
+			if(_creditCardCur!=null //using a saved CC
+				&& !string.IsNullOrEmpty(_creditCardCur.XChargeToken) //there is an X-Charge token saved
+				&& (cardNumber.Right(4)!=_creditCardCur.CCNumberMasked.Right(4) //the card number entered doesn't have the same last 4 digits
+					|| expYear!=_creditCardCur.CCExpiration.Year //the card exp date entered doesn't have the same year
+					|| expMonth!=_creditCardCur.CCExpiration.Month)) //the card exp date entered doesn't have the same month
+			{
+				_creditCardCur.XChargeToken="";
+			}
 			//if the user has chosen to store CC tokens and the stored CC has a token and the token is not expired,
 			//then use it instead of the CC number and CC expiration.
 			if(checkSaveToken.Checked
@@ -452,7 +471,7 @@ namespace OpenDental {
 				_creditCardCur.CCNumberMasked=textCardNumber.Text;
 			}
 			else {
-				_creditCardCur.CCNumberMasked=textCardNumber.Text.Substring(textCardNumber.Text.Length-4).PadLeft(textCardNumber.Text.Length,'X');
+				_creditCardCur.CCNumberMasked=textCardNumber.Text.Right(4).PadLeft(textCardNumber.Text.Length,'X');
 			}
 			_creditCardCur.Zip=textZipCode.Text;
 			_creditCardCur.PayConnectToken="";

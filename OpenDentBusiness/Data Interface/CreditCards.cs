@@ -243,15 +243,7 @@ namespace OpenDentBusiness{
 				+"AND (DateStop>="+DbHelper.Curdate()+" OR "+DbHelper.Year("DateStop")+"<1880) "
 				+"AND CreditCardNum!="+POut.Long(cardNum);
 			DataTable table=Db.GetTable(command);
-			for(int i=0;i<table.Rows.Count;i++) {
-				string[] arrayProcs=table.Rows[i]["Procedures"].ToString().Split(',');
-				for(int j=0;j<arrayProcs.Length;j++) {
-					if(arrayProcs[j]==procCode) {
-						return true;
-					}
-				}
-			}
-			return false;
+			return table.Rows.OfType<DataRow>().SelectMany(x => x["Procedures"].ToString().Split(',')).Any(x => x==procCode);
 		}
 
 		///<summary>Table must include columns labeled LatestPayment and DateStart.</summary>

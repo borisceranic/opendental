@@ -1506,10 +1506,8 @@ namespace OpenDental {
 			info.Arguments+="/AMOUNT:"+amt.ToString("F2")+" ";
 			CreditCard cc=null;
 			List<CreditCard> creditCards=CreditCards.Refresh(_patCur.PatNum);
-			for(int i=0;i<creditCards.Count;i++) {
-				if(i==comboCreditCards.SelectedIndex) {
-					cc=creditCards[i];
-				}
+			if(comboCreditCards.SelectedIndex<creditCards.Count && comboCreditCards.SelectedIndex>-1) {
+				cc=creditCards[comboCreditCards.SelectedIndex];
 			}
 			//Show window to lock in the transaction type.
 			FormXchargeTrans FormXT=new FormXchargeTrans();
@@ -1526,30 +1524,27 @@ namespace OpenDental {
 			string cashBack=cashAmt.ToString("F2");
 			_promptSignature=FormXT.PromptSignature;
 			_printReceipt=FormXT.PrintReceipt;
-			if(cc!=null) {
-				//Have credit card on file
-				if(!string.IsNullOrEmpty(cc.XChargeToken)) {//Recurring charge
-					hasXToken=true;
-					if(CreditCards.GetTokenCount(cc.XChargeToken,CreditCardSource.XServer)!=1) {
-						MsgBox.Show(this,"This card shares a token with another card. Delete it from the Credit Card Manage window and re-add it.");
-						return;
-					}
-					/*       ***** An example of how recurring charges work***** 
-					C:\Program Files\X-Charge\XCharge.exe /TRANSACTIONTYPE:Purchase /LOCKTRANTYPE
-					/AMOUNT:10.00 /LOCKAMOUNT /XCACCOUNTID:XAW0JWtx5kjG8 /RECEIPT:RC001
-					/LOCKRECEIPT /CLERK:Clerk /LOCKCLERK /RESULTFILE:C:\ResultFile.txt /USERID:system
-					/PASSWORD:system /STAYONTOP /AUTOPROCESS /AUTOCLOSE /HIDEMAINWINDOW
-					/RECURRING /SMALLWINDOW /NORESULTDIALOG
-					*/
+			if(cc!=null && !string.IsNullOrEmpty(cc.XChargeToken)) {//Have CC on file with an XChargeToken
+				hasXToken=true;
+				if(CreditCards.GetTokenCount(cc.XChargeToken,CreditCardSource.XServer)!=1) {
+					MsgBox.Show(this,"This card shares a token with another card. Delete it from the Credit Card Manage window and re-add it.");
+					return;
 				}
-				else {//Not recurring charge, on file and might need a token.
-					notRecurring=true;
-					if(!PrefC.GetBool(PrefName.StoreCCnumbers)) {//Use token only if user has has pref unchecked in module setup (allow store credit card nums).
-						needToken=true;//Will create a token from result file so credit card info isn't saved in our db.
-					}
+				/*       ***** An example of how recurring charges work***** 
+				C:\Program Files\X-Charge\XCharge.exe /TRANSACTIONTYPE:Purchase /LOCKTRANTYPE
+				/AMOUNT:10.00 /LOCKAMOUNT /XCACCOUNTID:XAW0JWtx5kjG8 /RECEIPT:RC001
+				/LOCKRECEIPT /CLERK:Clerk /LOCKCLERK /RESULTFILE:C:\ResultFile.txt /USERID:system
+				/PASSWORD:system /STAYONTOP /AUTOPROCESS /AUTOCLOSE /HIDEMAINWINDOW
+				/RECURRING /SMALLWINDOW /NORESULTDIALOG
+				*/
+			}
+			else if(cc!=null) {//Have CC on file, no XChargeToken so not a recurring charge, and might need a token.
+				notRecurring=true;
+				if(!PrefC.GetBool(PrefName.StoreCCnumbers)) {//Use token only if user has has pref unchecked in module setup (allow store credit card nums).
+					needToken=true;//Will create a token from result file so credit card info isn't saved in our db.
 				}
 			}
-			else {//Add card option was selected in credit card drop down. No other possibility.
+			else {//CC is null, add card option was selected in credit card drop down, no other possibility.
 				newCard=true;
 			}
 			info.Arguments+=GetXChargeTransactionTypeCommands(tranType,hasXToken,notRecurring,cc,cashBack);
@@ -1693,12 +1688,24 @@ namespace OpenDental {
 						line=reader.ReadLine();
 					}
 					if(needToken && !string.IsNullOrEmpty(xChargeToken)) {
+						DateTime expDate=new DateTime(PIn.Int("20"+expiration.Right(2)),PIn.Int(expiration.Left(2)),1);
+						//If the stored CC used for this X-Charge payment has a PayConnect token, and X-Charge returns a different masked number or exp date, we
+						//will clear out the PayConnect token since this CC no longer refers to the same card that was used to generate the PayConnect token.
+						if(!string.IsNullOrEmpty(cc.PayConnectToken) //there is a PayConnect token for this saved CC
+							&& Regex.IsMatch(cc.CCNumberMasked,@"X+[0-9]{4}") //the saved CC has a masked number with the pattern XXXXXXXXXXXX1234
+							&& (cc.CCNumberMasked.Right(4)!=accountMasked.Right(4) //and either the last four digits don't match what X-Charge returned
+									|| cc.CCExpiration.Year!=expDate.Year //or the exp year doesn't match that returned by X-Charge
+									|| cc.CCExpiration.Month!=expDate.Month)) //or the exp month doesn't match that returned by X-Charge
+						{
+							cc.PayConnectToken="";
+							cc.PayConnectTokenExp=DateTime.MinValue;
+						}
 						//Only way this code can be hit is if they have set up a credit card and it does not have a token.
 						//So we'll use the created token from result file and assign it to the coresponding account.
 						//Also will delete the credit card number and replace it with secure masked number.
 						cc.XChargeToken=xChargeToken;
 						cc.CCNumberMasked=accountMasked;
-						cc.CCExpiration=new DateTime(Convert.ToInt32("20"+expiration.Substring(2,2)),Convert.ToInt32(expiration.Substring(0,2)),1);
+						cc.CCExpiration=expDate;
 						//Add the default procedures to this card if those procedures are not attached to any other active card
 						List<string> listDefaultProcs=PrefC.GetString(PrefName.DefaultCCProcs).Split(',').ToList();
 						listDefaultProcs.RemoveAll(x => CreditCards.ProcLinkedToCard(_patCur.PatNum,x,cc.CreditCardNum));
@@ -2109,15 +2116,12 @@ namespace OpenDental {
 				MsgBox.Show(this, "Split totals must equal payment amount before running a credit card transaction.");
 				return;
 			}
-			CreditCard CCard=null;
+			CreditCard cc=null;
 			List<CreditCard> creditCards=CreditCards.Refresh(_patCur.PatNum);
-			for(int i=0;i<creditCards.Count;i++) {
-				if(i==comboCreditCards.SelectedIndex) {
-					CCard=creditCards[i];
-					break;
-				}
+			if(comboCreditCards.SelectedIndex<creditCards.Count) {
+				cc=creditCards[comboCreditCards.SelectedIndex];
 			}
-			FormPayConnect FormP=new FormPayConnect(_paymentCur,_patCur,textAmount.Text,CCard);
+			FormPayConnect FormP=new FormPayConnect(_paymentCur,_patCur,textAmount.Text,cc);
 			FormP.ShowDialog();
 			//If PayConnect response is not null, refresh comboCreditCards and select the index of the card used for this payment if the token was saved
 			creditCards=CreditCards.Refresh(_patCur.PatNum);

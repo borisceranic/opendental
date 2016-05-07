@@ -51,6 +51,8 @@ namespace OpenDental{
 		private List<long> _listUserClinicNums;
 		///<summary>List of X-Charge prog props for all clinics.  Includes props with ClinicNum=0 for headquarters/props unassigned to a clinic.</summary>
 		private List<ProgramProperty> _listProgProps;
+		private CheckBox checkWebPayEnabled;
+
 		///<summary>Used to revert the clinic drop down selected index if the user tries to change clinics and the payment type hasn't been set.</summary>
 		private int _indexClinicRevert;
 
@@ -115,6 +117,7 @@ namespace OpenDental{
 			this.groupPaySettings = new System.Windows.Forms.GroupBox();
 			this.butOK = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
+			this.checkWebPayEnabled = new System.Windows.Forms.CheckBox();
 			this.groupXWeb.SuspendLayout();
 			this.groupPaySettings.SuspendLayout();
 			this.SuspendLayout();
@@ -145,14 +148,14 @@ namespace OpenDental{
 			// 
 			this.textPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.textPath.Location = new System.Drawing.Point(187, 68);
+			this.textPath.Location = new System.Drawing.Point(187, 65);
 			this.textPath.Name = "textPath";
 			this.textPath.Size = new System.Drawing.Size(273, 20);
 			this.textPath.TabIndex = 3;
 			// 
 			// labelPath
 			// 
-			this.labelPath.Location = new System.Drawing.Point(24, 70);
+			this.labelPath.Location = new System.Drawing.Point(24, 67);
 			this.labelPath.Name = "labelPath";
 			this.labelPath.Size = new System.Drawing.Size(162, 16);
 			this.labelPath.TabIndex = 0;
@@ -161,7 +164,7 @@ namespace OpenDental{
 			// 
 			// labelPaymentType
 			// 
-			this.labelPaymentType.Location = new System.Drawing.Point(12, 73);
+			this.labelPaymentType.Location = new System.Drawing.Point(12, 67);
 			this.labelPaymentType.Name = "labelPaymentType";
 			this.labelPaymentType.Size = new System.Drawing.Size(162, 16);
 			this.labelPaymentType.TabIndex = 0;
@@ -174,7 +177,7 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.comboPaymentType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.comboPaymentType.FormattingEnabled = true;
-			this.comboPaymentType.Location = new System.Drawing.Point(175, 71);
+			this.comboPaymentType.Location = new System.Drawing.Point(175, 65);
 			this.comboPaymentType.MaxDropDownItems = 25;
 			this.comboPaymentType.Name = "comboPaymentType";
 			this.comboPaymentType.Size = new System.Drawing.Size(192, 21);
@@ -184,7 +187,7 @@ namespace OpenDental{
 			// 
 			this.textPassword.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.textPassword.Location = new System.Drawing.Point(175, 45);
+			this.textPassword.Location = new System.Drawing.Point(175, 42);
 			this.textPassword.Name = "textPassword";
 			this.textPassword.Size = new System.Drawing.Size(273, 20);
 			this.textPassword.TabIndex = 2;
@@ -193,7 +196,7 @@ namespace OpenDental{
 			// 
 			// labelPassword
 			// 
-			this.labelPassword.Location = new System.Drawing.Point(12, 47);
+			this.labelPassword.Location = new System.Drawing.Point(12, 44);
 			this.labelPassword.Name = "labelPassword";
 			this.labelPassword.Size = new System.Drawing.Size(162, 16);
 			this.labelPassword.TabIndex = 0;
@@ -222,14 +225,14 @@ namespace OpenDental{
 			// 
 			this.textOverride.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.textOverride.Location = new System.Drawing.Point(187, 94);
+			this.textOverride.Location = new System.Drawing.Point(187, 88);
 			this.textOverride.Name = "textOverride";
 			this.textOverride.Size = new System.Drawing.Size(273, 20);
 			this.textOverride.TabIndex = 4;
 			// 
 			// labelOverride
 			// 
-			this.labelOverride.Location = new System.Drawing.Point(6, 96);
+			this.labelOverride.Location = new System.Drawing.Point(6, 90);
 			this.labelOverride.Name = "labelOverride";
 			this.labelOverride.Size = new System.Drawing.Size(180, 16);
 			this.labelOverride.TabIndex = 0;
@@ -240,6 +243,7 @@ namespace OpenDental{
 			// 
 			this.groupXWeb.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupXWeb.Controls.Add(this.checkWebPayEnabled);
 			this.groupXWeb.Controls.Add(this.textTerminalID);
 			this.groupXWeb.Controls.Add(this.labelTerminalID);
 			this.groupXWeb.Controls.Add(this.labelXwebDesc);
@@ -247,9 +251,9 @@ namespace OpenDental{
 			this.groupXWeb.Controls.Add(this.labelAuthKey);
 			this.groupXWeb.Controls.Add(this.textXWebID);
 			this.groupXWeb.Controls.Add(this.labelXWebID);
-			this.groupXWeb.Location = new System.Drawing.Point(6, 144);
+			this.groupXWeb.Location = new System.Drawing.Point(6, 129);
 			this.groupXWeb.Name = "groupXWeb";
-			this.groupXWeb.Size = new System.Drawing.Size(448, 134);
+			this.groupXWeb.Size = new System.Drawing.Size(448, 145);
 			this.groupXWeb.TabIndex = 6;
 			this.groupXWeb.TabStop = false;
 			this.groupXWeb.Text = "X-Web";
@@ -259,14 +263,14 @@ namespace OpenDental{
 			// 
 			this.textTerminalID.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.textTerminalID.Location = new System.Drawing.Point(169, 108);
+			this.textTerminalID.Location = new System.Drawing.Point(169, 99);
 			this.textTerminalID.Name = "textTerminalID";
 			this.textTerminalID.Size = new System.Drawing.Size(273, 20);
 			this.textTerminalID.TabIndex = 3;
 			// 
 			// labelTerminalID
 			// 
-			this.labelTerminalID.Location = new System.Drawing.Point(6, 110);
+			this.labelTerminalID.Location = new System.Drawing.Point(6, 101);
 			this.labelTerminalID.Name = "labelTerminalID";
 			this.labelTerminalID.Size = new System.Drawing.Size(162, 16);
 			this.labelTerminalID.TabIndex = 0;
@@ -288,7 +292,7 @@ namespace OpenDental{
 			// 
 			this.textAuthKey.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.textAuthKey.Location = new System.Drawing.Point(169, 82);
+			this.textAuthKey.Location = new System.Drawing.Point(169, 76);
 			this.textAuthKey.Name = "textAuthKey";
 			this.textAuthKey.Size = new System.Drawing.Size(273, 20);
 			this.textAuthKey.TabIndex = 2;
@@ -296,7 +300,7 @@ namespace OpenDental{
 			// 
 			// labelAuthKey
 			// 
-			this.labelAuthKey.Location = new System.Drawing.Point(6, 84);
+			this.labelAuthKey.Location = new System.Drawing.Point(6, 78);
 			this.labelAuthKey.Name = "labelAuthKey";
 			this.labelAuthKey.Size = new System.Drawing.Size(162, 16);
 			this.labelAuthKey.TabIndex = 0;
@@ -307,14 +311,14 @@ namespace OpenDental{
 			// 
 			this.textXWebID.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.textXWebID.Location = new System.Drawing.Point(169, 56);
+			this.textXWebID.Location = new System.Drawing.Point(169, 53);
 			this.textXWebID.Name = "textXWebID";
 			this.textXWebID.Size = new System.Drawing.Size(273, 20);
 			this.textXWebID.TabIndex = 1;
 			// 
 			// labelXWebID
 			// 
-			this.labelXWebID.Location = new System.Drawing.Point(6, 58);
+			this.labelXWebID.Location = new System.Drawing.Point(6, 55);
 			this.labelXWebID.Name = "labelXWebID";
 			this.labelXWebID.Size = new System.Drawing.Size(162, 16);
 			this.labelXWebID.TabIndex = 0;
@@ -324,7 +328,7 @@ namespace OpenDental{
 			// checkPrintReceipt
 			// 
 			this.checkPrintReceipt.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkPrintReceipt.Location = new System.Drawing.Point(175, 121);
+			this.checkPrintReceipt.Location = new System.Drawing.Point(175, 109);
 			this.checkPrintReceipt.Name = "checkPrintReceipt";
 			this.checkPrintReceipt.Size = new System.Drawing.Size(273, 17);
 			this.checkPrintReceipt.TabIndex = 5;
@@ -332,7 +336,7 @@ namespace OpenDental{
 			// 
 			// checkPromptSig
 			// 
-			this.checkPromptSig.Location = new System.Drawing.Point(175, 98);
+			this.checkPromptSig.Location = new System.Drawing.Point(175, 89);
 			this.checkPromptSig.Name = "checkPromptSig";
 			this.checkPromptSig.Size = new System.Drawing.Size(273, 17);
 			this.checkPromptSig.TabIndex = 4;
@@ -340,7 +344,7 @@ namespace OpenDental{
 			// 
 			// labelClinicEnable
 			// 
-			this.labelClinicEnable.Location = new System.Drawing.Point(24, 124);
+			this.labelClinicEnable.Location = new System.Drawing.Point(24, 118);
 			this.labelClinicEnable.Name = "labelClinicEnable";
 			this.labelClinicEnable.Size = new System.Drawing.Size(436, 16);
 			this.labelClinicEnable.TabIndex = 0;
@@ -352,7 +356,7 @@ namespace OpenDental{
 			this.comboClinic.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboClinic.Location = new System.Drawing.Point(187, 150);
+			this.comboClinic.Location = new System.Drawing.Point(187, 144);
 			this.comboClinic.MaxDropDownItems = 30;
 			this.comboClinic.Name = "comboClinic";
 			this.comboClinic.Size = new System.Drawing.Size(192, 21);
@@ -361,7 +365,7 @@ namespace OpenDental{
 			// 
 			// labelClinic
 			// 
-			this.labelClinic.Location = new System.Drawing.Point(24, 153);
+			this.labelClinic.Location = new System.Drawing.Point(24, 147);
 			this.labelClinic.Name = "labelClinic";
 			this.labelClinic.Size = new System.Drawing.Size(162, 16);
 			this.labelClinic.TabIndex = 0;
@@ -381,9 +385,9 @@ namespace OpenDental{
 			this.groupPaySettings.Controls.Add(this.labelUsername);
 			this.groupPaySettings.Controls.Add(this.labelPassword);
 			this.groupPaySettings.Controls.Add(this.labelPaymentType);
-			this.groupPaySettings.Location = new System.Drawing.Point(12, 177);
+			this.groupPaySettings.Location = new System.Drawing.Point(12, 171);
 			this.groupPaySettings.Name = "groupPaySettings";
-			this.groupPaySettings.Size = new System.Drawing.Size(460, 284);
+			this.groupPaySettings.Size = new System.Drawing.Size(460, 280);
 			this.groupPaySettings.TabIndex = 6;
 			this.groupPaySettings.TabStop = false;
 			this.groupPaySettings.Text = "Clinic Payment Settings";
@@ -396,7 +400,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(311, 474);
+			this.butOK.Location = new System.Drawing.Point(311, 464);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 26);
 			this.butOK.TabIndex = 7;
@@ -411,17 +415,25 @@ namespace OpenDental{
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(397, 474);
+			this.butCancel.Location = new System.Drawing.Point(397, 464);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 26);
 			this.butCancel.TabIndex = 8;
 			this.butCancel.Text = "&Cancel";
 			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
 			// 
+			// checkWebPayEnabled
+			// 
+			this.checkWebPayEnabled.ImageAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkWebPayEnabled.Location = new System.Drawing.Point(169, 122);
+			this.checkWebPayEnabled.Name = "checkWebPayEnabled";
+			this.checkWebPayEnabled.Size = new System.Drawing.Size(273, 17);
+			this.checkWebPayEnabled.TabIndex = 7;
+			this.checkWebPayEnabled.Text = "Enable X-Web for patient portal payments";
+			// 
 			// FormXchargeSetup
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(484, 512);
+			this.ClientSize = new System.Drawing.Size(484, 502);
 			this.Controls.Add(this.groupPaySettings);
 			this.Controls.Add(this.labelClinicEnable);
 			this.Controls.Add(this.comboClinic);
@@ -437,10 +449,9 @@ namespace OpenDental{
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
-			this.MinimumSize = new System.Drawing.Size(500, 550);
+			this.MinimumSize = new System.Drawing.Size(500, 540);
 			this.Name = "FormXchargeSetup";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "X-Charge Setup";
 			this.Load += new System.EventHandler(this.FormXchargeSetup_Load);
 			this.groupXWeb.ResumeLayout(false);
@@ -530,6 +541,7 @@ namespace OpenDental{
 			textUsername.Text=ProgramProperties.GetPropValFromList(_listProgProps,"Username",clinicNum);
 			textXWebID.Text=ProgramProperties.GetPropValFromList(_listProgProps,"XWebID",clinicNum);
 			textTerminalID.Text=ProgramProperties.GetPropValFromList(_listProgProps,"TerminalID",clinicNum);
+			checkWebPayEnabled.Checked=PIn.Bool(ProgramProperties.GetPropValFromList(_listProgProps,"IsOnlinePaymentsEnabled",clinicNum));
 			checkPromptSig.Checked=PIn.Bool(ProgramProperties.GetPropValFromList(_listProgProps,"PromptSignature",clinicNum));
 			checkPrintReceipt.Checked=PIn.Bool(ProgramProperties.GetPropValFromList(_listProgProps,"PrintReceipt",clinicNum));
 		}
@@ -573,6 +585,8 @@ namespace OpenDental{
 				.ForEach(x => x.PropertyValue=textAuthKey.Text.Trim());//always 1 item, null safe
 			_listProgProps.FindAll(x => x.ClinicNum==_listUserClinicNums[_indexClinicRevert] && x.PropertyDesc=="TerminalID")
 				.ForEach(x => x.PropertyValue=textTerminalID.Text.Trim());//always 1 item, null safe
+			_listProgProps.FindAll(x => x.ClinicNum==_listUserClinicNums[_indexClinicRevert] && x.PropertyDesc=="IsOnlinePaymentsEnabled")
+				.ForEach(x => x.PropertyValue=POut.Bool(checkWebPayEnabled.Checked));//always 1 item, null safe
 			_listProgProps.FindAll(x => x.ClinicNum==_listUserClinicNums[_indexClinicRevert] && x.PropertyDesc=="PaymentType")//payment type already validated
 				.ForEach(x => x.PropertyValue=payTypeCur);//always 1 item, null safe
 			_indexClinicRevert=comboClinic.SelectedIndex;//now that we've updated the values for the clinic we're switching from, update _indexClinicRevert
@@ -709,6 +723,7 @@ namespace OpenDental{
 			string hqAuthKey=ProgramProperties.GetPropValFromList(_listProgProps,"AuthKey",0);//HQ AuthKey before updating to value in textbox
 			string hqTerminalID=ProgramProperties.GetPropValFromList(_listProgProps,"TerminalID",0);//HQ TerminalID before updating to value in textbox
 			string hqPayType=ProgramProperties.GetPropValFromList(_listProgProps,"PaymentType",0);//HQ PaymentType before updating to combo box selection
+			//IsOnlinePaymentsEnabled will not be synced with HQ so specific clinics can be disabled for patient portal payments.
 			string payTypeCur="";
 			if(comboPaymentType.SelectedIndex>-1) {
 				payTypeCur=DefC.Short[(int)DefCat.PaymentTypes][comboPaymentType.SelectedIndex].DefNum.ToString();
@@ -760,41 +775,6 @@ namespace OpenDental{
 				MsgBox.Show(this,"X-Charge entry is missing from the database.");
 				return;
 			}
-			#region Check Credit Card Processor Mismatch
-			if(_progCur.Enabled && !checkEnabled.Checked) {
-				MsgBox.Show(this,"Warning: Changing credit card processing companies will require you to delete all cards stored with tokens."
-					+"  When you enable another processor you will be prompted to delete these credit cards.");
-			}
-			if(checkEnabled.Checked && Programs.IsEnabled(ProgramName.PayConnect)) {
-				MsgBox.Show(this,"PayConnect is currently enabled.  You cannot enable both X-Charge and PayConnect at the same time.");
-				return;
-			}
-			if(checkEnabled.Checked) {
-				List<CreditCard> payConnectCreditCards = CreditCards.GetCardsWithPayConnectTokens();
-				if(payConnectCreditCards.Count>0) {
-					if(MessageBox.Show(Lan.g(this,"There are")+" "+payConnectCreditCards.Count.ToString()+" "+Lan.g(this,"credit cards using PayConnect tokens.  Enabling X-Charge will delete all of these credit cards and their authorized repeating charge information.  Continue?"),"",MessageBoxButtons.OKCancel)!=DialogResult.OK) {
-						return;
-					}
-					SecurityLogs.MakeLogEntry(Permissions.Setup,0,Lan.g(this,"Deleted all credit cards with PayConnect tokens"));
-					List<Patient> listPats = new List<Patient>();
-					foreach(CreditCard creditC in payConnectCreditCards) {
-						//Delete the card
-						CreditCards.Delete(creditC.CreditCardNum);
-						//Add patient to list to display for reference
-						if(listPats.Select(x => x.PatNum).Contains(creditC.PatNum)) {
-							continue;
-						}
-						listPats.Add(Patients.GetPat(creditC.PatNum));
-					}
-					string msg = Lan.g(this,"Credit Cards deleted for the following patients:");
-					listPats.OrderBy(x => x.LName)
-						.ThenBy(x => x.FName).ToList()
-						.ForEach(x => msg+="\r\n"+x.PatNum+" "+Patients.GetNameFL(x.LName,x.FName,x.Preferred,x.MiddleI));
-					MsgBoxCopyPaste msgBox = new MsgBoxCopyPaste(msg);
-					msgBox.ShowDialog();
-				}
-			}
-			#endregion Check Credit Card Processor Mismatch
 			#region Validate Path and Local Path Override
 			if(checkEnabled.Checked && textOverride.Text.Trim().Length>0 && !File.Exists(textOverride.Text.Trim())) {
 				MsgBox.Show(this,"Local Path Override is not valid.");
@@ -856,6 +836,8 @@ namespace OpenDental{
 				.ForEach(x => x.PropertyValue=textAuthKey.Text.Trim());//always 1 item, null safe
 			_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="TerminalID")
 				.ForEach(x => x.PropertyValue=textTerminalID.Text.Trim());//always 1 item, null safe
+			_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="IsOnlinePaymentsEnabled")
+				.ForEach(x => x.PropertyValue=POut.Bool(checkWebPayEnabled.Checked));//always 1 item, null safe
 			_listProgProps.FindAll(x => x.ClinicNum==clinicNum && x.PropertyDesc=="PaymentType")
 				.ForEach(x => x.PropertyValue=payTypeCur);//always 1 item; null safe
 			#endregion Update Local List of Program Properties

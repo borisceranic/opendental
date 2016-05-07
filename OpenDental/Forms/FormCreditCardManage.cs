@@ -5,12 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
+using OpenDental.UI;
 using OpenDentBusiness;
 
 namespace OpenDental {
 	public partial class FormCreditCardManage:ODForm {
 		private Patient PatCur;
-		private List<CreditCard> creditCards;
+		private List<CreditCard> _listCreditCards;
 
 		public FormCreditCardManage(Patient pat) {
 			InitializeComponent();
@@ -24,35 +25,45 @@ namespace OpenDental {
 			{
 				labelStoreCCNumWarning.Visible=true;
 			}
-			RefreshCardList();
-			if(creditCards.Count>0) {
-				listCreditCards.SelectedIndex=0;
-			}
+			FillGrid();
 		}
 
-		private void RefreshCardList() {
-			listCreditCards.Items.Clear();
-			creditCards=CreditCards.Refresh(PatCur.PatNum);
-			for(int i=0;i<creditCards.Count;i++) {
-				listCreditCards.Items.Add(creditCards[i].CCNumberMasked);
+		private void FillGrid() {
+			gridMain.BeginUpdate();
+			gridMain.Columns.Clear();
+			gridMain.Columns.Add(new ODGridColumn("Card Number",140));
+			if(Programs.IsEnabled(ProgramName.Xcharge)) {
+				gridMain.Columns.Add(new ODGridColumn("X-Charge",70,HorizontalAlignment.Center));
 			}
+			if(Programs.IsEnabled(ProgramName.PayConnect)) {
+				gridMain.Columns.Add(new ODGridColumn("PayConnect",85,HorizontalAlignment.Center));
+			}
+			gridMain.Rows.Clear();
+			ODGridRow row;
+			_listCreditCards=CreditCards.Refresh(PatCur.PatNum);
+			foreach(CreditCard cc in _listCreditCards) {
+				row=new ODGridRow();
+				row.Cells.Add(cc.CCNumberMasked);
+				if(Programs.IsEnabled(ProgramName.Xcharge)) {
+					row.Cells.Add(string.IsNullOrEmpty(cc.XChargeToken)?"":"X");
+				}
+				if(Programs.IsEnabled(ProgramName.PayConnect)) {
+					row.Cells.Add(string.IsNullOrEmpty(cc.PayConnectToken)?"":"X");
+				}
+				row.Tag=cc;
+				gridMain.Rows.Add(row);
+			}
+			gridMain.EndUpdate();
 		}
 
-		private void listCreditCards_MouseDoubleClick(object sender,MouseEventArgs e) {
-			if(listCreditCards.SelectedIndex==-1) {
-				return;
-			}
-			int prev=creditCards.Count;
-			int placement=listCreditCards.SelectedIndex;
+		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			FormCreditCardEdit FormCCE=new FormCreditCardEdit(PatCur);
-			FormCCE.CreditCardCur=creditCards[placement];
+			FormCCE.CreditCardCur=(CreditCard)gridMain.Rows[e.Row].Tag;
 			FormCCE.ShowDialog();
-			RefreshCardList();
-			if(creditCards.Count==prev) {
-				listCreditCards.SelectedIndex=placement;
-			}
-			else if(creditCards.Count>0) {
-				listCreditCards.SelectedIndex=0;
+			FillGrid();
+			if(gridMain.Rows.Count>0) {//could have deleted the only CC, make sure there's at least one row
+				int indexCC=gridMain.Rows.OfType<ODGridRow>().ToList().FindIndex(x => ((CreditCard)x.Tag).CreditCardNum==FormCCE.CreditCardCur.CreditCardNum);
+				gridMain.SetSelected(Math.Max(0,indexCC),true);
 			}
 		}
 
@@ -60,6 +71,7 @@ namespace OpenDental {
 			List<string> listDefaultProcs;
 			if(!PrefC.GetBool(PrefName.StoreCCnumbers)) {
 				if(Programs.IsEnabled(ProgramName.Xcharge)) {
+					CreditCard creditCardCur=null;
 					Program prog=Programs.GetCur(ProgramName.Xcharge);
 					string path=Programs.GetProgramPath(prog);
 					string xUsername=ProgramProperties.GetPropVal(prog.ProgramNum,"Username",Clinics.ClinicNum).Trim();
@@ -145,7 +157,7 @@ namespace OpenDental {
 								line=reader.ReadLine();
 							}
 							if(insertCard && xChargeToken!="") {//Might not be necessary but we've had successful charges with no tokens returned before.
-								CreditCard creditCardCur=new CreditCard();
+								creditCardCur=new CreditCard();
 								List<CreditCard> itemOrderCount=CreditCards.Refresh(PatCur.PatNum);
 								creditCardCur.PatNum=PatCur.PatNum;
 								creditCardCur.ItemOrder=itemOrderCount.Count;
@@ -165,11 +177,13 @@ namespace OpenDental {
 								CreditCards.Insert(creditCardCur);
 							}
 						}
-						RefreshCardList();
+						FillGrid();
+						if(gridMain.Rows.Count>0 && creditCardCur!=null) {
+							gridMain.SetSelected(gridMain.Rows.Count-1,true);
+						}
 					}
-					catch(Exception ex) {
+					catch(Exception) {
 						MsgBox.Show(this,Lan.g(this,"There was a problem adding the credit card.  Please try again."));
-						return;
 					}
 					return;
 				}
@@ -178,39 +192,29 @@ namespace OpenDental {
 						+"enter the card information into the payment window and process a payment with the \"Save Token\" option selected.");
 					return;
 				}
-				else {
+				else {//not storing CC numbers and both PayConnect and X-Charge are disabled
 					MsgBox.Show(this,"Not allowed to store credit cards.");
 					return;
 				}
 			}
-			bool remember=false;
-			int placement=listCreditCards.SelectedIndex;
-			if(placement!=-1) {
-				remember=true;
-			}
+			//storing CC numbers allowed from here down
 			FormCreditCardEdit FormCCE=new FormCreditCardEdit(PatCur);
 			FormCCE.CreditCardCur=new CreditCard();
 			FormCCE.CreditCardCur.IsNew=true;
 			//Add the default procedures to this card if those procedures are not attached to any other active card
-			listDefaultProcs=PrefC.GetString(PrefName.DefaultCCProcs).Split(',').ToList();
-			for(int i=listDefaultProcs.Count-1;i>=0;i--) {
-				if(CreditCards.ProcLinkedToCard(PatCur.PatNum,listDefaultProcs[i],0)) {
-					listDefaultProcs.RemoveAt(i);
-				}
-			}
-			FormCCE.CreditCardCur.Procedures=String.Join(",",listDefaultProcs);
+			listDefaultProcs=PrefC.GetString(PrefName.DefaultCCProcs).Split(',').ToList().FindAll(x => !CreditCards.ProcLinkedToCard(PatCur.PatNum,x,0));
+			FormCCE.CreditCardCur.Procedures=string.Join(",",listDefaultProcs);
 			FormCCE.ShowDialog();
-			RefreshCardList();
-			if(remember) {//in case they canceled and had one selected
-				listCreditCards.SelectedIndex=placement;
-			}
-			if(FormCCE.DialogResult==DialogResult.OK && creditCards.Count>0) {
-				listCreditCards.SelectedIndex=0;
+			if(FormCCE.DialogResult==DialogResult.OK) {
+				FillGrid();
+				if(gridMain.Rows.Count>0) {
+					gridMain.SetSelected(gridMain.Rows.Count-1,true);
+				}
 			}
 		}
 
 		private void butMoveTo_Click(object sender,EventArgs e) {
-			if(listCreditCards.SelectedIndex==-1) {
+			if(gridMain.GetSelectedIndex()<0) {
 				MsgBox.Show(this,"Please select a card first.");
 				return;
 			}
@@ -221,16 +225,16 @@ namespace OpenDental {
 			if(form.ShowDialog()!=DialogResult.OK) {
 				return;
 			}
-			int selected=listCreditCards.SelectedIndex;
-			CreditCard creditCard=creditCards[selected];
+			int selected=gridMain.GetSelectedIndex();
+			CreditCard creditCard=_listCreditCards[selected];
 			creditCard.PatNum=form.SelectedPatNum;
 			CreditCards.Update(creditCard);
-			RefreshCardList();
-			MessageBox.Show("Credit card moved successfully");
+			FillGrid();
+			MsgBox.Show(this,"Credit card moved successfully");
 		}
 
 		private void butUp_Click(object sender,EventArgs e) {
-			int placement=listCreditCards.SelectedIndex;
+			int placement=gridMain.GetSelectedIndex();
 			if(placement==-1) {
 				MsgBox.Show(this,"Please select a card first.");
 				return;
@@ -242,49 +246,49 @@ namespace OpenDental {
 			int newIdx;
 			CreditCard oldItem;
 			CreditCard newItem;
-			oldIdx=creditCards[placement].ItemOrder;
+			oldIdx=_listCreditCards[placement].ItemOrder;
 			newIdx=oldIdx+1; 
-			for(int i=0;i<creditCards.Count;i++) {
-				if(creditCards[i].ItemOrder==oldIdx) {
-					oldItem=creditCards[i];
-					newItem=creditCards[i-1];
+			for(int i=0;i<_listCreditCards.Count;i++) {
+				if(_listCreditCards[i].ItemOrder==oldIdx) {
+					oldItem=_listCreditCards[i];
+					newItem=_listCreditCards[i-1];
 					oldItem.ItemOrder=newItem.ItemOrder;
 					newItem.ItemOrder-=1;
 					CreditCards.Update(oldItem);
 					CreditCards.Update(newItem);
 				}
 			}
-			RefreshCardList();
-			listCreditCards.SetSelected(placement-1,true);
+			FillGrid();
+			gridMain.SetSelected(placement-1,true);
 		}
 
 		private void butDown_Click(object sender,EventArgs e) {
-			int placement=listCreditCards.SelectedIndex;
+			int placement=gridMain.GetSelectedIndex();
 			if(placement==-1) {
 				MsgBox.Show(this,"Please select a card first.");
 				return;
 			}
-			if(placement==creditCards.Count-1) {
+			if(placement==_listCreditCards.Count-1) {
 				return;//can't move down any more
 			}
 			int oldIdx;
 			int newIdx;
 			CreditCard oldItem;
 			CreditCard newItem;
-			oldIdx=creditCards[placement].ItemOrder;
+			oldIdx=_listCreditCards[placement].ItemOrder;
 			newIdx=oldIdx-1;
-			for(int i=0;i<creditCards.Count;i++) {
-				if(creditCards[i].ItemOrder==newIdx) {
-					newItem=creditCards[i];
-					oldItem=creditCards[i-1];
+			for(int i=0;i<_listCreditCards.Count;i++) {
+				if(_listCreditCards[i].ItemOrder==newIdx) {
+					newItem=_listCreditCards[i];
+					oldItem=_listCreditCards[i-1];
 					newItem.ItemOrder=oldItem.ItemOrder;
 					oldItem.ItemOrder-=1;
 					CreditCards.Update(oldItem);
 					CreditCards.Update(newItem);
 				}
 			}
-			RefreshCardList();
-			listCreditCards.SetSelected(placement+1,true);
+			FillGrid();
+			gridMain.SetSelected(placement+1,true);
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {

@@ -1106,6 +1106,46 @@ namespace OpenDentBusiness {
 				   command="INSERT INTO preference(PrefNum,PrefName,ValueString) VALUES((SELECT MAX(PrefNum)+1 FROM preference),'ClearinghouseDefaultEligibility','"+value+"')";
 				   Db.NonQ(command);
 				}
+				//Insert programproperty IsOnlinePaymentsEnabled for X-Charge per clinic to indicate whether to use for patient portal web payments
+				command="SELECT ProgramNum FROM program WHERE ProgName='Xcharge'";
+				long xChargeProgNum=PIn.Long(Db.GetScalar(command));
+				command="SELECT DISTINCT ClinicNum FROM programproperty WHERE ProgramNum="+POut.Long(xChargeProgNum);
+				List<long> listClinicNums=Db.GetListLong(command);
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					foreach(long clinicNum in listClinicNums) {
+						command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue,ComputerName,ClinicNum) "
+							+"VALUES ("+POut.Long(xChargeProgNum)+",'IsOnlinePaymentsEnabled','0','',"+POut.Long(clinicNum)+")";
+						Db.NonQ(command);
+					}
+				}
+				else {//oracle
+					foreach(long clinicNum in listClinicNums) {
+						command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ComputerName,ClinicNum) "
+							+"VALUES ((SELECT MAX(ProgramPropertyNum)+1 FROM programproperty),"
+							+POut.Long(xChargeProgNum)+",'IsOnlinePaymentsEnabled','0','',"+POut.Long(clinicNum)+")";
+						Db.NonQ(command);
+					}
+				}
+				//Insert programproperty IsOnlinePaymentsEnabled for PayConnect per clinic to indicate whether to use for patient portal web payments
+				command="SELECT ProgramNum FROM program WHERE ProgName='PayConnect'";
+				long payConnectProgNum=PIn.Long(Db.GetScalar(command));
+				command="SELECT DISTINCT ClinicNum FROM programproperty WHERE ProgramNum="+POut.Long(payConnectProgNum);
+				listClinicNums=Db.GetListLong(command);
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					foreach(long clinicNum in listClinicNums) {
+						command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue,ComputerName,ClinicNum) "
+							+"VALUES ("+POut.Long(payConnectProgNum)+",'IsOnlinePaymentsEnabled','0','',"+POut.Long(clinicNum)+")";
+						Db.NonQ(command);
+					}
+				}
+				else {//oracle
+					foreach(long clinicNum in listClinicNums) {
+						command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ComputerName,ClinicNum) "
+							+"VALUES ((SELECT MAX(ProgramPropertyNum)+1 FROM programproperty),"
+							+POut.Long(payConnectProgNum)+",'IsOnlinePaymentsEnabled','0','',"+POut.Long(clinicNum)+")";
+						Db.NonQ(command);
+					}
+				}
 
 
 
