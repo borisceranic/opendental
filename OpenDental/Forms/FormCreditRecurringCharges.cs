@@ -27,6 +27,7 @@ namespace OpenDental {
 		private string _xPath;
 		private int _success;
 		private int _failed;
+		private int _updated;
 
 		///<summary>Only works for XCharge and PayConnect so far.</summary>
 		public FormCreditRecurringCharges() {
@@ -41,6 +42,7 @@ namespace OpenDental {
 			}
 			if(Programs.IsEnabled(ProgramName.PayConnect)) {
 				_progCur=Programs.GetCur(ProgramName.PayConnect);
+				labelUpdated.Visible=false;
 			}
 			else if(Programs.IsEnabled(ProgramName.Xcharge)) {
 				_progCur=Programs.GetCur(ProgramName.Xcharge);
@@ -428,11 +430,13 @@ namespace OpenDental {
 				string addressPat=PIn.String(table.Rows[gridMain.SelectedIndices[i]]["AddressPat"].ToString());
 				string zip=PIn.String(table.Rows[gridMain.SelectedIndices[i]]["Zip"].ToString());
 				string zipPat=PIn.String(table.Rows[gridMain.SelectedIndices[i]]["ZipPat"].ToString());
+				long creditCardNum=PIn.Long(table.Rows[gridMain.SelectedIndices[i]]["CreditCardNum"].ToString());
 				info.Arguments+="/AMOUNT:"+amt.ToString("F2")+" /LOCKAMOUNT ";
 				info.Arguments+="/TRANSACTIONTYPE:PURCHASE /LOCKTRANTYPE ";
 				if(table.Rows[gridMain.SelectedIndices[i]]["XChargeToken"].ToString()!="") {
 					info.Arguments+="/XCACCOUNTID:"+table.Rows[gridMain.SelectedIndices[i]]["XChargeToken"].ToString()+" ";
 					info.Arguments+="/RECURRING ";
+					info.Arguments+="/GETXCACCOUNTIDSTATUS ";
 				}
 				else {
 					info.Arguments+="/ACCOUNT:"+table.Rows[gridMain.SelectedIndices[i]]["CCNumberMasked"].ToString()+" ";
@@ -483,6 +487,9 @@ namespace OpenDental {
 				Thread.Sleep(200);//Wait 2/10 second to give time for file to be created.
 				Cursor=Cursors.Default;
 				string line="";
+				bool updateCard=false;
+				string newAccount="";
+				DateTime newExpiration=new DateTime();
 				StringBuilder strBuilderResultText=new StringBuilder();
 				strBuilderResultFile.AppendLine("PatNum: "+patNum+" Name: "+table.Rows[i]["PatName"].ToString());
 				try {
@@ -501,6 +508,18 @@ namespace OpenDental {
 									labelFailed.Text=Lan.g(this,"Failed=")+_failed;
 								}
 							}
+							else if(line=="XCACCOUNTIDUPDATED=T") {//Decline minimizer updated the account information since the last time this card was charged
+								updateCard=true;
+								_updated++;
+								labelUpdated.Text=Lan.g(this,"Updated=")+_updated;
+							}
+							else if(line.StartsWith("ACCOUNT=")) {
+								newAccount=line.Substring("ACCOUNT=".Length);
+							}
+							else if(line.StartsWith("EXPIRATION=")) {
+								string expStr=line.Substring("EXPIRATION=".Length);//Expiration should be MMYY
+								newExpiration=new DateTime(PIn.Int("20"+expStr.Substring(2)),PIn.Int(expStr.Substring(0,2)),1);//First day of the month
+							}
 							line=reader.ReadLine();
 						}
 						strBuilderResultFile.AppendLine(strBuilderResultText.ToString());
@@ -512,6 +531,13 @@ namespace OpenDental {
 				}
 				if(insertPayment) {
 					CreatePayment(patCur,i,strBuilderResultText.ToString());
+				}
+				//If the decline minimizer updated the card, returned a value in the ACCOUNT field, and returned a valid exp date.  Update our record.
+				if(updateCard && newAccount!="" && newExpiration.Year>1880) {
+					CreditCard creditCardCur=CreditCards.GetOne(creditCardNum);
+					creditCardCur.CCNumberMasked=newAccount;
+					creditCardCur.CCExpiration=newExpiration;
+					CreditCards.Update(creditCardCur);
 				}
 			}
 			try {
@@ -758,7 +784,13 @@ namespace OpenDental {
 			else if(_progCur.ProgName==ProgramName.PayConnect.ToString()) {
 				SendPayConnect();
 			}
-			FillGrid();
+			try {
+				FillGrid();
+			}
+			catch(ObjectDisposedException) {
+				//This likely occurred if the user clicked Close before the charges were done processing. Since we don't need to display the grid, we can
+				//do nothing.
+			}
 			labelCharged.Text=Lan.g(this,"Charged=")+_success;
 			labelFailed.Text=Lan.g(this,"Failed=")+_failed;
 			MsgBox.Show(this,"Done charging cards.\r\nIf there are any patients remaining in list, print the list and handle each one manually.");

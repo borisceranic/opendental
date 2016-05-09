@@ -25,6 +25,7 @@ namespace OpenDental{
 		private void InitializeComponent() {
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormCreditRecurringCharges));
 			this.groupCounts = new System.Windows.Forms.GroupBox();
+			this.labelUpdated = new System.Windows.Forms.Label();
 			this.labelFailed = new System.Windows.Forms.Label();
 			this.labelCharged = new System.Windows.Forms.Label();
 			this.labelSelected = new System.Windows.Forms.Label();
@@ -43,20 +44,30 @@ namespace OpenDental{
 			// groupCounts
 			// 
 			this.groupCounts.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupCounts.Controls.Add(this.labelUpdated);
 			this.groupCounts.Controls.Add(this.labelFailed);
 			this.groupCounts.Controls.Add(this.labelCharged);
 			this.groupCounts.Controls.Add(this.labelSelected);
 			this.groupCounts.Controls.Add(this.labelTotal);
-			this.groupCounts.Location = new System.Drawing.Point(807, 196);
+			this.groupCounts.Location = new System.Drawing.Point(807, 177);
 			this.groupCounts.Name = "groupCounts";
-			this.groupCounts.Size = new System.Drawing.Size(96, 103);
+			this.groupCounts.Size = new System.Drawing.Size(96, 115);
 			this.groupCounts.TabIndex = 34;
 			this.groupCounts.TabStop = false;
 			this.groupCounts.Text = "Counts";
 			// 
+			// labelUpdated
+			// 
+			this.labelUpdated.Location = new System.Drawing.Point(4, 76);
+			this.labelUpdated.Name = "labelUpdated";
+			this.labelUpdated.Size = new System.Drawing.Size(89, 16);
+			this.labelUpdated.TabIndex = 33;
+			this.labelUpdated.Text = "Updated=0";
+			this.labelUpdated.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
 			// labelFailed
 			// 
-			this.labelFailed.Location = new System.Drawing.Point(4, 76);
+			this.labelFailed.Location = new System.Drawing.Point(4, 95);
 			this.labelFailed.Name = "labelFailed";
 			this.labelFailed.Size = new System.Drawing.Size(89, 16);
 			this.labelFailed.TabIndex = 32;
@@ -141,6 +152,7 @@ namespace OpenDental{
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridMain.AutoScroll = true;
+			this.gridMain.HasAddButton = false;
 			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(12, 12);
@@ -225,10 +237,8 @@ namespace OpenDental{
 			this.Controls.Add(this.butSend);
 			this.Controls.Add(this.butCancel);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-			this.KeyPreview = true;
 			this.MinimumSize = new System.Drawing.Size(542, 416);
 			this.Name = "FormCreditRecurringCharges";
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Credit Card Recurring Charges";
 			this.Load += new System.EventHandler(this.FormRecurringCharges_Load);
 			this.groupCounts.ResumeLayout(false);
@@ -251,5 +261,6 @@ namespace OpenDental{
 		private UI.Button butAll;
 		private UI.Button butPrintList;
 		private System.Windows.Forms.CheckBox checkHideBold;
+		private System.Windows.Forms.Label labelUpdated;
 	}
 }

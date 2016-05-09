@@ -1607,6 +1607,10 @@ namespace OpenDental {
 			string signatureResult="";
 			string receipt="";
 			bool isDigitallySigned=false;
+			bool updateCard=false;
+			string newAccount="";
+			long creditCardNum;
+			DateTime newExpiration=new DateTime();
 			try {
 				using(TextReader reader=new StreamReader(resultfile)) {
 					line=reader.ReadLine();
@@ -1685,6 +1689,16 @@ namespace OpenDental {
 							}
 							receipt=receipt.Replace("\r","").Replace("\n","\r\n");//remove any existing \r's before replacing \n's with \r\n's
 						}
+						if(line=="XCACCOUNTIDUPDATED=T") {//Decline minimizer updated the account information since the last time this card was charged
+							updateCard=true;
+						}
+						if(line.StartsWith("ACCOUNT=")) {
+							newAccount=line.Substring("ACCOUNT=".Length);
+						}
+						if(line.StartsWith("EXPIRATION=")) {
+							string expStr=line.Substring("EXPIRATION=".Length);//Expiration should be MMYY
+							newExpiration=new DateTime(PIn.Int("20"+expStr.Substring(2)),PIn.Int(expStr.Substring(0,2)),1);//First day of the month
+						}
 						line=reader.ReadLine();
 					}
 					if(needToken && !string.IsNullOrEmpty(xChargeToken)) {
@@ -1728,11 +1742,17 @@ namespace OpenDental {
 							cc.Procedures=string.Join(",",listDefaultProcs);
 							cc.CCSource=CreditCardSource.XServer;
 							cc.ClinicNum=_paymentCur.ClinicNum;
-							CreditCards.Insert(cc);
+							creditCardNum=CreditCards.Insert(cc);
 						}
 						else if(string.IsNullOrEmpty(xChargeToken)) {//Shouldn't happen again but leaving just in case.
 							MsgBox.Show(this,"X-Charge didn't return a token so credit card information couldn't be saved.");
 						}
+					}
+					if(updateCard && newAccount!="" && newExpiration.Year>1880) {
+						cc.CCNumberMasked=newAccount;
+						cc.CCExpiration=newExpiration;
+						CreditCards.Update(cc);
+						MsgBox.Show(this,"Credit card information automatically updated via Decline Minimizer.");
 					}
 				}
 			}
@@ -2032,6 +2052,7 @@ namespace OpenDental {
 					if(hasXToken) {
 						tranText+="/XCACCOUNTID:"+CCard.XChargeToken+" ";
 						tranText+="/AUTOPROCESS ";
+						tranText+="/GETXCACCOUNTIDSTATUS ";
 					}
 					if(notRecurring) {
 						tranText+="/ACCOUNT:"+CCard.CCNumberMasked+" ";
@@ -2043,6 +2064,7 @@ namespace OpenDental {
 					if(hasXToken) {
 						tranText+="/XCACCOUNTID:"+CCard.XChargeToken+" ";
 						tranText+="/AUTOPROCESS ";
+						tranText+="/GETXCACCOUNTIDSTATUS ";
 					}
 					if(notRecurring) {
 						tranText+="/ACCOUNT:"+CCard.CCNumberMasked+" ";
@@ -2064,6 +2086,7 @@ namespace OpenDental {
 					if(hasXToken) {
 						tranText+="/XCACCOUNTID:"+CCard.XChargeToken+" ";
 						tranText+="/AUTOPROCESS ";
+						tranText+="/GETXCACCOUNTIDSTATUS ";
 					}
 					if(notRecurring) {
 						tranText+="/ACCOUNT:"+CCard.CCNumberMasked+" ";
