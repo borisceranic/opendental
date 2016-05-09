@@ -27,8 +27,11 @@ namespace OpenDental {
 		private DataTable _tableOrtho;
 		///<summary>True if there are any ortho display fields with the internal name of "Signature"</summary>
 		private bool _showSigBox;
-		///<summary>Keeps track of the column index of the Signature field if one is present.</summary>
+		///<summary>Keeps track of the column index of the Signature field if one is present.
+		///This column index represents the the index of the grid that is displayed to the user, not the index within _tableOrtho.</summary>
 		private int _sigColIdx=-1;
+		///<summary>Keeps track of the column index within _tableOrtho of the Signature field if one is present.</summary>
+		private int _sigTableOrthoColIdx=-1;
 		private int _prevRow;
 		private bool _sigClearWasClicked;
 		private bool _topazNeedsSaved;
@@ -77,6 +80,9 @@ namespace OpenDental {
 			_tableOrtho.Columns.Add(Lan.g(this,"Date"),typeof(DateTime));
 			_listDisplayFieldNames=new List<string>();
 			foreach(DisplayField field in _listOrthDisplayFields) {
+				if(field.InternalName=="Signature") {
+					_sigTableOrthoColIdx=_tableOrtho.Columns.Count;
+				}
 				_tableOrtho.Columns.Add(field.Description);//Set the column header to the description of the display field.  Used in FillGrid().
 				_listDisplayFieldNames.Add(field.Description);
 			}
@@ -268,10 +274,10 @@ namespace OpenDental {
 			if(gridMain.SelectedCell.Y==-1) {
 				return;
 			}			
-			if(OrthoSignature.GetSigString(_tableOrtho.Rows[gridMain.SelectedCell.Y][_sigColIdx].ToString())!="") {
+			if(OrthoSignature.GetSigString(_tableOrtho.Rows[gridMain.SelectedCell.Y][_sigTableOrthoColIdx].ToString())!="") {
 				_hasChanged=true;
 			}
-			_tableOrtho.Rows[gridMain.SelectedCell.Y][_sigColIdx]="";
+			_tableOrtho.Rows[gridMain.SelectedCell.Y][_sigTableOrthoColIdx]="";
 			SetSignature(gridMain.SelectedCell.Y);
 			_prevRow=gridMain.SelectedCell.Y;
 			_sigClearWasClicked=true;
@@ -281,10 +287,10 @@ namespace OpenDental {
 			if(gridMain.SelectedCell.Y==-1) {
 				return;
 			}
-			if(OrthoSignature.GetSigString(_tableOrtho.Rows[gridMain.SelectedCell.Y][_sigColIdx].ToString())!="") {
+			if(OrthoSignature.GetSigString(_tableOrtho.Rows[gridMain.SelectedCell.Y][_sigTableOrthoColIdx].ToString())!="") {
 				_hasChanged=true;
 			}
-			_tableOrtho.Rows[gridMain.SelectedCell.Y][_sigColIdx]="";
+			_tableOrtho.Rows[gridMain.SelectedCell.Y][_sigTableOrthoColIdx]="";
 			SetSignature(gridMain.SelectedCell.Y);
 			_prevRow=gridMain.SelectedCell.Y;
 			_topazNeedsSaved=true;
@@ -381,7 +387,7 @@ namespace OpenDental {
 				return;
 			}
 			DateTime orthoDate=PIn.Date(_tableOrtho.Rows[gridRow][0].ToString());
-			OrthoSignature sig=new OrthoSignature(_tableOrtho.Rows[gridRow][_sigColIdx].ToString());
+			OrthoSignature sig=new OrthoSignature(_tableOrtho.Rows[gridRow][_sigTableOrthoColIdx].ToString());
 			if(sig.SigString=="") {
 				signatureBoxWrapper.ClearSignature();
 				gridMain.Rows[gridRow].ColorBackG=SystemColors.Window;
@@ -439,9 +445,9 @@ namespace OpenDental {
 			if(sig.IsTopaz && !_topazNeedsSaved) {
 				return;
 			}
-			if(OrthoSignature.GetSigString(_tableOrtho.Rows[gridRow][_sigColIdx].ToString())!=sig.SigString) {
+			if(OrthoSignature.GetSigString(_tableOrtho.Rows[gridRow][_sigTableOrthoColIdx].ToString())!=sig.SigString) {
 				_hasChanged=true;
-				_tableOrtho.Rows[gridRow][_sigColIdx]=sig.ToString();
+				_tableOrtho.Rows[gridRow][_sigTableOrthoColIdx]=sig.ToString();
 			}
 		}
 
@@ -620,11 +626,11 @@ namespace OpenDental {
 			//Save data from grid to table
 			for(int i=0;i<gridMain.Rows.Count;i++) {
 				_tableOrtho.Rows[i][0]=gridMain.Rows[i].Tag;//store date
-				for(int j=0;j<_listOrthDisplayFields.Count;j++) {
-					if(_listOrthDisplayFields[j].InternalName=="Signature") {
-						continue;//Already saved to table
+				for(int j=0;j<gridMain.Columns.Count;j++) {
+					if(j==_sigColIdx) {
+						continue;//Skip signature field.
 					}
-					_tableOrtho.Rows[i][j+1]=gridMain.Rows[i].Cells[j+1].Text;
+					_tableOrtho.Rows[i][_tableOrtho.Columns.IndexOf(gridMain.Columns[j].Heading)]=gridMain.Rows[i].Cells[j].Text;
 				}
 			}
 			if(_showSigBox) {
@@ -632,7 +638,7 @@ namespace OpenDental {
 				for(int i=0;i<_tableOrtho.Rows.Count;i++) {
 					bool allEmpty=true;
 					for(int j=1;j<_tableOrtho.Columns.Count;j++) {//skip col 0
-						if(_tableOrtho.Rows[i][j].ToString() != "" && j != _sigColIdx) {
+						if(_tableOrtho.Rows[i][j].ToString() != "" && j != _sigTableOrthoColIdx) {
 							allEmpty=false;
 							break;
 						}
