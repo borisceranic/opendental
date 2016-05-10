@@ -13575,7 +13575,7 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString='16.1.20.0' WHERE PrefName='DataBaseVersion'";
 				Db.NonQ(command);
 			}
-			To16_2_0();
+			To16_2_1();
 		}
 
 	}
