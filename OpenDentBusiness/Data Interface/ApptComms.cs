@@ -63,6 +63,17 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary></summary>
+		public static void TruncateAll() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod());
+				return;
+			}
+			//Truncate also resets autoincrement, this is ok for the apptcomm table.
+			string command="TRUNCATE TABLE apptcomm";
+			Db.NonQ(command);
+		}
+
+		///<summary></summary>
 		public static void DeleteForAppt(long apptNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),apptNum);
@@ -133,8 +144,8 @@ namespace OpenDentBusiness{
 			double hourInterval=PrefC.GetDouble(PrefName.ApptReminderHourInterval);
 			DateTime automationBeginPref=PrefC.GetDateT(PrefName.AutomaticCommunicationTimeStart);
 			DateTime automationEndPref=PrefC.GetDateT(PrefName.AutomaticCommunicationTimeEnd);
+			TruncateAll();
 			foreach(Appointment appt in listFutureAppts) {
-				DeleteForAppt(appt.AptNum);
 				//Get the DateTime automation end
 				InsertForAppt(appt,dayInterval,hourInterval,automationBeginPref,automationEndPref);
 			}
