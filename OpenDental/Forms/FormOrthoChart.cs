@@ -146,6 +146,8 @@ namespace OpenDental {
 			_sigColIdx=-1;//Clear out the signature column index cause it will most likely change or disappear (switching tabs)
 			int gridMainScrollValue=gridMain.ScrollValue;
 			gridMain.BeginUpdate();
+			//Set the title of the grid to the title of the currently selected ortho chart tab.  This is so that medical users don't see Ortho Chart.
+			gridMain.Title=orthoChartTab.TabName;
 			gridMain.Columns.Clear();
 			ODGridColumn col;
 			//First column will always be the date.  gridMain_CellLeave() depends on this fact.
