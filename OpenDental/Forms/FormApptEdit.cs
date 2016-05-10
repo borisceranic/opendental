@@ -122,10 +122,6 @@ namespace OpenDental{
 		///<summary>Procedure were attached/detached from appt and the user clicked cancel or closed the form.
 		///Used in ApptModule to tell if we need to refresh.</summary>
 		public bool HasProcsChangedAndCancel;
-		///<summary>A list of all procs for this patient.  Enables the user to edit and attach procs from other appointments.</summary>
-		private List<Procedure> _listProcs;
-		///<summary>A list of all procs for this patient from the database.  Used for syncing and recovering information if appointment cancelled/deleted.</summary>
-		private List<Procedure> _listProcsFromDB;
 		///<summary>Lab for the current appointment.  It may be null if there is no lab.</summary>
 		private LabCase _labCur;
 		///<summary>A list of appointments for this patient that are either scheduled or planned.</summary>
@@ -136,8 +132,6 @@ namespace OpenDental{
 		private DataTable _tableFields;
 		private DataTable _tableComms;
 		private List<ProcedureCode> _listProcCodes;
-		///<summary>A short list of procedures which were moved from another appointment to this appointment.</summary>
-		private List<Procedure> _listProcsMoved;
 		private Label labelPlannedComplete;
 		///<summary>Local copy of the provider cache for convenience due to how frequently provider cache is accessed.</summary>
 		private List<Provider> _listProvidersAll;
@@ -153,6 +147,10 @@ namespace OpenDental{
 		private long _selectedProvNum;
 		///<summary>Instead of relying on _listProviders[comboProvHyg.SelectedIndex] to determine the selected Provider we use this variable to store it explicitly.</summary>
 		private long _selectedProvHygNum;
+		///<summary>All ProcNums attached to the appt when form opened.</summary>
+		private List<long> _listProcNumsAttachedStart;
+		///<summary>Used when first loading the form to skip calling fill methods multiple times.</summary>
+		private bool _isOnLoad;
 
 		///<summary></summary>
 		public FormApptEdit(long aptNum)
@@ -163,7 +161,6 @@ namespace OpenDental{
 			InitializeComponent();
 			Lan.F(this);
 			AptCur=Appointments.GetOneApt(aptNum);//We need this query to get the PatNum for the appointment.
-			_listProcsMoved=new List<Procedure>();
 		}
 
 		/// <summary>Clean up any resources being used.</summary>
@@ -1215,6 +1212,7 @@ namespace OpenDental{
 		#endregion
 
 		private void FormApptEdit_Load(object sender, System.EventArgs e){
+			_isOnLoad=true;
 			tbTime.CellClicked += new OpenDental.ContrTable.CellEventHandler(tbTime_CellClicked);
 			_listAppointments=Appointments.GetListForPat(AptCur.PatNum);
 			_listAppointmentsOld=_listAppointments.Select(x => x.Clone()).ToList();
@@ -1257,12 +1255,7 @@ namespace OpenDental{
 			PlanList=InsPlans.RefreshForSubList(SubList);
 			_tableFields=Appointments.GetApptFields(AptCur.AptNum);
 			_tableComms=Appointments.GetCommTable(AptCur.PatNum.ToString());
-			_listProcs=Procedures.GetProcsForApptEdit(AptCur);
 			_listProvidersAll=ProviderC.ListLong;
-			_listProcsFromDB=new List<Procedure>();
-			for(int i=0;i<_listProcs.Count;i++) {
-				_listProcsFromDB.Add(_listProcs[i].Copy());
-			}
 			_isPlanned=false;
 			if(AptCur.AptStatus==ApptStatus.Planned) {
 				_isPlanned=true;
@@ -1543,6 +1536,7 @@ namespace OpenDental{
 			#if DEBUG
 				Text="AptNum"+AptCur.AptNum;
 			#endif
+			_isOnLoad=false;
 			Plugins.HookAddCode(this,"FormApptEdit.Load_End",pat,butText);
 			Plugins.HookAddCode(this,"FormApptEdit.Load_end2",AptCur);//Lower casing the code area (_end) is the newer pattern for this.
 		}
@@ -1551,8 +1545,10 @@ namespace OpenDental{
 			if(comboClinic.SelectedIndex>-1) {
 				_selectedClinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
 			}
-			fillComboProvHyg();
-			FillProcedures();
+			if(!_isOnLoad) {//If not called when loading form
+				fillComboProvHyg();
+				FillProcedures();
+			}
 		}
 
 		private void comboProv_SelectedIndexChanged(object sender,EventArgs e) {
@@ -1611,22 +1607,24 @@ namespace OpenDental{
 			comboProvHyg.IndexSelectOrSetText(_listProvHygs.FindIndex(x => x.ProvNum==_selectedProvHygNum),() => { return Providers.GetAbbr(_selectedProvHygNum); });
 		}
 
-		///<summary>If an eCW program link is turned on, then this attaches completed procs with the same date as the appt.</summary>
+		///<summary>If an eCW program link is turned on, then this attaches completed procs with the same date as the appt.
+		///This needs to be called after FillProcedures()</summary>
 		private void SetProceduresForECW() {
 			if(!Programs.UsingEcwTightOrFullMode()) {
-			  return;
+				return;
 			}
 			List<Procedure> listProcs=new List<Procedure>();
 			//this is a method that attaches very specific kinds of procedures to appt
-			for(int i=0;i<_listProcs.Count;i++) {//loop through procs
-				if(_listProcs[i].ProcStatus != ProcStat.C) {//must be complete proc
+			for(int i=0;i<gridProc.Rows.Count;i++) {//loop through procs
+				Procedure proc = (Procedure)gridProc.Rows[i].Tag;
+				if(proc.ProcStatus != ProcStat.C) {//must be complete proc
 					continue;
 				}
-				if(_listProcs[i].ProcDate.Date != AptCur.AptDateTime.Date) {//must have same date as appt
+				if(proc.ProcDate.Date != AptCur.AptDateTime.Date) {//must have same date as appt
 					continue;
 				}
 				gridProc.SetSelected(i,true);//harmless if already selected.
-				listProcs.Add(_listProcs[i]);
+				listProcs.Add(proc);
 			}
 			//Now attach the procedures to the appt in the database.
 			for(int i=0;i<listProcs.Count;i++) {
@@ -1755,7 +1753,17 @@ namespace OpenDental{
 				gridProc.Columns.Add(col);
 			}
 			ODGridRow row;
-			foreach(Procedure proc in _listProcs) {
+			//Every time the procedures available have been manipulated (associated to appt, deleted, etc) we need to refresh the list from the db.
+			//This has the potential to call the database a lot (cell click via a grid) but we accept this insufficiency for the benefit of concurrency.
+			//If the following call to the db is to be removed, make sure that all procedure manipulations from FormProcEdit, FormClaimProcEdit, etc.
+			//  handle the changes accordingly.  Changing this call to the database should not be done 'lightly'.  Heed our warning.
+			List<Procedure> listProcs=Procedures.GetProcsForApptEdit(AptCur);
+			listProcs.Sort(ProcedureLogic.CompareProcedures);
+			if(_listProcNumsAttachedStart==null) {//Happening on load
+				//set ProcNums attached to the appt when form opened for use in automation on closing.
+				_listProcNumsAttachedStart=listProcs.Select(x => x.ProcNum).ToList();
+			}
+			foreach(Procedure proc in listProcs) {
 				row=new ODGridRow();
 				ProcedureCode procCode=ProcedureCodes.GetProcCode(proc.CodeNum);
 				foreach(DisplayField displayField in listAptDisplayFields) {
@@ -1808,11 +1816,11 @@ namespace OpenDental{
 				gridProc.Rows.Add(row);
 			}
 			gridProc.EndUpdate();
-			for(int i=0;i<_listProcs.Count;i++){
-				if(_isPlanned && _listProcs[i].PlannedAptNum==AptCur.AptNum) {
+			for(int i=0;i<listProcs.Count;i++) {
+				if(_isPlanned && listProcs[i].PlannedAptNum==AptCur.AptNum) {
 					gridProc.SetSelected(i,true);
 				}
-				else if(!_isPlanned && _listProcs[i].AptNum==AptCur.AptNum) {
+				else if(!_isPlanned && listProcs[i].AptNum==AptCur.AptNum) {
 					gridProc.SetSelected(i,true);
 				}
 			}
@@ -1909,7 +1917,27 @@ namespace OpenDental{
 					isSelected=true;
 				}
 			}
-			Procedure proc=_listProcs[e.Row];
+			Procedure proc=(Procedure)gridProc.Rows[e.Row].Tag;
+			Procedure procOld=proc.Copy();
+			//The procedure wasn't selected prior to the cell click and is attached to a different appointment or planned appointment.
+			if(!isSelected && (!_isPlanned && proc.AptNum!=0 || _isPlanned && proc.PlannedAptNum!=0)) {
+				if(!MsgBox.Show(this,true,"This will permanently detach the procedure from a different appointment.  Continue with these changes?")) {
+					return;
+				}
+				if(_isPlanned) {
+					Appointment apptOldPlanned = _listAppointments.FirstOrDefault(x => x.AptNum==proc.PlannedAptNum && x.AptStatus==ApptStatus.Planned);
+					SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,AptCur.PatNum,Lan.g(this,"Procedure")+" "
+						+ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).AbbrDesc+" "+Lan.g(this,"moved from planned appointment created on")+" "
+						+apptOldPlanned.AptDateTime.ToShortDateString()+" "+Lan.g(this,"to planned appointment created on")+" "
+						+AptCur.AptDateTime.ToShortDateString());
+				}
+				else {
+					Appointment apptOld = _listAppointments.FirstOrDefault(x => x.AptNum==proc.AptNum);
+					SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,AptCur.PatNum,Lan.g(this,"Procedure")+" "
+						+ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).AbbrDesc+" "+Lan.g(this,"moved from appointment on")+" "+apptOld.AptDateTime
+						+" "+Lan.g(this,"to appointment on")+" "+AptCur.AptDateTime);
+				}
+			}
 			if(isSelected && _isPlanned) {//Detatching from this planned appointment.
 				proc.PlannedAptNum=0;
 			}
@@ -1932,6 +1960,7 @@ namespace OpenDental{
 					proc.AptNum=AptCur.AptNum;
 				}
 			}
+			Procedures.Update(proc,procOld);//Update above changes to db.
 			FillProcedures();
 			CalculateTime();
 			FillTime();
@@ -1939,21 +1968,14 @@ namespace OpenDental{
 		}
 
 		private void gridProc_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			Procedure proc=_listProcs[e.Row].Copy();//Make a copy so if the user cancels we don't reflect changes.
+			//Get fresh copy from DB so we are not editing a stale procedure
+			//If this is to be changed, make sure that this window is registering for procedure changes via signals or by some other means.
+			Procedure proc=Procedures.GetOneProc(((Procedure)gridProc.Rows[e.Row].Tag).ProcNum,true);
 			FormProcEdit FormP=new FormProcEdit(proc,pat,fam);
 			FormP.ShowDialog();
 			if(FormP.DialogResult!=DialogResult.OK){
 				return;
 			}
-			//we can go to the db for this proc because FormProcEdit saves changes before returning to this form
-			if(Procedures.GetOneProc(proc.ProcNum,true).ProcStatus==ProcStat.D) {//User deleted the procedure.
-				_listProcsMoved.Remove(_listProcs[e.Row]);
-				_listProcs.RemoveAt(e.Row);
-			}
-			else {//User did not delete the procedure.
-				_listProcs[e.Row]=proc;//Replace the proc in the mem list with the edited proc.
-			}
-			_listProcs.Sort(ProcedureLogic.CompareProcedures);
 			FillProcedures();
 			CalculateTime();
 			FillTime();
@@ -1973,7 +1995,6 @@ namespace OpenDental{
 			}
 			if(appt!=null) {
 				SetProcDescript(appt);
-				_listProcsMoved.Add(proc);
 			}
 		}
 
@@ -1990,7 +2011,7 @@ namespace OpenDental{
 			int skippedSecurity=0;
 			try{
 				for(int i=gridProc.SelectedIndices.Length-1;i>=0;i--) {
-					Procedure proc=_listProcs[gridProc.SelectedIndices[i]];
+					Procedure proc=(Procedure)gridProc.Rows[gridProc.SelectedIndices[i]].Tag;
 					if(!Security.IsAuthorized(Permissions.ProcComplEdit,proc.DateEntryC,true)) {
 						if(proc.ProcStatus==ProcStat.C) {
 							skipped++;
@@ -2005,9 +2026,7 @@ namespace OpenDental{
 						skippedSecurity++;
 						continue;
 					}
-					Procedures.ValidateDelete(proc.ProcNum);
-					_listProcsMoved.Remove(proc);
-					_listProcs.Remove(proc);//Actual deletion will be done in the Sync at close.
+					Procedures.Delete(proc.ProcNum);
 					if(proc.ProcStatus==ProcStat.C) {
 						SecurityLogs.MakeLogEntry(Permissions.ProcComplEdit,AptCur.PatNum,ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum)
 							+", "+proc.ProcFee.ToString("c")+", Deleted");
@@ -2119,14 +2138,7 @@ namespace OpenDental{
 				}
 				return;
 			}
-			_listProcs.Add(proc);//In Appointments.cs there is no ORDER BY clause for getting the appointments...  We may want to think about ordering the list.
-			if(_isPlanned) {
-				proc.PlannedAptNum=AptCur.AptNum;
-			}
-			else {
-				proc.AptNum=AptCur.AptNum;
-			}
-			_listProcs.Sort(ProcedureLogic.CompareProcedures);
+			Procedures.AttachToApt(proc.ProcNum,AptCur.AptNum,_isPlanned);
 			FillProcedures();
 			CalculateTime();
 			FillTime();
@@ -2258,8 +2270,8 @@ namespace OpenDental{
 				provHyg=_selectedProvHygNum;
 			}
 			List<long> codeNums=new List<long>();
-			for(int i=0;i<gridProc.SelectedIndices.Length;i++) {
-				codeNums.Add(_listProcs[gridProc.SelectedIndices[i]].CodeNum);
+			foreach(int i in gridProc.SelectedIndices) {
+				codeNums.Add(((Procedure)gridProc.Rows[i].Tag).CodeNum);
 			}
 			strBTime=new StringBuilder(Appointments.CalculatePattern(provDent,provHyg,codeNums,false));
 			//Plugins.HookAddCode(this,"FormApptEdit.CalculateTime_end",strBTime,provDent,provHyg,codeNums);//set strBTime, but without using the 'new' keyword.--Hook removed.
@@ -2439,10 +2451,7 @@ namespace OpenDental{
 				Procedures.ComputeEstimates(proc,pat.PatNum,ClaimProcList,false,PlanList,PatPlanList,benefitList,pat.Age,SubList);
 				listAddedProcs.Add(proc);
 			}
-			//Get from db to remove nulls. Consider initializing dates and strings instead.  Safe to get from DB since they were just inserted above.
-			_listProcs.AddRange(Procedures.GetManyProc(listAddedProcs.Select(x => x.ProcNum).ToList(),false));
 			listQuickAdd.SelectedIndex=-1;
-			_listProcs.Sort(ProcedureLogic.CompareProcedures);
 			FillProcedures();
 			for(int i=0;i<gridProc.Rows.Count;i++) {
 				if(listAddedProcs.Contains((Procedure)gridProc.Rows[i].Tag)) {
@@ -2584,8 +2593,7 @@ namespace OpenDental{
 			FillFields();
 		}
 
-		///<summary>Called from butOK_Click and butPin_Click. Only saves appointment infomration to DB. Procedure information is updated to _listProcs for
-		///use with syncing later.</summary>
+		///<summary>Called from butOK_Click and butPin_Click. Only saves appointment information to DB.</summary>
 		private bool UpdateListAndDB(){
 			DateTime dateTimeAskedToArrive=DateTime.MinValue;
 			if((AptOld.AptStatus==ApptStatus.Complete && comboStatus.SelectedIndex!=1)
@@ -2751,32 +2759,32 @@ namespace OpenDental{
 				MessageBox.Show(ex.Message);
 				return false;
 			}
-			//if appointment is marked complete and any procedures are not,
-			//then set the remaining procedures complete
+			//if appointment is marked complete and any procedures are not, then set the remaining procedures complete.
 			if(AptCur.AptStatus!=ApptStatus.Complete) {
-				for(int i=0;i<_listProcs.Count;i++) {
-					if(!gridProc.SelectedIndices.Contains(i)) {
-						continue;
-					}
-					_listProcs[i]=Procedures.UpdateProcInAppointment(AptCur,_listProcs[i]);
+				foreach(int i in gridProc.SelectedIndices) {
+					//We only want to change the fields that just changed.  We don't want to undo any changes that are being made outside this window.  Note
+					//that if we make any other changes to this proc that are not in this section we should consolidate update statements.
+					Procedure procOld = ((Procedure)gridProc.Rows[i].Tag).Copy();
+					gridProc.Rows[i].Tag=Procedures.UpdateProcInAppointment(AptCur,(Procedure)gridProc.Rows[i].Tag);//Doesn't update DB
+					Procedures.Update((Procedure)gridProc.Rows[i].Tag,procOld);//Update fields if needed.
 				}
 			}
-			else if(gridProc.SelectedIndices.Select(x => _listProcs[x]).Any(x => x.ProcStatus!=ProcStat.C)) {//appt is complete and a proc attached is not
+			else if(gridProc.SelectedIndices.Select(x => (Procedure)gridProc.Rows[x].Tag).Any(x => x.ProcStatus!=ProcStat.C)) {
+				//appt is complete and a proc attached is not
 				if(!Security.IsAuthorized(Permissions.ProcComplCreate,AptCur.AptDateTime)) {
-					return false;
+					return false;//This permission check should probably moved up earlier not after the appt has already been updated.
 				}
 				List<PatPlan> listPatPlans=PatPlans.Refresh(AptCur.PatNum);
 				List<Procedure> listSelectedProcs=new List<Procedure>();
-				gridProc.SelectedIndices.ToList().ForEach(x => listSelectedProcs.Add(_listProcs[x]));
-				listSelectedProcs=ProcedureL.SetCompleteInAppt(AptCur,PlanList,listPatPlans,pat.SiteNum,pat.Age,SubList,listSelectedProcs);
+				listSelectedProcs=ProcedureL.SetCompleteInAppt(AptCur,PlanList,listPatPlans,pat.SiteNum,pat.Age,SubList);
 				Procedure procNew;
-				//update _listProcs with changes made to listSelectedProcs
-				for(int i=0;i<_listProcs.Count;i++) {
-					procNew=listSelectedProcs.FirstOrDefault(x => x.ProcNum==_listProcs[i].ProcNum);
+				//update tags with changes made to listSelectedProcs so that anyone accessing it later has an updated copy.
+				foreach(ODGridRow row in gridProc.Rows) {
+					procNew=listSelectedProcs.FirstOrDefault(x => x.ProcNum==((Procedure)row.Tag).ProcNum);
 					if(procNew==null) {//if proc is not selected, continue
 						continue;
 					}
-					_listProcs[i]=procNew.Copy();
+					row.Tag=procNew.Copy();
 				}
 				if(AptOld.AptStatus==ApptStatus.Complete) {//seperate log entry for completed appointments
 					SecurityLogs.MakeLogEntry(Permissions.AppointmentCompleteEdit,pat.PatNum,AptCur.AptDateTime.ToShortDateString()
@@ -2857,7 +2865,6 @@ namespace OpenDental{
 					if(!PrefC.GetBool(PrefName.EasyHidePublicHealth)) {
 						procedureCur.SiteNum=pat.SiteNum;
 					}
-					_listProcs.Add(procedureCur);
 					Procedures.Insert(procedureCur);
 					//Now make a claimproc if the patient has insurance.  We do this now for consistency because a claimproc could get created in the future.
 					List<Benefit> listBenefits=Benefits.Refresh(listPatPlans,listInsSubs);
@@ -2866,6 +2873,9 @@ namespace OpenDental{
 					FormProcBroken FormPB=new FormProcBroken(procedureCur);
 					FormPB.IsNew=true;
 					FormPB.ShowDialog();
+					//==tg: We used to add procedureCur to our current list of procedures (now gridProc.Rows[i].Tag).  However I don't think we need to here
+					//since we now push procedure changes to DB as they're needed instead of sync.  If it causes an issue in the future we'll need to deal with
+					//it here.  Note: Above broken appt proc isn't attached to the appt.
 				}
 				if(PrefC.GetBool(PrefName.BrokenApptAdjustment)) {
 					Adjustment AdjustmentCur=new Adjustment();
@@ -2903,8 +2913,8 @@ namespace OpenDental{
 			apt.ProcDescript="";
 			apt.ProcsColored="";
 			int numAptProcs=0;
-			for(int i=0;i<_listProcs.Count;i++) {
-				Procedure proc=_listProcs[i];
+			foreach(ODGridRow row in gridProc.Rows) {
+				Procedure proc=(Procedure)row.Tag;
 				if(apt.AptStatus==ApptStatus.Planned && apt.AptNum != proc.PlannedAptNum) {
 					continue;
 				}
@@ -2997,7 +3007,7 @@ namespace OpenDental{
 
 		private void butPDF_Click(object sender,EventArgs e) {
 			//this will only happen for eCW HL7 interface users.
-			List<Procedure> listProcsForAppt=_listProcs.FindAll(x => x.AptNum==AptCur.AptNum);
+			List<Procedure> listProcsForAppt=Procedures.GetProcsForSingle(AptCur.AptNum,AptCur.AptStatus==ApptStatus.Planned);
 			string duplicateProcs=ProcedureL.ProcsContainDuplicates(listProcsForAppt);
 			if(duplicateProcs!="") {
 				MessageBox.Show(duplicateProcs);
@@ -3093,7 +3103,7 @@ namespace OpenDental{
 			gridProg.NoteSpanStart=2;
 			gridProg.NoteSpanStop=7;
 			gridProg.Rows.Clear();
-			List<Procedure> procsForDay=_listProcs.FindAll(x => x.ProcDate.Date==AptCur.AptDateTime.Date || x.DateEntryC.Date==AptCur.AptDateTime.Date);
+			List<Procedure> procsForDay=Procedures.GetProcsForPatByDate(AptCur.PatNum,AptCur.AptDateTime);
 			for(int i=0;i<procsForDay.Count;i++){
 				Procedure proc=procsForDay[i];
 				ProcedureCode procCode=ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum);
@@ -3194,7 +3204,7 @@ namespace OpenDental{
 		private void butComplete_Click(object sender,EventArgs e) {
 			//This is only used with eCW HL7 interface.
 			if(butComplete.Text=="Finish && Send") {
-				List<Procedure> listProcsForAppt=_listProcs.FindAll(x => x.AptNum==AptCur.AptNum);
+				List<Procedure> listProcsForAppt=Procedures.GetProcsForSingle(AptCur.AptNum,AptCur.AptStatus==ApptStatus.Planned);
 				string duplicateProcs=ProcedureL.ProcsContainDuplicates(listProcsForAppt);
 				if(duplicateProcs!="") {
 					MessageBox.Show(duplicateProcs);
@@ -3230,10 +3240,10 @@ namespace OpenDental{
 					return;
 				}
 				comboStatus.SelectedIndex=1;//Set the appointment status to complete. This will trigger the procedures to be completed in UpdateToDB() as well.
-				if(!UpdateListAndDB()) {//procedure changes saved to db in sync call in form closing
+				if(!UpdateListAndDB()) {
 					return;
 				}
-				listProcsForAppt=_listProcs.FindAll(x => x.AptNum==AptCur.AptNum);//may not be necessary
+				listProcsForAppt=Procedures.GetProcsForSingle(AptCur.AptNum,AptCur.AptStatus==ApptStatus.Planned);
 				//Send DFT to eCW containing the attached procedures for this appointment in a .pdf file.				
 				string pdfDataStr=GenerateProceduresIntoPdf();
 				if(HL7Defs.IsExistingHL7Enabled()) {
@@ -3287,7 +3297,7 @@ namespace OpenDental{
 		}
 
 		private void butTask_Click(object sender,EventArgs e) {
-			if(!UpdateListAndDB()) {//procedure changes saved to db in sync call in form closing
+			if(!UpdateListAndDB()) {
 				return;
 			}
 			FormTaskListSelect FormT=new FormTaskListSelect(TaskObjectType.Appointment);//,AptCur.AptNum);
@@ -3309,7 +3319,7 @@ namespace OpenDental{
 		}
 
 		private void butPin_Click(object sender,System.EventArgs e) {
-			if(!UpdateListAndDB()) {//procedure changes saved to db in sync call in form closing
+			if(!UpdateListAndDB()) {
 				return;
 			}
 			PinClicked=true;
@@ -3421,7 +3431,6 @@ namespace OpenDental{
 					AptCur.AptNum);
 			}
 			if(IsNew) {
-				Procedures.Sync(_listProcs,AptCur);//Deleted procedures were not getting synced in new deleted appointments
 				DialogResult=DialogResult.Cancel;
 			}
 			else {
@@ -3434,29 +3443,7 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please select a provider.");
 				return;
 			}
-			if(_listProcsMoved.Count > 0) {
-				if(!MsgBox.Show(this,true,"Some procedures were detached from a different appointment.  Continue with these changes?")) {
-					return;
-				}
-				for(int i=0;i<_listProcsMoved.Count;i++) {
-					Procedure proc=_listProcsMoved[i];
-					Procedure procDB=_listProcsFromDB.FirstOrDefault(x => x.ProcNum==proc.ProcNum);
-					if(_isPlanned) {
-						Appointment apptOldPlanned=_listAppointments.FirstOrDefault(x => x.AptNum==procDB.PlannedAptNum && x.AptStatus==ApptStatus.Planned);
-						SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,AptCur.PatNum,Lan.g(this,"Procedure")+" "
-							+ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).AbbrDesc+" "+Lan.g(this,"moved from planned appointment created on")+" "
-							+apptOldPlanned.AptDateTime.ToShortDateString()+" "+Lan.g(this,"to planned appointment created on")+" "
-							+AptCur.AptDateTime.ToShortDateString());
-					}
-					else {
-						Appointment apptOld=_listAppointments.FirstOrDefault(x => x.AptNum==procDB.AptNum);
-						SecurityLogs.MakeLogEntry(Permissions.AppointmentEdit,AptCur.PatNum,Lan.g(this,"Procedure")+" "
-							+ProcedureCodes.GetProcCode(_listProcCodes,proc.CodeNum).AbbrDesc+" "+Lan.g(this,"moved from appointment on")+" "+apptOld.AptDateTime
-							+" "+Lan.g(this,"to appointment on")+" "+AptCur.AptDateTime);
-					}
-				}
-			}
-			if(!UpdateListAndDB()) {//procedure changes saved to db in sync call in form closing
+			if(!UpdateListAndDB()) {
 				return;
 			}
 			bool isCreateAppt=false;
@@ -3547,15 +3534,16 @@ namespace OpenDental{
 			//Do not use pat.PatNum here.  Use AptCur.PatNum instead.  Pat will be null in the case that the user does not have the appt create permission.
 			if(DialogResult!=DialogResult.OK) {
 				if(AptCur.AptStatus==ApptStatus.Complete) {
-					for(int i=0;i<_listProcs.Count;i++) {
+					//This is a completed appointment and we need to warn the user if they are trying to leave the window and need to detach procs first.
+					foreach(ODGridRow row in gridProc.Rows) {
 						bool attached=false;
-						if(AptCur.AptStatus==ApptStatus.Planned && _listProcs[i].PlannedAptNum==AptCur.AptNum) {
+						if(AptCur.AptStatus==ApptStatus.Planned && ((Procedure)row.Tag).PlannedAptNum==AptCur.AptNum) {
 							attached=true;
 						}
-						else if(_listProcs[i].AptNum==AptCur.AptNum) {
+						else if(((Procedure)row.Tag).AptNum==AptCur.AptNum) {
 							attached=true;
 						}
-						if(_listProcs[i].ProcStatus!=ProcStat.TP || !attached) {
+						if(((Procedure)row.Tag).ProcStatus!=ProcStat.TP || !attached) {
 							continue;
 						}
 						if(!Security.IsAuthorized(Permissions.AppointmentCompleteEdit,true)) {
@@ -3585,12 +3573,12 @@ namespace OpenDental{
 				}
 			}
 			else {//DialogResult==DialogResult.OK (User clicked OK or Delete)
-				Procedures.Sync(_listProcs,AptCur);
+				//Note that Procedures.Sync is never used.  This is intentional.  In order to properly use procedure.Sync logic in this form we would
+				//need to enhance ProcEdit and all its possible child forms to also not insert into DB until OK is clicked.  This would be a massive undertaking
+				//and as such we just immediately push changes to DB.
 				if(AptCur.AptStatus==ApptStatus.Scheduled || AptCur.AptStatus==ApptStatus.ASAP) {
-					//all ProcNums attached to the appt when form opened
-					List<long> listProcNumsAttachedStart=_listProcsFromDB.FindAll(y => y.AptNum==AptCur.AptNum).Select(x => x.ProcNum).ToList();
 					//find all procs that are currently attached to the appt that weren't when the form opened
-					List<string> listProcCodes=_listProcs.FindAll(x => x.AptNum==AptCur.AptNum && !listProcNumsAttachedStart.Contains(x.ProcNum))
+					List<string> listProcCodes = Procedures.GetProcsForApptEdit(AptCur).FindAll(x => x.AptNum==AptCur.AptNum && !_listProcNumsAttachedStart.Contains(x.ProcNum))
 						.Select(x => ProcedureCodes.GetStringProcCode(x.CodeNum)).Distinct().ToList();//get list of string proc codes
 					AutomationL.Trigger(AutomationTrigger.ScheduleProcedure,listProcCodes,AptCur.PatNum);
 				}

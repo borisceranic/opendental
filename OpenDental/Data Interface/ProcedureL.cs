@@ -4,20 +4,13 @@ using OpenDentBusiness;
 
 namespace OpenDental {
 	public class ProcedureL {
-		///<summary>Sets all procedures for apt (or in listProcsForAppt) complete.  Flags procedures as CPOE as needed (when prov logged in).  Makes a log
-		///entry for each completed proc.  Then fires the CompleteProcedure automation trigger.
-		///<para>If the procs to be set complete already exist in the db and are associated to apt, do not set listProcsForAppt, they will be pulled
-		///from/updated to the db.</para>
-		///<para>If procs are not already associated with the appointment in the db, e.g. from FormApptEdit since they have not been synched yet, set
-		///listProcsForAppt equal to the list of procedures that are selected in the grid in FormApptEdit.  The proc changes will not be saved to the db,
-		///but will be reflected in the returned list of procs for synching later.</para></summary>
+		///<summary>Sets all procedures for apt complete.  Flags procedures as CPOE as needed (when prov logged in).  Makes a log
+		///entry for each completed proc.  Then fires the CompleteProcedure automation trigger.</summary>
 		public static List<Procedure> SetCompleteInAppt(Appointment apt,List<InsPlan> PlanList,List<PatPlan> patPlans,long siteNum,
-			int patientAge,List<InsSub> subList,List<Procedure> listProcsInAppt=null)
+			int patientAge,List<InsSub> subList) 
 		{
-			bool isDbUpdate=listProcsInAppt==null;
-			if(isDbUpdate) {
-				listProcsInAppt=Procedures.GetProcsForSingle(apt.AptNum,false);
-			}
+			//Get all procs that are not yet completed and set them complete and log it in the audit trail.
+			List<Procedure> listProcsInAppt=Procedures.GetProcsForSingle(apt.AptNum,false).FindAll(x => x.ProcStatus!=ProcStat.C);
 			if(listProcsInAppt.Count==0) {
 				return listProcsInAppt;//Nothing to do.
 			}
@@ -27,7 +20,7 @@ namespace OpenDental {
 				//Only change the status of IsCpoe to true.  Never set it back to false for any reason.  Once true, always true.
 				listProcsInAppt.ForEach(x => x.IsCpoe=true);
 			}
-			listProcsInAppt=Procedures.SetCompleteInAppt(apt,PlanList,patPlans,siteNum,patientAge,listProcsInAppt,subList,isDbUpdate);
+			listProcsInAppt=Procedures.SetCompleteInAppt(apt,PlanList,patPlans,siteNum,patientAge,listProcsInAppt,subList);
 			listProcsInAppt.ForEach(x => LogProcComplCreate(apt.PatNum,x,x.ToothNum));
 			if(Programs.UsingOrion) {
 				OrionProcs.SetCompleteInAppt(listProcsInAppt);

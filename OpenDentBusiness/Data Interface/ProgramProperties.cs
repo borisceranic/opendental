@@ -228,6 +228,9 @@ namespace OpenDentBusiness {
 			ProgramProperties.Insert(pp);
 		}
 
+		///<summary>Syncs list against cache copy of program properties.  listProgPropsNew should never include local path overrides (PropertyDesc=="").
+		///This sync uses the cache copy of program properties rather than a stale list because we want to make sure we never have duplicate properties
+		///and concurrency isn't really an issue.</summary>
 		public static void Sync(List<ProgramProperty> listProgPropsNew,long programNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),listProgPropsNew,programNum);

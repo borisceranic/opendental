@@ -303,6 +303,7 @@ namespace OpenDentBusiness{
 		}
 
 		public static void Insert(Appointment appt) {
+			//No need to check RemotingRole; no call to db.
 			if(DataConnection.DBtype==DatabaseType.MySql) {
 				InsertIncludeAptNum(appt,false);
 			}
@@ -655,6 +656,7 @@ namespace OpenDentBusiness{
 
 		///<summary></summary>
 		public static DataSet RefreshPeriod(DateTime dateStart,DateTime dateEnd) {
+			//No need to check RemotingRole; no call to db.
 			return RefreshPeriod(dateStart,dateEnd,0);
 		}
 
@@ -1323,6 +1325,7 @@ namespace OpenDentBusiness{
 		}
 
 		public static DataTable GetPeriodEmployeeSchedTable(DateTime dateStart,DateTime dateEnd) {
+			//No need to check RemotingRole; no call to db.
 			return Schedules.GetPeriodEmployeeSchedTable(dateStart,dateEnd,0);
 		}
 
@@ -1885,6 +1888,7 @@ namespace OpenDentBusiness{
 
 		/// <summary>If make5minute is false, then result will be in 10 or 15 minutes blocks and will need a later conversion step before going to db.</summary>
 		public static string CalculatePattern(long provDent,long provHyg,List<long> codeNums,bool make5minute) {
+			//No need to check RemotingRole; no call to db.
 			StringBuilder strBTime=new StringBuilder("");
 			string procTime="";
 			ProcedureCode procCode;
@@ -1939,6 +1943,7 @@ namespace OpenDentBusiness{
 		}
 
 		public static string ConvertPatternTo5(string pattern) {
+			//No need to check RemotingRole; no call to db.
 			StringBuilder savePattern=new StringBuilder();
 			for(int i=0;i<pattern.Length;i++) {
 				savePattern.Append(pattern.Substring(i,1));

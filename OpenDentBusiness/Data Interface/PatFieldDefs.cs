@@ -153,13 +153,12 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>Sync pattern, must sync entire table. Probably only to be used in the master problem list window.</summary>
-		public static void Sync(List<PatFieldDef> listDefs) {
+		public static void Sync(List<PatFieldDef> listDefs,List<PatFieldDef> listDefsOld) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),listDefs);
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listDefs,listDefsOld);
 				return;
 			}
-			PatFieldDefs.RefreshCache();
-			Crud.PatFieldDefCrud.Sync(listDefs,new List<PatFieldDef>(GetListLong()));
+			Crud.PatFieldDefCrud.Sync(listDefs,listDefsOld);
 		}
 	}
 }

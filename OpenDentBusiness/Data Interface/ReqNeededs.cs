@@ -64,14 +64,13 @@ namespace OpenDentBusiness{
 			return Crud.ReqNeededCrud.SelectMany(command);
 		}
 
-		///<summary>Inserts, updates, or deletes database rows to match supplied list. Must always pass in sheetDefNum.</summary>
-		public static void Sync(List<ReqNeeded> listNew) {
+		///<summary>Inserts, updates, or deletes rows to reflect changes between listNew and stale listOld.</summary>
+		public static void Sync(List<ReqNeeded> listNew,List<ReqNeeded> listOld) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew);//never pass DB list through the web service
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,listOld);//never pass DB list through the web service
 				return;
 			}
-			List<ReqNeeded> listDB=ReqNeededs.GetListFromDb();
-			Crud.ReqNeededCrud.Sync(listNew,listDB);
+			Crud.ReqNeededCrud.Sync(listNew,listOld);
 		}
 
 

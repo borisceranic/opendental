@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using OpenDental.UI;
+using System.Linq;
 
 namespace OpenDental{
 	/// <summary>
@@ -25,6 +26,8 @@ namespace OpenDental{
 		private ComboBox comboClinic;
 		private Label labelClinic;
 		private List<Operatory> _listOps;
+		///<summary>Stale deep copy of _listOps to use with sync.</summary>
+		private List<Operatory> _listOpsOld;
 		private UI.Button butPickClinic;
 		private Clinic[] _arrayClinics;
 
@@ -249,6 +252,7 @@ namespace OpenDental{
 			}
 			Cache.Refresh(InvalidType.Operatories);
 			_listOps=OperatoryC.GetListt();//Already ordered by ItemOrder
+			_listOpsOld=_listOps.Select(x => x.Copy()).ToList();
 			FillGrid();
 		}
 
@@ -414,7 +418,7 @@ namespace OpenDental{
 			for(int i=0;i<_listOps.Count;i++) {
 				_listOps[i].ItemOrder=i;
 			}
-			Operatories.Sync(_listOps);
+			Operatories.Sync(_listOps,_listOpsOld);
 			DataValid.SetInvalid(InvalidType.Operatories);//With sync we don't know if anything changed.
 		}
 	}

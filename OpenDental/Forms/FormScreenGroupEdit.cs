@@ -37,6 +37,8 @@ namespace OpenDental{
 		private List<OpenDentBusiness.Screen> _listScreens;
 		private ODGrid gridScreenPats;
 		private List<ScreenPat> _listScreenPats;
+		///<summary>Stale deep copy of _listScreenPats to use with sync.</summary>
+		private List<ScreenPat> _listScreenPatsOld;
 		private UI.Button button1;
 		private UI.Button butRemovePat;
 		private UI.Button butStartScreens;
@@ -429,6 +431,7 @@ namespace OpenDental{
 				ScreenGroups.Insert(_screenGroup);
 			}
 			_listScreenPats=ScreenPats.GetForScreenGroup(_screenGroup.ScreenGroupNum);
+			_listScreenPatsOld=_listScreenPats.Select(x => x.Clone()).ToList();
 			FillGrid();
 			FillScreenPats();
 			patContextMenu=new ContextMenu();
@@ -991,7 +994,7 @@ namespace OpenDental{
 				_screenGroup.GradeSchool=comboGradeSchool.SelectedItem.ToString();
 			}
 			_screenGroup.PlaceService=(PlaceOfService)comboPlaceService.SelectedIndex;
-			ScreenPats.Sync(_listScreenPats,_screenGroup.ScreenGroupNum);
+			ScreenPats.Sync(_listScreenPats,_listScreenPatsOld);
 			ScreenGroups.Update(_screenGroup);
 			DialogResult=DialogResult.OK;
 		}

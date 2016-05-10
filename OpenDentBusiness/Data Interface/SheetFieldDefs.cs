@@ -78,7 +78,9 @@ namespace OpenDentBusiness{
 			Crud.SheetFieldDefCrud.Delete(sheetFieldDefNum);
 		}
 
-		///<summary>Inserts, updates, or deletes database rows to match supplied list. Must always pass in sheetDefNum.</summary>
+		///<summary>Inserts, updates, or deletes database rows to match supplied list. Must always pass in sheetDefNum.
+		///This function uses a DB comparison rather than a stale list because we are not worried about concurrency of a single sheet and enhancing the
+		///functions that call this would take a lot of restructuring.</summary>
 		public static void Sync(List<SheetFieldDef> listNew,long sheetDefNum) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,sheetDefNum);//never pass DB list through the web service

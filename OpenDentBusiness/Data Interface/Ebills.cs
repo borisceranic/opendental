@@ -118,12 +118,11 @@ namespace OpenDentBusiness{
 			return null;
 		}
 
-		public static bool Sync(List<Ebill> listNew) {
+		public static bool Sync(List<Ebill> listNew,List<Ebill> listOld) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetBool(MethodBase.GetCurrentMethod(),listNew);
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),listNew,listOld);
 			}
-			List<Ebill> listDB=Ebills.GetList();
-			return Crud.EbillCrud.Sync(listNew,listDB);
+			return Crud.EbillCrud.Sync(listNew,listOld);
 		}
 
 	}

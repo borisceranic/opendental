@@ -12,6 +12,8 @@ namespace OpenDental {
 	public partial class FormBillingDefaults:ODForm {
 		private List<Clinic> _listClinics;
 		private List<Ebill> _listEbills;
+		///<summary>Stale deep copy of _listEbills to use with sync.</summary>
+		private List<Ebill> _listEbillsOld;
 		///<summary>The eBill corresponding to the currently selected clinic if clinics are enabled.</summary>
 		private Ebill _eBillCur;
 		///<summary>The eBill corresponding to the default credentials.</summary>
@@ -55,6 +57,7 @@ namespace OpenDental {
 			textBillingEmailBody.Text=PrefC.GetString(PrefName.BillingEmailBodyText);
 			textInvoiceNote.Text=PrefC.GetString(PrefName.BillingDefaultsInvoiceNote);
 			_listEbills=Ebills.GetList();
+			_listEbillsOld=_listEbills.Select(x => x.Copy()).ToList();
 			//Find the default Ebill
 			for(int i=0;i<_listEbills.Count;i++) {
 				if(_listEbills[i].ClinicNum==0) {
@@ -286,7 +289,7 @@ namespace OpenDental {
 			{
 				DataValid.SetInvalid(InvalidType.Prefs);
 			}
-			if(Ebills.Sync(_listEbills)) {//Includes the default Ebill
+			if(Ebills.Sync(_listEbills,_listEbillsOld)) {//Includes the default Ebill
 				DataValid.SetInvalid(InvalidType.Ebills);
 			}
 			DialogResult=DialogResult.OK;

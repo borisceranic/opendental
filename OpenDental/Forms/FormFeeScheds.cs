@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
+using System.Linq;
 
 namespace OpenDental{
 	/// <summary>
@@ -34,6 +35,8 @@ namespace OpenDental{
 		private List<FeeSched> _listFeeSchedsForType;
 		///<summary>Set this list prior to loading this window to use a custom list of fee schedules.  Otherwise, uses the cache.</summary>
 		public List<FeeSched> ListFeeScheds;
+		///<summary>Stale deep copy of _listFeeScheds to use with sync.</summary>
+		private List<FeeSched> _listFeeSchedsOld;
 		public bool IsSelectionMode;
 		private UI.Button butOK;
 		public long SelectedFeeSchedNum;
@@ -316,6 +319,7 @@ namespace OpenDental{
 			if(ListFeeScheds==null) {
 				ListFeeScheds=FeeSchedC.GetListLong();
 			}
+			_listFeeSchedsOld=ListFeeScheds.Select(x => x.Copy()).ToList();
 			listType.Items.Add(Lan.g(this,"All"));
 			Array arrayValues=Enum.GetValues(typeof(FeeScheduleType));
 			for(int i=0;i<arrayValues.Length;i++) {
@@ -511,6 +515,18 @@ namespace OpenDental{
 			//DialogResult=DialogResult.OK;
 		}
 
+		private void butCleanUp_Click(object sender,EventArgs e) {
+			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Delete allowed fee schedules that are not in use or that are attached to hidden insurance plans?")) {
+				return;
+			}
+			long changed=FeeScheds.CleanupAllowedScheds();
+			MessageBox.Show(changed.ToString()+" "+Lan.g(this,"unused fee schedules deleted."));
+			FeeScheds.RefreshCache();
+			ListFeeScheds=FeeSchedC.GetListLong();  //After deletion, refresh in-memory copy to continue editing.
+			_listFeeSchedsOld=ListFeeScheds.Select(x => x.Copy()).ToList();
+			FillGrid();
+		}
+
 		private void butOK_Click(object sender,EventArgs e) {
 			if(IsSelectionMode && gridMain.SelectedIndices.Length>0) {
 				SelectedFeeSchedNum=((FeeSched)gridMain.Rows[gridMain.GetSelectedIndex()].Tag).FeeSchedNum;
@@ -524,21 +540,10 @@ namespace OpenDental{
 		}
 
 		private void FormFeeSchedules_FormClosing(object sender,FormClosingEventArgs e) {
-			if(changed){
-				FeeScheds.Sync(ListFeeScheds);
+			if(changed) {
+				FeeScheds.Sync(ListFeeScheds,_listFeeSchedsOld);
 				DataValid.SetInvalid(InvalidType.FeeScheds);
 			}
-		}
-
-		private void butCleanUp_Click(object sender,EventArgs e) {
-			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Delete allowed fee schedules that are not in use or that are attached to hidden insurance plans?")) {
-				return;
-			}
-			long changed=FeeScheds.CleanupAllowedScheds();
-			MessageBox.Show(changed.ToString()+" "+Lan.g(this,"unused fee schedules deleted."));
-			FeeScheds.RefreshCache();
-			ListFeeScheds=FeeSchedC.GetListLong();  //After deletion, refresh in-memory copy to continue editing.
-			FillGrid();
 		}
 		
 

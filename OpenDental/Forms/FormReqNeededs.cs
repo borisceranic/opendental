@@ -23,6 +23,8 @@ namespace OpenDental{
 		private ComboBox comboCourseFrom;
 		private GroupBox groupBox1;
 		private List<ReqNeeded> _listReqsAll;
+		///<summary>Stale deep copy of _listReqsAll to use with sync.</summary>
+		private List<ReqNeeded> _listReqsAllOld;
 		private List<ReqNeeded> _listReqsInGrid;
 		private List<SchoolClass> _listSchoolClasses;
 		private List<SchoolCourse> _listSchoolCourses;
@@ -325,6 +327,7 @@ namespace OpenDental{
 
 		private void ReloadReqList() {
 			_listReqsAll=ReqNeededs.GetListFromDb();
+			_listReqsAllOld=_listReqsAll.Select(x => x.Copy()).ToList();
 		}
 
 		private bool RemoveReqFromAllList(ReqNeeded req) {
@@ -481,7 +484,7 @@ namespace OpenDental{
 		}
 
 		private void butOk_Click(object sender,EventArgs e) {
-			ReqNeededs.Sync(_listReqsAll);
+			ReqNeededs.Sync(_listReqsAll,_listReqsAllOld);
 			DialogResult=DialogResult.OK;
 		}
 

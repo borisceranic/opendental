@@ -138,7 +138,9 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>SigBoxes must be synced after all other fields have been synced for the keyData to be in the right order.
-		///So sync must be called first without SigBoxes, then the keyData for the signature(s) can be retrieved, then the SigBoxes can be synced.</summary>
+		///So sync must be called first without SigBoxes, then the keyData for the signature(s) can be retrieved, then the SigBoxes can be synced.
+		///This function uses a DB comparison rather than a stale list because we are not worried about concurrency of a single sheet and enhancing the
+		///functions that call this would take a lot of restructuring.</summary>
 		public static void Sync(List<SheetField> listSheetFieldsNew,long sheetNum,bool isSigBoxOnly) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),listSheetFieldsNew,sheetNum,isSigBoxOnly);
