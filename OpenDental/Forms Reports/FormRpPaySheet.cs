@@ -507,6 +507,7 @@ namespace OpenDental{
 			ReportComplex report=new ReportComplex(true,false);
 			report.ReportName=Lan.g(this,"Daily Payments");
 			report.AddTitle("Title",Lan.g(this,"Daily Payments"),fontTitle);
+			report.AddSubTitle("PracTitle",PrefC.GetString(PrefName.PracticeTitle),fontSubTitle);
 			report.AddSubTitle("Providers",subtitleProvs,fontSubTitle);
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				report.AddSubTitle("Clinics",subtitleClinics,fontSubTitle);
