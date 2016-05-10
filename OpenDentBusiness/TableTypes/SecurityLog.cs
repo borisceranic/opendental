@@ -62,7 +62,9 @@ namespace OpenDentBusiness{
 		///but the user may not be aware that the fix involves patient recreation.</summary>
 		DBM,
 		///<summary>5 - FHIR is an automated process which the user may not be aware of.</summary>
-		FHIR
+		FHIR,
+		///<summary>6 - Patient Portal application.</summary>
+		PatientPortal
 	}
 
 	
