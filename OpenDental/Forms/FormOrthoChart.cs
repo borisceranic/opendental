@@ -13,6 +13,8 @@ namespace OpenDental {
 	public partial class FormOrthoChart:ODForm {
 		private PatField[] _arrayPatientFields;
 		private List<DisplayField> _listOrthDisplayFields;
+		///<summary>A stale copy of all ortho charts associated to the selected patient.  Filled on load.
+		///This list will often differ from the database the longer that the window is left open and changes are made (sigs invalidating, etc).</summary>
 		private List<OrthoChart> _listOrthoCharts;
 		private Patient _patCur;
 		private List<string> _listDisplayFieldNames;
@@ -35,6 +37,7 @@ namespace OpenDental {
 		private int _prevRow;
 		private bool _sigClearWasClicked;
 		private bool _topazNeedsSaved;
+		private List<DateTime> _listDates;
 
 		public FormOrthoChart(Patient patCur) {
 			_patCur=patCur;
@@ -46,6 +49,7 @@ namespace OpenDental {
 		private void FormOrthoChart_Load(object sender,EventArgs e) {
 			_listOrthoCharts=OrthoCharts.GetAllForPatient(_patCur.PatNum);
 			FillTabs();
+			FillDataTable();
 			FillGrid();
 			FillGridPat();
 		}
@@ -87,34 +91,40 @@ namespace OpenDental {
 				_listDisplayFieldNames.Add(field.Description);
 			}
 			//define rows------------------------------------------------------------------------------------------------------------
-			List<DateTime> listDates=new List<DateTime>();
+			_listDates=new List<DateTime>();
 			//start adding dates starting with today's date
-			listDates.Add(DateTime.Today);
+			_listDates.Add(DateTime.Today);
 			foreach(OrthoChart orthoChart in _listOrthoCharts) {
 				if(!_listDisplayFieldNames.Contains(orthoChart.FieldName)) {//skip rows not in display fields
 					continue;
 				}
-				if(!listDates.Contains(orthoChart.DateService)) {//add dates not already in date list
-					listDates.Add(orthoChart.DateService);
+				if(!_listDates.Contains(orthoChart.DateService)) {//add dates not already in date list
+					_listDates.Add(orthoChart.DateService);
 				}
 			}
-			listDates.Sort();
+			_listDates.Sort();
 			//We now have a complete list of dates necessary to show this patients ortho chart.
 			//Add all blank cells to each row except for the date.
 			DataRow row;
 			//create and add row for each date in date showing
-			for(int i=0;i<listDates.Count;i++) {
+			for(int i=0;i<_listDates.Count;i++) {
 				row=_tableOrtho.NewRow();
-				row[0]=listDates[i];
+				row[0]=_listDates[i];
 				for(int j=0;j<_listOrthDisplayFields.Count;j++) {
 					row[j+1]="";//j+1 because first row is date field.
 				}
 				_tableOrtho.Rows.Add(row);
 			}
-			//We now have a table with all empty strings in cells except dates.
+		}
+
+		///<summary>Clears the current grid and fills from datatable.  Do not call unless you have saved changes to database first.</summary>
+		private void FillGrid() {
+			if(tabControl.SelectedIndex==-1) {
+				return;//This happens when the tab pages are cleared (updating the selected index).
+			}
 			//Fill with data as necessary.
-			foreach(OrthoChart orthoChart in _listOrthoCharts) {//loop
-				if(!listDates.Contains(orthoChart.DateService)) {
+			foreach(OrthoChart orthoChart in _listOrthoCharts) {
+				if(!_listDates.Contains(orthoChart.DateService)) {
 					continue;
 				}
 				if(!_listDisplayFieldNames.Contains(orthoChart.FieldName)) {
@@ -126,15 +136,6 @@ namespace OpenDental {
 					}
 				}
 			}
-		}
-
-		///<summary>Clears the current grid and fills from datatable.  Do not call unless you have saved changes to database first.</summary>
-		private void FillGrid() {
-			if(tabControl.SelectedIndex==-1) {
-				return;//This happens when the tab pages are cleared (updating the selected index).
-			}
-			//Make _tableOrtho match up to the display fields designated to the selected tab.
-			FillDataTable();
 			//Get all the corresponding fields from the OrthoChartTabLink table that are associated to the currently selected ortho tab.
 			OrthoChartTab orthoChartTab=OrthoChartTabs.Listt[tabControl.SelectedIndex];
 			List<DisplayField> listSelectedTabDisplayFields=OrthoChartTabLinks.List
@@ -142,6 +143,7 @@ namespace OpenDental {
 				.OrderBy(x => x.ItemOrder)//Each tab is ordered based on the ortho tab link entry
 				.Select(x => _listOrthDisplayFields.FirstOrDefault(y => y.DisplayFieldNum==x.DisplayFieldNum))//Project all corresponding display fields in order
 				.ToList();//Casts the projection to a list of display fields
+			_sigColIdx=-1;//Clear out the signature column index cause it will most likely change or disappear (switching tabs)
 			int gridMainScrollValue=gridMain.ScrollValue;
 			gridMain.BeginUpdate();
 			gridMain.Columns.Clear();
@@ -197,8 +199,8 @@ namespace OpenDental {
 				gridMain.ScrollValue=gridMainScrollValue;
 				gridMainScrollValue=0;
 			}
-			//Show the signature control if any ortho display fields on any tab.
-			_showSigBox=listSelectedTabDisplayFields.Any(x => x.InternalName=="Signature");
+			//Show the signature control if a signature display field is present on any tab.
+			_showSigBox=_listOrthDisplayFields.Any(x => x.InternalName=="Signature");
 			signatureBoxWrapper.Visible=_showSigBox;//Hide the signature box if this tab does not have the signature column present.
 			if(_showSigBox) {
 				for(int i=0;i<gridMain.Rows.Count;i++) {
@@ -251,6 +253,7 @@ namespace OpenDental {
 			FormDisplayFieldsOrthoChart form=new FormDisplayFieldsOrthoChart();
 			if(form.ShowDialog()==DialogResult.OK) {
 				FillTabs();
+				FillDataTable();
 				FillGrid();
 			}
 		}
@@ -391,7 +394,10 @@ namespace OpenDental {
 			if(sig.SigString=="") {
 				signatureBoxWrapper.ClearSignature();
 				gridMain.Rows[gridRow].ColorBackG=SystemColors.Window;
-				gridMain.Rows[gridRow].Cells[_sigColIdx].Text="";
+				//Empty out the signature column displaying to the user.
+				if(_sigColIdx > 0) {//User might be vieweing a tab that does not have the signature column.  Greater than 0 because index 0 is a Date column.
+					gridMain.Rows[gridRow].Cells[_sigColIdx].Text="";
+				}
 				return;
 			}
 			//Get the "translated" name for the signature column.
@@ -401,11 +407,15 @@ namespace OpenDental {
 			signatureBoxWrapper.FillSignature(sig.IsTopaz,keyData,sig.SigString);
 			if(signatureBoxWrapper.IsValid) {
 				gridMain.Rows[gridRow].ColorBackG=Color.FromArgb(0,245,165);//A lighter version of Color.MediumSpringGreen
-				gridMain.Rows[gridRow].Cells[_sigColIdx].Text=Lan.g(this,"Valid");
+				if(_sigColIdx > 0) {//User might be vieweing a tab that does not have the signature column.  Greater than 0 because index 0 is a Date column.
+					gridMain.Rows[gridRow].Cells[_sigColIdx].Text=Lan.g(this,"Valid");
+				}
 			}
 			else {
 				gridMain.Rows[gridRow].ColorBackG=Color.FromArgb(255,140,143);//A darker version of Color.LightPink
-				gridMain.Rows[gridRow].Cells[_sigColIdx].Text=Lan.g(this,"Invalid");
+				if(_sigColIdx > 0) {//User might be vieweing a tab that does not have the signature column.  Greater than 0 because index 0 is a Date column.
+					gridMain.Rows[gridRow].Cells[_sigColIdx].Text=Lan.g(this,"Invalid");
+				}
 			}
 		}
 
@@ -448,6 +458,8 @@ namespace OpenDental {
 			if(OrthoSignature.GetSigString(_tableOrtho.Rows[gridRow][_sigTableOrthoColIdx].ToString())!=sig.SigString) {
 				_hasChanged=true;
 				_tableOrtho.Rows[gridRow][_sigTableOrthoColIdx]=sig.ToString();
+				//Update the in-memory list that we use to help fill the grid just in case the user invalidated the ortho row on a tab without the signature.
+				_listOrthoCharts.First(x => x.FieldName==sigColumnName).FieldValue=sig.ToString();
 			}
 		}
 
