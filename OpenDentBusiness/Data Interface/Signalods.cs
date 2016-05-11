@@ -47,6 +47,11 @@ namespace OpenDentBusiness {
 					onShutdown();
 					return new List<Signalod>();
 				}
+				List<Signalod> listFeeSignals = listSignals.FindAll(x => x.ITypes.Contains(((int)InvalidType.Fees).ToString()) && x.FKeyType==KeyType.FeeSched && x.FKey>0);
+				if(listFeeSignals.Count>0) {
+					Fees.InvalidateFeeSchedules(listFeeSignals.Select(x=>x.FKey).ToList());
+					listSignals.RemoveAll(x=>listFeeSignals.Any(y=>x.SignalNum==y.SignalNum));//only fee signals without an FKey should cause an entire cache refresh for fees.
+				}
 				Cache.RefreshCache(string.Join(",",listSignals.SelectMany(x => x.ITypes.Split(',').Distinct())));//refresh invalid data
 				BroadcastSignals(listSignals);
 				return listSignals;
@@ -209,7 +214,7 @@ namespace OpenDentBusiness {
 			return Crud.SignalodCrud.Insert(sig);
 		}
 
-		///<summary>Simplest way to use the new fKey and FKeyType.</summary>
+		///<summary>Simplest way to use the new fKey and FKeyType. Set isBroadcast=true to process signals immediately on workstation.</summary>
 		public static void SetInvalid(InvalidType iType,KeyType fKeyType,long fKey) {
 			//Remoting role check performed in the Insert.
 			Signalod sig = new Signalod();

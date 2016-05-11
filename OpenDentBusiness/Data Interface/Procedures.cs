@@ -1180,6 +1180,7 @@ namespace OpenDentBusiness {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetLong(MethodBase.GetCurrentMethod());
 			}
+			FeeCache feeCache = new FeeCache(listFees);
 			string command=@"SELECT procedurecode.CodeNum,ProcNum,patient.PatNum,procedurelog.PatNum,
 				insplan.FeeSched PlanFeeSched,patient.FeeSched PatFeeSched,procedurelog.ProvNum,
 				procedurelog.ProcFee,insplan.PlanType,procedurelog.ClinicNum
@@ -1207,16 +1208,14 @@ namespace OpenDentBusiness {
 				patFeeSched=PIn.Long(table.Rows[i]["PatFeeSched"].ToString());
 				procProv=PIn.Long(table.Rows[i]["ProvNum"].ToString());
 				planType=PIn.String(table.Rows[i]["PlanType"].ToString());
-				insfee=Fees.GetAmount0(PIn.Long(table.Rows[i]["CodeNum"].ToString())
+				insfee=feeCache.GetAmount0(PIn.Long(table.Rows[i]["CodeNum"].ToString())
 					,Fees.GetFeeSched(priPlanFeeSched,patFeeSched,procProv)
-					,PIn.Long(table.Rows[i]["ClinicNum"].ToString()),procProv
-					,listFees);
+					,PIn.Long(table.Rows[i]["ClinicNum"].ToString()),procProv);
 				if(planType=="p") {//PPO
-					standardfee=Fees.GetAmount0(PIn.Long(table.Rows[i]["CodeNum"].ToString())
+					standardfee=feeCache.GetAmount0(PIn.Long(table.Rows[i]["CodeNum"].ToString())
 						,Providers.GetProv(procProv).FeeSched
 						,PIn.Long(table.Rows[i]["ClinicNum"].ToString())
-						,procProv
-						,listFees);
+						,procProv);
 					if(standardfee>insfee) {
 						newFee=standardfee;
 					} 

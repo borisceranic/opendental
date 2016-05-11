@@ -75,6 +75,7 @@ namespace OpenDentBusiness{
 	///<summary>Do not combine with SignalType, they must be seperate. Stored as string, safe to reorder enum values.</summary>
 	public enum KeyType {
 		Undefined = 0,
+		FeeSched,
 		Job,
 		Operatory,
 		Provider

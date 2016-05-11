@@ -717,6 +717,7 @@ namespace OpenDental
 			List<Procedure> ProcList=Procedures.Refresh(PatCur.PatNum);
 			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
 			Procedure proc;
+			List<long> invalidFeeSchedNums = new List<long>();
 			for(int i=0;i<ClaimProcsToEdit.Length;i++){
 				proc=Procedures.GetProcFromList(ProcList,ClaimProcsToEdit[i].ProcNum);
 				codeNum=proc.CodeNum;
@@ -741,8 +742,11 @@ namespace OpenDental
 				SecurityLogs.MakeLogEntry(Permissions.ProcFeeEdit,0,Lan.g(this,"Procedure")+": "+ProcedureCodes.GetStringProcCode(FeeCur.CodeNum)
 					+", "+Lan.g(this,"Fee")+": "+FeeCur.Amount.ToString("c")+", "+Lan.g(this,"Fee Schedule")+" "+FeeScheds.GetDescription(FeeCur.FeeSched)
 					+". "+Lan.g(this,"Automatic change to allowed fee in Enter Payment window.  Confirmed by user."),FeeCur.CodeNum);
+				invalidFeeSchedNums.Add(FeeCur.FeeSched);
 			}
-			DataValid.SetInvalid(InvalidType.Fees);
+			foreach(long feeSchedNum in invalidFeeSchedNums.Distinct()) {
+				Signalods.SetInvalid(InvalidType.Fees,KeyType.FeeSched,feeSchedNum);
+			}
 		}
 
 		private void butOK_Click(object sender,System.EventArgs e) {

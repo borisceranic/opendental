@@ -98,10 +98,10 @@ namespace OpenDental{
 		private System.Windows.Forms.Button butColorProvider;
 		private System.Windows.Forms.Button butColorClinic;
 		private System.Windows.Forms.Button butColorDefault;
-		///<summary>Local copy of a dictionary of all fees, stored in memory for easy access and editing.  Synced on form closing.</summary>
-		Dictionary<long,Dictionary<long,List<Fee>>> _dictFeesByFeeSchedNumsAndCodeNums;
-		///<summary>Stale local copy of all fees, stored in memory for used with Sync on form closing.</summary>
-		List<Fee> _listFeesOld;
+		///<summary>Local copy of a FeeCache class that contains all fees, stored in memory for easy access and editing.  Synced on form closing.</summary>
+		FeeCache _feeCache;
+		///<summary>Stale copy of Fees, instead of List&lt;Fee></summary>
+		FeeCache _feeCacheOld;
 
 		///<summary></summary>
 		public FormProcCodes() {
@@ -1024,8 +1024,8 @@ namespace OpenDental{
 			}
 			_arrayClinics=Clinics.GetList();
 			_listProviders=ProviderC.GetListShort();
-			_dictFeesByFeeSchedNumsAndCodeNums=Fees.GetDict();
-			_listFeesOld = Fees.GetFeesAllDeepCopy(_dictFeesByFeeSchedNumsAndCodeNums);//Get copy of all fees from _dictFeesByFeeSchedNumsAndCodeNums
+			_feeCache=Fees.GetCache();
+			_feeCacheOld=_feeCache.GetCopy();
 			_listProcCodes=ProcedureCodeC.GetListLong();
 			_colorProv=DefC.GetColor(DefCat.FeeColors,DefC.GetByExactName(DefCat.FeeColors,"Provider"));
 			_colorProvClinic=DefC.GetColor(DefCat.FeeColors,DefC.GetByExactName(DefCat.FeeColors,"Provider and Clinic"));
@@ -1323,11 +1323,11 @@ namespace OpenDental{
 			listProcsForCats.RemoveAll(proc => !proc.Descript.ToLower().Contains(searchDesc.ToLower()));
 			listProcsForCats.RemoveAll(proc => !proc.ProcCode.ToLower().Contains(searchCode.ToLower()));
 			string lastCategoryName="";
-			for(int i=0;i<listProcsForCats.Count;i++) {
+			foreach(ProcedureCode procCode in listProcsForCats) { 
 				row=new ODGridRow();
-				row.Tag=listProcsForCats[i];
+				row.Tag=procCode;
 				//Only show the category on the first procedure code in that category.
-				string categoryName=DefC.GetName(DefCat.ProcCodeCats,listProcsForCats[i].ProcCat);
+				string categoryName=DefC.GetName(DefCat.ProcCodeCats,procCode.ProcCat);
 				if(lastCategoryName!=categoryName) {
 					row.Cells.Add(categoryName);
 					lastCategoryName=categoryName;
@@ -1335,17 +1335,17 @@ namespace OpenDental{
 				else {//This proc code is in the same category.
 					row.Cells.Add("");
 				}
-				row.Cells.Add(listProcsForCats[i].Descript);
-				row.Cells.Add(listProcsForCats[i].AbbrDesc);
-				row.Cells.Add(listProcsForCats[i].ProcCode);
-				Fee fee1=Fees.GetFee(listProcsForCats[i].CodeNum,feeSched1,clinic1Num,provider1Num,_dictFeesByFeeSchedNumsAndCodeNums);
+				row.Cells.Add(procCode.Descript);
+				row.Cells.Add(procCode.AbbrDesc);
+				row.Cells.Add(procCode.ProcCode);
+				Fee fee1 = _feeCache.GetFee(procCode.CodeNum,feeSched1.FeeSchedNum,clinic1Num,provider1Num);
 				Fee fee2=null;
 				if(feeSched2!=null) {
-					fee2=Fees.GetFee(listProcsForCats[i].CodeNum,feeSched2,clinic2Num,provider2Num,_dictFeesByFeeSchedNumsAndCodeNums);
+					fee2=_feeCache.GetFee(procCode.CodeNum,feeSched2.FeeSchedNum,clinic2Num,provider2Num);
 				}
 				Fee fee3=null;
 				if(feeSched3!=null) {
-					fee3=Fees.GetFee(listProcsForCats[i].CodeNum,feeSched3,clinic3Num,provider3Num,_dictFeesByFeeSchedNumsAndCodeNums);
+					fee3=_feeCache.GetFee(procCode.CodeNum,feeSched3.FeeSchedNum,clinic3Num,provider3Num);
 				}
 				if(fee1==null || fee1.Amount==-1) {
 					row.Cells.Add("");
@@ -1402,9 +1402,9 @@ namespace OpenDental{
 				return;
 			}
 			//not on a fee: Edit code instead
-			List<Fee> listFees=Fees.GetFeesAllDeepCopy(_dictFeesByFeeSchedNumsAndCodeNums);
-			if(Fees.Sync(listFees,_listFeesOld)) {
-				DataValid.SetInvalid(InvalidType.Fees);//Let other users know the fees have changed.
+			List<long> schedNums = Fees.Sync(_feeCache.ToList(),_feeCacheOld.ToList());//Sync any changes made in this window to the database.
+			foreach(long feeSchedNum in schedNums) {
+				Signalods.SetInvalid(InvalidType.Fees,KeyType.FeeSched,feeSchedNum);
 			}
 			changed=false;//We just updated the database and synced our cache, set changed to false.
 			ProcedureCode procCode=(ProcedureCode)gridMain.Rows[e.Row].Tag;
@@ -1413,8 +1413,8 @@ namespace OpenDental{
 			FormPCE.ShowDialog();
 			//The user could have edited a fee within the Procedure Code Edit window or within one of it's children so we need to refresh our cache.
 			//Yes, it could have even changed if the user Canceled out of the Proc Code Edit window (e.g. use FormProcCodeEditMore.cs)
-			_dictFeesByFeeSchedNumsAndCodeNums=Fees.GetDict();
-			_listFeesOld = Fees.GetFeesAllDeepCopy(_dictFeesByFeeSchedNumsAndCodeNums);//Get copy of all fees from _dictFeesByFeeSchedNumsAndCodeNums
+			_feeCache=Fees.GetCache();
+			_feeCacheOld=_feeCache.GetCopy();//Get copy of all fees from _dictFeesByFeeSchedNumsAndCodeNums
 			FillGrid();
 		}
 
@@ -1461,7 +1461,7 @@ namespace OpenDental{
 					clinicNum=_arrayClinics[comboClinic3.SelectedIndex-1].ClinicNum;
 				}
 			}
-			Fee fee=Fees.GetFee(codeNum,feeSched,clinicNum,provNum,_dictFeesByFeeSchedNumsAndCodeNums);
+			Fee fee=_feeCache.GetFee(codeNum,feeSched.FeeSchedNum,clinicNum,provNum);
 			string feeAmtOld="";
 			if(fee!=null){
 				feeAmtOld=fee.Amount.ToString("n");
@@ -1501,11 +1501,11 @@ namespace OpenDental{
 					fee.Amount=feeAmtNew;
 					fee.ClinicNum=0;
 					fee.ProvNum=0;
-					Fees.AddFeeToDict(fee,_dictFeesByFeeSchedNumsAndCodeNums);
+					_feeCache.Add(fee);
 				}
 				else { //Fee does exist, update or delete.
 					if(feeAmtNewStr=="") { //They want to delete the fee
-						Fees.RemoveFeeFromDict(fee,_dictFeesByFeeSchedNumsAndCodeNums);
+						_feeCache.Remove(fee);
 					}
 					else { //They want to update the fee
 						fee.Amount=feeAmtNew;
@@ -1526,10 +1526,10 @@ namespace OpenDental{
 						fee.Amount=-1.0;
 						fee.ClinicNum=clinicNum;
 						fee.ProvNum=provNum;
-						Fees.AddFeeToDict(fee,_dictFeesByFeeSchedNumsAndCodeNums);
+						_feeCache.Add(fee);
 					}
 					else {//They want to delete a fee for their current settings.
-						Fees.RemoveFeeFromDict(fee,_dictFeesByFeeSchedNumsAndCodeNums);
+						_feeCache.Remove(fee);
 					}
 				}
 				//The fee did not previously exist, or the fee found isn't for the currently set settings.
@@ -1540,7 +1540,7 @@ namespace OpenDental{
 					fee.Amount=feeAmtNew;
 					fee.ClinicNum=clinicNum;
 					fee.ProvNum=provNum;
-					Fees.AddFeeToDict(fee,_dictFeesByFeeSchedNumsAndCodeNums);
+					_feeCache.Add(fee);
 				}
 				else { //Fee isn't null, is for our current clinic, is for the selected provider, and they don't want to delete it.  Just update.
 					fee.Amount=feeAmtNew;
@@ -1651,17 +1651,16 @@ namespace OpenDental{
 		}
 
 		private void butTools_Click(object sender,System.EventArgs e) {
-			List<Fee> listFees=Fees.GetFeesAllShallow(_dictFeesByFeeSchedNumsAndCodeNums);
 			long schedNum=_listFeeScheds[comboFeeSched1.SelectedIndex].FeeSchedNum;
-			FormFeeSchedTools FormF=new FormFeeSchedTools(schedNum,_listFeeScheds,listFees,_listFeesOld,_listProviders,_arrayClinics);
+			FormFeeSchedTools FormF=new FormFeeSchedTools(schedNum,_listFeeScheds,_feeCache.ToList(),_feeCacheOld.ToList(),_listProviders,_arrayClinics);
 			FormF.ShowDialog();
 			if(FormF.DialogResult==DialogResult.Cancel) {
 				return;
 			}
 			//Fees could have changed from within the FeeSchedTools window.  Refresh our local dictionary to match the cache.
 			changed=false;
-			_dictFeesByFeeSchedNumsAndCodeNums=Fees.GetDict();
-			_listFeesOld = Fees.GetFeesAllDeepCopy(_dictFeesByFeeSchedNumsAndCodeNums);//Get copy of all fees from _dictFeesByFeeSchedNumsAndCodeNums
+			_feeCache=Fees.GetCache();
+			_feeCacheOld=_feeCache.GetCopy();
 			if(Programs.IsEnabled(ProgramName.eClinicalWorks)) {
 				FillComboBoxes();//To show possible added fee schedule.
 			}
@@ -1921,9 +1920,11 @@ namespace OpenDental{
 
 		private void FormProcedures_Closing(object sender,System.ComponentModel.CancelEventArgs e) {
 			if(changed) {
-				List<Fee> listFees=Fees.GetFeesAllShallow(_dictFeesByFeeSchedNumsAndCodeNums);
-				Fees.Sync(listFees,_listFeesOld);
-				DataValid.SetInvalid(InvalidType.ProcCodes,InvalidType.Fees);
+				List<long> schedNums = Fees.Sync(_feeCache.ToList(),_feeCacheOld.ToList());//Sync any changes made in this window to the database.
+				foreach(long feeSchedNum in schedNums) {
+					Signalods.SetInvalid(InvalidType.Fees,KeyType.FeeSched,feeSchedNum);
+				}
+				DataValid.SetInvalid(InvalidType.ProcCodes);
 			}
 		}
 

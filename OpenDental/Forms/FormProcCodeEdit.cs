@@ -1071,6 +1071,9 @@ namespace OpenDental{
 			}
 			FormFE.FeeCur=FeeCur;
 			FormFE.ShowDialog();
+			if(FormFE.DialogResult==DialogResult.OK) {
+				Fees.InvalidateFeeSchedules(new List<long>() { FeeCur.FeeSched });
+			}
 			FillFees();
 		}
 
