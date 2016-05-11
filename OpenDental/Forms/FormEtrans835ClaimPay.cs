@@ -829,6 +829,7 @@ namespace OpenDental {
 			List<Procedure> listProcs=Procedures.Refresh(_patCur.PatNum);
 			List<FeeSched> listFeeScheds=FeeSchedC.GetListLong();
 			Procedure proc;
+			List<long> invalidFeeSchedNums = new List<long>();
 			for(int i=0;i<ListClaimProcsForClaim.Count;i++) {
 				proc=Procedures.GetProcFromList(listProcs,ListClaimProcsForClaim[i].ProcNum);
 				codeNum=proc.CodeNum;
@@ -853,8 +854,11 @@ namespace OpenDental {
 				SecurityLogs.MakeLogEntry(Permissions.ProcFeeEdit,0,Lan.g(this,"Procedure")+": "+ProcedureCodes.GetStringProcCode(feeCur.CodeNum)
 					+", "+Lan.g(this,"Fee")+": "+feeCur.Amount.ToString("c")+", "+Lan.g(this,"Fee Schedule")+" "+FeeScheds.GetDescription(feeCur.FeeSched)
 					+". "+Lan.g(this,"Automatic change to allowed fee in Enter Payment window.  Confirmed by user."),feeCur.CodeNum);
+				invalidFeeSchedNums.Add(feeCur.FeeSched);
 			}
-			DataValid.SetInvalid(InvalidType.Fees);
+			foreach(long feeSchedNum in invalidFeeSchedNums.Distinct()) {
+				Signalods.SetInvalid(InvalidType.Fees,KeyType.FeeSched,feeSchedNum);
+			}
 		}
 
 		private void butViewEobDetails_Click(object sender,EventArgs e) {

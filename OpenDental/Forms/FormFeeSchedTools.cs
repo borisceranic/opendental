@@ -826,8 +826,7 @@ namespace OpenDental{
 				provNum=_listProvs[comboProvider.SelectedIndex-1].ProvNum;
 			}
 			long feeSchedNum=_listFeeScheds[comboFeeSched.SelectedIndex].FeeSchedNum;
-			//Modifies in-memory list.
-			_listFees=Fees.ClearFeeSched(feeSchedNum,clinicNum,provNum,_listFees);
+			_listFees.RemoveAll(x => x.FeeSched==feeSchedNum && x.ClinicNum==clinicNum && x.ProvNum==provNum);
 			string logText=Lan.g(this,"Procedures for Fee Schedule")+" "+FeeScheds.GetDescription(feeSchedNum)+" ";
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				if(Clinics.GetDesc(Clinics.ClinicNum)=="") {
@@ -857,7 +856,6 @@ namespace OpenDental{
 				toProvNum=_listProvs[comboProviderTo.SelectedIndex-1].ProvNum;
 			}
 			long toFeeSchedNum=_listFeeScheds[comboFeeSchedTo.SelectedIndex].FeeSchedNum;
-			_listFees=Fees.ClearFeeSched(toFeeSchedNum,toClinicNum,toProvNum,_listFees); //Clears based on the "To" combo box settings.
 			long fromClinicNum=0;
 			if(!PrefC.GetBool(PrefName.EasyNoClinics) && comboClinic.SelectedIndex!=0){
 				fromClinicNum=_arrayClinics[comboClinic.SelectedIndex-1].ClinicNum;
@@ -871,20 +869,21 @@ namespace OpenDental{
 			//Modifies in-memory list, adding 100% match entries based on combo boxes.
 			//First, we've cleared out the "To" fee schedule based on the "To" combo box settings so that fee sched will have 0 entries for the criteria in the combo boxes.
 			//Next, we take all the fees from the "From" fee schedule with those matching criteria, and copy them to the "To" fee schedule with the "To" schedule's criteria.
-			_listFees=Fees.CopyFees(fromFeeSchedNum,fromClinicNum,fromProvNum,toFeeSchedNum,toClinicNum,toProvNum,_listFees); 
-			for(int i=0;i<_listFees.Count;i++) {
-				//Make a log for the fees that changed.
-				if(_listFees[i].FeeSched!=toFeeSchedNum) {
-					continue;
-				}
-				if(_listFees[i].ClinicNum!=toClinicNum) {
-					continue;
-				}
-				if(_listFees[i].ProvNum!=toProvNum) {
-					continue;
-				}
-				string logText=Lan.g(this,"Procedure")+": "+ProcedureCodes.GetStringProcCode(_listFees[i].CodeNum)
-					+", "+Lan.g(this,"Fee")+": "+_listFees[i].Amount.ToString("c")+", "+Lan.g(this,"Fee Schedule")+": "+FeeScheds.GetDescription(_listFees[i].FeeSched);
+			_listFees.RemoveAll(x => x.FeeSched==toFeeSchedNum && x.ProvNum==toProvNum && x.ClinicNum==toClinicNum);
+			//This fee cache  contains only the fees that might be copied, it already excludes fee from the to.
+			FeeCache feesToAddCache = new FeeCache(_listFees.FindAll(x => x.FeeSched==fromFeeSchedNum));//must come after the RemoveAll line above; cache class for speed and convenience
+			//fill listBestFees with the "best" fee for each proccode.
+			List<Fee> listBestFees= feesToAddCache.ToList()
+				.GroupBy(x => x.CodeNum)
+				.Select(x => feesToAddCache.GetFee(x.Key,fromFeeSchedNum,fromClinicNum,fromProvNum))
+				.Where(x=>x!=null).ToList();
+			foreach(Fee fee in listBestFees) {
+				fee.ProvNum=toProvNum;
+				fee.ClinicNum=toClinicNum;
+				fee.FeeSched=toFeeSchedNum;
+				_listFees.Add(fee);
+				string logText = Lan.g(this,"Procedure")+": "+ProcedureCodes.GetStringProcCode(fee.CodeNum)
+					+", "+Lan.g(this,"Fee")+": "+fee.Amount.ToString("c")+", "+Lan.g(this,"Fee Schedule")+": "+FeeScheds.GetDescription(fee.FeeSched);
 				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 					if(Clinics.GetDesc(toClinicNum)=="") {
 						logText+=Lan.g(this,"at Headquarters");
@@ -897,7 +896,7 @@ namespace OpenDental{
 					logText+=", "+Lan.g(this,"for provider")+": "+Providers.GetAbbr(toProvNum);
 				}
 				logText+=". "+Lan.g(this,"Fee copied from")+" "+FeeScheds.GetDescription(_listFeeScheds[comboFeeSched.SelectedIndex].FeeSchedNum)+" "+Lan.g(this,"using Fee Tools.");
-				SecurityLogs.MakeLogEntry(Permissions.ProcFeeEdit,0,logText,_listFees[i].CodeNum);
+				SecurityLogs.MakeLogEntry(Permissions.ProcFeeEdit,0,logText,fee.CodeNum);
 			}
 			_changed=true;
 			DialogResult=DialogResult.OK;
@@ -943,7 +942,7 @@ namespace OpenDental{
 			}
 			long feeSchedNum=_listFeeScheds[comboFeeSched.SelectedIndex].FeeSchedNum;
 			//Modifies in-memory list, all entries increased (if they exist) will be a 100% match to the combo box settings.
-			_listFees=Fees.Increase(feeSchedNum,percent,round,_listFees,clinicNum,provNum); 
+			_listFees=Fees.Increase(feeSchedNum,percent,round,_listFees,clinicNum,provNum);
 			for(int i=0;i<_listFees.Count;i++) {
 				if(_listFees[i].FeeSched!=feeSchedNum) {
 					continue;
@@ -1005,13 +1004,10 @@ namespace OpenDental{
 				}
 				//Get every single procedure code from the cache which will already be ordered by ProcCat and then ProcCode.
 				//Even if the code does not have a fee, include it in the export because that will trigger a 'deletion' when importing over other schedules.
-				List<ProcedureCode> listCodes=ProcedureCodeC.GetListLong();
-				//Make a complex dictionary out of the list of fees we have to quickly search through for the best fees.
-				Dictionary<long,Dictionary<long,List<Fee>>> dictFeesByFeeSchedNumsAndCodeNums=Fees.GetDictForList(_listFees);
-				for(int i=0;i<listCodes.Count;i++) {
+				FeeCache feeCache = new FeeCache(_listFees);//speeds searching
+				foreach(ProcedureCode procCode in ProcedureCodeC.GetListLong()) {
 					//Get the best matching fee for the current selections. 
-					Fee fee=Fees.GetFee(listCodes[i].CodeNum,feeSched,clinicNum,provNum,dictFeesByFeeSchedNumsAndCodeNums);
-					ProcedureCode procCode=ProcedureCodes.GetProcCode(listCodes[i].CodeNum);
+					Fee fee = feeCache.GetFee(procCode.CodeNum,feeSchedNum,clinicNum,provNum);
 					sr.Write(procCode.ProcCode+"\t");
 					if(fee!=null && fee.Amount!=-1) {
 						sr.Write(fee.Amount.ToString("n"));
@@ -1137,7 +1133,7 @@ namespace OpenDental{
 				if(comboProvider.SelectedIndex!=0) {
 					provNum=_listProvs[comboProvider.SelectedIndex-1].ProvNum;
 				}
-				_listFees=Fees.ClearFeeSched(feesched.FeeSchedNum,clinicNum,provNum,_listFees);
+				_listFees.RemoveAll(x => x.FeeSched==feesched.FeeSchedNum && x.ClinicNum==clinicNum && x.ProvNum==provNum);
 			}
 			bool importAllowed=false;
 			if(MsgBox.Show(this,MsgBoxButtons.YesNo,"Import Allowed Fee column instead of Unit Fee column?")) {
@@ -1497,8 +1493,10 @@ namespace OpenDental{
 		private void FormFeeSchedTools_FormClosing(object sender,FormClosingEventArgs e) {
 			if(DialogResult==DialogResult.OK && _changed) {
 				Cursor=Cursors.WaitCursor;
-				Fees.Sync(_listFees,_listFeesOld);//Sync any changes made in this window to the database.
-				DataValid.SetInvalid(InvalidType.Fees);//Notify all other workstations about the changes made to the Fees.
+				List<long> schedNums=Fees.Sync(_listFees,_listFeesOld);//Sync any changes made in this window to the database.
+				foreach(long feeSchedNum in schedNums) {
+					Signalods.SetInvalid(InvalidType.Fees,KeyType.FeeSched,feeSchedNum);
+				}
 				Cursor=Cursors.Default;
 			}
 		}
