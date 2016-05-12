@@ -1146,6 +1146,74 @@ namespace OpenDentBusiness {
 						Db.NonQ(command);
 					}
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE site ADD Address varchar(100) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE site ADD Address varchar2(100)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE site ADD Address2 varchar(100) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE site ADD Address2 varchar2(100)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE site ADD City varchar(100) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE site ADD City varchar2(100)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE site ADD State varchar(100) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE site ADD State varchar2(100)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE site ADD Zip varchar(100) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE site ADD Zip varchar2(100)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE site ADD ProvNum bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE site ADD INDEX (ProvNum)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE site ADD ProvNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE site SET ProvNum = 0 WHERE ProvNum IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE site MODIFY ProvNum NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX site_ProvNum ON site (ProvNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE site ADD PlaceService tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE site ADD PlaceService number(3)";
+					Db.NonQ(command);
+					command="UPDATE site SET PlaceService = 0 WHERE PlaceService IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE site MODIFY PlaceService NOT NULL";
+					Db.NonQ(command);
+				}
 				command="UPDATE preference SET ValueString = '16.2.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}

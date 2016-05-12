@@ -4113,6 +4113,20 @@ namespace OpenDental{
 				butAttachPerio.Visible=false;
 			}
 			FillForm();
+			//_listClaimProcsForClaim gets filled within FillGrids() which gets called at the end of FillForm().
+			//Because of that, this PlaceOfService code has to be after FillForm();
+			if(IsNew) {
+				//Check to see if any procedures associated to this claim have a site specified.
+				//If so, link this claim's POS to the POS of the first procedure we come across.
+				List<Procedure> listSiteProcs=ProcList.FindAll(x => _listClaimProcsForClaim.Any(y => y.ProcNum==x.ProcNum) && x.SiteNum!=0);
+				//Null is an acceptable site.
+				if(listSiteProcs.Count > 0) {
+					Site site=SiteC.List.FirstOrDefault(x => x.SiteNum==listSiteProcs[0].SiteNum);
+					if(site!=null) {
+						comboPlaceService.SelectedIndex=(int)site.PlaceService;
+					}
+				}
+			}
 			FillCanadian();
 		}
 

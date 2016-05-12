@@ -46,9 +46,16 @@ namespace OpenDentBusiness.Crud{
 			Site site;
 			foreach(DataRow row in table.Rows) {
 				site=new Site();
-				site.SiteNum    = PIn.Long  (row["SiteNum"].ToString());
-				site.Description= PIn.String(row["Description"].ToString());
-				site.Note       = PIn.String(row["Note"].ToString());
+				site.SiteNum     = PIn.Long  (row["SiteNum"].ToString());
+				site.Description = PIn.String(row["Description"].ToString());
+				site.Note        = PIn.String(row["Note"].ToString());
+				site.Address     = PIn.String(row["Address"].ToString());
+				site.Address2    = PIn.String(row["Address2"].ToString());
+				site.City        = PIn.String(row["City"].ToString());
+				site.State       = PIn.String(row["State"].ToString());
+				site.Zip         = PIn.String(row["Zip"].ToString());
+				site.ProvNum     = PIn.Long  (row["ProvNum"].ToString());
+				site.PlaceService= (OpenDentBusiness.PlaceOfService)PIn.Int(row["PlaceService"].ToString());
 				retVal.Add(site);
 			}
 			return retVal;
@@ -63,11 +70,25 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("SiteNum");
 			table.Columns.Add("Description");
 			table.Columns.Add("Note");
+			table.Columns.Add("Address");
+			table.Columns.Add("Address2");
+			table.Columns.Add("City");
+			table.Columns.Add("State");
+			table.Columns.Add("Zip");
+			table.Columns.Add("ProvNum");
+			table.Columns.Add("PlaceService");
 			foreach(Site site in listSites) {
 				table.Rows.Add(new object[] {
 					POut.Long  (site.SiteNum),
 					            site.Description,
 					            site.Note,
+					            site.Address,
+					            site.Address2,
+					            site.City,
+					            site.State,
+					            site.Zip,
+					POut.Long  (site.ProvNum),
+					POut.Int   ((int)site.PlaceService),
 				});
 			}
 			return table;
@@ -108,13 +129,20 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="SiteNum,";
 			}
-			command+="Description,Note) VALUES(";
+			command+="Description,Note,Address,Address2,City,State,Zip,ProvNum,PlaceService) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(site.SiteNum)+",";
 			}
 			command+=
 				 "'"+POut.String(site.Description)+"',"
-				+"'"+POut.String(site.Note)+"')";
+				+"'"+POut.String(site.Note)+"',"
+				+"'"+POut.String(site.Address)+"',"
+				+"'"+POut.String(site.Address2)+"',"
+				+"'"+POut.String(site.City)+"',"
+				+"'"+POut.String(site.State)+"',"
+				+"'"+POut.String(site.Zip)+"',"
+				+    POut.Long  (site.ProvNum)+","
+				+    POut.Int   ((int)site.PlaceService)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -147,13 +175,20 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="SiteNum,";
 			}
-			command+="Description,Note) VALUES(";
+			command+="Description,Note,Address,Address2,City,State,Zip,ProvNum,PlaceService) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(site.SiteNum)+",";
 			}
 			command+=
 				 "'"+POut.String(site.Description)+"',"
-				+"'"+POut.String(site.Note)+"')";
+				+"'"+POut.String(site.Note)+"',"
+				+"'"+POut.String(site.Address)+"',"
+				+"'"+POut.String(site.Address2)+"',"
+				+"'"+POut.String(site.City)+"',"
+				+"'"+POut.String(site.State)+"',"
+				+"'"+POut.String(site.Zip)+"',"
+				+    POut.Long  (site.ProvNum)+","
+				+    POut.Int   ((int)site.PlaceService)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -166,8 +201,15 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one Site in the database.</summary>
 		public static void Update(Site site){
 			string command="UPDATE site SET "
-				+"Description= '"+POut.String(site.Description)+"', "
-				+"Note       = '"+POut.String(site.Note)+"' "
+				+"Description = '"+POut.String(site.Description)+"', "
+				+"Note        = '"+POut.String(site.Note)+"', "
+				+"Address     = '"+POut.String(site.Address)+"', "
+				+"Address2    = '"+POut.String(site.Address2)+"', "
+				+"City        = '"+POut.String(site.City)+"', "
+				+"State       = '"+POut.String(site.State)+"', "
+				+"Zip         = '"+POut.String(site.Zip)+"', "
+				+"ProvNum     =  "+POut.Long  (site.ProvNum)+", "
+				+"PlaceService=  "+POut.Int   ((int)site.PlaceService)+" "
 				+"WHERE SiteNum = "+POut.Long(site.SiteNum);
 			Db.NonQ(command);
 		}
@@ -182,6 +224,34 @@ namespace OpenDentBusiness.Crud{
 			if(site.Note != oldSite.Note) {
 				if(command!=""){ command+=",";}
 				command+="Note = '"+POut.String(site.Note)+"'";
+			}
+			if(site.Address != oldSite.Address) {
+				if(command!=""){ command+=",";}
+				command+="Address = '"+POut.String(site.Address)+"'";
+			}
+			if(site.Address2 != oldSite.Address2) {
+				if(command!=""){ command+=",";}
+				command+="Address2 = '"+POut.String(site.Address2)+"'";
+			}
+			if(site.City != oldSite.City) {
+				if(command!=""){ command+=",";}
+				command+="City = '"+POut.String(site.City)+"'";
+			}
+			if(site.State != oldSite.State) {
+				if(command!=""){ command+=",";}
+				command+="State = '"+POut.String(site.State)+"'";
+			}
+			if(site.Zip != oldSite.Zip) {
+				if(command!=""){ command+=",";}
+				command+="Zip = '"+POut.String(site.Zip)+"'";
+			}
+			if(site.ProvNum != oldSite.ProvNum) {
+				if(command!=""){ command+=",";}
+				command+="ProvNum = "+POut.Long(site.ProvNum)+"";
+			}
+			if(site.PlaceService != oldSite.PlaceService) {
+				if(command!=""){ command+=",";}
+				command+="PlaceService = "+POut.Int   ((int)site.PlaceService)+"";
 			}
 			if(command==""){
 				return false;
@@ -199,6 +269,27 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			if(site.Note != oldSite.Note) {
+				return true;
+			}
+			if(site.Address != oldSite.Address) {
+				return true;
+			}
+			if(site.Address2 != oldSite.Address2) {
+				return true;
+			}
+			if(site.City != oldSite.City) {
+				return true;
+			}
+			if(site.State != oldSite.State) {
+				return true;
+			}
+			if(site.Zip != oldSite.Zip) {
+				return true;
+			}
+			if(site.ProvNum != oldSite.ProvNum) {
+				return true;
+			}
+			if(site.PlaceService != oldSite.PlaceService) {
 				return true;
 			}
 			return false;
