@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -124,6 +125,7 @@ namespace OpenDentBusiness
 			Provider provTreat;//claim level treating provider.
 			Provider billProv=null;
 			Clinic clinic=null;
+			Site site=null;
 			seg=0;
 			#endregion Define Variables
 			#region Transaction Set Header
@@ -217,6 +219,12 @@ namespace OpenDentBusiness
 				procList=Procedures.Refresh(claim.PatNum);
 				initialList=ToothInitials.Refresh(claim.PatNum);
 				patPlans=PatPlans.Refresh(patient.PatNum);
+				//Get all procedures corresponding to the claimprocs which also have a site.
+				List<Procedure> listSiteProcs=procList.FindAll(x => claimProcs.Exists(y => y.ProcNum==x.ProcNum) && x.SiteNum!=0);
+				//A null site is acceptable, because billing info will be used instead.
+				if(listSiteProcs.Count > 0) {
+					site=SiteC.List.FirstOrDefault(x => x.SiteNum==listSiteProcs[0].SiteNum);
+				}
 				#endregion Initialize Variables
 				#region Billing Provider
 				//Billing address is based on clinic, not provider.  All claims in a batch are guaranteed to be from a single clinic.  That validation is done in FormClaimSend.
@@ -1064,15 +1072,13 @@ namespace OpenDentBusiness
 					//Code added to send the segment below, but no logic here for sending yet, so it is never sent.
 				}
 				else if(medType==EnumClaimMedType.Dental) {
-					if(claim.PlaceService!=PlaceOfService.Office) {
-						if(IsClaimConnect(clearinghouseClin) || IsDentiCal(clearinghouseClin)) {
-							//Osvaldo Ferrer, VIP account manager for DentalXChange, says we need the segment whenever the place of service is not office.
-							//Denti-Cal now requires the ability to send facility information, as of the last round of testing for a customer on 05/11/2015.
-							sendFacilityNameAndAddress=true;
-						}
-						else {//for other clearinghouses, the X12 specs say that we don't send it if it's the same as the billing prov.
-							//and since we always set it the same as the billing prov, we shouldn't send it.
-						}
+					if(IsClaimConnect(clearinghouseClin) || IsDentiCal(clearinghouseClin)) {
+						//Osvaldo Ferrer, VIP account manager for DentalXChange, says we need the segment whenever the place of service is not office.
+						//Denti-Cal now requires the ability to send facility information, as of the last round of testing for a customer on 05/11/2015.
+						sendFacilityNameAndAddress=true;
+					}
+					else {//for other clearinghouses, the X12 specs say that we don't send it if it's the same as the billing prov.
+						//and since we always set it the same as the billing prov, we shouldn't send it.
 					}
 				}
 				Provider facilityProv=billProv;//If this provider changes in the future, then the validation section will also need to be updated.
@@ -1081,8 +1087,17 @@ namespace OpenDentBusiness
 				string facilityCity=billingCity;
 				string facilityState=billingState;
 				string facilityZip=billingZip;
-				//For medical, instititional, and dental, sending facility NPI must be for an organization (non-person).
-				if(!facilityProv.IsNotPerson) {//Validated also
+				if(site!=null && site.ProvNum > 0 && site.ProvNum!=billProv.ProvNum) {
+					facilityProv=Providers.GetProv(site.ProvNum);
+					facilityAddress1=site.Address;
+					facilityAddress2=site.Address2;
+					facilityCity=site.City;
+					facilityState=site.State;
+					facilityZip=site.Zip;
+					sendFacilityNameAndAddress=true;
+				}
+				//For medical, instititional, and dental, sending facility NPI must be for an organization (non-person).  Facility must also be external.
+				if(!facilityProv.IsNotPerson || claim.PlaceService==PlaceOfService.Office) {//Validated also
 					sendFacilityNameAndAddress=false;
 				}
 				provTreat=Providers.GetProv(claim.ProvTreat);
@@ -1837,7 +1852,7 @@ namespace OpenDentBusiness
 						}
 						//2420B NM1: Purchased Service Provider Name. Situational. We do not use.
 						//2420B REF: Purchased Service Provider Secondary Identificaiton. Situational. We do not use.
-						//2420C NM1: 77 (medical) Service Facility Location Name. Situational. We enforce all procs on a claim being performed at the same location so we don't need this.
+						//2420C NM1: 77 (medical) Service Facility Location Name. Situational.  If site is different on selected procs, then likely unintentional.
 						//2420C N3: (medical) Service Facility Location Address. We do not use.
 						//2420C N4: (medical) Service Facility Location City, State, Zip Code. We do not use.
 						//2420C REF: (medical) Service Facility Location Secondary Identification. Situational. We do not use.
@@ -3096,6 +3111,40 @@ namespace OpenDentBusiness
 						if(!Regex.IsMatch(provTreatProc.NationalProvID,"^(80840)?[0-9]{10}$")) {
 							Comma(strb);
 							strb.Append("Ordering Prov "+provOrderProc.Abbr+" NPI for proc "+procCode.ProcCode+" must be a 10 digit number with an optional prefix of 80840");
+						}
+					}
+				}
+				//Site validation (if specified).  Currently used for Service Facility Location.
+				if(proc.SiteNum > 0) {
+					Site site=SiteC.List.FirstOrDefault(x => x.SiteNum==proc.SiteNum);
+					//Provider
+					if(site.ProvNum > 0) {
+						Provider provFacility=listProvs.First(x => x.ProvNum==site.ProvNum);
+						if(provFacility.LName=="") {
+							Comma(strb);
+							strb.Append("Site prov "+provFacility.Abbr+" LName for proc "+procCode.ProcCode);
+						}
+						if(!Regex.IsMatch(provFacility.NationalProvID,"^(80840)?[0-9]{10}$")) {
+							Comma(strb);
+							strb.Append("Site prov "+provFacility.Abbr+" NPI for proc "+procCode.ProcCode
+								+" must be a 10 digit number with an optional prefix of 80840");
+						}
+						//Address
+						if(site.Address.Trim()=="") {
+							Comma(strb);
+							strb.Append("Site address for proc "+procCode.ProcCode);
+						}
+						if(site.City.Trim().Length<2) {
+							Comma(strb);
+							strb.Append("Site city for proc "+procCode.ProcCode);
+						}
+						if(site.State.Trim().Length!=2) {
+							Comma(strb);
+							strb.Append("Site state for proc "+procCode.ProcCode);
+						}
+						if(!Regex.IsMatch(site.Zip.Trim(),"^[0-9]{5}\\-?([0-9]{4})?$")) {//#####, or #####-, or #####-####, or #########. Dashes are removed when X12 is generated.
+							Comma(strb);
+							strb.Append("Site zip for proc "+procCode.ProcCode);
 						}
 					}
 				}
