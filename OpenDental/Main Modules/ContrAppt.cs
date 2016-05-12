@@ -3773,6 +3773,18 @@ namespace OpenDental {
 				}
 				return;
 			}
+			int yval=p.Y+ContrApptSheet2.Top+panelSheet.Top+10;
+			int xval=p.X+ContrApptSheet2.Left+panelSheet.Left+10;
+			if(aptNum==bubbleAptNum) {
+				if(DateTime.Now.AddMilliseconds(-280) > bubbleTime | !PrefC.GetBool(PrefName.ApptBubbleDelay)) {
+					infoBubble.Visible=true;
+					if(yval > panelSheet.Bottom-infoBubble.Height) {
+						yval=panelSheet.Bottom-infoBubble.Height;
+					}
+					infoBubble.Location=new Point(xval,yval);
+				}
+				return;
+			}
 			if(aptNum!=bubbleAptNum) {
 				//reset timer for popup delay
 				timerInfoBubble.Enabled=false;
@@ -4056,19 +4068,16 @@ namespace OpenDental {
 				infoBubble.Size=new Size(infoBubble.Width,(int)y+5);
 				infoBubble.BringToFront();
 			}
-			int yval=p.Y+ContrApptSheet2.Top+panelSheet.Top+10;
 			if(yval > panelSheet.Bottom-infoBubble.Height) {
 				yval=panelSheet.Bottom-infoBubble.Height;
 			}
-			infoBubble.Location=new Point(p.X+ContrApptSheet2.Left+panelSheet.Left+10,yval);
+			infoBubble.Location=new Point(xval,yval);
 			/*only show right away if option set for no delay, otherwise, it will not show
 			until mouse had hovered for at least 0.28 seconds(arbitrary #)
 			the timer fires at 0.30 seconds, so the difference was introduced because
 			of what seemed to be inconsistencies in the timer function */
-			if(DateTime.Now.AddMilliseconds(-280) > bubbleTime | !PrefC.GetBool(PrefName.ApptBubbleDelay)) {
+			if(!PrefC.GetBool(PrefName.ApptBubbleDelay)) {
 				infoBubble.Visible=true;
-				//Something may have changed so we need to refresh the bubble.
-				infoBubble.Invalidate();
 			}
 			else {
 				infoBubble.Visible=false;
