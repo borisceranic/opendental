@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using CodeBase;
 using OpenDentBusiness;
 using OpenDental.UI;
+using System.Linq;
 
 namespace OpenDental {
 	///<summary></summary>
