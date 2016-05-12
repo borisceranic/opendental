@@ -301,7 +301,7 @@ namespace OpenDental{
 		#endregion
 
 		private void FormAudit_Load(object sender, System.EventArgs e) {
-			textDateFrom.Text=DateTime.Today.AddDays(-10).ToShortDateString();
+			textDateFrom.Text=DateTime.Today.ToShortDateString();
 			textDateTo.Text=DateTime.Today.ToShortDateString();
 			for(int i=0;i<permissionsAlphabetic.Count;i++){
 				if(i==0){
@@ -317,7 +317,14 @@ namespace OpenDental{
 			for(int i=0;i<UserodC.Listt.Count;i++){
 				comboUser.Items.Add(UserodC.Listt[i].UserName);
 			}
-			PatNum=0;
+			PatNum=CurPatNum;
+			if(PatNum==0) {
+				textPatient.Text="";
+				comboPermission.SelectedIndex=1;//Choose the first one so we don't get thousands of audit entries.
+			}
+			else {
+				textPatient.Text=Patients.GetLim(PatNum).GetNameLF();
+			}
 			FillGrid();
 		}
 
