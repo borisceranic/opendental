@@ -3117,10 +3117,14 @@ namespace OpenDental {
 					grfx.DrawImage(ContrApptSingle3[thisIndex].Shadow,ContrApptSingle3[thisIndex].Location.X
 								,ContrApptSingle3[thisIndex].Location.Y);
 				}
+				long oldPatNum=(PatCur==null ? 0 : PatCur.PatNum);
 				RefreshModuleDataPatient(PIn.Long(ContrApptSingle3[thisIndex].DataRoww["PatNum"].ToString()));
-				RefreshModuleScreenPatient();
-				FormOpenDental.S_Contr_PatientSelected(PatCur);
-				//RefreshModulePatient(PIn.PInt(ContrApptSingle3[thisIndex].DataRoww["PatNum"].ToString()));
+				if(PatCur.PatNum!=oldPatNum) {
+					FormOpenDental.S_Contr_PatientSelected(PatCur);
+				}
+				else {
+					RefreshModuleScreenPatient();
+				}
 				if(e.Button==MouseButtons.Right) {
 					menuApt.MenuItems.RemoveByKey("Phone Div");
 					menuApt.MenuItems.RemoveByKey("Home Phone");
