@@ -7520,8 +7520,9 @@ namespace OpenDental {
 			logComplCreate(ProcCur);
 		}
 
-		///<summary>No user dialog is shown.  This only works for some kinds of procedures.  Set the codeNum first.  AddProcedure and AddQuick both call
-		///AddProcHelper, where most of the logic for setting the fields for a new procedure is located.</summary>
+		///<summary>No user dialog is shown.  This only works for some kinds of procedures.  Set the codeNum first.
+		///AddProcedure and AddQuick both call AddProcHelper, where most of the logic for setting the fields for a new procedure is located.
+		///No validation is done before adding the procedure so check all permissions and such prior to calling this method.</summary>
 		private void AddQuick(Procedure ProcCur) {
 			Plugins.HookAddCode(this,"ContrChart.AddQuick_begin",ProcCur);
 			AddProcHelper(ProcCur);
