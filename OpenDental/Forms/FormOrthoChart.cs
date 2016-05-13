@@ -766,7 +766,8 @@ namespace OpenDental {
 				#region security log entry
 				string logText=Lan.g(this,"Ortho chart field edited.  Field date")+": "+listUpdNew[i].DateService.ToShortDateString()+"  "
 					+Lan.g(this,"Field name")+": "+listUpdNew[i].FieldName+"\r\n";
-				if(listUpdNew[i].FieldName==Lan.g(this,"Signature")) {
+				//Do not log the Base64 information into the audit trail if this is a signature column, log some short descriptive text instead.
+				if(_tableOrtho.Columns.IndexOf(listUpdNew[i].FieldName)==_sigTableOrthoColIdx) {
 					if(listUpdDB[i].FieldValue != "" && listUpdNew[i].FieldValue != "") {
 						logText+=Lan.g(this,"Signature modified.")+" ";
 					}
