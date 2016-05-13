@@ -49,7 +49,8 @@ namespace OpenDentBusiness {
 		public string CcAddress;
 		///<summary>Single email address or comma-delimited list of addresses.  User may enter multiple email addresses for blind carbon copies.</summary>
 		public string BccAddress;
-		
+		///<summary>Enum:HideIn None=0,EmailInbox=1.  Indicates which places in the program that should not show this email message.</summary>
+		public HideInFlags HideIn;
 		///<summary>Constructor</summary>
 		public EmailMessage(){
 			Attachments=new List<EmailAttach>();
@@ -96,6 +97,15 @@ namespace OpenDentBusiness {
 		///<summary>13 Message Delivery Notification (MDN) created and saved to db, but not sent yet.  Does not show in patient Chart.  Attached to the same patient as the incoming email which caused the MDN to be created.
 		///This status is used to try resending MDNs if they fail to send.  The MDN is saved to the db so the unset MDNs can be found easily, and also because MDNs are hard to rebuild again later.</summary>
 		AckDirectNotSent,
+	}
+	
+	///<summary></summary>
+	[Flags]
+	public enum HideInFlags {
+		///<summary>0 - None</summary>
+		None=0,
+		///<summary>1 - Hide email from inbox view</summary>
+		EmailInbox=1
 	}
 
 

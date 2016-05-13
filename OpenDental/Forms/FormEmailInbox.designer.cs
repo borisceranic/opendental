@@ -43,6 +43,7 @@ namespace OpenDental{
 			this.butClose = new OpenDental.UI.Button();
 			this.odToolBarButton1 = new OpenDental.UI.ODToolBarButton();
 			this.comboEmailAddress = new System.Windows.Forms.ComboBox();
+			this.label2 = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainerNoFlicker)).BeginInit();
 			this.splitContainerNoFlicker.Panel1.SuspendLayout();
 			this.splitContainerNoFlicker.Panel2.SuspendLayout();
@@ -96,6 +97,7 @@ namespace OpenDental{
 			this.textComputerName.AcceptsTab = true;
 			this.textComputerName.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.textComputerName.BackColor = System.Drawing.SystemColors.Control;
+			this.textComputerName.DetectLinksEnabled = false;
 			this.textComputerName.DetectUrls = false;
 			this.textComputerName.Location = new System.Drawing.Point(714, 651);
 			this.textComputerName.Multiline = false;
@@ -104,6 +106,7 @@ namespace OpenDental{
 			this.textComputerName.ReadOnly = true;
 			this.textComputerName.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textComputerName.Size = new System.Drawing.Size(142, 18);
+			this.textComputerName.SpellCheckIsEnabled = false;
 			this.textComputerName.TabIndex = 150;
 			this.textComputerName.Text = "";
 			// 
@@ -112,6 +115,7 @@ namespace OpenDental{
 			this.textComputerNameReceive.AcceptsTab = true;
 			this.textComputerNameReceive.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.textComputerNameReceive.BackColor = System.Drawing.SystemColors.Control;
+			this.textComputerNameReceive.DetectLinksEnabled = false;
 			this.textComputerNameReceive.DetectUrls = false;
 			this.textComputerNameReceive.Location = new System.Drawing.Point(714, 635);
 			this.textComputerNameReceive.Multiline = false;
@@ -120,6 +124,7 @@ namespace OpenDental{
 			this.textComputerNameReceive.ReadOnly = true;
 			this.textComputerNameReceive.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.Vertical;
 			this.textComputerNameReceive.Size = new System.Drawing.Size(142, 18);
+			this.textComputerNameReceive.SpellCheckIsEnabled = false;
 			this.textComputerNameReceive.TabIndex = 149;
 			this.textComputerNameReceive.Text = "";
 			// 
@@ -153,6 +158,7 @@ namespace OpenDental{
 			this.gridEmailMessages.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridEmailMessages.HasAddButton = false;
 			this.gridEmailMessages.HasMultilineHeaders = false;
 			this.gridEmailMessages.HScrollVisible = false;
 			this.gridEmailMessages.Location = new System.Drawing.Point(0, 0);
@@ -297,10 +303,21 @@ namespace OpenDental{
 			this.comboEmailAddress.TabIndex = 141;
 			this.comboEmailAddress.SelectionChangeCommitted += new System.EventHandler(this.butRefresh_Click);
 			// 
+			// label2
+			// 
+			this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.label2.Location = new System.Drawing.Point(97, 644);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(304, 16);
+			this.label2.TabIndex = 152;
+			this.label2.Text = "Hides the email if a patient is attached.";
+			this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
 			// FormEmailInbox
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(974, 675);
+			this.Controls.Add(this.label2);
 			this.Controls.Add(this.comboEmailAddress);
 			this.Controls.Add(this.textComputerName);
 			this.Controls.Add(this.textComputerNameReceive);
@@ -318,7 +335,6 @@ namespace OpenDental{
 			this.Menu = this.mainMenu1;
 			this.MinimumSize = new System.Drawing.Size(990, 713);
 			this.Name = "FormEmailInbox";
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Email Inbox";
 			this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
 			this.Load += new System.EventHandler(this.FormEmailInbox_Load);
@@ -351,5 +367,6 @@ namespace OpenDental{
 		private ODtextBox textComputerNameReceive;
 		private ODtextBox textComputerName;
 		private System.Windows.Forms.ComboBox comboEmailAddress;
+		private System.Windows.Forms.Label label2;
 	}
 }

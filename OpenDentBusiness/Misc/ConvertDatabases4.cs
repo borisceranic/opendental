@@ -1214,6 +1214,18 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE site MODIFY PlaceService NOT NULL";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE emailmessage ADD HideIn tinyint NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE emailmessage ADD HideIn number(3)";
+					Db.NonQ(command);
+					command="UPDATE emailmessage SET HideIn = 0 WHERE HideIn IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE emailmessage MODIFY HideIn NOT NULL";
+					Db.NonQ(command);
+				}
 				command="UPDATE preference SET ValueString = '16.2.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
