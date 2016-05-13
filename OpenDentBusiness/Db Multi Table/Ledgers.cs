@@ -274,12 +274,14 @@ namespace OpenDentBusiness{
 			}
 			else if(payPlanVersionCur==2) {//v2, we should be looking for payplancharges and aging those as patient debits/credits accordingly.
 				command+="INSERT INTO "+tempOdAgingTransTableName+" (PatNum,TranDate,TranAmount) "+
-					"SELECT pp.PatNum PatNum,"+
-							"pp.ChargeDate TranDate,"+
-							"IF(pp.ChargeType="+POut.Int((int)PayPlanChargeType.Debit)+",pp.Principal+pp.Interest,-pp.Principal) TranAmount "+
-						"FROM payplancharge pp "+
-						"WHERE ChargeDate <= "+POut.Date(AsOfDate)+
-						(guarantor==0?"":(" AND pp.PatNum IN "+familyPatNums))+";";
+					"SELECT pp.PatNum PatNum,"
+						+"pp.ChargeDate TranDate,"
+						+"(CASE WHEN pplan.PlanNum!=0 THEN (CASE WHEN pp.ChargeType!="+POut.Int((int)PayPlanChargeType.Debit)+" THEN -pp.Principal ELSE 0 END) "
+							+"ELSE (CASE WHEN pp.ChargeType="+POut.Int((int)PayPlanChargeType.Debit)+" THEN pp.Principal+pp.Interest ELSE -pp.Principal END) END) AS TranAmount "
+					+"FROM payplancharge pp "
+					+"LEFT JOIN payplan pplan ON pplan.PayPlanNum=pp.PayPlanNum "
+					+"WHERE ChargeDate <= "+POut.Date(AsOfDate)
+					+(guarantor==0?"":(" AND pp.PatNum IN "+familyPatNums))+";";
 			}
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
 				//The aging calculation buckets, insurance estimates, and payment plan due amounts are 
