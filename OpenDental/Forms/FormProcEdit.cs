@@ -4032,9 +4032,20 @@ namespace OpenDental{
 					textProcFee.Text=ProcCur.ProcFee.ToString("f");
 				}
 			}
-			if(comboProcStatus.SelectedIndex==1){//C
-				if(!Security.IsAuthorized(Permissions.ProcComplCreate)) {
-					//set it back to whatever it was before
+			if(comboProcStatus.SelectedIndex==1) {//C
+				bool isAllowedToCompl=true;
+				if(!PrefC.GetBool(PrefName.AllowSettingProcsComplete)) {
+					MsgBox.Show(this,"Set the procedure complete by setting the appointment complete.  "
+						+"If you want to be able to set procedures complete, you must turn on that option in Setup | Chart | Chart Preferences.");
+					isAllowedToCompl=false;
+				}
+				//else if so that we don't give multiple notifications to the user.
+				else if(!Security.IsAuthorized(Permissions.ProcComplCreate,PIn.Date(textDate.Text))) {
+					isAllowedToCompl=false;
+				}
+				//Check to see if the user is allowed to set the procedure complete.
+				if(!isAllowedToCompl) {
+					//User not allowed to complete procedures so set it back to whatever it was before
 					if(ProcCur.ProcStatus==ProcStat.TP) {
 						comboProcStatus.SelectedIndex=0;
 					}
@@ -4102,6 +4113,11 @@ namespace OpenDental{
 			//can't get to here if attached to a claim, even if use the Edit Anyway button.
 			if(ProcOld.ProcStatus==ProcStat.C){
 				MsgBox.Show(this,"Procedure was already set complete.");
+				return;
+			}
+			if(!PrefC.GetBool(PrefName.AllowSettingProcsComplete)) {
+				MsgBox.Show(this,"Set the procedure complete by setting the appointment complete.  "
+					+"If you want to be able to set procedures complete, you must turn on that option in Setup | Chart | Chart Preferences.");
 				return;
 			}
 			if(!Security.IsAuthorized(Permissions.ProcComplCreate)){
