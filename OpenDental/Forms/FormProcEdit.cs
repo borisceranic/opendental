@@ -4042,10 +4042,10 @@ namespace OpenDental{
 						comboProcStatus.SelectedIndex=-1;//original status must not be visible
 					}
 					else {
-						if(ProcCur.ProcStatus==ProcStat.EO) {
+						if(ProcCur.ProcStatus==ProcStat.EC) {
 							comboProcStatus.SelectedIndex=2;
 						}
-						if(ProcCur.ProcStatus==ProcStat.EC) {
+						if(ProcCur.ProcStatus==ProcStat.EO) {
 							comboProcStatus.SelectedIndex=3;
 						}
 						if(ProcCur.ProcStatus==ProcStat.R) {
