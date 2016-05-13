@@ -2619,6 +2619,12 @@ namespace OpenDental.UI {
 
 		///<summary>Just prior to displaying the context menu, add wiki links if neccesary.</summary>
 		private void PopupHelper(object sender, EventArgs e) {
+			try {
+				PrefC.GetBool(PrefName.WikiDetectLinks);//if this fails then we do not have a pref table or a wiki, so don't bother going with this part.
+			}
+			catch(Exception) {
+				return;
+			}
 			removeWikiMenu();
 			if(!PrefC.GetBool(PrefName.WikiDetectLinks)) {//NOTE: if this preference is changed while the program is open there MAY be some lingering wiki links in the context menu. 
 				//It is not worth it to force users to log off and back on again, or to run the link removal code below EVERY time, even if the pref is disabled.
