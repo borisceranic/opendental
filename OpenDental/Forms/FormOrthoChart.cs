@@ -43,7 +43,7 @@ namespace OpenDental {
 			_listOrthDisplayFields = DisplayFields.GetForCategory(DisplayFieldCategory.OrthoChart);
 			_showSigBox=_listOrthDisplayFields.Any(x => x.InternalName=="Signature");//'Signature' is a field selected for display.
 			for(int i=0;i<_listOrthDisplayFields.Count;i++) {
-				_tableOrtho.Columns.Add((i+1).ToString());//named by number, but probably refer to by index
+				_tableOrtho.Columns.Add(_listOrthDisplayFields[i].Description);
 			}
 			//define rows------------------------------------------------------------------------------------------------------------
 			_listOrthoCharts=OrthoCharts.GetAllForPatient(_patCur.PatNum);
@@ -693,7 +693,8 @@ namespace OpenDental {
 				#region security log entry
 				string logText=Lan.g(this,"Ortho chart field edited.  Field date")+": "+listUpdNew[i].DateService.ToShortDateString()+"  "
 					+Lan.g(this,"Field name")+": "+listUpdNew[i].FieldName+"\r\n";
-				if(listUpdNew[i].FieldName==Lan.g(this,"Signature")) {
+				//Do not log the Base64 information into the audit trail if this is a signature column, log some short descriptive text instead.
+				if(_tableOrtho.Columns.IndexOf(listUpdNew[i].FieldName)==_sigColIdx) {
 					if(listUpdDB[i].FieldValue != "" && listUpdNew[i].FieldValue != "") {
 						logText+=Lan.g(this,"Signature modified.")+" ";
 					}
