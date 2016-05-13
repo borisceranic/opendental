@@ -2074,15 +2074,6 @@ namespace OpenDental{
 				panelPat.Visible=false;
 			}
 			else {
-				if(PatPlanCur.PatPlanNum!=0) {
-					textPatPlanNum.Text=PatPlanCur.PatPlanNum.ToString();
-					InsVerify insVerifyPatPlanCur=InsVerifies.GetOneByFKey(PatPlanCur.PatPlanNum,VerifyTypes.PatientEnrollment);
-					if(insVerifyPatPlanCur!=null && !IsNewPatPlan) {
-						textDateLastVerifiedPatPlan.Text=insVerifyPatPlanCur.DateLastVerified.ToShortDateString();
-					}
-				}
-				textOrdinal.Text=PatPlanCur.Ordinal.ToString();
-				checkIsPending.Checked=PatPlanCur.IsPending;
 				comboRelationship.Items.Clear();
 				for(int i=0;i<Enum.GetNames(typeof(Relat)).Length;i++) {
 					comboRelationship.Items.Add(Lan.g("enumRelat",Enum.GetNames(typeof(Relat))[i]));
@@ -2090,6 +2081,23 @@ namespace OpenDental{
 						comboRelationship.SelectedIndex=i;
 					}
 				}
+				if(PatPlanCur.PatPlanNum!=0) {
+					textPatPlanNum.Text=PatPlanCur.PatPlanNum.ToString();
+					if(IsNewPatPlan) {
+						//Relationship is set to Self,  but the subscriber for the plan is not set to the current patient.
+						if(comboRelationship.SelectedIndex==0 && _subCur.Subscriber!=PatPlanCur.PatNum) {
+								comboRelationship.SelectedIndex=-1;
+						}
+					}
+					else {
+						InsVerify insVerifyPatPlanCur=InsVerifies.GetOneByFKey(PatPlanCur.PatPlanNum,VerifyTypes.PatientEnrollment);
+						if(insVerifyPatPlanCur!=null) {
+							textDateLastVerifiedPatPlan.Text=insVerifyPatPlanCur.DateLastVerified.ToShortDateString();
+						}
+					}
+				}
+				textOrdinal.Text=PatPlanCur.Ordinal.ToString();
+				checkIsPending.Checked=PatPlanCur.IsPending;
 				textPatID.Text=PatPlanCur.PatID;
 				FillPatientAdjustments();
 			}
@@ -4229,6 +4237,10 @@ namespace OpenDental{
 			}
 			if(PatPlanCur!=null && textOrdinal.errorProvider1.GetError(textOrdinal)!=""){
 				MsgBox.Show(this,"Please fix data entry errors first.");
+				return false;
+			}
+			if(comboRelationship.SelectedIndex==-1) {
+				MsgBox.Show(this,"Relationship to Subscriber is not allowed to be blank.");
 				return false;
 			}
 			if(_subCur!=null) {
