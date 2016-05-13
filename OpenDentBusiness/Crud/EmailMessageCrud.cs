@@ -60,6 +60,7 @@ namespace OpenDentBusiness.Crud{
 				emailMessage.PatNumSubj      = PIn.Long  (row["PatNumSubj"].ToString());
 				emailMessage.CcAddress       = PIn.String(row["CcAddress"].ToString());
 				emailMessage.BccAddress      = PIn.String(row["BccAddress"].ToString());
+				emailMessage.HideIn          = (OpenDentBusiness.HideInFlags)PIn.Int(row["HideIn"].ToString());
 				retVal.Add(emailMessage);
 			}
 			return retVal;
@@ -85,6 +86,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("PatNumSubj");
 			table.Columns.Add("CcAddress");
 			table.Columns.Add("BccAddress");
+			table.Columns.Add("HideIn");
 			foreach(EmailMessage emailMessage in listEmailMessages) {
 				table.Rows.Add(new object[] {
 					POut.Long  (emailMessage.EmailMessageNum),
@@ -101,6 +103,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (emailMessage.PatNumSubj),
 					            emailMessage.CcAddress,
 					            emailMessage.BccAddress,
+					POut.Int   ((int)emailMessage.HideIn),
 				});
 			}
 			return table;
@@ -141,7 +144,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="EmailMessageNum,";
 			}
-			command+="PatNum,ToAddress,FromAddress,Subject,BodyText,MsgDateTime,SentOrReceived,RecipientAddress,RawEmailIn,ProvNumWebMail,PatNumSubj,CcAddress,BccAddress) VALUES(";
+			command+="PatNum,ToAddress,FromAddress,Subject,BodyText,MsgDateTime,SentOrReceived,RecipientAddress,RawEmailIn,ProvNumWebMail,PatNumSubj,CcAddress,BccAddress,HideIn) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(emailMessage.EmailMessageNum)+",";
 			}
@@ -158,7 +161,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (emailMessage.ProvNumWebMail)+","
 				+    POut.Long  (emailMessage.PatNumSubj)+","
 				+"'"+POut.String(emailMessage.CcAddress)+"',"
-				+"'"+POut.String(emailMessage.BccAddress)+"')";
+				+"'"+POut.String(emailMessage.BccAddress)+"',"
+				+    POut.Int   ((int)emailMessage.HideIn)+")";
 			if(emailMessage.BodyText==null) {
 				emailMessage.BodyText="";
 			}
@@ -199,7 +203,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="EmailMessageNum,";
 			}
-			command+="PatNum,ToAddress,FromAddress,Subject,BodyText,MsgDateTime,SentOrReceived,RecipientAddress,RawEmailIn,ProvNumWebMail,PatNumSubj,CcAddress,BccAddress) VALUES(";
+			command+="PatNum,ToAddress,FromAddress,Subject,BodyText,MsgDateTime,SentOrReceived,RecipientAddress,RawEmailIn,ProvNumWebMail,PatNumSubj,CcAddress,BccAddress,HideIn) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(emailMessage.EmailMessageNum)+",";
 			}
@@ -216,7 +220,8 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (emailMessage.ProvNumWebMail)+","
 				+    POut.Long  (emailMessage.PatNumSubj)+","
 				+"'"+POut.String(emailMessage.CcAddress)+"',"
-				+"'"+POut.String(emailMessage.BccAddress)+"')";
+				+"'"+POut.String(emailMessage.BccAddress)+"',"
+				+    POut.Int   ((int)emailMessage.HideIn)+")";
 			if(emailMessage.BodyText==null) {
 				emailMessage.BodyText="";
 			}
@@ -249,7 +254,8 @@ namespace OpenDentBusiness.Crud{
 				+"ProvNumWebMail  =  "+POut.Long  (emailMessage.ProvNumWebMail)+", "
 				+"PatNumSubj      =  "+POut.Long  (emailMessage.PatNumSubj)+", "
 				+"CcAddress       = '"+POut.String(emailMessage.CcAddress)+"', "
-				+"BccAddress      = '"+POut.String(emailMessage.BccAddress)+"' "
+				+"BccAddress      = '"+POut.String(emailMessage.BccAddress)+"', "
+				+"HideIn          =  "+POut.Int   ((int)emailMessage.HideIn)+" "
 				+"WHERE EmailMessageNum = "+POut.Long(emailMessage.EmailMessageNum);
 			if(emailMessage.BodyText==null) {
 				emailMessage.BodyText="";
@@ -317,6 +323,10 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="BccAddress = '"+POut.String(emailMessage.BccAddress)+"'";
 			}
+			if(emailMessage.HideIn != oldEmailMessage.HideIn) {
+				if(command!=""){ command+=",";}
+				command+="HideIn = "+POut.Int   ((int)emailMessage.HideIn)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -374,6 +384,9 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			if(emailMessage.BccAddress != oldEmailMessage.BccAddress) {
+				return true;
+			}
+			if(emailMessage.HideIn != oldEmailMessage.HideIn) {
 				return true;
 			}
 			return false;

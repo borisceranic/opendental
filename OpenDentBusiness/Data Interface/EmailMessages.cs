@@ -46,7 +46,7 @@ namespace OpenDentBusiness{
 			//We only pull the first 50 characters of the bodytext for preview purposes. We also do not pull the RawEmailIn, because it is not necessary for the inbox.
 			//After double-clicking an email in the inbox to view it, then the entire email contents are read from the database.
 			string command="SELECT EmailMessageNum,PatNum,ToAddress,FromAddress,Subject,SUBSTR(BodyText,1,50) BodyText,MsgDateTime,SentOrReceived,"
-				+"RecipientAddress,'' RawEmailIn,ProvNumWebMail,PatNumSubj,CcAddress,BccAddress "
+				+"RecipientAddress,'' RawEmailIn,ProvNumWebMail,PatNumSubj,CcAddress,BccAddress,HideIn "
 				+"FROM emailmessage "
 				+"WHERE SentOrReceived IN (";
 			if(provNum==0) {//emailmessages

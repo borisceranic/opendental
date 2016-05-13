@@ -213,6 +213,9 @@ namespace OpenDental {
 			Dictionary<long,string> dictPatNames=Patients.GetAllPatientNames();
 			for(int i=0;i<ListEmailMessages.Count;i++) {
 				EmailMessage emailMessage=ListEmailMessages[i];
+				if(emailMessage.HideIn.HasFlag(HideInFlags.EmailInbox)) {
+					continue;
+				}
 				UI.ODGridRow row=new UI.ODGridRow();
 				row.Tag=emailMessage;//Used to locate the correct email message if the user decides to sort the grid.
 				if(emailMessage.SentOrReceived==EmailSentOrReceived.Received || emailMessage.SentOrReceived==EmailSentOrReceived.WebMailReceived
@@ -385,15 +388,21 @@ namespace OpenDental {
 
 		private void butDelete_Click(object sender,EventArgs e) {
 			if(gridEmailMessages.SelectedIndices.Length==0) {
-				MsgBox.Show(this,"Please select email to delete.");
+				MsgBox.Show(this,"Please select email to delete or hide.");
 				return;
 			}
-			if(!MsgBox.Show(this,true,"Permanently delete all selected email?")) {
+			if(!MsgBox.Show(this,true,"Permanently delete or hide selected email?")) {
 				return;
 			}
 			Cursor=Cursors.WaitCursor;
 			for(int i=0;i<gridEmailMessages.SelectedIndices.Length;i++) {
 				EmailMessage emailMessage=(EmailMessage)gridEmailMessages.Rows[gridEmailMessages.SelectedIndices[i]].Tag;
+				//If attached to a patient, simply hide the email message instead of deleting it so that it still shows in other parts of the program.
+				if(emailMessage.PatNum!=0) {
+					emailMessage.HideIn=HideInFlags.EmailInbox;
+					EmailMessages.Update(emailMessage);
+					continue;
+				}
 				if(EmailMessages.IsSecureWebMail(emailMessage.SentOrReceived)) {
 						EmailMessages.Delete(emailMessage);
 						string logText="";
