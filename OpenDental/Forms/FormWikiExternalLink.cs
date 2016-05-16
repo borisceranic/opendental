@@ -24,9 +24,14 @@ namespace OpenDental {
 			DialogResult=DialogResult.OK;
 		}
 
+		private void butEmptyLink_Click(object sender,EventArgs e) {
+			URL="";
+			DisplayText="";
+			DialogResult=DialogResult.OK;
+		}
+
 		private void butCancel_Click(object sender,EventArgs e) {
 			DialogResult=DialogResult.Cancel;
 		}
-
 	}
 }
