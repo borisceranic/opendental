@@ -4295,8 +4295,10 @@ namespace OpenDental{
 			}
 			g.FillRectangle(new SolidBrush(color),x,y,4,4);
 			IntPtr intPtr=bitmapIcon.GetHicon();
-			Icon=Icon.FromHandle(intPtr);
+			Icon icon=Icon.FromHandle(intPtr);
+			Icon=(Icon)icon.Clone();
 			DestroyIcon(intPtr);
+			icon.Dispose();
 			g.Dispose();
 		}
 
