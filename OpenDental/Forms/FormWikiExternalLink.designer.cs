@@ -25,11 +25,12 @@ namespace OpenDental{
 		private void InitializeComponent() {
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormWikiExternalLink));
 			this.butOK = new OpenDental.UI.Button();
-			this.butCancel = new OpenDental.UI.Button();
+			this.butEmptyLink = new OpenDental.UI.Button();
 			this.label1 = new System.Windows.Forms.Label();
 			this.textDisplay = new System.Windows.Forms.TextBox();
 			this.label2 = new System.Windows.Forms.Label();
 			this.textURL = new System.Windows.Forms.TextBox();
+			this.butCancel = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// butOK
@@ -40,27 +41,27 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(556, 96);
+			this.butOK.Location = new System.Drawing.Point(475, 96);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 21;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// butCancel
+			// butEmptyLink
 			// 
-			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
-			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.butCancel.Autosize = true;
-			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
-			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
-			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(637, 96);
-			this.butCancel.Name = "butCancel";
-			this.butCancel.Size = new System.Drawing.Size(75, 24);
-			this.butCancel.TabIndex = 20;
-			this.butCancel.Text = "<a href=\"\">";
-			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
+			this.butEmptyLink.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butEmptyLink.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butEmptyLink.Autosize = true;
+			this.butEmptyLink.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butEmptyLink.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butEmptyLink.CornerRadius = 4F;
+			this.butEmptyLink.Location = new System.Drawing.Point(556, 96);
+			this.butEmptyLink.Name = "butEmptyLink";
+			this.butEmptyLink.Size = new System.Drawing.Size(75, 24);
+			this.butEmptyLink.TabIndex = 20;
+			this.butEmptyLink.Text = "<a href=\"\">";
+			this.butEmptyLink.Click += new System.EventHandler(this.butEmptyLink_Click);
 			// 
 			// label1
 			// 
@@ -98,19 +99,34 @@ namespace OpenDental{
 			this.textURL.Size = new System.Drawing.Size(514, 20);
 			this.textURL.TabIndex = 24;
 			// 
+			// butCancel
+			// 
+			this.butCancel.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butCancel.Autosize = true;
+			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butCancel.CornerRadius = 4F;
+			this.butCancel.Location = new System.Drawing.Point(637, 96);
+			this.butCancel.Name = "butCancel";
+			this.butCancel.Size = new System.Drawing.Size(75, 24);
+			this.butCancel.TabIndex = 26;
+			this.butCancel.Text = "Cancel";
+			this.butCancel.Click += new System.EventHandler(this.butCancel_Click);
+			// 
 			// FormWikiExternalLink
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(724, 132);
+			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.textURL);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.textDisplay);
 			this.Controls.Add(this.butOK);
-			this.Controls.Add(this.butCancel);
+			this.Controls.Add(this.butEmptyLink);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormWikiExternalLink";
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Insert Link to External Resource";
 			this.ResumeLayout(false);
 			this.PerformLayout();
@@ -120,12 +136,11 @@ namespace OpenDental{
 		#endregion
 
 		private UI.Button butOK;
-		private UI.Button butCancel;
+		private UI.Button butEmptyLink;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.TextBox textDisplay;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.TextBox textURL;
-
-
+		private UI.Button butCancel;
 	}
 }

@@ -511,14 +511,17 @@ namespace OpenDental {
 			FormWEL.ShowDialog();
 			int tempStart=textContent.SelectionStart;
 			if(FormWEL.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			if(FormWEL.URL=="" && FormWEL.DisplayText=="") {
 				textContent.Paste("<a href=\"\"></a>");
 				textContent.SelectionStart=tempStart+11;
 				textContent.SelectionLength=0;
-				return;
 			}
-			textContent.Paste("<a href=\""+FormWEL.URL+"\">"+FormWEL.DisplayText+"</a>");
+			else {
+				textContent.Paste("<a href=\""+FormWEL.URL+"\">"+FormWEL.DisplayText+"</a>");
+			}
 			textContent.Focus();
-			//RefreshHtml();
 		}
 
 		private void H1_Click() {
