@@ -1562,10 +1562,10 @@ Fam Urgent Fin Note: [famFinUrgNote]"
 			sheet.Width=850;
 			sheet.Height=1100;
 			//From top to bottom
-			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("statementReceiptInvoice",15f,"Arial",true,325,60,200,22,HorizontalAlignment.Center));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("statementReceiptInvoice",15f,"Arial",true,310,60,230,22,HorizontalAlignment.Center));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("returnAddress",10f,"Arial",false,40,70,250,80,GrowthBehaviorEnum.DownLocal));
-			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("statement.DateSent",9f,"Arial",false,325,83,200,13,HorizontalAlignment.Center));
-			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("accountNumber",9f,"Arial",false,325,97,200,13,HorizontalAlignment.Center));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("statement.DateSent",9f,"Arial",false,310,83,230,13,HorizontalAlignment.Center));
+			sheet.SheetFieldDefs.Add(SheetFieldDef.NewOutput("accountNumber",9f,"Arial",false,310,97,230,13,HorizontalAlignment.Center));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewGrid("StatementEnclosed",445,120,321,31));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("CREDIT CARD TYPE",8f,"Arial",false,445,185,125,14,isPaymentOption:true));
 			sheet.SheetFieldDefs.Add(SheetFieldDef.NewLine(566,201,200,0,true));

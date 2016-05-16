@@ -429,6 +429,9 @@
     <Compile Include="Crud\SignalodCrud.cs" />
     <Compile Include="Crud\SiteCrud.cs" />
     <Compile Include="Crud\StateAbbrCrud.cs" />
+    <Compile Include="Crud\StmtAdjAttachCrud.cs" />
+    <Compile Include="Crud\StmtPaySplitAttachCrud.cs" />
+    <Compile Include="Crud\StmtProcAttachCrud.cs" />
     <Compile Include="Crud\TreatPlanAttachCrud.cs" />
     <Compile Include="Crud\UpdateHistoryCrud.cs" />
     <Compile Include="Crud\UserClinicCrud.cs" />
@@ -447,6 +450,9 @@
     <Compile Include="Data Interface\JobLogs.cs" />
     <Compile Include="Data Interface\OrthoChartTabLinks.cs" />
     <Compile Include="Data Interface\OrthoChartTabs.cs" />
+    <Compile Include="Data Interface\StmtAdjAttaches.cs" />
+    <Compile Include="Data Interface\StmtPaySplitAttaches.cs" />
+    <Compile Include="Data Interface\StmtProcAttaches.cs" />
     <Compile Include="Data Interface\TreatPlanAttaches.cs" />
     <Compile Include="Data Interface\UpdateHistories.cs" />
     <Compile Include="Data Interface\UserOdPrefs.cs" />
@@ -1019,6 +1025,9 @@
     <Compile Include="TableTypes\DisplayReport.cs" />
     <Compile Include="TableTypes\OrthoChartTabLink.cs" />
     <Compile Include="TableTypes\OrthoChartTab.cs" />
+    <Compile Include="TableTypes\StmtAdjAttach.cs" />
+    <Compile Include="TableTypes\StmtPaySplitAttach.cs" />
+    <Compile Include="TableTypes\StmtProcAttach.cs" />
     <Compile Include="TableTypes\UpdateHistory.cs" />
     <Compile Include="TableTypes\ApptComm.cs" />
     <Compile Include="TableTypes\CDSPermission.cs" />

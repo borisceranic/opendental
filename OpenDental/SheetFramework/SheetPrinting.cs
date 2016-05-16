@@ -160,13 +160,10 @@ namespace OpenDental {
 				//Worst case scenario we will end up calling the database a few extra times for the same data set.
 				//It use to call this method many, many times so anything is an improvement at this point.
 				if(stmt.SuperFamily!=0) {
-					_dataSet=AccountModules.GetSuperFamAccount(stmt.SuperFamily,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
-							,stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+					_dataSet=AccountModules.GetSuperFamAccount(stmt.SuperFamily,stmt);
 				}
 				else {
-					_dataSet=AccountModules.GetAccount(stmt.PatNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient
-							,stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
-							,stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+					_dataSet=AccountModules.GetAccount(stmt.PatNum,stmt);
 				}
 			}
 			return Print(sheet,_dataSet,copies,isRxControlled,stmt,medLab,isPrintDocument);
@@ -946,9 +943,7 @@ namespace OpenDental {
 				//This should never get hit.  This line of code is here just in case I forgot to update a random spot in our code.
 				//Worst case scenario we will end up calling the database a few extra times for the same data set.
 				//It use to call this method many, many times so anything is an improvement at this point.
-				dataSet=AccountModules.GetAccount(stmt.PatNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient
-						,stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
-						,stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+				dataSet=AccountModules.GetAccount(stmt.PatNum,stmt);
 			}
 			drawFieldGrid(field,sheet,g,gx,dataSet,stmt,medLab);
 		}
@@ -957,16 +952,16 @@ namespace OpenDental {
 		public static void drawFieldGrid(SheetField field,Sheet sheet,Graphics g,XGraphics gx,DataSet dataSet,Statement stmt,MedLab medLab,
 			bool isPrinting=false) 
 		{
+			if(stmt.StatementType==StmtType.LimitedStatement && field.FieldName.StartsWith("StatementAging")) {
+				return;
+			}
 			Sheets.SetPageMargin(sheet,_printMargin);
 			UI.ODGrid odGrid=new UI.ODGrid();//Only used for measurements, also contains printing/drawing logic.
 			odGrid.FontForSheets=new Font(field.FontName,field.FontSize,field.FontIsBold?FontStyle.Bold:FontStyle.Regular);
 			int _yAdjCurRow=0;//used to adjust for Titles, Headers, Rows, and footers (all considered part of the same row).
-			odGrid.Width=0;
 			List<DisplayField> Columns=SheetUtil.GetGridColumnsAvailable(field.FieldName);
 			filterColumnsHelper(sheet,field,Columns);
-			foreach(DisplayField Col in Columns) {
-				odGrid.Width+=Col.ColumnWidth;
-			}
+			odGrid.Width=Columns.Sum(x => x.ColumnWidth);//sum of empty list will return 0
 			odGrid.Height=field.Height;
 			odGrid.HideScrollBars=true;
 			odGrid.YPosField=field.YPos;
@@ -982,9 +977,9 @@ namespace OpenDental {
 			odGrid.BeginUpdate();
 			odGrid.Columns.Clear();
 			ODGridColumn col;
-			for(int i=0;i<Columns.Count;i++) {
-				col=new ODGridColumn(Columns[i].Description,Columns[i].ColumnWidth);
-				switch(field.FieldName+"."+Columns[i].InternalName) {//Unusual switch statement to differentiate similar column names in different grids.
+			foreach(DisplayField colCur in Columns) {
+				col=new ODGridColumn(colCur.Description,colCur.ColumnWidth);
+				switch(field.FieldName+"."+colCur.InternalName) {//Unusual switch statement to differentiate similar column names in different grids.
 					case "StatementMain.charges":
 					case "StatementMain.credits":
 					case "StatementMain.balance":
@@ -1017,27 +1012,25 @@ namespace OpenDental {
 				odGrid.Columns.Add(col);
 			}
 			ODGridRow row;
-			for(int i=0;i<Table.Rows.Count;i++) {
+			foreach(DataRow rowCur in Table.Rows) {
 				row=new ODGridRow();
-				for(int c=0;c<Columns.Count;c++) {//Selectively fill columns from the dataTable into the odGrid.
-					row.Cells.Add(Table.Rows[i][Columns[c].InternalName].ToString());
-				}
+				Columns.ForEach(x => row.Cells.Add(rowCur[x.InternalName].ToString()));//Selectively fill columns from the dataTable into the odGrid.
 				if(Table.Columns.Contains("PatNum")) {//Used for statments to determine account splitting.
-					row.Tag=Table.Rows[i]["PatNum"].ToString();
+					row.Tag=rowCur["PatNum"].ToString();
 				}
 				//Colored Text
-				if(Table.Columns.Contains("paramTextColor") && !string.IsNullOrEmpty(Table.Rows[i]["paramTextColor"].ToString())) {
-					Color cRowText=Color.FromArgb(PIn.Int(Table.Rows[i]["paramTextColor"].ToString()));
+				if(Table.Columns.Contains("paramTextColor") && !string.IsNullOrEmpty(rowCur["paramTextColor"].ToString())) {
+					Color cRowText=Color.FromArgb(PIn.Int(rowCur["paramTextColor"].ToString()));
 					if(!cRowText.IsEmpty) {
 						row.ColorText=cRowText;
 					}
 				}
 				//Bold Text
 				if(Table.Columns.Contains("paramIsBold")) {
-					row.Bold=(bool)Table.Rows[i]["paramIsBold"];
+					row.Bold=(bool)rowCur["paramIsBold"];
 				}
 				if(Table.Columns.Contains("paramIsBorderBoldBottom")) {
-					if((bool)Table.Rows[i]["paramIsBorderBoldBottom"]) {
+					if((bool)rowCur["paramIsBorderBoldBottom"]) {
 						row.ColorLborder=Color.Black;
 					}
 				}
@@ -1046,19 +1039,20 @@ namespace OpenDental {
 			odGrid.EndUpdate(true);//Calls ComputeRows and ComputeColumns, meaning the RowHeights int[] has been filled.
 			#endregion
 			for(int i=0;i<odGrid.RowHeights.Length;i++) {
+				ODPrintRow printRowCur=odGrid.PrintRows[i];
 				if(_isPrinting
-					&& (odGrid.PrintRows[i].YPos-_printMargin.Top<_yPosPrint //rows at the end of previous page
-						|| odGrid.PrintRows[i].YPos-sheet.HeightPage+_printMargin.Bottom>_yPosPrint)) 
+					&& (printRowCur.YPos-_printMargin.Top<_yPosPrint //rows at the end of previous page
+						|| printRowCur.YPos-sheet.HeightPage+_printMargin.Bottom>_yPosPrint)) 
 				{
 					continue;//continue because we do not want to draw rows from other pages.
 				}
 				_yAdjCurRow=0;
-				//if(odGrid.PrintRows[i].YPos<_yPosPrint
-				//	|| odGrid.PrintRows[i].YPos-_yPosPrint>sheet.HeightPage) {
+				//if(printRowCur.YPos<_yPosPrint
+				//	|| printRowCur.YPos-_yPosPrint>sheet.HeightPage) {
 				//	continue;//skip rows on previous page and rows on next page.
 				//}
 				#region Draw Title
-				if(odGrid.PrintRows[i].IsTitleRow) {
+				if(printRowCur.IsTitleRow) {
 					switch(field.FieldName) {//Draw titles differently for different grids.
 						case "StatementMain":
 							Patient pat=Patients.GetPat(PIn.Long(Table.Rows[i]["PatNum"].ToString()));
@@ -1067,15 +1061,15 @@ namespace OpenDental {
 								patName=pat.GetNameFLnoPref();
 							}
 							if(gx==null) {
-								g.FillRectangle(Brushes.White,field.XPos-10,odGrid.PrintRows[i].YPos-_yPosPrint,odGrid.Width+10,odGrid.TitleHeight);
-								g.DrawString(patName,new Font("Arial",10,FontStyle.Bold),new SolidBrush(Color.Black),field.XPos-10,odGrid.PrintRows[i].YPos-_yPosPrint);
+								g.FillRectangle(Brushes.White,field.XPos-10,printRowCur.YPos-_yPosPrint,odGrid.Width+10,odGrid.TitleHeight);
+								g.DrawString(patName,new Font("Arial",10,FontStyle.Bold),new SolidBrush(Color.Black),field.XPos-10,printRowCur.YPos-_yPosPrint);
 							}
 							else {
-								gx.DrawRectangle(Brushes.White,p(field.XPos-10),p(odGrid.PrintRows[i].YPos-_yPosPrint-1),p(odGrid.Width+10),p(odGrid.TitleHeight));
+								gx.DrawRectangle(Brushes.White,p(field.XPos-10),p(printRowCur.YPos-_yPosPrint-1),p(odGrid.Width+10),p(odGrid.TitleHeight));
 								using(Font _font=new Font("Arial",10,FontStyle.Bold)) {
 									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),patName,
 										new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,
-										new XRect(p(field.XPos-10),p(odGrid.PrintRows[i].YPos-_yPosPrint-1),p(odGrid.Width+10),p(odGrid.TitleHeight)),XStringAlignment.Near);
+										new XRect(p(field.XPos-10),p(printRowCur.YPos-_yPosPrint-1),p(odGrid.Width+10),p(odGrid.TitleHeight)),XStringAlignment.Near);
 									//gx.DrawString(patName,new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),new SolidBrush(Color.Black),field.XPos-10,yPosGrid);
 								}
 							}
@@ -1086,15 +1080,15 @@ namespace OpenDental {
 								sSize=f.MeasureString("Payment Plans",new Font("Arial",10,FontStyle.Bold));
 							}
 							if(gx==null) {
-								g.FillRectangle(Brushes.White,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint,odGrid.Width,odGrid.TitleHeight);
-								g.DrawString("Payment Plans",new Font("Arial",10,FontStyle.Bold),new SolidBrush(Color.Black),field.XPos+(field.Width-sSize.Width)/2,odGrid.PrintRows[i].YPos-_yPosPrint);
+								g.FillRectangle(Brushes.White,field.XPos,printRowCur.YPos-_yPosPrint,odGrid.Width,odGrid.TitleHeight);
+								g.DrawString("Payment Plans",new Font("Arial",10,FontStyle.Bold),new SolidBrush(Color.Black),field.XPos+(field.Width-sSize.Width)/2,printRowCur.YPos-_yPosPrint);
 							}
 							else {
-								gx.DrawRectangle(Brushes.White,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint-1,odGrid.Width,odGrid.TitleHeight);
+								gx.DrawRectangle(Brushes.White,field.XPos,printRowCur.YPos-_yPosPrint-1,odGrid.Width,odGrid.TitleHeight);
 								using(Font _font=new Font("Arial",10,FontStyle.Bold)) {
 									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),"Payment Plans",
 										new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,
-										new XRect(p(field.XPos+field.Width/2),p(odGrid.PrintRows[i].YPos-_yPosPrint-1),p(odGrid.Width),p(odGrid.TitleHeight)),XStringAlignment.Center);
+										new XRect(p(field.XPos+field.Width/2),p(printRowCur.YPos-_yPosPrint-1),p(odGrid.Width),p(odGrid.TitleHeight)),XStringAlignment.Center);
 									//gx.DrawString("Payment Plans",new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),new SolidBrush(Color.Black),field.XPos+(field.Width-sSize.Width)/2,yPosGrid);
 								}
 							}
@@ -1105,15 +1099,15 @@ namespace OpenDental {
 								sSize=f.MeasureString("Family Insurance Benefits",new Font("Arial",10,FontStyle.Bold));
 							}
 							if(gx==null) {
-								g.FillRectangle(Brushes.White,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint,odGrid.Width,odGrid.TitleHeight);
-								g.DrawString("Family Insurance Benefits",new Font("Arial",10,FontStyle.Bold),new SolidBrush(Color.Black),field.XPos+(field.Width-sSize.Width)/2,odGrid.PrintRows[i].YPos-_yPosPrint);
+								g.FillRectangle(Brushes.White,field.XPos,printRowCur.YPos-_yPosPrint,odGrid.Width,odGrid.TitleHeight);
+								g.DrawString("Family Insurance Benefits",new Font("Arial",10,FontStyle.Bold),new SolidBrush(Color.Black),field.XPos+(field.Width-sSize.Width)/2,printRowCur.YPos-_yPosPrint);
 							}
 							else {
-								gx.DrawRectangle(Brushes.White,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint-1,odGrid.Width,odGrid.TitleHeight);
+								gx.DrawRectangle(Brushes.White,field.XPos,printRowCur.YPos-_yPosPrint-1,odGrid.Width,odGrid.TitleHeight);
 								using(Font _font=new Font("Arial",10,FontStyle.Bold)) {
 									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),"Family Insurance Benefits",
 										new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,
-										new XRect(p(field.XPos+field.Width/2),p(odGrid.PrintRows[i].YPos-_yPosPrint-1),p(odGrid.Width),p(odGrid.TitleHeight)),XStringAlignment.Center);
+										new XRect(p(field.XPos+field.Width/2),p(printRowCur.YPos-_yPosPrint-1),p(odGrid.Width),p(odGrid.TitleHeight)),XStringAlignment.Center);
 									//gx.DrawString("Payment Plans",new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),new SolidBrush(Color.Black),field.XPos+(field.Width-sSize.Width)/2,yPosGrid);
 								}
 							}
@@ -1124,25 +1118,25 @@ namespace OpenDental {
 								sSize=f.MeasureString("Individual Insurance Benefits",new Font("Arial",10,FontStyle.Bold));
 							}
 							if(gx==null) {
-								g.FillRectangle(Brushes.White,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint,odGrid.Width,odGrid.TitleHeight);
-								g.DrawString("Individual Insurance Benefits",new Font("Arial",10,FontStyle.Bold),new SolidBrush(Color.Black),field.XPos+(field.Width-sSize.Width)/2,odGrid.PrintRows[i].YPos-_yPosPrint);
+								g.FillRectangle(Brushes.White,field.XPos,printRowCur.YPos-_yPosPrint,odGrid.Width,odGrid.TitleHeight);
+								g.DrawString("Individual Insurance Benefits",new Font("Arial",10,FontStyle.Bold),new SolidBrush(Color.Black),field.XPos+(field.Width-sSize.Width)/2,printRowCur.YPos-_yPosPrint);
 							}
 							else {
-								gx.DrawRectangle(Brushes.White,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint-1,odGrid.Width,odGrid.TitleHeight);
+								gx.DrawRectangle(Brushes.White,field.XPos,printRowCur.YPos-_yPosPrint-1,odGrid.Width,odGrid.TitleHeight);
 								using(Font _font=new Font("Arial",10,FontStyle.Bold)) {
 									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),"Individual Insurance Benefits",
 										new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,
-										new XRect(p(field.XPos+field.Width/2),p(odGrid.PrintRows[i].YPos-_yPosPrint-1),p(odGrid.Width),p(odGrid.TitleHeight)),XStringAlignment.Center);
+										new XRect(p(field.XPos+field.Width/2),p(printRowCur.YPos-_yPosPrint-1),p(odGrid.Width),p(odGrid.TitleHeight)),XStringAlignment.Center);
 									//gx.DrawString("Payment Plans",new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),new SolidBrush(Color.Black),field.XPos+(field.Width-sSize.Width)/2,yPosGrid);
 								}
 							}
 							break;
 						default:
 							if(gx==null) {
-								odGrid.PrintTitle(g,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint);
+								odGrid.PrintTitle(g,field.XPos,printRowCur.YPos-_yPosPrint);
 							}
 							else {
-								odGrid.PrintTitleX(gx,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint);
+								odGrid.PrintTitleX(gx,field.XPos,printRowCur.YPos-_yPosPrint);
 							}
 							break;
 					}
@@ -1150,27 +1144,27 @@ namespace OpenDental {
 				}
 				#endregion
 				#region Draw Header
-				if(odGrid.PrintRows[i].IsHeaderRow) {
+				if(printRowCur.IsHeaderRow) {
 					if(gx==null) {
-						odGrid.PrintHeader(g,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint+_yAdjCurRow);
+						odGrid.PrintHeader(g,field.XPos,printRowCur.YPos-_yPosPrint+_yAdjCurRow);
 					}
 					else {
-						odGrid.PrintHeaderX(gx,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint+_yAdjCurRow);
+						odGrid.PrintHeaderX(gx,field.XPos,printRowCur.YPos-_yPosPrint+_yAdjCurRow);
 					}
 					_yAdjCurRow+=odGrid.HeaderHeight;
 				}
 				#endregion
 				#region Draw Row
 				if(gx==null) {
-					odGrid.PrintRow(i,g,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint+_yAdjCurRow,odGrid.PrintRows[i].IsBottomRow,true,isPrinting);
+					odGrid.PrintRow(i,g,field.XPos,printRowCur.YPos-_yPosPrint+_yAdjCurRow,printRowCur.IsBottomRow,true,isPrinting);
 				}
 				else {
-					odGrid.PrintRowX(i,gx,field.XPos,odGrid.PrintRows[i].YPos-_yPosPrint+_yAdjCurRow,odGrid.PrintRows[i].IsBottomRow,true);
+					odGrid.PrintRowX(i,gx,field.XPos,printRowCur.YPos-_yPosPrint+_yAdjCurRow,printRowCur.IsBottomRow,true);
 				}
 				_yAdjCurRow+=odGrid.RowHeights[i];
 				#endregion
 				#region Draw Footer (rare)
-				if(odGrid.PrintRows[i].IsFooterRow) {
+				if(printRowCur.IsFooterRow) {
 					_yAdjCurRow+=2;
 					switch(field.FieldName) {
 						case "StatementPayPlan":
@@ -1185,16 +1179,16 @@ namespace OpenDental {
 								}
 							}
 							if(gx==null) {
-								RectangleF rf=new RectangleF(sheet.Width-60-field.Width,odGrid.PrintRows[i].YPos-_yPosPrint+_yAdjCurRow,field.Width,odGrid.TitleHeight);
+								RectangleF rf=new RectangleF(sheet.Width-60-field.Width,printRowCur.YPos-_yPosPrint+_yAdjCurRow,field.Width,odGrid.TitleHeight);
 								g.FillRectangle(Brushes.White,rf);
 								StringFormat sf=new StringFormat();
 								sf.Alignment=StringAlignment.Far;
 								g.DrawString("Payment Plan Amount Due: "+payPlanDue.ToString("c"),new Font("Arial",9,FontStyle.Bold),new SolidBrush(Color.Black),rf,sf);
 							}
 							else {
-								gx.DrawRectangle(Brushes.White,p(sheet.Width-field.Width-60),p(odGrid.PrintRows[i].YPos-_yPosPrint+_yAdjCurRow),p(field.Width),p(odGrid.TitleHeight));
+								gx.DrawRectangle(Brushes.White,p(sheet.Width-field.Width-60),p(printRowCur.YPos-_yPosPrint+_yAdjCurRow),p(field.Width),p(odGrid.TitleHeight));
 								using(Font _font=new Font("Arial",9,FontStyle.Bold)) {
-									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),"Payment Plan Amount Due: "+payPlanDue.ToString("c"),new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,new XRect(p(sheet.Width-60),p(odGrid.PrintRows[i].YPos-_yPosPrint+_yAdjCurRow),p(field.Width),p(odGrid.TitleHeight)),XStringAlignment.Far);
+									GraphicsHelper.DrawStringX(gx,Graphics.FromImage(new Bitmap(100,100)),(double)((1d)/p(1)),"Payment Plan Amount Due: "+payPlanDue.ToString("c"),new XFont(_font.FontFamily.ToString(),_font.Size,XFontStyle.Bold),XBrushes.Black,new XRect(p(sheet.Width-60),p(printRowCur.YPos-_yPosPrint+_yAdjCurRow),p(field.Width),p(odGrid.TitleHeight)),XStringAlignment.Far);
 								}
 							}
 							break;
@@ -1964,13 +1958,10 @@ namespace OpenDental {
 				//Worst case scenario we will end up calling the database a few extra times for the same data set.
 				//It use to call this method many, many times so anything is an improvement at this point.
 				if(stmt.SuperFamily!=0) {
-					dataSet=AccountModules.GetSuperFamAccount(stmt.SuperFamily,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
-							,stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+					dataSet=AccountModules.GetSuperFamAccount(stmt.SuperFamily,stmt);
 				}
 				else {
-					dataSet=AccountModules.GetAccount(stmt.PatNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient
-							,stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
-							,stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+					dataSet=AccountModules.GetAccount(stmt.PatNum,stmt);
 				}
 			}
 			CreatePdf(sheet,fullFileName,stmt,dataSet,medLab);

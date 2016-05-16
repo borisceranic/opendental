@@ -45,9 +45,7 @@ namespace OpenDental{
 				//This should never get hit.  This line of code is here just in case I forgot to update a random spot in our code.
 				//Worst case scenario we will end up calling the database a few extra times for the same data set.
 				//It use to call this method many, many times so anything is an improvement at this point.
-				dataSet=AccountModules.GetAccount(stmt.PatNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient
-						,stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
-						,stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+				dataSet=AccountModules.GetAccount(stmt.PatNum,stmt);
 			}
 			CalculateHeights(sheet,g,dataSet,stmt,isPrinting,topMargin,bottomMargin,medLab);
 		}
@@ -1014,80 +1012,104 @@ namespace OpenDental{
 			table.Columns.Add(new DataColumn("DateDue"));
 			table.Columns.Add(new DataColumn("AmountEnclosed"));
 			DataRow row=table.NewRow();
-			Patient patGuar=null;
-			List<Patient> listSuperFamGuars=new List<Patient>();
-			if(stmt.SuperFamily!=0) {//Superfamily statement
-				patGuar=Patients.GetPat(Patients.GetPat(stmt.SuperFamily).Guarantor);
-				listSuperFamGuars=Patients.GetSuperFamilyGuarantors(patGuar.SuperFamily);
-			}
-			else {
-				patGuar=Patients.GetPat(Patients.GetPat(stmt.PatNum).Guarantor);
-			}
-			double balTotal=0;
-			if(stmt.SuperFamily!=0) {//Superfamily statement
-				foreach(Patient guarantor in listSuperFamGuars) {
-					if(!guarantor.HasSuperBilling) {
-						continue;
-					}
-					balTotal+=guarantor.BalTotal;
+			#region Statement Type NotSet
+			if(stmt.StatementType!=StmtType.LimitedStatement) {
+				Patient patGuar=null;
+				List<Patient> listSuperFamGuars=new List<Patient>();
+				if(stmt.SuperFamily!=0) {//Superfamily statement
+					patGuar=Patients.GetPat(Patients.GetPat(stmt.SuperFamily).Guarantor);
+					listSuperFamGuars=Patients.GetSuperFamilyGuarantors(patGuar.SuperFamily);
 				}
-			}
-			else {
-				balTotal=patGuar.BalTotal;
-			}
-			if(!PrefC.GetBool(PrefName.BalancesDontSubtractIns)) {//this is typical
+				else {
+					patGuar=Patients.GetPat(Patients.GetPat(stmt.PatNum).Guarantor);
+				}
+				double balTotal=0;
 				if(stmt.SuperFamily!=0) {//Superfamily statement
 					foreach(Patient guarantor in listSuperFamGuars) {
 						if(!guarantor.HasSuperBilling) {
 							continue;
 						}
-						balTotal-=guarantor.InsEst;
+						balTotal+=guarantor.BalTotal;
 					}
 				}
 				else {
-					balTotal-=patGuar.InsEst;
+					balTotal=patGuar.BalTotal;
 				}
-			}
-			for(int m=0;m<tableMisc.Rows.Count;m++) {
-				//only add payplandue value to total balance in version 1 (version 2+ already account for it when calculating aging)
-				if(tableMisc.Rows[m]["descript"].ToString()=="payPlanDue" && payPlanVersionCur==1) {
-					balTotal+=PIn.Double(tableMisc.Rows[m]["value"].ToString());
-					//payPlanDue;//PatGuar.PayPlanDue;
-				}
-			}
-			if(stmt.SuperFamily!=0) {//Superfamily statement
-				List<InstallmentPlan> listInstallPlans=InstallmentPlans.GetForSuperFam(patGuar.SuperFamily);
-				if(listInstallPlans.Count>0) {
-					double installPlanTotal=0;
-					foreach(InstallmentPlan plan in listInstallPlans) {
-						installPlanTotal+=plan.MonthlyPayment;
-					}
-					if(installPlanTotal < balTotal) {
-						text=installPlanTotal.ToString("F");
+				if(!PrefC.GetBool(PrefName.BalancesDontSubtractIns)) {//this is typical
+					if(stmt.SuperFamily!=0) {//Superfamily statement
+						foreach(Patient guarantor in listSuperFamGuars) {
+							if(!guarantor.HasSuperBilling) {
+								continue;
+							}
+							balTotal-=guarantor.InsEst;
+						}
 					}
 					else {
+						balTotal-=patGuar.InsEst;
+					}
+				}
+				for(int m=0;m<tableMisc.Rows.Count;m++) {
+					//only add payplandue value to total balance in version 1 (version 2+ already account for it when calculating aging)
+					if(tableMisc.Rows[m]["descript"].ToString()=="payPlanDue" && payPlanVersionCur==1) {
+						balTotal+=PIn.Double(tableMisc.Rows[m]["value"].ToString());
+						//payPlanDue;//PatGuar.PayPlanDue;
+					}
+				}
+				if(stmt.SuperFamily!=0) {//Superfamily statement
+					List<InstallmentPlan> listInstallPlans=InstallmentPlans.GetForSuperFam(patGuar.SuperFamily);
+					if(listInstallPlans.Count>0) {
+						double installPlanTotal=0;
+						foreach(InstallmentPlan plan in listInstallPlans) {
+							installPlanTotal+=plan.MonthlyPayment;
+						}
+						if(installPlanTotal < balTotal) {
+							text=installPlanTotal.ToString("F");
+						}
+						else {
+							text=balTotal.ToString("F");
+						}
+					}
+					else {//No installment plans
 						text=balTotal.ToString("F");
 					}
 				}
-				else {//No installment plans
-					text=balTotal.ToString("F");
+				else {
+					InstallmentPlan installPlan=InstallmentPlans.GetOneForFam(patGuar.PatNum);
+					if(installPlan!=null) {
+						//show lesser of normal total balance or the monthly payment amount.
+						if(installPlan.MonthlyPayment < balTotal) {
+							text=installPlan.MonthlyPayment.ToString("F");
+						}
+						else {
+							text=balTotal.ToString("F");
+						}
+					}
+					else {//no installmentplan
+						text=balTotal.ToString("F");
+					}
 				}
 			}
+			#endregion Statement Type NotSet
+			#region Statement Type LimitedStatement
 			else {
-				InstallmentPlan installPlan=InstallmentPlans.GetOneForFam(patGuar.PatNum);
-				if(installPlan!=null) {
-					//show lesser of normal total balance or the monthly payment amount.
-					if(installPlan.MonthlyPayment < balTotal) {
-						text=installPlan.MonthlyPayment.ToString("F");
-					}
-					else {
-						text=balTotal.ToString("F");
-					}
+				double statementTotal=dataSet.Tables.OfType<DataTable>().Where(x => x.TableName.StartsWith("account"))
+					.SelectMany(x => x.Rows.OfType<DataRow>())
+					.Where(x => x["AdjNum"].ToString()!="0"//adjustments, may be charges or credits
+						|| x["ProcNum"].ToString()!="0"//procs, will be charges with credits==0
+						|| x["PayNum"].ToString()!="0"//patient payments, will be credits with charges==0
+						|| x["ClaimPaymentNum"].ToString()!="0").ToList()//claimproc payments+writeoffs, will be credits with charges==0
+					.Sum(x => PIn.Double(x["chargesDouble"].ToString())-PIn.Double(x["creditsDouble"].ToString()));//add charges-credits
+				if(PrefC.GetBool(PrefName.BalancesDontSubtractIns)) {
+					text=statementTotal.ToString("c");
 				}
-				else {//no installmentplan
-					text=balTotal.ToString("F");
+				else {
+					double patInsEst=PIn.Double(tableMisc.Rows.OfType<DataRow>()
+						.Where(x => x["descript"].ToString()=="patInsEst")
+						.Select(x => x["value"].ToString()).FirstOrDefault());//safe, if string is blank or null PIn.Double will return 0
+					text=(statementTotal-patInsEst).ToString("c");
 				}
 			}
+			#endregion Statement Type LimitedStatement
 			row[0]=text;
 			if(PrefC.GetLong(PrefName.StatementsCalcDueDate)==-1) {
 				text=Lans.g("Statements","Upon Receipt");

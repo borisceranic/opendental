@@ -1226,6 +1226,89 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE emailmessage MODIFY HideIn NOT NULL";
 					Db.NonQ(command);
 				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE statement ADD StatementType varchar(50) NOT NULL";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE statement ADD StatementType varchar2(50)";
+					Db.NonQ(command);
+				}
+				//Default all statements in the db to NotSet.  This is for LimitedStatement, but in the future this will replace IsReceipt and IsInvoice.
+				command="UPDATE statement SET StatementType='NotSet'";
+				Db.NonQ(command);
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS stmtadjattach";
+					Db.NonQ(command);
+					command=@"CREATE TABLE stmtadjattach (
+						StmtAdjAttachNum bigint NOT NULL auto_increment PRIMARY KEY,
+						StatementNum bigint NOT NULL,
+						AdjNum bigint NOT NULL,
+						INDEX(StatementNum,AdjNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE stmtadjattach'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE stmtadjattach (
+						StmtAdjAttachNum number(20) NOT NULL,
+						StatementNum number(20) NOT NULL,
+						AdjNum number(20) NOT NULL,
+						CONSTRAINT stmtadjattach_StmtAdjAttachNum PRIMARY KEY (StmtAdjAttachNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX stmtadjattach_StmtNumAdjNum ON stmtadjattach (StatementNum,AdjNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS stmtpaysplitattach";
+					Db.NonQ(command);
+					command=@"CREATE TABLE stmtpaysplitattach (
+						StmtPaySplitAttachNum bigint NOT NULL auto_increment PRIMARY KEY,
+						StatementNum bigint NOT NULL,
+						PaySplitNum bigint NOT NULL,
+						INDEX(StatementNum,PaySplitNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE stmtpaysplitattach'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE stmtpaysplitattach (
+						StmtPaySplitAttachNum number(20) NOT NULL,
+						StatementNum number(20) NOT NULL,
+						PaySplitNum number(20) NOT NULL,
+						CONSTRAINT stmtpaysplitattach_StmtPaySpli PRIMARY KEY (StmtPaySplitAttachNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX stmtpaysplitattach_SNumPSNum ON stmtpaysplitattach (StatementNum,PaySplitNum)";
+					Db.NonQ(command);
+				}
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="DROP TABLE IF EXISTS stmtprocattach";
+					Db.NonQ(command);
+					command=@"CREATE TABLE stmtprocattach (
+						StmtProcAttachNum bigint NOT NULL auto_increment PRIMARY KEY,
+						StatementNum bigint NOT NULL,
+						ProcNum bigint NOT NULL,
+						INDEX(StatementNum,ProcNum)
+						) DEFAULT CHARSET=utf8";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="BEGIN EXECUTE IMMEDIATE 'DROP TABLE stmtprocattach'; EXCEPTION WHEN OTHERS THEN NULL; END;";
+					Db.NonQ(command);
+					command=@"CREATE TABLE stmtprocattach (
+						StmtProcAttachNum number(20) NOT NULL,
+						StatementNum number(20) NOT NULL,
+						ProcNum number(20) NOT NULL,
+						CONSTRAINT stmtprocattach_StmtProcAttachN PRIMARY KEY (StmtProcAttachNum)
+						)";
+					Db.NonQ(command);
+					command=@"CREATE INDEX stmtprocattach_SNumProcNum ON stmtprocattach (StatementNum,ProcNum)";
+					Db.NonQ(command);
+				}
 				command="UPDATE preference SET ValueString = '16.2.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}

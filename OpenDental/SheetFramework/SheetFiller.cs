@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using OpenDentBusiness;
@@ -16,9 +17,7 @@ namespace OpenDental{
 				//This should never get hit.  This line of code is here just in case I forgot to update a random spot in our code.
 				//Worst case scenario we will end up calling the database a few extra times for the same data set.
 				//It use to call this method many, many times so anything is an improvement at this point.
-				dataSet=AccountModules.GetAccount(stmt.PatNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient
-						,stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
-						,stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+				dataSet=AccountModules.GetAccount(stmt.PatNum,stmt);
 			}
 			FillFields(sheet,dataSet,stmt,medLab);
 		}
@@ -2263,6 +2262,9 @@ namespace OpenDental{
 						}
 						else {
 							field.FieldValue=Lan.g("Statements","STATEMENT");
+							if(Stmt.StatementType==StmtType.LimitedStatement) {
+								field.FieldValue+=" ("+Lan.g("Statements","Limited")+")";
+							}
 						}
 						#endregion
 						break;
@@ -2995,6 +2997,26 @@ namespace OpenDental{
 				sLine1+=procAmt.ToString("c");
 				sLine2+=adjAmt.ToString("c");
 				sLine3+=(procAmt+adjAmt).ToString("c");
+			}
+			else if(Stmt.StatementType==StmtType.LimitedStatement) {
+				double statementTotal=dataSet.Tables.OfType<DataTable>().Where(x => x.TableName.StartsWith("account"))
+					.SelectMany(x => x.Rows.OfType<DataRow>())
+					.Where(x => x["AdjNum"].ToString()!="0"//adjustments, may be charges or credits
+						|| x["ProcNum"].ToString()!="0"//procs, will be charges with credits==0
+						|| x["PayNum"].ToString()!="0"//patient payments, will be credits with charges==0
+						|| x["ClaimPaymentNum"].ToString()!="0").ToList()//claimproc payments+writeoffs, will be credits with charges==0
+					.Sum(x => PIn.Double(x["chargesDouble"].ToString())-PIn.Double(x["creditsDouble"].ToString()));//add charges-credits
+				if(PrefC.GetBool(PrefName.BalancesDontSubtractIns)) {
+					sLine1+=statementTotal.ToString("c");
+				}
+				else {
+					double patInsEst=PIn.Double(tableMisc.Rows.OfType<DataRow>()
+						.Where(x => x["descript"].ToString()=="patInsEst")
+						.Select(x => x["value"].ToString()).FirstOrDefault());//safe, if string is blank or null PIn.Double will return 0
+					sLine1+=statementTotal.ToString("c");
+					sLine2+=patInsEst.ToString("c");
+					sLine3+=(statementTotal-patInsEst).ToString("c");
+				}
 			}
 			else if(PrefC.GetBool(PrefName.BalancesDontSubtractIns)) {
 				if(Stmt.SinglePatient) {
