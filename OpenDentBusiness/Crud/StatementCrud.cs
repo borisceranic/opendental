@@ -69,6 +69,16 @@ namespace OpenDentBusiness.Crud{
 				statement.IsBalValid   = PIn.Bool  (row["IsBalValid"].ToString());
 				statement.InsEst       = PIn.Double(row["InsEst"].ToString());
 				statement.BalTotal     = PIn.Double(row["BalTotal"].ToString());
+				string statementType=row["StatementType"].ToString();
+				if(statementType==""){
+					statement.StatementType=(StmtType)0;
+				}
+				else try{
+					statement.StatementType=(StmtType)Enum.Parse(typeof(StmtType),statementType);
+				}
+				catch{
+					statement.StatementType=(StmtType)0;
+				}
 				retVal.Add(statement);
 			}
 			return retVal;
@@ -103,6 +113,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("IsBalValid");
 			table.Columns.Add("InsEst");
 			table.Columns.Add("BalTotal");
+			table.Columns.Add("StatementType");
 			foreach(Statement statement in listStatements) {
 				table.Rows.Add(new object[] {
 					POut.Long  (statement.StatementNum),
@@ -128,6 +139,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Bool  (statement.IsBalValid),
 					POut.Double(statement.InsEst),
 					POut.Double(statement.BalTotal),
+					POut.Int   ((int)statement.StatementType),
 				});
 			}
 			return table;
@@ -168,7 +180,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="StatementNum,";
 			}
-			command+="PatNum,SuperFamily,DateSent,DateRangeFrom,DateRangeTo,Note,NoteBold,Mode_,HidePayment,SinglePatient,Intermingled,IsSent,DocNum,IsReceipt,IsInvoice,IsInvoiceCopy,EmailSubject,EmailBody,IsBalValid,InsEst,BalTotal) VALUES(";
+			command+="PatNum,SuperFamily,DateSent,DateRangeFrom,DateRangeTo,Note,NoteBold,Mode_,HidePayment,SinglePatient,Intermingled,IsSent,DocNum,IsReceipt,IsInvoice,IsInvoiceCopy,EmailSubject,EmailBody,IsBalValid,InsEst,BalTotal,StatementType) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(statement.StatementNum)+",";
 			}
@@ -194,7 +206,8 @@ namespace OpenDentBusiness.Crud{
 				+    DbHelper.ParamChar+"paramEmailBody,"
 				+    POut.Bool  (statement.IsBalValid)+","
 				+"'"+POut.Double(statement.InsEst)+"',"
-				+"'"+POut.Double(statement.BalTotal)+"')";
+				+"'"+POut.Double(statement.BalTotal)+"',"
+				+"'"+POut.String(statement.StatementType.ToString())+"')";
 			if(statement.EmailBody==null) {
 				statement.EmailBody="";
 			}
@@ -231,7 +244,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="StatementNum,";
 			}
-			command+="PatNum,SuperFamily,DateSent,DateRangeFrom,DateRangeTo,Note,NoteBold,Mode_,HidePayment,SinglePatient,Intermingled,IsSent,DocNum,IsReceipt,IsInvoice,IsInvoiceCopy,EmailSubject,EmailBody,IsBalValid,InsEst,BalTotal) VALUES(";
+			command+="PatNum,SuperFamily,DateSent,DateRangeFrom,DateRangeTo,Note,NoteBold,Mode_,HidePayment,SinglePatient,Intermingled,IsSent,DocNum,IsReceipt,IsInvoice,IsInvoiceCopy,EmailSubject,EmailBody,IsBalValid,InsEst,BalTotal,StatementType) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(statement.StatementNum)+",";
 			}
@@ -257,7 +270,8 @@ namespace OpenDentBusiness.Crud{
 				+    DbHelper.ParamChar+"paramEmailBody,"
 				+    POut.Bool  (statement.IsBalValid)+","
 				+"'"+POut.Double(statement.InsEst)+"',"
-				+"'"+POut.Double(statement.BalTotal)+"')";
+				+"'"+POut.Double(statement.BalTotal)+"',"
+				+"'"+POut.String(statement.StatementType.ToString())+"')";
 			if(statement.EmailBody==null) {
 				statement.EmailBody="";
 			}
@@ -295,7 +309,8 @@ namespace OpenDentBusiness.Crud{
 				+"EmailBody    =  "+DbHelper.ParamChar+"paramEmailBody, "
 				+"IsBalValid   =  "+POut.Bool  (statement.IsBalValid)+", "
 				+"InsEst       = '"+POut.Double(statement.InsEst)+"', "
-				+"BalTotal     = '"+POut.Double(statement.BalTotal)+"' "
+				+"BalTotal     = '"+POut.Double(statement.BalTotal)+"', "
+				+"StatementType= '"+POut.String(statement.StatementType.ToString())+"' "
 				+"WHERE StatementNum = "+POut.Long(statement.StatementNum);
 			if(statement.EmailBody==null) {
 				statement.EmailBody="";
@@ -392,6 +407,10 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="BalTotal = '"+POut.Double(statement.BalTotal)+"'";
 			}
+			if(statement.StatementType != oldStatement.StatementType) {
+				if(command!=""){ command+=",";}
+				command+="StatementType = '"+POut.String(statement.StatementType.ToString())+"'";
+			}
 			if(command==""){
 				return false;
 			}
@@ -470,6 +489,9 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			if(statement.BalTotal != oldStatement.BalTotal) {
+				return true;
+			}
+			if(statement.StatementType != oldStatement.StatementType) {
 				return true;
 			}
 			return false;

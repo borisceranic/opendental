@@ -129,7 +129,7 @@ namespace OpenDental {
 		private bool MouseIsDownOnSplitter;
 		private int SplitterOriginalY;
 		private bool FinNoteChanged;
-		private bool CCChanged;
+		//private bool CCChanged;
 		private bool UrgFinNoteChanged;
 		private int Actscrollval;
 		///<summary>Set to true if this control is placed in the recall edit window. This affects the control behavior.</summary>
@@ -181,6 +181,7 @@ namespace OpenDental {
 		///<summary>Used by FormRpProcNotBilledIns to determine what errors happened while trying to create claims.</summary>
 		public static string ClaimErrorsCur;
 		private CheckBox checkShowCompletePayPlans;
+		private MenuItem menuItemLimited;
 
 		///<summary>Used by FormRpProcNotBilledIns to determine how many claims were created.</summary>
 		public static int ClaimCreatedCount;
@@ -333,6 +334,7 @@ namespace OpenDental {
 			this.textQuickProcs = new System.Windows.Forms.TextBox();
 			this.contextMenuPayment = new System.Windows.Forms.ContextMenu();
 			this.menuItemPay = new System.Windows.Forms.MenuItem();
+			this.menuItemLimited = new System.Windows.Forms.MenuItem();
 			this.panelProgNotes.SuspendLayout();
 			this.groupBox7.SuspendLayout();
 			this.groupBox6.SuspendLayout();
@@ -425,6 +427,7 @@ namespace OpenDental {
             this.menuItemStatementEmail,
             this.menuItemReceipt,
             this.menuItemInvoice,
+            this.menuItemLimited,
             this.menuItemStatementMore});
 			// 
 			// menuItemStatementWalkout
@@ -453,7 +456,7 @@ namespace OpenDental {
 			// 
 			// menuItemStatementMore
 			// 
-			this.menuItemStatementMore.Index = 4;
+			this.menuItemStatementMore.Index = 5;
 			this.menuItemStatementMore.Text = "More Options";
 			this.menuItemStatementMore.Click += new System.EventHandler(this.menuItemStatementMore_Click);
 			// 
@@ -1677,6 +1680,12 @@ namespace OpenDental {
 			this.menuItemPay.Text = "Allocate Unearned";
 			this.menuItemPay.Click += new System.EventHandler(this.menuItemPrePay_Click);
 			// 
+			// menuItemLimited
+			// 
+			this.menuItemLimited.Index = 4;
+			this.menuItemLimited.Text = "Limited";
+			this.menuItemLimited.Click += new System.EventHandler(this.menuItemLimited_Click);
+			// 
 			// ContrAccount
 			// 
 			this.Controls.Add(this.textQuickProcs);
@@ -2188,7 +2197,7 @@ namespace OpenDental {
 			}
 			UrgFinNoteChanged=false;
 			FinNoteChanged=false;
-			CCChanged=false;
+			//CCChanged=false;
 			if(ViewingInRecall) {
 				textUrgFinNote.ReadOnly=true;
 				textFinNotes.ReadOnly=true;
@@ -2801,38 +2810,43 @@ namespace OpenDental {
 			if(e.Row>=table.Rows.Count){
 				return;
 			}
-			if(ViewingInRecall) return;
-			if(table.Rows[e.Row]["ClaimNum"].ToString()!="0"){//claims and claimpayments
+			if(ViewingInRecall) {
+				return;
+			}
+			DataRow rowCur=table.Rows[e.Row];
+			if(rowCur["ClaimNum"].ToString()!="0") {//claims and claimpayments
 				//Claim ClaimCur=Claims.GetClaim(
 				//	arrayClaim[AcctLineList[e.Row].Index];
-				string[] procsOnClaim=table.Rows[e.Row]["procsOnObj"].ToString().Split(',');
+				List<string> procsOnClaim=rowCur["procsOnObj"].ToString().Split(',').ToList();
 				for(int i=0;i<table.Rows.Count;i++){//loop through all rows
-					if(table.Rows[i]["ClaimNum"].ToString()==table.Rows[e.Row]["ClaimNum"].ToString()){
+					if(table.Rows[i]["ClaimNum"].ToString()==rowCur["ClaimNum"].ToString()){
 						gridAccount.SetSelected(i,true);//for the claim payments
+						procsOnClaim.AddRange(table.Rows[i]["procsOnObj"].ToString().Split(','));
 					}
 					else if(table.Rows[i]["ProcNum"].ToString()=="0"){//if not a procedure, then skip
 						continue;
 					}
-					for(int j=0;j<procsOnClaim.Length;j++){
-						if(table.Rows[i]["ProcNum"].ToString()==procsOnClaim[j]){
-							gridAccount.SetSelected(i,true);
-						}
+				}
+				for(int i=0;i<table.Rows.Count;i++) {
+					if(procsOnClaim.Contains(table.Rows[i]["ProcNum"].ToString())) {
+						gridAccount.SetSelected(i,true);
 					}
 				}
 			}
-			if(table.Rows[e.Row]["PayNum"].ToString()!="0"){
-				string[] procsOnPayment=table.Rows[e.Row]["procsOnObj"].ToString().Split(',');
-				for(int i=0;i<table.Rows.Count;i++){//loop through all rows
-					if(table.Rows[i]["PayNum"].ToString()==table.Rows[e.Row]["PayNum"].ToString()){
+			else if(rowCur["PayNum"].ToString()!="0") {
+				List<string> procsOnPayment=rowCur["procsOnObj"].ToString().Split(',').ToList();
+				for(int i = 0;i<table.Rows.Count;i++) {//loop through all rows
+					if(table.Rows[i]["PayNum"].ToString()==rowCur["PayNum"].ToString()) {
 						gridAccount.SetSelected(i,true);//for other splits in family view
+						procsOnPayment.AddRange(table.Rows[i]["procsOnObj"].ToString().Split(','));
 					}
-					if(table.Rows[i]["ProcNum"].ToString()=="0"){//if not a procedure, then skip
+					if(table.Rows[i]["ProcNum"].ToString()=="0") {//if not a procedure, then skip
 						continue;
 					}
-					for(int j=0;j<procsOnPayment.Length;j++){
-						if(table.Rows[i]["ProcNum"].ToString()==procsOnPayment[j]){
-							gridAccount.SetSelected(i,true);
-						}
+				}
+				for(int i=0;i<table.Rows.Count;i++){
+					if(procsOnPayment.Contains(table.Rows[i]["ProcNum"].ToString())) {
+						gridAccount.SetSelected(i,true);
 					}
 				}
 			}
@@ -3854,16 +3868,14 @@ namespace OpenDental {
 			stmt.Mode_=StatementMode.InPerson;
 			stmt.HidePayment=false;
 			stmt.SinglePatient=false;
-			stmt.Intermingled=false;
+			stmt.Intermingled=PrefC.GetBool(PrefName.IntermingleFamilyDefault);
+			stmt.StatementType=StmtType.NotSet;
 			stmt.DateRangeFrom=DateTime.MinValue;
-			if (PrefC.GetBool(PrefName.IntermingleFamilyDefault)){
-				stmt.Intermingled = true;
-			}
-			if (PrefC.GetBool(PrefName.FuchsOptionsOn)){
+			if(PrefC.GetBool(PrefName.FuchsOptionsOn)){
 				stmt.DateRangeFrom = PIn.Date(DateTime.Today.AddDays(-45).ToShortDateString());
 				stmt.DateRangeTo = PIn.Date(DateTime.Today.ToShortDateString());
 			} 
-			else{
+			else {
 				if (textDateStart.errorProvider1.GetError(textDateStart) == "") {
 					if (textDateStart.Text != "") {
 						stmt.DateRangeFrom = PIn.Date(textDateStart.Text);
@@ -3898,13 +3910,10 @@ namespace OpenDental {
 			stmt.IsSent=true;
 			stmt.Mode_=StatementMode.InPerson;
 			stmt.HidePayment=true;
-			stmt.SinglePatient=true;
-			stmt.Intermingled=false;
+			stmt.Intermingled=PrefC.GetBool(PrefName.IntermingleFamilyDefault);
+			stmt.SinglePatient=!stmt.Intermingled;
 			stmt.IsReceipt=false;
-			if(PrefC.GetBool(PrefName.IntermingleFamilyDefault)) {
-				stmt.Intermingled = true;
-				stmt.SinglePatient=false;
-			}
+			stmt.StatementType=StmtType.NotSet;
 			stmt.DateRangeFrom=DateTimeOD.Today;
 			stmt.DateRangeTo=DateTimeOD.Today;
 			stmt.Note="";
@@ -3934,11 +3943,9 @@ namespace OpenDental {
 			stmt.Mode_=StatementMode.Email;
 			stmt.HidePayment=false;
 			stmt.SinglePatient=false;
-			stmt.Intermingled=false;
+			stmt.Intermingled=PrefC.GetBool(PrefName.IntermingleFamilyDefault);
 			stmt.IsReceipt=false;
-			if(PrefC.GetBool(PrefName.IntermingleFamilyDefault)){
-				stmt.Intermingled=true;
-			}
+			stmt.StatementType=StmtType.NotSet;
 			stmt.DateRangeFrom=DateTime.MinValue;
 			if(textDateStart.errorProvider1.GetError(textDateStart)==""){
 				if(textDateStart.Text!=""){
@@ -3974,13 +3981,10 @@ namespace OpenDental {
 			stmt.IsSent=true;
 			stmt.Mode_=StatementMode.InPerson;
 			stmt.HidePayment=true;
-			stmt.SinglePatient=true;
-			stmt.Intermingled=false;
+			stmt.Intermingled=PrefC.GetBool(PrefName.IntermingleFamilyDefault);
+			stmt.SinglePatient=!stmt.Intermingled;
 			stmt.IsReceipt=true;
-			if(PrefC.GetBool(PrefName.IntermingleFamilyDefault)) {
-				stmt.Intermingled = true;
-				stmt.SinglePatient=false;
-			}
+			stmt.StatementType=StmtType.NotSet;
 			stmt.DateRangeFrom=DateTimeOD.Today;
 			stmt.DateRangeTo=DateTimeOD.Today;
 			stmt.Note="";
@@ -4095,6 +4099,7 @@ namespace OpenDental {
 			stmt.Intermingled=false;
 			stmt.IsReceipt=false;
 			stmt.IsInvoice=true;
+			stmt.StatementType=StmtType.NotSet;
 			stmt.DateRangeFrom=DateTime.MinValue;
 			stmt.DateRangeTo=DateTimeOD.Today;
 			stmt.Note=PrefC.GetString(PrefName.BillingDefaultsInvoiceNote);
@@ -4143,9 +4148,92 @@ namespace OpenDental {
 			FormSO.StmtCur=stmt;
 			FormSO.ShowDialog();
 			if(FormSO.DialogResult!=DialogResult.OK) {
-				Procedures.DetachFromInvoice(stmt.StatementNum);
-				Adjustments.DetachFromInvoice(stmt.StatementNum);
-				Statements.Delete(stmt.StatementNum);
+				Statements.Delete(stmt.StatementNum);//detached from adjustments, procedurelogs, and paysplits as well
+			}
+			ModuleSelected(PatCur.PatNum);
+		}
+
+		private void menuItemLimited_Click(object sender,EventArgs e) {
+			DataTable table=DataSetMain.Tables["account"];
+			Patient guarantor=Patients.GetPat(PatCur.Guarantor);
+			DataRow row;
+			#region Autoselect Today's Procedures
+			if(gridAccount.SelectedIndices.Length==0) {//autoselect procedures
+				for(int i = 0;i<table.Rows.Count;i++) {//loop through every line showing on screen
+					row=table.Rows[i];
+					if(row["ProcNum"].ToString()=="0" //ignore items that aren't procs
+						|| PIn.Date(row["date"].ToString())!=DateTime.Today //autoselecting todays procs only
+						|| PIn.Long(row["PatNum"].ToString())!=PatCur.PatNum) //only procs for the current patient
+					{
+						continue;
+					}
+					gridAccount.SetSelected(i,true);
+				}
+				if(gridAccount.SelectedIndices.Length==0) {//if still none selected
+					MsgBox.Show(this,"Please select procedures, adjustments, payments, or claims first.");
+					return;
+				}
+			}
+			#endregion Autoselect Today's Procedures
+			//guaranteed to have rows selected from here down, verify they are allowed transactions
+			if(gridAccount.SelectedIndices.Any(x => table.Rows[x]["StatementNum"].ToString()!="0" || table.Rows[x]["PayPlanNum"].ToString()!="0")) {
+				MsgBox.Show(this,"You can only select procedures, adjustments, payments, and claims.");
+				gridAccount.SetSelected(false);
+				return;
+			}
+			//get all ClaimNums from claimprocs for the selected procs
+			List<long> listSelectedProcClaimNums=ClaimProcs.GetForProcs(gridAccount.SelectedIndices.Where(x => table.Rows[x]["ProcNum"].ToString()!="0")
+				.Select(x => PIn.Long(table.Rows[x]["ProcNum"].ToString())).ToList()).FindAll(x => x.ClaimNum!=0).Select(x => x.ClaimNum).ToList();
+			//get all ClaimNums for any selected claimpayments
+			List<long> listSelectedPaymentClaimNums=gridAccount.SelectedIndices
+				.Where(x => table.Rows[x]["ClaimNum"].ToString()!="0" && table.Rows[x]["ClaimPaymentNum"].ToString()=="1")
+				.Select(x => PIn.Long(table.Rows[x]["ClaimNum"].ToString())).ToList();
+			//prevent user from selecting a claimpayment that is not associatede with any of the selected procs
+			if(listSelectedPaymentClaimNums.Any(x => !listSelectedProcClaimNums.Contains(x))) {
+				MsgBox.Show(this,"You can only select claim payments for the selected procedures.");
+				gridAccount.SetSelected(false);
+				return;
+			}
+			List<long> listPatNumsSelected=gridAccount.SelectedIndices.Select(x => table.Rows[x]["PatNum"].ToString()).Distinct().Select(x => PIn.Long(x)).ToList();
+			//At this point, all selected items are procedures, adjustments, payments, or claims.
+			Statement stmt=new Statement();
+			stmt.PatNum=PatCur.PatNum;
+			stmt.DateSent=DateTimeOD.Today;
+			stmt.IsSent=false;
+			stmt.Mode_=StatementMode.InPerson;
+			stmt.HidePayment=false;
+			stmt.SinglePatient=listPatNumsSelected.Count==1;//SinglePatient determined by the selected transactions
+			stmt.Intermingled=PrefC.GetBool(PrefName.IntermingleFamilyDefault);
+			stmt.IsReceipt=false;
+			stmt.IsInvoice=false;
+			stmt.StatementType=StmtType.LimitedStatement;
+			stmt.DateRangeFrom=DateTime.MinValue;
+			stmt.DateRangeTo=DateTimeOD.Today;
+			stmt.Note="";
+			stmt.NoteBold="";
+			stmt.IsBalValid=true;
+			stmt.BalTotal=0;
+			stmt.InsEst=0;
+			Statements.Insert(stmt);//we need stmt.StatementNum for attaching procs, adjustments, and paysplits to the statement
+			foreach(DataRow rowCur in gridAccount.SelectedIndices.Select(x => table.Rows[x])) {
+				if(rowCur["AdjNum"].ToString()!="0") {
+					StmtAdjAttaches.Insert(new StmtAdjAttach() { AdjNum=PIn.Long(rowCur["AdjNum"].ToString()),StatementNum=stmt.StatementNum });
+				}
+				else if(rowCur["PayNum"].ToString()!="0") {
+					PaySplits.GetForPayment(PIn.Long(rowCur["PayNum"].ToString()))
+						.FindAll(x => x.PatNum.ToString()==rowCur["PatNum"].ToString() && x.ClinicNum==Clinics.GetByDesc(rowCur["clinic"].ToString()))
+					.ForEach(x => StmtPaySplitAttaches.Insert(new StmtPaySplitAttach() { PaySplitNum=x.SplitNum,StatementNum=stmt.StatementNum }));
+				}
+				else if(rowCur["ProcNum"].ToString()!="0") {//if selected item is a procedure
+					StmtProcAttaches.Insert(new StmtProcAttach() { ProcNum=PIn.Long(rowCur["ProcNum"].ToString()),StatementNum=stmt.StatementNum });
+				}
+			}
+			//All printing and emailing will be done from within the form:
+			FormStatementOptions FormSO=new FormStatementOptions();
+			FormSO.StmtCur=stmt;
+			FormSO.ShowDialog();
+			if(FormSO.DialogResult!=DialogResult.OK) {
+				Statements.Delete(stmt.StatementNum);//detached from adjustments, procedurelogs, and paysplits as well
 			}
 			ModuleSelected(PatCur.PatNum);
 		}
@@ -4158,14 +4246,9 @@ namespace OpenDental {
 			stmt.Mode_=StatementMode.InPerson;
 			stmt.HidePayment=false;
 			stmt.SinglePatient=false;
-			stmt.Intermingled=false;
+			stmt.Intermingled=PrefC.GetBool(PrefName.IntermingleFamilyDefault);
 			stmt.IsReceipt=false;
-			if(PrefC.GetBool(PrefName.IntermingleFamilyDefault)) {
-				stmt.Intermingled=true;
-			}
-			else {
-				stmt.Intermingled=false;
-			} 
+			stmt.StatementType=StmtType.NotSet;
 			stmt.DateRangeFrom=DateTime.MinValue;
 			stmt.DateRangeFrom=DateTime.MinValue;
 			if(textDateStart.errorProvider1.GetError(textDateStart)==""){
@@ -4286,9 +4369,7 @@ namespace OpenDental {
 			Statements.Insert(stmt);
 			SheetDef sheetDef=SheetUtil.GetStatementSheetDef();
 			Sheet sheet=SheetUtil.CreateSheet(sheetDef,stmt.PatNum,stmt.HidePayment);
-			DataSet dataSet=AccountModules.GetAccount(stmt.PatNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient
-					,stmt.StatementNum,PrefC.GetBool(PrefName.StatementShowProcBreakdown),PrefC.GetBool(PrefName.StatementShowNotes)
-					,stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+			DataSet dataSet=AccountModules.GetAccount(stmt.PatNum,stmt);
 			SheetFiller.FillFields(sheet,dataSet,stmt,null);
 			SheetUtil.CalculateHeights(sheet,Graphics.FromImage(new Bitmap(sheet.HeightPage,sheet.WidthPage)),dataSet,stmt);
 			string tempPath=CodeBase.ODFileUtils.CombinePaths(PrefL.GetTempFolderPath(),stmt.PatNum.ToString()+".pdf");

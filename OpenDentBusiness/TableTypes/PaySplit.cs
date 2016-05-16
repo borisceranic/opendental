@@ -5,7 +5,7 @@ namespace OpenDentBusiness{
 
 	///<summary>Always attached to a payment.  Always affects exactly one patient account and one provider.</summary>
 	[Serializable]
-	[CrudTable(IsSecurityStamped=true)]
+	[CrudTable(IsSecurityStamped=true,IsSynchable=true)]
 	public class PaySplit:TableBase {
 		///<summary>Primary key.</summary>
 		[CrudColumn(IsPriKey=true)]

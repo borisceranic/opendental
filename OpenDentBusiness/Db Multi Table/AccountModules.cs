@@ -42,7 +42,7 @@ namespace OpenDentBusiness {
 				}
 				retVal.Tables.Add(table);
 			}
-			retVal.Tables.Add(GetMisc(fam,patNum,payPlanDue,balanceForward));//table = misc.  Just holds a few bits of info that we can't find anywhere else.
+			retVal.Tables.Add(GetMisc(fam,patNum,payPlanDue,balanceForward,StmtType.NotSet,null));//table=misc.  Just holds some info that we can't find anywhere else.
 			return retVal;
 		}
 
@@ -65,20 +65,12 @@ namespace OpenDentBusiness {
 			}
 			Patient pat=fam.GetPatient(patNum);
 			//Gets 3 tables: account(or account###,account###,etc), patient, payplan.
-			bool showProcBreakdown=PrefC.GetBool(PrefName.StatementShowProcBreakdown);
-			if(stmt.IsInvoice) {
-				showProcBreakdown=false;
-			}
 			DataSet retVal;
 			if(stmt.SuperFamily!=0) {//Superfamily statement, Intermingled and SinglePatient should always be false
-				retVal=GetSuperFamAccount(patNum,stmt.DateRangeFrom,stmt.DateRangeTo,
-					stmt.StatementNum,showProcBreakdown,PrefC.GetBool(PrefName.StatementShowNotes),stmt.IsInvoice,
-					PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+				retVal=GetSuperFamAccount(patNum,stmt);
 			}
 			else {
-				retVal=GetAccount(patNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient,
-					stmt.StatementNum,showProcBreakdown,PrefC.GetBool(PrefName.StatementShowNotes),stmt.IsInvoice,
-					PrefC.GetBool(PrefName.StatementShowAdjNotes),true);
+				retVal=GetAccount(patNum,stmt);
 			}
 			return retVal;
 		}
@@ -536,23 +528,24 @@ namespace OpenDentBusiness {
 		
 		///<summary>Returns a data set that is designed for a super family statement.
 		///This means that GetAccount will be run for every guarantor that HasSuperBilling within the super family.</summary>
-		public static DataSet GetSuperFamAccount(long superFam,DateTime fromDate,DateTime toDate,long statementNum,bool showProcBreakdown
-			,bool showPayNotes,bool isInvoice,bool showAdjNotes,bool isForStatementPrinting) 
-		{
+		public static DataSet GetSuperFamAccount(long superFam,Statement stmtCur) {
 			//This method does not call the database directly but still requires a remoting role check because it calls a method that uses out variables.
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetDS(MethodBase.GetCurrentMethod(),superFam,fromDate,toDate,statementNum,showProcBreakdown,showPayNotes,isInvoice,showAdjNotes
-					,isForStatementPrinting);
+				return Meth.GetDS(MethodBase.GetCurrentMethod(),superFam,stmtCur);
 			}
 			DataSet retVal=new DataSet();
 			List<Patient> listSuperFamilyGuars=new List<Patient>();
-			if(isInvoice) {
+			if(stmtCur.IsInvoice) {
 				//Just add the super family head to the list of patients to include for the super statement.
 				listSuperFamilyGuars.Add(Patients.GetPat(superFam));
 			}
 			else {//Regular super family statement.
 				listSuperFamilyGuars=Patients.GetSuperFamilyGuarantors(superFam);
-			}			
+			}
+			bool showProcBreakdown=false;
+			if(!stmtCur.IsInvoice) {
+				showProcBreakdown=PrefC.GetBool(PrefName.StatementShowProcBreakdown);
+			}
 			foreach(Patient guarantor in listSuperFamilyGuars) {
 				if(!guarantor.HasSuperBilling) {
 					continue;
@@ -561,12 +554,13 @@ namespace OpenDentBusiness {
 				Family fam=Patients.GetFamily(guarantor.PatNum);
 				decimal payPlanDue=0;
 				decimal balanceForward=0;
-				DataSet account=GetAccount(guarantor.PatNum,fromDate,toDate,true,false,statementNum,showProcBreakdown,showPayNotes,isInvoice,showAdjNotes
-					,isForStatementPrinting,guarantor,fam,out payPlanDue,out balanceForward);
+				DataSet account=GetAccount(guarantor.PatNum,stmtCur.DateRangeFrom,stmtCur.DateRangeTo,true,false,stmtCur.StatementNum,showProcBreakdown,
+					PrefC.GetBool(PrefName.StatementShowNotes),stmtCur.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true,guarantor,fam,
+					out payPlanDue,out balanceForward,stmtCur);
 				//Setting the PatNum for all rows to the guarantor so that each family will be interminged in one grid. 
 				account.Tables["account"].Rows.Cast<DataRow>().ToList().ForEach(x => x["PatNum"]=guarantor.PatNum);
 				account.Tables.Add(GetApptTable(fam,false,guarantor.PatNum));
-				account.Tables.Add(GetMisc(fam,guarantor.PatNum,payPlanDue,balanceForward));
+				account.Tables.Add(GetMisc(fam,guarantor.PatNum,payPlanDue,balanceForward,stmtCur.StatementType,account));
 				retVal.Merge(account);//This works for the purposes we need it for.  Sheets framework auto-splits entries by patnum.
 			}
 			//Sort rows in table by cloning table, sorting rows, then re-adding table to DataSet.
@@ -612,36 +606,42 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>Also gets the patient table, which has one row for each family member. Also currently runs aging.  Also gets payplan table.  
-		///If StatementNum is not zero, then it's for a statement, and the resulting payplan table looks totally different.  
-		///If IsInvoice, this does some extra filtering.</summary>
-		public static DataSet GetAccount(long patNum,DateTime fromDate,DateTime toDate,bool intermingled,bool singlePatient,long statementNum
-			,bool showProcBreakdown,bool showPayNotes,bool isInvoice,bool showAdjNotes,bool isForStatementPrinting) 
-		{
+		///If stmt.StatementNum is not zero, then it's for a statement, and the resulting payplan table looks totally different.  
+		///If stmt.IsInvoice or stmt.StatementType==StmtType.LimitedStatement, this does some extra filtering.</summary>
+		public static DataSet GetAccount(long patNum,Statement stmt) {
 			//This method does not call the database directly but still requires a remoting role check because it calls a method that uses out variables.
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetDS(MethodBase.GetCurrentMethod(),patNum,fromDate,toDate,intermingled,singlePatient,statementNum,showProcBreakdown,showPayNotes
-					,isInvoice,showAdjNotes,isForStatementPrinting);
+				return Meth.GetDS(MethodBase.GetCurrentMethod(),patNum,stmt);
+			}
+			bool showProcBreakdown=false;
+			if(!stmt.IsInvoice) {
+				showProcBreakdown=PrefC.GetBool(PrefName.StatementShowProcBreakdown);
 			}
 			Family fam=Patients.GetFamily(patNum);
 			Patient pat=fam.GetPatient(patNum);
 			decimal payPlanDue=0;
 			decimal balanceForward=0;
-			DataSet retVal=GetAccount(patNum,fromDate,toDate,intermingled,singlePatient,statementNum,showProcBreakdown,showPayNotes,isInvoice,showAdjNotes
-				,isForStatementPrinting,pat,fam,out payPlanDue,out balanceForward);
-			retVal.Tables.Add(GetApptTable(fam,singlePatient,patNum));
-			retVal.Tables.Add(GetMisc(fam,patNum,payPlanDue,balanceForward));//table = misc.  Just holds a few bits of info that we can't find anywhere else.
+			DataSet retVal=GetAccount(patNum,stmt.DateRangeFrom,stmt.DateRangeTo,stmt.Intermingled,stmt.SinglePatient,stmt.StatementNum,showProcBreakdown,
+				PrefC.GetBool(PrefName.StatementShowNotes),stmt.IsInvoice,PrefC.GetBool(PrefName.StatementShowAdjNotes),true,pat,fam,out payPlanDue,
+				out balanceForward,stmt);
+			retVal.Tables.Add(GetApptTable(fam,stmt.SinglePatient,patNum));
+			retVal.Tables.Add(GetMisc(fam,patNum,payPlanDue,balanceForward,stmt.StatementType,retVal));//table=misc; Just holds some info we can't find anywhere else.
 			return retVal;
 		}
 
 		///<summary>Also gets the patient table, which has one row for each family member. Also currently runs aging.  Also gets payplan table.  
 		///If StatementNum is not zero, then it's for a statement, and the resulting payplan table looks totally different.  
-		///If IsInvoice, this does some extra filtering.
+		///If IsInvoice or statementType==StmtType.LimitedStatement, this does some extra filtering.
 		///This method cannot be called from the Middle Tier as long as it uses out parameters.</summary>
 		private static DataSet GetAccount(long patNum,DateTime fromDate,DateTime toDate,bool intermingled,bool singlePatient,long statementNum
 			,bool showProcBreakdown,bool showPayNotes,bool isInvoice,bool showAdjNotes,bool isForStatementPrinting
-			,Patient pat,Family fam,out decimal payPlanDue,out decimal balanceForward) 
+			,Patient pat,Family fam,out decimal payPlanDue,out decimal balanceForward,Statement stmt=null) 
 		{
 			//No need to check RemotingRole; this method contains out parameters.
+			if(stmt==null) {
+				//for when we are loading account data for the actual account module.
+				stmt=new Statement() { StatementType=StmtType.NotSet };
+			}
 			DataSet retVal=new DataSet();
 			payPlanDue=0;
 			balanceForward=0;
@@ -668,6 +668,18 @@ namespace OpenDentBusiness {
 			decimal qty;
 			decimal amt;
 			string command;
+			string familyPatNums="";
+			if(fam!=null && fam.ListPats!=null && fam.ListPats.Length>0) {
+				familyPatNums=string.Join(",",fam.ListPats.Select(x => POut.Long(x.PatNum)));
+			}
+			string adjNumsForLimited="";
+			string paySplitNumsForLimited="";
+			string procNumsForLimited="";
+			if(stmt.StatementType==StmtType.LimitedStatement && statementNum>0) {
+				adjNumsForLimited=string.Join(",",stmt.ListAdjNums.Select(x => POut.Long(x)));
+				paySplitNumsForLimited=string.Join(",",stmt.ListPaySplitNums.Select(x => POut.Long(x)));
+				procNumsForLimited=string.Join(",",stmt.ListProcNums.Select(x => POut.Long(x)));
+			}
 			#region Claimprocs
 			//claimprocs (ins payments)----------------------------------------------------------------------------
 			command="SELECT ClaimNum,MAX(ClaimPaymentNum) ClaimPaymentNum,MAX(ClinicNum) ClinicNum,DateCP,"
@@ -683,24 +695,23 @@ namespace OpenDentBusiness {
 				+"(SELECT ProvTreat FROM claim WHERE claimproc.ClaimNum=claim.ClaimNum) provNum_,MAX(PayPlanNum) PayPlanNum "//MAX PayPlanNum will return 0 or the num of the payplan tracking the payments.  Every claim will only be allowed to have payments tracked by one payplan.
 				+"FROM claimproc "
 				+"WHERE (Status=1 OR Status=4 OR Status=5) "//received or supplemental or capclaim
-				+"AND (WriteOff>0 OR InsPayAmt!=0) "
-				+"AND (";
-			for(int i=0;i<fam.ListPats.Length;i++){
-				if(i!=0){
-					command+="OR ";
-				}
-				command+="PatNum ="+POut.Long(fam.ListPats[i].PatNum)+" ";
+				+"AND (WriteOff>0 OR InsPayAmt!=0) ";
+			if(familyPatNums!="") {
+				command+="AND PatNum IN ("+familyPatNums+") ";
 			}
-			command+=") GROUP BY ClaimNum,DateCP "
+			if(stmt.StatementType==StmtType.LimitedStatement && procNumsForLimited!="") {
+				command+="AND ProcNum IN ("+procNumsForLimited+") ";
+			}
+			command+="GROUP BY ClaimNum,DateCP "
 				+"ORDER BY DateCP";
-			DataTable rawClaimPay=dcon.GetTable(command);
+			DataTable rawClaimPay=new DataTable();
+			if(!isInvoice && (stmt.StatementType!=StmtType.LimitedStatement || procNumsForLimited!="")) {//don't run if IsInvoice or if LimitedStatement with no procs
+				rawClaimPay=dcon.GetTable(command);
+			}
 			DateTime procdate;
 			decimal writeoff;
 			Def[][] arrayDefs=DefC.GetArrayLong();
-			for(int i=0;i<rawClaimPay.Rows.Count;i++){
-				if(isInvoice) {//this could possibly be optimized later by not running the query in the first place.
-					break;
-				}
+			foreach(DataRow rawClaimPayRow in rawClaimPay.Rows) {//0 rows if isInvoice or is LimitedStatement with no procs
 				row=table.NewRow();
 				row["AbbrDesc"]="";//fill this later
 				row["AdjNum"]="0";
@@ -708,25 +719,31 @@ namespace OpenDentBusiness {
 				row["balanceDouble"]=0;//fill this later
 				row["chargesDouble"]=0;
 				row["charges"]="";
-				row["ClaimNum"]=rawClaimPay.Rows[i]["ClaimNum"].ToString();
-				row["clinic"]=Clinics.GetDesc(PIn.Long(rawClaimPay.Rows[i]["ClinicNum"].ToString()));
+				row["ClaimNum"]=rawClaimPayRow["ClaimNum"].ToString();
+				//jsalmon - I do not agree with the next line but am leaving it here so as to not break unknown parts of the program.  Something like this should never be done.
+				//          We either need to create a separate column using a naming convention that leads programmers to think it is a boolean or
+				//          we need to make the column lowercase "claimPaymentNum".  Making the first character lowercase will at least lead OD developers to this line 
+				//          so that they can then learn that this variable is not to be trusted and that it is in fact a boolean...
+				row["ClaimPaymentNum"]="1";//this is now just a boolean flag indicating that it is a payment.
+				//this is because it will frequently not be attached to an actual claim payment.
+				row["clinic"]=Clinics.GetDesc(PIn.Long(rawClaimPayRow["ClinicNum"].ToString()));
 				row["colorText"]=arrayDefs[(int)DefCat.AccountColors][7].ItemColor.ToArgb().ToString();
-				amt=PIn.Decimal(rawClaimPay.Rows[i]["InsPayAmt_"].ToString());//payments tracked in payment plans will show in the payment plan grid
-				writeoff=PIn.Decimal(rawClaimPay.Rows[i]["WriteOff_"].ToString());
-				if(rawClaimPay.Rows[i]["PayPlanNum"].ToString()!="0" && amt+writeoff==0) {//payplan payments are tracked in the payplan, so nothing to display.
+				amt=PIn.Decimal(rawClaimPayRow["InsPayAmt_"].ToString());//payments tracked in payment plans will show in the payment plan grid
+				writeoff=PIn.Decimal(rawClaimPayRow["WriteOff_"].ToString());
+				if(rawClaimPayRow["PayPlanNum"].ToString()!="0" && amt+writeoff==0) {//payplan payments are tracked in the payplan, so nothing to display.
 					continue;//Does not add a row, so don't worry about setting the remaining columns.
 				}
 				row["creditsDouble"]=amt+writeoff;
 				row["credits"]=((decimal)row["creditsDouble"]).ToString("n");
-				dateT=PIn.DateT(rawClaimPay.Rows[i]["DateCP"].ToString());
+				dateT=PIn.DateT(rawClaimPayRow["DateCP"].ToString());
 				row["DateTime"]=dateT;
 				row["date"]=dateT.ToString(Lans.GetShortDateTimeFormat());
-				procdate=PIn.DateT(rawClaimPay.Rows[i]["ProcDate"].ToString());
+				procdate=PIn.DateT(rawClaimPayRow["ProcDate"].ToString());
 				row["description"]=Lans.g("AccountModule","Insurance Payment for Claim")+" "+procdate.ToShortDateString();
-				if(rawClaimPay.Rows[i]["PayPlanNum"].ToString()!="0") {
+				if(rawClaimPayRow["PayPlanNum"].ToString()!="0") {
 					row["description"]+="\r\n("+Lans.g("AccountModule","Payments Tracked in Payment Plan")+")";
 				}
-				if(rawClaimPay.Rows[i]["PayPlanNum"].ToString()!="0" || writeoff!=0) {
+				if(rawClaimPayRow["PayPlanNum"].ToString()!="0" || writeoff!=0) {
 					row["description"]+="\r\n"+Lans.g("AccountModule","Payment")+": "+amt.ToString("c");
 				}
 				if(writeoff!=0) {
@@ -736,22 +753,13 @@ namespace OpenDentBusiness {
 					}
 					row["description"]+="\r\n"+writeoffDescript+": "+writeoff.ToString("c");
 				}
-				if(!isForStatementPrinting && amt!=0 
-					&& rawClaimPay.Rows[i]["ClaimPaymentNum"].ToString()=="0") 
-				{
+				if(!isForStatementPrinting && amt!=0 && rawClaimPayRow["ClaimPaymentNum"].ToString()=="0") {
 					//Not all claim payments have been finalized and are not yet attached to claim payments (checks).
 					//Indicate to the user that they need to finalize this payment before reports will be accurate.
 					row["description"]+="\r\n"+Lans.g("AccountModule","PAYMENT NEEDS TO BE FINALIZED");
 				}
-				//jsalmon - I do not agree with the next line but am leaving it here so as to not break unknown parts of the program.  Something like this should never be done.
-				//          We either need to create a separate column using a naming convention that leads programmers to think it is a boolean or
-				//          we need to make the column lowercase "claimPaymentNum".  Making the first character lowercase will at least lead OD developers to this line 
-				//          so that they can then learn that this variable is not to be trusted and that it is in fact a boolean...
-				row["ClaimPaymentNum"]="1";//this is now just a boolean flag indicating that it is a payment.
-				//this is because it will frequently not be attached to an actual claim payment.
-				//row["extraDetail"]="";
-				row["patient"]=fam.GetNameInFamFirst(PIn.Long(rawClaimPay.Rows[i]["PatNum"].ToString()));
-				row["PatNum"]=rawClaimPay.Rows[i]["PatNum"].ToString();
+				row["patient"]=fam.GetNameInFamFirst(PIn.Long(rawClaimPayRow["PatNum"].ToString()));
+				row["PatNum"]=rawClaimPayRow["PatNum"].ToString();
 				row["PayNum"]="0";
 				row["PayPlanNum"]="0";
 				row["PayPlanChargeNum"]="0";
@@ -759,19 +767,12 @@ namespace OpenDentBusiness {
 				row["ProcNum"]="0";
 				row["ProcNumLab"]="";
 				row["procsOnObj"]="";
-				row["prov"]=Providers.GetAbbr(PIn.Long(rawClaimPay.Rows[i]["provNum_"].ToString()));
+				row["prov"]=Providers.GetAbbr(PIn.Long(rawClaimPayRow["provNum_"].ToString()));
 				row["StatementNum"]="0";
 				row["ToothNum"]="";
 				row["ToothRange"]="";
 				row["tth"]="";
 				rows.Add(row);
-			}
-			string familyPatNums="";
-			for(int i=0;i<fam.ListPats.Length;i++) {
-				if(i!=0) {
-					familyPatNums+=", ";
-				}
-				familyPatNums+=POut.Long(fam.ListPats[i].PatNum);
 			}
 			#endregion Claimprocs
 			#region Procedures
@@ -808,16 +809,20 @@ namespace OpenDentBusiness {
 				+"FROM procedurelog "
 				+"LEFT JOIN procedurecode ON procedurelog.CodeNum=procedurecode.CodeNum "
 				+"LEFT JOIN claimproc cp1 ON procedurelog.ProcNum=cp1.ProcNum "
-				+"WHERE ProcStatus=2 "//complete
-				+"AND procedurelog.PatNum IN ("
-				+familyPatNums;
+				+"WHERE ProcStatus=2 ";//complete
+			if(familyPatNums!="") {
+				command+="AND procedurelog.PatNum IN ("+familyPatNums+") ";
+			}
+			if(stmt.StatementType==StmtType.LimitedStatement && procNumsForLimited!="") {
+				command+="AND procedurelog.ProcNum IN ("+procNumsForLimited+") ";
+			}
 			if(DataConnection.DBtype==DatabaseType.Oracle) {
-				command+=") GROUP BY procedurelog.ClinicNum,procedurelog.BaseUnits,procedurelog.BillingNote,procedurecode.CodeNum,procedurecode.AbbrDesc"
+				command+="GROUP BY procedurelog.ClinicNum,procedurelog.BaseUnits,procedurelog.BillingNote,procedurecode.CodeNum,procedurecode.AbbrDesc"
 					+",Descript,LaymanTerm,procedurelog.MedicalCode,procedurelog.PatNum,ProcCode,"+DbHelper.DtimeToDate("procedurelog.ProcDate")+",ProcFee"
 					+",procedurelog.ProcNum,procedurelog.ProcNumLab,procedurelog.ProvNum,procedurelog.Surf,ToothNum,ToothRange,UnitQty ";
 			}
 			else{//mysql. Including Descript in the GROUP BY causes mysql to lock up sometimes.  Unsure why.
-				command+=") GROUP BY procedurelog.ProcNum ";
+				command+="GROUP BY procedurelog.ProcNum ";
 			}
 			command+="ORDER BY procDate_";
 			if(isInvoice) {
@@ -829,7 +834,7 @@ namespace OpenDentBusiness {
 					+"'' AS writeOff_,'' AS unsent_,'' AS writeOffCap_ "
 					+"FROM procedurelog "
 					+"LEFT JOIN procedurecode ON procedurelog.CodeNum=procedurecode.CodeNum "
-					+"WHERE StatementNum='"+POut.Long(statementNum)+"' "
+					+"WHERE StatementNum="+POut.Long(statementNum)+" "
 					+"ORDER BY procDate_";
 			}
 			DataTable rawProc=dcon.GetTable(command);
@@ -1005,23 +1010,31 @@ namespace OpenDentBusiness {
 			#region Adjustments
 			//Adjustments---------------------------------------------------------------------------------------
 			command="SELECT AdjAmt,AdjDate,AdjNum,AdjType,ClinicNum,PatNum,ProvNum,AdjNote "
-				+"FROM adjustment "
-				+"WHERE (";
-			for(int i=0;i<fam.ListPats.Length;i++){
-				if(i!=0){
-					command+="OR ";
-				}
-				command+="PatNum ="+POut.Long(fam.ListPats[i].PatNum)+" ";
-			}
-			command+=") ORDER BY AdjDate";
+				+"FROM adjustment ";
 			if(isInvoice) {
-				//different query here.  Include all column names.
-				command="SELECT AdjAmt,AdjDate,AdjNum,AdjType,ClinicNum,PatNum,ProvNum,AdjNote "
-					+"FROM adjustment "
-					+"WHERE StatementNum='"+POut.Long(statementNum)+"' "
-					+"ORDER BY AdjDate";
+				command+="WHERE StatementNum="+POut.Long(statementNum)+" ";
 			}
-			DataTable rawAdj=dcon.GetTable(command);
+			else if(stmt.StatementType==StmtType.LimitedStatement) {
+				List<string> listAdjWhereOR=new List<string>();
+				if(adjNumsForLimited!="") {
+					listAdjWhereOR.Add("adjustment.AdjNum IN ("+adjNumsForLimited+")");//adjustments highlighted by user
+				}
+				if(procNumsForLimited!="") {
+					listAdjWhereOR.Add("adjustment.ProcNum IN ("+procNumsForLimited+")");//add adjustments for selected procs whether user highlighted or not
+				}
+				if(listAdjWhereOR.Count>0) {
+					command+="WHERE ("+string.Join(" OR ",listAdjWhereOR)+") ";
+				}
+			}
+			else if(familyPatNums!="") {
+				command+="WHERE PatNum IN ("+familyPatNums+") ";
+			}
+			command+="ORDER BY AdjDate";
+			DataTable rawAdj=new DataTable();
+			//don't run query if LimitedStatement and both lists are empty
+			if(stmt.StatementType!=StmtType.LimitedStatement || adjNumsForLimited!="" || procNumsForLimited!="") {
+				rawAdj=dcon.GetTable(command);
+			}
 			for(int i=0;i<rawAdj.Rows.Count;i++){
 				row=table.NewRow();
 				row["AbbrDesc"]="";
@@ -1076,11 +1089,26 @@ namespace OpenDentBusiness {
 			#endregion Adjustments
 			#region Paysplits
 			//paysplits-----------------------------------------------------------------------------------------
-			string whereClause="";//create whereClause variable so both queries get the same paysplits
-			if(fam!=null && fam.ListPats!=null && fam.ListPats.Length>0) {
-				whereClause="WHERE paysplit.PatNum IN("+string.Join(",",fam.ListPats.Select(x => POut.Long(x.PatNum)))+") ";
+			List<string> listWhereClauses=new List<string>();
+			if(familyPatNums!="") {
+				listWhereClauses.Add("paysplit.PatNum IN ("+familyPatNums+")");
 			}
-			DataTable rawPay;
+			if(stmt.StatementType==StmtType.LimitedStatement) {
+				List<string> listLimitedWhere=new List<string>();
+				if(paySplitNumsForLimited!="") {
+					listLimitedWhere.Add("paysplit.SplitNum IN ("+paySplitNumsForLimited+")");//add paysplits highlighted by the user
+				}
+				if(procNumsForLimited!="") {
+					listLimitedWhere.Add("paysplit.ProcNum IN ("+procNumsForLimited+")");//add paysplits for selected procs whether user highlighted or not
+				}
+				if(listLimitedWhere.Count>0) {
+					listWhereClauses.Add("("+string.Join(" OR ",listLimitedWhere)+")");
+				}
+			}
+			string whereClause="";//create whereClause variable so both queries get the same paysplits
+			if(listWhereClauses.Count>0) {
+				whereClause="WHERE "+string.Join(" AND ",listWhereClauses);
+			}
 			//Column names with MAX left the same as they should not be considered aggregate (even though they are).
 			//MAX function used to preserve behavior in Oracle.
 			command="SELECT MAX(CheckNum) CheckNum,paysplit.ClinicNum,MAX(DatePay) DatePay,paysplit.PatNum,MAX(payment.PatNum) patNumPayment_,"
@@ -1088,12 +1116,20 @@ namespace OpenDentBusiness {
 				+"SUM(SplitAmt) splitAmt_,MAX(payment.PayNote) PayNote,MAX(paysplit.UnearnedType) UnearnedType "
 				+"FROM paysplit "
 				+"LEFT JOIN payment ON paysplit.PayNum=payment.PayNum "
-				+whereClause
+				+whereClause+" "
 				//if this GROUP BY changes, the foreach loop below must be changed to match
 				+"GROUP BY paysplit.DatePay,paysplit.PayPlanNum,paysplit.PayNum,paysplit.PatNum,paysplit.ClinicNum ORDER BY DatePay";//ProcDate ORDER BY ProcDate";
-			rawPay=dcon.GetTable(command);
+			DataTable rawPay=new DataTable();
+			//don't run query if isInvoice or if it's a LimitedStatement and no paysplits or procs were selected
+			if(!isInvoice && (stmt.StatementType!=StmtType.LimitedStatement || paySplitNumsForLimited!="" || procNumsForLimited!="")) {
+				rawPay=dcon.GetTable(command);
+			}
 			command="SELECT * FROM paysplit "+whereClause;
-			List<PaySplit> listPaysplits=Crud.PaySplitCrud.SelectMany(command).FindAll(x => x.ProcNum>0);
+			List<PaySplit> listPaysplits=new List<PaySplit>();
+			//don't run query if isInvoice or if it's a LimitedStatement and no paysplits or procs were selected
+			if(!isInvoice && (stmt.StatementType!=StmtType.LimitedStatement || paySplitNumsForLimited!="" || procNumsForLimited!="")) {
+				listPaysplits=Crud.PaySplitCrud.SelectMany(command).FindAll(x => x.ProcNum>0);
+			}
 			foreach(DataRow rowRp in rawPay.Rows) {
 				if(listPaysplits.Count==0) {
 					break;
@@ -1113,10 +1149,8 @@ namespace OpenDentBusiness {
 			}
 			int payPlanVersionCur=PrefC.GetInt(PrefName.PayPlansVersion);
 			decimal payamt;
+			//if isInvoice or if it's a LimitedStatement and no paysplits or procs were selected there will be 0 rows and this loop will be skipped
 			for(int i=0;i<rawPay.Rows.Count;i++){
-				if(isInvoice) {
-					break;
-				}
 				string strDescript="";
 				if(rawPay.Rows[i]["PayPlanNum"].ToString()!="0"){
 					if(payPlanVersionCur==1) {
@@ -1203,10 +1237,9 @@ namespace OpenDentBusiness {
 			#endregion Paysplits
 			#region Claims
 			//claims (do not affect balance)-------------------------------------------------------------------------
-			DataTable rawClaim;
-			string whereAndClause="";
-			if(fam!=null && fam.ListPats!=null && fam.ListPats.Length>0) {
-				whereAndClause="AND claim.PatNum IN ("+string.Join(",",fam.ListPats.Select(x => x.PatNum))+") ";
+			string whereAndClause="";//create whereAndClause variable so both queries get the same claims
+			if(familyPatNums!="") {
+				whereAndClause="AND claim.PatNum IN ("+familyPatNums+") ";
 			}
 			command="SELECT CarrierName,ClaimFee,claim.ClaimNum,ClaimStatus,ClaimType,claim.ClinicNum,DateReceived,DateService,"
 				+"claim.DedApplied,claim.InsPayEst,claim.InsPayAmt,claim.PatNum,'' ProcNums_,ProvTreat,claim.ReasonUnderPaid,claim.WriteOff,"
@@ -1222,7 +1255,10 @@ namespace OpenDentBusiness {
 				+"claim.ClinicNum,claim.DateReceived,claim.DateService,claim.DedApplied,claim.InsPayEst,claim.InsPayAmt,"
 				+"claim.PatNum,claim.ProvTreat,claim.ReasonUnderPaid,claim.WriteOff "
 				+"ORDER BY DateService";
-			rawClaim=dcon.GetTable(command);
+			DataTable rawClaim=new DataTable();
+			if(!isInvoice && stmt.StatementType!=StmtType.LimitedStatement) {
+				rawClaim=dcon.GetTable(command);
+			}
 			//Select the claimprocs attached to claims for this patient using the same list of pats from family where the claim is not a preauth
 			//and there is a ProcNum on the claimproc.  Used to highlight the procs attached to a claim when the claim is selected.
 			command="SELECT claim.ClaimNum,claimproc.ProcNum "
@@ -1230,8 +1266,11 @@ namespace OpenDentBusiness {
 				+"INNER JOIN claimproc ON claimproc.ClaimNum=claim.ClaimNum AND claimproc.ProcNum>0 "
 				+"WHERE claim.ClaimType!='PreAuth' "
 				+whereAndClause;
-			DataTable rawProcNumsClaim=dcon.GetTable(command);
-			foreach(DataRow rcRow in rawClaim.Rows) {
+			DataTable rawProcNumsClaim=new DataTable();
+			if(!isInvoice && stmt.StatementType!=StmtType.LimitedStatement) {
+				rawProcNumsClaim=dcon.GetTable(command);
+			}
+			foreach(DataRow rcRow in rawClaim.Rows) {//rawClaim will have 0 rows if isInvoice or StatementType is LimitedStatement
 				if(rawProcNumsClaim.Rows.Count==0) {
 					break;
 				}
@@ -1247,10 +1286,7 @@ namespace OpenDentBusiness {
 			decimal deductible;
 			decimal patport;
 			string claimStatus;
-			for(int i=0;i<rawClaim.Rows.Count;i++){
-				if(isInvoice) {
-					break;
-				}
+			for(int i=0;i<rawClaim.Rows.Count;i++){//rawClaim will have 0 rows if isInvoice or StatementType is LimitedStatement
 				row=table.NewRow();
 				row["AbbrDesc"]="";
 				row["AdjNum"]="0";
@@ -1410,12 +1446,12 @@ namespace OpenDentBusiness {
 				command+="AND StatementNum != "+POut.Long(statementNum)+" ";
 			}
 			command+="ORDER BY DateSent";
-			DataTable rawState=dcon.GetTable(command);
+			DataTable rawState=new DataTable();
+			if(!isInvoice && stmt.StatementType!=StmtType.LimitedStatement) {
+				rawState=dcon.GetTable(command);
+			}
 			StatementMode _mode;
-			for(int i=0;i<rawState.Rows.Count;i++){
-				if(isInvoice) {
-					break;
-				}
+			for(int i=0;i<rawState.Rows.Count;i++) {//rawState will have 0 rows if isInvoice or StatementType is LimitedStatement
 				row=table.NewRow();
 				row["AbbrDesc"]="";
 				row["AdjNum"]="0";
@@ -1493,37 +1529,26 @@ namespace OpenDentBusiness {
 				+"(SELECT SUM(Principal) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum AND ChargeType="+debitType+") principal_,"
 				+"(SELECT SUM(Interest) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum AND ChargeType="+debitType+") interest_,"
 				+"(SELECT SUM(Principal) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum AND ChargeType="+debitType+" "
-					+"AND ChargeDate <= "+datesql+@" AND ChargeType="+debitType+") principalDue_,"
+					+"AND ChargeDate <= "+datesql+") principalDue_,"
 				+"(SELECT SUM(Interest) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum "
-					+"AND ChargeDate <= "+datesql+@" AND ChargeType="+debitType+") interestDue_,"
-				+"MAX(CarrierName) CarrierName,CompletedAmt,payplan.Guarantor,"
-				+"payplan.PatNum,PayPlanDate,payplan.PayPlanNum,"
-				+"payplan.PlanNum, payplan.IsClosed "
+					+"AND ChargeDate <= "+datesql+" AND ChargeType="+debitType+") interestDue_,"
+				+"MAX(CarrierName) CarrierName,CompletedAmt,payplan.Guarantor,payplan.PatNum,PayPlanDate,payplan.PayPlanNum,payplan.PlanNum,payplan.IsClosed "
 				+"FROM payplan "
 				+"LEFT JOIN insplan ON insplan.PlanNum=payplan.PlanNum "
 				+"LEFT JOIN carrier ON carrier.CarrierNum=insplan.CarrierNum "
-				+"WHERE  (";
-			for(int i=0;i<fam.ListPats.Length;i++){
-				if(i!=0){
-					command+="OR ";
-				}
-				command+="payplan.Guarantor ="+POut.Long(fam.ListPats[i].PatNum)+" "
-					+"OR payplan.PatNum ="+POut.Long(fam.ListPats[i].PatNum)+" ";
-			}
-			command+=") GROUP BY CompletedAmt,payplan.Guarantor,"
-				+"payplan.PatNum,PayPlanDate,payplan.PayPlanNum,"
-				+"payplan.PlanNum ";
+				+"WHERE (payplan.Guarantor IN ("+familyPatNums+") OR payplan.Guarantor IN ("+familyPatNums+")) "
+				+"GROUP BY CompletedAmt,payplan.Guarantor,payplan.PatNum,PayPlanDate,payplan.PayPlanNum,payplan.PlanNum";
 			if(DataConnection.DBtype==DatabaseType.Oracle){
-				command+=",CarrierName,payplan.Guarantor,payplan.PatNum,PayPlanDate,payplan.PlanNum ";
+				command+=",CarrierName,payplan.Guarantor,payplan.PatNum,PayPlanDate,payplan.PlanNum";
 			}
-			command+="ORDER BY PayPlanDate";
-			DataTable rawPayPlan=dcon.GetTable(command);
+			command+=" ORDER BY PayPlanDate";
+			DataTable rawPayPlan=new DataTable();
+			if(!isInvoice && stmt.StatementType!=StmtType.LimitedStatement) {
+				rawPayPlan=dcon.GetTable(command);
+			}
 			if(payPlanVersionCur==1) {
-				for(int i=0;i<rawPayPlan.Rows.Count;i++){
-					//Skip payment plan rows for invoices.  In spite of this, the payment plans breakdown will still show at the top of invoices.
-					if(isInvoice) {
-						break;
-					}
+				//0 rows if isInvoice or statement type is LimitedStatement.  In spite of this, the payment plans breakdown will still show at the top of invoices.
+				for(int i=0;i<rawPayPlan.Rows.Count;i++) {
 					row=table.NewRow();
 					row["AbbrDesc"]="";
 					row["AdjNum"]="0";
@@ -1573,26 +1598,19 @@ namespace OpenDentBusiness {
 			}
 			#endregion Payment Plans
 			#region Payment Plans Version 2
-			if(payPlanVersionCur==2) { //this infomration is only required for v2
-				command="SELECT ChargeDate,payplancharge.PatNum,payplancharge.Guarantor,ProvNum,ClinicNum,payplancharge.Note,Principal,ChargeType,Interest,payplancharge.PayPlanNum,PayPlanChargeNum "
+			else if(payPlanVersionCur==2) {//this information is only required for v2
+				command="SELECT ChargeDate,payplancharge.PatNum,payplancharge.Guarantor,ProvNum,ClinicNum,payplancharge.Note,Principal,ChargeType,Interest,"
+					+"payplancharge.PayPlanNum,PayPlanChargeNum "
 					+"FROM payplancharge "
-					+"WHERE (";
-				for(int i=0;i<fam.ListPats.Length;i++) {
-					if(i!=0) {
-						command+="OR ";
-					}
-					command+="payplancharge.Guarantor="+POut.Long(fam.ListPats[i].PatNum)+" "
-						+"OR payplancharge.PatNum="+POut.Long(fam.ListPats[i].PatNum)+" ";
+					+"WHERE (payplancharge.Guarantor IN ("+familyPatNums+") OR payplancharge.PatNum IN ("+familyPatNums+")) "
+					+"AND ChargeDate<="+DbHelper.Curdate()+" "
+					+"ORDER BY ChargeDate";
+				DataTable rawPayPlan2=new DataTable();
+				if(!isInvoice && stmt.StatementType!=StmtType.LimitedStatement) {
+					rawPayPlan2=dcon.GetTable(command);
 				}
-				command+=") ";
-				command+="AND ChargeDate<="+DbHelper.Curdate();
-				command+="ORDER BY ChargeDate";
-				DataTable rawPayPlan2=dcon.GetTable(command);
+				//0 rows if isInvoice or statement type is LimitedStatement.  In spite of this, the payment plans breakdown will still show at the top of invoices.
 				for(int i=0;i<rawPayPlan2.Rows.Count;i++) {
-					//Skip payment plan rows for invoices.  In spite of this, the payment plans breakdown will still show at the top of invoices.
-					if(isInvoice) {
-						break;
-					}
 					row=table.NewRow();
 					row["AbbrDesc"]="";
 					row["AdjNum"]="0";
@@ -1646,20 +1664,14 @@ namespace OpenDentBusiness {
 			#endregion Payment Plans Version 2
 			#region Installment Plans
 			//Installment plans----------------------------------------------------------------------------------
-			command="SELECT * FROM installmentplan WHERE ";
-			for(int i=0;i<fam.ListPats.Length;i++){
-				if(i!=0){
-					command+="OR ";
-				}
-				command+="PatNum ="+POut.Long(fam.ListPats[i].PatNum)+" ";
-			}
-			DataTable rawInstall=Db.GetTable(command);
 			if(statementNum==0) {
+				command="SELECT * FROM installmentplan WHERE PatNum IN ("+familyPatNums+")";
+				DataTable rawInstall=Db.GetTable(command);
 				retVal.Tables.Add(GetPayPlans(rawPayPlan,rawPay,rawInstall,rawClaimPay,fam));
 			}
 			else {
-				//Always includes the payment plan breakdown for statements, receipts, and invoices.
-				retVal.Tables.Add(GetPayPlansForStatement(rawPayPlan,rawPay,fromDate,toDate,singlePatient,rawClaimPay,fam,pat,out payPlanDue));
+				//Always includes the payment plan breakdown for statements, receipts, and invoices.  LimitedStatements will return an empty payplan table.
+				retVal.Tables.Add(GetPayPlansForStatement(rawPayPlan,rawPay,fromDate,toDate,singlePatient,rawClaimPay,fam,pat,out payPlanDue,stmt.StatementType));
 			}
 			#endregion Installment Plans
 			//Sorting-----------------------------------------------------------------------------------------
@@ -1670,87 +1682,60 @@ namespace OpenDentBusiness {
 				rows.Sort(new AccountLineComparer());
 			}
 			//Canadian lab procedures need to come immediately after their corresponding proc---------------------------------
-			for(int i=0;i<labRows.Count;i++) {
-				for(int r=0;r<rows.Count;r++) {
-					if(rows[r]["ProcNum"].ToString()==labRows[i]["ProcNumLab"].ToString()) {
-						rows.Insert(r+1,labRows[i]);
-						break;
-					}
+			foreach(DataRow labRow in labRows) {
+				int labRowIndex=rows.FindIndex(x => x["ProcNum"].ToString()==labRow["ProcNumLab"].ToString())+1;//+1 insert just after proc
+				if(labRowIndex>0) {//must come after proc, so if index==0 no proc was found, don't insert
+					rows.Insert(labRowIndex,labRow);
 				}
 			}
-			//rows.Sort(CompareCommRows);
 			//Pass off all the rows for the whole family in order to compute the patient balances----------------
-			retVal.Tables.Add(GetPatientTable(fam,rows,isInvoice));
+			retVal.Tables.Add(GetPatientTable(fam,rows,isInvoice,stmt.StatementType));
 			//Regroup rows by patient---------------------------------------------------------------------------
 			DataTable[] rowsByPat=null;//will only used if multiple patients not intermingled
 			if(singlePatient) {//This is usually used for Account module grid.  Always gets used for superstatements.
-				for(int i=rows.Count-1;i>=0;i--) {//go backwards and remove from end
-					if(PIn.Long(rows[i]["SuperFamily"].ToString())!=0) {
-						long superFamNum=PIn.Long(rows[i]["SuperFamily"].ToString());
-						Patient patGuarantor=Patients.GetFamily(patNum).ListPats[0];
-						if(!patGuarantor.HasSuperBilling) {
-							rows.RemoveAt(i);//SuperStatement, but this family isn't included.  Remove the statement so it doesn't show in account module.
-						}
-					}
-					else if(rows[i]["PatNum"].ToString()!=patNum.ToString()){
-						rows.RemoveAt(i);
-					}
-				}
+				Patient patGuarantor=Patients.GetFamily(patNum).ListPats[0];
+				rows.RemoveAll(x => PIn.Long(x["SuperFamily"].ToString())!=0 && !patGuarantor.HasSuperBilling);
+				rows.RemoveAll(x => PIn.Long(x["SuperFamily"].ToString())==0 && x["PatNum"].ToString()!=patNum.ToString());
 			}
-			else if(intermingled){
-				//leave the rows alone
-			}
-			else{//multiple patients not intermingled.  This is most common for an ordinary statement.  Never gets used with superstatements.
-				for(int i=0;i<rows.Count;i++){
-					table.Rows.Add(rows[i]);
-				}
+			else if(!intermingled) {//multiple patients not intermingled.  This is most common for an ordinary statement.  Never gets used with superstatements.
+				rows.ForEach(x => table.Rows.Add(x));
 				rowsByPat=new DataTable[fam.ListPats.Length];
-				for(int p=0;p<rowsByPat.Length;p++){
-					rowsByPat[p]=new DataTable();
-					SetTableColumns(rowsByPat[p]);
-					for(int i=0;i<rows.Count;i++){
-						if(rows[i]["PatNum"].ToString()==fam.ListPats[p].PatNum.ToString()){
-							rowsByPat[p].ImportRow(rows[i]);
-						}
-					}
+				DataTable tableCur;
+				for(int i=0;i<rowsByPat.Length;i++) {
+					tableCur=new DataTable();
+					SetTableColumns(tableCur);
+					rows.FindAll(x => x["PatNum"].ToString()==fam.ListPats[i].PatNum.ToString()).ForEach(x => tableCur.ImportRow(x));
+					rowsByPat[i]=tableCur;
 				}
 			}
 			//Compute balances-------------------------------------------------------------------------------------
 			decimal bal;
 			if(rowsByPat==null){//just one table
 				bal=0;
-				for(int i=0;i<rows.Count;i++) {
-					bal+=(decimal)rows[i]["chargesDouble"];
-					bal-=(decimal)rows[i]["creditsDouble"];
-					rows[i]["balanceDouble"]=bal;
-					if(rows[i]["ClaimPaymentNum"].ToString()=="0" && rows[i]["ClaimNum"].ToString()!="0"){//claims
-						rows[i]["balance"]="";
+				foreach(DataRow rowCur in rows) {
+					bal+=(decimal)rowCur["chargesDouble"];
+					bal-=(decimal)rowCur["creditsDouble"];
+					rowCur["balanceDouble"]=bal;
+					if(rowCur["ClaimPaymentNum"].ToString()=="0" && rowCur["ClaimNum"].ToString()!="0"){//claims
+						rowCur["balance"]="";
 					}
-					else if(rows[i]["StatementNum"].ToString()!="0"){
-
-					}
-					else{
-						rows[i]["balance"]=bal.ToString("n");
+					else if(rowCur["StatementNum"].ToString()=="0") {
+						rowCur["balance"]=bal.ToString("n");
 					}
 				}
 			}
-			else{
-				for(int p=0;p<rowsByPat.Length;p++){
+			else {//family rows
+				foreach(DataTable patTable in rowsByPat) {
 					bal=0;
-					for(int i=0;i<rowsByPat[p].Rows.Count;i++) {
-						bal+=(decimal)rowsByPat[p].Rows[i]["chargesDouble"];
-						bal-=(decimal)rowsByPat[p].Rows[i]["creditsDouble"];
-						rowsByPat[p].Rows[i]["balanceDouble"]=bal;
-						if(rowsByPat[p].Rows[i]["ClaimPaymentNum"].ToString()=="0" 
-							&& rowsByPat[p].Rows[i]["ClaimNum"].ToString()!="0")//claims
-						{
-							rowsByPat[p].Rows[i]["balance"]="";
+					foreach(DataRow rowCur in patTable.Rows) {
+						bal+=(decimal)rowCur["chargesDouble"];
+						bal-=(decimal)rowCur["creditsDouble"];
+						rowCur["balanceDouble"]=bal;
+						if(rowCur["ClaimPaymentNum"].ToString()=="0" && rowCur["ClaimNum"].ToString()!="0") {//claims
+							rowCur["balance"]="";
 						}
-						else if(rowsByPat[p].Rows[i]["StatementNum"].ToString()!="0"){
-
-						}
-						else{
-							rowsByPat[p].Rows[i]["balance"]=bal.ToString("n");
+						else if(rowCur["StatementNum"].ToString()=="0") {
+							rowCur["balance"]=bal.ToString("n");
 						}
 					}
 				}
@@ -1758,7 +1743,7 @@ namespace OpenDentBusiness {
 			//Remove rows outside of daterange-------------------------------------------------------------------
 			bool foundBalForward;
 			long pnum=pat.Guarantor;//the patnum that should be put on the Balance foreward row.
-			if(rowsByPat==null){
+			if(rowsByPat==null && stmt.StatementType!=StmtType.LimitedStatement) {//LimitedStatements don't have a balance forward row
 				foundBalForward=false;
 				for(int i=rows.Count-1;i>=0;i--) {//go backwards and remove from end
 					if(((DateTime)rows[i]["DateTime"])>toDate){
@@ -1780,7 +1765,7 @@ namespace OpenDentBusiness {
 					rows.Insert(0,row);
 				}
 			}
-			else{
+			else if(stmt.StatementType!=StmtType.LimitedStatement) {//LimitedStatements don't have a balance forward row
 				for(int p=0;p<rowsByPat.Length;p++){
 					foundBalForward=false;
 					for(int i=rowsByPat[p].Rows.Count-1;i>=0;i--) {//go backwards and remove from end
@@ -1808,21 +1793,19 @@ namespace OpenDentBusiness {
 			//Finally, add rows to new table(s)-----------------------------------------------------------------------
 			if(rowsByPat==null){
 				table.Rows.Clear();
-				for(int i=0;i<rows.Count;i++) {
-					table.Rows.Add(rows[i]);
-				}
+				rows.ForEach(x => table.Rows.Add(x));
 				retVal.Tables.Add(table);
 			}
 			else{
+				DataTable tablep;
 				for(int p=0;p<rowsByPat.Length;p++){
-					if(p>0 && statementNum>0 && fam.ListPats[p].PatStatus!=PatientStatus.Patient && fam.ListPats[p].EstBalance==0 ){
+					Patient patRowCur=fam.ListPats[p];
+					if(p>0 && statementNum>0 && patRowCur.PatStatus!=PatientStatus.Patient && patRowCur.EstBalance==0 ){
 						continue;
 					}
-					DataTable tablep=new DataTable("account"+fam.ListPats[p].PatNum.ToString());
+					tablep=new DataTable("account"+patRowCur.PatNum.ToString());
 					SetTableColumns(tablep);
-					for(int i=0;i<rowsByPat[p].Rows.Count;i++) {
-						tablep.ImportRow(rowsByPat[p].Rows[i]);
-					}
+					rowsByPat[p].Rows.OfType<DataRow>().ToList().ForEach(x => tablep.ImportRow(x));
 					retVal.Tables.Add(tablep);
 				}
 			}
@@ -1971,22 +1954,28 @@ namespace OpenDentBusiness {
 			return table;
 		}
 
-		///<summary>Gets payment plans for the family.  RawPay will include any paysplits for anyone in the family, so it's guaranteed to include all paysplits for a given payplan since payplans only show in the guarantor's family.  Database maint tool enforces paysplit.patnum=payplan.guarantor just in case.  fromDate and toDate are only used if isForStatement.  From date lets us restrict how many amortization items to show.  toDate is typically 10 days in the future.
-		///This method cannot be called by the Middle Tier due to its use of an out parameter.</summary>
-		private static DataTable GetPayPlansForStatement(DataTable rawPayPlan,DataTable rawPay,DateTime fromDate,DateTime toDate,bool singlePatient
-			,DataTable rawClaimPay,Family fam,Patient pat,out decimal payPlanDue)
+		///<summary>Gets payment plans for the family.  RawPay will include any paysplits for anyone in the family, so it's guaranteed to include all
+		///paysplits for a given payplan since payplans only show in the guarantor's family.  Database maint tool enforces
+		///paysplit.patnum=payplan.guarantor just in case.  fromDate and toDate are only used if isForStatement.  From date lets us restrict how many
+		///amortization items to show.  toDate is typically 10 days in the future.  This method cannot be called by the Middle Tier due to its use of an
+		///out parameter.  LimitedStatements will return an empty DataTable.</summary>
+		private static DataTable GetPayPlansForStatement(DataTable rawPayPlan,DataTable rawPay,DateTime fromDate,DateTime toDate,bool singlePatient,
+			DataTable rawClaimPay,Family fam,Patient pat,out decimal payPlanDue,StmtType statementType)
 		{
 			//No need to check RemotingRole; no call to db.
 			//We may need to add installment plans to this grid some day.  No time right now.
 			DataTable table=new DataTable("payplan");
 			DataRow row;
 			SetTableColumns(table);//this will allow it to later be fully integrated into a single grid.
+			payPlanDue=0;
+			if(statementType==StmtType.LimitedStatement) {//don't include payment plans on LimitedStatements
+				return table;
+			}
 			List<DataRow> rows=new List<DataRow>();
 			decimal princ;
 			decimal bal;
 			DataTable rawAmort;
 			long payPlanNum;
-			payPlanDue=0;
 			for(int i=0;i<rawPayPlan.Rows.Count;i++){//loop through the payment plans (usually zero or one)
 				//Do not include a payment plan in the payment plan grid if the guarantor is from another family
 				if(!fam.ListPats.Select(x => x.PatNum).ToList().Contains(PIn.Long(rawPayPlan.Rows[i]["Guarantor"].ToString()))) {
@@ -2098,7 +2087,7 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>All rows for the entire family are getting passed in here.  (Except Invoices)  The rows have already been sorted.  Balances have not been computed, and we will do that here, separately for each patient (except invoices).</summary>
-		private static DataTable GetPatientTable(Family fam,List<DataRow> rows,bool isInvoice){
+		private static DataTable GetPatientTable(Family fam,List<DataRow> rows,bool isInvoice,StmtType statementType){
 			//No need to check RemotingRole; no call to db.
 			//DataConnection dcon=new DataConnection();
 			DataTable table=new DataTable("patient");
@@ -2125,7 +2114,7 @@ namespace OpenDentBusiness {
 				row["name"]=fam.ListPats[p].GetNameLF();
 				row["PatNum"]=fam.ListPats[p].PatNum.ToString();
 				rowspat.Add(row);
-				if(isInvoice) {
+				if(isInvoice || statementType==StmtType.LimitedStatement) {
 					//we don't have all the rows, so we don't want to try to compute balance
 				}
 				else {
@@ -2199,9 +2188,9 @@ namespace OpenDentBusiness {
 			return table;
 		}
 
-		public static DataTable GetMisc(Family fam,long patNum,decimal payPlanDue,decimal balanceForward) {
+		public static DataTable GetMisc(Family fam,long patNum,decimal payPlanDue,decimal balanceForward,StmtType statementType,DataSet ds) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),fam,patNum,payPlanDue,balanceForward);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),fam,patNum,payPlanDue,balanceForward,statementType,ds);
 			}
 			DataTable table=new DataTable("misc");
 			DataRow row;
@@ -2231,13 +2220,26 @@ namespace OpenDentBusiness {
 			row["value"]=POut.Decimal(balanceForward);
 			rows.Add(row);
 			//patInsEst----------------------------
-			command="SELECT SUM(inspayest+writeoff) FROM claimproc "
-				+"WHERE status = 0 "//not received
-				+"AND PatNum="+POut.Long(patNum);
-			raw=Db.GetTable(command);
+			string procNumsForInsEst="";
+			command="SELECT COALESCE(SUM(inspayest+writeoff),0) FROM claimproc "
+				+"WHERE status = 0 ";//not received
+			if(statementType!=StmtType.LimitedStatement) {
+				command+="AND PatNum="+POut.Long(patNum);
+			}
+			else {
+				procNumsForInsEst=string.Join(",",ds.Tables.OfType<DataTable>()//only reference to ds, should never be null if it's a LimitedStatement
+					.Where(x => x.TableName.StartsWith("account"))
+					.SelectMany(x => x.Rows.OfType<DataRow>()
+						.Select(y => POut.String(y["ProcNum"].ToString()))
+						.Where(y => y!="0")));
+				command+="AND ProcNum IN ("+procNumsForInsEst+")";
+			}
 			row=table.NewRow();
-			row["descript"]="patInsEst";
-			row["value"]=raw.Rows[0][0].ToString();
+			if(statementType!=StmtType.LimitedStatement || procNumsForInsEst!="") {//don't run if LimitedStatement and no procs selected
+				raw=Db.GetTable(command);
+				row["descript"]="patInsEst";
+				row["value"]=raw.Rows[0][0].ToString();
+			}
 			rows.Add(row);
 			//Unearned income----------------------
 			command="SELECT SUM(SplitAmt) FROM paysplit WHERE "

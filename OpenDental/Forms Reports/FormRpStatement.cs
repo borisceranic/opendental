@@ -20,6 +20,7 @@ using PdfSharp.Pdf;
 using MigraDoc.DocumentObjectModel;
 using MigraDoc.DocumentObjectModel.Shapes;
 using MigraDoc.DocumentObjectModel.Tables;
+using System.Linq;
 
 namespace OpenDental{
 ///<summary></summary>
@@ -464,6 +465,21 @@ namespace OpenDental{
 			Patient PatGuar=fam.ListPats[0];//.Clone();
 			//Patient pat=fam.GetPatient(Stmt.PatNum);
 			DataTable tableMisc=dataSet.Tables["misc"];
+			double patInsEstLimited=0;
+			double statementTotal=0;
+			//LimitedStatements have Total and InsEst for only those transactions selected for the statement
+			if(Stmt.StatementType==StmtType.LimitedStatement) {
+				patInsEstLimited=PIn.Double(tableMisc.Rows.OfType<DataRow>()
+					.Where(x => x["descript"].ToString()=="patInsEst")
+					.Select(x => x["value"].ToString()).FirstOrDefault());//safe, if string is blank or null PIn.Double will return 0
+				statementTotal=dataSet.Tables.OfType<DataTable>().Where(x => x.TableName.StartsWith("account"))
+					.SelectMany(x => x.Rows.OfType<DataRow>())
+					.Where(x => x["AdjNum"].ToString()!="0"//adjustments, may be charges or credits
+						|| x["ProcNum"].ToString()!="0"//procs, will be charges with credits==0
+						|| x["PayNum"].ToString()!="0"//patient payments, will be credits with charges==0
+						|| x["ClaimPaymentNum"].ToString()!="0").ToList()//claimproc payments+writeoffs, will be credits with charges==0
+					.Sum(x => PIn.Double(x["chargesDouble"].ToString())-PIn.Double(x["creditsDouble"].ToString()));//add charges-credits
+			}
 			//HEADING-----------------------------------------------------------------------------------------------------------
 			#region Heading
 			Paragraph par=section.AddParagraph();
@@ -488,6 +504,9 @@ namespace OpenDental{
 			}
 			else {
 				text=Lan.g(this,"STATEMENT");
+				if(Stmt.StatementType==StmtType.LimitedStatement) {
+					text+=" ("+Lan.g(this,"Limited")+")";
+				}
 			}
 			par.AddFormattedText(text,font);
 			text=DateTime.Today.ToShortDateString();
@@ -649,33 +668,44 @@ namespace OpenDental{
 				row.Borders.Bottom.Color=Colors.Gray;
 				row.Borders.Right.Color=Colors.Gray;
 				font=MigraDocHelper.CreateFont(9);
-				double balTotal=PatGuar.BalTotal;
-				if(!PrefC.GetBool(PrefName.BalancesDontSubtractIns)) {//this is typical
-					balTotal-=PatGuar.InsEst;
-				}
-				for(int m=0;m<tableMisc.Rows.Count;m++){
-					//only add the payplandue value for version 1. (version 2+ already account for it when calculating aging)
-					if(tableMisc.Rows[m]["descript"].ToString()=="payPlanDue" && PrefC.GetInt(PrefName.PayPlansVersion)==1) {
-						balTotal+=PIn.Double(tableMisc.Rows[m]["value"].ToString());
-						//payPlanDue;//PatGuar.PayPlanDue;
+				if(Stmt.StatementType==StmtType.LimitedStatement) {
+					//statementTotal and patInsEstLimited calculated above and used here and in the Floating Balance region
+					if(PrefC.GetBool(PrefName.BalancesDontSubtractIns)) {
+						row.Cells[0].AddParagraph().AddFormattedText(statementTotal.ToString("F"),font);
+					}
+					else {//this is typical
+						row.Cells[0].AddParagraph().AddFormattedText((statementTotal-patInsEstLimited).ToString("F"),font);
 					}
 				}
-				InstallmentPlan installPlan=InstallmentPlans.GetOneForFam(PatGuar.PatNum);
-				if(installPlan!=null){
-					//show lesser of normal total balance or the monthly payment amount.
-					if(installPlan.MonthlyPayment < balTotal) {
-						text=installPlan.MonthlyPayment.ToString("F");
+				else {
+					double balTotal=PatGuar.BalTotal;
+					if(!PrefC.GetBool(PrefName.BalancesDontSubtractIns)) {//this is typical
+						balTotal-=PatGuar.InsEst;
 					}
-					else {
+					for(int m=0;m<tableMisc.Rows.Count;m++){
+						//only add the payplandue value for version 1. (version 2+ already account for it when calculating aging)
+						if(tableMisc.Rows[m]["descript"].ToString()=="payPlanDue" && PrefC.GetInt(PrefName.PayPlansVersion)==1) {
+							balTotal+=PIn.Double(tableMisc.Rows[m]["value"].ToString());
+							//payPlanDue;//PatGuar.PayPlanDue;
+						}
+					}
+					InstallmentPlan installPlan=InstallmentPlans.GetOneForFam(PatGuar.PatNum);
+					if(installPlan!=null){
+						//show lesser of normal total balance or the monthly payment amount.
+						if(installPlan.MonthlyPayment < balTotal) {
+							text=installPlan.MonthlyPayment.ToString("F");
+						}
+						else {
+							text=balTotal.ToString("F");
+						}
+					}
+					else {//no installmentplan
 						text=balTotal.ToString("F");
 					}
+					cell=row.Cells[0];
+					par=cell.AddParagraph();
+					par.AddFormattedText(text,font);
 				}
-				else {//no installmentplan
-					text=balTotal.ToString("F");
-				}
-				cell=row.Cells[0];
-				par=cell.AddParagraph();
-				par.AddFormattedText(text,font);
 				if(PrefC.GetLong(PrefName.StatementsCalcDueDate)==-1) {
 					text=Lan.g(this,"Upon Receipt");
 				}
@@ -824,8 +854,7 @@ namespace OpenDental{
 			#region Aging
 			MigraDocHelper.InsertSpacer(section,275);
 			frame=MigraDocHelper.CreateContainer(section,55,390+legendOffset,250,29);
-			if (!Stmt.HidePayment)
-			{
+			if(!Stmt.HidePayment && Stmt.StatementType!=StmtType.LimitedStatement) {
 				table = MigraDocHelper.DrawTable(frame, 0, 0, 29);
 				col = table.AddColumn(Unit.FromInch(1.1));
 				col = table.AddColumn(Unit.FromInch(1.1));
@@ -1014,6 +1043,17 @@ namespace OpenDental{
 				par.AddLineBreak();
 				text=(procAmt+adjAmt).ToString("c");
 				par.AddFormattedText(text,fontBold);
+			}
+			else if(Stmt.StatementType==StmtType.LimitedStatement) {
+				//statementTotal and patInsEstLimited calculated above and used here and in the Amount Enclosed region
+				if(PrefC.GetBool(PrefName.BalancesDontSubtractIns)) {
+					par.AddFormattedText(statementTotal.ToString("c"),font);
+				}
+				else {//this is typical
+					par.AddFormattedText(statementTotal.ToString("c"),font).AddLineBreak();
+					par.AddFormattedText(patInsEstLimited.ToString("c"),font).AddLineBreak();
+					par.AddFormattedText((statementTotal-patInsEstLimited).ToString("c"),fontBold);
+				}
 			}
 			else if(PrefC.GetBool(PrefName.BalancesDontSubtractIns)) {
 				if(Stmt.SinglePatient) {
@@ -1208,73 +1248,73 @@ namespace OpenDental{
 				gridPat.BeginUpdate();
 				gridPat.Rows.Clear();
 				//lineData=FamilyStatementDataList[famIndex].PatDataList[i].PatData;
-				for(int p=0;p<tableAccount.Rows.Count;p++) {
+				foreach(DataRow rowCur in tableAccount.Rows) {
 					if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 						if(Stmt.IsReceipt) {
-							if(tableAccount.Rows[p]["StatementNum"].ToString()!="0") {//Hide statement rows for Canadian receipts.
+							if(rowCur["StatementNum"].ToString()!="0") {//Hide statement rows for Canadian receipts.
 								continue;
 							}
-							if(tableAccount.Rows[p]["ClaimNum"].ToString()!="0") {//Hide claim rows and claim payment rows for Canadian receipts.
+							if(rowCur["ClaimNum"].ToString()!="0") {//Hide claim rows and claim payment rows for Canadian receipts.
 								continue;
 							}
 						}
 					}
 					if(CultureInfo.CurrentCulture.Name=="en-US") {
 						if(Stmt.IsReceipt) {
-							if(tableAccount.Rows[p]["PayNum"].ToString()=="0") {//Hide everything except patient payments
+							if(rowCur["PayNum"].ToString()=="0") {//Hide everything except patient payments
 								continue;
 							}
 						}
 						//js Some additional features would be nice for receipts, such as hiding the bal column, the aging, and the amount due sections.
 					}
 					grow=new ODGridRow();
-					grow.Cells.Add(tableAccount.Rows[p]["date"].ToString());
-					grow.Cells.Add(tableAccount.Rows[p]["patient"].ToString());
+					grow.Cells.Add(rowCur["date"].ToString());
+					grow.Cells.Add(rowCur["patient"].ToString());
 					if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 						if(Stmt.IsReceipt) {
 							grow.Cells.Add("");//Code: blank in Canada normally because this information is used on taxes and is considered a security concern.
 							grow.Cells.Add("");//Tooth: blank in Canada normally because this information is used on taxes and is considered a security concern.
 						}
 						else {
-							grow.Cells.Add(tableAccount.Rows[p]["ProcCode"].ToString());
+							grow.Cells.Add(rowCur["ProcCode"].ToString());
 							if(!Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
-								grow.Cells.Add(tableAccount.Rows[p]["tth"].ToString());
+								grow.Cells.Add(rowCur["tth"].ToString());
 							}
 						}
 					}
 					else {
-						grow.Cells.Add(tableAccount.Rows[p]["ProcCode"].ToString());
+						grow.Cells.Add(rowCur["ProcCode"].ToString());
 						if(!Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
-							grow.Cells.Add(tableAccount.Rows[p]["tth"].ToString());
+							grow.Cells.Add(rowCur["tth"].ToString());
 						}
 					}
 					if(CultureInfo.CurrentCulture.Name=="en-AU") {//English (Australia)
-						if(tableAccount.Rows[p]["prov"].ToString().Trim()!="") {
-							grow.Cells.Add(tableAccount.Rows[p]["prov"].ToString()+" - "+tableAccount.Rows[p]["description"].ToString());
+						if(rowCur["prov"].ToString().Trim()!="") {
+							grow.Cells.Add(rowCur["prov"].ToString()+" - "+rowCur["description"].ToString());
 						}
 						else {//No provider on this account row item, so don't put the extra leading characters.
-							grow.Cells.Add(tableAccount.Rows[p]["description"].ToString());
+							grow.Cells.Add(rowCur["description"].ToString());
 						}
 					}
 					else if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
 						if(Stmt.IsReceipt) {
-							if(PIn.Long(tableAccount.Rows[p]["ProcNum"].ToString())==0) {
-								grow.Cells.Add(tableAccount.Rows[p]["description"].ToString());
+							if(PIn.Long(rowCur["ProcNum"].ToString())==0) {
+								grow.Cells.Add(rowCur["description"].ToString());
 							}
 							else {//Only clear description for procedures.
 								grow.Cells.Add("");//Description: blank in Canada normally because this information is used on taxes and is considered a security concern.
 							}
 						}
 						else {
-							grow.Cells.Add(tableAccount.Rows[p]["description"].ToString());
+							grow.Cells.Add(rowCur["description"].ToString());
 						}
 					}
 					else {//Assume English (United States)
-						grow.Cells.Add(tableAccount.Rows[p]["description"].ToString());
+						grow.Cells.Add(rowCur["description"].ToString());
 					}
-					grow.Cells.Add(tableAccount.Rows[p]["charges"].ToString());
-					grow.Cells.Add(tableAccount.Rows[p]["credits"].ToString());
-					grow.Cells.Add(tableAccount.Rows[p]["balance"].ToString());
+					grow.Cells.Add(rowCur["charges"].ToString());
+					grow.Cells.Add(rowCur["credits"].ToString());
+					grow.Cells.Add(rowCur["balance"].ToString());
 					gridPat.Rows.Add(grow);
 				}
 				gridPat.EndUpdate();

@@ -51,6 +51,15 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary></summary>
+		public static void Update(PaySplit paySplit,PaySplit oldPaySplit) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),paySplit,oldPaySplit);
+				return;
+			}
+			Crud.PaySplitCrud.Update(paySplit,oldPaySplit);
+		}
+
+		///<summary></summary>
 		public static long Insert(PaySplit split) {
 			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
 				split.SecUserNumEntry=Security.CurUser.UserNum;//must be before normal remoting role check to get user at workstation
@@ -298,52 +307,17 @@ namespace OpenDentBusiness{
 			return unearnedTotal;
 		}
 
-		///<summary>Used in FormPayment to sych database with changes user made to the paySplit list for a payment.  Must supply an old list for comparison.  Only the differences are saved.</summary>
-		public static void UpdateList(List<PaySplit> oldSplitList,List<PaySplit> newSplitList) {
-			//No need to check RemotingRole; no call to db.
-			PaySplit newPaySplit;
-			for(int i=0;i<oldSplitList.Count;i++) {//loop through the old list
-				newPaySplit=null;
-				for(int j=0;j<newSplitList.Count;j++) {
-					if(newSplitList[j]==null || newSplitList[j].SplitNum==0) {
-						continue;
-					}
-					if(((PaySplit)oldSplitList[i]).SplitNum==((PaySplit)newSplitList[j]).SplitNum) {
-						newPaySplit=newSplitList[j];
-						break;
-					}
-				}
-				if(newPaySplit==null) {
-					//PaySplit with matching SplitNum was not found, so it must have been deleted
-					Delete(oldSplitList[i]);
-					continue;
-				}
-				//PaySplit was found with matching SplitNum, so check for changes
-				if(newPaySplit.DateEntry != oldSplitList[i].DateEntry
-					|| newPaySplit.DatePay != oldSplitList[i].DatePay
-					|| newPaySplit.PatNum != oldSplitList[i].PatNum
-					|| newPaySplit.PayNum != oldSplitList[i].PayNum
-					|| newPaySplit.PayPlanNum != oldSplitList[i].PayPlanNum
-					|| newPaySplit.ProcDate != oldSplitList[i].ProcDate
-					|| newPaySplit.ProcNum != oldSplitList[i].ProcNum
-					|| newPaySplit.ProvNum != oldSplitList[i].ProvNum
-					|| newPaySplit.SplitAmt != oldSplitList[i].SplitAmt
-					|| newPaySplit.UnearnedType != oldSplitList[i].UnearnedType
-					|| newPaySplit.ClinicNum != oldSplitList[i].ClinicNum) 
-				{
-					Update(newPaySplit);
-				}
+		///<summary>Inserts, updates, or deletes db rows to match listNew.  No need to pass in userNum, it's set before remoting role check and passed to
+		///the server if necessary.</summary>
+		public static void Sync(List<PaySplit> listNew,List<PaySplit> listOld,long userNum=0) {
+			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
+				userNum=Security.CurUser.UserNum;
 			}
-			for(int i=0;i<newSplitList.Count;i++) {//loop through the new list
-				if(newSplitList[i]==null) {
-					continue;
-				}
-				if(newSplitList[i].SplitNum!=0) {
-					continue;
-				}
-				//entry with SplitNum=0, so it's new
-				Insert(newSplitList[i]);
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,listOld,userNum);
+				return;
 			}
+			Crud.PaySplitCrud.Sync(listNew,listOld,userNum);
 		}
 
 		

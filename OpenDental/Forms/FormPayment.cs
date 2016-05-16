@@ -2679,7 +2679,7 @@ namespace OpenDental {
 			for(int i=0;i<_listPaySplits.Count;i++) {
 				_listPaySplits[i].DatePay=_paymentCur.PayDate;
 			}
-			PaySplits.UpdateList(_listPaySplitsOld,_listPaySplits);
+			PaySplits.Sync(_listPaySplits,_listPaySplitsOld);
 			//Accounting synch is done here.  All validation was done further up
 			//If user is trying to change the amount or linked account of an entry that was already copied and linked to accounting section
 			if(accountingSynchRequired) {
@@ -2812,7 +2812,7 @@ namespace OpenDental {
 			for(int i=0;i<_listPaySplits.Count;i++) {
 				_listPaySplits[i].DatePay=_paymentCur.PayDate;
 			}
-			PaySplits.UpdateList(_listPaySplitsOld,_listPaySplits);
+			PaySplits.Sync(_listPaySplits,_listPaySplitsOld);
 			SecurityLogs.MakeLogEntry(Permissions.PaymentCreate,_paymentCur.PatNum,Patients.GetLim(_paymentCur.PatNum).GetNameLF()+", "+
 				_paymentCur.PayAmt.ToString("c"));
 			string refNum="";

@@ -63,7 +63,10 @@ namespace OpenDentBusiness{
 			}
 			//Removed dependencies from procedures and adjustments.
 			Procedures.DetachFromInvoice(statementNum);
+			StmtProcAttaches.DetachFromStatement(statementNum);
 			Adjustments.DetachFromInvoice(statementNum);
+			StmtAdjAttaches.DetachFromStatement(statementNum);
+			StmtPaySplitAttaches.DetachFromStatement(statementNum);
 			Crud.StatementCrud.Delete(statementNum);
 		}
 
