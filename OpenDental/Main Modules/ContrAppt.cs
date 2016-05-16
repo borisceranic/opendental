@@ -175,6 +175,8 @@ namespace OpenDental {
 		///Use this list when accessing the view by comboView.SelectedIndex.</summary>
 		private List<ApptView> _listApptViews;
 		private FormTrackNext FormTN;
+		private TabPage tabProv;
+		private ODGrid gridProv;
 		private FormUnsched FormUnsched2;
 		///<summary></summary>
 		[Category("Data"),Description("Occurs when a user has taken action on an item needing an action taken.")]
@@ -312,6 +314,8 @@ namespace OpenDental {
 			this.butMakeRecall = new OpenDental.UI.Button();
 			this.butViewAppts = new OpenDental.UI.Button();
 			this.ToolBarMain = new OpenDental.UI.ODToolBar();
+			this.tabProv = new System.Windows.Forms.TabPage();
+			this.gridProv = new OpenDental.UI.ODGrid();
 			this.panelArrows.SuspendLayout();
 			this.panelSheet.SuspendLayout();
 			this.panelAptInfo.SuspendLayout();
@@ -324,6 +328,7 @@ namespace OpenDental {
 			this.tabWaiting.SuspendLayout();
 			this.tabSched.SuspendLayout();
 			this.panelMakeButtons.SuspendLayout();
+			this.tabProv.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// imageListMain
@@ -1096,6 +1101,7 @@ namespace OpenDental {
 			this.tabControl.Anchor = System.Windows.Forms.AnchorStyles.None;
 			this.tabControl.Controls.Add(this.tabWaiting);
 			this.tabControl.Controls.Add(this.tabSched);
+			this.tabControl.Controls.Add(this.tabProv);
 			this.tabControl.Location = new System.Drawing.Point(665, 521);
 			this.tabControl.Name = "tabControl";
 			this.tabControl.SelectedIndex = 0;
@@ -1256,6 +1262,33 @@ namespace OpenDental {
 			this.ToolBarMain.TabIndex = 73;
 			this.ToolBarMain.ButtonClick += new OpenDental.UI.ODToolBarButtonClickEventHandler(this.ToolBarMain_ButtonClick);
 			// 
+			// tabProv
+			// 
+			this.tabProv.Controls.Add(this.gridProv);
+			this.tabProv.Location = new System.Drawing.Point(4, 22);
+			this.tabProv.Name = "tabProv";
+			this.tabProv.Size = new System.Drawing.Size(211, 161);
+			this.tabProv.TabIndex = 2;
+			this.tabProv.Text = "Prov";
+			this.tabProv.UseVisualStyleBackColor = true;
+			// 
+			// gridProv
+			// 
+			this.gridProv.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridProv.HasAddButton = false;
+			this.gridProv.HasMultilineHeaders = false;
+			this.gridProv.HScrollVisible = false;
+			this.gridProv.Location = new System.Drawing.Point(0, 0);
+			this.gridProv.Margin = new System.Windows.Forms.Padding(0);
+			this.gridProv.Name = "gridProv";
+			this.gridProv.ScrollValue = 0;
+			this.gridProv.Size = new System.Drawing.Size(211, 161);
+			this.gridProv.TabIndex = 79;
+			this.gridProv.Title = "Provider Schedules";
+			this.gridProv.TranslationName = "TableAppProv";
+			// 
 			// ContrAppt
 			// 
 			this.Controls.Add(this.groupSearch);
@@ -1285,6 +1318,7 @@ namespace OpenDental {
 			this.tabWaiting.ResumeLayout(false);
 			this.tabSched.ResumeLayout(false);
 			this.panelMakeButtons.ResumeLayout(false);
+			this.tabProv.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
@@ -1697,6 +1731,7 @@ namespace OpenDental {
 			List<LabCase> labCaseList=LabCases.GetForPeriod(startDate,endDate,opNums);
 			FillLab(labCaseList);
 			FillProduction();
+			FillProvSched();
 			FillEmpSched();
 			FillWaitingRoom();
 			LayoutPanels();
@@ -1920,13 +1955,15 @@ namespace OpenDental {
 				radioWeek,
 				tabWaiting,
 				tabSched,
+				tabProv,
 				butLab,
 				butBackWeek,
 				butBackMonth,
 				butFwdWeek,
 				butFwdMonth,
 				gridEmpSched,
-				gridWaiting
+				gridWaiting,
+				gridProv
 				});
 			LayoutToolBar();
 			//Appointment action buttons
@@ -2222,6 +2259,29 @@ namespace OpenDental {
 			if(grossproduction!=netproduction) {
 				textProduction.Text+=Lan.g(this,", net:")+netproduction.ToString("c0");
 			}
+		}
+
+		///<summary></summary>
+		private void FillProvSched() {
+			DataTable table=DS.Tables["ProvSched"];
+			gridProv.BeginUpdate();
+			gridProv.Columns.Clear();
+			ODGridColumn col=new ODGridColumn(Lan.g("TableApptProvSched","Provider"),80);
+			gridProv.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("TableApptProvSched","Schedule"),70);
+			gridProv.Columns.Add(col);
+			col=new ODGridColumn(Lan.g("TableApptProvSched","Notes"),100);
+			gridProv.Columns.Add(col);
+			gridProv.Rows.Clear();
+			ODGridRow row;
+			foreach(DataRow dRow in table.Rows) { 
+				row=new ODGridRow();
+				row.Cells.Add(dRow["ProvAbbr"].ToString());
+				row.Cells.Add(dRow["schedule"].ToString());
+				row.Cells.Add(dRow["Note"].ToString());
+				gridProv.Rows.Add(row);
+			}
+			gridProv.EndUpdate();
 		}
 
 		///<summary></summary>

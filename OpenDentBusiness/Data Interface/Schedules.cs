@@ -453,7 +453,7 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Schedule>>(MethodBase.GetCurrentMethod(),date,schedType);
 			}
-			string command="SELECT * FROM schedule WHERE SchedDate="+POut.Date(date)+" AND SchedType="+POut.Int((int)ScheduleType.Practice);
+			string command="SELECT * FROM schedule WHERE SchedDate="+POut.Date(date)+" AND SchedType="+POut.Int((int)schedType);
 			return Crud.ScheduleCrud.SelectMany(command);
 		}
 
@@ -917,6 +917,49 @@ namespace OpenDentBusiness{
 			return table;
 		}
 	
+		///<summary>Set clinicNum to 0 to return 'unassigned' clinics.  Otherwise, filters the data set on the clinic num passed in.
+		///Added to the DataSet in Appointments.RefreshPeriod.</summary>
+		public static DataTable GetPeriodProviderSchedTable(DateTime dateStart,DateTime dateEnd,long clinicNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateStart,dateEnd,clinicNum);
+			}
+			DataTable table=new DataTable("ProvSched");
+			//columns that start with lowercase are altered for display rather than being raw data.
+			table.Columns.Add("ProvAbbr");
+			table.Columns.Add("schedule");
+			table.Columns.Add("Note");
+			if(dateStart!=dateEnd) {
+				return table;
+			}
+			List<long> listProvNums;
+			if(PrefC.HasClinicsEnabled) {//Using clinics.
+				listProvNums=Providers.GetProvsForClinic(clinicNum).Select(x => x.ProvNum).ToList();
+				if(listProvNums.Count==0) {
+					return table;
+				}
+			}
+			else {
+				listProvNums=ProviderC.GetListShort().OrderBy(x => x.Abbr).Select(y => y.ProvNum).ToList();
+			}
+			List<Schedule> ListSchedulesForDate=Schedules.GetAllForDateAndType(dateStart,ScheduleType.Provider);
+			List<Schedule> listScheds=ListSchedulesForDate.FindAll(x => listProvNums.Contains(x.ProvNum));
+			listScheds=listScheds.OrderBy(x => listProvNums.IndexOf(x.ProvNum)).ToList();//Make list alphabetical.
+			Schedule schedCur;
+			DataRow row;
+			DateTime startTime;
+			DateTime stopTime;
+			for(int i=0; i<listScheds.Count; i++){
+				schedCur=listScheds[i];
+				row=table.NewRow();
+				row["ProvAbbr"]=Providers.GetAbbr(schedCur.ProvNum);
+				startTime=PIn.DateT(schedCur.StartTime.ToString());
+				stopTime=PIn.DateT(schedCur.StopTime.ToString());
+				row["schedule"]=startTime.ToString("h:mm")+"-"+stopTime.ToString("h:mm");
+				row["Note"]=schedCur.Note;
+				table.Rows.Add(row);
+			}
+			return table;
+		}
 		public static DataTable GetPeriodSchedule(DateTime dateStart,DateTime dateEnd) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateStart,dateEnd);
