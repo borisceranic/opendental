@@ -165,7 +165,7 @@ namespace OpenDental {
 			query.AddColumn("Amount",60,FieldValueType.Number,font);
 			query.GetColumnHeader("Amount").ContentAlignment=ContentAlignment.MiddleRight;
 			Cursor=Cursors.Default;
-			if(!report.SubmitQueries()) {
+			if(!report.SubmitQueries(true)) {
 				return;
 			}
 			// display report
@@ -197,7 +197,7 @@ namespace OpenDental {
 			query.GetColumnHeader("PayAmt").ContentAlignment=ContentAlignment.MiddleRight;
 			query.GetColumnDetail("PayAmt").ContentAlignment=ContentAlignment.MiddleRight;
 			Cursor=Cursors.Default;
-			if(!report.SubmitQueries()) {
+			if(!report.SubmitQueries(true)) {
 				return;
 			}
 			// display report
