@@ -896,7 +896,7 @@ namespace OpenDental {
 			for(int i=0;i<_listCreditCards.Count;i++) {
 				comboCreditCards.Items.Add(_listCreditCards[i].CCNumberMasked);
 			}
-			comboCreditCards.Items.Add("New card");
+			comboCreditCards.Items.Add(Lan.g(this,"New card"));
 			comboCreditCards.SelectedIndex=0;
 			_tableBalances=Patients.GetPaymentStartingBalances(_patCur.Guarantor,_paymentCur.PayNum);
 			//this works even if patient not in family
@@ -1463,6 +1463,7 @@ namespace OpenDental {
 			}
 			if(textAmount.Text=="" || PIn.Double(textAmount.Text)==0) {
 				MsgBox.Show(this,"Please enter an amount first.");
+				textAmount.Focus();
 				return;
 			}
 			if(!HasXCharge()) {
@@ -1839,11 +1840,28 @@ namespace OpenDental {
 			}
 			textNote.Text+=resulttext;
 			_paymentCur.Receipt=receipt;
-			if(receipt!="") {
+			if(!string.IsNullOrEmpty(receipt)) {
 				butPrintReceipt.Visible=true;
 				if(_printReceipt) {
 					PrintReceipt(receipt);
 				}
+			}
+			//Refresh comboCreditCards and select the index of the card used for this payment if the token was saved
+			creditCards=CreditCards.Refresh(_patCur.PatNum);
+			comboCreditCards.Items.Clear();
+			comboCreditCards.SelectedIndex=-1;
+			for(int i=0;i<creditCards.Count;i++) {
+				comboCreditCards.Items.Add(creditCards[i].CCNumberMasked);
+				if(creditCards[i].XChargeToken==cc.XChargeToken
+					&& creditCards[i].CCExpiration.Year==cc.CCExpiration.Year
+					&& creditCards[i].CCExpiration.Month==cc.CCExpiration.Month)
+				{
+					comboCreditCards.SelectedIndex=i;
+				}
+			}
+			comboCreditCards.Items.Add(Lan.g(this,"New card"));
+			if(comboCreditCards.SelectedIndex==-1) {
+				comboCreditCards.SelectedIndex=comboCreditCards.Items.Count-1;
 			}
 		}
 
@@ -2131,6 +2149,7 @@ namespace OpenDental {
 			}
 			if(textAmount.Text=="" || textAmount.Text=="0.00") {
 				MsgBox.Show(this,"Please enter an amount first.");
+				textAmount.Focus();
 				return;
 			}
 			if(_listPaySplits.Count>0 && PIn.Double(textAmount.Text)!=PIn.Double(textTotal.Text)
@@ -2162,7 +2181,7 @@ namespace OpenDental {
 					comboCreditCards.SelectedIndex=i;
 				}
 			}
-			comboCreditCards.Items.Add("New card");
+			comboCreditCards.Items.Add(Lan.g(this,"New card"));
 			if(comboCreditCards.SelectedIndex==-1) {
 				comboCreditCards.SelectedIndex=comboCreditCards.Items.Count-1;
 			}
@@ -2251,7 +2270,7 @@ namespace OpenDental {
 				_paymentOld.ProcessStatus=ProcessStat.OfficeProcessed;
 				Payments.Update(_paymentOld,true);
 			}
-			if(_paymentCur.Receipt!="") {
+			if(!string.IsNullOrEmpty(_paymentCur.Receipt)) {
 				butPrintReceipt.Visible=true;
 			}
 			if(FormP.Response==null || FormP.Response.Status.code!=0) { //The transaction failed.
