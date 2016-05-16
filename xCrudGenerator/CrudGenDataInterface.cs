@@ -239,20 +239,21 @@ namespace OpenDentBusiness{
 		//This region can be eliminated if this is not a table type with cached data.
 		//If leaving this region in place, be sure to add RefreshCache and FillCache 
 		//to the Cache.cs file with all the other Cache types.
+		//Also, make sure to consider making an invalid type for this class in Cache.GetAllCachedInvalidTypes() if needed.
 
 		///<summary>A list of all "+Sname+@".</summary>
-		private static List<"+typeClassName+@"> listt;
+		private static List<"+typeClassName+@"> _list;
 
 		///<summary>A list of all "+Sname+@".</summary>
-		public static List<"+typeClassName+@"> Listt{
+		public static List<"+typeClassName+@"> List {
 			get {
-				if(listt==null) {
+				if(_list==null) {
 					RefreshCache();
 				}
-				return listt;
+				return _list;
 			}
 			set {
-				listt=value;
+				_list=value;
 			}
 		}
 
@@ -269,7 +270,7 @@ namespace OpenDentBusiness{
 		///<summary></summary>
 		public static void FillCache(DataTable table){
 			//No need to check RemotingRole; no call to db.
-			listt=Crud."+typeClassName+@"Crud.TableToList(table);
+			_list=Crud."+typeClassName+@"Crud.TableToList(table);
 		}
 		#endregion
 		*/
