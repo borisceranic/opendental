@@ -164,11 +164,11 @@ namespace OpenDental {
 		public List<Provider> ProviderList;
 		private int pagesPrinted;
 		private int pageRow;
+		private int pageColumn;
 		private UI.Button butFamRecall;
 		private UI.Button butViewAppts;
 		private UI.Button butMakeRecall;
 		private Panel panelMakeButtons;
-		private int pageColumn;
 		private List<DisplayField> _aptBubbleDefs;
 		///<summary>This is a list of ApptViews that are available in comboView, which will be filtered for the currently selected clinic if clincs are
 		///enabled.  This list will contain the same number of items as comboView minus 1 for 'none' and is filled at the same time as comboView.
@@ -4627,21 +4627,8 @@ namespace OpenDental {
 			pd2=new PrintDocument();
 			pd2.PrintPage += new PrintPageEventHandler(this.pd2_PrintPage);
 			//pd2.DefaultPageSettings.Margins= new Margins(10,40,40,60);
-#if DEBUG
-			pView = new FormRpPrintPreview();
-			pView.printPreviewControl2.Document=pd2;
+			FormPrintPreview pView=new FormPrintPreview(PrintSituation.Appointments,pd2,0,"Daily appointment view for "+apptPrintStartTime.ToShortDateString()+" printed");
 			pView.ShowDialog();
-#else
-				if(!PrinterL.SetPrinter(pd2,PrintSituation.Appointments,0,"Daily appointment view for "+apptPrintStartTime.ToShortDateString()+" printed")){
-					return;
-				}
-				try{
-					pd2.Print();
-				}
-				catch{
-					MessageBox.Show(Lan.g(this,"Printer not available"));
-				}
-#endif
 		}
 
 		private void pd2_PrintPage(object sender,System.Drawing.Printing.PrintPageEventArgs e) {
@@ -4742,6 +4729,9 @@ namespace OpenDental {
 			pagesPrinted++;
 			pageColumn++;
 			if(totalPages==pagesPrinted) {
+				pagesPrinted=0;
+				pageRow=0;
+				pageColumn=0;
 				e.HasMorePages=false;
 			}
 			else {

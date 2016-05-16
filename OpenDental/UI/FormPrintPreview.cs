@@ -37,6 +37,17 @@ namespace OpenDental.UI{
 			AuditDescription=auditDescription;
 		}
 
+		///<summary>Must supply the printSituation so that when user clicks print, we know where to send it. PatNum and AuditDescription used to make audit log entry.  PatNum can be 0.  Audit Log Text will show AuditDescription exactly.</summary>
+		public FormPrintPreview(PrintSituation sit,PrintDocument document,long patNum,string auditDescription) {
+			InitializeComponent();// Required for Windows Form Designer support
+			Sit=sit;
+			Document=document;
+			TotalPages=0;
+			PatNumCur=patNum;
+			AuditDescription=auditDescription;
+		}
+
+
 		/// <summary>Clean up any resources being used.</summary>
 		protected override void Dispose( bool disposing )
 		{
@@ -134,8 +145,7 @@ namespace OpenDental.UI{
 					/(double)Document.DefaultPageSettings.PaperSize.Width);
 			}
 			printPreviewControl2.Document=Document;
-			ToolBarMain.Buttons["PageNum"].Text=(printPreviewControl2.StartPage+1).ToString()
-				+" / "+TotalPages.ToString();
+			SetPageNumText();
 		}
 
 		///<summary>Causes the toolbar to be laid out again.</summary>
@@ -206,19 +216,27 @@ namespace OpenDental.UI{
 		private void OnBack_Click(){
 			if(printPreviewControl2.StartPage==0) return;
 			printPreviewControl2.StartPage--;
-			ToolBarMain.Buttons["PageNum"].Text=(printPreviewControl2.StartPage+1).ToString()
-				+" / "+TotalPages.ToString();
+			SetPageNumText();
 			ToolBarMain.Invalidate();
 		}
 
 		private void OnFwd_Click(){
 			//if(printPreviewControl2.StartPage==totalPages-1) return;
 			printPreviewControl2.StartPage++;
-			ToolBarMain.Buttons["PageNum"].Text=(printPreviewControl2.StartPage+1).ToString()
-				+" / "+TotalPages.ToString();
+			SetPageNumText();
 			ToolBarMain.Invalidate();
 		}
 
+		///<summary>Sets the toolbar's pagenum text based on the total pages. If 0 total pages, only shows the current pagenum.</summary>
+		private void SetPageNumText() {
+			if(TotalPages==0) {
+				ToolBarMain.Buttons["PageNum"].Text=(printPreviewControl2.StartPage+1).ToString();
+			}
+			else {
+				ToolBarMain.Buttons["PageNum"].Text=(printPreviewControl2.StartPage+1).ToString()
+								+" / "+TotalPages.ToString();
+			}
+		}
 	
 	
 
