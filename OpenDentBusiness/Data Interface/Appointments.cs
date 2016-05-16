@@ -669,6 +669,7 @@ namespace OpenDentBusiness{
 			DataTable tableAppt=GetPeriodApptsTable(dateStart,dateEnd,0,false);
 			retVal.Tables.Add(tableAppt);
 			retVal.Tables.Add(Schedules.GetPeriodEmployeeSchedTable(dateStart,dateEnd,clinicNum));
+			retVal.Tables.Add(Schedules.GetPeriodProviderSchedTable(dateStart,dateEnd,clinicNum));
 			//retVal.Tables.Add(GetPeriodWaitingRoomTable(clinicNum));
 			retVal.Tables.Add(GetPeriodWaitingRoomTable());
 			retVal.Tables.Add(Schedules.GetPeriodSchedule(dateStart,dateEnd));
