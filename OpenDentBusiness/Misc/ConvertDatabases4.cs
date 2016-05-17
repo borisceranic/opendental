@@ -8,7 +8,7 @@ using System.Text;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("16.3.0.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("16.2.1.0");//This value must be changed when a new conversion is to be triggered.
 
 		#region Helper Functions
 
