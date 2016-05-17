@@ -220,6 +220,7 @@ namespace OpenDental {
 				butWebSchedEnable.Enabled=false;
 				listBoxWebSchedProviderPref.Enabled=false;
 				butRecallSchedSetup.Enabled=false;
+				butSetFeaturesPatientPortal.Enabled=false;
 				((Control)tabMobileOld).Enabled=false;
 			}
 		}
@@ -232,6 +233,25 @@ namespace OpenDental {
 				if(textRedirectUrlPatientPortal.Text=="") {
 					textRedirectUrlPatientPortal.Text=url;
 				}
+			}
+			catch(Exception ex) {
+				MessageBox.Show(ex.Message);
+			}
+		}
+		
+		private void butSetFeaturesPatientPortal_Click(object sender,EventArgs e) {
+			try {
+				string url=WebSerializer.DeserializePrimitiveOrThrow<string>(
+					_webServiceMain.BuildFeaturePortalUrl(PrefC.GetString(PrefName.RegistrationKey),eServiceCode.PatientPortal.ToString()));
+				WebBrowser webBrowser=new WebBrowser();
+				webBrowser.Navigate(new Uri(url));
+				webBrowser.Dock=DockStyle.Fill;
+				SecurityLogs.MakeLogEntry(Permissions.EServicesSetup,0,Lan.g(this,"Patient Portal features were accessed."));
+				ODForm form=new ODForm();
+				form.Size=new Size(500,500);
+				form.Controls.Add(webBrowser);
+				form.Text="Choose Features";
+				form.Show();				
 			}
 			catch(Exception ex) {
 				MessageBox.Show(ex.Message);
