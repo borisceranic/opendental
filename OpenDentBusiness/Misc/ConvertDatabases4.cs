@@ -994,8 +994,9 @@ namespace OpenDentBusiness {
 					command="ALTER TABLE payplan MODIFY IsClosed NOT NULL";
 					Db.NonQ(command);
 				}
-				//Get all payment plans that have been paid off and need to be "closed".
-				command="SELECT payplan.PayPlanNum,SUM(payplancharge.Principal) AS Princ,SUM(payplancharge.Interest) AS Interest,"
+				if(DataConnection.DBtype==DatabaseType.MySql) { //Oracle users will have to manually close payment plans.
+																												//Get all payment plans that have been paid off and need to be "closed".
+					command="SELECT payplan.PayPlanNum,SUM(payplancharge.Principal) AS Princ,SUM(payplancharge.Interest) AS Interest,"
 					+"COALESCE(ps.TotPayments,0) AS TotPay,COALESCE(cp.InsPayments,0) AS InsPay,"
 					+"MAX(payplancharge.ChargeDate) AS LastDate "
 					+"FROM payplan "
@@ -1011,18 +1012,19 @@ namespace OpenDentBusiness {
 						+"GROUP BY claimproc.PayPlanNum "
 					+")cp ON cp.PayPlanNum = payplan.PayPlanNum "
 					+"HAVING Princ+Interest <= (TotPay + InsPay) AND LastDate <="+Curdate();
-				table=Db.GetTable(command);
-				string payPlanNums="";
-				for(int i=0;i < table.Rows.Count;i++) {
-					if(i!=0) {
-						payPlanNums+=",";
+					table=Db.GetTable(command);
+					string payPlanNums="";
+					for(int i = 0;i < table.Rows.Count;i++) {
+						if(i!=0) {
+							payPlanNums+=",";
+						}
+						payPlanNums+=table.Rows[i]["PayPlanNum"];
 					}
-					payPlanNums+=table.Rows[i]["PayPlanNum"];
-				}
-				//Set all payment plans closed based on previous criteria.
-				if(payPlanNums!="") {
-					command="UPDATE payplan SET IsClosed=1 WHERE PayPlanNum IN ("+payPlanNums+")";
-					Db.NonQ(command);
+					//Set all payment plans closed based on previous criteria.
+					if(payPlanNums!="") {
+						command="UPDATE payplan SET IsClosed=1 WHERE PayPlanNum IN ("+payPlanNums+")";
+						Db.NonQ(command);
+					}
 				}
 				//add a payplancharge credit for all current payment plans
 				command="SELECT payplan.PayPlanNum,payplan.PatNum,payplan.Guarantor,payplan.PayPlanDate,payplan.PlanNum,payplan.CompletedAmt,"
@@ -1033,9 +1035,8 @@ namespace OpenDentBusiness {
 				if(DataConnection.DBtype==DatabaseType.MySql) {
 					command+="GROUP BY payplan.PayPlanNum";
 				}
-				else {
-					//TODO: make oracle compatible by grouping by every column that is not an aggregate. 
-					command+="GROUP BY payplan.PayPlanNum";
+				else { //oracle
+					command+="GROUP BY payplan.PayPlanNum,payplan.PatNum,payplan.Guarantor,payplan.PayPlanDate,payplan.PlanNum,payplan.CompletedAmt";
 				}
 				table=Db.GetTable(command);
 				for(int i=0;i<table.Rows.Count;i++) {
