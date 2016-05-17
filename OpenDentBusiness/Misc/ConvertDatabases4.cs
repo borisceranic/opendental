@@ -21,6 +21,7 @@ namespace OpenDentBusiness {
 
 		#endregion
 
+		///<summary>Oracle compatible: 05/17/2016</summary>
 		private static void To16_2_1() {
 			if(FromVersion<new Version("16.2.1.0")) {
 				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.2.1"));//No translation in convert script.
@@ -785,8 +786,11 @@ namespace OpenDentBusiness {
 				else {//oracle
 					foreach(DataRow row in table.Rows) {
 						groupNum=PIn.Long(row["UserGroupNum"].ToString());
-						command="INSERT INTO grouppermission (GroupPermNum,UserGroupNum,PermType) "
-							+"VALUES((SELECT MAX(GroupPermNum)+1 FROM grouppermission),"+POut.Long(groupNum)+",118)";//118 - ClaimDelete
+						command="INSERT INTO grouppermission (GroupPermNum,NewerDate,NewerDays,UserGroupNum,PermType) "
+							+"VALUES((SELECT MAX(GroupPermNum)+1 FROM grouppermission)"
+							+",TO_DATE('0001-01-01','YYYY-MM-DD')"
+							+",0"
+							+","+POut.Long(groupNum)+",118)";//118 - ClaimDelete
 						Db.NonQ(command);
 					}
 				}
@@ -905,8 +909,11 @@ namespace OpenDentBusiness {
 				else {//oracle
 					foreach(DataRow row in table.Rows) {
 						groupNum=PIn.Long(row["UserGroupNum"].ToString());
-						command="INSERT INTO grouppermission (GroupPermNum,UserGroupNum,PermType) "
-							+"VALUES((SELECT MAX(GroupPermNum)+1 FROM grouppermission),"+POut.Long(groupNum)+",119)";//119 - InsWriteOffEdit
+						command="INSERT INTO grouppermission (GroupPermNum,NewerDate,NewerDays,UserGroupNum,PermType) "
+							+"VALUES((SELECT MAX(GroupPermNum)+1 FROM grouppermission)"
+							+",TO_DATE('0001-01-01','YYYY-MM-DD')"
+							+",0"
+							+","+POut.Long(groupNum)+",119)";//119 - InsWriteOffEdit
 						Db.NonQ(command);
 					}
 				}
@@ -995,7 +1002,7 @@ namespace OpenDentBusiness {
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) { //Oracle users will have to manually close payment plans.
-																												//Get all payment plans that have been paid off and need to be "closed".
+					//Get all payment plans that have been paid off and need to be "closed".
 					command="SELECT payplan.PayPlanNum,SUM(payplancharge.Principal) AS Princ,SUM(payplancharge.Interest) AS Interest,"
 					+"COALESCE(ps.TotPayments,0) AS TotPay,COALESCE(cp.InsPayments,0) AS InsPay,"
 					+"MAX(payplancharge.ChargeDate) AS LastDate "
@@ -1036,7 +1043,9 @@ namespace OpenDentBusiness {
 					command+="GROUP BY payplan.PayPlanNum";
 				}
 				else { //oracle
-					command+="GROUP BY payplan.PayPlanNum,payplan.PatNum,payplan.Guarantor,payplan.PayPlanDate,payplan.PlanNum,payplan.CompletedAmt";
+					command+="GROUP BY payplan.PayPlanNum,payplan.PatNum,payplan.Guarantor,payplan.PayPlanDate,payplan.PlanNum,payplan.CompletedAmt"
+						+",COALESCE(payplancharge.ProvNum,patient.PriProv)"
+						+",COALESCE(payplancharge.ClinicNum,patient.ClinicNum)";
 				}
 				table=Db.GetTable(command);
 				for(int i=0;i<table.Rows.Count;i++) {
