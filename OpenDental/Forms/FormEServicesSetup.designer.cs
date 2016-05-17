@@ -165,6 +165,7 @@ namespace OpenDental{
 			this.button7 = new OpenDental.UI.Button();
 			this.label37 = new System.Windows.Forms.Label();
 			this.butClose = new OpenDental.UI.Button();
+			this.butSetFeaturesPatientPortal = new OpenDental.UI.Button();
 			this.groupBoxNotification.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			this.tabControl.SuspendLayout();
@@ -291,6 +292,7 @@ namespace OpenDental{
 			// 
 			this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupBox1.Controls.Add(this.butSetFeaturesPatientPortal);
 			this.groupBox1.Controls.Add(this.butGetUrlPatientPortal);
 			this.groupBox1.Controls.Add(this.textOpenDentalUrlPatientPortal);
 			this.groupBox1.Controls.Add(this.label2);
@@ -1925,6 +1927,21 @@ namespace OpenDental{
 			this.butClose.UseVisualStyleBackColor = true;
 			this.butClose.Click += new System.EventHandler(this.butClose_Click);
 			// 
+			// butSetFeaturesPatientPortal
+			// 
+			this.butSetFeaturesPatientPortal.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butSetFeaturesPatientPortal.Autosize = true;
+			this.butSetFeaturesPatientPortal.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butSetFeaturesPatientPortal.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butSetFeaturesPatientPortal.CornerRadius = 4F;
+			this.butSetFeaturesPatientPortal.Location = new System.Drawing.Point(580, 47);
+			this.butSetFeaturesPatientPortal.Name = "butSetFeaturesPatientPortal";
+			this.butSetFeaturesPatientPortal.Size = new System.Drawing.Size(83, 23);
+			this.butSetFeaturesPatientPortal.TabIndex = 56;
+			this.butSetFeaturesPatientPortal.Text = "Set Features...";
+			this.butSetFeaturesPatientPortal.UseVisualStyleBackColor = true;
+			this.butSetFeaturesPatientPortal.Click += new System.EventHandler(this.butSetFeaturesPatientPortal_Click);
+			// 
 			// FormEServicesSetup
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -1934,7 +1951,6 @@ namespace OpenDental{
 			this.Controls.Add(this.tabControl);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormEServicesSetup";
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "eServices Setup";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FormPatientPortalSetup_FormClosed);
 			this.Load += new System.EventHandler(this.FormEServicesSetup_Load);
@@ -2113,5 +2129,6 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label38;
 		private UI.Button butDefaultClinic;
 		private UI.Button butDefaultClinicClear;
+		private UI.Button butSetFeaturesPatientPortal;
 	}
 }

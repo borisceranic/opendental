@@ -59,6 +59,21 @@
           </s:sequence>
         </s:complexType>
       </s:element>
+      <s:element name="BuildFeaturePortalUrl">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="registrationKey" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="eService" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="BuildFeaturePortalUrlResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="BuildFeaturePortalUrlResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
       <s:element name="ValidateVersion">
         <s:complexType>
           <s:sequence>
@@ -173,18 +188,17 @@
           </s:sequence>
         </s:complexType>
       </s:element>
-      <s:element name="GetFeaturesForEService">
+      <s:element name="GetFeaturesForCustomer">
         <s:complexType>
           <s:sequence>
             <s:element minOccurs="0" maxOccurs="1" name="registrationKey" type="s:string" />
-            <s:element minOccurs="0" maxOccurs="1" name="eService" type="s:string" />
           </s:sequence>
         </s:complexType>
       </s:element>
-      <s:element name="GetFeaturesForEServiceResponse">
+      <s:element name="GetFeaturesForCustomerResponse">
         <s:complexType>
           <s:sequence>
-            <s:element minOccurs="0" maxOccurs="1" name="GetFeaturesForEServiceResult" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="GetFeaturesForCustomerResult" type="s:string" />
           </s:sequence>
         </s:complexType>
       </s:element>
@@ -228,6 +242,12 @@
   </wsdl:message>
   <wsdl:message name="BuildWebLanderUrlSoapOut">
     <wsdl:part name="parameters" element="tns:BuildWebLanderUrlResponse" />
+  </wsdl:message>
+  <wsdl:message name="BuildFeaturePortalUrlSoapIn">
+    <wsdl:part name="parameters" element="tns:BuildFeaturePortalUrl" />
+  </wsdl:message>
+  <wsdl:message name="BuildFeaturePortalUrlSoapOut">
+    <wsdl:part name="parameters" element="tns:BuildFeaturePortalUrlResponse" />
   </wsdl:message>
   <wsdl:message name="ValidateVersionSoapIn">
     <wsdl:part name="parameters" element="tns:ValidateVersion" />
@@ -277,11 +297,11 @@
   <wsdl:message name="ValidateEServiceSoapOut">
     <wsdl:part name="parameters" element="tns:ValidateEServiceResponse" />
   </wsdl:message>
-  <wsdl:message name="GetFeaturesForEServiceSoapIn">
-    <wsdl:part name="parameters" element="tns:GetFeaturesForEService" />
+  <wsdl:message name="GetFeaturesForCustomerSoapIn">
+    <wsdl:part name="parameters" element="tns:GetFeaturesForCustomer" />
   </wsdl:message>
-  <wsdl:message name="GetFeaturesForEServiceSoapOut">
-    <wsdl:part name="parameters" element="tns:GetFeaturesForEServiceResponse" />
+  <wsdl:message name="GetFeaturesForCustomerSoapOut">
+    <wsdl:part name="parameters" element="tns:GetFeaturesForCustomerResponse" />
   </wsdl:message>
   <wsdl:message name="EnableAdditionalFeaturesSoapIn">
     <wsdl:part name="parameters" element="tns:EnableAdditionalFeatures" />
@@ -312,6 +332,13 @@
     <wsdl:part name="eService" type="s:string" />
   </wsdl:message>
   <wsdl:message name="BuildWebLanderUrlHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="BuildFeaturePortalUrlHttpPostIn">
+    <wsdl:part name="registrationKey" type="s:string" />
+    <wsdl:part name="eService" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="BuildFeaturePortalUrlHttpPostOut">
     <wsdl:part name="Body" element="tns:string" />
   </wsdl:message>
   <wsdl:message name="ValidateVersionHttpPostIn">
@@ -364,11 +391,10 @@
   <wsdl:message name="ValidateEServiceHttpPostOut">
     <wsdl:part name="Body" element="tns:string" />
   </wsdl:message>
-  <wsdl:message name="GetFeaturesForEServiceHttpPostIn">
+  <wsdl:message name="GetFeaturesForCustomerHttpPostIn">
     <wsdl:part name="registrationKey" type="s:string" />
-    <wsdl:part name="eService" type="s:string" />
   </wsdl:message>
-  <wsdl:message name="GetFeaturesForEServiceHttpPostOut">
+  <wsdl:message name="GetFeaturesForCustomerHttpPostOut">
     <wsdl:part name="Body" element="tns:string" />
   </wsdl:message>
   <wsdl:message name="EnableAdditionalFeaturesHttpPostIn">
@@ -393,6 +419,10 @@
     <wsdl:operation name="BuildWebLanderUrl">
       <wsdl:input message="tns:BuildWebLanderUrlSoapIn" />
       <wsdl:output message="tns:BuildWebLanderUrlSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="BuildFeaturePortalUrl">
+      <wsdl:input message="tns:BuildFeaturePortalUrlSoapIn" />
+      <wsdl:output message="tns:BuildFeaturePortalUrlSoapOut" />
     </wsdl:operation>
     <wsdl:operation name="ValidateVersion">
       <wsdl:input message="tns:ValidateVersionSoapIn" />
@@ -426,9 +456,9 @@
       <wsdl:input message="tns:ValidateEServiceSoapIn" />
       <wsdl:output message="tns:ValidateEServiceSoapOut" />
     </wsdl:operation>
-    <wsdl:operation name="GetFeaturesForEService">
-      <wsdl:input message="tns:GetFeaturesForEServiceSoapIn" />
-      <wsdl:output message="tns:GetFeaturesForEServiceSoapOut" />
+    <wsdl:operation name="GetFeaturesForCustomer">
+      <wsdl:input message="tns:GetFeaturesForCustomerSoapIn" />
+      <wsdl:output message="tns:GetFeaturesForCustomerSoapOut" />
     </wsdl:operation>
     <wsdl:operation name="EnableAdditionalFeatures">
       <wsdl:input message="tns:EnableAdditionalFeaturesSoapIn" />
@@ -451,6 +481,10 @@
     <wsdl:operation name="BuildWebLanderUrl">
       <wsdl:input message="tns:BuildWebLanderUrlHttpPostIn" />
       <wsdl:output message="tns:BuildWebLanderUrlHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="BuildFeaturePortalUrl">
+      <wsdl:input message="tns:BuildFeaturePortalUrlHttpPostIn" />
+      <wsdl:output message="tns:BuildFeaturePortalUrlHttpPostOut" />
     </wsdl:operation>
     <wsdl:operation name="ValidateVersion">
       <wsdl:input message="tns:ValidateVersionHttpPostIn" />
@@ -484,9 +518,9 @@
       <wsdl:input message="tns:ValidateEServiceHttpPostIn" />
       <wsdl:output message="tns:ValidateEServiceHttpPostOut" />
     </wsdl:operation>
-    <wsdl:operation name="GetFeaturesForEService">
-      <wsdl:input message="tns:GetFeaturesForEServiceHttpPostIn" />
-      <wsdl:output message="tns:GetFeaturesForEServiceHttpPostOut" />
+    <wsdl:operation name="GetFeaturesForCustomer">
+      <wsdl:input message="tns:GetFeaturesForCustomerHttpPostIn" />
+      <wsdl:output message="tns:GetFeaturesForCustomerHttpPostOut" />
     </wsdl:operation>
     <wsdl:operation name="EnableAdditionalFeatures">
       <wsdl:input message="tns:EnableAdditionalFeaturesHttpPostIn" />
@@ -524,6 +558,15 @@
     </wsdl:operation>
     <wsdl:operation name="BuildWebLanderUrl">
       <soap:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/BuildWebLanderUrl" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="BuildFeaturePortalUrl">
+      <soap:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/BuildFeaturePortalUrl" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -603,8 +646,8 @@
         <soap:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="GetFeaturesForEService">
-      <soap:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/GetFeaturesForEService" style="document" />
+    <wsdl:operation name="GetFeaturesForCustomer">
+      <soap:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/GetFeaturesForCustomer" style="document" />
       <wsdl:input>
         <soap:body use="literal" />
       </wsdl:input>
@@ -653,6 +696,15 @@
     </wsdl:operation>
     <wsdl:operation name="BuildWebLanderUrl">
       <soap12:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/BuildWebLanderUrl" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="BuildFeaturePortalUrl">
+      <soap12:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/BuildFeaturePortalUrl" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -732,8 +784,8 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="GetFeaturesForEService">
-      <soap12:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/GetFeaturesForEService" style="document" />
+    <wsdl:operation name="GetFeaturesForCustomer">
+      <soap12:operation soapAction="https://www.opendental.com/OpenDentalWebServiceHQ/GetFeaturesForCustomer" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -782,6 +834,15 @@
     </wsdl:operation>
     <wsdl:operation name="BuildWebLanderUrl">
       <http:operation location="/BuildWebLanderUrl" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="BuildFeaturePortalUrl">
+      <http:operation location="/BuildFeaturePortalUrl" />
       <wsdl:input>
         <mime:content type="application/x-www-form-urlencoded" />
       </wsdl:input>
@@ -861,8 +922,8 @@
         <mime:mimeXml part="Body" />
       </wsdl:output>
     </wsdl:operation>
-    <wsdl:operation name="GetFeaturesForEService">
-      <http:operation location="/GetFeaturesForEService" />
+    <wsdl:operation name="GetFeaturesForCustomer">
+      <http:operation location="/GetFeaturesForCustomer" />
       <wsdl:input>
         <mime:content type="application/x-www-form-urlencoded" />
       </wsdl:input>
@@ -882,13 +943,13 @@
   </wsdl:binding>
   <wsdl:service name="WebServiceMainHQ">
     <wsdl:port name="WebServiceMainHQSoap" binding="tns:WebServiceMainHQSoap">
-      <soap:address location="http://localhost:64111/webservicemainhq.asmx" />
+      <soap:address location="http://localhost/OpenDentalWebServiceHQ/webservicemainhq.asmx" />
     </wsdl:port>
     <wsdl:port name="WebServiceMainHQSoap12" binding="tns:WebServiceMainHQSoap12">
-      <soap12:address location="http://localhost:64111/webservicemainhq.asmx" />
+      <soap12:address location="http://localhost/OpenDentalWebServiceHQ/webservicemainhq.asmx" />
     </wsdl:port>
     <wsdl:port name="WebServiceMainHQHttpPost" binding="tns:WebServiceMainHQHttpPost">
-      <http:address location="http://localhost:64111/webservicemainhq.asmx" />
+      <http:address location="http://localhost/OpenDentalWebServiceHQ/webservicemainhq.asmx" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

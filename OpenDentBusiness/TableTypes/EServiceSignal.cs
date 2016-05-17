@@ -72,6 +72,8 @@ namespace OpenDentBusiness {
 		///<summary>EService WebApp.</summary>		
 		WebForms,
 		///<summary>EService WebApp.</summary>		
-		ResellerPortal
+		ResellerPortal,
+		///<summary>EService WebApp.</summary>		
+		FeaturePortal,
 	}
 }
