@@ -11,7 +11,6 @@ namespace OpenDental {
 	public partial class FormEhrLabOrderEdit2014:ODForm {
 		long PatCurNum;
 		public EhrLab EhrLabCur;
-		private EhrLab ParentLab;
 		public bool IsNew;
 		public bool IsImport;
 		public bool IsViewOnly;
@@ -466,11 +465,11 @@ namespace OpenDental {
 			if(e.Col!=0) {
 				return;
 			}
-			FormInfobutton FormIB=new FormInfobutton();
-			if(PatCurNum!=null && PatCurNum>0) {
+			List<KnowledgeRequest> listKnowledgeRequests=EhrTriggers.ConvertToKnowledgeRequests(EhrLabCur.ListEhrLabResults[e.Row]);
+			FormInfobutton FormIB=new FormInfobutton(listKnowledgeRequests);
+			if(PatCurNum>0) {
 				FormIB.PatCur=Patients.GetPat(PatCurNum);
 			}
-			FormIB.ListObjects.Add(EhrLabCur.ListEhrLabResults[e.Row]);
 			FormIB.ShowDialog();
 		}
 

@@ -20,7 +20,7 @@ namespace OpenDental {
 		///<summary>Usually filled from within the form by using Patcur.PriProv</summary>
 		public Provider ProvCur;
 		///<summary>Knowledge request objects, possible object types are: DiseaseDef, Medication, LabResult, ICD9, Icd10, Snomed, RxNorm, Loinc, or LabResult.  Should not break if unsupported objects are in list.</summary>
-		public List<object> ListObjects;
+		private List<KnowledgeRequest> _listKnowledgeRequests;
 		//public List<DiseaseDef> ListProblems;//should this be named disease or problem? Also snomed/medication
 		//public List<Medication> ListMedications;
 		//public List<LabResult> ListLabResults;
@@ -36,7 +36,13 @@ namespace OpenDental {
 		private CultureInfo[] arrayCultures;
 
 		public FormInfobutton() {
-			ListObjects=new List<object>();
+			_listKnowledgeRequests=new List<KnowledgeRequest>();
+			InitializeComponent();
+			Lan.F(this);
+		}
+
+		public FormInfobutton(List<KnowledgeRequest> listKnowledgeRequests) {
+			_listKnowledgeRequests=listKnowledgeRequests;
 			InitializeComponent();
 			Lan.F(this);
 		}
@@ -141,165 +147,13 @@ namespace OpenDental {
 			gridMain.Columns.Add(col);
 			gridMain.Rows.Clear();
 			ODGridRow row;
-			for(int i=0;i<ListObjects.Count;i++) {
+			foreach(KnowledgeRequest knowRequest in _listKnowledgeRequests) {
 				row=new ODGridRow();
-				switch(ListObjects[i].GetType().ToString().Split(new string[]{"."},StringSplitOptions.None)[1]) {
-					case "DiseaseDef":
-						if(((DiseaseDef)ListObjects[i]).ICD9Code!="") {
-							row=new ODGridRow();//just in case;
-							ICD9 icd9=ICD9s.GetByCode(((DiseaseDef)ListObjects[i]).ICD9Code);
-							row.Cells.Add("Problem");
-							row.Cells.Add(icd9.ICD9Code);
-							row.Cells.Add("ICD9-CM");
-							row.Cells.Add(icd9.Description);
-							row.Tag=icd9;
-							gridMain.Rows.Add(row);
-						}
-						if(((DiseaseDef)ListObjects[i]).SnomedCode!="") {
-							row=new ODGridRow();//just in case
-							Snomed snomed=Snomeds.GetByCode(((DiseaseDef)ListObjects[i]).SnomedCode);
-							row.Cells.Add("Problem");
-							row.Cells.Add(snomed.SnomedCode);
-							row.Cells.Add("SNOMED CT");
-							row.Cells.Add(snomed.Description);
-							row.Tag=snomed;
-							gridMain.Rows.Add(row);
-						}
-						if(((DiseaseDef)ListObjects[i]).Icd10Code!="") {
-							row=new ODGridRow();//just in case
-							row.Cells.Add("Problem");
-							Icd10 icd10=Icd10s.GetByCode(((DiseaseDef)ListObjects[i]).Icd10Code);
-							row.Cells.Add(icd10.Icd10Code);
-							row.Cells.Add("ICD10");
-							row.Cells.Add(icd10.Description);
-							row.Tag=icd10;
-							gridMain.Rows.Add(row);
-						}
-						if(((DiseaseDef)ListObjects[i]).ICD9Code!=""
-							&& ((DiseaseDef)ListObjects[i]).SnomedCode!=""
-							&& ((DiseaseDef)ListObjects[i]).Icd10Code!="") 
-						{
-							row=new ODGridRow();//just in case
-							row.Cells.Add("Problem");
-							row.Cells.Add("none");
-							row.Cells.Add("none");
-							row.Cells.Add(((DiseaseDef)ListObjects[i]).DiseaseName);
-							row.Tag=null;
-							gridMain.Rows.Add(row);
-						}
-						continue;//not break, because we have already added the rows.
-					case "Medication":
-						if(((Medication)ListObjects[i]).RxCui!=0) {
-							row=new ODGridRow();//just in case
-							row.Cells.Add("Medication");
-							RxNorm rxNorm=RxNorms.GetByRxCUI(((Medication)ListObjects[i]).RxCui.ToString());
-							row.Cells.Add(rxNorm.RxCui);
-							row.Cells.Add("RxNorm");
-							row.Cells.Add(rxNorm.Description);
-							row.Tag=rxNorm;
-							gridMain.Rows.Add(row);
-						}
-						if(((Medication)ListObjects[i]).RxCui==0) {
-							row=new ODGridRow();//just in case
-							row.Cells.Add("Medication");
-							row.Cells.Add("none");
-							row.Cells.Add("none");
-							row.Cells.Add(((Medication)ListObjects[i]).MedName);
-							row.Tag=ListObjects[i];
-							gridMain.Rows.Add(row);
-						}
-						continue;
-					case "MedicationPat":
-						if(((MedicationPat)ListObjects[i]).RxCui!=0) {
-							row=new ODGridRow();//just in case
-							row.Cells.Add("Medication");
-							RxNorm rxNorm=RxNorms.GetByRxCUI(((MedicationPat)ListObjects[i]).RxCui.ToString());
-							row.Cells.Add(rxNorm.RxCui);
-							row.Cells.Add("RxNorm");
-							row.Cells.Add(rxNorm.Description);
-							row.Tag=rxNorm;
-							gridMain.Rows.Add(row);
-						}
-						if(((MedicationPat)ListObjects[i]).MedDescript!="") {
-							row=new ODGridRow();//just in case
-							row.Cells.Add("Medication");
-							row.Cells.Add("none");
-							row.Cells.Add("none");
-							row.Cells.Add(((MedicationPat)ListObjects[i]).MedDescript);
-							row.Tag=ListObjects[i];
-							gridMain.Rows.Add(row);
-						}
-						continue;
-					case "ICD9":
-						ICD9 icd9Obj=(ICD9)ListObjects[i];
-						row.Cells.Add("Code");
-						row.Cells.Add(icd9Obj.ICD9Code);
-						row.Cells.Add("ICD9 CM");
-						row.Cells.Add(icd9Obj.Description);
-						row.Tag=icd9Obj;
-						break;
-					case "Snomed":
-						Snomed snomedObj=(Snomed)ListObjects[i];
-						row.Cells.Add("Code");
-						row.Cells.Add(snomedObj.SnomedCode);
-						row.Cells.Add("SNOMED CT");
-						row.Cells.Add(snomedObj.Description);
-						row.Tag=snomedObj;
-						break;
-					case "Icd10":
-						Icd10 icd10Obj=(Icd10)ListObjects[i];
-						row.Cells.Add("Code");
-						row.Cells.Add(icd10Obj.Icd10Code);
-						row.Cells.Add("ICD10 CM");
-						row.Cells.Add(icd10Obj.Description);
-						row.Tag=icd10Obj;
-						break;
-					case "RxNorm":
-						RxNorm rxNormObj=(RxNorm)ListObjects[i];
-						row.Cells.Add("Code");
-						row.Cells.Add(rxNormObj.RxCui);
-						row.Cells.Add("RxNorm");
-						row.Cells.Add(rxNormObj.Description);
-						row.Tag=rxNormObj;
-						break;
-					//case "LabResult"://Deprecated
-						//TODO
-						//Loinc loincObj=(Loinc)ListObjects[i];
-						//row.Cells.Add("Code");
-						//row.Cells.Add(loincObj.LoincCode);
-						//row.Cells.Add("LOINC");
-						//row.Cells.Add(loincObj.NameShort);
-						//row.Tag=loincObj;
-						//break;
-					case "EhrLabResult":
-						EhrLabResult ehrLabResultObj=(EhrLabResult)ListObjects[i];
-						row.Cells.Add("Lab Result");
-						if(ehrLabResultObj.ObservationIdentifierID!="") {//1st triplet
-							row.Cells.Add(ehrLabResultObj.ObservationIdentifierID);
-							row.Cells.Add("LOINC");
-							row.Cells.Add(ehrLabResultObj.ObservationIdentifierText);
-						}
-						else if(ehrLabResultObj.ObservationIdentifierIDAlt!="") {//second triplet
-							row.Cells.Add(ehrLabResultObj.ObservationIdentifierIDAlt);
-							row.Cells.Add("LOINC");
-							row.Cells.Add(ehrLabResultObj.ObservationIdentifierTextAlt);
-						}
-						else {
-							row.Cells.Add("");
-							row.Cells.Add("UNK");
-							row.Cells.Add("Unknown");
-						}
-						row.Tag=ehrLabResultObj;
-						break;
-					case "Loinc":
-						Loinc loincObj=(Loinc)ListObjects[i];
-						row.Cells.Add("Code");
-						row.Cells.Add(loincObj.LoincCode);
-						row.Cells.Add("LOINC");
-						row.Cells.Add(loincObj.NameShort);
-						row.Tag=loincObj;
-						break;
-				}
+				row.Cells.Add(knowRequest.Type);
+				row.Cells.Add(knowRequest.Code);
+				row.Cells.Add(knowRequest.GetCodeSystemDisplay());
+				row.Cells.Add(knowRequest.Description);
+				row.Tag=knowRequest;
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
@@ -1143,7 +997,7 @@ namespace OpenDental {
 			if(FormDD.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			ListObjects.Add(DiseaseDefs.GetItem(FormDD.SelectedDiseaseDefNum));
+			EhrTriggers.ConvertToKnowledgeRequests(DiseaseDefs.GetItem(FormDD.SelectedDiseaseDefNum)).ForEach(x=>_listKnowledgeRequests.Add(x));
 			fillKnowledgeRequestitems();
 		}
 
@@ -1155,8 +1009,8 @@ namespace OpenDental {
 				return;
 			}
 			for(int i=0;i<FormS.ListSelectedSnomeds.Count;i++) {
-				ListObjects.Add(FormS.ListSelectedSnomeds[i]);
-			}
+				EhrTriggers.ConvertToKnowledgeRequests(FormS.ListSelectedSnomeds[i]).ForEach(x=>_listKnowledgeRequests.Add(x));
+			}			
 			fillKnowledgeRequestitems();
 		}
 
@@ -1168,8 +1022,8 @@ namespace OpenDental {
 				return;
 			}
 			for(int i=0;i<FormRXN.ListSelectedRxNorms.Count;i++) {
-				ListObjects.Add(FormRXN.ListSelectedRxNorms[i]);
-			}
+				EhrTriggers.ConvertToKnowledgeRequests(FormRXN.ListSelectedRxNorms[i]).ForEach(x=>_listKnowledgeRequests.Add(x));
+			}	
 			fillKnowledgeRequestitems();
 		}
 
@@ -1180,7 +1034,7 @@ namespace OpenDental {
 			if(FormI9.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			ListObjects.Add(FormI9.SelectedIcd9);
+			EhrTriggers.ConvertToKnowledgeRequests(FormI9.SelectedIcd9).ForEach(x=>_listKnowledgeRequests.Add(x));
 			fillKnowledgeRequestitems();
 		}
 
@@ -1191,7 +1045,7 @@ namespace OpenDental {
 			if(FormA.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			ListObjects.Add(AllergyDefs.GetOne(FormA.SelectedAllergyDefNum));
+			EhrTriggers.ConvertToKnowledgeRequests(AllergyDefs.GetOne(FormA.SelectedAllergyDefNum)).ForEach(x => _listKnowledgeRequests.Add(x));
 			fillKnowledgeRequestitems();
 		}
 
@@ -1202,7 +1056,7 @@ namespace OpenDental {
 			if(FormI10.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			ListObjects.Add(FormI10.SelectedIcd10);
+			EhrTriggers.ConvertToKnowledgeRequests(FormI10.SelectedIcd10).ForEach(x => _listKnowledgeRequests.Add(x));
 			fillKnowledgeRequestitems();
 		}
 
@@ -1213,7 +1067,7 @@ namespace OpenDental {
 			if(FormL.DialogResult!=DialogResult.OK) {
 				return;
 			}
-			ListObjects.Add(FormL.SelectedLoinc);
+			EhrTriggers.ConvertToKnowledgeRequests(FormL.SelectedLoinc).ForEach(x => _listKnowledgeRequests.Add(x));
 			fillKnowledgeRequestitems();
 		}
 
@@ -1224,8 +1078,10 @@ namespace OpenDental {
 					MsgBox.Show(this,"Cannot search without a valid code.");
 					continue;
 				}
-				krn = new KnowledgeRequestNotification.KnowledgeRequestNotification();
-				krn.AddObject(gridMain.Rows[i].Tag);
+				krn=new KnowledgeRequestNotification.KnowledgeRequestNotification();
+				krn.AddKnowledgeRequest((KnowledgeRequest)gridMain.Rows[i].Tag);
+				krn.performerIsPatient=radioReqPat.Checked;
+				krn.recipientIsPatient=radioRecPat.Checked;
 				MsgBoxCopyPaste msgbox=new MsgBoxCopyPaste("http://apps.nlm.nih.gov/medlineplus/services/mpconnect.cfm?"+krn.ToUrl());
 				msgbox.ShowDialog();
 				//msgbox=new MsgBoxCopyPaste("http://apps2.nlm.nih.gov/medlineplus/services/servicedemo.cfm?"+krn.ToUrl());
@@ -1241,8 +1097,8 @@ namespace OpenDental {
 					MsgBox.Show(this,"Cannot search without a valid code.");
 					continue;
 				}
-				krn = new KnowledgeRequestNotification.KnowledgeRequestNotification();
-				krn.AddObject(gridMain.Rows[i].Tag);
+				krn=new KnowledgeRequestNotification.KnowledgeRequestNotification();
+				krn.AddKnowledgeRequest((KnowledgeRequest)gridMain.Rows[i].Tag);
 				krn.performerIsPatient=radioReqPat.Checked;
 				krn.recipientIsPatient=radioRecPat.Checked;
 				//FormInfobuttonResponse FormIR = new FormInfobuttonResponse();
@@ -1253,7 +1109,7 @@ namespace OpenDental {
 					System.Diagnostics.Process.Start("http://apps.nlm.nih.gov/medlineplus/services/mpconnect.cfm?"+krn.ToUrl());
 					//System.Diagnostics.Process.Start("http://apps2.nlm.nih.gov/medlineplus/services/servicedemo.cfm?"+krn.ToUrl());
 				}
-				catch(Exception ex) { }
+				catch(Exception) { }
 			}//end gridMain.Rows
 
 		}
@@ -1445,78 +1301,41 @@ namespace KnowledgeRequestNotification {
 			componentOf=new Component1();
 		}
 
-		public void AddObject(object obj) {
-			switch(obj.GetType().Name) {
-				case "Snomed":
-					AddCode((Snomed)obj);
+		public void AddKnowledgeRequest(KnowledgeRequest knowRequest) {
+			switch(knowRequest.CodeSystem) {
+				case CodeSyst.Snomed:
+					subject4List.Add(new Subject3(new Value(knowRequest.Code,"2.16.840.1.113883.6.96","SNOMEDCT",knowRequest.Description)));
+					subject4List[subject4List.Count-1].mainSearchCriteria.originalText=knowRequest.Description;
 					break;
-				case "ICD9":
-					AddCode((ICD9)obj);
+				case CodeSyst.Icd9:
+					subject4List.Add(new Subject3(new Value(knowRequest.Code,"2.16.840.1.113883.6.103","ICD9CM",knowRequest.Description)));
+					subject4List[subject4List.Count-1].mainSearchCriteria.originalText=knowRequest.Description;
 					break;
-				case "Icd10":
-					AddCode((Icd10)obj);
+				case CodeSyst.Icd10:
+					subject4List.Add(new Subject3(new Value(knowRequest.Code,"2.16.840.1.113883.6.90","ICD10CM",knowRequest.Description)));
+					subject4List[subject4List.Count-1].mainSearchCriteria.originalText=knowRequest.Description;
 					break;
-				case "RxNorm":
-					AddCode((RxNorm)obj);
+				case CodeSyst.RxNorm:
+					subject4List.Add(new Subject3(new Value(knowRequest.Code,"2.16.840.1.113883.6.88","RxNorm",knowRequest.Description)));
+					subject4List[subject4List.Count-1].mainSearchCriteria.originalText=knowRequest.Description;
 					break;
-				case "Loinc":
-					AddCode((Loinc)obj);
+				case CodeSyst.Loinc:
+					subject4List.Add(new Subject3(new Value(knowRequest.Code,"2.16.840.1.113883.6.1","LOINC",knowRequest.Description)));
+					subject4List[subject4List.Count-1].mainSearchCriteria.originalText=knowRequest.Description;
 					break;
-				//case "LabResult"://Deprecated
-				//	AddLabResult((LabResult)obj);
-				//	break;
-				case "EhrLabResult":
-					AddLabResult((EhrLabResult)obj);
+				case CodeSyst.AllergyDef:
+					subject4List.Add(new Subject3(new Value("","","",knowRequest.Description.Replace("Allergy -",""))));
+					subject4List[subject4List.Count-1].mainSearchCriteria.originalText=knowRequest.Description.Replace("Allergy -","");
 					break;
+				case CodeSyst.ProblemDef:
+					subject4List.Add(new Subject3(new Value("","","",knowRequest.Description.Replace("Problem -",""))));
+					subject4List[subject4List.Count-1].mainSearchCriteria.originalText=knowRequest.Description.Replace("Problem -","");
+					break;
+					//case "LabResult"://Deprecated
+					//	AddLabResult((LabResult)obj);
+					//	break;
 			}
-		}
-
-		public void AddCode(Snomed snomed) {
-			subject4List.Add(new Subject3(new Value(snomed.SnomedCode,"2.16.840.1.113883.6.96","SNOMEDCT",snomed.Description)));
-			subject4List[subject4List.Count-1].mainSearchCriteria.originalText=snomed.Description;
-		}
-
-		public void AddCode(ICD9 icd9) {
-			subject4List.Add(new Subject3(new Value(icd9.ICD9Code,"2.16.840.1.113883.6.103","ICD9CM",icd9.Description)));
-			subject4List[subject4List.Count-1].mainSearchCriteria.originalText=icd9.Description;
-		}
-
-		public void AddCode(Icd10 icd10) {
-			subject4List.Add(new Subject3(new Value(icd10.Icd10Code,"2.16.840.1.113883.6.90","ICD10CM",icd10.Description)));
-			subject4List[subject4List.Count-1].mainSearchCriteria.originalText=icd10.Description;
-		}
-
-		public void AddCode(RxNorm rxNorm) {
-			subject4List.Add(new Subject3(new Value(rxNorm.RxCui,"2.16.840.1.113883.6.88","RxNorm",rxNorm.Description)));
-			subject4List[subject4List.Count-1].mainSearchCriteria.originalText=rxNorm.Description;
-		}
-
-		public void AddCode(Loinc loinc) {
-			//TODO: lab values? no, add LabResult Instead
-			subject4List.Add(new Subject3(new Value(loinc.LoincCode,"2.16.840.1.113883.6.1","LOINC",loinc.NameShort)));
-			subject4List[subject4List.Count-1].mainSearchCriteria.originalText=loinc.NameShort;
-		}
-
-		//public void AddLabResult(LabResult labResult) {
-		//	if(labResult.TestID==null || labResult.TestID=="") {
-		//		return;
-		//	}
-		//	Loinc loinc=Loincs.GetByCode(labResult.TestID);
-		//	subject4List.Add(new Subject3(new Value(loinc.LoincCode,"2.16.840.1.113883.6.1","LOINC",loinc.NameShort)));
-		//	subject4List[subject4List.Count-1].mainSearchCriteria.originalText=loinc.NameShort;
-		//	subject4List[subject4List.Count-1].mainSearchCriteria.subject.severityObservation.observationInterpretationNormality.SetInterpretation(labResult.AbnormalFlag);
-		//}
-
-		public void AddLabResult(EhrLabResult ehrLabResult) {
-			if(ehrLabResult.ObservationIdentifierID!="") {//1st triplet
-				subject4List.Add(new Subject3(new Value(ehrLabResult.ObservationIdentifierID,"2.16.840.1.113883.6.1","LOINC",ehrLabResult.ObservationIdentifierText)));
-				subject4List[subject4List.Count-1].mainSearchCriteria.originalText=ehrLabResult.ObservationIdentifierTextOriginal;
-			}
-			if(ehrLabResult.ObservationIdentifierIDAlt!="") {//2nd triplet
-				subject4List.Add(new Subject3(new Value(ehrLabResult.ObservationIdentifierIDAlt,"2.16.840.1.113883.6.1","LOINC",ehrLabResult.ObservationIdentifierTextAlt)));
-				subject4List[subject4List.Count-1].mainSearchCriteria.originalText=ehrLabResult.ObservationIdentifierTextOriginal;
-			}
-		}
+		}	
 
 		public string ToXml() {
 			XmlWriterSettings xmlSettings=new XmlWriterSettings();

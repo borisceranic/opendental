@@ -317,7 +317,7 @@ namespace OpenDentBusiness{
 				CDSIntervention cdsi=new CDSIntervention();
 				cdsi.EhrTrigger=listEhrTriggers[i];
 				cdsi.InterventionMessage=triggerMessage;
-				cdsi.TriggerObjects=ListObjectMatches;
+				cdsi.TriggerObjects=ConvertListToKnowledgeRequests(ListObjectMatches);
 				listInterventions.Add(cdsi);
 			}
 			//Fill object lists to be checked---------------------------------------------------------------------------------------------------------------
@@ -604,7 +604,7 @@ namespace OpenDentBusiness{
 			CDSIntervention cdsi=new CDSIntervention();
 			cdsi.EhrTrigger=ehrTrig;
 			cdsi.InterventionMessage=triggerMessage;
-			cdsi.TriggerObjects=listObjectMatches;
+			cdsi.TriggerObjects=ConvertListToKnowledgeRequests(listObjectMatches);
 			listInterventions.Add(cdsi);
 			//These are all potential match sources for CDSI triggers. Some of these have been implemented, some have not. 2016_02_08
 			//Allergy-----------------------------------------------------------------------------------------------------------------------
@@ -794,7 +794,183 @@ namespace OpenDentBusiness{
 				}
 			}
 			return true;//One from each defined category was found.
-		}		
+		}
+
+		///<summary>Turns a trigger object into a list of KnowledgeReqests that can be passed to FormInfoButton. The supported objects are DiseaseDef,
+		///Medication, MedicationPat, ICD9, Icd10, Snomed, RxNorm, EhrLabResult, Loinc, and AllergyDef. If the passed in object is not one of these 
+		///objects, this method will return an empty list.</summary>
+		public static List<KnowledgeRequest> ConvertToKnowledgeRequests(object objectMatch) {
+			//No need to check RemotingRoll; no call to db.
+			List<KnowledgeRequest> listCDSTrigs=new List<KnowledgeRequest>();
+			KnowledgeRequest cdsTrig=new KnowledgeRequest();
+			switch(objectMatch.GetType().Name) {
+				case "DiseaseDef":
+					cdsTrig=new KnowledgeRequest();
+					cdsTrig.Type="Problem";
+					cdsTrig.Code=POut.Long(((DiseaseDef)objectMatch).DiseaseDefNum);
+					cdsTrig.CodeSystem=CodeSyst.ProblemDef;
+					cdsTrig.Description=((DiseaseDef)objectMatch).DiseaseName;
+					listCDSTrigs.Add(cdsTrig);
+					if(((DiseaseDef)objectMatch).ICD9Code!="") {
+						cdsTrig=new KnowledgeRequest();
+						ICD9 icd9=ICD9s.GetByCode(((DiseaseDef)objectMatch).ICD9Code);
+						cdsTrig.Type="Problem";
+						cdsTrig.Code=icd9.ICD9Code;
+						cdsTrig.CodeSystem=CodeSyst.Icd9;
+						cdsTrig.Description=icd9.Description;
+						listCDSTrigs.Add(cdsTrig);
+					}
+					if(((DiseaseDef)objectMatch).SnomedCode!="") {
+						cdsTrig=new KnowledgeRequest();
+						Snomed snomed=Snomeds.GetByCode(((DiseaseDef)objectMatch).SnomedCode);
+						cdsTrig.Type="Problem";
+						cdsTrig.Code=snomed.SnomedCode;
+						cdsTrig.CodeSystem=CodeSyst.Snomed;
+						cdsTrig.Description=snomed.Description;
+						listCDSTrigs.Add(cdsTrig);
+					}
+					if(((DiseaseDef)objectMatch).Icd10Code!="") {
+						cdsTrig=new KnowledgeRequest();
+						Icd10 icd10=Icd10s.GetByCode(((DiseaseDef)objectMatch).Icd10Code);
+						cdsTrig.Type="Problem";
+						cdsTrig.Code=icd10.Icd10Code;
+						cdsTrig.CodeSystem=CodeSyst.Icd10;
+						cdsTrig.Description=icd10.Description;
+						listCDSTrigs.Add(cdsTrig);
+					}
+					break;
+				case "Medication":
+					if(((Medication)objectMatch).RxCui!=0) {
+						cdsTrig=new KnowledgeRequest();
+						RxNorm rxNorm=RxNorms.GetByRxCUI(((Medication)objectMatch).RxCui.ToString());
+						cdsTrig.Type="Medication";
+						cdsTrig.Code=rxNorm.RxCui;
+						cdsTrig.CodeSystem=CodeSyst.RxNorm;
+						cdsTrig.Description=rxNorm.Description;
+						listCDSTrigs.Add(cdsTrig);
+					}
+					if(((Medication)objectMatch).RxCui==0) {
+						cdsTrig=new KnowledgeRequest();
+						cdsTrig.Type="Medication";
+						cdsTrig.Code="";
+						cdsTrig.CodeSystem=CodeSyst.None;
+						cdsTrig.Description=((Medication)objectMatch).MedName;
+						listCDSTrigs.Add(cdsTrig);
+					}
+					break;
+				case "MedicationPat":
+					if(((MedicationPat)objectMatch).RxCui!=0) {
+						cdsTrig=new KnowledgeRequest();
+						RxNorm rxNorm=RxNorms.GetByRxCUI(((MedicationPat)objectMatch).RxCui.ToString());
+						cdsTrig.Type="Medication";
+						cdsTrig.Code=rxNorm.RxCui;
+						cdsTrig.CodeSystem=CodeSyst.RxNorm;
+						cdsTrig.Description=rxNorm.Description;
+						listCDSTrigs.Add(cdsTrig);
+					}
+					if(((MedicationPat)objectMatch).MedDescript!="") {
+						cdsTrig=new KnowledgeRequest();
+						cdsTrig.Type="Medication";
+						cdsTrig.Code="";
+						cdsTrig.CodeSystem=CodeSyst.None;
+						cdsTrig.Description=((MedicationPat)objectMatch).MedDescript;
+						listCDSTrigs.Add(cdsTrig);
+					}
+					break;
+				case "ICD9":
+					cdsTrig=new KnowledgeRequest();
+					ICD9 icd9Obj=(ICD9)objectMatch;
+					cdsTrig.Type="Code";
+					cdsTrig.Code=icd9Obj.ICD9Code;
+					cdsTrig.CodeSystem=CodeSyst.Icd9;
+					cdsTrig.Description=icd9Obj.Description;
+					listCDSTrigs.Add(cdsTrig);
+					break;
+				case "Icd10":
+					cdsTrig=new KnowledgeRequest();
+					Icd10 icd10Obj=(Icd10)objectMatch;
+					cdsTrig.Type="Problem";
+					cdsTrig.Code=icd10Obj.Icd10Code;
+					cdsTrig.CodeSystem=CodeSyst.Icd10;
+					cdsTrig.Description=icd10Obj.Description;
+					listCDSTrigs.Add(cdsTrig);
+					break;
+				case "Snomed":
+					cdsTrig=new KnowledgeRequest();
+					Snomed snomedObj=(Snomed)objectMatch;
+					cdsTrig.Type="Code";
+					cdsTrig.Code=snomedObj.SnomedCode;
+					cdsTrig.CodeSystem=CodeSyst.Snomed;
+					cdsTrig.Description=snomedObj.Description;
+					listCDSTrigs.Add(cdsTrig);
+					break;
+				case "RxNorm":
+					cdsTrig=new KnowledgeRequest();
+					RxNorm rxNormObj=(RxNorm)objectMatch;
+					cdsTrig.Type="Code";
+					cdsTrig.Code=rxNormObj.RxCui;
+					cdsTrig.CodeSystem=CodeSyst.RxNorm;
+					cdsTrig.Description=rxNormObj.Description;
+					listCDSTrigs.Add(cdsTrig);
+					break;
+				case "EhrLabResult":
+					EhrLabResult ehrLabResultObj=(EhrLabResult)objectMatch;
+					if(ehrLabResultObj.ObservationIdentifierID!="") {	
+						cdsTrig=new KnowledgeRequest();
+						cdsTrig.Type="Lab Result";
+						cdsTrig.Code=ehrLabResultObj.ObservationIdentifierID;
+						cdsTrig.CodeSystem=CodeSyst.Loinc;
+						cdsTrig.Description=ehrLabResultObj.ObservationIdentifierText;
+					}
+					else if(ehrLabResultObj.ObservationIdentifierIDAlt!="") {
+						cdsTrig=new KnowledgeRequest();
+						cdsTrig.Type="Lab Result";
+						cdsTrig.Code=ehrLabResultObj.ObservationIdentifierIDAlt;
+						cdsTrig.CodeSystem=CodeSyst.Loinc;
+						cdsTrig.Description=ehrLabResultObj.ObservationIdentifierTextAlt;
+					}
+					else {
+						cdsTrig=new KnowledgeRequest();
+						cdsTrig.Type="Lab Result";
+						cdsTrig.Code="";
+						cdsTrig.CodeSystem=CodeSyst.None;
+						cdsTrig.Description="Unknown";
+					}
+					listCDSTrigs.Add(cdsTrig);
+					break;
+				case "Loinc":
+					cdsTrig=new KnowledgeRequest();
+					Loinc loincObj=(Loinc)objectMatch;
+					cdsTrig.Type="Code";
+					cdsTrig.Code=loincObj.LoincCode;
+					cdsTrig.CodeSystem=CodeSyst.Loinc;
+					cdsTrig.Description=loincObj.NameShort;
+					listCDSTrigs.Add(cdsTrig);
+					break;
+				case "AllergyDef":
+					cdsTrig=new KnowledgeRequest();
+					AllergyDef allergyObj=(AllergyDef)objectMatch;
+					cdsTrig.Type="Allergy";
+					cdsTrig.Code=POut.Long(allergyObj.AllergyDefNum);
+					cdsTrig.CodeSystem=CodeSyst.AllergyDef;
+					cdsTrig.Description=AllergyDefs.GetOne(allergyObj.AllergyDefNum).Description;
+					listCDSTrigs.Add(cdsTrig);
+					break;
+				default:
+					//This is a CDS trigger that cannot be turned into a knowledge request such as Age or Vital Sign. This will simply not add this object to 
+					//the list of knowledge requests.
+					break;
+			}
+			return listCDSTrigs;
+		}
+
+		///<summary>Turns a list of trigger objects into a list of KnowledgeReqests that can be passed to FormInfoButton. The supported objects are 
+		///DiseaseDef, Medication, MedicationPat, ICD9, Icd10, Snomed, RxNorm, EhrLabResult, Loinc, and AllergyDef. If none of the passed in objects are 
+		///one of these objects, this method will return an empty list.</summary>
+		public static List<KnowledgeRequest> ConvertListToKnowledgeRequests(List<object> listObjectMatches) {
+			//No need to check RemotingRoll; no call to db.
+			return listObjectMatches.SelectMany(x => ConvertToKnowledgeRequests(x)).ToList();
+		}
 
 		///<summary></summary>
 		public static long Insert(EhrTrigger ehrTrigger) {
