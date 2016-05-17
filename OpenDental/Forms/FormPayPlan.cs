@@ -112,6 +112,7 @@ namespace OpenDental{
 		private FormPayPlanRecalculate _formPayPlanRecalculate;
 		private TextBox textDue;
 		private List<PaySplit> _listPaySplits;
+		private DataTable _bundledClaimProcs;
 		private string _payPlanNote;
 		int _roundDec=CultureInfo.CurrentCulture.NumberFormat.NumberDecimalDigits;
 		///<summary>Cached list of clinics available to user. Also includes a dummy Clinic at index 0 for "none".</summary>
@@ -127,7 +128,6 @@ namespace OpenDental{
 		private ValidDouble textTotalTxAmt;
 		private UI.Button butClosePlan;
 		private Label labelClosed;
-		private int _payPlanVersionCur;
 
 		///<summary>The supplied payment plan should already have been saved in the database.</summary>
 		public FormPayPlan(Patient patCur,PayPlan payPlanCur) {
@@ -245,7 +245,6 @@ namespace OpenDental{
 			this.labelTotalTx.TabIndex = 147;
 			this.labelTotalTx.Text = "Total Tx Amt";
 			this.labelTotalTx.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.labelTotalTx.Visible = false;
 			// 
 			// textTotalTxAmt
 			// 
@@ -256,7 +255,6 @@ namespace OpenDental{
 			this.textTotalTxAmt.ReadOnly = true;
 			this.textTotalTxAmt.Size = new System.Drawing.Size(85, 20);
 			this.textTotalTxAmt.TabIndex = 148;
-			this.textTotalTxAmt.Visible = false;
 			// 
 			// butAddTxCredits
 			// 
@@ -267,10 +265,9 @@ namespace OpenDental{
 			this.butAddTxCredits.CornerRadius = 4F;
 			this.butAddTxCredits.Location = new System.Drawing.Point(239, 492);
 			this.butAddTxCredits.Name = "butAddTxCredits";
-			this.butAddTxCredits.Size = new System.Drawing.Size(84, 19);
+			this.butAddTxCredits.Size = new System.Drawing.Size(93, 19);
 			this.butAddTxCredits.TabIndex = 146;
-			this.butAddTxCredits.Text = "Add Tx Credits";
-			this.butAddTxCredits.Visible = false;
+			this.butAddTxCredits.Text = "View Tx Credits";
 			this.butAddTxCredits.Click += new System.EventHandler(this.butPayPlanTx_Click);
 			// 
 			// textDue
@@ -357,7 +354,7 @@ namespace OpenDental{
 			// comboClinic
 			// 
 			this.comboClinic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboClinic.Location = new System.Drawing.Point(142, 39);
+			this.comboClinic.Location = new System.Drawing.Point(134, 39);
 			this.comboClinic.MaxDropDownItems = 30;
 			this.comboClinic.Name = "comboClinic";
 			this.comboClinic.Size = new System.Drawing.Size(177, 21);
@@ -371,7 +368,7 @@ namespace OpenDental{
 			this.butPickProv.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butPickProv.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butPickProv.CornerRadius = 2F;
-			this.butPickProv.Location = new System.Drawing.Point(321, 37);
+			this.butPickProv.Location = new System.Drawing.Point(317, 14);
 			this.butPickProv.Name = "butPickProv";
 			this.butPickProv.Size = new System.Drawing.Size(18, 21);
 			this.butPickProv.TabIndex = 2;
@@ -381,7 +378,7 @@ namespace OpenDental{
 			// comboProv
 			// 
 			this.comboProv.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboProv.Location = new System.Drawing.Point(142, 14);
+			this.comboProv.Location = new System.Drawing.Point(134, 14);
 			this.comboProv.MaxDropDownItems = 30;
 			this.comboProv.Name = "comboProv";
 			this.comboProv.Size = new System.Drawing.Size(177, 21);
@@ -390,7 +387,7 @@ namespace OpenDental{
 			// 
 			// labelClinic
 			// 
-			this.labelClinic.Location = new System.Drawing.Point(44, 41);
+			this.labelClinic.Location = new System.Drawing.Point(36, 41);
 			this.labelClinic.Name = "labelClinic";
 			this.labelClinic.Size = new System.Drawing.Size(96, 16);
 			this.labelClinic.TabIndex = 0;
@@ -399,7 +396,7 @@ namespace OpenDental{
 			// 
 			// label16
 			// 
-			this.label16.Location = new System.Drawing.Point(41, 18);
+			this.label16.Location = new System.Drawing.Point(33, 18);
 			this.label16.Name = "label16";
 			this.label16.Size = new System.Drawing.Size(100, 16);
 			this.label16.TabIndex = 0;
@@ -408,7 +405,7 @@ namespace OpenDental{
 			// 
 			// labelTxAmtInfo
 			// 
-			this.labelTxAmtInfo.Location = new System.Drawing.Point(140, 495);
+			this.labelTxAmtInfo.Location = new System.Drawing.Point(143, 511);
 			this.labelTxAmtInfo.Name = "labelTxAmtInfo";
 			this.labelTxAmtInfo.Size = new System.Drawing.Size(163, 28);
 			this.labelTxAmtInfo.TabIndex = 0;
@@ -430,6 +427,7 @@ namespace OpenDental{
 			this.textCompletedAmt.MaxVal = 100000000D;
 			this.textCompletedAmt.MinVal = -100000000D;
 			this.textCompletedAmt.Name = "textCompletedAmt";
+			this.textCompletedAmt.ReadOnly = true;
 			this.textCompletedAmt.Size = new System.Drawing.Size(85, 20);
 			this.textCompletedAmt.TabIndex = 2;
 			// 
@@ -982,7 +980,6 @@ namespace OpenDental{
 			this.butClosePlan.Size = new System.Drawing.Size(84, 24);
 			this.butClosePlan.TabIndex = 149;
 			this.butClosePlan.Text = "Close Plan";
-			this.butClosePlan.Visible = false;
 			this.butClosePlan.Click += new System.EventHandler(this.butCloseOut_Click);
 			// 
 			// labelClosed
@@ -1146,29 +1143,19 @@ namespace OpenDental{
 			else {
 				butRecalculate.Enabled=false;//Don't allow a plan that hasn't started to be recalculated.
 			}
-			_payPlanVersionCur=PrefC.GetInt(PrefName.PayPlansVersion);
-			if(_payPlanVersionCur==2) {
-				textTotalTxAmt.Text=POut.Double(PayPlans.GetTxTotalAmt(_listPayPlanCharges));
-				textCompletedAmt.ReadOnly=true;
-				butAddTxCredits.Visible=true;
-				textTotalTxAmt.Visible=true;
-				labelTotalTx.Visible=true;
-				labelTxAmtInfo.Location=new Point(labelTxAmtInfo.Location.X,labelTxAmtInfo.Location.Y+20);
-				butClosePlan.Visible=true;
-				double sumDebits=_listPayPlanCharges
-					.Where(x => x.ChargeType == PayPlanChargeType.Debit)
-					.Sum(x => x.Principal);
-				double sumCredits=_listPayPlanCharges
-					.Where(x => x.ChargeType == PayPlanChargeType.Credit)
-					.Sum(x => x.Principal);
-				bool hasFutureCharges=_listPayPlanCharges
-					.Exists(x => x.ChargeDate > DateTimeOD.Today.Date);
-				if(PayPlanCur.IsClosed) {
-					butOK.Text="Reopen";
-					butDelete.Enabled=false;
-					butClosePlan.Enabled=false;
-					labelClosed.Visible=true;
-				}
+			textTotalTxAmt.Text=POut.Double(PayPlans.GetTxTotalAmt(_listPayPlanCharges));
+			if(checkIns.Checked) {
+				textCompletedAmt.ReadOnly=false;
+				butAddTxCredits.Visible=false;
+				textTotalTxAmt.Visible=false;
+				labelTotalTx.Visible=false;
+				labelTxAmtInfo.Location=new Point(labelTxAmtInfo.Location.X,labelTxAmtInfo.Location.Y-20);
+			}
+			if(PayPlanCur.IsClosed) {
+				butOK.Text=Lan.g(this,"Reopen");
+				butDelete.Enabled=false;
+				butClosePlan.Enabled=false;
+				labelClosed.Visible=true;
 			}
 			FillCharges();
 		}
@@ -1235,8 +1222,8 @@ namespace OpenDental{
 			gridCharges.Rows.Clear();
 			List<ODGridRow> listPayPlanRows=new List<ODGridRow>();
 			int numCharges=1;
-			for(int i = 0;i<_listPayPlanCharges.Count;i++) {//Payplan Charges
-				if(_listPayPlanCharges[i].ChargeType==PayPlanChargeType.Credit) {  //for v1, debits are the only ChargeType.
+			for(int i=0;i<_listPayPlanCharges.Count;i++) {//Payplan Charges
+				if(_listPayPlanCharges[i].ChargeType==PayPlanChargeType.Credit) {
 					continue;//hide credits from the amortization grid.
 				}
 				listPayPlanRows.Add(CreateRowForPayPlanCharge(_listPayPlanCharges[i],numCharges));
@@ -1248,25 +1235,25 @@ namespace OpenDental{
 				_listPaySplits=new List<PaySplit>();
 				DataTable bundledPayments=PaySplits.GetForPayPlan(PayPlanCur.PayPlanNum);
 				_listPaySplits=PaySplits.GetFromBundled(bundledPayments);
-				for(int i = 0;i<_listPaySplits.Count;i++) {
+				for(int i=0;i<_listPaySplits.Count;i++) {
 					listPayPlanRows.Add(CreateRowForPaySplit(bundledPayments.Rows[i],_listPaySplits[i]));
 				}
 			}
 			else {//Insurance payplan
-				DataTable bundledClaimProcs=ClaimProcs.GetBundlesForPayPlan(PayPlanCur.PayPlanNum);
-				for(int i = 0;i<bundledClaimProcs.Rows.Count;i++) {
-					listPayPlanRows.Add(CreateRowForClaimProcs(bundledClaimProcs.Rows[i]));
+				_bundledClaimProcs=ClaimProcs.GetBundlesForPayPlan(PayPlanCur.PayPlanNum);
+				for(int i=0;i<_bundledClaimProcs.Rows.Count;i++) {
+					listPayPlanRows.Add(CreateRowForClaimProcs(_bundledClaimProcs.Rows[i]));
 				}
 			}
 			listPayPlanRows.Sort(ComparePayPlanRows);
-			for(int i = 0;i<listPayPlanRows.Count;i++) {
+			for(int i=0;i<listPayPlanRows.Count;i++) {
 				gridCharges.Rows.Add(listPayPlanRows[i]);
 			}
 			TotPrinc=0;
 			TotInt=0;
 			int countDebits=0;
-			for(int i = 0;i<_listPayPlanCharges.Count;i++) {
-				if(_listPayPlanCharges[i].ChargeType==PayPlanChargeType.Credit) { //for v1, debits are the only ChargeType.
+			for(int i=0;i<_listPayPlanCharges.Count;i++) {
+				if(_listPayPlanCharges[i].ChargeType==PayPlanChargeType.Credit) {
 					continue;//don't include credits when calculating the total loan cost.
 				}
 				countDebits++;
@@ -1477,6 +1464,11 @@ namespace OpenDental{
 				labelInsPlan.Visible=true;
 				textInsPlan.Visible=true;
 				butChangePlan.Visible=true;
+				textCompletedAmt.ReadOnly=false;
+				butAddTxCredits.Visible=false;
+				textTotalTxAmt.Visible=false;
+				labelTotalTx.Visible=false;
+				labelTxAmtInfo.Location=new Point(labelTxAmtInfo.Location.X,labelTxAmtInfo.Location.Y-20);
 			}
 			else {//not insurance
 				PayPlanCur.Guarantor=PayPlanCur.PatNum;
@@ -1490,6 +1482,11 @@ namespace OpenDental{
 				labelInsPlan.Visible=false;
 				textInsPlan.Visible=false;
 				butChangePlan.Visible=false;
+				textCompletedAmt.ReadOnly=true;
+				butAddTxCredits.Visible=true;
+				textTotalTxAmt.Visible=true;
+				labelTotalTx.Visible=true;
+				labelTxAmtInfo.Location=new Point(labelTxAmtInfo.Location.X,labelTxAmtInfo.Location.Y+20);
 			}
 		}
 
@@ -1499,9 +1496,6 @@ namespace OpenDental{
 			}
 			if(PIn.Double(textCompletedAmt.Text)==PIn.Double(textAmount.Text)) {
 				return;
-			}
-			if(_payPlanVersionCur==1 && MsgBox.Show(this,MsgBoxButtons.YesNo,"Change Tx Completed Amt to match?")) {
-				textCompletedAmt.Text=textAmount.Text;
 			}
 		}
 
@@ -1689,14 +1683,10 @@ namespace OpenDental{
 		}
 
 		private void butClear_Click(object sender,System.EventArgs e) {
-			string msgStr=Lan.g(this, "Clear all charges from amortization schedule?");
-			if(_payPlanVersionCur==2) {
-				msgStr+="  "+Lan.g(this,"Credits will not be cleared.");
-			}
-			if(MessageBox.Show(msgStr,"",MessageBoxButtons.OKCancel)!=DialogResult.OK) {
+			if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"Clear all charges from amortization schedule?  Credits will not be cleared.")) {
 				return;
 			}
-			_listPayPlanCharges.RemoveAll(x => x.ChargeType == PayPlanChargeType.Debit);  //for v1, debits are the only ChargeType.
+			_listPayPlanCharges.RemoveAll(x => x.ChargeType==PayPlanChargeType.Debit); 
 			textDateFirstPay.ReadOnly=false;
 			textDownPayment.ReadOnly=false;
 			gridCharges.BeginUpdate();
@@ -1815,16 +1805,16 @@ namespace OpenDental{
 		}
 
 		private void butPayPlanTx_Click(object sender,EventArgs e) {
-			FormPayPlanTreatment FormPPT=new FormPayPlanTreatment(PayPlanCur,PatCur);
-			FormPPT.ListPayPlanCredits=_listPayPlanCharges.Where(x => x.ChargeType==PayPlanChargeType.Credit).Select(x => x.Copy()).ToList();
-			FormPPT.ShowDialog();
-			if(FormPPT.DialogResult!=DialogResult.OK) {
+			FormPayPlanCredits FormPPC=new FormPayPlanCredits(PayPlanCur);
+			FormPPC.ListPayPlanCreditsCur=_listPayPlanCharges.Where(x => x.ChargeType==PayPlanChargeType.Credit).Select(x => x.Copy()).ToList();
+			FormPPC.ShowDialog();
+			if(FormPPC.DialogResult!=DialogResult.OK) {
 				return;
 			}
 			_listPayPlanCharges.RemoveAll(x => x.ChargeType==PayPlanChargeType.Credit);
-			_listPayPlanCharges.AddRange(FormPPT.ListPayPlanCredits);
+			_listPayPlanCharges.AddRange(FormPPC.ListPayPlanCreditsCur);
 			double txCompleteAmt=0;
-			foreach(PayPlanCharge credit in FormPPT.ListPayPlanCredits) {
+			foreach(PayPlanCharge credit in FormPPC.ListPayPlanCreditsCur) {
 				if(credit.ChargeDate.Date!=DateTime.MaxValue.Date) { //do not take into account maxvalue (tp'd) charges
 					txCompleteAmt+=credit.Principal;
 				}
@@ -1845,31 +1835,44 @@ namespace OpenDental{
 			if(HasErrors()) {
 				return;
 			}
-			if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"Closing out this payment plan will move all unpaid debits onto the patient's ledger "
-				+"and make them due immediately.  Do you want to continue?")) {
-				return;
-			}
-			double sumPastDebits = _listPayPlanCharges
-				.Where(x => x.ChargeType == PayPlanChargeType.Debit)
+			if(!checkIns.Checked) {
+				if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"Closing out this payment plan will move all unpaid debits onto the patient's ledger "
+					+"and make them due immediately.  Do you want to continue?")) {
+					return;
+				}
+				double sumPastDebits = _listPayPlanCharges
+				.Where(x => x.ChargeType==PayPlanChargeType.Debit)
 				.Where(x => x.ChargeDate <= DateTimeOD.Today.Date)
 				.Sum(x => x.Principal);
-			double sumCredits = _listPayPlanCharges
-				.Where(x => x.ChargeType == PayPlanChargeType.Credit)
+				double sumCredits = _listPayPlanCharges
+				.Where(x => x.ChargeType==PayPlanChargeType.Credit)
 				.Sum(x => x.Principal);
-			PayPlanCharge closeoutCharge=new PayPlanCharge() {
-				PayPlanNum=PayPlanCur.PayPlanNum,
-				Guarantor=PayPlanCur.Guarantor,
-				PatNum=PayPlanCur.PatNum,
-				ChargeDate=DateTimeOD.Today,
-				Interest=0,
-				Principal=sumCredits - sumPastDebits,
-				Note="Close Out Charge",
-				ProvNum=PatCur.PriProv,//will be changed in SaveCur()
-				ClinicNum=PatCur.ClinicNum,//will be changed in SaveCur()
-				ChargeType=PayPlanChargeType.Debit,
-			};
-			_listPayPlanCharges.RemoveAll(x => x.ChargeDate > DateTimeOD.Today.Date);
-			_listPayPlanCharges.Add(closeoutCharge);
+				PayPlanCharge closeoutCharge=new PayPlanCharge() {
+					PayPlanNum=PayPlanCur.PayPlanNum,
+					Guarantor=PayPlanCur.Guarantor,
+					PatNum=PayPlanCur.PatNum,
+					ChargeDate=DateTimeOD.Today,
+					Interest=0,
+					Principal=sumCredits-sumPastDebits,
+					Note=Lan.g(this,"Close Out Charge"),
+					//ProvNum=PatCur.PriProv,//will be changed in SaveData()
+					//ClinicNum=PatCur.ClinicNum,//will be changed in SaveData()
+					ChargeType=PayPlanChargeType.Debit,
+				};
+				_listPayPlanCharges.RemoveAll(x => x.ChargeDate > DateTimeOD.Today.Date);
+				_listPayPlanCharges.Add(closeoutCharge);
+			}
+			else {
+				if(!MsgBox.Show(this,MsgBoxButtons.YesNo,"Closing out an insurance payment plan will change the Tx Completed Amt to match the amount"
+					+" insurance actually paid.  Do you want to continue?")) {
+					return;
+				}
+				double insPaidTotal=0;
+				for(int i=0;i < _bundledClaimProcs.Rows.Count;i++) {
+					insPaidTotal+=PIn.Double(_bundledClaimProcs.Rows[i]["InsPayAmt"].ToString());
+				}
+				textCompletedAmt.Text=insPaidTotal.ToString("f");
+			}
 			butClosePlan.Enabled=false;
 			PayPlanCur.IsClosed=true;
 			FillCharges();
@@ -1915,16 +1918,28 @@ namespace OpenDental{
 			PayPlanCur.Note=textNote.Text;
 			PayPlanCur.CompletedAmt=PIn.Double(textCompletedAmt.Text);
 			//PlanNum set already
+			if(checkIns.Checked) { //if insurance payment plan, remove all other credits and create one credit for the completed amt.
+				_listPayPlanCharges.RemoveAll(x => x.ChargeType==PayPlanChargeType.Credit);//remove all credits
+				PayPlanCharge addCharge=new PayPlanCharge();
+				addCharge.ChargeDate=PIn.Date(textDate.Text);
+				addCharge.ChargeType=PayPlanChargeType.Credit;
+				addCharge.Guarantor=PayPlanCur.Guarantor;
+				addCharge.Interest=0;
+				addCharge.Note=Lan.g(this,"Expected Payments from")+" "+textInsPlan.Text;
+				addCharge.PatNum=PayPlanCur.PatNum;
+				addCharge.PayPlanNum=PayPlanCur.PayPlanNum;
+				addCharge.Principal=PIn.Double(textCompletedAmt.Text);
+				addCharge.ProcNum=0;
+				//addCharge.ProvNum=0; //handled below
+				//addCharge.ClinicNum=0; //handled below
+				_listPayPlanCharges.Add(addCharge);
+			}
 			PayPlans.Update(PayPlanCur);//always saved to db before opening this form
 			foreach(PayPlanCharge charge in _listPayPlanCharges) {
 				charge.ClinicNum=_selectedClinicNum;
 				charge.ProvNum=_selectedProvNum;
 			}
-			int countCredits=0;
 			for(int i=0;i<_listPayPlanCharges.Count;i++) {
-				if(_listPayPlanCharges[i].ChargeType==PayPlanChargeType.Credit) {  //for v1, debits are the only ChargeType.
-					countCredits++;
-				}
 				_listPayPlanCharges[i].ClinicNum=_selectedClinicNum;
 				_listPayPlanCharges[i].ProvNum=_selectedProvNum;
 			}
@@ -1932,11 +1947,7 @@ namespace OpenDental{
 		}
 
 		private void butDelete_Click(object sender,System.EventArgs e) {
-			string warning=Lan.g(this,"Delete payment plan?");
-			if(_payPlanVersionCur==2) {
-				warning+="  "+Lan.g(this,"All debits and credits in the ledger will also be deleted.");
-			}
-			if(MessageBox.Show(warning,"",MessageBoxButtons.OKCancel)!=DialogResult.OK) {
+			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Delete payment plan?  All debits and credits will also be deleted.")) {
 				return;
 			}
 			//later improvement if needed: possibly prevent deletion of some charges like older ones.
@@ -1962,13 +1973,14 @@ namespace OpenDental{
 			if(HasErrors()) {
 				return;
 			}
-			if(_payPlanVersionCur==1 && PIn.Double(textCompletedAmt.Text)!=PIn.Double(textAmount.Text)) { //v1
+			//insurance payment plans use the CompletedAmt text box, regular payment plans use totalTxAmt text box for validation.
+			if(checkIns.Checked && PIn.Double(textCompletedAmt.Text)!=PIn.Double(textAmount.Text)) { 
 				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Tx Completed Amt and Total Amount do not match, continue?")) { 
 					return;
 				}
 			}
-			else if(_payPlanVersionCur==2 && PIn.Double(textTotalTxAmt.Text)!=PIn.Double(textAmount.Text)) {//v2
-				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Tx Completed Amt and Total Amount do not match, continue?")) { 
+			else if(PIn.Double(textTotalTxAmt.Text)!=PIn.Double(textAmount.Text) && !checkIns.Checked) {
+				if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Tx Completed Amt and Total Amount do not match, continue?")) {
 					return;
 				}
 			}
@@ -2285,8 +2297,8 @@ namespace OpenDental{
 			ppCharge.Interest=interestAmt;
 			ppCharge.Principal=principalAmt;
 			ppCharge.Note=note;
-			ppCharge.ProvNum=PatCur.PriProv;//will be changed in SaveCur()
-			ppCharge.ClinicNum=PatCur.ClinicNum;//will be changed in SaveCur()
+			ppCharge.ProvNum=PatCur.PriProv;//will be changed in SaveData()
+			ppCharge.ClinicNum=PatCur.ClinicNum;//will be changed in SaveData()
 			return ppCharge;
 		}
 
@@ -2305,6 +2317,5 @@ namespace OpenDental{
 				}
 			}
 		}
-
 	}
 }

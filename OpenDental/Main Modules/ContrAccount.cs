@@ -1779,12 +1779,7 @@ namespace OpenDental {
 			_patInfoDisplayFields=DisplayFields.GetForCategory(DisplayFieldCategory.AccountPatientInformation);
 			LayoutPanels();
 			checkShowFamilyComm.Checked=PrefC.GetBoolSilent(PrefName.ShowAccountFamilyCommEntries,true);
-			if(PrefC.GetInt(PrefName.PayPlansVersion)==2){
-				checkShowCompletePayPlans.Checked=PrefC.GetBool(PrefName.AccountShowCompletedPaymentPlans);
-			}
-			else {
-				checkShowCompletePayPlans.Visible=false;
-			}
+			checkShowCompletePayPlans.Checked=PrefC.GetBool(PrefName.AccountShowCompletedPaymentPlans);
 			Plugins.HookAddCode(this,"ContrAccount.InitializeOnStartup_end");
 		}
 
@@ -2416,13 +2411,20 @@ namespace OpenDental {
 				row.Cells.Add(table.Rows[i]["paid"].ToString());
 				row.Cells.Add(table.Rows[i]["princPaid"].ToString());
 				row.Cells.Add(table.Rows[i]["balance"].ToString());
-				cell=new ODGridCell(table.Rows[i]["due"].ToString());
-				if(table.Rows[i]["type"].ToString()!="Ins"){
-					cell.Bold=YN.Yes;
-					cell.ColorText=Color.Red;
+				if(table.Rows[i]["IsClosed"].ToString()=="0") {
+					cell=new ODGridCell(table.Rows[i]["due"].ToString());
+					if(table.Rows[i]["type"].ToString()!="Ins") {
+						cell.Bold=YN.Yes;
+						cell.ColorText=Color.Red;
+					}
+				}
+				else {
+					cell=new ODGridCell(Lan.g(this,"Closed"));
+					row.ColorText=Color.Gray;
 				}
 				row.Cells.Add(cell);
 				row.Cells.Add("");
+				row.Tag=table.Rows[i]["PayPlanNum"].ToString();
 				gridPayPlan.Rows.Add(row);
 				PPBalanceTotal += (Convert.ToDecimal(PIn.Double(table.Rows[i]["balance"].ToString())));
 			}
@@ -2809,6 +2811,22 @@ namespace OpenDental {
 			//this seems to fire after a doubleclick, so this prevents error:
 			if(e.Row>=table.Rows.Count){
 				return;
+			}
+			gridPayPlan.SetSelected(false);
+			if(table.Rows[e.Row]["PayPlanNum"].ToString()!="0") {
+				for(int i=0;i < gridPayPlan.Rows.Count;i++) {
+					if((string)gridPayPlan.Rows[i].Tag==table.Rows[e.Row]["PayPlanNum"].ToString()) {
+						gridPayPlan.SetSelected(i,true);
+					}
+				}
+				if(table.Rows[e.Row]["procsOnObj"].ToString()!="0") {
+					for(int i=0;i<table.Rows.Count;i++) {//loop through all rows
+						if(table.Rows[i]["ProcNum"].ToString()==table.Rows[e.Row]["procsOnObj"].ToString()) {
+							gridAccount.SetSelected(i,true);//select the pertinent procedure
+							break;
+						}
+					}
+				}
 			}
 			if(ViewingInRecall) {
 				return;
@@ -3722,12 +3740,7 @@ namespace OpenDental {
 			payPlan.PatNum=PatCur.PatNum;
 			payPlan.Guarantor=PatCur.Guarantor;
 			payPlan.PayPlanDate=DateTimeOD.Today;
-			if(PrefC.GetInt(PrefName.PayPlansVersion)==1) {
-				payPlan.CompletedAmt=PatCur.EstBalance;
-			}
-			else {
-				payPlan.CompletedAmt=0;
-			}
+			payPlan.CompletedAmt=0;
 			PayPlans.Insert(payPlan);
 			FormPayPlan FormPP=new FormPayPlan(PatCur,payPlan);
 			FormPP.TotalAmt=PatCur.EstBalance;

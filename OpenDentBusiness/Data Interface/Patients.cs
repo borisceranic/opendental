@@ -882,7 +882,7 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<List<Patient>>(MethodBase.GetCurrentMethod());
 			}
-			string command="SELECT * FROM patient WHERE PatStatus != 4";
+			string command="SELECT * FROM patient WHERE PatStatus != "+POut.Int((int)PatientStatus.Deleted);
 			return Crud.PatientCrud.SelectMany(command);
 		}
 

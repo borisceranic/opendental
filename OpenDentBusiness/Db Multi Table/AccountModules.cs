@@ -1522,8 +1522,8 @@ namespace OpenDentBusiness {
 			if(DataConnection.DBtype==DatabaseType.Oracle){
 				datesql="(SELECT CURRENT_DATE FROM dual)";
 			}
-			//for v1, debits are the only ChargeType, so limiting to Debits should have no effect.
-			//v2 still requires this information for displaying the payment plan in the payment plans grid.
+			//v1 should just use the payment plan's CompletedAmount to display one line item in the account module.
+			//v2 should actually use payment plan credits and display each individual payplancharge in the account module.
 			string debitType=POut.Int((int)PayPlanChargeType.Debit);
 			command="SELECT "
 				+"(SELECT SUM(Principal) FROM payplancharge WHERE payplancharge.PayPlanNum=payplan.PayPlanNum AND ChargeType="+debitType+") principal_,"
@@ -1598,10 +1598,13 @@ namespace OpenDentBusiness {
 			}
 			#endregion Payment Plans
 			#region Payment Plans Version 2
-			else if(payPlanVersionCur==2) {//this information is only required for v2
-				command="SELECT ChargeDate,payplancharge.PatNum,payplancharge.Guarantor,ProvNum,ClinicNum,payplancharge.Note,Principal,ChargeType,Interest,"
-					+"payplancharge.PayPlanNum,PayPlanChargeNum "
+			if(payPlanVersionCur==2) { //this information is only required for v2
+				command="SELECT ChargeDate,payplancharge.PatNum,payplancharge.Guarantor,ProvNum,ClinicNum,payplancharge.Note,Principal,ChargeType,"
+					+"Interest,payplancharge.PayPlanNum,PayPlanChargeNum,IsClosed,ProcNum,payplan.PlanNum,carrier.CarrierName "
 					+"FROM payplancharge "
+					+"INNER JOIN payplan ON payplan.PayPlanNum = payplancharge.PayPlanNum "
+					+"LEFT JOIN insplan ON insplan.PlanNum = payplan.PlanNum "
+					+"LEFT JOIN carrier ON carrier.CarrierNum = insplan.CarrierNum "
 					+"WHERE (payplancharge.Guarantor IN ("+familyPatNums+") OR payplancharge.PatNum IN ("+familyPatNums+")) "
 					+"AND ChargeDate<="+DbHelper.Curdate()+" "
 					+"ORDER BY ChargeDate";
@@ -1611,6 +1614,10 @@ namespace OpenDentBusiness {
 				}
 				//0 rows if isInvoice or statement type is LimitedStatement.  In spite of this, the payment plans breakdown will still show at the top of invoices.
 				for(int i=0;i<rawPayPlan2.Rows.Count;i++) {
+					if(rawPayPlan2.Rows[i]["PlanNum"].ToString()!="0" && PIn.Int(rawPayPlan2.Rows[i]["ChargeType"].ToString())==(int)PayPlanChargeType.Debit) {
+						//debits attached to insurance payplans do not get shown in the account module.
+						continue;
+					}
 					row=table.NewRow();
 					row["AbbrDesc"]="";
 					row["AdjNum"]="0";
@@ -1638,7 +1645,13 @@ namespace OpenDentBusiness {
 					dateT=PIn.DateT(rawPayPlan2.Rows[i]["ChargeDate"].ToString());
 					row["DateTime"]=dateT;
 					row["date"]=dateT.ToString(Lans.GetShortDateTimeFormat());
-					row["description"]=rawPayPlan2.Rows[i]["Note"].ToString();
+					if(rawPayPlan2.Rows[i]["PlanNum"].ToString()=="0") { //not an insurance payplan
+						row["description"]=rawPayPlan2.Rows[i]["Note"].ToString();
+					}
+					else {//an insurance payplan
+						row["description"]=Lans.g("ContrAccount","Expected payments from ")
+							+rawPayPlan2.Rows[i]["CarrierName"].ToString();
+					}
 					//row["extraDetail"]="";
 					string patname=fam.GetNameInFamFirst(PIn.Long(rawPayPlan2.Rows[i]["PatNum"].ToString()));
 					if(isReseller) {
@@ -1652,7 +1665,7 @@ namespace OpenDentBusiness {
 					row["ProcCode"]=Lans.g("AccountModule","PayPln:")+" "+(PayPlanChargeType)(PIn.Int(rawPayPlan2.Rows[i]["ChargeType"].ToString()));
 					row["ProcNum"]="0";
 					row["ProcNumLab"]="";
-					row["procsOnObj"]="";
+					row["procsOnObj"]=rawPayPlan2.Rows[i]["ProcNum"].ToString();
 					row["prov"]=Providers.GetAbbr(PIn.Int(rawPayPlan2.Rows[i]["ProvNum"].ToString()));
 					row["StatementNum"]="0";
 					row["ToothNum"]="";
@@ -1908,7 +1921,12 @@ namespace OpenDentBusiness {
 				dateT=PIn.DateT(rawPayPlan.Rows[i]["PayPlanDate"].ToString());
 				row["DateTime"]=dateT;
 				row["date"]=dateT.ToShortDateString();
-				row["due"]=due.ToString("n");
+				if(rawPayPlan.Rows[i]["PlanNum"].ToString()=="0") {
+					row["due"]=due.ToString("n");
+				}
+				else {
+					row["due"]=0.ToString("n");
+				}
 				row["guarantor"]=fam.GetNameInFamLF(PIn.Long(rawPayPlan.Rows[i]["Guarantor"].ToString()));
 				row["InstallmentPlanNum"]="0";
 				row["IsClosed"]=rawPayPlan.Rows[i]["IsClosed"].ToString();
@@ -1979,6 +1997,9 @@ namespace OpenDentBusiness {
 			for(int i=0;i<rawPayPlan.Rows.Count;i++){//loop through the payment plans (usually zero or one)
 				//Do not include a payment plan in the payment plan grid if the guarantor is from another family
 				if(!fam.ListPats.Select(x => x.PatNum).ToList().Contains(PIn.Long(rawPayPlan.Rows[i]["Guarantor"].ToString()))) {
+					continue;
+				}
+				if(rawPayPlan.Rows[i]["IsClosed"].ToString()=="1") {
 					continue;
 				}
 				princ=PIn.Decimal(rawPayPlan.Rows[i]["principal_"].ToString());

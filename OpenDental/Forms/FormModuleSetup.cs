@@ -175,6 +175,7 @@ namespace OpenDental{
 		private Label label30;
 		private TextBox textClaimSnapshotRunTime;
 		private ComboBox comboClaimSnapshotTrigger;
+		private CheckBox checkPayPlansVersion;
 		private GroupBox groupBox3;
 
 		///<summary>Default constructor.  Opens the form with the Appts tab selected.</summary>
@@ -272,6 +273,12 @@ namespace OpenDental{
 			this.comboSearchBehavior = new System.Windows.Forms.ComboBox();
 			this.checkAppointmentTimeIsLocked = new System.Windows.Forms.CheckBox();
 			this.tabFamily = new System.Windows.Forms.TabPage();
+			this.groupBox5 = new System.Windows.Forms.GroupBox();
+			this.label31 = new System.Windows.Forms.Label();
+			this.label30 = new System.Windows.Forms.Label();
+			this.textClaimSnapshotRunTime = new System.Windows.Forms.TextBox();
+			this.comboClaimSnapshotTrigger = new System.Windows.Forms.ComboBox();
+			this.checkEnableClaimSnapshot = new System.Windows.Forms.CheckBox();
 			this.checkSuperFamSync = new System.Windows.Forms.CheckBox();
 			this.label26 = new System.Windows.Forms.Label();
 			this.comboSuperFamSort = new System.Windows.Forms.ComboBox();
@@ -361,16 +368,12 @@ namespace OpenDental{
 			this.colorDialog = new System.Windows.Forms.ColorDialog();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
-			this.groupBox5 = new System.Windows.Forms.GroupBox();
-			this.checkEnableClaimSnapshot = new System.Windows.Forms.CheckBox();
-			this.comboClaimSnapshotTrigger = new System.Windows.Forms.ComboBox();
-			this.textClaimSnapshotRunTime = new System.Windows.Forms.TextBox();
-			this.label30 = new System.Windows.Forms.Label();
-			this.label31 = new System.Windows.Forms.Label();
+			this.checkPayPlansVersion = new System.Windows.Forms.CheckBox();
 			this.tabControl1.SuspendLayout();
 			this.tabAppts.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.tabFamily.SuspendLayout();
+			this.groupBox5.SuspendLayout();
 			this.tabAccount.SuspendLayout();
 			this.groupBox4.SuspendLayout();
 			this.tabTreatPlan.SuspendLayout();
@@ -379,7 +382,6 @@ namespace OpenDental{
 			this.groupBox3.SuspendLayout();
 			this.tabManage.SuspendLayout();
 			this.groupBox1.SuspendLayout();
-			this.groupBox5.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -851,7 +853,7 @@ namespace OpenDental{
 			this.tabControl1.Location = new System.Drawing.Point(20, 10);
 			this.tabControl1.Name = "tabControl1";
 			this.tabControl1.SelectedIndex = 0;
-			this.tabControl1.Size = new System.Drawing.Size(474, 537);
+			this.tabControl1.Size = new System.Drawing.Size(474, 556);
 			this.tabControl1.TabIndex = 196;
 			// 
 			// tabAppts
@@ -1117,6 +1119,68 @@ namespace OpenDental{
 			this.tabFamily.TabIndex = 1;
 			this.tabFamily.Text = "Family";
 			// 
+			// groupBox5
+			// 
+			this.groupBox5.Controls.Add(this.label31);
+			this.groupBox5.Controls.Add(this.label30);
+			this.groupBox5.Controls.Add(this.textClaimSnapshotRunTime);
+			this.groupBox5.Controls.Add(this.comboClaimSnapshotTrigger);
+			this.groupBox5.Controls.Add(this.checkEnableClaimSnapshot);
+			this.groupBox5.Location = new System.Drawing.Point(98, 282);
+			this.groupBox5.Name = "groupBox5";
+			this.groupBox5.Size = new System.Drawing.Size(346, 100);
+			this.groupBox5.TabIndex = 220;
+			this.groupBox5.TabStop = false;
+			this.groupBox5.Text = "Claim Snapshot";
+			// 
+			// label31
+			// 
+			this.label31.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.label31.Location = new System.Drawing.Point(24, 31);
+			this.label31.Name = "label31";
+			this.label31.Size = new System.Drawing.Size(164, 15);
+			this.label31.TabIndex = 224;
+			this.label31.Text = "Snapshot Trigger";
+			this.label31.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// label30
+			// 
+			this.label30.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.label30.Location = new System.Drawing.Point(59, 57);
+			this.label30.Name = "label30";
+			this.label30.Size = new System.Drawing.Size(167, 15);
+			this.label30.TabIndex = 223;
+			this.label30.Text = "eConnector Run Time";
+			this.label30.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			// 
+			// textClaimSnapshotRunTime
+			// 
+			this.textClaimSnapshotRunTime.Location = new System.Drawing.Point(232, 54);
+			this.textClaimSnapshotRunTime.Name = "textClaimSnapshotRunTime";
+			this.textClaimSnapshotRunTime.Size = new System.Drawing.Size(110, 20);
+			this.textClaimSnapshotRunTime.TabIndex = 222;
+			// 
+			// comboClaimSnapshotTrigger
+			// 
+			this.comboClaimSnapshotTrigger.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboClaimSnapshotTrigger.FormattingEnabled = true;
+			this.comboClaimSnapshotTrigger.Location = new System.Drawing.Point(194, 28);
+			this.comboClaimSnapshotTrigger.MaxDropDownItems = 30;
+			this.comboClaimSnapshotTrigger.Name = "comboClaimSnapshotTrigger";
+			this.comboClaimSnapshotTrigger.Size = new System.Drawing.Size(148, 21);
+			this.comboClaimSnapshotTrigger.TabIndex = 221;
+			// 
+			// checkEnableClaimSnapshot
+			// 
+			this.checkEnableClaimSnapshot.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkEnableClaimSnapshot.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkEnableClaimSnapshot.Location = new System.Drawing.Point(101, 9);
+			this.checkEnableClaimSnapshot.Name = "checkEnableClaimSnapshot";
+			this.checkEnableClaimSnapshot.Size = new System.Drawing.Size(241, 17);
+			this.checkEnableClaimSnapshot.TabIndex = 220;
+			this.checkEnableClaimSnapshot.Text = "Enable Claim Snapshots";
+			this.checkEnableClaimSnapshot.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// checkSuperFamSync
 			// 
 			this.checkSuperFamSync.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -1240,6 +1304,7 @@ namespace OpenDental{
 			// tabAccount
 			// 
 			this.tabAccount.BackColor = System.Drawing.SystemColors.Window;
+			this.tabAccount.Controls.Add(this.checkPayPlansVersion);
 			this.tabAccount.Controls.Add(this.groupBox4);
 			this.tabAccount.Controls.Add(this.label28);
 			this.tabAccount.Controls.Add(this.comboUnallocatedSplits);
@@ -1269,7 +1334,7 @@ namespace OpenDental{
 			this.tabAccount.Controls.Add(this.checkProviderIncomeShows);
 			this.tabAccount.Location = new System.Drawing.Point(4, 22);
 			this.tabAccount.Name = "tabAccount";
-			this.tabAccount.Size = new System.Drawing.Size(466, 511);
+			this.tabAccount.Size = new System.Drawing.Size(466, 530);
 			this.tabAccount.TabIndex = 2;
 			this.tabAccount.Text = "Account";
 			// 
@@ -1278,7 +1343,7 @@ namespace OpenDental{
 			this.groupBox4.Controls.Add(this.listboxBadDebtAdjs);
 			this.groupBox4.Controls.Add(this.label29);
 			this.groupBox4.Controls.Add(this.butBadDebt);
-			this.groupBox4.Location = new System.Drawing.Point(126, 386);
+			this.groupBox4.Location = new System.Drawing.Point(126, 405);
 			this.groupBox4.Name = "groupBox4";
 			this.groupBox4.Size = new System.Drawing.Size(314, 122);
 			this.groupBox4.TabIndex = 224;
@@ -1465,6 +1530,7 @@ namespace OpenDental{
 			// 
 			this.textTreatNote.AcceptsTab = true;
 			this.textTreatNote.BackColor = System.Drawing.SystemColors.Window;
+			this.textTreatNote.DetectLinksEnabled = false;
 			this.textTreatNote.DetectUrls = false;
 			this.textTreatNote.Location = new System.Drawing.Point(77, 7);
 			this.textTreatNote.MaxLength = 32767;
@@ -2130,7 +2196,7 @@ namespace OpenDental{
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(441, 553);
+			this.butCancel.Location = new System.Drawing.Point(445, 572);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 8;
@@ -2145,78 +2211,27 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(336, 553);
+			this.butOK.Location = new System.Drawing.Point(364, 572);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(75, 24);
 			this.butOK.TabIndex = 7;
 			this.butOK.Text = "&OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
-			// groupBox5
+			// checkPayPlansVersion
 			// 
-			this.groupBox5.Controls.Add(this.label31);
-			this.groupBox5.Controls.Add(this.label30);
-			this.groupBox5.Controls.Add(this.textClaimSnapshotRunTime);
-			this.groupBox5.Controls.Add(this.comboClaimSnapshotTrigger);
-			this.groupBox5.Controls.Add(this.checkEnableClaimSnapshot);
-			this.groupBox5.Location = new System.Drawing.Point(98, 282);
-			this.groupBox5.Name = "groupBox5";
-			this.groupBox5.Size = new System.Drawing.Size(346, 100);
-			this.groupBox5.TabIndex = 220;
-			this.groupBox5.TabStop = false;
-			this.groupBox5.Text = "Claim Snapshot";
-			// 
-			// checkEnableClaimSnapshot
-			// 
-			this.checkEnableClaimSnapshot.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkEnableClaimSnapshot.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.checkEnableClaimSnapshot.Location = new System.Drawing.Point(101, 9);
-			this.checkEnableClaimSnapshot.Name = "checkEnableClaimSnapshot";
-			this.checkEnableClaimSnapshot.Size = new System.Drawing.Size(241, 17);
-			this.checkEnableClaimSnapshot.TabIndex = 220;
-			this.checkEnableClaimSnapshot.Text = "Enable Claim Snapshots";
-			this.checkEnableClaimSnapshot.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// comboClaimSnapshotTrigger
-			// 
-			this.comboClaimSnapshotTrigger.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-			this.comboClaimSnapshotTrigger.FormattingEnabled = true;
-			this.comboClaimSnapshotTrigger.Location = new System.Drawing.Point(194, 28);
-			this.comboClaimSnapshotTrigger.MaxDropDownItems = 30;
-			this.comboClaimSnapshotTrigger.Name = "comboClaimSnapshotTrigger";
-			this.comboClaimSnapshotTrigger.Size = new System.Drawing.Size(148, 21);
-			this.comboClaimSnapshotTrigger.TabIndex = 221;
-			// 
-			// textClaimSnapshotRunTime
-			// 
-			this.textClaimSnapshotRunTime.Location = new System.Drawing.Point(232, 54);
-			this.textClaimSnapshotRunTime.Name = "textClaimSnapshotRunTime";
-			this.textClaimSnapshotRunTime.Size = new System.Drawing.Size(110, 20);
-			this.textClaimSnapshotRunTime.TabIndex = 222;
-			// 
-			// label30
-			// 
-			this.label30.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label30.Location = new System.Drawing.Point(59, 57);
-			this.label30.Name = "label30";
-			this.label30.Size = new System.Drawing.Size(167, 15);
-			this.label30.TabIndex = 223;
-			this.label30.Text = "eConnector Run Time";
-			this.label30.TextAlign = System.Drawing.ContentAlignment.TopRight;
-			// 
-			// label31
-			// 
-			this.label31.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.label31.Location = new System.Drawing.Point(24, 31);
-			this.label31.Name = "label31";
-			this.label31.Size = new System.Drawing.Size(164, 15);
-			this.label31.TabIndex = 224;
-			this.label31.Text = "Snapshot Trigger";
-			this.label31.TextAlign = System.Drawing.ContentAlignment.TopRight;
+			this.checkPayPlansVersion.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+			this.checkPayPlansVersion.FlatStyle = System.Windows.Forms.FlatStyle.System;
+			this.checkPayPlansVersion.Location = new System.Drawing.Point(3, 388);
+			this.checkPayPlansVersion.Name = "checkPayPlansVersion";
+			this.checkPayPlansVersion.Size = new System.Drawing.Size(438, 17);
+			this.checkPayPlansVersion.TabIndex = 225;
+			this.checkPayPlansVersion.Text = "Display PayPlanCharges as line items in Account Module and Aging of A/R";
+			this.checkPayPlansVersion.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// FormModuleSetup
 			// 
-			this.ClientSize = new System.Drawing.Size(543, 590);
+			this.ClientSize = new System.Drawing.Size(543, 609);
 			this.Controls.Add(this.tabControl1);
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.butOK);
@@ -2233,6 +2248,8 @@ namespace OpenDental{
 			this.tabAppts.PerformLayout();
 			this.groupBox2.ResumeLayout(false);
 			this.tabFamily.ResumeLayout(false);
+			this.groupBox5.ResumeLayout(false);
+			this.groupBox5.PerformLayout();
 			this.tabAccount.ResumeLayout(false);
 			this.tabAccount.PerformLayout();
 			this.groupBox4.ResumeLayout(false);
@@ -2245,8 +2262,6 @@ namespace OpenDental{
 			this.tabManage.ResumeLayout(false);
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();
-			this.groupBox5.ResumeLayout(false);
-			this.groupBox5.PerformLayout();
 			this.ResumeLayout(false);
 
 		}
@@ -2412,6 +2427,7 @@ namespace OpenDental{
 			textInsWriteoffDescript.Text=PrefC.GetString(PrefName.InsWriteoffDescript);
 			checkRecurChargPriProv.Checked=PrefC.GetBool(PrefName.RecurringChargesUsePriProv);
 			checkPaymentsUsePatClin.Checked=PrefC.GetBool(PrefName.PaymentsUsePatientClinic);
+			checkPayPlansVersion.Checked=(PrefC.GetInt(PrefName.PayPlansVersion)==2);
 			string[] paySplitEnumNames=Enum.GetNames(typeof(SplitManagerPromptType));
 			for(int i=0;i<paySplitEnumNames.Length;i++) {
 				comboPaySplitManage.Items.Add(paySplitEnumNames[i]);
@@ -2790,6 +2806,10 @@ namespace OpenDental{
 					}
 				}
 			}//end if TP Note Changed
+			int payPlanVersion=1;
+			if(checkPayPlansVersion.Checked) {
+				payPlanVersion=2;
+			}
 			if(
 				#region Appointment Module
 				Prefs.UpdateBool(PrefName.AppointmentBubblesDisabled,checkAppointmentBubblesDisabled.Checked)
@@ -2853,6 +2873,7 @@ namespace OpenDental{
 				| Prefs.UpdateString(PrefName.InsWriteoffDescript,textInsWriteoffDescript.Text)
 				| Prefs.UpdateBool(PrefName.PaymentsUsePatientClinic,checkPaymentsUsePatClin.Checked)
 				| Prefs.UpdateLong(PrefName.PrepaymentUnearnedType,_arrayPaySplitUnearnedType[comboUnallocatedSplits.SelectedIndex].DefNum)
+				| Prefs.UpdateInt(PrefName.PayPlansVersion,payPlanVersion)
 				#endregion
 				#region TP Module
 				| Prefs.UpdateString(PrefName.TreatmentPlanNote,textTreatNote.Text)

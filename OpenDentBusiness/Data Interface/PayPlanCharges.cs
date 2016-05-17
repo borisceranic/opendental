@@ -68,9 +68,6 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),proc);
 				return;
 			}
-			if(PrefC.GetInt(PrefName.PayPlansVersion)==1) {
-				return;
-			}
 			List<PayPlanCharge> listCharges=GetFromProc(proc.ProcNum);
 			foreach(PayPlanCharge chargeCur in listCharges) {
 				chargeCur.ChargeDate=DateTime.MaxValue;
@@ -81,18 +78,6 @@ namespace OpenDentBusiness{
 			}
 			List<PayPlan> listPayPlans=PayPlans.GetAllForCharges(listCharges);
 			PayPlans.UpdateTreatmentCompletedAmt(listPayPlans);
-		}
-
-		///<summary>Returns a list of procedures attached to the passed-in payment plan.  Returns an empty list if none.</summary>
-		public static List<Procedure> GetPayPlanProcs(long payPlanNum) {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<Procedure>>(MethodBase.GetCurrentMethod(),payPlanNum);
-			}
-			string command="SELECT procedurelog.* FROM procedurelog "
-				+"INNER JOIN payplancharge ON payplancharge.ProcNum=procedurelog.ProcNum "
-				+"AND payplancharge.PayPlanNum="+payPlanNum+" "
-				+"GROUP BY procedurelog.ProcNum";
-			return Crud.ProcedureCrud.SelectMany(command);
 		}
 
 		///<summary>Takes a procNum and returns a list of all payment plan charge credits associated to the procedure.
@@ -140,7 +125,7 @@ namespace OpenDentBusiness{
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),procNum);
 				return;
 			}
-			if(PrefC.GetInt(PrefName.PayPlansVersion) == 1 || procNum == 0) {
+			if(procNum==0) {
 				return;
 			}
 			List<PayPlan> listPayPlans=PayPlans.GetAllForCharges(GetFromProc(procNum));

@@ -10,6 +10,17 @@ namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
 		public static System.Version LatestVersion=new Version("16.3.0.0");//This value must be changed when a new conversion is to be triggered.
 
+		#region Helper Functions
+
+		private static string Curdate() {
+			if(DataConnection.DBtype==DatabaseType.Oracle) {
+				return "SYSDATE";
+			}
+			return "CURDATE()";
+		}
+
+		#endregion
+
 		private static void To16_2_1() {
 			if(FromVersion<new Version("16.2.1.0")) {
 				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.2.1"));//No translation in convert script.
@@ -981,6 +992,80 @@ namespace OpenDentBusiness {
 					command="UPDATE payplan SET IsClosed = 0 WHERE IsClosed IS NULL";
 					Db.NonQ(command);
 					command="ALTER TABLE payplan MODIFY IsClosed NOT NULL";
+					Db.NonQ(command);
+				}
+				//Get all payment plans that have been paid off and need to be "closed".
+				command="SELECT payplan.PayPlanNum,SUM(payplancharge.Principal) AS Princ,SUM(payplancharge.Interest) AS Interest,"
+					+"COALESCE(ps.TotPayments,0) AS TotPay,COALESCE(cp.InsPayments,0) AS InsPay,"
+					+"MAX(payplancharge.ChargeDate) AS LastDate "
+					+"FROM payplan "
+					+"LEFT JOIN payplancharge ON payplancharge.PayPlanNum=payplan.PayPlanNum "
+					+"LEFT JOIN ("
+						+"SELECT paysplit.PayPlanNum, SUM(paysplit.SplitAmt) AS TotPayments "
+						+"FROM paysplit "
+						+"GROUP BY paysplit.PayPlanNum "
+					+")ps ON ps.PayPlanNum = payplan.PayPlanNum "
+					+"LEFT JOIN ( "
+						+"SELECT claimproc.PayPlanNum, SUM(claimproc.InsPayAmt) AS InsPayments "
+						+"FROM claimproc "
+						+"GROUP BY claimproc.PayPlanNum "
+					+")cp ON cp.PayPlanNum = payplan.PayPlanNum "
+					+"HAVING Princ+Interest <= (TotPay + InsPay) AND LastDate <="+Curdate();
+				table=Db.GetTable(command);
+				string payPlanNums="";
+				for(int i=0;i < table.Rows.Count;i++) {
+					if(i!=0) {
+						payPlanNums+=",";
+					}
+					payPlanNums+=table.Rows[i]["PayPlanNum"];
+				}
+				//Set all payment plans closed based on previous criteria.
+				if(payPlanNums!="") {
+					command="UPDATE payplan SET IsClosed=1 WHERE PayPlanNum IN ("+payPlanNums+")";
+					Db.NonQ(command);
+				}
+				//add a payplancharge credit for all current payment plans
+				command="SELECT payplan.PayPlanNum,payplan.PatNum,payplan.Guarantor,payplan.PayPlanDate,payplan.PlanNum,payplan.CompletedAmt,"
+					+"COALESCE(payplancharge.ProvNum,patient.PriProv) AS ProvNum,COALESCE(payplancharge.ClinicNum,patient.ClinicNum) AS ClinicNum "
+					+"FROM payplan "
+					+"LEFT JOIN payplancharge ON payplancharge.PayPlanNum=payplan.PayPlanNum "
+					+"INNER JOIN patient on patient.PatNum=payplan.PatNum ";
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command+="GROUP BY payplan.PayPlanNum";
+				}
+				else {
+					//TODO: make oracle compatible by grouping by every column that is not an aggregate. 
+					command+="GROUP BY payplan.PayPlanNum";
+				}
+				table=Db.GetTable(command);
+				for(int i=0;i<table.Rows.Count;i++) {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						command="INSERT INTO payplancharge (PayPlanNum,Guarantor,PatNum,ChargeDate,Principal,Note,ProvNum,ClinicNum,ChargeType) "
+							+"VALUES ("
+							+"'"+table.Rows[i]["PayPlanNum"].ToString()+"',"
+							+"'"+table.Rows[i]["Guarantor"].ToString()+"',"
+							+"'"+table.Rows[i]["PatNum"].ToString()+"',"
+							+POut.Date(PIn.Date(table.Rows[i]["PayPlanDate"].ToString()))+","
+							+"'"+table.Rows[i]["CompletedAmt"].ToString()+"',"
+							+"'"+"Payment Plan Credit"+"',"
+							+"'"+table.Rows[i]["ProvNum"].ToString()+"',"
+							+"'"+table.Rows[i]["ClinicNum"].ToString()+"',"
+							+"'1')";//Charge Type of Credit
+					}
+					else {//oracle
+						command="INSERT INTO payplancharge (PayPlanChargeNum,PayPlanNum,Guarantor,PatNum,ChargeDate,Principal,Note,ProvNum,ClinicNum,ChargeType) "
+							+"VALUES ("
+							+"(SELECT COALESCE(MAX(PayPlanChargeNum),0)+1 FROM payplancharge)"+","
+							+"'"+table.Rows[i]["PayPlanNum"].ToString()+"',"
+							+"'"+table.Rows[i]["Guarantor"].ToString()+"',"
+							+"'"+table.Rows[i]["PatNum"].ToString()+"',"
+							+POut.Date(PIn.Date(table.Rows[i]["PayPlanDate"].ToString()))+","
+							+"'"+table.Rows[i]["CompletedAmt"].ToString()+"',"
+							+"'"+"Payment Plan Credit"+"',"
+							+"'"+table.Rows[i]["ProvNum"].ToString()+"',"
+							+"'"+table.Rows[i]["ClinicNum"].ToString()+"',"
+							+"'1')";//Charge Type of Credit
+					}
 					Db.NonQ(command);
 				}
 				if(DataConnection.DBtype==DatabaseType.MySql) {
