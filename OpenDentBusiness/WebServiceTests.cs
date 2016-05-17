@@ -367,7 +367,9 @@ namespace OpenDentBusiness {
 				new Icd10					{	Description=DirtyString	},
 				new DiseaseDef		{ DiseaseName=DirtyString }
 			};
-			return new List<CDSIntervention> { new CDSIntervention { InterventionMessage=DirtyString,TriggerObjects=listObjs } };
+			return new List<CDSIntervention> { new CDSIntervention {
+				InterventionMessage=DirtyString,
+				TriggerObjects=EhrTriggers.ConvertListToKnowledgeRequests(listObjs) } };
 		}
 
 		public static Vitalsign GetVitalsignFromObjectParam(object obj) {

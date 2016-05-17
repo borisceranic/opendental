@@ -104,7 +104,55 @@ namespace OpenDentBusiness {
 		///<summary>The message generated for the user based on the specific objects that triggered the intervention. </summary>
 		public string InterventionMessage;
 		///<summary>The list of objects that will be passed to FormInfobutton. </summary>
-		public List<object> TriggerObjects;
+		public List<KnowledgeRequest> TriggerObjects;
+	}
+
+	///<summary>Not a DB table. Used to pass trigger object information for a CDSIntervention.</summary>
+	public class KnowledgeRequest {
+		///<summary>The EHRtrigger that this CDSIntervention is generated from.</summary>
+		public string Type;
+		///<summary>The message generated for the user based on the specific objects that triggered the intervention.</summary>
+		public string Code;
+		///<summary>The list of objects that will be passed to FormInfobutton.</summary>
+		public CodeSyst CodeSystem;
+		///<summary>The description of the knowledge request.</summary>
+		public string Description;
+
+		///<summary>Converts the CodeSystem enum value into a string for display purposes.</summary>
+		public string GetCodeSystemDisplay() {
+			switch(CodeSystem) {
+				case CodeSyst.None:
+					return "None";
+				case CodeSyst.Snomed:
+					return "SNOMED CT";
+				case CodeSyst.Icd9:
+					return "ICD9 CM";
+				case CodeSyst.Icd10:
+					return "ICD10 CM";
+				case CodeSyst.Loinc:
+					return "LOINC";
+				case CodeSyst.RxNorm:
+					return "RxNorm";
+				case CodeSyst.ProblemDef:
+					return "Problem Def";
+				case CodeSyst.AllergyDef:
+					return "Allergy Def";
+				default:
+					return CodeSystem.ToString();
+			}
+		}
+	}
+
+	///<summary>The different types of code systems that a knowledge request can be for.</summary>
+	public enum CodeSyst {
+		None,
+		Snomed,
+		Icd9,
+		Icd10,
+		Loinc,
+		RxNorm,
+		ProblemDef,
+		AllergyDef
 	}
 
 	/// <summary></summary>

@@ -11,7 +11,6 @@ namespace OpenDental {
 		public Snomed SelectedSnomed;
 		public List<Snomed> ListSelectedSnomeds;
 		private List<Snomed> SnomedList;
-		private bool changed;
 		private bool _showingInfoButton;//used when filling grid. for increased speed.
 		private int _showingInfobuttonShift;//used when sorting grid rows. 1 if showing, 0 if hidden
 
@@ -114,8 +113,8 @@ namespace OpenDental {
 			if(e.Col!=0) {
 				return;
 			}
-			FormInfobutton FormIB = new FormInfobutton();
-			FormIB.ListObjects.Add(Snomeds.GetByCode(gridMain.Rows[e.Row].Cells[1].Text));
+			List<KnowledgeRequest> listKnowledgeRequests=EhrTriggers.ConvertToKnowledgeRequests(Snomeds.GetByCode(gridMain.Rows[e.Row].Cells[1].Text));
+			FormInfobutton FormIB=new FormInfobutton(listKnowledgeRequests);
 			FormIB.ShowDialog();
 		}
 
@@ -134,7 +133,7 @@ namespace OpenDental {
 				//Just string compare
 				return row1.Cells[2+_showingInfobuttonShift].Text.CompareTo(row2.Cells[2+_showingInfobuttonShift].Text);
 			}
-			catch(Exception ex) {
+			catch(Exception) {
 				return 0;
 			}
 		}

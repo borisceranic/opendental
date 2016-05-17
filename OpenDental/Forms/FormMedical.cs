@@ -1316,11 +1316,24 @@ namespace OpenDental{
 			if(e.Col!=0) {
 				return;
 			}
-			FormInfobutton FormIB = new FormInfobutton();
+			List<KnowledgeRequest> listKnowledgeRequests;
+			MedicationPat medPat=medList[e.Row];
+			if(medPat.MedicationNum==0) {//Medication orders returned from NewCrop
+				listKnowledgeRequests=new List<KnowledgeRequest> {
+					new KnowledgeRequest {
+						Type="Medication",
+						Code=POut.Long(medPat.RxCui),
+						CodeSystem=CodeSyst.RxNorm,
+						Description=medPat.MedDescript
+					}
+				};
+			}
+			else {
+				listKnowledgeRequests=EhrTriggers.ConvertToKnowledgeRequests(medList[e.Row]);				
+			}
+			FormInfobutton FormIB=new FormInfobutton(listKnowledgeRequests);
 			FormIB.PatCur=PatCur;
 			//FormInfoButton allows MedicationCur to be null, so this will still work for medication orders returned from NewCrop (because MedicationNum will be 0).
-			FormIB.ListObjects.Add(medList[e.Row]);//TODO: verify that this is what we need to get.
-			//FormIB.ListObjects.Add(Medications.GetMedicationFromDb(medList[e.Row].MedicationNum));//TODO: verify that this is what we need to get.
 			FormIB.ShowDialog();
 			//Nothing to do with Dialog Result yet.
 		}
@@ -1684,9 +1697,9 @@ namespace OpenDental{
 			if(e.Col!=0) {
 				return;
 			}
-			FormInfobutton FormIB=new FormInfobutton();
+			List<KnowledgeRequest> listKnowledgeRequests=EhrTriggers.ConvertToKnowledgeRequests(DiseaseDefs.GetItem(DiseaseList[e.Row].DiseaseDefNum));
+			FormInfobutton FormIB=new FormInfobutton(listKnowledgeRequests);
 			FormIB.PatCur=PatCur;
-			FormIB.ListObjects.Add(DiseaseDefs.GetItem(DiseaseList[e.Row].DiseaseDefNum));//TODO: verify that this is what we need to get.
 			FormIB.ShowDialog();
 			//Nothing to do with Dialog Result yet.
 		}
@@ -1760,10 +1773,9 @@ namespace OpenDental{
 			if(e.Col!=0) {
 				return;
 			}
-			FormInfobutton FormIB=new FormInfobutton();
+			List<KnowledgeRequest> listKnowledgeRequests=EhrTriggers.ConvertToKnowledgeRequests(AllergyDefs.GetOne(allergyList[e.Row].AllergyDefNum));
+			FormInfobutton FormIB=new FormInfobutton(listKnowledgeRequests);
 			FormIB.PatCur=PatCur;
-			//TODO: get right object and pass it in.
-			//FormIB. = Medications.GetMedicationFromDb(medList[e.Row].MedicationNum);//TODO: verify that this is what we need to get.
 			FormIB.ShowDialog();
 			//Nothing to do with Dialog Result yet.
 		}
