@@ -51,7 +51,7 @@ namespace OpenDental {
 				row.Cells.Add(_table.Rows[i][1].ToString());//Trigger Text
 				row.Cells.Add(_table.Rows[i][2].ToString());//TriggerInstructions
 				row.Cells.Add(_table.Rows[i][3].ToString());//Bibliography
-				row.Tag=(List<object>)_table.Rows[i][4];//List of objects to be sent to FormInfobutton;
+				row.Tag=(List<KnowledgeRequest>)_table.Rows[i][4];//List of objects to be sent to FormInfobutton;
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
@@ -64,8 +64,7 @@ namespace OpenDental {
 			if(e.Col!=0) {
 				return;//not infobutton column
 			}
-			FormInfobutton FormIB=new FormInfobutton();
-			FormIB.ListObjects=(List<object>)gridMain.Rows[e.Row].Tag;
+			FormInfobutton FormIB=new FormInfobutton((List<KnowledgeRequest>)gridMain.Rows[e.Row].Tag);
 			FormIB.ShowDialog();
 		}
 
@@ -84,7 +83,7 @@ namespace OpenDental {
 			_table.Columns.Add("");//Conditions = Description and match conditions
 			_table.Columns.Add("");//Instructions
 			_table.Columns.Add("");//Bibliographic information
-			_table.Columns.Add("",typeof(List<object>));//Used to store the list of matched objects to later be passed to formInfobutton.
+			_table.Columns.Add("",typeof(List<KnowledgeRequest>));//Used to store the list of matched objects to later be passed to formInfobutton.
 			foreach(CDSIntervention cdsi in ListCDSI) {
 				DataRow row=_table.NewRow();
 				row[0]="0";
