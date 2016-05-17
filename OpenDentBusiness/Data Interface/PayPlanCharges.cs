@@ -49,6 +49,16 @@ namespace OpenDentBusiness{
 			return Crud.PayPlanChargeCrud.SelectMany(command);
 		}
 
+		public static List<PayPlanCharge> GetCreditsForPayPlan(long payPlanNum) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<List<PayPlanCharge>>(MethodBase.GetCurrentMethod(),payPlanNum);
+			}
+			string command="SELECT * FROM payplancharge "
+				+"WHERE PayPlanNum="+POut.Long(payPlanNum)+" "
+				+"AND ChargeType="+(int)PayPlanChargeType.Credit;
+			return Crud.PayPlanChargeCrud.SelectMany(command);
+		}
+
 		///<summary>Takes a procNum and updates all of the dates of the payment plan charge credits associated to it.
 		///If a completed procedure is passed in, it will update all of the payment plan charges associated to it to the ProcDate. 
 		///If a non-complete procedure is passed in, it will update the charges associated to MaxValue.
