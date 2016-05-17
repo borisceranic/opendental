@@ -95,13 +95,10 @@ namespace OpenDentBusiness {
 			else if(displayPayPlanType==DisplayPayPlanType.Both) {
 				//Do not filter the query at all which will show both insurance and patient payment plan types.
 			}
-			if(hideCompletedPlans && PrefC.GetInt(PrefName.PayPlansVersion) == 2) { //version 2 hide completed payment plans
+			if(hideCompletedPlans) {
 				command+="AND payplan.IsClosed=0 ";
 			}
-				command+="GROUP BY FName,LName,MiddleI,Preferred,payplan.PayPlanNum ";
-			if(hideCompletedPlans && PrefC.GetInt(PrefName.PayPlansVersion) == 1) {//version 1 hide completed payment plans
-				command+="HAVING _credits!=_principal AND MAX(DATE(payplancharge.ChargeDate)) > "+DbHelper.Curdate();
-			}
+			command+="GROUP BY FName,LName,MiddleI,Preferred,payplan.PayPlanNum ";
 			if(!PrefC.GetBool(PrefName.EasyNoClinics)) {
 				command+="ORDER BY ClinicNum,LName,FName";
 			}
@@ -125,16 +122,6 @@ namespace OpenDentBusiness {
 					paid=PIn.Double(raw.Rows[i]["_insPaid"].ToString());
 				}
 				accumDue=PIn.Double(raw.Rows[i]["_accumDue"].ToString());
-				if(hideCompletedPlans) {
-					//We store all monetary amounts in our database as data type "double".  
-					//Doubles cannot do precision math so some payment plans that are already paid off will get returned.
-					//We need to skip any payment plans that are off by a fraction of a penny.
-					//We cannot use _accumDue (which is principle (up to today) + interest (up to today)) because we need principle for the entire payment plan.
-					double amountRemain=(princ+interest)-paid;
-					if(amountRemain < 0.005) {
-						continue;
-					}
-				}
 				row=table.NewRow();
 				//payplanDate=PIn.PDate(raw.Rows[i]["PayPlanDate"].ToString());
 				//row["date"]=raw.Rows[i]["PayPlanDate"].ToString();//payplanDate.ToShortDateString();

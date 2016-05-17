@@ -682,7 +682,7 @@ namespace OpenDental{
 					if(!PrefC.GetBool(PrefName.BalancesDontSubtractIns)) {//this is typical
 						balTotal-=PatGuar.InsEst;
 					}
-					for(int m=0;m<tableMisc.Rows.Count;m++){
+					for(int m = 0;m<tableMisc.Rows.Count;m++) {
 						//only add the payplandue value for version 1. (version 2+ already account for it when calculating aging)
 						if(tableMisc.Rows[m]["descript"].ToString()=="payPlanDue" && PrefC.GetInt(PrefName.PayPlansVersion)==1) {
 							balTotal+=PIn.Double(tableMisc.Rows[m]["value"].ToString());
@@ -690,7 +690,7 @@ namespace OpenDental{
 						}
 					}
 					InstallmentPlan installPlan=InstallmentPlans.GetOneForFam(PatGuar.PatNum);
-					if(installPlan!=null){
+					if(installPlan!=null) {
 						//show lesser of normal total balance or the monthly payment amount.
 						if(installPlan.MonthlyPayment < balTotal) {
 							text=installPlan.MonthlyPayment.ToString("F");

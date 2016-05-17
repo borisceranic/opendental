@@ -159,47 +159,6 @@ namespace OpenDentBusiness{
 				.Sum();
 		}
 
-		///<summary>Updates the database preference "PayPlansVerion" and puts a payment plan credit into the ledger for all currently existing.
-		///Pass in the version to update to.  Currently you can only update from version 1 to version 2.
-		///Does NOT perform aging or generate the post-update changelog PDF.  (See FormPayPlanUpdate)</summary>
-		public static bool UpdatePayPlanVersion(int versionNumber) {
-			//No need to check RemotingRole; no call to db.
-			switch(versionNumber) {
-				case 2:					
-					List<PayPlan> listPayPlanAll=GetAll();//get all payment plans
-					foreach(PayPlan payPlanCur in listPayPlanAll) {//for each plan, create a new credit of the txCompletedAmt.
-						//it should not be possible to have an existing payment plan without at least one payplancharge.
-						List<PayPlanCharge> listPayPlanCharges=PayPlanCharges.GetForPayPlan(payPlanCur.PayPlanNum);
-						//add a credit to the list of payplancharges for each payplan
-						PayPlanCharge creditNew=new PayPlanCharge();
-						creditNew.ChargeDate=payPlanCur.PayPlanDate;
-						creditNew.ChargeType=PayPlanChargeType.Credit;
-						creditNew.ClinicNum=listPayPlanCharges[0].ClinicNum;//Because all payplancharges for a payment plan have the same ClinicNum.
-						creditNew.Guarantor=payPlanCur.Guarantor;
-						creditNew.Note=Lans.g("AccountModule","Payment Plan Credit");
-						creditNew.PatNum=payPlanCur.PatNum;
-						creditNew.PayPlanNum=payPlanCur.PayPlanNum;
-						creditNew.Principal=payPlanCur.CompletedAmt;
-						creditNew.ProvNum=listPayPlanCharges[0].ProvNum;//Because all payplancharges for a payment plan have the same ProvNum.
-						PayPlanCharges.Insert(creditNew);
-					}
-					Prefs.RefreshCache();//Because the prefs might not yet been refreshed in FormOpenDental if we are in the middle of updating.
-					Prefs.UpdateInt(PrefName.PayPlansVersion,2);
-					Prefs.RefreshCache();
-					break;
-				default:
-					throw new Exception("Version 2 is the highest Payment Plan version currently available.");
-		}
-			return true;
-		}
-
-		public static List<PayPlan> GetAll() {
-			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<PayPlan>>(MethodBase.GetCurrentMethod());
-			}
-			return Crud.PayPlanCrud.SelectMany("SELECT * FROM payplan");
-		}
-
 		///<summary></summary>
 		public static long Insert(PayPlan payPlan) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb){

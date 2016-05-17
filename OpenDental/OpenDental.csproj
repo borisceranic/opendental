@@ -410,6 +410,10 @@
     <Compile Include="Forms Reports\FormRpBrokenAppointments.Designer.cs">
       <DependentUpon>FormRpBrokenAppointments.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormPayPlanCredits.cs" />
+    <Compile Include="Forms\FormPayPlanCredits.designer.cs">
+      <DependentUpon>FormPayPlanCredits.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\FormPendingPayments.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -445,15 +449,6 @@
     </Compile>
     <Compile Include="Forms\FormDefinitionPicker.designer.cs">
       <DependentUpon>FormDefinitionPicker.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\FormPayPlanTreatment.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\FormPayPlanUpdate.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Forms\FormPayPlanUpdate.designer.cs">
-      <DependentUpon>FormPayPlanUpdate.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\FormDisplayFieldsOrthoChart.cs">
       <SubType>Form</SubType>
@@ -4114,6 +4109,9 @@
     <EmbeddedResource Include="Forms Reports\FormRpBrokenAppointments.resx">
       <DependentUpon>FormRpBrokenAppointments.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormPayPlanCredits.resx">
+      <DependentUpon>FormPayPlanCredits.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormPendingPayments.resx">
       <DependentUpon>FormPendingPayments.cs</DependentUpon>
     </EmbeddedResource>
@@ -4131,12 +4129,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormDefinitionPicker.resx">
       <DependentUpon>FormDefinitionPicker.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\FormPayPlanTreatment.resx">
-      <DependentUpon>FormPayPlanTreatment.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\FormPayPlanUpdate.resx">
-      <DependentUpon>FormPayPlanUpdate.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormDisplayFieldsOrthoChart.resx">
       <DependentUpon>FormDisplayFieldsOrthoChart.cs</DependentUpon>

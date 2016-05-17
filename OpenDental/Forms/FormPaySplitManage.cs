@@ -301,12 +301,12 @@ namespace OpenDental {
 			for(int i=0;i<listInsPayAsTotal.Count;i++) {			
 				creditTotal+=(decimal)listInsPayAsTotal[i].InsPayAmt;
 			}
-			if(payPlanVersionCur==1) {
+			if(payPlanVersionCur==1) { //for version 1, just use the completed amount of the payment plan.
 				for(int i=0;i<listPayPlans.Count;i++) {
 					creditTotal+=(decimal)listPayPlans[i].CompletedAmt;
 				}
 			}
-			else if(payPlanVersionCur==2) {
+			else if(payPlanVersionCur==2) { //for version 2, use the sum of the credits that are in the past.
 				for(int i=0;i<listPayPlanCharges.Count;i++) {
 					if(listPayPlanCharges[i].ChargeType!=PayPlanChargeType.Credit) {
 						continue;
