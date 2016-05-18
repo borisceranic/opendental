@@ -5651,16 +5651,18 @@ namespace OpenDental{
 				ProcCur.CodeNum=verifyCode;
 				//ProcedureCode2=ProcedureCodes.GetProcCode(ProcCur.CodeNum);
 				//ProcCur.Code=verifyCode;
-				InsSub prisub=null;
-				InsPlan priplan=null;
-				if(PatPlanList.Count>0) {
-					prisub=InsSubs.GetSub(PatPlanList[0].InsSubNum,SubList);
-					priplan=InsPlans.GetPlan(prisub.PlanNum,PlanList);
-				}
-				ProcCur.ProcFee=Fees.GetAmount0(ProcCur.CodeNum,Fees.GetFeeSched(PatCur,PlanList,PatPlanList,SubList,ProcCur.ProvNum),ProcCur.ClinicNum,ProcCur.ProvNum);
-				if(priplan!=null && priplan.PlanType=="p") {//PPO
-					double standardfee=Fees.GetAmount0(ProcCur.CodeNum,Providers.GetProv(Patients.GetProvNum(PatCur)).FeeSched,ProcCur.ClinicNum,ProcCur.ProvNum);
-					ProcCur.ProcFee=Math.Max(ProcCur.ProcFee,standardfee);
+				if(new[] { ProcStat.TP,ProcStat.C,ProcStat.TPi }.Contains(ProcCur.ProcStatus)) {//Only change the fee if Complete or TP
+					InsSub prisub=null;
+					InsPlan priplan=null;
+					if(PatPlanList.Count>0) {
+						prisub=InsSubs.GetSub(PatPlanList[0].InsSubNum,SubList);
+						priplan=InsPlans.GetPlan(prisub.PlanNum,PlanList);
+					}
+					ProcCur.ProcFee=Fees.GetAmount0(ProcCur.CodeNum,Fees.GetFeeSched(PatCur,PlanList,PatPlanList,SubList,ProcCur.ProvNum),ProcCur.ClinicNum,ProcCur.ProvNum);
+					if(priplan!=null && priplan.PlanType=="p") {//PPO
+						double standardfee=Fees.GetAmount0(ProcCur.CodeNum,Providers.GetProv(Patients.GetProvNum(PatCur)).FeeSched,ProcCur.ClinicNum,ProcCur.ProvNum);
+						ProcCur.ProcFee=Math.Max(ProcCur.ProcFee,standardfee);
+					}
 				}
 				Procedures.Update(ProcCur,ProcOld);
 				Recalls.Synch(ProcCur.PatNum);
