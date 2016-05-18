@@ -410,7 +410,9 @@
     <Compile Include="Forms Reports\FormRpBrokenAppointments.Designer.cs">
       <DependentUpon>FormRpBrokenAppointments.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\FormPayPlanCredits.cs" />
+    <Compile Include="Forms\FormPayPlanCredits.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Forms\FormPayPlanCredits.designer.cs">
       <DependentUpon>FormPayPlanCredits.cs</DependentUpon>
     </Compile>
