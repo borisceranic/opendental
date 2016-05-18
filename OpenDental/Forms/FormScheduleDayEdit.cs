@@ -493,6 +493,7 @@ namespace OpenDental{
 			comboClinic.IndexSelectOrSetText(_listClinics.FindIndex(x => x.ClinicNum==_selectedClinicNum),() => { return Clinics.GetDesc(_selectedClinicNum); });
 			if(!PrefC.HasClinicsEnabled) {
 				comboClinic.Visible=false;
+				labelClinic.Visible=false;
 			}
 			FillProvsAndEmps();
 			//Fill Provider Override
