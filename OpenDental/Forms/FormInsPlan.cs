@@ -4239,7 +4239,7 @@ namespace OpenDental{
 				MsgBox.Show(this,"Please fix data entry errors first.");
 				return false;
 			}
-			if(comboRelationship.SelectedIndex==-1) {
+			if(comboRelationship.SelectedIndex==-1 && comboRelationship.Items.Count>0) {
 				MsgBox.Show(this,"Relationship to Subscriber is not allowed to be blank.");
 				return false;
 			}
