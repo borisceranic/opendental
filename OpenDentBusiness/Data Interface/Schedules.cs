@@ -173,7 +173,7 @@ namespace OpenDentBusiness{
 				return retVal;
 			}
 			for(int i = 0;i<retVal.Count;i++) {
-				retVal[i].Ops=table.Rows[i]["ops"].ToString().Split(',').Select(x => PIn.Long(x)).ToList();
+				retVal[i].Ops=table.Rows[i]["ops"].ToString().Split(new[] { "," },StringSplitOptions.RemoveEmptyEntries).Select(x => PIn.Long(x)).ToList();
 			}
 			return retVal;
 		}
@@ -287,8 +287,8 @@ namespace OpenDentBusiness{
 			//No need to check RemotingRole; no call to db.
 			List<Schedule> retVal=new List<Schedule>();
 			foreach(Schedule schedCur in listForPeriod.FindAll(x => x.SchedType==ScheduleType.Provider)) {//only schedules for provs
-				if(schedCur.Ops.Count(x => x!=0)>0) { //the schedule is for specific op(s), add if it is for this op
-					if(schedCur.Ops.Contains(op.OperatoryNum)) {
+				if(schedCur.Ops.Count(x => x!=0)>0) {//leaving count only non 0's, but 0's are no longer added in ConvertTableToList with remove empty entries code
+					if(schedCur.Ops.Contains(op.OperatoryNum)) {//the schedule is for specific op(s), add if it is for this op
 						retVal.Add(schedCur.Copy());
 					}
 					continue;
