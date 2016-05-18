@@ -283,6 +283,7 @@ namespace OpenDental{
 			ODGridRow row;
 			for(int i=0;i<ListShowing.Count;i++){
 				row=new ODGridRow();
+				row.Cells.Add(ListShowing[i].InternalName);
 				row.Cells.Add(ListShowing[i].Description);
 				row.Cells.Add(ListShowing[i].ColumnWidth.ToString());
 				gridMain.Rows.Add(row);
