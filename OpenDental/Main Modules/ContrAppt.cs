@@ -306,6 +306,8 @@ namespace OpenDental {
 			this.gridWaiting = new OpenDental.UI.ODGrid();
 			this.tabSched = new System.Windows.Forms.TabPage();
 			this.gridEmpSched = new OpenDental.UI.ODGrid();
+			this.tabProv = new System.Windows.Forms.TabPage();
+			this.gridProv = new OpenDental.UI.ODGrid();
 			this.timerWaitingRoom = new System.Windows.Forms.Timer(this.components);
 			this.timerTests = new System.Windows.Forms.Timer(this.components);
 			this.panelMakeButtons = new System.Windows.Forms.Panel();
@@ -314,8 +316,6 @@ namespace OpenDental {
 			this.butMakeRecall = new OpenDental.UI.Button();
 			this.butViewAppts = new OpenDental.UI.Button();
 			this.ToolBarMain = new OpenDental.UI.ODToolBar();
-			this.tabProv = new System.Windows.Forms.TabPage();
-			this.gridProv = new OpenDental.UI.ODGrid();
 			this.panelArrows.SuspendLayout();
 			this.panelSheet.SuspendLayout();
 			this.panelAptInfo.SuspendLayout();
@@ -327,8 +327,8 @@ namespace OpenDental {
 			this.tabControl.SuspendLayout();
 			this.tabWaiting.SuspendLayout();
 			this.tabSched.SuspendLayout();
-			this.panelMakeButtons.SuspendLayout();
 			this.tabProv.SuspendLayout();
+			this.panelMakeButtons.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// imageListMain
@@ -1165,6 +1165,34 @@ namespace OpenDental {
 			this.gridEmpSched.TranslationName = "TableApptEmpSched";
 			this.gridEmpSched.DoubleClick += new System.EventHandler(this.gridEmpSched_DoubleClick);
 			// 
+			// tabProv
+			// 
+			this.tabProv.Controls.Add(this.gridProv);
+			this.tabProv.Location = new System.Drawing.Point(4, 22);
+			this.tabProv.Name = "tabProv";
+			this.tabProv.Size = new System.Drawing.Size(211, 161);
+			this.tabProv.TabIndex = 2;
+			this.tabProv.Text = "Prov";
+			this.tabProv.UseVisualStyleBackColor = true;
+			// 
+			// gridProv
+			// 
+			this.gridProv.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridProv.HasAddButton = false;
+			this.gridProv.HasMultilineHeaders = false;
+			this.gridProv.HScrollVisible = true;
+			this.gridProv.Location = new System.Drawing.Point(0, 0);
+			this.gridProv.Margin = new System.Windows.Forms.Padding(0);
+			this.gridProv.Name = "gridProv";
+			this.gridProv.ScrollValue = 0;
+			this.gridProv.Size = new System.Drawing.Size(211, 161);
+			this.gridProv.TabIndex = 79;
+			this.gridProv.Title = "Provider Schedules";
+			this.gridProv.TranslationName = "TableAppProv";
+			this.gridProv.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridProv_CellDoubleClick);
+			// 
 			// timerWaitingRoom
 			// 
 			this.timerWaitingRoom.Enabled = true;
@@ -1262,33 +1290,6 @@ namespace OpenDental {
 			this.ToolBarMain.TabIndex = 73;
 			this.ToolBarMain.ButtonClick += new OpenDental.UI.ODToolBarButtonClickEventHandler(this.ToolBarMain_ButtonClick);
 			// 
-			// tabProv
-			// 
-			this.tabProv.Controls.Add(this.gridProv);
-			this.tabProv.Location = new System.Drawing.Point(4, 22);
-			this.tabProv.Name = "tabProv";
-			this.tabProv.Size = new System.Drawing.Size(211, 161);
-			this.tabProv.TabIndex = 2;
-			this.tabProv.Text = "Prov";
-			this.tabProv.UseVisualStyleBackColor = true;
-			// 
-			// gridProv
-			// 
-			this.gridProv.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.gridProv.HasAddButton = false;
-			this.gridProv.HasMultilineHeaders = false;
-			this.gridProv.HScrollVisible = false;
-			this.gridProv.Location = new System.Drawing.Point(0, 0);
-			this.gridProv.Margin = new System.Windows.Forms.Padding(0);
-			this.gridProv.Name = "gridProv";
-			this.gridProv.ScrollValue = 0;
-			this.gridProv.Size = new System.Drawing.Size(211, 161);
-			this.gridProv.TabIndex = 79;
-			this.gridProv.Title = "Provider Schedules";
-			this.gridProv.TranslationName = "TableAppProv";
-			// 
 			// ContrAppt
 			// 
 			this.Controls.Add(this.groupSearch);
@@ -1317,8 +1318,8 @@ namespace OpenDental {
 			this.tabControl.ResumeLayout(false);
 			this.tabWaiting.ResumeLayout(false);
 			this.tabSched.ResumeLayout(false);
-			this.panelMakeButtons.ResumeLayout(false);
 			this.tabProv.ResumeLayout(false);
+			this.panelMakeButtons.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
@@ -2383,6 +2384,14 @@ namespace OpenDental {
 		}
 
 		private void gridEmpSched_DoubleClick(object sender,EventArgs e) {
+			gridSchedDoubleClickHelper();
+		}
+
+		private void gridProv_CellDoubleClick(object sender,ODGridClickEventArgs e) {
+			gridSchedDoubleClickHelper();
+		}
+
+		private void gridSchedDoubleClickHelper() {
 			if(ApptDrawing.IsWeeklyView) {
 				MsgBox.Show(this,"Not available in weekly view");
 				return;
@@ -2390,8 +2399,7 @@ namespace OpenDental {
 			if(!Security.IsAuthorized(Permissions.Schedules)) {
 				return;
 			}
-			FormScheduleDayEdit FormS=new FormScheduleDayEdit(AppointmentL.DateSelected,Clinics.ClinicNum,
-				(PrefC.HasClinicsEnabled && !Security.CurUser.ClinicIsRestricted),PrefC.HasClinicsEnabled);
+			FormScheduleDayEdit FormS=new FormScheduleDayEdit(AppointmentL.DateSelected,Clinics.ClinicNum,true,PrefC.HasClinicsEnabled);
 			FormS.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.Schedules,0,"");
 			SetWeeklyView(false);//to refresh
