@@ -172,6 +172,10 @@
     <Reference Include="NHunspell">
       <HintPath>..\Required dlls\NHunspell.dll</HintPath>
     </Reference>
+    <Reference Include="OpenDentalHelp, Version=15.2.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Required dlls\OpenDentalHelp.dll</HintPath>
+    </Reference>
     <Reference Include="Org.Mentalis.Security, Version=1.0.13.715, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Required dlls\Org.Mentalis.Security.dll</HintPath>
@@ -7909,10 +7913,6 @@
     <ProjectReference Include="..\..\..\Shared Projects Subversion\EHR\EHR_16_2\EHR\xEHR.csproj">
       <Project>{5abf1d9d-2b93-4217-afa6-9eeccf6f525f}</Project>
       <Name>xEHR</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\Shared Projects Subversion\OpenDentalHelp\OpenDentalHelp_16_2\OpenDentalHelp\OpenDentalHelp.csproj">
-      <Project>{98b2999c-8a9f-4795-b452-7f6231ed56b4}</Project>
-      <Name>OpenDentalHelp</Name>
     </ProjectReference>
     <ProjectReference Include="..\CodeBase\xCodeBase.csproj">
       <Project>{18F7BC78-4B99-48D3-A1F1-0D13A63E3CF9}</Project>
