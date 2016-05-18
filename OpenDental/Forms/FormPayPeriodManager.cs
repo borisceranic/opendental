@@ -492,10 +492,6 @@ namespace OpenDental {
 				MsgBox.Show(this,"# Days After Pay Period cannot be zero.");
 				return;
 			}
-			if(dateTimeStart.Value<DateTime.Today) {
-				MsgBox.Show(this,"Please select a start day that's either today or in the future.");
-				return;
-			}
 			_listPayPeriods.Clear();
 			int numPeriods=PIn.Int(numPayPeriods.Text);
 			PayPeriodInterval payPeriodInterval=PayPeriodInterval.Weekly;
