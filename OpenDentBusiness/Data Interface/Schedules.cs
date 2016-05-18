@@ -287,7 +287,7 @@ namespace OpenDentBusiness{
 			//No need to check RemotingRole; no call to db.
 			List<Schedule> retVal=new List<Schedule>();
 			foreach(Schedule schedCur in listForPeriod.FindAll(x => x.SchedType==ScheduleType.Provider)) {//only schedules for provs
-				if(schedCur.Ops.Count>0) { //the schedule is for specific op(s), add if it is for this op
+				if(schedCur.Ops.Count(x => x!=0)>0) { //the schedule is for specific op(s), add if it is for this op
 					if(schedCur.Ops.Contains(op.OperatoryNum)) {
 						retVal.Add(schedCur.Copy());
 					}
