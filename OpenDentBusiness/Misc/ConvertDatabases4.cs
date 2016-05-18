@@ -1018,6 +1018,7 @@ namespace OpenDentBusiness {
 						+"FROM claimproc "
 						+"GROUP BY claimproc.PayPlanNum "
 					+")cp ON cp.PayPlanNum = payplan.PayPlanNum "
+					+"GROUP BY payplan.PayPlanNum "
 					+"HAVING Princ+Interest <= (TotPay + InsPay) AND LastDate <="+Curdate();
 					table=Db.GetTable(command);
 					string payPlanNums="";
