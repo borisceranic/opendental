@@ -487,7 +487,10 @@ namespace OpenDental{
 		#endregion
 
 		private void FormScheduleDay_Load(object sender,System.EventArgs e) {
-			_listClinics=new List<Clinic>() { new Clinic() { Description=Lan.g(this,"Headquarters") } }; //Seed with "Headquarters"
+			_listClinics=new List<Clinic>();
+			if(!Security.CurUser.ClinicIsRestricted) {
+				_listClinics.Add(new Clinic() { Description=Lan.g(this,"Headquarters") }); //Seed with "Headquarters"
+			}
 			Clinics.GetForUserod(Security.CurUser).ForEach(x => _listClinics.Add(x));//do not re-organize from cache. They could either be alphabetizeded or sorted by item order.
 			_listClinics.ForEach(x => comboClinic.Items.Add(x.Description));
 			comboClinic.IndexSelectOrSetText(_listClinics.FindIndex(x => x.ClinicNum==_selectedClinicNum),() => { return Clinics.GetDesc(_selectedClinicNum); });
