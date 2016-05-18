@@ -106,7 +106,7 @@ namespace OpenDental {
 				}
 				double fee=0;
 				if(entryCur!=null) {
-					fee=(double)entryCur.AmountOriginal;
+					fee=(double)entryCur.AmountStart;
 				}
 				listCreditsApplied.Add(credCur);
 				double remAfter=fee-listCreditsApplied.Where(x => x.ProcNum==credCur.ProcNum).Sum(x => x.Principal);
