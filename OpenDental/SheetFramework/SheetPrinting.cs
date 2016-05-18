@@ -952,7 +952,7 @@ namespace OpenDental {
 		public static void drawFieldGrid(SheetField field,Sheet sheet,Graphics g,XGraphics gx,DataSet dataSet,Statement stmt,MedLab medLab,
 			bool isPrinting=false) 
 		{
-			if(stmt.StatementType==StmtType.LimitedStatement && field.FieldName.StartsWith("StatementAging")) {
+			if(stmt!=null && stmt.StatementType==StmtType.LimitedStatement && field.FieldName.StartsWith("StatementAging")) {
 				return;
 			}
 			Sheets.SetPageMargin(sheet,_printMargin);
