@@ -372,17 +372,23 @@ namespace OpenDental {
 			strBuilderResultFile.AppendLine();
 			string resultfile=ODFileUtils.CombinePaths(Path.GetDirectoryName(_xPath),"XResult.txt");
 			List<long> listClinicNumsBadCredentials=new List<long>();
-			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
-				if(table.Rows[gridMain.SelectedIndices[i]]["XChargeToken"].ToString()!="" &&
-					CreditCards.IsDuplicateXChargeToken(table.Rows[gridMain.SelectedIndices[i]]["XChargeToken"].ToString()))
+			//Making a copy now because the user can change the selected index as we are looping through
+			List<int> listSelectedIndices=gridMain.SelectedIndices.ToList();
+			foreach(int selectedIndex in listSelectedIndices) {
+				if(table.Rows[selectedIndex]["XChargeToken"].ToString()!="" &&
+					CreditCards.IsDuplicateXChargeToken(table.Rows[selectedIndex]["XChargeToken"].ToString()))
 				{
 					_failed++;
 					labelFailed.Text=Lan.g(this,"Failed=")+_failed;
-					MessageBox.Show(Lan.g(this,"A duplicate token was found, the card cannot be charged for customer")+": "+table.Rows[i]["PatName"].ToString());
+					MessageBox.Show(Lan.g(this,"A duplicate token was found, the card cannot be charged for customer")+": "
+						+table.Rows[selectedIndex]["PatName"].ToString());
 					continue;
 				}
-				//this is patient.ClinicNum or if it's a payplan row it's the ClinicNum from one of the payplancharges on the payplan
-				long clinicNumCur=PIn.Long(table.Rows[gridMain.SelectedIndices[i]]["ClinicNum"].ToString());
+				long clinicNumCur=0;
+				if(PrefC.HasClinicsEnabled) {
+					//this is patient.ClinicNum or if it's a payplan row it's the ClinicNum from one of the payplancharges on the payplan
+					clinicNumCur=PIn.Long(table.Rows[selectedIndex]["ClinicNum"].ToString());//If clinics were enabled but no longer are, use credentials for headquarters.
+				}
 				if(listClinicNumsBadCredentials.Contains(clinicNumCur)) {//username or password is blank, don't try to process
 					_failed++;
 					labelFailed.Text=Lan.g(this,"Failed=")+_failed;
@@ -405,7 +411,7 @@ namespace OpenDental {
 				password=CodeBase.MiscUtils.Decrypt(password);
 				insertPayment=false;
 				ProcessStartInfo info=new ProcessStartInfo(_xPath);
-				long patNum=PIn.Long(table.Rows[gridMain.SelectedIndices[i]]["PatNum"].ToString());
+				long patNum=PIn.Long(table.Rows[selectedIndex]["PatNum"].ToString());
 				Patient patCur=Patients.GetPat(patNum);
 				if(patCur==null) {
 					continue;
@@ -419,20 +425,20 @@ namespace OpenDental {
 					continue;
 				}
 				info.Arguments="";
-				double amt=PIn.Double(table.Rows[gridMain.SelectedIndices[i]]["ChargeAmt"].ToString());
-				DateTime exp=PIn.Date(table.Rows[gridMain.SelectedIndices[i]]["CCExpiration"].ToString());
-				string address=PIn.String(table.Rows[gridMain.SelectedIndices[i]]["Address"].ToString());
-				string addressPat=PIn.String(table.Rows[gridMain.SelectedIndices[i]]["AddressPat"].ToString());
-				string zip=PIn.String(table.Rows[gridMain.SelectedIndices[i]]["Zip"].ToString());
-				string zipPat=PIn.String(table.Rows[gridMain.SelectedIndices[i]]["ZipPat"].ToString());
+				double amt=PIn.Double(table.Rows[selectedIndex]["ChargeAmt"].ToString());
+				DateTime exp=PIn.Date(table.Rows[selectedIndex]["CCExpiration"].ToString());
+				string address=PIn.String(table.Rows[selectedIndex]["Address"].ToString());
+				string addressPat=PIn.String(table.Rows[selectedIndex]["AddressPat"].ToString());
+				string zip=PIn.String(table.Rows[selectedIndex]["Zip"].ToString());
+				string zipPat=PIn.String(table.Rows[selectedIndex]["ZipPat"].ToString());
 				info.Arguments+="/AMOUNT:"+amt.ToString("F2")+" /LOCKAMOUNT ";
 				info.Arguments+="/TRANSACTIONTYPE:PURCHASE /LOCKTRANTYPE ";
-				if(table.Rows[gridMain.SelectedIndices[i]]["XChargeToken"].ToString()!="") {
-					info.Arguments+="/XCACCOUNTID:"+table.Rows[gridMain.SelectedIndices[i]]["XChargeToken"].ToString()+" ";
+				if(table.Rows[selectedIndex]["XChargeToken"].ToString()!="") {
+					info.Arguments+="/XCACCOUNTID:"+table.Rows[selectedIndex]["XChargeToken"].ToString()+" ";
 					info.Arguments+="/RECURRING ";
 				}
 				else {
-					info.Arguments+="/ACCOUNT:"+table.Rows[gridMain.SelectedIndices[i]]["CCNumberMasked"].ToString()+" ";
+					info.Arguments+="/ACCOUNT:"+table.Rows[selectedIndex]["CCNumberMasked"].ToString()+" ";
 				}
 				if(exp.Year>1880) {
 					info.Arguments+="/EXP:"+exp.ToString("MMyy")+" ";
@@ -481,7 +487,7 @@ namespace OpenDental {
 				Cursor=Cursors.Default;
 				string line="";
 				StringBuilder strBuilderResultText=new StringBuilder();
-				strBuilderResultFile.AppendLine("PatNum: "+patNum+" Name: "+table.Rows[i]["PatName"].ToString());
+				strBuilderResultFile.AppendLine("PatNum: "+patNum+" Name: "+table.Rows[selectedIndex]["PatName"].ToString());
 				try {
 					using(TextReader reader=new StreamReader(resultfile)) {
 						line=reader.ReadLine();
@@ -508,7 +514,7 @@ namespace OpenDental {
 					continue;//Cards will still be in the list if something went wrong.
 				}
 				if(insertPayment) {
-					CreatePayment(patCur,i,strBuilderResultText.ToString());
+					CreatePayment(patCur,selectedIndex,strBuilderResultText.ToString());
 				}
 			}
 			try {
@@ -527,27 +533,30 @@ namespace OpenDental {
 			strBuilderResultFile.AppendLine("Recurring charge results for "+DateTime.Now.ToShortDateString()+" ran at "+DateTime.Now.ToShortTimeString());
 			strBuilderResultFile.AppendLine();
 			#region Card Charge Loop
-			for(int i=0;i<gridMain.SelectedIndices.Length;i++) {
+			//Making a copy now because the user can change the selected index as we are looping through
+			List<int> listSelectedIndices=gridMain.SelectedIndices.ToList();
+			foreach(int selectedIndex in listSelectedIndices) {
 				bool isPayConnectToken=true;
-				string tokenOrCCMasked=table.Rows[gridMain.SelectedIndices[i]]["PayConnectToken"].ToString();
+				string tokenOrCCMasked=table.Rows[selectedIndex]["PayConnectToken"].ToString();
 				if(tokenOrCCMasked!="" && CreditCards.IsDuplicatePayConnectToken(tokenOrCCMasked)) {
-					MessageBox.Show(Lan.g(this,"A duplicate token was found, the card cannot be charged for customer: ")+table.Rows[i]["PatName"].ToString());
+					MessageBox.Show(Lan.g(this,"A duplicate token was found, the card cannot be charged for customer: ")
+						+table.Rows[selectedIndex]["PatName"].ToString());
 					continue;
 				}
-				long patNum=PIn.Long(table.Rows[gridMain.SelectedIndices[i]]["PatNum"].ToString());
+				long patNum=PIn.Long(table.Rows[selectedIndex]["PatNum"].ToString());
 				Patient patCur=Patients.GetPat(patNum);
 				if(patCur==null) {
 					continue;
 				}
-				DateTime exp=PIn.Date(table.Rows[gridMain.SelectedIndices[i]]["PayConnectTokenExp"].ToString());
+				DateTime exp=PIn.Date(table.Rows[selectedIndex]["PayConnectTokenExp"].ToString());
 				if(tokenOrCCMasked=="") {
 					isPayConnectToken=false;
-					tokenOrCCMasked=table.Rows[gridMain.SelectedIndices[i]]["CCNumberMasked"].ToString();
-					exp=PIn.Date(table.Rows[gridMain.SelectedIndices[i]]["CCExpiration"].ToString());
+					tokenOrCCMasked=table.Rows[selectedIndex]["CCNumberMasked"].ToString();
+					exp=PIn.Date(table.Rows[selectedIndex]["CCExpiration"].ToString());
 				}
-				decimal amt=PIn.Decimal(table.Rows[gridMain.SelectedIndices[i]]["ChargeAmt"].ToString());
-				string zip=PIn.String(table.Rows[gridMain.SelectedIndices[i]]["Zip"].ToString());
-				long clinicNumCur=PIn.Long(table.Rows[gridMain.SelectedIndices[i]]["ClinicNum"].ToString());
+				decimal amt=PIn.Decimal(table.Rows[selectedIndex]["ChargeAmt"].ToString());
+				string zip=PIn.String(table.Rows[selectedIndex]["Zip"].ToString());
+				long clinicNumCur=PIn.Long(table.Rows[selectedIndex]["ClinicNum"].ToString());
 				//request a PayConnect token, if a token was already saved PayConnect will return the same token,
 				//otherwise replace CCNumberMasked with the returned token if the sale successful
 				Cursor=Cursors.WaitCursor;
@@ -583,7 +592,7 @@ namespace OpenDental {
 				_success++;
 				labelCharged.Text=Lan.g(this,"Charged=")+_success;
 				//Update the credit card token values if sale approved
-				CreditCard ccCur=CreditCards.GetOne(PIn.Long(table.Rows[gridMain.SelectedIndices[i]]["CreditCardNum"].ToString()));
+				CreditCard ccCur=CreditCards.GetOne(PIn.Long(table.Rows[selectedIndex]["CreditCardNum"].ToString()));
 				PayConnectService.expiration payConnectExp=payConnectResponse.PaymentToken.Expiration;
 				//if stored CC token or token expiration are different than those returned by PayConnect, update the stored CC
 				if(ccCur.PayConnectToken!=payConnectResponse.PaymentToken.TokenId
@@ -616,7 +625,7 @@ namespace OpenDental {
 					strBuilderResultText.AppendLine("CARD TYPE="+PayConnect.GetCardType(tokenOrCCMasked).ToString());
 				}
 				strBuilderResultText.AppendLine("AMOUNT="+payConnectRequest.Amount.ToString("F2"));
-				CreatePayment(patCur,i,strBuilderResultText.ToString());
+				CreatePayment(patCur,selectedIndex,strBuilderResultText.ToString());
 				strBuilderResultFile.AppendLine(strBuilderResultText.ToString());
 			}
 			#endregion Card Charge Loop
@@ -634,33 +643,33 @@ namespace OpenDental {
 			}
 		}
 
-		///<summary>Inserts a payment and paysplit, called after processing a payment through either X-Charge or PayConnect. indexCur is the current index
-		///of the gridMain row this payment is for.</summary>
-		private void CreatePayment(Patient patCur,int indexCur,string note) {
+		///<summary>Inserts a payment and paysplit, called after processing a payment through either X-Charge or PayConnect. selectedIndex is the current 
+		///selected index of the gridMain row this payment is for.</summary>
+		private void CreatePayment(Patient patCur,int selectedIndex,string note) {
 			Payment paymentCur=new Payment();
 			paymentCur.DateEntry=_nowDateTime.Date;
-			DateTime dateStart=PIn.Date(table.Rows[gridMain.SelectedIndices[indexCur]]["DateStart"].ToString());
-			if(Prefs.IsODHQ() &&PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
+			DateTime dateStart=PIn.Date(table.Rows[selectedIndex]["DateStart"].ToString());
+			if(Prefs.IsODHQ() && PrefC.GetBool(PrefName.BillingUseBillingCycleDay)) {
 				int dayOfMonth=Math.Min(DateTime.DaysInMonth(dateStart.Year,dateStart.Month),
-					PIn.Int(table.Rows[gridMain.SelectedIndices[indexCur]]["BillingCycleDay"].ToString()));
+					PIn.Int(table.Rows[selectedIndex]["BillingCycleDay"].ToString()));
 				dateStart=new DateTime(dateStart.Year,dateStart.Month,dayOfMonth);
 			}
-			paymentCur.PayDate=GetPayDate(PIn.Date(table.Rows[gridMain.SelectedIndices[indexCur]]["LatestPayment"].ToString()),dateStart);
+			paymentCur.PayDate=GetPayDate(PIn.Date(table.Rows[selectedIndex]["LatestPayment"].ToString()),dateStart);
 			paymentCur.PatNum=patCur.PatNum;
 			//Explicitly set ClinicNum=0, since a pat's ClinicNum will remain set if the user enabled clinics, assigned patients to clinics, and then
 			//disabled clinics because we use the ClinicNum to determine which PayConnect or XCharge/XWeb credentials to use for payments.
 			paymentCur.ClinicNum=0;
 			if(PrefC.HasClinicsEnabled) {
-				paymentCur.ClinicNum=PIn.Long(table.Rows[gridMain.SelectedIndices[indexCur]]["ClinicNum"].ToString());
+				paymentCur.ClinicNum=PIn.Long(table.Rows[selectedIndex]["ClinicNum"].ToString());
 			}
 			//ClinicNum can be 0 for 'Headquarters' or clinics not enabled, PayType will be the 0 clinic or headquarters PayType if using PayConnect
 			paymentCur.PayType=PIn.Int(ProgramProperties.GetPropVal(_progCur.ProgramNum,"PaymentType",paymentCur.ClinicNum));
-			paymentCur.PayAmt=PIn.Double(table.Rows[gridMain.SelectedIndices[indexCur]]["ChargeAmt"].ToString());
-			double payPlanDue=PIn.Double(table.Rows[gridMain.SelectedIndices[indexCur]]["PayPlanDue"].ToString());
+			paymentCur.PayAmt=PIn.Double(table.Rows[selectedIndex]["ChargeAmt"].ToString());
+			double payPlanDue=PIn.Double(table.Rows[selectedIndex]["PayPlanDue"].ToString());
 			paymentCur.PayNote=note;
 			paymentCur.IsRecurringCC=true;
 			Payments.Insert(paymentCur);
-			long provNumPayPlan=PIn.Long(table.Rows[gridMain.SelectedIndices[indexCur]]["ProvNum"].ToString());//for payment plans only
+			long provNumPayPlan=PIn.Long(table.Rows[selectedIndex]["ProvNum"].ToString());//for payment plans only
 			//Regular payments need to apply to the provider that the family owes the most money to.
 			//Also get provNum for provider owed the most if the card is for a payplan and for other repeating charges and they will be charged for both
 			//the payplan and regular repeating charges
@@ -683,7 +692,7 @@ namespace OpenDental {
 			split.PayNum=paymentCur.PayNum;
 			split.ProcDate=paymentCur.PayDate;
 			split.DatePay=paymentCur.PayDate;
-			split.PayPlanNum=PIn.Long(table.Rows[gridMain.SelectedIndices[indexCur]]["PayPlanNum"].ToString());
+			split.PayPlanNum=PIn.Long(table.Rows[selectedIndex]["PayPlanNum"].ToString());
 			if(split.PayPlanNum==0 || payPlanDue<=0) {//this row is not for a payplan or there is no payplandue
 				split.PayPlanNum=0;//if the payplan does not have any amount due, don't attach split to payplan
 				split.SplitAmt=paymentCur.PayAmt;
