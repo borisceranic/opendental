@@ -4444,6 +4444,10 @@ namespace OpenDental{
 			}
 			//Signal Processing
 			List<Signalod> listSignals=Signalods.SignalsTick(onShutdown);
+			//Post Signal Processing
+			if(PrefC.GetBool(PrefName.DockPhonePanelShow)) {//No actual signals are sent, so this must happen independantly from SignalsTick.
+				lightSignalGrid1.SetConfs(PhoneConfs.GetAll());
+			}
 			if(listSignals.Exists(x => x.ITypes.Contains(((int)InvalidType.Programs).ToString()))) {
 				RefreshMenuReports();
 			}
