@@ -204,6 +204,7 @@ namespace OpenDental{
 			this.gridBill.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridBill_CellDoubleClick);
 			this.gridBill.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridBill_CellClick);
 			this.gridBill.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gridBill_MouseDown);
+			this.gridBill.MouseUp += new System.Windows.Forms.MouseEventHandler(this.gridBill_MouseUp);
 			// 
 			// contextMenu
 			// 
@@ -715,6 +716,12 @@ namespace OpenDental{
 		private void gridBill_MouseDown(object sender,MouseEventArgs e) {
 			if(e.Button==MouseButtons.Right){
 				gridBill.SetSelected(false);
+			}
+		}
+
+		private void gridBill_MouseUp(object sender,MouseEventArgs e) {
+			if(e.Button==MouseButtons.Right && gridBill.SelectedIndices.Length>0) {
+				contextMenu.Show(gridBill,new Point(e.X,e.Y));
 			}
 		}
 

@@ -88,6 +88,7 @@ namespace OpenDental{
 			this.gridMain.TranslationName = "TablePendingPayments";
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
 			this.gridMain.MouseClick += new System.Windows.Forms.MouseEventHandler(this.gridMain_MouseClick);
+			this.gridMain.MouseDown += new System.Windows.Forms.MouseEventHandler(this.gridMain_MouseDown);
 			// 
 			// butRefresh
 			// 
