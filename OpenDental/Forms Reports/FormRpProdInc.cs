@@ -682,8 +682,14 @@ namespace OpenDental{
 					checkClinicBreakdown.Visible=false;
 				}
 				_selectedPayPeriodIdx=PayPeriods.GetForDate(DateTime.Today);
-				textDateFrom.Text=PayPeriods.List[_selectedPayPeriodIdx].DateStart.ToShortDateString();
-				textDateTo.Text=PayPeriods.List[_selectedPayPeriodIdx].DateStop.ToShortDateString();
+				if(_selectedPayPeriodIdx<0) {
+					textDateFrom.Text=DateTime.Today.AddDays(-7).ToShortDateString();
+					textDateTo.Text=DateTime.Today.ToShortDateString();
+				}
+				else {
+					textDateFrom.Text=PayPeriods.List[_selectedPayPeriodIdx].DateStart.ToShortDateString();
+					textDateTo.Text=PayPeriods.List[_selectedPayPeriodIdx].DateStop.ToShortDateString();
+				}
 				butThis.Text=Lan.g(this,"This Period");
 			}
 			else if(radioMonthly.Checked) {
