@@ -121,6 +121,12 @@ namespace OpenDental {
 			FillGrid();
 		}
 
+		private void gridMain_MouseDown(object sender,MouseEventArgs e) {
+			if(e.Button==MouseButtons.Right) {
+				gridMain.SetSelected(false);
+			}
+		}
+
 		private void gridMain_MouseClick(object sender,MouseEventArgs e) {
 			if(e.Button==MouseButtons.Right && gridMain.SelectedIndices.Length>0) {
 				contextMenu.Show(gridMain,new Point(e.X,e.Y));
