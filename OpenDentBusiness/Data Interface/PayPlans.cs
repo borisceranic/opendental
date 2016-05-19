@@ -340,9 +340,48 @@ namespace OpenDentBusiness{
 			return retVal;
 		}
 
-		
-
-
+		///<summary>Automatically closes all payment plans that have no future charges and that are paid off.
+		///Not really a problem if it fails because the UPDATE statement happens all at once, so at worst, no changes are made to their database.
+		///Returns the number of payment plans that were closed.</summary>
+		public static long AutoClose() {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetLong(MethodBase.GetCurrentMethod());
+			}
+			string command="";
+			DataTable table;
+			command="SELECT payplan.PayPlanNum,SUM(payplancharge.Principal) AS Princ,SUM(payplancharge.Interest) AS Interest,"
+				+"COALESCE(ps.TotPayments,0) AS TotPay,COALESCE(cp.InsPayments,0) AS InsPay,"
+				+"MAX(payplancharge.ChargeDate) AS LastDate "
+				+"FROM payplan "
+				+"LEFT JOIN payplancharge ON payplancharge.PayPlanNum=payplan.PayPlanNum "
+					+"AND payplancharge.ChargeType="+POut.Int((int)PayPlanChargeType.Debit)+" "
+				+"LEFT JOIN ("
+					+"SELECT paysplit.PayPlanNum, SUM(paysplit.SplitAmt) AS TotPayments "
+					+"FROM paysplit "
+					+"GROUP BY paysplit.PayPlanNum "
+				+")ps ON ps.PayPlanNum = payplan.PayPlanNum "
+				+"LEFT JOIN ( "
+					+"SELECT claimproc.PayPlanNum, SUM(claimproc.InsPayAmt) AS InsPayments "
+					+"FROM claimproc "
+					+"GROUP BY claimproc.PayPlanNum "
+				+")cp ON cp.PayPlanNum = payplan.PayPlanNum "
+				+"WHERE payplan.IsClosed = 0 "
+				+"GROUP BY payplan.PayPlanNum "
+				+"HAVING Princ+Interest <= (TotPay + InsPay) AND LastDate <="+DbHelper.Curdate();
+			table=Db.GetTable(command);
+			string payPlanNums="";
+			for(int i=0;i < table.Rows.Count;i++) {
+				if(i!=0) {
+					payPlanNums+=",";
+				}
+				payPlanNums+=table.Rows[i]["PayPlanNum"];
+			}
+			if(payPlanNums=="") {
+				return 0; //no plans to close.
+			}
+			command="UPDATE payplan SET IsClosed=1 WHERE PayPlanNum IN ("+payPlanNums+")";
+			return Db.NonQ(command);
+		}
 	}
 
 	
