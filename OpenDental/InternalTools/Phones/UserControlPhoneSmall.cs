@@ -42,7 +42,7 @@ namespace OpenDental {
 
 		private void FillTile() {
 			//Get the new phone list from the database and redraw control.
-			SetPhoneList(PhoneEmpDefaults.Refresh(),Phones.GetPhoneList());
+			SetPhoneList(PhoneEmpDefaults.Refresh(),Phones.GetPhoneList(true));
 			//Set the currently selected phone accordingly.
 			if(phoneList==null) {//No phone list. Shouldn't get here.
 				phoneTile.SetPhone(null,null,false);
