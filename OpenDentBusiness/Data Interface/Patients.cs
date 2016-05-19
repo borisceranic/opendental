@@ -890,7 +890,7 @@ namespace OpenDentBusiness{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetBool(MethodBase.GetCurrentMethod(),pat);
 			}
-			string command="SELECT HmPhone,Address,Addres2,City,State,Zip FROM patient WHERE PatNum="+POut.Long(pat.SuperFamily);
+			string command="SELECT HmPhone,Address,Address2,City,State,Zip FROM patient WHERE PatNum="+POut.Long(pat.SuperFamily);
 			DataTable result=Db.GetTable(command);
 			command="SELECT COUNT(*) FROM patient WHERE SuperFamily="+POut.Long(pat.SuperFamily)+" "
 				+"AND (HmPhone!="+POut.String(result.Rows[0]["HmPhone"].ToString())+" "
