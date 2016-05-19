@@ -382,6 +382,7 @@ namespace OpenDental{
 		private MenuItem menuItemNoAlerts;
 		private MenuItem menuItemAlertPendingPayments;
 		private System.Windows.Forms.Timer timerAlerts;
+		private MenuItem menuItemAutoClosePayPlans;
 
 		//consider rewriting this to use new FormOpenDental singleton method pattern.
 		[Category("Data"),Description("Occurs when a user has taken action on an item needing action taken.")]
@@ -682,6 +683,7 @@ namespace OpenDental{
 			this.menuItemTextMessagesSent = new System.Windows.Forms.MenuItem();
 			this.timerAlerts = new System.Windows.Forms.Timer(this.components);
 			this.lightSignalGrid1 = new OpenDental.UI.LightSignalGrid();
+			this.menuItemAutoClosePayPlans = new System.Windows.Forms.MenuItem();
 			this.panelPhoneSmall.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -1520,6 +1522,7 @@ namespace OpenDental{
 			// 
 			this.menuItem1.Index = 2;
 			this.menuItem1.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] {
+            this.menuItemAutoClosePayPlans,
             this.menuItemDuplicateBlockouts,
             this.menuItemCreateAtoZFolders,
             this.menuItemMergeMedications,
@@ -1536,73 +1539,73 @@ namespace OpenDental{
 			// 
 			// menuItemDuplicateBlockouts
 			// 
-			this.menuItemDuplicateBlockouts.Index = 0;
+			this.menuItemDuplicateBlockouts.Index = 1;
 			this.menuItemDuplicateBlockouts.Text = "Clear Duplicate Blockouts";
 			this.menuItemDuplicateBlockouts.Click += new System.EventHandler(this.menuItemDuplicateBlockouts_Click);
 			// 
 			// menuItemCreateAtoZFolders
 			// 
-			this.menuItemCreateAtoZFolders.Index = 1;
+			this.menuItemCreateAtoZFolders.Index = 2;
 			this.menuItemCreateAtoZFolders.Text = "Create A to Z Folders";
 			this.menuItemCreateAtoZFolders.Click += new System.EventHandler(this.menuItemCreateAtoZFolders_Click);
 			// 
 			// menuItemMergeMedications
 			// 
-			this.menuItemMergeMedications.Index = 2;
+			this.menuItemMergeMedications.Index = 3;
 			this.menuItemMergeMedications.Text = "Merge Medications";
 			this.menuItemMergeMedications.Click += new System.EventHandler(this.menuItemMergeMedications_Click);
 			// 
 			// menuItemMergePatients
 			// 
-			this.menuItemMergePatients.Index = 3;
+			this.menuItemMergePatients.Index = 4;
 			this.menuItemMergePatients.Text = "Merge Patients";
 			this.menuItemMergePatients.Click += new System.EventHandler(this.menuItemMergePatients_Click);
 			// 
 			// menuItemMergeProviders
 			// 
-			this.menuItemMergeProviders.Index = 4;
+			this.menuItemMergeProviders.Index = 5;
 			this.menuItemMergeProviders.Text = "Merge Providers";
 			this.menuItemMergeProviders.Click += new System.EventHandler(this.menuItemMergeProviders_Click);
 			// 
 			// menuItemMergeReferrals
 			// 
-			this.menuItemMergeReferrals.Index = 5;
+			this.menuItemMergeReferrals.Index = 6;
 			this.menuItemMergeReferrals.Text = "Merge Referrals";
 			this.menuItemMergeReferrals.Click += new System.EventHandler(this.menuItemMergeReferrals_Click);
 			// 
 			// menuItemMoveSubscribers
 			// 
-			this.menuItemMoveSubscribers.Index = 6;
+			this.menuItemMoveSubscribers.Index = 7;
 			this.menuItemMoveSubscribers.Text = "Move Subscribers";
 			this.menuItemMoveSubscribers.Click += new System.EventHandler(this.menuItemMoveSubscribers_Click);
 			// 
 			// menuItemProcLockTool
 			// 
-			this.menuItemProcLockTool.Index = 7;
+			this.menuItemProcLockTool.Index = 8;
 			this.menuItemProcLockTool.Text = "Procedure Lock Tool";
 			this.menuItemProcLockTool.Click += new System.EventHandler(this.menuItemProcLockTool_Click);
 			// 
 			// menuItemShutdown
 			// 
-			this.menuItemShutdown.Index = 8;
+			this.menuItemShutdown.Index = 9;
 			this.menuItemShutdown.Text = "Shutdown All Workstations";
 			this.menuItemShutdown.Click += new System.EventHandler(this.menuItemShutdown_Click);
 			// 
 			// menuTelephone
 			// 
-			this.menuTelephone.Index = 9;
+			this.menuTelephone.Index = 10;
 			this.menuTelephone.Text = "Telephone Numbers";
 			this.menuTelephone.Click += new System.EventHandler(this.menuTelephone_Click);
 			// 
 			// menuItemTestLatency
 			// 
-			this.menuItemTestLatency.Index = 10;
+			this.menuItemTestLatency.Index = 11;
 			this.menuItemTestLatency.Text = "Test Latency";
 			this.menuItemTestLatency.Click += new System.EventHandler(this.menuItemTestLatency_Click);
 			// 
 			// menuItemXChargeReconcile
 			// 
-			this.menuItemXChargeReconcile.Index = 11;
+			this.menuItemXChargeReconcile.Index = 12;
 			this.menuItemXChargeReconcile.Text = "X-Charge Reconcile";
 			this.menuItemXChargeReconcile.Visible = false;
 			this.menuItemXChargeReconcile.Click += new System.EventHandler(this.menuItemXChargeReconcile_Click);
@@ -2139,6 +2142,12 @@ namespace OpenDental{
 			this.lightSignalGrid1.TabIndex = 20;
 			this.lightSignalGrid1.Text = "lightSignalGrid1";
 			this.lightSignalGrid1.ButtonClick += new OpenDental.UI.ODLightSignalGridClickEventHandler(this.lightSignalGrid1_ButtonClick);
+			// 
+			// menuItemAutoClosePayPlans
+			// 
+			this.menuItemAutoClosePayPlans.Index = 0;
+			this.menuItemAutoClosePayPlans.Text = "Auto-Close Payment Plans";
+			this.menuItemAutoClosePayPlans.Click += new System.EventHandler(this.menuItemAutoClosePayPlans_Click);
 			// 
 			// FormOpenDental
 			// 
@@ -6684,6 +6693,30 @@ namespace OpenDental{
 			_formOpenDentalS.FormMyWiki.LoadWikiPagePublic(pageTitle);
 		}
 
+		private void menuItemAutoClosePayPlans_Click(object sender,EventArgs e) {
+			if(DataConnection.DBtype==DatabaseType.Oracle) {
+				MsgBox.Show(this,"Tool does not currently support Oracle.  Please call support to see if you need this fix.");
+				return;
+			}
+			if(!Security.IsAuthorized(Permissions.Setup)) {
+				return;
+			}
+			if(!MsgBox.Show(this,MsgBoxButtons.OKCancel,"Running this tool will automatically mark all payment plans that have"
+				+" been paid off and have no future charges as closed.  Do you want to continue?")) 
+			{
+				return;
+			}
+			long plansClosed=PayPlans.AutoClose(); //returns # of payplans closed.
+			string msgText;
+			if(plansClosed>0) {
+				msgText=Lan.g(this,"Success.")+"  "+plansClosed+" "+Lan.g(this,"plan(s) closed.");
+			}
+			else {
+				msgText=Lan.g(this,"There were no plans to close.");
+			}
+			MessageBox.Show(msgText);
+		}
+
 		#endregion
 
 		#region Clinics
@@ -7921,61 +7954,6 @@ namespace OpenDental{
 			//Environment.Exit requires permission for unmanaged code, which we have explicitly specified in the solution already.
 			Environment.Exit(0);//Guaranteed to kill any threads which are still running.
 		}
-
-
-	
-
-
-		
-
-		
-
-		
-
-
-	
-
-
-
-		
-
-
-		
-
-		
-
-		
-
-		
-
-		
-
-	
-
-	
-
-		
-
-		
-
-		
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	}
 
