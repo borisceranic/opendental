@@ -1894,10 +1894,6 @@ namespace OpenDental{
 				MsgBox.Show(this,"A provider must be selected first.");
 				return true;
 			}
-			if(PrefC.HasClinicsEnabled && _selectedClinicNum==0) {
-				MsgBox.Show(this,"A clinic must be selected first.");
-				return true;
-			}
 			return false;
 		}
 
