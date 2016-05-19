@@ -105,7 +105,7 @@ namespace OpenDental {
 
 		private void FillTiles(bool refreshList) {
 			if(refreshList) { //Refresh the phone list. This will cause a database refresh for our list and call this function again with the new list.
-				SetPhoneList(PhoneEmpDefaults.Refresh(),Phones.GetPhoneList());
+				SetPhoneList(PhoneEmpDefaults.Refresh(),Phones.GetPhoneList(true));
 				return;
 			}
 			if(PhoneList==null) {

@@ -153,11 +153,22 @@ namespace OpenDentBusiness {
 			Crud.PhoneCrud.Insert(phone);//db sets the PK
 		}
 
-		public static List<Phone> GetPhoneList() {
+		///<summary>Gets every phone entry in the database.  By default the list of phones returned will not include the correspnond web cam images.
+		///Set hasWebCamImages to true if the web cam images are needed which is only for the phone tile and phone control small (right now).</summary>
+		public static List<Phone> GetPhoneList(bool hasWebCamImages=false) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<Phone>>(MethodBase.GetCurrentMethod());
+				return Meth.GetObject<List<Phone>>(MethodBase.GetCurrentMethod(),hasWebCamImages);
 			}
-			string command="SELECT * FROM phone ORDER BY Extension";
+			string command="SELECT PhoneNum, Extension, EmployeeName, ClockStatus, Description, ColorBar, ColorText, EmployeeNum, CustomerNumber"
+				+", InOrOut, PatNum, DateTimeStart, ScreenshotPath, ScreenshotImage, CustomerNumberRaw, LastCallTimeStart";
+			if(hasWebCamImages) {
+				command+=", WebCamImage ";
+			}
+			else {//Does not require the web cam images.
+				//Not including the web cam images will significantlly cut down the payload size.  E.g. went from ~407 KB to ~4 KB (when there is ~80 rows).
+				command+=", '' WebCamImage ";
+			}
+			command+="FROM phone ORDER BY Extension";
 			try {
 				return Crud.PhoneCrud.SelectMany(command);
 			}
@@ -483,6 +494,21 @@ namespace OpenDentBusiness {
 				+"AND NOT EXISTS(SELECT * FROM phoneempdefault WHERE PhoneExt= "+POut.Long(extension)+" "
 				+"AND ComputerName!='')";//there exists a computername override for the extension
 			Db.NonQ(command);
+		}
+
+		///<summary>Updates the web cam images in listNew with the images from listOld.
+		///This is because listNew will typically not have the web cam images set to save network traffic.</summary>
+		public static void UpdateWebCamImages(List<Phone> listOld,List<Phone> listNew) {
+			if(listOld==null || listNew==null) {
+				return;//Nothing to do.
+			}
+			foreach(Phone phone in listNew) {
+				Phone phoneOld=listOld.Find(x => x.PhoneNum==phone.PhoneNum);
+				if(phoneOld==null) {
+					continue;//Couldn't find the corresponding phone entry in list old so nothing to do.
+				}
+				phone.WebCamImage=phoneOld.WebCamImage;
+			}
 		}
 
 		public static int GetPhoneExtension(string ipAddress,string computerName) {

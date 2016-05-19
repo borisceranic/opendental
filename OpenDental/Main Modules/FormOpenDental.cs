@@ -333,6 +333,8 @@ namespace OpenDental{
 		DateTime _hqTriageMetricsLastRefreshed=DateTime.MinValue;
 		///<summary>HQ only. Keep track of last time EServiceMetrics were filled. Server is only updating every 30 seconds so no need to go any faster than that.</summary>
 		DateTime _hqEServiceMetricsLastRefreshed=DateTime.MinValue;
+		///<summary>HQ only. Web cam images get captured once every ~5 seconds so we don't need to be getting that data every 1.6 seconds.</summary>
+		DateTime _hqWebCamImagesLastRefreshed=DateTime.MinValue;
 		///<summary>The current color of the eServices menu item in the main menu.</summary>
 		private Color _colorEServicesBackground=SystemColors.Control;
 		private ODThread _odThreadEServices;
@@ -383,6 +385,8 @@ namespace OpenDental{
 		private MenuItem menuItemAlertPendingPayments;
 		private System.Windows.Forms.Timer timerAlerts;
 		private MenuItem menuItemAutoClosePayPlans;
+		///<summary>List of currently showing phones.  This list is accessed within a thread but is only accessed by one thread so no lock.</summary>
+		private List<Phone> _listPhonesCur;
 
 		//consider rewriting this to use new FormOpenDental singleton method pattern.
 		[Category("Data"),Description("Occurs when a user has taken action on an item needing action taken.")]
@@ -7329,7 +7333,18 @@ namespace OpenDental{
 				//Reset the interval timer.
 				_hqTriageMetricsLastRefreshed=DateTime.Now;
 			}
-			List<Phone> phoneList=Phones.GetPhoneList();
+			//Currently web cam images are captured every 5 seconds.  Therefore, we don't need to be getting all web cam images every 1.6 seconds.
+			//Only get web cam images every ~5 seconds to save on the amount of data going back and forth.
+			List<Phone> listPhonesNew;
+			if(DateTime.Now.Subtract(_hqWebCamImagesLastRefreshed).TotalMilliseconds > PrefC.GetInt(PrefName.WebCamFrequencyMS)) {
+				listPhonesNew=Phones.GetPhoneList(true);//Web cam images need to push out to the small phone control and big phones if open.
+				_listPhonesCur=listPhonesNew;
+				_hqWebCamImagesLastRefreshed=DateTime.Now;
+			}
+			else {
+				listPhonesNew=Phones.GetPhoneList();//It hasn't been enough time to merit getting web cam images again.
+				Phones.UpdateWebCamImages(_listPhonesCur,listPhonesNew);
+			}
 			List<PhoneEmpDefault> listPED=PhoneEmpDefaults.Refresh();
 			//HQ Only - 'Office Down' TaskListNum = 2576.
 			List<Task> listOfficesDown=Tasks.RefreshChildren(2576,false,DateTime.MinValue,Security.CurUser.UserNum,0);
@@ -7346,11 +7361,11 @@ namespace OpenDental{
 			//Now get the Phone object for this extension. Phone table matches PhoneEmpDefault table more or less 1:1. 
 			//Phone fields represent current state of the PhoneEmpDefault table and will be modified by the phone tracking server anytime a phone state changes for a given extension 
 			//(EG... incoming call, outgoing call, hangup, etc).
-			Phone phone=Phones.GetPhoneForExtension(phoneList,extension);
+			Phone phone=Phones.GetPhoneForExtension(listPhonesNew,extension);
 			bool isTriageOperator=PhoneEmpDefaults.IsTriageOperatorForExtension(extension,listPED);
 			//send the results back to the UI layer for action.
 			if(!this.IsDisposed) {
-				Invoke(new ProcessHqMetricsResultsArgs(OnProcessHqMetricsResults),new object[] { listPED,phoneList,listOfficesDown,phone,isTriageOperator });
+				Invoke(new ProcessHqMetricsResultsArgs(OnProcessHqMetricsResults),new object[] { listPED,listPhonesNew,listOfficesDown,phone,isTriageOperator });
 			}
 		}
 
