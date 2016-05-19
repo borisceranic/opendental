@@ -60,6 +60,7 @@ namespace OpenDental{
 		private DataTable _tableScheds;
 		private ComboBox comboClinic;
 		private bool _isResizing;
+		private Point _clickedCell;
 
 		///<summary></summary>
 		public FormSchedule()
@@ -658,6 +659,18 @@ namespace OpenDental{
 				colI--;
 			}
 			gridMain.Rows[Schedules.GetRowCal(PIn.Date(textDateFrom.Text),DateTime.Today)].Cells[colI].ColorText=Color.Red;
+			if(_clickedCell!=null //when first opening form
+				&& _clickedCell.Y>-1 
+				&& _clickedCell.Y< gridMain.Rows.Count
+				&& _clickedCell.X>-1
+				&& _clickedCell.X<gridMain.Columns.Count) 
+			{
+				gridMain.SetSelected(_clickedCell);
+			}
+			//scroll to cell to keep it in view when editing schedules.
+			if(gridMain.SelectedCell.X>-1 && gridMain.SelectedCell.Y>-1) {
+				gridMain.ScrollToIndex(gridMain.SelectedCell.Y);
+			}
 		}
 
 		private void listProv_SelectedIndexChanged(object sender,EventArgs e) {
@@ -690,7 +703,25 @@ namespace OpenDental{
 		}
 
 		private void checkWeekend_Click(object sender,EventArgs e) {
+			//Shift selected cell to account for adding/subtracting weekend columns from gridMain.
+			if(checkWeekend.Checked) {//impossible to already have a weekend day selected, no need to doctor _clickedCell
+				_clickedCell=new Point(gridMain.SelectedCell.X+1,gridMain.SelectedCell.Y);//All values shifted right because Sunday was added at begining of row.
+			}
+			else {//weekend may have been selected, which is now no longer valid.
+				_clickedCell=new Point(gridMain.SelectedCell.X-1,gridMain.SelectedCell.Y);
+				if(_clickedCell.X==-1 && gridMain.SelectedCell.X==0) {//Sunday WAS selected, reselect Monday
+					_clickedCell.X=0;//Monday will be the 0th cell
+				}
+				if(_clickedCell.X==5 && gridMain.SelectedCell.X==6) {//Saturday WAS selected, reselect Friday
+					_clickedCell.X=4;//Friday will be the 4th cell
+				}
+			}
+			//If the _clickedCell above has an X or Y that is -1, because sunday or saturday were selected, it will be handled in fill grid.
+			//We will scroll to the same row, but no cells will be selected.
 			FillGrid(false);
+			if(checkWeekend.Checked && _clickedCell.Y>-1) {
+				gridMain.ScrollToIndex(_clickedCell.Y);
+			}
 		}
 
 		private void checkPracticeNotes_Click(object sender,EventArgs e) {
@@ -712,11 +743,8 @@ namespace OpenDental{
 				return;
 			}
 			int clickedCol=e.Col;
-			if(!checkWeekend.Checked){
-				clickedCol++;
-			}
 			//the "clickedCell" is in terms of the entire 7 col layout.
-			Point clickedCell=new Point(clickedCol,e.Row);
+			_clickedCell=new Point(clickedCol,e.Row);
 			DateTime selectedDate=Schedules.GetDateCal(PIn.Date(textDateFrom.Text),e.Row,clickedCol);
 			if(selectedDate<PIn.Date(textDateFrom.Text) || selectedDate>PIn.Date(textDateTo.Text)){
 				return;
@@ -732,12 +760,6 @@ namespace OpenDental{
 				return;
 			}
 			FillGrid();
-			if(checkWeekend.Checked){
-				gridMain.SetSelected(clickedCell);
-			}
-			else{
-				gridMain.SetSelected(new Point(clickedCell.X-1,clickedCell.Y));
-			}
 			changed=true;
 		}
 
@@ -912,6 +934,7 @@ namespace OpenDental{
 			}
 			DateTime rememberDateStart=DateCopyStart;
 			DateTime rememberDateEnd=DateCopyEnd;
+			_clickedCell=gridMain.SelectedCell;
 			FillGrid();
 			DateCopyStart=rememberDateStart;
 			DateCopyEnd=rememberDateEnd;
@@ -1039,6 +1062,7 @@ namespace OpenDental{
 			}
 			DateTime rememberDateStart=DateCopyStart;
 			DateTime rememberDateEnd=DateCopyEnd;
+			_clickedCell=gridMain.SelectedCell;
 			FillGrid();
 			DateCopyStart=rememberDateStart;
 			DateCopyEnd=rememberDateEnd;
@@ -1119,6 +1143,7 @@ namespace OpenDental{
 
 		///<summary>Fires when manual resizing begins.</summary>
 		private void FormSchedule_ResizeBegin(object sender,EventArgs e) {
+			_clickedCell=gridMain.SelectedCell;
 			_isResizing=true;
 		}
 
