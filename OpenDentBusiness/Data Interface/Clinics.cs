@@ -383,7 +383,9 @@ namespace OpenDentBusiness{
 
 		///<summary>Syncs two supplied lists of Clinics.</summary>
 		public static bool Sync(List<Clinic> listNew,List<Clinic> listOld) {
-			//No need to check RemotingRole; no call to db.
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),listNew,listOld);
+			}
 			return Crud.ClinicCrud.Sync(listNew,listOld);
 		}
 
