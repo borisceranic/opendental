@@ -82,14 +82,9 @@ namespace OpenDentBusiness{
 
 		///<summary>Gets a list of Schedule items for one date filtered by providers and employees.
 		///Also option to include practice and clinic holidays and practice notes.</summary>
-		public static List<Schedule> RefreshDayEditForPracticeProvsEmps(DateTime dateSched,List<long> listProvNums,List<long> listEmpNums,
-			bool includePNotes,bool includeCNotes,long clinicNum)
-		{
+		public static List<Schedule> RefreshDayEditForPracticeProvsEmps(DateTime dateSched,List<long> listProvNums,List<long> listEmpNums,long clinicNum){
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<Schedule>>(MethodBase.GetCurrentMethod(),dateSched,listProvNums,listEmpNums,includePNotes,includeCNotes,clinicNum);
-			}
-			if(listProvNums.Count==0 && listEmpNums.Count==0 && !includeCNotes && !includePNotes) {
-				return new List<Schedule>();
+				return Meth.GetObject<List<Schedule>>(MethodBase.GetCurrentMethod(),dateSched,listProvNums,listEmpNums,clinicNum);
 			}
 			List<string> listOrClauses=new List<string>();
 			if(listProvNums.Count>0) {
@@ -100,14 +95,12 @@ namespace OpenDentBusiness{
 				listOrClauses.Add("(SchedType="+POut.Int((int)ScheduleType.Employee)+" "
 					+"AND EmployeeNum IN ("+string.Join(",",listEmpNums.Select(x => POut.Long(x)))+"))");
 			}
-			//Only notes with clinicNum==0
-			if(includePNotes) {
-				listOrClauses.Add("(SchedType="+POut.Int((int)ScheduleType.Practice)+" AND ClinicNum=0)");
+			//always include practice notes, plus any clinic notes for the selected clinic
+			string pNoteOr="SchedType="+POut.Int((int)ScheduleType.Practice);
+			if(clinicNum>0) {
+				pNoteOr="("+pNoteOr+" AND ClinicNum IN (0,"+POut.Long(clinicNum)+"))";//0 for practice notes, clinicNum for clinic notes
 			}
-			//Only notes with clinicNum!=0; Treats HQ/ClinicNum==0 as show all non-practice notes.
-			if(includeCNotes) {
-				listOrClauses.Add("(SchedType="+POut.Int((int)ScheduleType.Practice)+" AND ClinicNum"+(clinicNum==0?">0":("="+POut.Long(clinicNum)))+")");
-			}
+			listOrClauses.Add(pNoteOr);
 			string command="SELECT schedule.* "
 				+"FROM schedule "
 				+"WHERE SchedDate="+POut.Date(dateSched)+" "
@@ -468,7 +461,6 @@ namespace OpenDentBusiness{
 				return Meth.GetTable(MethodBase.GetCurrentMethod(),dateStart,dateEnd,provNums,empNums,includePNotes,includeCNotes,clinicNum);
 			}
 			DataTable table=new DataTable();
-			DataRow row;
 			table.Columns.Add("sun");
 			table.Columns.Add("mon");
 			table.Columns.Add("tues");
@@ -476,6 +468,19 @@ namespace OpenDentBusiness{
 			table.Columns.Add("thurs");
 			table.Columns.Add("fri");
 			table.Columns.Add("sat");
+			DataRow row;
+			int rowsInGrid=GetRowCal(dateStart,dateEnd)+1;//because 0-based
+			for(int i=0;i<rowsInGrid;i++){
+				row=table.NewRow();
+				table.Rows.Add(row);
+			}
+			DateTime dateSched=dateStart;
+			while(dateSched<=dateEnd){
+				table.Rows[GetRowCal(dateStart,dateSched)][(int)dateSched.DayOfWeek]=
+					dateSched.ToString("MMM d, yyyy");
+				dateSched=dateSched.AddDays(1);
+			}
+			//no schedules to show, just return the table with weeks and days in date range.
 			if(provNums.Count==0 && empNums.Count==0 && !includeCNotes && !includePNotes) {
 				return table;
 			}
@@ -500,22 +505,11 @@ namespace OpenDentBusiness{
 				+"LEFT JOIN employee ON schedule.EmployeeNum=employee.EmployeeNum "
 				+"WHERE SchedDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd)+" "
 				+"AND ("+string.Join(" OR ",listOrClauses)+") "
-				+"ORDER BY SchedDate,employee.FName,provider.ItemOrder,StartTime";
+				//if the for loop below changes to compare values in a row and the previous row, this query must be ordered by the additional comparison column
+				+"ORDER BY SchedDate,employee.FName,provider.ItemOrder,StartTime,schedule.ClinicNum,Status";
 			DataTable raw=Db.GetTable(command);
-			DateTime dateSched;
 			DateTime startTime;
 			DateTime stopTime;
-			int rowsInGrid=GetRowCal(dateStart,dateEnd)+1;//because 0-based
-			for(int i=0;i<rowsInGrid;i++){
-				row=table.NewRow();
-				table.Rows.Add(row);
-			}
-			dateSched=dateStart;
-			while(dateSched<=dateEnd){
-				table.Rows[GetRowCal(dateStart,dateSched)][(int)dateSched.DayOfWeek]=
-					dateSched.ToString("MMM d, yyyy");
-				dateSched=dateSched.AddDays(1);
-			}
 			int rowI;
 			for(int i=0;i<raw.Rows.Count;i++){
 				dateSched=PIn.Date(raw.Rows[i]["SchedDate"].ToString());
@@ -527,32 +521,44 @@ namespace OpenDentBusiness{
 					&& raw.Rows[i-1]["FName"].ToString()==raw.Rows[i]["FName"].ToString()//same employee as previous row
 					&& raw.Rows[i-1]["SchedDate"].ToString()==raw.Rows[i]["SchedDate"].ToString())//and same date as previous row
 				{
-					if(startTime.TimeOfDay==PIn.DateT("12 AM").TimeOfDay
-						&& stopTime.TimeOfDay==PIn.DateT("12 AM").TimeOfDay)
-					{
-						table.Rows[rowI][(int)dateSched.DayOfWeek]+="\r\n";//notes and holidays start on new lines
-						if(raw.Rows[i]["Status"].ToString()=="2") {//if holiday
-							table.Rows[rowI][(int)dateSched.DayOfWeek]+=Lans.g("Schedules","Holiday");
+					#region Not First Row and Same Prov/Emp/Date as Previous Row
+					if(startTime.TimeOfDay==PIn.DateT("12 AM").TimeOfDay && stopTime.TimeOfDay==PIn.DateT("12 AM").TimeOfDay) {
+						#region Note or Holiday
+						if((PrefC.HasClinicsEnabled && raw.Rows[i-1]["ClinicNum"].ToString()!=raw.Rows[i]["ClinicNum"].ToString())//different clinic than previous line
+							|| raw.Rows[i-1]["Status"].ToString()!=raw.Rows[i]["Status"].ToString())//start notes and holidays on different lines
+						{
+							table.Rows[rowI][(int)dateSched.DayOfWeek]+="\r\n";
+							if(raw.Rows[i]["Status"].ToString()=="2") {//if holiday
+								table.Rows[rowI][(int)dateSched.DayOfWeek]+=Lans.g("Schedules","Holiday");
+							}
+							else {
+								table.Rows[rowI][(int)dateSched.DayOfWeek]+=Lans.g("Schedules","Note");
+							}
+							if(PrefC.HasClinicsEnabled && raw.Rows[i]["SchedType"].ToString()=="0") {//a practice sched type, prov/emp notes do not have a clinic associated
+								string clinicDesc=Clinics.GetDesc(PIn.Long(raw.Rows[i]["ClinicNum"].ToString()));
+								if(string.IsNullOrEmpty(clinicDesc)) {
+									clinicDesc="Headquarters";
+								}
+								table.Rows[rowI][(int)dateSched.DayOfWeek]+=" ("+clinicDesc+")";
+							}
+							table.Rows[rowI][(int)dateSched.DayOfWeek]+=":";
 						}
 						else {
-							table.Rows[rowI][(int)dateSched.DayOfWeek]+=Lans.g("Schedules","Note");
+							table.Rows[rowI][(int)dateSched.DayOfWeek]+=",";
 						}
-						if(PrefC.HasClinicsEnabled) {
-							string clinicDesc=Clinics.GetDesc(PIn.Long(raw.Rows[i]["ClinicNum"].ToString()));
-							table.Rows[rowI][(int)dateSched.DayOfWeek]+=" ("+(string.IsNullOrEmpty(clinicDesc)?"Headquarters":clinicDesc)+")";
-						}
-						table.Rows[rowI][(int)dateSched.DayOfWeek]+=":";
+						#endregion Note or Holiday
 					}
-					else{
+					else {
 						table.Rows[rowI][(int)dateSched.DayOfWeek]+=", ";//other than notes and holidays, if same emp or same prov and same date separate by commas
 						table.Rows[rowI][(int)dateSched.DayOfWeek]+=startTime.ToString("h:mm")+"-"+stopTime.ToString("h:mm");
 					}
+					#endregion Not First Row and Same Prov/Emp/Date as Previous Row
 				}
-				else{
+				else {
+					#region First Row or Different Prov/Emp/Date as Previous Row
 					table.Rows[rowI][(int)dateSched.DayOfWeek]+="\r\n";
-					if(startTime.TimeOfDay==PIn.DateT("12 AM").TimeOfDay
-						&& stopTime.TimeOfDay==PIn.DateT("12 AM").TimeOfDay)
-					{
+					if(startTime.TimeOfDay==PIn.DateT("12 AM").TimeOfDay && stopTime.TimeOfDay==PIn.DateT("12 AM").TimeOfDay) {
+						#region Note or Holiday
 						if(raw.Rows[i]["Status"].ToString()=="2"){//if holiday
 							table.Rows[rowI][(int)dateSched.DayOfWeek]+=Lans.g("Schedules","Holiday");
 						}
@@ -565,22 +571,23 @@ namespace OpenDentBusiness{
 							}
 							table.Rows[rowI][(int)dateSched.DayOfWeek]+=Lans.g("Schedules","Note");
 						}
-						if(PrefC.HasClinicsEnabled) {
+						if(PrefC.HasClinicsEnabled && raw.Rows[i]["SchedType"].ToString()=="0") {//a practice sched type, prov/emp notes do not have a clinic associated
 							string clinicDesc=Clinics.GetDesc(PIn.Long(raw.Rows[i]["ClinicNum"].ToString()));
 							table.Rows[rowI][(int)dateSched.DayOfWeek]+=" ("+(string.IsNullOrEmpty(clinicDesc)?"Headquarters":clinicDesc)+")";
 						}
 						table.Rows[rowI][(int)dateSched.DayOfWeek]+=":";
+						#endregion Note or Holiday
 					}
-					else{
+					else {
 						if(raw.Rows[i]["Abbr"].ToString()!="") {
 							table.Rows[rowI][(int)dateSched.DayOfWeek]+=raw.Rows[i]["Abbr"].ToString()+" ";
 						}
 						if(raw.Rows[i]["FName"].ToString()!="") {
 							table.Rows[rowI][(int)dateSched.DayOfWeek]+=raw.Rows[i]["FName"].ToString()+" ";
 						}
-						table.Rows[rowI][(int)dateSched.DayOfWeek]+=
-							startTime.ToString("h:mm")+"-"+stopTime.ToString("h:mm");
+						table.Rows[rowI][(int)dateSched.DayOfWeek]+=startTime.ToString("h:mm")+"-"+stopTime.ToString("h:mm");
 					}
+					#endregion First Row or Different Prov/Emp/Date as Previous Row
 				}
 				if(raw.Rows[i]["Note"].ToString()!="") {
 					table.Rows[rowI][(int)dateSched.DayOfWeek]+=" "+raw.Rows[i]["Note"].ToString();

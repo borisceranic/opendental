@@ -242,7 +242,7 @@ namespace OpenDental{
 					}
 				}
 				//if clinics are enabled and this is a holiday or practice note, set visible and fill the clinic combobox and private list of clinics
-				if(_isHolidayOrNote) {
+				if(_isHolidayOrNote && SchedCur.SchedType==ScheduleType.Practice) {
 					comboClinic.Visible=true;//only visible for holidays and practice notes and only if clinics are enabled
 					labelClinic.Visible=true;
 					_listClinics=Clinics.GetForUserod(Security.CurUser);
@@ -327,7 +327,7 @@ namespace OpenDental{
 				return;
 			}
 			long clinicNum=0;
-			if(_isHolidayOrNote && PrefC.HasClinicsEnabled) {
+			if(_isHolidayOrNote && SchedCur.SchedType==ScheduleType.Practice && PrefC.HasClinicsEnabled) {//prov notes do not have a clinic
 				int indexCur=comboClinic.SelectedIndex;
 				if(!Security.CurUser.ClinicIsRestricted) {//user isn't restricted, -1 for HQ
 					indexCur--;
@@ -338,12 +338,13 @@ namespace OpenDental{
 				if(SchedCur.Status==SchedStatus.Holiday) {//duplicate holiday check
 					List<Schedule> listScheds=ListScheds.FindAll(x => x.SchedType==ScheduleType.Practice && x.Status==SchedStatus.Holiday);//scheds in local list
 					listScheds.AddRange(Schedules.GetAllForDateAndType(SchedCur.SchedDate,ScheduleType.Practice)
-						.FindAll(x => x.Status==SchedStatus.Holiday && listScheds.All(y => y.ScheduleNum!=x.ScheduleNum)));//add any in db that aren't in local list
-					listScheds.Remove(SchedCur);//remove the current schedule from the list if it's in there
+						.FindAll(x => x.ScheduleNum!=SchedCur.ScheduleNum
+							&& x.Status==SchedStatus.Holiday
+							&& listScheds.All(y => y.ScheduleNum!=x.ScheduleNum)));//add any in db that aren't in local list
 					if(listScheds.Any(x => x.ClinicNum==0 || x.ClinicNum==clinicNum)//already a holiday for HQ in db or duplicate holiday for a clinic
 						|| (clinicNum==0 && listScheds.Count>0))//OR trying to create a HQ holiday when a clinic already has one for this day
 					{
-						MsgBox.Show(this,"There is already a Holiday for the practice or selected clinic on this date.");
+						MsgBox.Show(this,"There is already a Holiday for the practice or clinic on this date.");
 						return;
 					}
 				}
@@ -354,7 +355,7 @@ namespace OpenDental{
 			SchedCur.StopTime=stopDateT.TimeOfDay;
       SchedCur.Note=textNote.Text;
 			SchedCur.Ops=new List<long>();
-			if(!listOps.SelectedIndices.Contains(0)) {
+			if(listOps.SelectedIndices.Count>0 && !listOps.SelectedIndices.Contains(0)) {
 				listOps.SelectedIndices.OfType<int>().ToList().ForEach(x => SchedCur.Ops.Add(_listOps[x-1].OperatoryNum));
 			}
 			SchedCur.ClinicNum=clinicNum;//0 if HQ selected or clinics not enabled or not a holiday or practice note

@@ -455,6 +455,7 @@ namespace OpenDental{
 			this.gridMain.Title = "Schedule";
 			this.gridMain.TranslationName = null;
 			this.gridMain.CellDoubleClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellDoubleClick);
+			this.gridMain.CellClick += new OpenDental.UI.ODGridClickEventHandler(this.gridMain_CellClick);
 			// 
 			// comboClinic
 			// 
@@ -546,37 +547,56 @@ namespace OpenDental{
 		private void FillEmployeesAndProviders() {
 			tabPageEmp.Text=Lan.g(this,"Employees")+" (0)";
 			tabPageProv.Text=Lan.g(this,"Providers")+" (0)";
+			//Seed emp list and prov list with a dummy emp/prov with 'none' for the field that fills the list, FName and Abbr respectively.
+			//That way we don't have to add/subtract one in order when selecting from the list based on selected indexes.
+			_listEmps=new List<Employee>() { new Employee() { EmployeeNum=0,FName="none" } };
+			_listProviders=new List<Provider>() { new Provider() { ProvNum=0,Abbr="none" } };
 			if(PrefC.HasClinicsEnabled) {
 				//clinicNum will be 0 for unrestricted users with HQ selected in which case this will get only emps/provs not assigned to a clinic
-				_listEmps=Employees.GetEmpsForClinic(_listClinics[comboClinic.SelectedIndex].ClinicNum);
-				_listProviders=Providers.GetProvsForClinic(_listClinics[comboClinic.SelectedIndex].ClinicNum);
+				_listEmps.AddRange(Employees.GetEmpsForClinic(_listClinics[comboClinic.SelectedIndex].ClinicNum));
+				_listProviders.AddRange(Providers.GetProvsForClinic(_listClinics[comboClinic.SelectedIndex].ClinicNum));
 			}
 			else {//Not using clinics
-				_listEmps=Employees.GetListShort();
-				_listProviders=ProviderC.GetListShort();
+				_listEmps.AddRange(Employees.GetListShort());
+				_listProviders.AddRange(ProviderC.GetListShort());
 			}
+			//consider re-ordering provider and emp list here if names are not in correct order.
 			//Employee Listbox
 			listEmp.Items.Clear();
 			_listEmps.ForEach(x => listEmp.Items.Add(x.FName));
-			for(int i = 0;i<listEmp.Items.Count;i++) {
-				listEmp.SetSelected(i,true);
-			}
+			listEmp.SelectedIndex=0;//select the 'none' entry; used to select all, that caused an annoyance/bug with creating too many schedules.
 			//Provider Listbox
 			listProv.Items.Clear();
 			_listProviders.ForEach(x => listProv.Items.Add(x.Abbr));
-			for(int i = 0;i<listProv.Items.Count;i++) {
-				listProv.SetSelected(i,true);
+			listProv.SelectedIndex=0;//select the 'none' entry; used to select all, that caused an annoyance/bug with creating too many schedules.
+		}
+
+		///<summary>Returns true if date text boxes have no errors and the emp and prov lists don't have 'none' selected with other emps/provs.
+		///Set isQuiet to true to suppress the message box with the warning.</summary>
+		private bool ValidateInputs(bool isQuiet=false) {
+			List<string> listErrorMsgs=new List<string>();
+			if(textDateFrom.errorProvider1.GetError(textDateFrom)!="" || textDateTo.errorProvider1.GetError(textDateTo)!="") {
+				listErrorMsgs.Add(Lan.g(this,"Please fix date errors first."));
 			}
+			if(listProv.SelectedIndices.Count>1 && listProv.SelectedIndices.Contains(0)) {//'none' selected with additional provs
+				listErrorMsgs.Add(Lan.g(this,"Invalid selection of providers."));
+			}
+			if(listEmp.SelectedIndices.Count>1 && listEmp.SelectedIndices.Contains(0)) {//'none' selected with additional emps
+				listErrorMsgs.Add(Lan.g(this,"Invalid selection of employees."));
+			}
+			if(listErrorMsgs.Count>0) {
+				if(!isQuiet) {
+					MessageBox.Show(string.Join("\r\n",listErrorMsgs));
+				}
+			}
+			return listErrorMsgs.Count==0;
 		}
 
 		private void FillGrid(bool isFromDb=true){
 			DateCopyStart=DateTime.MinValue;
 			DateCopyEnd=DateTime.MinValue;
 			textClipboard.Text="";
-			if(textDateFrom.errorProvider1.GetError(textDateFrom)!=""
-				|| textDateTo.errorProvider1.GetError(textDateTo)!="")
-			{
-				//MsgBox.Show(this,"Please fix errors first.");
+			if(!ValidateInputs(true)) {
 				return;
 			}
 			//Clear out the columns and rows for dynamic resizing of the grid to calculate column widths
@@ -593,6 +613,8 @@ namespace OpenDental{
 			for(int i=0;i<listEmp.SelectedIndices.Count;i++){
 				empNums.Add(_listEmps[listEmp.SelectedIndices[i]].EmployeeNum);
 			}
+			provNums.RemoveAll(x => x==0);
+			empNums.RemoveAll(x => x==0);
 			long clinicNum=0;
 			if(PrefC.HasClinicsEnabled) {
 				clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
@@ -610,24 +632,16 @@ namespace OpenDental{
 			else{
 				colW=(gridMain.Width-20)/5;
 			}
-			ODGridColumn col;
 			if(checkWeekend.Checked){
-				col=new ODGridColumn(Lan.g("TableSchedule","Sunday"),colW);
-				gridMain.Columns.Add(col);
+				gridMain.Columns.Add(new ODGridColumn(Lan.g("TableSchedule","Sunday"),colW));
 			}
-			col=new ODGridColumn(Lan.g("TableSchedule","Monday"),colW);
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableSchedule","Tuesday"),colW);
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableSchedule","Wednesday"),colW);
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableSchedule","Thursday"),colW);
-			gridMain.Columns.Add(col);
-			col=new ODGridColumn(Lan.g("TableSchedule","Friday"),colW);
-			gridMain.Columns.Add(col);
+			gridMain.Columns.Add(new ODGridColumn(Lan.g("TableSchedule","Monday"),colW));
+			gridMain.Columns.Add(new ODGridColumn(Lan.g("TableSchedule","Tuesday"),colW));
+			gridMain.Columns.Add(new ODGridColumn(Lan.g("TableSchedule","Wednesday"),colW));
+			gridMain.Columns.Add(new ODGridColumn(Lan.g("TableSchedule","Thursday"),colW));
+			gridMain.Columns.Add(new ODGridColumn(Lan.g("TableSchedule","Friday"),colW));
 			if(checkWeekend.Checked){
-				col=new ODGridColumn(Lan.g("TableSchedule","Saturday"),colW);
-				gridMain.Columns.Add(col);
+				gridMain.Columns.Add(new ODGridColumn(Lan.g("TableSchedule","Saturday"),colW));
 			}
 			gridMain.Rows.Clear();
 			ODGridRow row;
@@ -674,16 +688,14 @@ namespace OpenDental{
 		}
 
 		private void listProv_SelectedIndexChanged(object sender,EventArgs e) {
-			tabPageProv.Text=Lan.g(this,"Providers")+" ("+listProv.SelectedIndices.Count+")";
+			tabPageProv.Text=Lan.g(this,"Providers")+" ("+listProv.SelectedIndices.OfType<int>().Count(x => x>0)+")";
 		}
 
 		private void listEmp_SelectedIndexChanged(object sender,EventArgs e) {
-			tabPageEmp.Text=Lan.g(this,"Employees")+" ("+listEmp.SelectedIndices.Count+")";
+			tabPageEmp.Text=Lan.g(this,"Employees")+" ("+listEmp.SelectedIndices.OfType<int>().Count(x => x>0)+")";
 		}
 
 		private void comboClinic_SelectionChangeCommitted(object sender,EventArgs e) {
-			//tabPageProv.Text=Lan.g(this,"Providers")+" (0)";
-			tabPageEmp.Text=Lan.g(this,"Employees")+" (0)";
 			comboClinic.Text=Lan.g(this,"Show Practice Notes");
 			if(!Security.CurUser.ClinicIsRestricted && comboClinic.SelectedIndex>0) {
 				comboClinic.Text=Lan.g(this,"Show Practice and Clinic Notes");
@@ -693,12 +705,10 @@ namespace OpenDental{
 		}
 
 		private void butRefresh_Click(object sender,EventArgs e) {
-			if(textDateFrom.errorProvider1.GetError(textDateFrom)!=""
-				|| textDateTo.errorProvider1.GetError(textDateTo)!="")
-			{
-				MsgBox.Show(this,"Please fix errors first.");
+			if(!ValidateInputs()) {
 				return;
 			}
+			_clickedCell=gridMain.SelectedCell;
 			FillGrid();
 		}
 
@@ -732,19 +742,22 @@ namespace OpenDental{
 			FillGrid();
 		}
 
+		private void gridMain_CellClick(object sender,ODGridClickEventArgs e) {
+			_clickedCell=gridMain.SelectedCell;
+		}
+
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			if(!Security.IsAuthorized(Permissions.Schedules,DateTime.MinValue)) {
 				return;
 			}
-			if(textDateFrom.errorProvider1.GetError(textDateFrom)!=""
-				|| textDateTo.errorProvider1.GetError(textDateTo)!="")
-			{
-				MsgBox.Show(this,"Please fix errors first.");
+			if(!ValidateInputs()) {
 				return;
 			}
 			int clickedCol=e.Col;
+			if(!checkWeekend.Checked) {
+				clickedCol++;
+			}
 			//the "clickedCell" is in terms of the entire 7 col layout.
-			_clickedCell=new Point(clickedCol,e.Row);
 			DateTime selectedDate=Schedules.GetDateCal(PIn.Date(textDateFrom.Text),e.Row,clickedCol);
 			if(selectedDate<PIn.Date(textDateFrom.Text) || selectedDate>PIn.Date(textDateTo.Text)){
 				return;
@@ -754,7 +767,7 @@ namespace OpenDental{
 			if(PrefC.HasClinicsEnabled) {
 				clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
 			}
-			FormScheduleDayEdit FormS=new FormScheduleDayEdit(selectedDate,clinicNum,checkPracticeNotes.Checked,checkClinicNotes.Checked);
+			FormScheduleDayEdit FormS=new FormScheduleDayEdit(selectedDate,clinicNum);
 			FormS.ShowDialog();
 			if(FormS.DialogResult!=DialogResult.OK){
 				return;
@@ -772,10 +785,7 @@ namespace OpenDental{
 		}
 
 		private void butDelete_Click(object sender,EventArgs e) {
-			if(textDateFrom.errorProvider1.GetError(textDateFrom)!=""
-				|| textDateTo.errorProvider1.GetError(textDateTo)!="") 
-			{
-				MsgBox.Show(this,"Please fix errors first.");
+			if(!ValidateInputs()) {
 				return;
 			}
 			if(gridMain.SelectedCell.X==-1) {
@@ -801,8 +811,14 @@ namespace OpenDental{
 			else {
 				dateSelectedEnd=dateSelectedStart.AddDays(4);
 			}
-			List<long> provNums = listProv.SelectedIndices.OfType<int>().Select(x => _listProviders[x].ProvNum).ToList();
-			List<long> empNums = listEmp.SelectedIndices.OfType<int>().Select(x => _listEmps[x].EmployeeNum).ToList();
+			List<long> provNums=new List<long>();//empty list deletes no prov schedules
+			if(!listProv.SelectedIndices.Contains(0)) {//if 'none' is selected, don't populate provNums; not allowed to select 'none' and another prov validated above
+				provNums=listProv.SelectedIndices.OfType<int>().Select(x => _listProviders[x].ProvNum).ToList();
+			}
+			List<long> empNums=new List<long>();//empty list deletes no emp schedules
+			if(!listEmp.SelectedIndices.Contains(0)) {//if 'none' is selected, don't populate empNums; not allowed to select 'none' and another emp validated above
+				empNums=listEmp.SelectedIndices.OfType<int>().Select(x => _listEmps[x].EmployeeNum).ToList();
+			}
 			long clinicNum=0;
 			if(PrefC.HasClinicsEnabled) {
 				clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
@@ -813,9 +829,7 @@ namespace OpenDental{
 		}
 
 		private void butCopyDay_Click(object sender,EventArgs e) {
-			if(textDateFrom.errorProvider1.GetError(textDateFrom)!=""
-				|| textDateTo.errorProvider1.GetError(textDateTo)!="") {
-				MsgBox.Show(this,"Please fix errors first.");
+			if(!ValidateInputs()) {
 				return;
 			}
 			if(gridMain.SelectedCell.X==-1){
@@ -832,10 +846,7 @@ namespace OpenDental{
 		}
 
 		private void butCopyWeek_Click(object sender,EventArgs e) {
-			if(textDateFrom.errorProvider1.GetError(textDateFrom)!=""
-				|| textDateTo.errorProvider1.GetError(textDateTo)!="")
-			{
-				MsgBox.Show(this,"Please fix errors first.");
+			if(!ValidateInputs()) {
 				return;
 			}
 			if(gridMain.SelectedCell.X==-1) {
@@ -857,10 +868,7 @@ namespace OpenDental{
 		}
 
 		private void butPaste_Click(object sender,EventArgs e) {
-			if(textDateFrom.errorProvider1.GetError(textDateFrom)!=""
-				|| textDateTo.errorProvider1.GetError(textDateTo)!="") 
-			{
-				MsgBox.Show(this,"Please fix errors first.");
+			if(!ValidateInputs()) {
 				return;
 			}
 			if(gridMain.SelectedCell.X==-1) {
@@ -905,8 +913,14 @@ namespace OpenDental{
 				MsgBox.Show(this,"Not allowed to paste back onto the same date as is on the clipboard.");
 				return;
 			}
-			List<long> provNums=listProv.SelectedIndices.OfType<int>().Select(x => _listProviders[x].ProvNum).ToList();
-			List<long> empNums=listEmp.SelectedIndices.OfType<int>().Select(x => _listEmps[x].EmployeeNum).ToList();
+			List<long> provNums=new List<long>();
+			if(!listProv.SelectedIndices.Contains(0)) {//if 'none' is selected, don't populate provNums; not allowed to select 'none' and another prov validated above
+				provNums=listProv.SelectedIndices.OfType<int>().Select(x => _listProviders[x].ProvNum).ToList();
+			}
+			List<long> empNums=new List<long>();
+			if(!listEmp.SelectedIndices.Contains(0)) {//if 'none' is selected, don't populate empNums; not allowed to select 'none' and another emp validated above
+				empNums=listEmp.SelectedIndices.OfType<int>().Select(x => _listEmps[x].EmployeeNum).ToList();
+			}
 			long clinicNum=0;
 			if(PrefC.HasClinicsEnabled) {
 				clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
@@ -952,10 +966,7 @@ namespace OpenDental{
 			if(DateCopyStart!=DateCopyEnd) {
 				isWeek=true;
 			}
-			if(textDateFrom.errorProvider1.GetError(textDateFrom)!=""
-				|| textDateTo.errorProvider1.GetError(textDateTo)!="") 
-			{
-				MsgBox.Show(this,"Please fix errors first.");
+			if(!ValidateInputs()) {
 				return;
 			}
 			int repeatCount;
@@ -1015,8 +1026,14 @@ namespace OpenDental{
 			//	MsgBox.Show(this,"Not allowed to paste back onto the same date as is on the clipboard.");
 			//	return;
 			//}
-			List<long> provNums = listProv.SelectedIndices.OfType<int>().Select(x => _listProviders[x].ProvNum).ToList();
-			List<long> empNums = listEmp.SelectedIndices.OfType<int>().Select(x => _listEmps[x].EmployeeNum).ToList();
+			List<long> provNums=new List<long>();
+			if(!listProv.SelectedIndices.Contains(0)) {//if 'none' is selected, don't populate provNums; not allowed to select 'none' and another prov above
+				provNums=listProv.SelectedIndices.OfType<int>().Select(x => _listProviders[x].ProvNum).ToList();
+			}
+			List<long> empNums=new List<long>();
+			if(!listEmp.SelectedIndices.Contains(0)) {//if 'none' is selected, don't populate empNums; not allowed to select 'none' and another emp above
+				empNums=listEmp.SelectedIndices.OfType<int>().Select(x => _listEmps[x].EmployeeNum).ToList();
+			}
 			long clinicNum=0;
 			if(PrefC.HasClinicsEnabled) {
 				clinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
