@@ -616,7 +616,7 @@ namespace OpenDental{
 			ToolBarHistory.Buttons.Add(new ODToolBarButton(ODToolBarButtonStyle.Separator));
 			ToolBarHistory.Buttons.Add(new ODToolBarButton(Lan.g(this,"Print List"),2,
 				Lan.g(this,"Print history list."),"PrintList"));
-			ToolBarHistory.Buttons.Add(new ODToolBarButton(Lan.g(this,"Outstanding Procs"),-1,"","OutstandingProcs"));
+			ToolBarHistory.Buttons.Add(new ODToolBarButton(Lan.g(this,"Outstanding Claims"),-1,"","OutstandingClaims"));
 			/*#if DEBUG
 			ToolBarHistory.Buttons.Add(new ODToolBarButton(Lan.g(this,"Print Item"),2,
 				Lan.g(this,"For debugging, this will simply display the first item in the list."),"PrintItem"));
@@ -1437,7 +1437,7 @@ namespace OpenDental{
 				case "PrintItem":
 					PrintItem_Click();
 					break;
-				case "OutstandingProcs":
+				case "OutstandingClaims":
 					FormRpOutstandingIns formROI=new FormRpOutstandingIns();
 					formROI.ShowDialog();
 					break;
