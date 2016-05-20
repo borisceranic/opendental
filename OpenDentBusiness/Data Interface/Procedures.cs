@@ -220,9 +220,13 @@ namespace OpenDentBusiness {
 
 		///<summary>Creates a new procedure with the patient, surface, toothnum, and status for the specified procedure code.
 		///Make sure to make a security log after calling this method.
-		///This method requires that Security.CurUser be set prior to invoking.</summary>
-		public static Procedure CreateProcForPat(long patNum,long codeNum,string surf,int toothNum,ProcStat procStatus,long provNum) {
+		///This method requires that Security.CurUser be set prior to invoking.
+		///Returns null procedure if one was not created for the patient.</summary>
+		public static Procedure CreateProcForPat(long patNum,long codeNum,string surf,string toothNum,ProcStat procStatus,long provNum) {
 			//No need to check RemotingRole; no call to db.
+			if(codeNum < 1) {
+				return null;
+			}
 			Patient pat=Patients.GetPat(patNum);
 			if(provNum==0) {
 				provNum=Patients.GetProvNum(pat);
@@ -232,8 +236,18 @@ namespace OpenDentBusiness {
 			proc.ClinicNum=Clinics.ClinicNum;
 			proc.ProcStatus=procStatus;
 			proc.ProvNum=provNum;
-			proc.Surf=surf; //Note: Sealant code D1351 is not a surface code by default, but can be manually set.  For screens they will be surface specific.
-			proc.ToothNum=toothNum.ToString();
+			if(surf=="") {
+				proc.Surf="";
+			}
+			else { 
+				proc.Surf=surf; //Note: Sealant code D1351 is not a surface code by default, but can be manually set.  For screens they will be surface specific.
+			}
+			if(toothNum=="") {
+				proc.ToothNum="";
+			}
+			else {
+				proc.ToothNum=toothNum;
+			}
 			proc.UserNum=Security.CurUser.UserNum;
 			proc.CodeNum=codeNum;
 			proc.ProcDate=DateTime.Today;

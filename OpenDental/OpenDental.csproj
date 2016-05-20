@@ -480,6 +480,12 @@
     <Compile Include="Forms\FormPayPeriodManager.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Forms\FormSheetFieldChart.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormSheetFieldChart.designer.cs">
+      <DependentUpon>FormSheetFieldChart.cs</DependentUpon>
+    </Compile>
     <Compile Include="InternalTools\Job Manager\FormEmailJobTemplateEdit.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -4152,6 +4158,9 @@
     <EmbeddedResource Include="Forms\FormPayPeriodManager.resx">
       <DependentUpon>FormPayPeriodManager.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormSheetFieldChart.resx">
+      <DependentUpon>FormSheetFieldChart.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="InternalTools\Job Manager\FormEmailJobTemplateEdit.resx">
       <DependentUpon>FormEmailJobTemplateEdit.cs</DependentUpon>

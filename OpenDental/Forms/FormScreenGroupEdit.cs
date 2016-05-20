@@ -44,7 +44,10 @@ namespace OpenDental{
 		private UI.Button butStartScreens;
 		private Label label4;
 		private ContextMenu patContextMenu;
+		private ComboBox comboSheetDefs;
+		private Label labelSheet;
 		private List<Provider> _listProvs;
+		private List<SheetDef> _listScreeningSheetDefs;
 
 		///<summary></summary>
 		public FormScreenGroupEdit(ScreenGroup screenGroup) {
@@ -103,6 +106,8 @@ namespace OpenDental{
 			this.butDelete = new OpenDental.UI.Button();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butOK = new OpenDental.UI.Button();
+			this.comboSheetDefs = new System.Windows.Forms.ComboBox();
+			this.labelSheet = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// label14
@@ -244,6 +249,7 @@ namespace OpenDental{
 			// 
 			this.gridScreenPats.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridScreenPats.HasAddButton = false;
 			this.gridScreenPats.HasMultilineHeaders = false;
 			this.gridScreenPats.HScrollVisible = false;
 			this.gridScreenPats.Location = new System.Drawing.Point(472, 21);
@@ -260,6 +266,7 @@ namespace OpenDental{
 			// 
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+			this.gridMain.HasAddButton = false;
 			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = false;
 			this.gridMain.Location = new System.Drawing.Point(2, 165);
@@ -385,10 +392,30 @@ namespace OpenDental{
 			this.butOK.Text = "OK";
 			this.butOK.Click += new System.EventHandler(this.butOK_Click);
 			// 
+			// comboSheet
+			// 
+			this.comboSheetDefs.BackColor = System.Drawing.SystemColors.Window;
+			this.comboSheetDefs.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboSheetDefs.Location = new System.Drawing.Point(375, 138);
+			this.comboSheetDefs.MaxDropDownItems = 25;
+			this.comboSheetDefs.Name = "comboSheet";
+			this.comboSheetDefs.Size = new System.Drawing.Size(92, 21);
+			this.comboSheetDefs.TabIndex = 153;
+			// 
+			// labelSheet
+			// 
+			this.labelSheet.Location = new System.Drawing.Point(286, 141);
+			this.labelSheet.Name = "labelSheet";
+			this.labelSheet.Size = new System.Drawing.Size(88, 17);
+			this.labelSheet.TabIndex = 154;
+			this.labelSheet.Text = "Sheet";
+			this.labelSheet.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
 			// FormScreenGroupEdit
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
 			this.ClientSize = new System.Drawing.Size(864, 641);
+			this.Controls.Add(this.comboSheetDefs);
+			this.Controls.Add(this.labelSheet);
 			this.Controls.Add(this.label4);
 			this.Controls.Add(this.butStartScreens);
 			this.Controls.Add(this.butRemovePat);
@@ -464,6 +491,18 @@ namespace OpenDental{
 			comboGradeSchool.SelectedIndex=comboGradeSchool.Items.IndexOf(_screenGroup.GradeSchool);//"" etc OK
 			comboPlaceService.Items.AddRange(Enum.GetNames(typeof(PlaceOfService)));
 			comboPlaceService.SelectedIndex=(int)_screenGroup.PlaceService;
+			_listScreeningSheetDefs=SheetDefs.GetCustomForType(SheetTypeEnum.Screening);
+			if(PrefC.GetBool(PrefName.ScreeningsUseSheets)) {
+				comboSheetDefs.Items.Add(Lan.g(this,"Default"));
+				foreach(SheetDef def in _listScreeningSheetDefs) {
+					comboSheetDefs.Items.Add(def.Description);
+				}
+				comboSheetDefs.SelectedIndex=0;//Maybe think of a way to save this information.
+			}
+			else {
+				labelSheet.Visible=false;
+				comboSheetDefs.Visible=false;
+			}
 		}
 
 		private void FillGrid() {
@@ -689,7 +728,14 @@ namespace OpenDental{
 
 		private void StartScreensForPatsWithSheets() {
 			//Get the first custom Screening sheet or use the internal one
-			SheetDef sheetDef=SheetDefs.GetInternalOrCustom(SheetInternalType.Screening);
+			SheetDef sheetDef=null;
+			if(comboSheetDefs.SelectedIndex==0) {
+				sheetDef=SheetsInternal.GetSheetDef(SheetInternalType.Screening);
+			}
+			else {
+				sheetDef=_listScreeningSheetDefs[comboSheetDefs.SelectedIndex-1];
+				SheetDefs.GetFieldsAndParameters(sheetDef);
+			}
 			int selectedIdx=gridScreenPats.GetSelectedIndex();
 			int i=selectedIdx;
 			if(i==-1) {
@@ -720,8 +766,13 @@ namespace OpenDental{
 				Sheet sheet=SheetUtil.CreateSheet(sheetDef);
 				sheet.IsNew=true;
 				sheet.PatNum=screenPat.PatNum;
+				long provNum=0;
+				if(comboProv.SelectedIndex!=-1) {
+					provNum=_listProvs[comboProv.SelectedIndex].ProvNum;
+				}
 				SheetParameter.SetParameter(sheet,"ScreenGroupNum",_screenGroup.ScreenGroupNum);//I think we may need this.
 				SheetParameter.SetParameter(sheet,"PatNum",screenPat.PatNum);
+				SheetParameter.SetParameter(sheet,"ProvNum",provNum);
 				SheetFiller.FillFields(sheet);
 				using(Graphics g=CreateGraphics()) {
 					SheetUtil.CalculateHeights(sheet,g);
@@ -735,10 +786,15 @@ namespace OpenDental{
 					screen.ScreenGroupOrder=_listScreens.Last().ScreenGroupOrder+1;//increments for next
 				}
 				List<SheetField> listChartOrigVals=new List<SheetField>();
-				SheetField sheetFieldTreatment=sheet.SheetFields.Find(x=>x.FieldName=="ChartSealantTreatment");
-				SheetField sheetFieldComplete=sheet.SheetFields.Find(x=>x.FieldName=="ChartSealantComplete");
+				SheetField sheetFieldTreatment=sheet.SheetFields.Find(x=>x.FieldName=="ChartSealantTreatment" && x.FieldType==SheetFieldType.ScreenChart);
+				SheetField sheetFieldComplete=sheet.SheetFields.Find(x=>x.FieldName=="ChartSealantComplete" && x.FieldType==SheetFieldType.ScreenChart);
 				listChartOrigVals.Add(sheetFieldTreatment==null ? null : sheetFieldTreatment.Copy());//Adds null entry if it's not found, which is fine.
 				listChartOrigVals.Add(sheetFieldComplete==null ? null : sheetFieldComplete.Copy());//Adds null entry if it's not found, which is fine.
+				List<SheetField> listProcOrigVals=new List<SheetField>();
+				SheetField sheetFieldAssess=sheet.SheetFields.Find(x=>x.FieldName=="AssessmentProc" && x.FieldType==SheetFieldType.CheckBox);
+				SheetField sheetFieldFlouride=sheet.SheetFields.Find(x=>x.FieldName=="FlourideProc" && x.FieldType==SheetFieldType.CheckBox);
+				listProcOrigVals.Add(sheetFieldAssess==null ? null : sheetFieldAssess.Copy());//Adds null entry if it's not found, which is fine.
+				listProcOrigVals.Add(sheetFieldFlouride==null ? null : sheetFieldFlouride.Copy());//Adds null entry if it's not found, which is fine.
 				FormSheetFillEdit FormSFE=new FormSheetFillEdit(sheet);
 				FormSFE.ShowDialog();
 				if(FormSFE.DialogResult!=DialogResult.OK) {
@@ -751,11 +807,8 @@ namespace OpenDental{
 						MsgBox.Show(this,"The required sealant code is not present in the database.  The screening chart will not be processed.");
 						break;
 					}
-					long provNum=0;
-					if(comboProv.SelectedIndex!=-1) {
-						provNum=_listProvs[comboProv.SelectedIndex].ProvNum;
-					}
-					Screens.ProcessScreenChart(sheet,ScreenChartType.TP|ScreenChartType.C,provNum,FormSFE.SheetCur.SheetNum,listChartOrigVals);//Process both TP and Compl charts.
+					//Process both TP and Compl charts.
+					Screens.ProcessScreenChart(sheet,ScreenChartType.TP|ScreenChartType.C,provNum,FormSFE.SheetCur.SheetNum,listChartOrigVals,listProcOrigVals);
 				}
 				screen.ScreenGroupOrder++;
 				FillGrid();
@@ -791,6 +844,11 @@ namespace OpenDental{
 			SheetField sheetFieldComplete=sheet.SheetFields.Find(x=>x.FieldName=="ChartSealantComplete");
 			listChartOrigVals.Add(sheetFieldTreatment==null ? null : sheetFieldTreatment.Copy());//Adds null entry if it's not found, which is fine.
 			listChartOrigVals.Add(sheetFieldComplete==null ? null : sheetFieldComplete.Copy());//Adds null entry if it's not found, which is fine.
+			List<SheetField> listProcOrigVals=new List<SheetField>();
+			SheetField sheetFieldAssess=sheet.SheetFields.Find(x=>x.FieldName=="AssessmentProc");
+			SheetField sheetFieldFlouride=sheet.SheetFields.Find(x=>x.FieldName=="FlourideProc");
+			listProcOrigVals.Add(sheetFieldAssess==null ? null : sheetFieldAssess.Copy());//Adds null entry if it's not found, which is fine.
+			listProcOrigVals.Add(sheetFieldFlouride==null ? null : sheetFieldFlouride.Copy());//Adds null entry if it's not found, which is fine.
 			FormSheetFillEdit FormSFE=new FormSheetFillEdit(sheet);
 			if(FormSFE.ShowDialog()==DialogResult.OK) {
 				//Now try and process the screening chart for completed sealants.
@@ -805,8 +863,9 @@ namespace OpenDental{
 				if(comboProv.SelectedIndex!=-1) {
 					provNum=_listProvs[comboProv.SelectedIndex].ProvNum;
 				}
-				Screens.ProcessScreenChart(sheet,ScreenChartType.TP|ScreenChartType.C,provNum,FormSFE.SheetCur.SheetNum,listChartOrigVals);						
+				Screens.ProcessScreenChart(sheet,ScreenChartType.TP|ScreenChartType.C,provNum,FormSFE.SheetCur.SheetNum,listChartOrigVals,listProcOrigVals);						
 			}
+			_listScreens[gridMain.GetSelectedIndex()]=Screens.CreateScreenFromSheet(sheet,_listScreens[gridMain.GetSelectedIndex()]);
 		}
 
 		private void gridScreenPats_MouseClick(object sender,MouseEventArgs e) {

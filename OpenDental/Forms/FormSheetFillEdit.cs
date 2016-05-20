@@ -288,11 +288,12 @@ namespace OpenDental {
 				if(field.FieldType!=SheetFieldType.ScreenChart) {
 					continue;
 				}
-				toothChart=new ScreenToothChart(field.FieldValue);//Need to pass in value here to set tooth chart items.
+				toothChart=new ScreenToothChart(field.FieldValue,field.FieldValue[0]=='1');//Need to pass in value here to set tooth chart items.
 				toothChart.Location=new Point(field.XPos,field.YPos);
 				toothChart.Width=field.Width;
 				toothChart.Height=field.Height;
 				toothChart.Tag=field;
+				toothChart.Invalidate();
 				panelMain.Controls.Add(toothChart);
 				panelMain.Controls.SetChildIndex(toothChart,panelMain.Controls.Count-2);//Ensures it's in the right order but in front of the picture frame.
 			}
@@ -972,8 +973,20 @@ namespace OpenDental {
 					continue;
 				}
 				ScreenToothChart toothChart=(ScreenToothChart)control;
-				List<UserControlScreenTooth> listTeeth=toothChart.GetTeeth;
+				List<UserControlScreenTooth> listTeeth=null;
+				if(toothChart.IsPrimary) {
+					listTeeth=toothChart.GetPrimaryTeeth;
+				}
+				else {
+					listTeeth=toothChart.GetTeeth;
+				}
 				string value="";
+				if(toothChart.IsPrimary) {
+					value+="1;";
+				}
+				else {
+					value+="0;";
+				}
 				for(int i=0;i<listTeeth.Count;i++) {
 					if(i > 0) {
 						value+=";";//Don't add ';' at very end or it will mess with .Split() logic.

@@ -30,7 +30,9 @@ namespace OpenDentBusiness{
 		///<para>SigBox: the first char will be 0 or 1 to indicate SigIsTopaz, and all subsequent chars will be the Signature itself.</para>
 		///<para>PatImage: Docnum or blank, FK to document.DocNum.</para>
 		///<para>ComboBox: The chosen option, semicolon, then a pipe delimited list of options such as: March;January|February|March|April</para>
-		///<para>ScreenChart: Contains a semicolon delimited list of comma separated surfaces.  It may look like S,P,N;S,S,S;... etc.</para></summary>
+		///<para>ScreenChart: Contains a semicolon delimited list of a single number followed by groups of comma separated surfaces.
+		///The first digit represents what type of ScreenChart it is.  0 = Permanent, 1 = Primary
+		///It may look like 0;S,P,N;S,S,S;... etc.</para></summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.TextIsClob)]
 		public string FieldValue;
 		///<summary>The fontSize for this field regardless of the default for the sheet.  The actual font must be saved with each sheetField.</summary>

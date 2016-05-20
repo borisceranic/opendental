@@ -89,6 +89,7 @@ namespace OpenDentBusiness{
 				case SheetTypeEnum.Screening:
 					list.Add(new SheetParameter(true,"ScreenGroupNum"));
 					list.Add(new SheetParameter(false,"PatNum"));
+					list.Add(new SheetParameter(false,"ProvNum"));
 					break;
 				case SheetTypeEnum.TreatmentPlan:
 				case SheetTypeEnum.Statement:
