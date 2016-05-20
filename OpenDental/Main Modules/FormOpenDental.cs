@@ -4207,6 +4207,7 @@ namespace OpenDental{
 				RefreshLocalData(itypeArray);//does local computer
 			}
 			if(e.ITypes.Contains((int)InvalidType.Task) || e.ITypes.Contains((int)InvalidType.TaskPopup)) {
+				Plugins.HookAddCode(this,"FormOpenDental.DataValid_BecameInvalid_taskInvalidTypes");
 				//One of the two task lists needs to be refreshed on this instance of OD
 				if(userControlTasks1.Visible) {
 					userControlTasks1.RefreshTasks();
