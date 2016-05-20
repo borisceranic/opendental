@@ -43,6 +43,7 @@ namespace OpenDental{
 		private const int _colWidthClinic=75;
 		private CheckBox checkAutoGroupProcs;
 		private DateTime _dateFromPrev=DateTime.MinValue;
+		private UI.Button butRefresh;
 		private DateTime _dateToPrev=DateTime.MinValue;
 
 		///<summary></summary>
@@ -88,6 +89,7 @@ namespace OpenDental{
 			this.gridMain = new OpenDental.UI.ODGrid();
 			this.butNewClaims = new OpenDental.UI.Button();
 			this.checkAutoGroupProcs = new System.Windows.Forms.CheckBox();
+			this.butRefresh = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// calendarTo
@@ -142,7 +144,7 @@ namespace OpenDental{
 			// checkMedical
 			// 
 			this.checkMedical.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkMedical.Location = new System.Drawing.Point(720, 8);
+			this.checkMedical.Location = new System.Drawing.Point(654, 8);
 			this.checkMedical.Name = "checkMedical";
 			this.checkMedical.Size = new System.Drawing.Size(227, 21);
 			this.checkMedical.TabIndex = 11;
@@ -192,7 +194,7 @@ namespace OpenDental{
 			this.butDropTo.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butDropTo.CornerRadius = 4F;
 			this.butDropTo.Image = global::OpenDental.Properties.Resources.arrowDownTriangle;
-			this.butDropTo.Location = new System.Drawing.Point(414, 27);
+			this.butDropTo.Location = new System.Drawing.Point(404, 27);
 			this.butDropTo.Name = "butDropTo";
 			this.butDropTo.Size = new System.Drawing.Size(22, 18);
 			this.butDropTo.TabIndex = 66;
@@ -201,7 +203,7 @@ namespace OpenDental{
 			// 
 			// label2
 			// 
-			this.label2.Location = new System.Drawing.Point(289, 28);
+			this.label2.Location = new System.Drawing.Point(279, 28);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(45, 16);
 			this.label2.TabIndex = 64;
@@ -210,7 +212,7 @@ namespace OpenDental{
 			// 
 			// textDateTo
 			// 
-			this.textDateTo.Location = new System.Drawing.Point(335, 26);
+			this.textDateTo.Location = new System.Drawing.Point(325, 26);
 			this.textDateTo.Name = "textDateTo";
 			this.textDateTo.Size = new System.Drawing.Size(102, 20);
 			this.textDateTo.TabIndex = 65;
@@ -220,7 +222,7 @@ namespace OpenDental{
 			// 
 			this.labelClinic.Location = new System.Drawing.Point(437, 28);
 			this.labelClinic.Name = "labelClinic";
-			this.labelClinic.Size = new System.Drawing.Size(87, 16);
+			this.labelClinic.Size = new System.Drawing.Size(55, 16);
 			this.labelClinic.TabIndex = 68;
 			this.labelClinic.Text = "Clinics";
 			this.labelClinic.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -231,7 +233,7 @@ namespace OpenDental{
 			this.comboBoxMultiClinics.BackColor = System.Drawing.SystemColors.Window;
 			this.comboBoxMultiClinics.DroppedDown = false;
 			this.comboBoxMultiClinics.Items = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiClinics.Items")));
-			this.comboBoxMultiClinics.Location = new System.Drawing.Point(525, 26);
+			this.comboBoxMultiClinics.Location = new System.Drawing.Point(493, 26);
 			this.comboBoxMultiClinics.Name = "comboBoxMultiClinics";
 			this.comboBoxMultiClinics.SelectedIndices = ((System.Collections.ArrayList)(resources.GetObject("comboBoxMultiClinics.SelectedIndices")));
 			this.comboBoxMultiClinics.Size = new System.Drawing.Size(160, 21);
@@ -265,9 +267,9 @@ namespace OpenDental{
 			this.butNewClaims.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butNewClaims.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butNewClaims.CornerRadius = 4F;
-			this.butNewClaims.Location = new System.Drawing.Point(450, 662);
+			this.butNewClaims.Location = new System.Drawing.Point(437, 662);
 			this.butNewClaims.Name = "butNewClaims";
-			this.butNewClaims.Size = new System.Drawing.Size(75, 26);
+			this.butNewClaims.Size = new System.Drawing.Size(100, 26);
 			this.butNewClaims.TabIndex = 71;
 			this.butNewClaims.Text = "New Claims";
 			this.butNewClaims.UseVisualStyleBackColor = true;
@@ -276,7 +278,7 @@ namespace OpenDental{
 			// checkAutoGroupProcs
 			// 
 			this.checkAutoGroupProcs.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-			this.checkAutoGroupProcs.Location = new System.Drawing.Point(720, 28);
+			this.checkAutoGroupProcs.Location = new System.Drawing.Point(654, 28);
 			this.checkAutoGroupProcs.Name = "checkAutoGroupProcs";
 			this.checkAutoGroupProcs.Size = new System.Drawing.Size(227, 21);
 			this.checkAutoGroupProcs.TabIndex = 72;
@@ -284,11 +286,28 @@ namespace OpenDental{
 			this.checkAutoGroupProcs.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			this.checkAutoGroupProcs.UseVisualStyleBackColor = true;
 			// 
+			// butRefresh
+			// 
+			this.butRefresh.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.butRefresh.Autosize = true;
+			this.butRefresh.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butRefresh.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butRefresh.CornerRadius = 4F;
+			this.butRefresh.Location = new System.Drawing.Point(896, 21);
+			this.butRefresh.Name = "butRefresh";
+			this.butRefresh.Size = new System.Drawing.Size(50, 26);
+			this.butRefresh.TabIndex = 73;
+			this.butRefresh.Text = "Refresh";
+			this.butRefresh.UseVisualStyleBackColor = true;
+			this.butRefresh.Click += new System.EventHandler(this.butRefresh_Click);
+			// 
 			// FormRpProcNotBilledIns
 			// 
 			this.AcceptButton = this.butPrint;
 			this.CancelButton = this.butClose;
 			this.ClientSize = new System.Drawing.Size(974, 696);
+			this.Controls.Add(this.butRefresh);
 			this.Controls.Add(this.checkAutoGroupProcs);
 			this.Controls.Add(this.butNewClaims);
 			this.Controls.Add(this.labelClinic);
@@ -600,6 +619,10 @@ namespace OpenDental{
 		}
 
 		private void checkMedical_Click(object sender,EventArgs e) {
+			FillGrid();
+		}
+
+		private void butRefresh_Click(object sender,EventArgs e) {
 			FillGrid();
 		}
 		
