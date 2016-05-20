@@ -139,6 +139,7 @@ namespace OpenDentBusiness{
 				+"guar.LName GuarLName,guar.FName GuarFName,guar.BalTotal-guar.InsEst FamBalTotal,"
 				//Special select statement to figure out how much is owed on a particular payment plan.
 				+"ROUND((SELECT COALESCE(SUM(ppc.Principal+ppc.Interest),0) FROM PayPlanCharge ppc WHERE ppc.PayPlanNum=cc.PayPlanNum "
+				+"AND ppc.ChargeType="+POut.Int((int)PayPlanChargeType.Debit)+" "
 				+"AND ppc.ChargeDate<="+DbHelper.Curdate()+")-COALESCE(SUM(ps.SplitAmt),0),2) PayPlanDueCalc,"
 				+"cc.DateStart,cc.Address,pat.Address AddressPat,cc.Zip,pat.Zip ZipPat,cc.XChargeToken,cc.CCNumberMasked,cc.CCExpiration,cc.ChargeAmt,"
 				+"cc.PayPlanNum,cc.DateStop,(SELECT ppc1.ProvNum FROM payplancharge ppc1 WHERE ppc1.PayPlanNum=cc.PayPlanNum "+DbHelper.LimitAnd(1)+") ProvNum,"
