@@ -376,7 +376,7 @@ namespace OpenDental {
 				_argsDF.brush=_argsDF.brushBlue;
 			}
 			g.DrawRectangle(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
-			g.DrawString("(combo box)",Font,_argsDF.brush,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos);
+			g.DrawString("("+Lan.g(this,"combo box")+")",Font,_argsDF.brush,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos);
 		}
 
 		private void DrawToothChartHelper(Graphics g,int i) {
@@ -389,7 +389,15 @@ namespace OpenDental {
 				_argsDF.brush=_argsDF.brushBlue;
 			}
 			g.DrawRectangle(_argsDF.pen,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
-			g.DrawString("(tooth chart "+SheetDefCur.SheetFieldDefs[i].FieldName+")",Font,_argsDF.brush,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos);
+			string toothChart="("+Lan.g(this,"tooth chart")+" "+SheetDefCur.SheetFieldDefs[i].FieldName;
+			if(SheetDefCur.SheetFieldDefs[i].FieldValue[0]=='1') {//Primary teeth chart
+				toothChart+=" "+Lan.g(this,"primary teeth");
+			}
+			else {//Permanent teeth chart
+				toothChart+=" "+Lan.g(this,"permanent teeth");
+			}
+			toothChart+=")";
+			g.DrawString(toothChart,Font,_argsDF.brush,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos);
 			if(SheetDefCur.SheetFieldDefs[i].FieldName=="ChartSealantTreatment") {
 				_hasChartSealantTreatment=true;
 			}
@@ -494,7 +502,7 @@ namespace OpenDental {
 			else {
 #if DEBUG
 				g.DrawRectangle(new Pen(Brushes.IndianRed),SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos,SheetDefCur.SheetFieldDefs[i].Width,SheetDefCur.SheetFieldDefs[i].Height);
-				g.DrawString("Cannot find image: "+SheetDefCur.SheetFieldDefs[i].FieldName,Font,_argsDF.brush??Brushes.Black,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos);
+				g.DrawString(Lan.g(this,"Cannot find image")+": "+SheetDefCur.SheetFieldDefs[i].FieldName,Font,_argsDF.brush??Brushes.Black,SheetDefCur.SheetFieldDefs[i].XPos,SheetDefCur.SheetFieldDefs[i].YPos);
 #endif
 				return;
 			}
@@ -1014,7 +1022,7 @@ namespace OpenDental {
 		}
 
 		private void butScreenChart_Click(object sender,EventArgs e) {
-			string fieldValue="d,m,ling;d,m,ling;,,;,,;,,;,,;m,d,ling;m,d,ling;m,d,buc;m,d,buc;,,;,,;,,;,,;d,m,buc;d,m,buc";
+			string fieldValue="0;d,m,ling;d,m,ling;,,;,,;,,;,,;m,d,ling;m,d,ling;m,d,buc;m,d,buc;,,;,,;,,;,,;d,m,buc;d,m,buc";
 			if(!_hasChartSealantComplete) {
 				SheetDefCur.SheetFieldDefs.Add(SheetFieldDef.NewScreenChart("ChartSealantComplete",fieldValue,0,0));
 			}
@@ -1308,6 +1316,21 @@ namespace OpenDental {
 					}
 					if(FormSFG.SheetFieldDefCur==null) {
 						SheetDefCur.SheetFieldDefs.RemoveAt(idx);
+					}
+					break;
+				case SheetFieldType.ScreenChart:
+					FormSheetFieldChart FormSFC=new FormSheetFieldChart();
+					FormSFC.SheetDefCur=SheetDefCur;
+					FormSFC.SheetFieldDefCur=field;
+					if(this.IsInternal){
+						FormSFC.IsReadOnly=true;
+					}
+					FormSFC.ShowDialog();
+					if(FormSFC.DialogResult!=DialogResult.OK) {
+						return;
+					}
+					if(FormSFC.SheetFieldDefCur==null) {
+						SheetDefCur.SheetFieldDefs.RemoveAt(idx);//Deleted
 					}
 					break;
 			}

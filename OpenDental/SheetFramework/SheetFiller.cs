@@ -31,6 +31,7 @@ namespace OpenDental{
 				}
 			}
 			Patient pat=null;
+			Provider provider=null;
 			Referral refer=null;
 			Deposit deposit=null;
 			switch(sheet.SheetType) {
@@ -121,7 +122,12 @@ namespace OpenDental{
 					if(paraPatNum!=null && paraPatNum.ParamValue!=null) {
 						pat=Patients.GetPat((long)paraPatNum.ParamValue);
 					}
-					FillFieldsForScreening(sheet,screenGroup,pat);
+					//Look for the optional ProvNum param:
+					SheetParameter paraProvNum=GetParamByName(sheet,"ProvNum");
+					if(paraProvNum!=null && paraProvNum.ParamValue!=null) {
+						provider=Providers.GetProv((long)paraProvNum.ParamValue);
+					}
+					FillFieldsForScreening(sheet,screenGroup,pat,provider);
 					break;
 			}
 			FillFieldsInStaticText(sheet,pat);
@@ -2864,7 +2870,7 @@ namespace OpenDental{
 			}
 		}
 
-		private static void FillFieldsForScreening(Sheet sheet,ScreenGroup screenGroup,Patient pat) {
+		private static void FillFieldsForScreening(Sheet sheet,ScreenGroup screenGroup,Patient pat,Provider prov) {
 			foreach(SheetField field in sheet.SheetFields) {
 				switch(field.FieldName) {
 					case "Description":
@@ -2874,7 +2880,12 @@ namespace OpenDental{
 						field.FieldValue=screenGroup.SGDate.ToShortDateString();
 						break;
 					case "ProvName":
-						field.FieldValue=screenGroup.ProvName;
+						if(prov!=null) {
+							field.FieldValue=prov.LName+", "+prov.FName;
+						}
+						else { 
+							field.FieldValue=screenGroup.ProvName;
+						}
 						break;
 					case "PlaceOfService":
 						field.FieldValue=screenGroup.PlaceService.ToString()+field.FieldValue;

@@ -16,6 +16,7 @@ namespace OpenDental {
 		public bool IsLing=false;
 		///<summary>If true, represents the right side of the patient's mouth</summary>
 		public bool IsRightSide=false;
+		public bool IsPrimary=false;
 
 
 		[Category("Layout"),Description("Set true if this is a molar tooth.")]
@@ -31,7 +32,7 @@ namespace OpenDental {
 
 		private void UserControlTooth_Load(object sender,EventArgs e) {
 			if(IsScreening) {
-				if(!IsMolar) {
+				if(IsPrimary || !IsMolar) {
 					sheetComboBox1.Visible=false;
 					sheetComboBox2.Visible=false;
 					sheetComboBox3.Height=this.Height;

@@ -623,14 +623,16 @@ namespace OpenDentBusiness{
 				listSheetFieldDefs.Add(NewInput("misc"));
 			}
 			else if(outInCheck==OutInCheck.Check) {
-				listSheetFieldDefs.Add(NewOutput("HasCaries"));
-				listSheetFieldDefs.Add(NewOutput("EarlyChildCaries"));
-				listSheetFieldDefs.Add(NewOutput("CariesExperience"));
-				listSheetFieldDefs.Add(NewOutput("ExistingSealants"));
-				listSheetFieldDefs.Add(NewOutput("NeedsSealants"));
-				listSheetFieldDefs.Add(NewOutput("MissingAllTeeth"));
+				listSheetFieldDefs.Add(NewCheck("HasCaries"));
+				listSheetFieldDefs.Add(NewCheck("EarlyChildCaries"));
+				listSheetFieldDefs.Add(NewCheck("CariesExperience"));
+				listSheetFieldDefs.Add(NewCheck("ExistingSealants"));
+				listSheetFieldDefs.Add(NewCheck("NeedsSealants"));
+				listSheetFieldDefs.Add(NewCheck("MissingAllTeeth"));
+				listSheetFieldDefs.Add(NewCheck("AssessmentProc"));
+				listSheetFieldDefs.Add(NewCheck("FlourideProc"));
 				listSheetFieldDefs.Add(NewCheck("Gender"));
-				listSheetFieldDefs.Add(NewOutput("misc"));
+				listSheetFieldDefs.Add(NewCheck("misc"));
 			}
 			return listSheetFieldDefs;
 		}

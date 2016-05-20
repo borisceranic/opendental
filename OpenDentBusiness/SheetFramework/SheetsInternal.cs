@@ -1840,10 +1840,18 @@ Fam Urgent Fin Note: [famFinUrgNote]"
 			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Preferred:",sheetDef.FontSize,sheetDef.FontName,false,76,y,150,rowH));
 			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewInput("Preferred",sheetDef.FontSize,sheetDef.FontName,false,235,y,500,rowH));
 			y+=rowH+20;
+			//Proc buttons.  One for D0191 and one for D1206
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Assessment Proc:",sheetDef.FontSize,sheetDef.FontName,false,60,y-5,100,rowH));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewRect(169,y-1,11,11));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewCheckBox("FlourideProc",170,y,10,10));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Flouride Proc:",sheetDef.FontSize,sheetDef.FontName,false,200,y-5,80,rowH));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewRect(289,y-1,11,11));
+			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewCheckBox("AssessmentProc",290,y,10,10));
+			y+=rowH+5;
 			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Screening Chart",12f,sheetDef.FontName,true,312,y,500,20));
 			y+=rowH+20;
-			//X,Y,Z; is the pattern that is used, per tooth.  Each surface on the tooth is separated by a comma.
-			fieldValue="d,m,ling;d,m,ling;,,;,,;,,;,,;m,d,ling;m,d,ling;m,d,buc;m,d,buc;,,;,,;,,;,,;d,m,buc;d,m,buc";
+			//X,Y,Z; is the pattern that is used, per tooth.  Each surface on the tooth is separated by a comma.  #; at the beginning indicates if it's a primary tooth chart or not.
+			fieldValue="0;d,m,ling;d,m,ling;,,;,,;,,;,,;m,d,ling;m,d,ling;m,d,buc;m,d,buc;,,;,,;,,;,,;d,m,buc;d,m,buc";
 			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewScreenChart("ChartSealantTreatment",fieldValue,60,y));
 			y+=rowH+110;
 			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewRect(76,y,200,150));
@@ -1857,8 +1865,8 @@ Fam Urgent Fin Note: [famFinUrgNote]"
 			y+=160;
 			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewStaticText("Sealant Placement",12f,sheetDef.FontName,true,312,y,500,20));
 			y+=rowH+20;
-			//X,Y,Z; is the pattern that is used, per tooth.  Each surface on the tooth is separated by a comma.
-			fieldValue="d,m,ling;d,m,ling;,,;,,;,,;,,;m,d,ling;m,d,ling;m,d,buc;m,d,buc;,,;,,;,,;,,;d,m,buc;d,m,buc";
+			//X,Y,Z; is the pattern that is used, per tooth.  Each surface on the tooth is separated by a comma.  #; at the beginning indicates if it's a primary tooth chart or not.
+			fieldValue="0;d,m,ling;d,m,ling;,,;,,;,,;,,;m,d,ling;m,d,ling;m,d,buc;m,d,buc;,,;,,;,,;,,;d,m,buc;d,m,buc";
 			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewScreenChart("ChartSealantComplete",fieldValue,60,y));
 			y+=rowH+110;
 			sheetDef.SheetFieldDefs.Add(SheetFieldDef.NewRect(76,y,400,50));
