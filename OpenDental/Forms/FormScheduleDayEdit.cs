@@ -40,8 +40,6 @@ namespace OpenDental{
 		private TabControl tabControl2;
 		private TabPage tabPageProv;
 		private TabPage tabPageEmp;
-		///<summary>True if the checkbox for showing practice notes and holidays is checked.</summary>
-		private bool _isPracticeNotes;
 		private Label label3;
 		private ComboBox comboClinic;
 		private Label labelClinic;
@@ -50,23 +48,20 @@ namespace OpenDental{
 		private Dictionary<long,Employee> _dictEmpNumEmployee;
 		///<summary>Only used in schedule sorting. Greatly increases speed of large databases.</summary>
 		private Dictionary<long,Provider> _dictProvNumProvider;
+		///<summary>Only used in schedule sorting. Greatly increases speed of large databases.</summary>
+		private Dictionary<long,Clinic> _dictClinicNumClinic;
 		///<summary>Used to keep track of the current clinic selected. This is because it may be a clinic that is not in _listClinics.</summary>
 		private long _selectedClinicNum;
-
-		///<summary>True if the checkbox for showing clinic notes and holidays is checked.</summary>
-		private bool _isClinicNotes;
 		
 		///<summary></summary>
-		public FormScheduleDayEdit(DateTime dateSched) : this(dateSched,0,true,true) {
+		public FormScheduleDayEdit(DateTime dateSched) : this(dateSched,0) {
 		}
 
 		///<summary>When clinics are enabled, this will filter the employee list box by the clinic passed in.  Pass 0 to only show employees not assigned to a clinic.</summary>
-		public FormScheduleDayEdit(DateTime dateSched,long clinicNum,bool isPracticeNotes,bool isClinicNotes) {
+		public FormScheduleDayEdit(DateTime dateSched,long clinicNum) {
 			InitializeComponent();
 			_dateSched=dateSched;
 			_selectedClinicNum=clinicNum;
-			_isPracticeNotes=isPracticeNotes;
-			_isClinicNotes=isClinicNotes;
 			Lan.F(this);
 		}
 
@@ -494,6 +489,9 @@ namespace OpenDental{
 			Clinics.GetForUserod(Security.CurUser).ForEach(x => _listClinics.Add(x));//do not re-organize from cache. They could either be alphabetizeded or sorted by item order.
 			_listClinics.ForEach(x => comboClinic.Items.Add(x.Description));
 			comboClinic.IndexSelectOrSetText(_listClinics.FindIndex(x => x.ClinicNum==_selectedClinicNum),() => { return Clinics.GetDesc(_selectedClinicNum); });
+			//filled here instead of FillGrid since the list of clinics doesn't change when the grid is filtered and refilled.
+			_dictClinicNumClinic=_listClinics.ToDictionary(x => x.ClinicNum);//speed up sorting of schedules.
+			_dictClinicNumClinic[0]=new Clinic() { Description="" };//so HQ always comes before other clinics in the sort order; only for notes and holidays
 			if(!PrefC.HasClinicsEnabled) {
 				comboClinic.Visible=false;
 				labelClinic.Visible=false;
@@ -501,15 +499,16 @@ namespace OpenDental{
 			FillProvsAndEmps();
 			//Fill Provider Override
 			ProviderC.ListShort.ForEach(x => comboProv.Items.Add(x.Abbr));
-			comboProv.SelectedIndex=_listProvs.FindIndex(x => x.ProvNum==PrefC.GetLong(PrefName.ScheduleProvUnassigned));
+			comboProv.SelectedIndex=ProviderC.ListShort.FindIndex(x => x.ProvNum==PrefC.GetLong(PrefName.ScheduleProvUnassigned));
 			labelDate.Text=_dateSched.ToString("dddd")+" "+_dateSched.ToShortDateString();
-			_listScheds=Schedules.RefreshDayEditForPracticeProvsEmps(_dateSched,_listProvs.Select(x => x.ProvNum).ToList(),
-				_listEmps.Select(x => x.EmployeeNum).ToList(),_isPracticeNotes,_isClinicNotes,_selectedClinicNum);//only does this on startup
+			_listScheds=Schedules.RefreshDayEditForPracticeProvsEmps(_dateSched,_listProvs.Select(x => x.ProvNum).Where(x => x>0).ToList(),
+				_listEmps.Select(x => x.EmployeeNum).Where(x => x>0).ToList(),_selectedClinicNum);
 			_listSchedsOld=_listScheds.Select(x => x.Copy()).ToList();
 			FillGrid();
 		}
 
 		private void comboClinic_SelectedIndexChanged(object sender,EventArgs e) {
+			long clinicNumOrig=_selectedClinicNum;
 			if(comboClinic.SelectedIndex>-1) {
 				_selectedClinicNum=_listClinics[comboClinic.SelectedIndex].ClinicNum;
 			}
@@ -520,48 +519,64 @@ namespace OpenDental{
 			else {
 				groupPractice.Text=Lan.g(this,"Clinic");
 			}
+			if(clinicNumOrig==_selectedClinicNum) {
+				return;
+			}
+			//Sync changes because we are going to change our in memory lists.
+			try {
+				Schedules.SetForDay(_listScheds,_listSchedsOld);
+			}
+			catch(Exception ex) {
+				MsgBox.Show(this,ex.Message);
+				return;
+			}
+			//Fill lists with new information from new clinic
 			FillProvsAndEmps();
+			_listScheds=Schedules.RefreshDayEditForPracticeProvsEmps(_dateSched,_listProvs.Select(x => x.ProvNum).Where(x => x>0).ToList(),
+				_listEmps.Select(x => x.EmployeeNum).Where(x => x>0).ToList(),_selectedClinicNum);
+			_listSchedsOld=_listScheds.Select(x => x.Copy()).ToList();
+			FillGrid();
 		}
 
 		private void FillProvsAndEmps() {
 			tabPageProv.Text=Lan.g(this,"Providers")+" (0)";
 			tabPageEmp.Text=Lan.g(this,"Employees")+" (0)";
+			//Seed emp list and prov list with a dummy emp/prov with 'none' for the field that fills the list, FName and Abbr respectively.
+			//That way we don't have to add/subtract one in order when selecting from the list based on selected indexes.
+			_listEmps=new List<Employee>() { new Employee() { EmployeeNum=0,FName="none" } };
+			_listProvs=new List<Provider>() { new Provider() { ProvNum=0,Abbr="none" } };
 			if(PrefC.HasClinicsEnabled) {
-				_listProvs=Providers.GetProvsForClinic(_selectedClinicNum);
-				_listEmps=Employees.GetEmpsForClinic(_selectedClinicNum);
+				_listProvs.AddRange(Providers.GetProvsForClinic(_selectedClinicNum));
+				_listEmps.AddRange(Employees.GetEmpsForClinic(_selectedClinicNum));
 			}
 			else {
-				_listProvs=ProviderC.GetListShort();
-				_listEmps=Employees.ListShort.ToList();
+				_listProvs.AddRange(ProviderC.GetListShort());
+				_listEmps.AddRange(Employees.GetListShort());
 			}
 			//Prov Listbox
 			listProv.Items.Clear();
-			listProv.ClearSelected();
 			_listProvs.ForEach(x => listProv.Items.Add(x.Abbr));
-			for(int i = 0;i<listProv.Items.Count;i++) {
-				listProv.SetSelected(i,true);
-			}
+			listProv.SelectedIndex=0;//select the 'none' entry
 			//Emp Listbox
 			listEmp.Items.Clear();
-			listEmp.ClearSelected();
 			_listEmps.ForEach(x => listEmp.Items.Add(x.FName));
-			for(int i = 0;i<listEmp.Items.Count;i++) {
-				listEmp.SetSelected(i,true);
-			}
+			listEmp.SelectedIndex=0;//select the 'none' entry
 		}
 
 		private void listProv_SelectedIndexChanged(object sender,EventArgs e) {
-			tabPageProv.Text=Lan.g(this,"Providers")+" ("+listProv.SelectedIndices.Count+")";
+			tabPageProv.Text=Lan.g(this,"Providers")+" ("+listProv.SelectedIndices.OfType<int>().Count(x => x>0)+")";
 		}
 
 		private void listEmp_SelectedIndexChanged(object sender,EventArgs e) {
-			tabPageEmp.Text=Lan.g(this,"Employees")+" ("+listEmp.SelectedIndices.Count+")";
+			tabPageEmp.Text=Lan.g(this,"Employees")+" ("+listEmp.SelectedIndices.OfType<int>().Count(x => x>0)+")";
 		}
 
 		private void FillGrid() {
 			//do not refresh from db
-			_dictEmpNumEmployee=_listScheds.Select(x => x.EmployeeNum).Distinct().Where(x => x>0).Select(x => Employees.GetEmp(x)).Where(x=>x!=null).ToDictionary(x => x.EmployeeNum,x => x);//speed up sort.
-			_dictProvNumProvider=_listScheds.Select(x => x.ProvNum).Distinct().Where(x => x>0).Select(x => Providers.GetProv(x)).Where(x=>x!=null).ToDictionary(x => x.ProvNum,x => x);//speed up sort.
+			_dictEmpNumEmployee=_listScheds.Select(x => x.EmployeeNum).Distinct().Select(x => Employees.GetEmp(x))//returns null if EmployeeNum==0 or invalid
+				.Where(x => x!=null).ToDictionary(x => x.EmployeeNum);//speed up sort.
+			_dictProvNumProvider=_listScheds.Select(x => x.ProvNum).Distinct().Select(x => Providers.GetProv(x))//returns null if ProvNum==0 or invalid
+				.Where(x => x!=null).ToDictionary(x => x.ProvNum);//speed up sort.
 			_listScheds.Sort(CompareSchedule);
 			graphScheduleDay.SetSchedules(_listScheds);
 			gridMain.BeginUpdate();
@@ -582,8 +597,6 @@ namespace OpenDental{
 			ODGridRow row;
 			string note;
 			string opdesc;
-			//string opstr;
-			//string[] oparray;
 			foreach(Schedule schedCur in _listScheds) {
 				row=new ODGridRow();
 				//Prov
@@ -637,7 +650,6 @@ namespace OpenDental{
 				}
 				note+=(note==""?"":": ")+schedCur.Note;
 				row.Cells.Add(note);
-				row.Tag=schedCur;
 				gridMain.Rows.Add(row);
 			}
 			gridMain.EndUpdate();
@@ -670,22 +682,52 @@ namespace OpenDental{
 				}
 				return x.EmployeeNum.CompareTo(y.EmployeeNum);
 			}
-			return x.StartTime.CompareTo(y.StartTime);
+			if(x.StartTime!=y.StartTime) {
+				return x.StartTime.CompareTo(y.StartTime);
+			}
+			if(x.ClinicNum!=y.ClinicNum) {//if clinics not enabled, both schedules should have ClinicNum 0 and this comparison will be skipped
+				return _dictClinicNumClinic[x.ClinicNum].Description.CompareTo(_dictClinicNumClinic[y.ClinicNum].Description);
+			}
+			if(!x.Status.Equals(y.Status)) {
+				return -x.Status.CompareTo(y.Status);//holiday to the top
+			}
+			if(x.Note!=y.Note) {
+				return x.Note.CompareTo(y.Note);
+			}
+			if(x.ScheduleNum!=y.ScheduleNum) {
+				return x.ScheduleNum.CompareTo(y.ScheduleNum);
+			}
+			return x.GetHashCode().CompareTo(y.GetHashCode()); //to ensure deterministric sorting, even when PK==0
 		}
 
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			Schedule schedCur=(Schedule)gridMain.Rows[e.Row].Tag;//remember the clicked row
 			FormScheduleEdit FormS=new FormScheduleEdit();
-			FormS.ListScheds=_listScheds;
-			FormS.SchedCur=schedCur;
+			FormS.ListScheds=new List<Schedule>();
+			//Remove clicked on date so that it does not cause itself to be blocked if holiday.
+			for(int i=0;i<_listScheds.Count;i++) {
+				if(i==e.Row) {
+					continue;
+				}
+				FormS.ListScheds.Add(_listScheds[i].Copy());//this list should never be manipulated. Deep copy for safety.
+			}
+			FormS.SchedCur=_listScheds[e.Row];
 			FormS.ClinicNum=_selectedClinicNum;
 			FormS.ShowDialog();
 			if(FormS.DialogResult!=DialogResult.OK) {
 				return;
 			}
+			//Sync changes because the user may have changed the clinic of a schedule in form
+			try {
+				Schedules.SetForDay(_listScheds,_listSchedsOld);
+			}
+			catch(Exception ex) {
+				MsgBox.Show(this,ex.Message);
+				return;
+			}
+			_listScheds=Schedules.RefreshDayEditForPracticeProvsEmps(_dateSched,_listProvs.Select(x => x.ProvNum).Where(x => x>0).ToList(),
+				_listEmps.Select(x => x.EmployeeNum).Where(x => x>0).ToList(),_selectedClinicNum);
+			_listSchedsOld=_listScheds.Select(x => x.Copy()).ToList();
 			FillGrid();
-			//this is safe and does nothing if the schedule is not found in the grid
-			gridMain.SetSelected(gridMain.Rows.OfType<ODGridRow>().Select(x => (Schedule)x.Tag).ToList().IndexOf(schedCur),true);
 		}
 
 		//private void butAll_Click(object sender,EventArgs e) {
@@ -694,8 +736,27 @@ namespace OpenDental{
 		//	}
 		//}
 
+		///<summary>Returns true if date text boxes have no errors and the emp and prov lists don't have 'none' selected with other emps/provs.
+		///Set isQuiet to true to suppress the message box with the warning.</summary>
+		private bool ValidateLists() {
+			List<string> listErrorMsgs=new List<string>();
+			if(listProv.SelectedIndices.Count>1 && listProv.SelectedIndices.Contains(0)) {//'none' selected with additional provs
+				listErrorMsgs.Add(Lan.g(this,"Invalid selection of providers."));
+			}
+			if(listEmp.SelectedIndices.Count>1 && listEmp.SelectedIndices.Contains(0)) {//'none' selected with additional emps
+				listErrorMsgs.Add(Lan.g(this,"Invalid selection of employees."));
+			}
+			if(listErrorMsgs.Count>0) {
+				MessageBox.Show(string.Join("\r\n",listErrorMsgs));
+			}
+			return listErrorMsgs.Count==0;
+		}
+
 		private void butAddTime_Click(object sender, System.EventArgs e) {
-			if(listProv.SelectedIndices.Count==0 && listEmp.SelectedIndices.Count==0) {
+			if(!ValidateLists()) {
+				return;
+			}
+			if(listProv.SelectedIndices.OfType<int>().Count(x => x>0)==0 && listEmp.SelectedIndices.OfType<int>().Count(x => x>0)==0) {
 				MsgBox.Show(this,"Please select at least one provider or one employee first.");
 				return;
 			}
@@ -714,6 +775,9 @@ namespace OpenDental{
 			}
 			Schedule schedTemp;
 			for(int i=0;i<listProv.SelectedIndices.Count;i++){
+				if(listProv.SelectedIndices[i]==0) {
+					continue;
+				}
 				schedTemp=new Schedule();
 				schedTemp=schedCur.Copy();
 				schedTemp.SchedType=ScheduleType.Provider;
@@ -721,6 +785,9 @@ namespace OpenDental{
 				_listScheds.Add(schedTemp);
 			}
 			for(int i=0;i<listEmp.SelectedIndices.Count;i++) {
+				if(listEmp.SelectedIndices[i]==0) {
+					continue;
+				}
 				schedTemp=new Schedule();
 				schedTemp=schedCur.Copy();
 				schedTemp.SchedType=ScheduleType.Employee;
@@ -731,13 +798,18 @@ namespace OpenDental{
 		}
 
 		private void butProvNote_Click(object sender,EventArgs e) {
-			if(listProv.SelectedIndices.Count==0 && listEmp.SelectedIndices.Count==0) {
+			if(!ValidateLists()) {
+				return;
+			}
+			if(listProv.SelectedIndices.OfType<int>().Count(x => x>0)==0 && listEmp.SelectedIndices.OfType<int>().Count(x => x>0)==0) {
 				MsgBox.Show(this,"Please select at least one provider or one employee first.");
 				return;
 			}
 			Schedule schedCur=new Schedule();
 			schedCur.SchedDate=_dateSched;
 			schedCur.Status=SchedStatus.Open;
+			//this is so we can differentiate between a practice note and a prov/emp note in FormScheduleEdit.  Updated if necessary below when inserting.
+			schedCur.SchedType=ScheduleType.Provider;
 			//schedtype, provNum, and empnum will be set down below
 			FormScheduleEdit FormS=new FormScheduleEdit();
 			FormS.SchedCur=schedCur;
@@ -747,18 +819,18 @@ namespace OpenDental{
 				return;
 			}
 			Schedule schedTemp;
-			for(int i=0;i<listProv.SelectedIndices.Count;i++) {
+			foreach(int listProvIndex in listProv.SelectedIndices.OfType<int>().Where(x => x>0)) {//validation of selected indices happens above
 				schedTemp=new Schedule();
 				schedTemp=schedCur.Copy();
 				schedTemp.SchedType=ScheduleType.Provider;
-				schedTemp.ProvNum=_listProvs[listProv.SelectedIndices[i]].ProvNum;
+				schedTemp.ProvNum=_listProvs[listProvIndex].ProvNum;
 				_listScheds.Add(schedTemp);
 			}
-			for(int i=0;i<listEmp.SelectedIndices.Count;i++) {
+			foreach(int listEmpIndex in listEmp.SelectedIndices.OfType<int>().Where(x => x>0)) {//validation of selected indices happens above
 				schedTemp=new Schedule();
 				schedTemp=schedCur.Copy();
 				schedTemp.SchedType=ScheduleType.Employee;
-				schedTemp.EmployeeNum=_listEmps[listEmp.SelectedIndices[i]].EmployeeNum;
+				schedTemp.EmployeeNum=_listEmps[listEmpIndex].EmployeeNum;
 				_listScheds.Add(schedTemp);
 			}
 			FillGrid();
@@ -769,6 +841,7 @@ namespace OpenDental{
 			SchedCur.SchedDate=_dateSched;
 			SchedCur.Status=SchedStatus.Open;
 			SchedCur.SchedType=ScheduleType.Practice;
+			SchedCur.ClinicNum=_selectedClinicNum;
 			FormScheduleEdit FormS=new FormScheduleEdit();
 			FormS.SchedCur=SchedCur;
 			FormS.ClinicNum=_selectedClinicNum;
@@ -806,10 +879,11 @@ namespace OpenDental{
 					return;
 				}
 				_listScheds.Clear();
-				FillGrid();
-				return;
 			}
-			gridMain.SelectedIndices.OfType<int>().ToList().ForEach(x => _listScheds.Remove((Schedule)gridMain.Rows[x].Tag));
+			else {
+				List<Schedule> listRemove=gridMain.SelectedIndices.OfType<int>().Select(x=>_listScheds[x]).ToList();
+				_listScheds.RemoveAll(x => listRemove.Contains(x));
+			}
 			FillGrid();
 		}
 

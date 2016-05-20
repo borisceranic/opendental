@@ -2399,7 +2399,7 @@ namespace OpenDental {
 			if(!Security.IsAuthorized(Permissions.Schedules)) {
 				return;
 			}
-			FormScheduleDayEdit FormS=new FormScheduleDayEdit(AppointmentL.DateSelected,Clinics.ClinicNum,true,PrefC.HasClinicsEnabled);
+			FormScheduleDayEdit FormS=new FormScheduleDayEdit(AppointmentL.DateSelected,Clinics.ClinicNum);
 			FormS.ShowDialog();
 			SecurityLogs.MakeLogEntry(Permissions.Schedules,0,"");
 			SetWeeklyView(false);//to refresh
