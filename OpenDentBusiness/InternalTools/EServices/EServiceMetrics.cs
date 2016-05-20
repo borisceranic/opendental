@@ -88,6 +88,22 @@ namespace OpenDentBusiness {
 			return CalculateMetricsForDateRange(DateTime.Today,DateTime.Today.AddDays(1),accountBalanceEuro);
 		}
 
+		public static void GetErrors(out int errors,out int warnings) {
+			errors=0; warnings=0;
+			//Count of unprocessed warnings and errors issued by Broadcaster.
+			DataTable table=GetBroadcastersErrors();
+			foreach(DataRow row in table.Rows) {
+				OpenDentBusiness.eServiceSignalSeverity severity=(OpenDentBusiness.eServiceSignalSeverity)PIn.Int(row["Severity"].ToString());
+				int count=PIn.Int(row["CountOf"].ToString());
+				if(severity==eServiceSignalSeverity.Error) {
+					errors+=count;
+				}
+				else if(severity==eServiceSignalSeverity.Warning) {
+					warnings+=count;
+				}
+			}
+		}
+
 		///<summary>Get metrics from serviceshq.</summary>
 		/// <param name="dateTimeStart">Used for message counts.</param>
 		/// <param name="dateTimeEnd">Used for message counts.</param>
@@ -99,23 +115,12 @@ namespace OpenDentBusiness {
 			ret.IsBroadcasterHeartbeatOk=GetIsBroadcasterHeartbeatOk();
 			ret.Warnings=0;
 			ret.Errors=0;
-			//Count of unprocessed warnings and errors issued by Broadcaster.
-			DataTable table=GetBroadcastersErrors();
-			foreach(DataRow row in table.Rows) {
-				OpenDentBusiness.eServiceSignalSeverity severity=(OpenDentBusiness.eServiceSignalSeverity)PIn.Int(row["Severity"].ToString());
-				int count=PIn.Int(row["CountOf"].ToString());
-				if(severity==eServiceSignalSeverity.Error) {
-					ret.Errors+=count;
-				}
-				else if(severity==eServiceSignalSeverity.Warning) {
-					ret.Warnings+=count;
-				}
-			}
-			table=GetSmsOutbound(dateTimeStart,dateTimeEnd);
+			GetErrors(out ret.Errors,out ret.Warnings);
+			DataTable table=GetSmsOutbound(dateTimeStart,dateTimeEnd);
 			ret.OutboundMessageCount=PIn.Int(table.Rows[0]["NumMessages"].ToString());
 			ret.TotalChargedToCustomersUSD=PIn.Float(table.Rows[0]["MsgChargeUSDTotal"].ToString());
 			table=GetSmsInbound(dateTimeStart,dateTimeEnd);
-			ret.InboundMessageCount=PIn.Int(table.Rows[0]["NumMessages"].ToString());			
+			ret.InboundMessageCount=PIn.Int(table.Rows[0]["NumMessages"].ToString());
 			return ret;
 		}
 
