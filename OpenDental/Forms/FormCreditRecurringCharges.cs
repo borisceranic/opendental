@@ -161,7 +161,11 @@ namespace OpenDental {
 				if(payPlanDue!=0) {
 					row.Cells.Add(payPlanDue.ToString("c"));
 					//negative family balance does not subtract from payplan amount due and negative payplan amount due does not subtract from family balance due
-					row.Cells.Add((Math.Max(famBalTotal,0)+Math.Max(payPlanDue,0)).ToString("c"));
+					double totalBal=(Math.Max(famBalTotal,0));
+					if(PrefC.GetInt(PrefName.PayPlansVersion) == 1) {//in PP v2, the PP amt due is included in the pat balance
+						totalBal+=Math.Max(payPlanDue,0);
+					}
+					row.Cells.Add(totalBal.ToString("c"));
 				}
 				else {
 					row.Cells.Add("");
