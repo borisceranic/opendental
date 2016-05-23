@@ -21,7 +21,7 @@ namespace OpenDental{
 		private System.ComponentModel.Container components = null;
 		private OpenDental.UI.ODGrid gridMain;
 		private ListBox listType;
-		private bool changed;
+		private bool _isChanged;
 		private OpenDental.UI.Button butDown;
 		private OpenDental.UI.Button butUp;
 		private GroupBox groupBox7;
@@ -398,7 +398,7 @@ namespace OpenDental{
 			}
 			FormF.ShowDialog();
 			FillGrid();
-			changed=true;
+			_isChanged=true;
 			for(int i=0;i<_listFeeSchedsForType.Count;i++){
 				if(FormF.FeeSchedCur.FeeSchedNum==_listFeeSchedsForType[i].FeeSchedNum){
 					gridMain.SetSelected(i,true);
@@ -417,7 +417,7 @@ namespace OpenDental{
 			FormF.ListFeeScheds=ListFeeScheds;
 			FormF.ShowDialog();
 			FillGrid();
-			changed=true;
+			_isChanged=true;
 			for(int i=0;i<_listFeeSchedsForType.Count;i++){
 				if(FormF.FeeSchedCur.FeeSchedNum==_listFeeSchedsForType[i].FeeSchedNum){
 					gridMain.SetSelected(i,true);
@@ -449,7 +449,7 @@ namespace OpenDental{
 			int order2=_listFeeSchedsForType[idx].ItemOrder;
 			_listFeeSchedsForType[idx-1].ItemOrder=order2;
 			_listFeeSchedsForType[idx].ItemOrder=order1;
-			changed=true;
+			_isChanged=true;
 			FillGrid();
 			gridMain.SetSelected(idx-1,true);
 		}
@@ -467,7 +467,7 @@ namespace OpenDental{
 			int order2=_listFeeSchedsForType[idx+1].ItemOrder;
 			_listFeeSchedsForType[idx].ItemOrder=order2;
 			_listFeeSchedsForType[idx+1].ItemOrder=order1;
-			changed=true;
+			_isChanged=true;
 			FillGrid();
 			gridMain.SetSelected(idx+1,true);
 		}
@@ -481,7 +481,7 @@ namespace OpenDental{
 					_listFeeSchedsForType[i].ItemOrder=i;
 				}
 			}
-			changed=true;
+			_isChanged=true;
 			FillGrid();
 		}
 
@@ -540,7 +540,7 @@ namespace OpenDental{
 		}
 
 		private void FormFeeSchedules_FormClosing(object sender,FormClosingEventArgs e) {
-			if(changed) {
+			if(_isChanged) {
 				FeeScheds.Sync(ListFeeScheds,_listFeeSchedsOld);
 				DataValid.SetInvalid(InvalidType.FeeScheds);
 			}
