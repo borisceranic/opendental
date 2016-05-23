@@ -3580,7 +3580,9 @@ namespace OpenDental {
 							+" "+Lan.g(this,"minutes early at")+" "+apt.DateTimeAskedToArrive.ToShortTimeString()+".");
 					}
 					else {
-						if(apt.DateTimeAskedToArrive.Year>1880) {
+						if(apt.DateTimeAskedToArrive.Year>1880
+							&& (aptOld.AptDateTime-aptOld.DateTimeAskedToArrive).TotalMinutes>0) 
+						{
 							apt.DateTimeAskedToArrive=apt.AptDateTime-(aptOld.AptDateTime-aptOld.DateTimeAskedToArrive);
 							if(MessageBox.Show(Lan.g(this,"Ask patient to arrive")+" "+(aptOld.AptDateTime-aptOld.DateTimeAskedToArrive).TotalMinutes
 								+" "+Lan.g(this,"minutes early at")+" "+apt.DateTimeAskedToArrive.ToShortTimeString()+"?","",MessageBoxButtons.YesNo)==DialogResult.No) {
