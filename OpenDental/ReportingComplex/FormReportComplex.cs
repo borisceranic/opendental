@@ -316,23 +316,6 @@ namespace OpenDental.ReportingComplex
 					}
 					_lastSectionPrinted=AreaSectionType.ReportHeader;
 				}
-				//If the size of pageheader+one detail+pagefooter is taller than page, then we might later display an error. But for now, they will all still be laid out, and whatever goes off the bottom edge will just not show.  This will not be an issue for normal reports:
-				if(_myReport.GetSectionHeight(AreaSectionType.PageHeader)
-					+_myReport.GetSectionHeight(AreaSectionType.Query)
-					+_myReport.GetSectionHeight(AreaSectionType.PageFooter)
-					>printableHeight){
-					//nothing for now.
-				}
-				//If this is first page and not enough room to print reportheader+pageheader+detail+pagefooter.
-				if(_pagesPrinted==0
-					&& _myReport.GetSectionHeight(AreaSectionType.ReportHeader)
-					+_myReport.GetSectionHeight(AreaSectionType.PageHeader)
-					+_myReport.GetSectionHeight(AreaSectionType.Query)
-					+_myReport.GetSectionHeight(AreaSectionType.PageFooter)
-					>printableHeight)
-				{
-					break;
-				}
 				//always print a page header if it exists
 				if(_myReport.Sections.Contains(AreaSectionType.PageHeader)) {
 					section=_myReport.Sections[AreaSectionType.PageHeader];
