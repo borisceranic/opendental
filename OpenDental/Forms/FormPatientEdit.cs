@@ -206,6 +206,7 @@ namespace OpenDental{
 		private ErrorProvider _errorProv=new ErrorProvider();
 		private CheckBox checkSuperBilling;
 		private bool _isValidating=false;
+		private bool _guardiansChanged=false;
 
 		///<summary></summary>
 		public FormPatientEdit(Patient patCur,Family famCur){
@@ -4078,6 +4079,7 @@ namespace OpenDental{
 			//no patnumGuardian set
 			FormGuardianEdit formG=new FormGuardianEdit(guardian,FamCur);
 			if(formG.ShowDialog()==DialogResult.OK) {
+				_guardiansChanged=true;
 				FillGuardians();
 			}
 		}
@@ -4134,6 +4136,7 @@ namespace OpenDental{
 				MsgBox.Show(this,"No male or female adults found.\r\nFamily relationships will not be changed.");
 				return;
 			}
+			_guardiansChanged=true;
 			if(Guardians.ExistForFamily(PatCur.Guarantor)) {
 				//delete all guardians for the family, original family relationships are saved on load so this can be undone if the user presses cancel.
 				Guardians.DeleteForFamily(PatCur.Guarantor);
@@ -4845,8 +4848,10 @@ namespace OpenDental{
 				//}
 				Patients.Delete(PatCur);
 			}
-			//revert any changes to the guardian list for all family members
-			Guardians.Sync(_listGuardiansForFamOld,FamCur.ListPats.Select(x => x.PatNum).ToList());
+			if(_guardiansChanged) {  //If guardian information was changed, and user canceled.
+				//revert any changes to the guardian list for all family members
+				Guardians.RevertChanges(_listGuardiansForFamOld,FamCur.ListPats.Select(x => x.PatNum).ToList());
+			}
 		}
 
 

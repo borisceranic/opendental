@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
+using System.Linq;
 
 namespace OpenDental{
 	/// <summary>
@@ -32,6 +33,8 @@ namespace OpenDental{
 		private CheckBox checkAlpha;
 		///<summary>A complete list of disease defs including hidden.  Only used when not in selection mode (item orders can change).  It's main purpose is to keep track of the item order for the life of the window so that we do not have to make unnecessary update calls to the database every time the up and down buttons are clicked.</summary>
 		private List<DiseaseDef> _listDiseaseDefs;
+		///<summary>Stale deep copy of _listDiseaseDefs to use with sync.</summary>
+		private List<DiseaseDef> _listDiseaseDefsOld;
 
 		///<summary></summary>
 		public FormDiseaseDefs()
@@ -244,6 +247,7 @@ namespace OpenDental{
 			}
 			_listDiseaseDefs=new List<DiseaseDef>();
 			_listDiseaseDefs.AddRange(DiseaseDefs.ListLong);
+			_listDiseaseDefsOld=_listDiseaseDefs.Select(x => x.Copy()).ToList();
 			//RefreshList();
 			FillGrid();
 		}
@@ -507,7 +511,7 @@ namespace OpenDental{
 
 		private void FormDiseaseDefs_FormClosing(object sender,FormClosingEventArgs e) {
 			if(IsChanged) {
-				DiseaseDefs.Sync(_listDiseaseDefs);//Update if anything has changed, even in selection mode.
+				DiseaseDefs.Sync(_listDiseaseDefs,_listDiseaseDefsOld);//Update if anything has changed, even in selection mode.
 				DataValid.SetInvalid(InvalidType.Diseases);
 			}
 		}

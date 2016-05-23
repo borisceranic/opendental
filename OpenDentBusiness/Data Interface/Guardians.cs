@@ -100,14 +100,26 @@ namespace OpenDentBusiness{
 			return "";
 		}
 
-		///<summary>Inserts, updates, or deletes database rows to match supplied list.  Must always pass in the list of family PatNums.</summary>
-		public static void Sync(List<Guardian> listNew,List<long> listFamPatNums) {
+		///<summary>Inserts, updates, or deletes database rows from the provided list of family PatNums back to the state of listNew.
+		///Must always pass in the list of family PatNums.</summary>
+		public static void RevertChanges(List<Guardian> listNew,List<long> listFamPatNums) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,listFamPatNums);//never pass DB list through the web service
 				return;
 			}
 			List<Guardian> listDB=listFamPatNums.SelectMany(x => Guardians.Refresh(x)).ToList();
+			//Usually we don't like using a DB list for sync because of potential deletions of newer entries.  However I am leaving this function alone 
+			//because it would be a lot of work to rewrite FormPatientEdit to only undo the changes that this instance of the window specifically made.
 			Crud.GuardianCrud.Sync(listNew,listDB);
+		}
+
+		///<summary>Inserts, updates, or deletes database rows to match supplied list.</summary>
+		public static void Sync(List<Guardian> listNew,List<Guardian> listOld) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,listOld);//never pass DB list through the web service
+				return;
+			}
+			Crud.GuardianCrud.Sync(listNew,listOld);
 		}
 
 		/*

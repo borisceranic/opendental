@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using OpenDentBusiness;
 using System.Collections.Generic;
 using OpenDental.UI;
+using System.Linq;
 
 namespace OpenDental{
 	/// <summary>
@@ -21,6 +22,8 @@ namespace OpenDental{
 		private UI.Button butDown;
 		private UI.Button butUp;
 		private List<PatFieldDef> _listPatFieldDefs;
+		///<summary>Stale deep copy of _listPatFieldDefs to use with sync.</summary>
+		private List<PatFieldDef> _listPatFieldDefsOld;
 		///<summary></summary>
 		public FormPatFieldDefs()
 		{
@@ -179,6 +182,7 @@ namespace OpenDental{
 
 		private void FormPatFieldDefs_Load(object sender, System.EventArgs e) {
 			_listPatFieldDefs=PatFieldDefs.GetListLong();
+			_listPatFieldDefsOld=_listPatFieldDefs.Select(x => x.Copy()).ToList();
 			FillGrid();
 		}
 
@@ -295,7 +299,7 @@ namespace OpenDental{
 				_listPatFieldDefs[i].ItemOrder=i;
 			}
 			if(_hasChanged) {
-				PatFieldDefs.Sync(_listPatFieldDefs);//Update if anything has changed
+				PatFieldDefs.Sync(_listPatFieldDefs,_listPatFieldDefsOld);//Update if anything has changed
 				DataValid.SetInvalid(InvalidType.PatFields);
 			}
 		}

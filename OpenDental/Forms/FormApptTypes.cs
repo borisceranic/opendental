@@ -6,10 +6,13 @@ using System.Text;
 using System.Windows.Forms;
 using OpenDentBusiness;
 using OpenDental.UI;
+using System.Linq;
 
 namespace OpenDental {
 	public partial class FormApptTypes:Form {
 		private List<AppointmentType> _listApptTypes;
+		///<summary>Stale deep copy of _listApptTypes to use with sync.</summary>
+		private List<AppointmentType> _listApptTypesOld;
 		private bool _isChanged=false;
 
 		public FormApptTypes() {
@@ -20,6 +23,7 @@ namespace OpenDental {
 
 		private void FormApptTypes_Load(object sender,EventArgs e) {
 			_listApptTypes=AppointmentTypes.GetListt();
+			_listApptTypesOld=_listApptTypes.Select(x => x.Clone()).ToList();
 			FillMain();
 		}
 
@@ -125,7 +129,7 @@ namespace OpenDental {
 				for(int i=0;i<_listApptTypes.Count;i++) {
 					_listApptTypes[i].ItemOrder=i;
 				}
-				AppointmentTypes.Sync(_listApptTypes);
+				AppointmentTypes.Sync(_listApptTypes,_listApptTypesOld);
 				DataValid.SetInvalid(InvalidType.AppointmentTypes);
 			}
 			DialogResult=DialogResult.OK;

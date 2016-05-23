@@ -36,14 +36,12 @@ namespace OpenDentBusiness{
 		#region Sync Pattern
 
 		///<summary>Inserts, updates, or deletes database rows to match supplied list.</summary>
-		public static void Sync(List<Operatory> listNew) {
+		public static void Sync(List<Operatory> listNew,List<Operatory> listOld) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew);//never pass DB list through the web service
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,listOld);//never pass DB list through the web service
 				return;
 			}
-			Operatories.RefreshCache();//To guarantee freshness
-			List<Operatory> listOperatories=OperatoryC.GetListt();
-			Crud.OperatoryCrud.Sync(listNew,listOperatories);
+			Crud.OperatoryCrud.Sync(listNew,listOld);
 		}
 
 		#endregion

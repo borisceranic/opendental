@@ -55,16 +55,15 @@ namespace OpenDentBusiness{
 
 		///<summary>Inserts, updates, or deletes database rows to match supplied list.  No need to pass in userNum, it's set before remoting role check
 		///and passed to the server if necessary.</summary>
-		public static void Sync(List<FeeSched> listNew,long userNum=0) {
+		public static void Sync(List<FeeSched> listNew,List<FeeSched> listOld,long userNum=0) {
 			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
 				userNum=Security.CurUser.UserNum;
 			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,userNum);
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,listOld,userNum);
 				return;
 			}
-			List<FeeSched> listDB=FeeSchedC.GetListLong();
-			Crud.FeeSchedCrud.Sync(listNew,listDB,userNum);
+			Crud.FeeSchedCrud.Sync(listNew,listOld,userNum);
 		}
 
 		///<summary>Gets one fee sched from the cache.  Will return null if not found.</summary>

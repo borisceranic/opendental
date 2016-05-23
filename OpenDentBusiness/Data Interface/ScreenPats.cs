@@ -25,12 +25,12 @@ namespace OpenDentBusiness {
 			return Crud.ScreenPatCrud.SelectMany(command);
 		}
 
-		///<summary>Syncs the ScreenPats for the supplied ScreenGroup.</summary>
-		public static bool Sync(List<ScreenPat> listScreenPats,long screenGroupNum) {
+		///<summary>Inserts, updates, or deletes rows to reflect changes between listScreenPats and stale listScreenPatsOld.</summary>
+		public static bool Sync(List<ScreenPat> listScreenPats,List<ScreenPat> listScreenPatsOld) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetBool(MethodBase.GetCurrentMethod(),listScreenPats,screenGroupNum);
+				return Meth.GetBool(MethodBase.GetCurrentMethod(),listScreenPats,listScreenPatsOld);
 			}
-			return Crud.ScreenPatCrud.Sync(listScreenPats,GetForScreenGroup(screenGroupNum));
+			return Crud.ScreenPatCrud.Sync(listScreenPats,listScreenPatsOld);
 		}
 
 		/*

@@ -59,14 +59,12 @@ namespace OpenDentBusiness{
 		#region Sync Pattern
 
 		///<summary>Inserts, updates, or deletes database rows to match supplied list.</summary>
-		public static void Sync(List<AppointmentType> listNew) {
+		public static void Sync(List<AppointmentType> listNew,List<AppointmentType> listOld) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew);//never pass DB list through the web service
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,listOld);//never pass DB list through the web service
 				return;
 			}
-			string command="SELECT * FROM appointmenttype ORDER BY ItemOrder";
-			List<AppointmentType> listApptTypes=Crud.AppointmentTypeCrud.SelectMany(command);
-			Crud.AppointmentTypeCrud.Sync(listNew,listApptTypes);
+			Crud.AppointmentTypeCrud.Sync(listNew,listOld);
 		}
 
 		#endregion

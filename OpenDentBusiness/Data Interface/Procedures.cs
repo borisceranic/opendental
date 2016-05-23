@@ -301,7 +301,11 @@ namespace OpenDentBusiness {
 			Db.NonQ(command);
 		}
 
-		///<summary>Gets one procedure directly from the db.  Option to include the note.  If the procNum is 0 or if the procNum does not exist in the database, this will return a new Procedure object with uninitialized fields.  If, for example, a new Procedure object is sent through the middle tier with an uninitialized ProcStatus=0, this will fail validation since the ProcStatus enum starts with 1.  Make sure to handle a new Procedure object with uninitialized fields.</summary>
+		///<summary>Gets one procedure directly from the db.  Always includes the note regardless of includeNote value (since 2010 at least).
+		///If the procNum is 0 or if the procNum does not exist in the database, this will return a new Procedure object with uninitialized fields.  
+		///If, for example, a new Procedure object is sent through the middle tier with an uninitialized ProcStatus=0, 
+		///  this will fail validation since the ProcStatus enum starts with 1.  
+		///Make sure to handle a new Procedure object with uninitialized fields.</summary>
 		public static Procedure GetOneProc(long procNum,bool includeNote) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetObject<Procedure>(MethodBase.GetCurrentMethod(),procNum,includeNote);
@@ -1570,10 +1574,10 @@ namespace OpenDentBusiness {
 		///from FormApptEdit.  Does not add notes to a procedure that already has notes. Only called from ProcedureL.SetCompleteInAppt, security checked
 		///before calling this.  Also sets provider for each proc and claimproc.  Returns dictIndexInListForProc with changes made to the procs.</summary>
 		public static List<Procedure> SetCompleteInAppt(Appointment apt,List<InsPlan> planList,List<PatPlan> patPlans,long siteNum,int patientAge,
-			List<Procedure> listProcsForAppt,List<InsSub> subList,bool isDbUpdate)
+			List<Procedure> listProcsForAppt,List<InsSub> subList)
 		{
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<List<Procedure>>(MethodBase.GetCurrentMethod(),apt,planList,patPlans,siteNum,patientAge,listProcsForAppt,subList,isDbUpdate);
+				return Meth.GetObject<List<Procedure>>(MethodBase.GetCurrentMethod(),apt,planList,patPlans,siteNum,patientAge,listProcsForAppt,subList);
 			}
 			if(listProcsForAppt.Count==0) {
 				return listProcsForAppt;//Nothing to do.
@@ -1639,9 +1643,7 @@ namespace OpenDentBusiness {
 					SetCanadianLabFeesCompleteForProc(procCur);
 				}
 				Plugins.HookAddCode(null,"Procedures.SetCompleteInAppt_procLoop",procCur,procOld);
-				if(isDbUpdate) {//if called from FormApptEdit, the update call is handled in the Procedures.Sync call on FormClosing
-					Update(procCur,procOld);
-				}
+				Update(procCur,procOld);//Updates payplan charges for the procedure if it went from any status to complete.
 				ComputeEstimates(procCur,apt.PatNum,claimProcList,false,planList,patPlans,benefitList,patientAge,subList);
 				ClaimProcs.SetProvForProc(procCur,claimProcList);
 				//Add provnum to list to create an encounter later. Done to limit calls to DB from Encounters.InsertDefaultEncounter().
@@ -1651,9 +1653,7 @@ namespace OpenDentBusiness {
 			}
 			//Auto-insert default encounters for the providers that did work on this appointment
 			encounterProvNums.Distinct().ToList().ForEach(x => Encounters.InsertDefaultEncounter(apt.PatNum,x,apt.AptDateTime));
-			if(isDbUpdate) {//if called from FormApptEdit, Recalls.Synch is handled after the Procedures.Sync call on FormClosing
-				Recalls.Synch(apt.PatNum);
-			}
+			Recalls.Synch(apt.PatNum);
 			return listProcsForAppt;
 			//Patient pt=Patients.GetPat(apt.PatNum);
 			//jsparks-See notes within this method:
@@ -1858,16 +1858,15 @@ namespace OpenDentBusiness {
 		}
 
 		///<summary>Inserts, updates, or deletes database rows to match supplied list.  Must always pass in two lists.</summary>
-		public static void Sync(List<Procedure> listNew,Appointment apptCur,long userNum=0) {
+		public static void Sync(List<Procedure> listNew,List<Procedure> listOld,long userNum=0) {
 			if(RemotingClient.RemotingRole!=RemotingRole.ServerWeb) {
 				userNum=Security.CurUser.UserNum;
 			}
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,apptCur,userNum);
+				Meth.GetVoid(MethodBase.GetCurrentMethod(),listNew,listOld,userNum);
 				return;
 			}
-			List<Procedure> listDB=Procedures.GetProcsForApptEdit(apptCur);
-			Crud.ProcedureCrud.Sync(listNew,listDB,userNum);
+			Crud.ProcedureCrud.Sync(listNew,listOld,userNum);
 		}
 
 		public static void SetTPActive(long patNum,List<long> listProcNums) {
