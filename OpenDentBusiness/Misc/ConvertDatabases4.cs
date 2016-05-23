@@ -1415,6 +1415,19 @@ namespace OpenDentBusiness {
 			if(FromVersion<new Version("16.3.0.0")) {
 				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.3.0"));//No translation in convert script.
 				string command;
+				try {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						if(!IndexExists("claimpayment","CheckDate")) {
+							command="ALTER TABLE claimpayment ADD INDEX (CheckDate)";
+							Db.NonQ(command);
+						}
+					}
+					else {//oracle
+						command=@"CREATE INDEX claimpayment_CheckDate ON claimpayment (CheckDate)";
+						Db.NonQ(command);
+					}
+				}
+				catch(Exception) { }//Only an index.
 
 
 
