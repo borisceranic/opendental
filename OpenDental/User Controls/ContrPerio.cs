@@ -1654,19 +1654,33 @@ namespace OpenDental
 				startedOnSkipped=true;
 			}
 			int limit=0;
+			int count=0;//count the number of positions skipped.
 			while(limit<400){//the 400 limit is just a last resort. Should always break manually.
 				limit++;
 				//to the right
 				section=GetSection(CurCell.Y);
 				if((!DirectionIsRight && isReverse) || (DirectionIsRight && !isReverse)){
 					if(CurCell.X==1 && !startedOnSkipped){//if first column
-						if(section==0){//usually in reverse
+						if(section==0 && skippedTeeth.Contains(1) && intTooth==1){
+							SetNewCell(count+1,CurCell.Y);
+							return;//tooth 1 is missing. Jump back.
+						}
+						else if(section==0){//usually in reverse
 							return;//no jump.  This is the starting point.
 						}
 						else if(section==1){
 							newSection=3;
 							newRow=GetTableRow(selectedExam,newSection,seqType);
 							OnDirectionChangedLeft();
+						}
+						else if(section==2 && skippedTeeth.Contains(32)){
+							if(CurCell.X==1){
+								SetNewCell(count+1,CurCell.Y);
+								return;//tooth 32 is missing. Jump back.
+							}
+							else{
+								return;//probably should never happen.
+							}
 						}
 						else if(section==2){
 							return;//no jump.  End of all sequences.
@@ -1694,7 +1708,19 @@ namespace OpenDental
 							SetNewCell(CurCell.X,newRow);
 						}
 					}
-					else{//standard advance with no jumping
+					else if(section==2 && skippedTeeth.Contains(32) || section==0 && skippedTeeth.Contains(1)){
+						count++;//used jump back to last non missing tooth
+						if(section==2 && CurCell.X==1){
+							return;//manually clicking on missing tooth 32 and entering data
+						}
+						else if(section==0 && CurCell.X==1){
+							return;//manually clicking on missing tooth 1 and entering data
+						}
+						else{
+							SetNewCell(CurCell.X-1,CurCell.Y);//standard advance
+						}
+					}
+					else {//standard advance with no jumping
 						SetNewCell(CurCell.X-1,CurCell.Y);
 					}
 				}
