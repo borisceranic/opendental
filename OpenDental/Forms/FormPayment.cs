@@ -1003,7 +1003,9 @@ namespace OpenDental {
 							split.ProcDate=DateTime.Now;
 							split.ProcNum=proc.ProcNum;
 							_listPaySplits.Add(split);
-							if(patPortion-amtToUse>0) {//The remaining UnearnedAmt didn't pay for the whole proc, let's be nice and make them a split for the difference.
+							if(patPortion-amtToUse>0 
+								&& MsgBox.Show(this,MsgBoxButtons.YesNo,"Selected procedures are worth more than the Unallocated amount.  Make splits for the remaining amount?")) 
+							{//The remaining UnearnedAmt didn't pay for the whole proc, let's be nice and make them a split for the difference.
 								split=new PaySplit();
 								split.PatNum=_patCur.PatNum;
 								split.PayNum=_paymentCur.PayNum;
@@ -1016,6 +1018,9 @@ namespace OpenDental {
 								split.ProcNum=proc.ProcNum;
 								_listPaySplits.Add(split);
 								textAmount.Text=(PIn.Double(textAmount.Text)+(patPortion-amtToUse)).ToString("F");
+							}
+							else {
+								checkPayTypeNone.Checked=true;//This is strictly an Income Transfer payment.
 							}
 						}
 					}
