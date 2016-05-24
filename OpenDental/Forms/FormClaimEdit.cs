@@ -5863,8 +5863,12 @@ namespace OpenDental{
 				//Later: we need to let user send anyway, using all 0's for electronic id.
 				return;
 			}
+			long clinicNum=0;
+			if(PrefC.HasClinicsEnabled) {
+				clinicNum=ClaimCur.ClinicNum;
+			}
 			Clearinghouse clearinghouseHq=ClearinghouseL.GetClearinghouseHq(listQueue[0].ClearinghouseNum);
-			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clinics.ClinicNum);
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,clinicNum);
 			//string warnings;
 			//string missingData=
 			Eclaims.Eclaims.GetMissingData(clearinghouseClin,listQueue[0]);//,out warnings);

@@ -1127,9 +1127,14 @@ namespace OpenDental{
 				}
 				queueItems.Add(queueitem);
 			}
+			Claim claim0=Claims.GetClaim(_arrayQueueFiltered[gridMain.SelectedIndices[0]].ClaimNum);
+			long claimClinicNum=0;
+			if(PrefC.HasClinicsEnabled) {
+				claimClinicNum=claim0.ClinicNum;//All claims for the queueItems have same clinic, due to validation above.
+			}
 			Clearinghouse clearinghouseHq=ClearinghouseL.GetClearinghouseHq(queueItems[0].ClearinghouseNum);
-			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,Clinics.ClinicNum);
-			EnumClaimMedType medType=Claims.GetClaim(_arrayQueueFiltered[gridMain.SelectedIndices[0]].ClaimNum).MedType;
+			Clearinghouse clearinghouseClin=Clearinghouses.OverrideFields(clearinghouseHq,claimClinicNum);
+			EnumClaimMedType medType=claim0.MedType;
 			//Already validated that all claims are for the same clearinghouse, clinic, and medType.
 			//Validated that medtype matches clearinghouse e-format
 			Cursor=Cursors.WaitCursor;
