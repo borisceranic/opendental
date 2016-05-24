@@ -2424,7 +2424,7 @@ namespace OpenDental {
 				}
 				row.Cells.Add(cell);
 				row.Cells.Add("");
-				row.Tag=table.Rows[i]["PayPlanNum"].ToString();
+				row.Tag=table.Rows[i];
 				gridPayPlan.Rows.Add(row);
 				PPBalanceTotal += (Convert.ToDecimal(PIn.Double(table.Rows[i]["balance"].ToString())));
 			}
@@ -2815,7 +2815,7 @@ namespace OpenDental {
 			gridPayPlan.SetSelected(false);
 			if(table.Rows[e.Row]["PayPlanNum"].ToString()!="0") {
 				for(int i=0;i < gridPayPlan.Rows.Count;i++) {
-					if((string)gridPayPlan.Rows[i].Tag==table.Rows[e.Row]["PayPlanNum"].ToString()) {
+					if(((DataRow)(gridPayPlan.Rows[i].Tag))["PayPlanNum"].ToString()==table.Rows[e.Row]["PayPlanNum"].ToString()) {
 						gridPayPlan.SetSelected(i,true);
 					}
 				}
@@ -2929,9 +2929,9 @@ namespace OpenDental {
 		}
 
 		private void gridPayPlan_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			DataTable table=DataSetMain.Tables["payplan"];
-			if(table.Rows[e.Row]["PayPlanNum"].ToString()!="0") {//Payment plan
-				PayPlan payplan=PayPlans.GetOne(PIn.Long(table.Rows[e.Row]["PayPlanNum"].ToString()));
+			DataRow selectedRow=((DataRow)(gridPayPlan.Rows[e.Row].Tag));
+			if(selectedRow["PayPlanNum"].ToString()!="0") {//Payment plan
+				PayPlan payplan=PayPlans.GetOne(PIn.Long(selectedRow["PayPlanNum"].ToString()));
 				FormPayPlan2=new FormPayPlan(PatCur,payplan);
 				FormPayPlan2.ShowDialog();
 				if(FormPayPlan2.GotoPatNum!=0) {
@@ -2944,7 +2944,7 @@ namespace OpenDental {
 			}
 			else {//Installment Plan
 				FormInstallmentPlanEdit FormIPE= new FormInstallmentPlanEdit();
-				FormIPE.InstallmentPlanCur = InstallmentPlans.GetOne(PIn.Long(table.Rows[e.Row]["InstallmentPlanNum"].ToString()));
+				FormIPE.InstallmentPlanCur = InstallmentPlans.GetOne(PIn.Long(selectedRow["InstallmentPlanNum"].ToString()));
 				FormIPE.IsNew=false;
 				FormIPE.ShowDialog();
 				ModuleSelected(PatCur.PatNum);
