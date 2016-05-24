@@ -3627,14 +3627,17 @@ namespace OpenDental{
 		private void SetControlsEnabled(bool isSilent) {
 			//Don't allow adding an estimate, since a new estimate could change the total writeoff amount for the proc.
 			//If the procedure is TP'd, Complete, or any status, use the DateEntryC to compare to the date/days newer restriction.
+			bool suppressLockDateMessage=false;
 			if(!Security.IsAuthorized(Permissions.InsWriteOffEdit,ProcCur.DateEntryC,isSilent)) {
 				butAddEstimate.Enabled=false;
 				checkNoBillIns.Enabled=false;
+				suppressLockDateMessage=true;
 			}
 			if(ProcCur.ProcStatus!=ProcStat.C) {
 				return;
 			}
-			if(!Security.IsAuthorized(Permissions.ProcComplEditLimited,ProcCur.DateEntryC,isSilent)) {//user doesn't have limited or full proc complete edit permission
+			if(!Security.IsAuthorized(Permissions.ProcComplEditLimited,ProcCur.DateEntryC,isSilent,suppressLockDateMessage)) {
+				//user doesn't have limited or full proc complete edit permission
 				List<Control> listControls=Controls.OfType<Control>().Where(x => x!=butCancel && x!=butSearch).ToList();//leave the cancel and search buttons enabled
 				listControls.AddRange(tabControl.TabPages.OfType<TabPage>().SelectMany(x => x.Controls.OfType<Control>()).ToList());
 				foreach(Control cCur in listControls) {
@@ -3651,7 +3654,7 @@ namespace OpenDental{
 					}
 				}
 			}
-			else if(!Security.IsAuthorized(Permissions.ProcComplEdit,ProcCur.DateEntryC,isSilent)) {
+			else if(!Security.IsAuthorized(Permissions.ProcComplEdit,ProcCur.DateEntryC,isSilent,suppressLockDateMessage)) {
 				//list of controls enabled for those with ProcComplEditLimited permission
 				List<Control> listControlsEnabled=new List<Control>() {
 					panel1,panelSurfaces,groupArch,listBoxTeeth,listBoxTeeth2,textTooth,textSurfaces,//controls enabled within panel1
