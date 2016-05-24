@@ -2230,6 +2230,14 @@ namespace OpenDental {
 				for(int i=0;i<tableMisc.Rows.Count;i++){
 					if(tableMisc.Rows[i]["descript"].ToString()=="unearnedIncome") {
 						labelUnearnedAmt.Text=PaySplits.GetUnearnedForFam(FamCur).ToString("F");
+						if(PIn.Double(labelUnearnedAmt.Text)<=0) {
+							labelUnearnedAmt.ForeColor=Color.Black;
+							labelUnearnedAmt.Font=new Font(labelUnearnedAmt.Font,FontStyle.Regular);
+						}
+						else {
+							labelUnearnedAmt.ForeColor=Color.Firebrick;
+							labelUnearnedAmt.Font=new Font(labelUnearnedAmt.Font,FontStyle.Bold);
+						}
 					}
 				}
 				//labelInsLeft.Text=Lan.g(this,"Ins Left");
