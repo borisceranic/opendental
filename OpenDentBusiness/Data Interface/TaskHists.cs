@@ -36,8 +36,7 @@ namespace OpenDentBusiness{
 				if(taskList!=null) {
 					descTwo=taskList.Descript;
 				}
-				strb.Append(Lans.g("TaskHists","Task list changed from ")
-					+descOne+Lans.g("TaskHists"," to ")+descTwo+".\r\n");
+				strb.Append(Lans.g("TaskHists","Task list changed from ")+descOne+Lans.g("TaskHists"," to ")+descTwo+".\r\n");
 			}
 			if(taskNext.ObjectType!=taskCur.ObjectType){
 				strb.Append(Lans.g("TaskHists","Task attachment changed from ")
