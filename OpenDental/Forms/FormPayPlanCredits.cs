@@ -58,8 +58,7 @@ namespace OpenDental {
 			_listPaySplits=PaySplits.GetForPats(_listPatNums);//Might contain payplan payments.
 			_listPayments=Payments.GetNonSplitForPats(_listPatNums);
 			_listInsPayAsTotal=ClaimProcs.GetByTotForPats(_listPatNums);//Claimprocs paid as total, might contain ins payplan payments.
-			_listClaimProcs=ClaimProcs.GetForProcs(_listProcs.Select(x => x.ProcNum).ToList())
-				.FindAll(x => (x.Status==ClaimProcStatus.Estimate || x.Status==ClaimProcStatus.NotReceived)); //only get claimprocs that haven't been received for those procedures.
+			_listClaimProcs=ClaimProcs.GetForProcs(_listProcs.Select(x => x.ProcNum).ToList());
 			textCode.Text=Lan.g(this,"None");
 			FillGrid();
 		}
@@ -284,23 +283,16 @@ namespace OpenDental {
 			//		creditTotal+=(decimal)ListPayPlanCreditsCur[i].Principal;
 			//	}
 			//}
-			for(int i = 0;i<_listClaimProcs.Count;i++) {
-				if(_listClaimProcs[i].InsEstTotalOverride!=-1) {
-					creditTotal+=(decimal)_listClaimProcs[i].InsEstTotalOverride;
-				}
-				else {
-					creditTotal+=(decimal)_listClaimProcs[i].InsEstTotal;
-				}
-			}
+			//don't need to to take insurance estimates and estimated writeoffs into account as they are always explicitly linked to procedures.
 			return creditTotal;
 		}
 
 		///<summary>Links charges to credits explicitly based on FKs first, then implicitly based on Date.</summary>
 		private void LinkChargesToCredits() {
 			#region Explicit
-			for(int i = 0;i<_listAccountCharges.Count;i++) {
+			for(int i=0;i<_listAccountCharges.Count;i++) {
 				AccountEntry charge=_listAccountCharges[i];
-				for(int j = 0;j<_listPaySplits.Count;j++) {
+				for(int j=0;j<_listPaySplits.Count;j++) {
 					PaySplit paySplit=_listPaySplits[j];
 					decimal paySplitAmt=(decimal)paySplit.SplitAmt;
 					if(charge.GetType()==typeof(Procedure) && paySplit.ProcNum==charge.PriKey) {
@@ -344,19 +336,40 @@ namespace OpenDental {
 				//		_accountCredits-=(decimal)payPlanCharge.Principal;
 				//	}
 				//}
-				for(int j = 0;j < _listClaimProcs.Count;j++) {
+				//
+				//claimprocs explicitly linked to the procedures for this patient.
+				for(int j=0;j < _listClaimProcs.Count;j++) {
 					ClaimProc claimProcCur=_listClaimProcs[j];
-					if(charge.GetType()==typeof(Procedure) && claimProcCur.ProcNum == charge.PriKey) {
+					if(charge.GetType()!=typeof(Procedure) || claimProcCur.ProcNum!=charge.PriKey) {
+						continue;
+					}
+					decimal amt=0;
+					if((claimProcCur.Status==ClaimProcStatus.Estimate || claimProcCur.Status==ClaimProcStatus.NotReceived)) {
+						//Estimated Payment
+						amt=(decimal)claimProcCur.InsEstTotal;
 						if(claimProcCur.InsEstTotalOverride!=-1) {
-							charge.AmountEnd-=(decimal)claimProcCur.InsEstTotalOverride;
-							charge.AmountStart-=(decimal)claimProcCur.InsEstTotalOverride;
-							_accountCredits-=(decimal)claimProcCur.InsEstTotalOverride;
+							amt=(decimal)claimProcCur.InsEstTotalOverride;
 						}
-						else {
-							charge.AmountEnd-=(decimal)claimProcCur.InsEstTotal;
-							charge.AmountStart-=(decimal)claimProcCur.InsEstTotal;
-							_accountCredits-=(decimal)claimProcCur.InsEstTotal;
+						charge.AmountEnd-=amt;
+						charge.AmountStart-=amt;
+						//Estimated Writeoff
+						amt=0;
+						if(claimProcCur.WriteOffEstOverride!=-1) {
+							amt=(decimal)claimProcCur.WriteOffEstOverride;
 						}
+						else if(claimProcCur.WriteOffEst!=-1) {
+							amt=(decimal)claimProcCur.WriteOffEst;
+						}
+						charge.AmountEnd-=amt;
+						charge.AmountStart-=amt;
+					}
+					else if(claimProcCur.Status==ClaimProcStatus.Received || claimProcCur.Status==ClaimProcStatus.Supplemental
+						|| claimProcCur.Status==ClaimProcStatus.CapClaim || claimProcCur.Status==ClaimProcStatus.CapComplete) 
+					{
+						//actual payment and actual writeoff.
+						amt=(decimal)claimProcCur.InsPayAmt+(decimal)claimProcCur.WriteOff;
+						charge.AmountEnd-=amt;
+						charge.AmountStart-=amt;
 					}
 				}
 			}
@@ -749,7 +762,7 @@ namespace OpenDental {
 				Date=proc.ProcDate;
 				PriKey=proc.ProcNum;
 				AmountOriginal=(decimal)proc.ProcFee;
-				AmountStart=AmountOriginal;
+				AmountStart=(decimal)proc.ProcFee*Math.Max(1,proc.BaseUnits+proc.UnitQty);
 				AmountEnd=AmountOriginal;
 				ProvNum=proc.ProvNum;
 				ClinicNum=proc.ClinicNum;
