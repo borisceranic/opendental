@@ -232,11 +232,7 @@ namespace OpenDentBusiness {
 		///<summary>Returns true if a Patient Portal URL is entered and program properties required for XWeb are entered.</summary>
 		public static bool HasOnlinePaymentEnabled() {
 			List<ProgramProperty> listXChargeProps=ProgramProperties.GetListForProgram(Programs.GetProgramNum(ProgramName.Xcharge));
-			return GetString(PrefName.PatientPortalURL)!=""
-				&& Programs.IsEnabled(ProgramName.Xcharge)
-				&& listXChargeProps.Any(x => x.PropertyDesc=="XWebID" && x.PropertyValue!="")
-				&& listXChargeProps.Any(x => x.PropertyDesc=="AuthKey" && x.PropertyValue!="")
-				&& listXChargeProps.Any(x => x.PropertyDesc=="TerminalID" && x.PropertyValue!="");
+			return listXChargeProps.Any(x => x.PropertyDesc=="IsOnlinePaymentsEnabled"&& x.PropertyValue=="1");
 		}
 
 		///<summary>Used by an outside developer.</summary>
