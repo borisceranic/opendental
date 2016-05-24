@@ -322,7 +322,7 @@ namespace OpenDental {
 			#region Explicitly Link Credits
 			for(int i=0;i<_listAccountCharges.Count;i++) {
 				AccountEntry charge=_listAccountCharges[i];
-				ExplicitlyJoinSplits(listPaySplits,charge,creditTotal);
+				creditTotal=ExplicitlyJoinSplits(listPaySplits,charge,creditTotal);
 				if(payPlanVersionCur==2 && charge.GetType()==typeof(Procedure)) {
 					for(int j=0;j<listPayPlanCharges.Count;j++) {
 						if(listPayPlanCharges[j].ChargeType!=PayPlanChargeType.Credit) {
@@ -348,7 +348,7 @@ namespace OpenDental {
 					}
 					listSplitsTemp.Add(paySplit.Copy());
 				}
-				ExplicitlyJoinSplits(listSplitsTemp,charge,creditTotal);
+				creditTotal=ExplicitlyJoinSplits(listSplitsTemp,charge,creditTotal);
 				for(int j=0;j<listAdjustments.Count;j++) {
 					Adjustment adjustment=listAdjustments[j];
 					decimal adjustmentAmt=(decimal)adjustment.AdjAmt;
@@ -468,11 +468,11 @@ namespace OpenDental {
 			return listAutoSplits;
 		}
 
-		private void ExplicitlyJoinSplits(List<PaySplit> listSplits,AccountEntry charge,decimal creditTotal) {
+		private decimal ExplicitlyJoinSplits(List<PaySplit> listSplits,AccountEntry charge,decimal creditTotal) {
 			for(int i=0;i<listSplits.Count;i++) {
 				PaySplit paySplit=listSplits[i];//The splits in listSplits aren't saved anywhere.  Therefore we can change the SplitAmt at will.
 				decimal paySplitAmt=(decimal)paySplit.SplitAmt;
-				if(charge.GetType()==typeof(Procedure) && paySplit.ProcNum==charge.PriKey) {
+				if(charge.GetType()==typeof(Procedure) && paySplit.ProcNum==((Procedure)charge.Tag).ProcNum) {
 					charge.ListPaySplits.Add(paySplit);
 					charge.AmountEnd-=paySplitAmt;
 					creditTotal-=paySplitAmt;
@@ -497,6 +497,7 @@ namespace OpenDental {
 					}
 				}
 			}
+			return creditTotal;
 		}
 
 		///<summary>Only for V2 PayPlans.  Creates a series of payment splits for a payplan, including interest splits and splits to procedures associated to the payplan.</summary>
