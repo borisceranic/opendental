@@ -452,6 +452,7 @@ namespace OpenDentBusiness {
 			command="SELECT p1.FName,DateTimeSheet,SheetNum,SheetType,Description,sheet.PatNum "
 				+"FROM sheet,patient p1,patient p2 "
 				+"WHERE sheet.PatNum =p1.PatNum "
+				+"AND IsDeleted=0 "//Don't show deleted sheets in the Account module Communications Log section.
 				+"AND p1.Guarantor=p2.Guarantor "
 				+"AND p2.PatNum="+POut.Long(patNum)
 				+" AND SheetType!="+POut.Long((int)SheetTypeEnum.Rx)//rx are only accesssible from within Rx edit window.
