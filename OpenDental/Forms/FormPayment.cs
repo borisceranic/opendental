@@ -1017,6 +1017,9 @@ namespace OpenDental {
 								_listPaySplits.Add(split);
 								textAmount.Text=(PIn.Double(textAmount.Text)+(patPortion-amtToUse)).ToString("F");
 							}
+							else {
+								checkPayTypeNone.Checked=true;//This is strictly an Income Transfer payment.
+							}
 						}
 					}
 				}
