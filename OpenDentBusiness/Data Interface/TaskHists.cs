@@ -26,8 +26,18 @@ namespace OpenDentBusiness{
 			StringBuilder strb=new StringBuilder();
 			strb.Append("");
 			if(taskNext.TaskListNum!=taskCur.TaskListNum){
+				string descOne=Lans.g("TaskHists","(DELETED)");
+				string descTwo=Lans.g("TaskHists","(DELETED)");
+				TaskList taskList=TaskLists.GetOne(taskCur.TaskListNum);
+				if(taskList!=null) {
+					descOne=taskList.Descript;
+				}
+				taskList=TaskLists.GetOne(taskNext.TaskListNum);
+				if(taskList!=null) {
+					descTwo=taskList.Descript;
+				}
 				strb.Append(Lans.g("TaskHists","Task list changed from ")
-					+TaskLists.GetOne(taskCur.TaskListNum).Descript+Lans.g("TaskHists"," to ")+TaskLists.GetOne(taskNext.TaskListNum).Descript+".\r\n");
+					+descOne+Lans.g("TaskHists"," to ")+descTwo+".\r\n");
 			}
 			if(taskNext.ObjectType!=taskCur.ObjectType){
 				strb.Append(Lans.g("TaskHists","Task attachment changed from ")
