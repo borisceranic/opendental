@@ -458,6 +458,7 @@ namespace OpenDental {
 				split.PatNum=PaymentCur.PatNum;
 				split.ProcDate=PaymentCur.PayDate;
 				split.ProvNum=0;
+				split.UnearnedType=PrefC.GetLong(PrefName.PrepaymentUnearnedType);//Use default unallocated type
 				if(!PrefC.GetBool(PrefName.EasyNoClinics)) {//Clinics
 					split.ClinicNum=PaymentCur.ClinicNum;
 				}
