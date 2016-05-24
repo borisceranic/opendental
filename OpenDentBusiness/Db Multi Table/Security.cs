@@ -51,9 +51,15 @@ namespace OpenDentBusiness{
 			//No need to check RemotingRole; no call to db.
 			return IsAuthorized(perm,DateTime.MinValue,suppressMessage);
 		}
-
+	
 		///<summary>Checks to see if current user is authorized.  It also checks any date restrictions.  If not authorized, it gives a Message box saying so and returns false.</summary>
 		public static bool IsAuthorized(Permissions perm,DateTime date,bool suppressMessage){
+			//No need to check RemotingRole; no call to db.
+			return IsAuthorized(perm,date,suppressMessage,false);
+		}
+
+		///<summary>Checks to see if current user is authorized.  It also checks any date restrictions.  If not authorized, it gives a Message box saying so and returns false.</summary>
+		public static bool IsAuthorized(Permissions perm,DateTime date,bool suppressMessage,bool suppressLockDateMessage) {
 			//No need to check RemotingRole; no call to db.
 			if(Security.CurUser==null) {
 				if(!suppressMessage) {
@@ -62,7 +68,7 @@ namespace OpenDentBusiness{
 				return false;
 			}
 			try {
-				return IsAuthorized(perm,date,suppressMessage,curUser.UserGroupNum);
+				return IsAuthorized(perm,date,suppressMessage,suppressLockDateMessage,curUser.UserGroupNum);
 			}
 			catch(Exception ex) {
 				MessageBox.Show(ex.Message);
@@ -71,7 +77,7 @@ namespace OpenDentBusiness{
 		}
 
 		///<summary>Will throw an error if not authorized and message not suppressed.</summary>
-		public static bool IsAuthorized(Permissions perm,DateTime date,bool suppressMessage,long userGroupNum) {
+		public static bool IsAuthorized(Permissions perm,DateTime date,bool suppressMessage,bool suppressLockDateMessage,long userGroupNum) {
 			//No need to check RemotingRole; no call to db.
 			date=date.Date; //Remove the time portion of date so we can compare strictly as a date later.
 			if(!GroupPermissions.HasPermission(userGroupNum,perm)){
@@ -83,7 +89,7 @@ namespace OpenDentBusiness{
 			}
 			if(perm==Permissions.AccountingCreate || perm==Permissions.AccountingEdit){
 				if(date <= PrefC.GetDate(PrefName.AccountingLockDate)){
-					if(!suppressMessage) {
+					if(!suppressMessage && !suppressLockDateMessage) {
 						throw new Exception(Lans.g("Security","Locked by Administrator."));
 					}
 					return false;	
@@ -114,7 +120,7 @@ namespace OpenDentBusiness{
 					if(PrefC.GetBool(PrefName.SecurityLockIncludesAdmin)//if admins are locked out too
 						|| !GroupPermissions.HasPermission(userGroupNum,Permissions.SecurityAdmin))//or is not an admin
 					{
-						if(!suppressMessage) {
+						if(!suppressMessage && !suppressLockDateMessage) {
 							throw new Exception(Lans.g("Security","Locked by Administrator before ")+PrefC.GetDate(PrefName.SecurityLockDate).ToShortDateString());
 						}
 						return false;	
@@ -128,7 +134,7 @@ namespace OpenDentBusiness{
 					if(PrefC.GetBool(PrefName.SecurityLockIncludesAdmin)//if admins are locked out too
 						|| !GroupPermissions.HasPermission(userGroupNum,Permissions.SecurityAdmin))//or is not an admin
 					{
-						if(!suppressMessage) {
+						if(!suppressMessage && !suppressLockDateMessage) {
 							throw new Exception(Lans.g("Security","Locked by Administrator before ")+PrefC.GetInt(PrefName.SecurityLockDays).ToString()+" days.");
 						}
 						return false;
