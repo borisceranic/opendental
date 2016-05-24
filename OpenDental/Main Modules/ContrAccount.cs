@@ -222,6 +222,7 @@ namespace OpenDental {
 			this.menuItemStatementEmail = new System.Windows.Forms.MenuItem();
 			this.menuItemReceipt = new System.Windows.Forms.MenuItem();
 			this.menuItemInvoice = new System.Windows.Forms.MenuItem();
+			this.menuItemLimited = new System.Windows.Forms.MenuItem();
 			this.menuItemStatementMore = new System.Windows.Forms.MenuItem();
 			this.contextMenuRepeat = new System.Windows.Forms.ContextMenu();
 			this.menuItemRepeatStand = new System.Windows.Forms.MenuItem();
@@ -334,7 +335,6 @@ namespace OpenDental {
 			this.textQuickProcs = new System.Windows.Forms.TextBox();
 			this.contextMenuPayment = new System.Windows.Forms.ContextMenu();
 			this.menuItemPay = new System.Windows.Forms.MenuItem();
-			this.menuItemLimited = new System.Windows.Forms.MenuItem();
 			this.panelProgNotes.SuspendLayout();
 			this.groupBox7.SuspendLayout();
 			this.groupBox6.SuspendLayout();
@@ -427,8 +427,8 @@ namespace OpenDental {
             this.menuItemStatementEmail,
             this.menuItemReceipt,
             this.menuItemInvoice,
-			this.menuItemLimited,
-			this.menuItemStatementMore});
+            this.menuItemLimited,
+            this.menuItemStatementMore});
 			// 
 			// menuItemStatementWalkout
 			// 
@@ -453,6 +453,12 @@ namespace OpenDental {
 			this.menuItemInvoice.Index = 3;
 			this.menuItemInvoice.Text = "Invoice";
 			this.menuItemInvoice.Click += new System.EventHandler(this.menuItemInvoice_Click);
+			// 
+			// menuItemLimited
+			// 
+			this.menuItemLimited.Index = 4;
+			this.menuItemLimited.Text = "Limited";
+			this.menuItemLimited.Click += new System.EventHandler(this.menuItemLimited_Click);
 			// 
 			// menuItemStatementMore
 			// 
@@ -1680,12 +1686,6 @@ namespace OpenDental {
 			this.menuItemPay.Text = "Allocate Unearned";
 			this.menuItemPay.Click += new System.EventHandler(this.menuItemPrePay_Click);
 			// 
-			// menuItemLimited
-			// 
-			this.menuItemLimited.Index = 4;
-			this.menuItemLimited.Text = "Limited";
-			this.menuItemLimited.Click += new System.EventHandler(this.menuItemLimited_Click);
-			// 
 			// ContrAccount
 			// 
 			this.Controls.Add(this.textQuickProcs);
@@ -2424,7 +2424,7 @@ namespace OpenDental {
 				}
 				row.Cells.Add(cell);
 				row.Cells.Add("");
-				row.Tag=table.Rows[i]["PayPlanNum"].ToString();
+				row.Tag=table.Rows[i];
 				gridPayPlan.Rows.Add(row);
 				PPBalanceTotal += (Convert.ToDecimal(PIn.Double(table.Rows[i]["balance"].ToString())));
 			}
@@ -2815,7 +2815,7 @@ namespace OpenDental {
 			gridPayPlan.SetSelected(false);
 			if(table.Rows[e.Row]["PayPlanNum"].ToString()!="0") {
 				for(int i=0;i < gridPayPlan.Rows.Count;i++) {
-					if((string)gridPayPlan.Rows[i].Tag==table.Rows[e.Row]["PayPlanNum"].ToString()) {
+					if(((DataRow)(gridPayPlan.Rows[i].Tag))["PayPlanNum"].ToString()==table.Rows[e.Row]["PayPlanNum"].ToString()) {
 						gridPayPlan.SetSelected(i,true);
 					}
 				}
@@ -2929,9 +2929,9 @@ namespace OpenDental {
 		}
 
 		private void gridPayPlan_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			DataTable table=DataSetMain.Tables["payplan"];
-			if(table.Rows[e.Row]["PayPlanNum"].ToString()!="0") {//Payment plan
-				PayPlan payplan=PayPlans.GetOne(PIn.Long(table.Rows[e.Row]["PayPlanNum"].ToString()));
+			DataRow selectedRow=((DataRow)(gridPayPlan.Rows[e.Row].Tag));
+			if(selectedRow["PayPlanNum"].ToString()!="0") {//Payment plan
+				PayPlan payplan=PayPlans.GetOne(PIn.Long(selectedRow["PayPlanNum"].ToString()));
 				FormPayPlan2=new FormPayPlan(PatCur,payplan);
 				FormPayPlan2.ShowDialog();
 				if(FormPayPlan2.GotoPatNum!=0) {
@@ -2944,7 +2944,7 @@ namespace OpenDental {
 			}
 			else {//Installment Plan
 				FormInstallmentPlanEdit FormIPE= new FormInstallmentPlanEdit();
-				FormIPE.InstallmentPlanCur = InstallmentPlans.GetOne(PIn.Long(table.Rows[e.Row]["InstallmentPlanNum"].ToString()));
+				FormIPE.InstallmentPlanCur = InstallmentPlans.GetOne(PIn.Long(selectedRow["InstallmentPlanNum"].ToString()));
 				FormIPE.IsNew=false;
 				FormIPE.ShowDialog();
 				ModuleSelected(PatCur.PatNum);
