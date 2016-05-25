@@ -40,7 +40,7 @@ namespace OpenDentBusiness {
 		public DateTime PayConnectTokenExp;
 		///<summary>What procedures will go on this card as a recurring charge.  Comma delimited list of ProcCodes.</summary>
 		public string Procedures;
-		///<summary>Enum:CreditCardSource. Indicates which application made this credit card and token.</summary>
+		///<summary>Enum:CreditCardSource Indicates which application made this credit card and token.</summary>
 		public CreditCardSource CCSource;
 		///<summary>FK to clinic.ClinicNum. The clinic where this card was added. Each clinic could have a different AuthKey and different
 		///AuthKeys could generate overlapping tokens.</summary>

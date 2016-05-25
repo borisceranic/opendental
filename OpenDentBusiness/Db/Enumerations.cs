@@ -1543,10 +1543,13 @@ namespace OpenDentBusiness{
 	
 	///<summary>The Enumeration value for which Claim Snapshot Trigger that will be stored.</summary>
 	public enum ClaimSnapshotTrigger {
+		///<summary>0</summary>
 		[Description("Claim Created")]
 		ClaimCreate,
+		///<summary>1</summary>
 		[Description("eConnector - Specific Time")]
 		EConnector,
+		///<summary>2</summary>
 		[Description("Insurance Payment Received")]
 		InsPayment
 	}
