@@ -60,7 +60,7 @@ namespace OpenDentBusiness{
 		/// <summary>Total balance for entire family before insurance estimate.  
 		/// Not the same as the sum of the 4 aging balances because this can be negative.</summary>
 		public double BalTotal;
-		///<summary>Enum:StatementType Statement, Receipt, Invoice, LimitedStatement.</summary>
+		///<summary>Enum:StmtType Statement, Receipt, Invoice, LimitedStatement.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.EnumAsString)]
 		public StmtType StatementType;
 

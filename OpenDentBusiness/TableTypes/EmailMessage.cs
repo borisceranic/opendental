@@ -49,7 +49,7 @@ namespace OpenDentBusiness {
 		public string CcAddress;
 		///<summary>Single email address or comma-delimited list of addresses.  User may enter multiple email addresses for blind carbon copies.</summary>
 		public string BccAddress;
-		///<summary>Enum:HideIn None=0,EmailInbox=1.  Indicates which places in the program that should not show this email message.</summary>
+		///<summary>Enum:HideInFlags None=0,EmailInbox=1.  Indicates which places in the program that should not show this email message.</summary>
 		public HideInFlags HideIn;
 		///<summary>Constructor</summary>
 		public EmailMessage(){

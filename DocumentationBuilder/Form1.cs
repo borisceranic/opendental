@@ -32,6 +32,8 @@ namespace DocumentationBuilder {
 
 		private void Form1_Load(object sender,EventArgs e) {
 			textConnStr.Text=dcon.ConnStr;
+			string command="SELECT ValueString FROM preference WHERE PrefName='DatabaseVersion'";
+			textVersion.Text=dcon.GetCount(command);
 		}
 
 		private void butBuild_Click(object sender,EventArgs e) {
@@ -282,6 +284,7 @@ namespace DocumentationBuilder {
 				case "dictcustom": return "DictCustom";
 				case "diseasedef": return "DiseaseDef";
 				case "displayfield": return "DisplayField";
+				case "displayreport": return "DisplayReport";
 				case "dispsupply": return "DispSupply";
 				case "docattach": return "DocAttach";
 				case "documentmisc": return "DocumentMisc";
@@ -339,6 +342,7 @@ namespace DocumentationBuilder {
 				case "hl7defmessage": return "HL7DefMessage";
 				case "hl7defsegment": return "HL7DefSegment";
 				case "hl7msg": return "HL7Msg";
+				case "hl7procattach": return "HL7ProcAttach";
 				case "icd9": return "ICD9";
 				case "insfilingcode": return "InsFilingCode";
 				case "insfilingcodesubtype": return "InsFilingCodeSubtype";
@@ -369,6 +373,8 @@ namespace DocumentationBuilder {
 				case "oidexternal": return "OIDExternal";
 				case "oidinternal": return "OIDInternal";
 				case "orthochart": return "OrthoChart";
+				case "orthocharttab": return "OrthoChartTabLink";
+				case "orthocharttablink": return "OrthoChartTabLink";
 				case "orionproc": return "OrionProc";
 				case "patfield": return "PatField";
 				case "patfielddef": return "PatFieldDef";
@@ -439,6 +445,9 @@ namespace DocumentationBuilder {
 				case "smsmt": return "SmsMT";
 				case "smsvln": return "SmsVln";
 				case "stateabbr": return "StateAbbr";
+				case "stmtadjattach": return "StmtAdjAttach";
+				case "stmtpaysplitattach": return "StmtPaySplitAttach";
+				case "stmtprocattach": return "StmtProcAttach";
 				case "supplyneeded": return "SupplyNeeded";
 				case "supplyorder": return "SupplyOrder";
 				case "supplyorderitem": return "SupplyOrderItem";
@@ -472,6 +481,7 @@ namespace DocumentationBuilder {
 				case "wikipage": return "WikiPage";
 				case "wikipagehist": return "WikiPageHist";
 				case "xchargetransaction": return "XChargeTransaction";
+				case "xwebresponse": return "XWebResponse";
 				case "zipcode": return "ZipCode";
 			}
 			/*single cap classes:

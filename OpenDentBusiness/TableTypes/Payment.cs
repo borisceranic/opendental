@@ -47,10 +47,10 @@ namespace OpenDentBusiness{
 		///updates.  Not user editable with the UI.</summary>
 		[CrudColumn(SpecialType=CrudSpecialColType.TimeStamp)]
 		public DateTime SecDateTEdit;
-		///<summary>Enum:CreditCardSource. Indicates the origin of the payment if the payment came from a credit card. Will be 'None' if this payment 
+		///<summary>Enum:CreditCardSource Indicates the origin of the payment if the payment came from a credit card. Will be 'None' if this payment 
 		///did not use a credit card.</summary>
 		public CreditCardSource PaymentSource;
-		///<summary>Enum:ProcessStat. Flags whether a payment came from online and needs to be processed.</summary>
+		///<summary>Enum:ProcessStat Flags whether a payment came from online and needs to be processed.</summary>
 		public ProcessStat ProcessStatus;
 
 		public Payment Clone() {

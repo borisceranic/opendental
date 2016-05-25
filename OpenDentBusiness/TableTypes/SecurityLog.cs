@@ -34,7 +34,7 @@ namespace OpenDentBusiness{
 		///	The PatNum column will represent the patient who is taking the action.  
 		///PlanNum with PermType InsPlanChangeCarrierName tracks carrier name changes.</summary>
 		public long FKey;
-		///<summary>Enum:LogSources None, WebSched, InsPlanImport834, FHIR.</summary>
+		///<summary>Enum:LogSources None, WebSched, InsPlanImport834, FHIR, PatientPortal.</summary>
 		public LogSources LogSource;
 
 		///<summary>PatNum-NameLF</summary>
