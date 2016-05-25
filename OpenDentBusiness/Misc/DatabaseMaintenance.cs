@@ -3861,6 +3861,43 @@ namespace OpenDentBusiness {
 		}
 
 		[DbmMethod]
+		public static string PayPlanChargeWithInvalidPayPlanNum(bool verbose,bool isCheck) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
+			}
+			if(DataConnection.DBtype==DatabaseType.Oracle) {
+				return Lans.g("FormDatabaseMaintenance","Currently not Oracle compatible.  Please call support.");
+			}
+			string log="";
+			command="SELECT COUNT(DISTINCT PayPlanNum) FROM (SELECT PayPlanNum FROM payplancharge WHERE PayPlanNum NOT IN(SELECT PayPlanNum FROM payplan) "
+				+"UNION SELECT PayPlanNum FROM creditcard WHERE PayPlanNum>0 AND PayPlanNum NOT IN(SELECT PayPlanNum FROM payplan)) A";
+			string count=Db.GetCount(command);
+			if(count=="0" && !verbose) {
+				return log;
+			}
+			//There is something to report OR the user has verbose mode on.
+			if(isCheck) {
+				if(count!="0" || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","PayPlan charges or credit cards with an invalid PayPlanNum found")+": "+count;
+				}
+			}
+			else {//Running the fix and there are items to show.
+				if(count!="0" || verbose) {
+					//Delete the payment plan charges and update credit cards that point to an invalid payment plan. Claimprocs and paysplits with an invalid
+					//PayPlanNum are taken care of in other DBM methods.
+					command="DELETE FROM payplancharge WHERE PayPlanNum NOT IN(SELECT PayPlanNum FROM payplan)";
+					Db.NonQ(command);
+					command="UPDATE creditcard SET PayPlanNum=0 WHERE PayPlanNum NOT IN(SELECT PayPlanNum FROM payplan)";
+					Db.NonQ(command);
+				}
+				if(count!="0" || verbose) {
+					log+=Lans.g("FormDatabaseMaintenance","PayPlan charges or credit cards with an invalid PayPlanNum fixed")+": "+count;
+				}
+			}
+			return log;
+		}
+
+		[DbmMethod]
 		public static string PayPlanSetGuarantorToPatForIns(bool verbose,bool isCheck) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				return Meth.GetString(MethodBase.GetCurrentMethod(),verbose,isCheck);
