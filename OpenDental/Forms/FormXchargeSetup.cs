@@ -669,9 +669,10 @@ namespace OpenDental{
 			if(!checkEnabled.Checked) {
 				return true;
 			}
-			//XWeb will be enabled for the clinic if the enabled checkbox is checked and the 3 XWeb fields are not blank.  Don't let them switch clinics or
+			//XWeb will be enabled for the clinic if the XWeb enabled checkbox is checked and the 3 XWeb fields are not blank.  Don't let them switch clinics or
 			//close the form with only 1 or 2 of the three fields filled in.  If they fill in 1, they must fill in the other 2.  Per JasonS - 10/12/2015
-			bool isXWebEnabled=textXWebID.Text.Trim().Length>0 || textAuthKey.Text.Trim().Length>0  || textTerminalID.Text.Trim().Length>0;
+			bool isXWebEnabled=checkWebPayEnabled.Checked 
+				&& (textXWebID.Text.Trim().Length>0 || textAuthKey.Text.Trim().Length>0  || textTerminalID.Text.Trim().Length>0);
 			//X-Charge will be enabled if the enabled checkbox is checked and either clinics are disabled OR both Username and Password are set
 			bool isClientEnabled=!PrefC.HasClinicsEnabled || (textUsername.Text.Trim().Length>0 && textPassword.Text.Trim().Length>0);
 			if((isClientEnabled || isXWebEnabled) && comboPaymentType.SelectedIndex<0) {
@@ -690,9 +691,10 @@ namespace OpenDental{
 				isClientEnabled=ProgramProperties.GetPropValFromList(_listProgProps,"Username",_listUserClinicNums[i]).Length>0
 					&& ProgramProperties.GetPropValFromList(_listProgProps,"Password",_listUserClinicNums[i]).Length>0;
 				//isXWebEnabled will be true if any of the XWeb values are set
-				isXWebEnabled=ProgramProperties.GetPropValFromList(_listProgProps,"XWebID",_listUserClinicNums[i]).Length>0
+				isXWebEnabled=checkWebPayEnabled.Checked
+					&& (ProgramProperties.GetPropValFromList(_listProgProps,"XWebID",_listUserClinicNums[i]).Length>0
 					|| ProgramProperties.GetPropValFromList(_listProgProps,"AuthKey",_listUserClinicNums[i]).Length>0
-					|| ProgramProperties.GetPropValFromList(_listProgProps,"TerminalID",_listUserClinicNums[i]).Length>0;
+					|| ProgramProperties.GetPropValFromList(_listProgProps,"TerminalID",_listUserClinicNums[i]).Length>0);
 				//if the program is enabled and the username and password fields are not blank for client, or XWebID, AuthKey, and TerminalID are not blank
 				//for XWeb, then X-Charge is enabled for this clinic so make sure the payment type is also set
 				if((isClientEnabled || isXWebEnabled)	&& !DefC.Short[(int)DefCat.PaymentTypes].Any(x => x.DefNum.ToString()==payTypeCur)) {
