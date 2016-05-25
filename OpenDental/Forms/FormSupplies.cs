@@ -118,7 +118,7 @@ namespace OpenDental {
 					continue;
 				}
 				row=new ODGridRow();
-				if(i==0 || (gridMain.Rows.Count>1 && supply.Category!=((Supply)gridMain.Rows[gridMain.Rows.Count-1].Tag).Category)) {
+				if(gridMain.Rows.Count==0 || (gridMain.Rows.Count>1 && supply.Category!=((Supply)gridMain.Rows[gridMain.Rows.Count-1].Tag).Category)) {
 					row.Cells.Add(DefC.GetName(DefCat.SupplyCats,supply.Category));//Add the new category header in this row if it doesn't match the previous row's category.
 				}
 				else {
