@@ -5964,7 +5964,21 @@ namespace OpenDental{
 		}
 
 		private void comboCustomTracking_SelectionChangeCommitted(object sender,EventArgs e) {
-			if(comboCustomTracking.SelectedIndex < 1) {
+			if(comboCustomTracking.SelectedIndex<1) {//If the user is trying to set the Custom Tracking from a valid definition to "none"
+				if(ClaimCur.CustomTracking!=0 && !MsgBox.Show(this,MsgBoxButtons.OKCancel,"Setting the status to none will disable filtering in the Outstanding Claims Report.  Do you wish to set the status of this claim to none?")) {
+					comboCustomTracking.Items.Clear();
+					comboCustomTracking.Items.Add(Lan.g(this,"none"));
+					comboCustomTracking.SelectedIndex=0;
+					for(int i=0;i<DefC.Long[(int)DefCat.ClaimCustomTracking].Length;i++) {
+						comboCustomTracking.Items.Add(DefC.Long[(int)DefCat.ClaimCustomTracking][i].ItemName);
+						if(ClaimCur.CustomTracking==DefC.Long[(int)DefCat.ClaimCustomTracking][i].DefNum) {
+							comboCustomTracking.SelectedIndex=i+1;
+						}
+					}
+				}
+				else {
+					//If the user wants to set the Custom Tracking to "none" we will allow it.
+				}
 				return;
 			}
 			InputBox inputBox=new InputBox(Lan.g(this,"Please enter note below"));
