@@ -229,10 +229,14 @@ namespace OpenDentBusiness {
 			return CultureInfo.CurrentCulture;
 		}
 
-		///<summary>Returns true if a Patient Portal URL is entered and program properties required for XWeb are entered.</summary>
+		///<summary>Returns true if the XCharge program is enabled and at least one clinic has online payments enabled.</summary>
 		public static bool HasOnlinePaymentEnabled() {
-			List<ProgramProperty> listXChargeProps=ProgramProperties.GetListForProgram(Programs.GetProgramNum(ProgramName.Xcharge));
-			return listXChargeProps.Any(x => x.PropertyDesc=="IsOnlinePaymentsEnabled"&& x.PropertyValue=="1");
+			Program prog=Programs.GetCur(ProgramName.Xcharge);
+			if(!prog.Enabled) {
+				return false;
+			}
+			List<ProgramProperty> listXChargeProps=ProgramProperties.GetListForProgram(prog.ProgramNum);
+			return listXChargeProps.Any(x => x.PropertyDesc=="IsOnlinePaymentsEnabled" && x.PropertyValue=="1");
 		}
 
 		///<summary>Used by an outside developer.</summary>
