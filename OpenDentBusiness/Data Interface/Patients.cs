@@ -289,10 +289,16 @@ namespace OpenDentBusiness{
 			}
 			if(subscriberId!=""){
 				command+="LEFT JOIN patplan ON patplan.PatNum=patient.PatNum "
-					+"LEFT JOIN inssub ON patplan.InsSubNum=inssub.InsSubNum "
-					+"LEFT JOIN insplan ON inssub.PlanNum=insplan.PlanNum ";
+					+"LEFT JOIN inssub ON patplan.InsSubNum=inssub.InsSubNum ";
 			}
-			command+="WHERE patient.PatStatus != '4' ";//not status 'deleted'
+			command+="WHERE patient.PatStatus NOT IN("+POut.Int((int)PatientStatus.Deleted);
+			if(hideInactive) {
+				command+=","+POut.Int((int)PatientStatus.Inactive);
+			}
+			if(!showArchived) {
+				command+=","+POut.Int((int)PatientStatus.Archived)+","+POut.Int((int)PatientStatus.Deceased);
+			}
+			command+=") ";
 			if(DataConnection.DBtype==DatabaseType.MySql) {//LIKE is case insensitive in mysql.
 				if(lname.Length>0) {
 					if(limit) {//normal behavior is fast
@@ -408,12 +414,6 @@ namespace OpenDentBusiness{
 				command+="AND patient.Birthdate ="+POut.Date(birthdate)+" ";
 			}
 			command+=billingsnippet;
-			if(hideInactive){
-				command+="AND patient.PatStatus != '"+POut.Int((int)PatientStatus.Inactive)+"' ";
-			}
-			if(!showArchived) {
-				command+="AND patient.PatStatus != '"+POut.Int((int)PatientStatus.Archived)+"' AND patient.PatStatus != '"+POut.Int((int)PatientStatus.Deceased)+"' ";
-			}
 			//if(showProspectiveOnly) {
 			//	command+="AND patient.PatStatus = "+POut.Int((int)PatientStatus.Prospective)+" ";
 			//}
@@ -439,7 +439,7 @@ namespace OpenDentBusiness{
 				command+="AND patient.SiteNum="+POut.Long(siteNum)+" ";
 			}
 			if(subscriberId!=""){
-				command+="AND inssub.SubscriberId LIKE '%"+POut.String(subscriberId)+"%' ";
+				command+="AND inssub.SubscriberId LIKE '"+POut.String(subscriberId)+"%' ";
 			}
 			//NOTE: This filter will superceed all filters set above.
 			if(explicitPatNums!=null && explicitPatNums.Count>0) {
