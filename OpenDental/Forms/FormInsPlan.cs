@@ -1941,7 +1941,6 @@ namespace OpenDental{
 				labelNoPermission.Visible=true;
 				this.Controls.Add(labelNoPermission);
 				groupChanges.Visible=false;
-				butPick.Enabled=false;
 				butPickCarrier.Enabled=false;
 				comboElectIDdescript.Enabled=false;
 				checkIsMedical.Enabled=false;
