@@ -1235,7 +1235,13 @@ namespace OpenDental {
 							userNumInbox=TaskLists.GetMailboxUserNumByAncestor(TasksList[clickedI-TaskListsList.Count].TaskNum);
 						}
 						else {
-							userNumInbox=TaskLists.GetMailboxUserNum(TreeHistory[0].TaskListNum);
+							if(TreeHistory.Count!=0) {
+								userNumInbox=TaskLists.GetMailboxUserNum(TreeHistory[0].TaskListNum);
+							}
+							else {
+								MsgBox.Show(this,"Please setup task lists before marking tasks as read.");
+								return;
+							}
 						}
 						if(userNumInbox != 0 && userNumInbox != Security.CurUser.UserNum) {
 							MsgBox.Show(this,"Not allowed to mark off tasks in someone else's inbox.");
