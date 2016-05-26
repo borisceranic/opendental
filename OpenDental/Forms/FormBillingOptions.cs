@@ -707,8 +707,8 @@ namespace OpenDental{
 					}
 				}
 			}
-			if(PrefC.HasSuperStatementsEnabled) {
-				checkSuperFam.Visible=true;
+			if(!PrefC.HasSuperStatementsEnabled) {
+				checkSuperFam.Visible=false;
 			}
 			//blank is allowed
 			FillDunning();
@@ -997,7 +997,7 @@ namespace OpenDental{
 			if(PrefC.GetBool(PrefName.AgingCalculatedMonthlyInsteadOfDaily)) {//if aging calculated monthly, use the last aging date instead of today
 				dateAsOf=PrefC.GetDate(PrefName.DateLastAging);
 			}
-			DataTable tableBalAge=Ledgers.GetDateBalanceBegan(agingList.Select(x => x.PatNum).ToList(),dateAsOf);
+			DataTable tableBalAge=Ledgers.GetDateBalanceBegan(agingList,dateAsOf,checkSuperFam.Checked);
 			foreach(PatAging patAgeCur in agingList) {
 				stmt=new Statement();
 				stmt.DateRangeFrom=dateRangeFrom;
@@ -1030,13 +1030,17 @@ namespace OpenDental{
 						+"Note: "+installPlan.Note);
 				}
 				//appointment reminders are not handled here since it would be too slow.
-				//dateBalBegan is first transaction date that resulted in a positive balance after the last time they had a bal <=0
+				//dateBalBegan is first transaction date for a charge that consumed the last of the credits for the account, so first transaction that isn't
+				//fully paid for based on oldest paid first logic
 				DateTime dateBalBegan=tableBalAge.Rows.OfType<DataRow>()
 					.Where(x => x["PatNum"].ToString()==patAgeCur.PatNum.ToString())
 					.Select(x => PIn.Date(x["DateAccountAge"].ToString()))
 					.DefaultIfEmpty(DateTime.MinValue).FirstOrDefault();
 				//ageAccount is number of days between the day the account first started to have a positive bal and the asOf date
-				int ageAccount=(dateAsOf-dateBalBegan).Days;
+				int ageAccount=0;
+				if(dateBalBegan>DateTime.MinValue) {
+					ageAccount=(dateAsOf-dateBalBegan).Days;
+				}
 				dunning=dunList.LastOrDefault(x => (x.BillingType==0 || x.BillingType==patAgeCur.BillingType) //same billing type
 					&& ageAccount>=x.AgeAccount-x.DaysInAdvance //old enough to qualify for this dunning message, taking into account DaysInAdvance
 					&& (x.InsIsPending==YN.Unknown || x.InsIsPending==(patAgeCur.InsEst>0?YN.Yes:YN.No)));//dunning msg ins pending=unkown or matches this acct

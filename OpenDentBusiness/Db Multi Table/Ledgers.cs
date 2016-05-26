@@ -472,20 +472,35 @@ namespace OpenDentBusiness{
 
 		///<summary>Gets the earliest date of any portion of the current balance for the family.
 		///Returns a data table with two columns: PatNum and DateAccountAge.</summary>
-		public static DataTable GetDateBalanceBegan(List<long> listGuarantors,DateTime dateAsOf) {
+		public static DataTable GetDateBalanceBegan(List<PatAging> listGuarantors,DateTime dateAsOf,bool isSuperBills) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetTable(MethodBase.GetCurrentMethod(),listGuarantors,dateAsOf);
+				return Meth.GetTable(MethodBase.GetCurrentMethod(),listGuarantors,dateAsOf,isSuperBills);
 			}
 			DataTable retval=new DataTable();
 			retval.Columns.Add("PatNum");
 			retval.Columns.Add("DateAccountAge");
-			List<long> listPatNumsAll=Patients.GetAllFamilyPatNums(listGuarantors);
-			if(listPatNumsAll.Count<1) {
+			//key=SuperFamily (PatNum); value=list of PatNums for the guars of each fam on a superbill, or if not a superbill, a list containing the GuarNum
+			Dictionary<long,List<long>> dictSuperFamGNums=new Dictionary<long,List<long>>();
+			foreach(PatAging patAgeCur in listGuarantors) {
+				//if making superBills and this guarantor has super billing and is also the superhead for the super family,
+				//fill dict with all guarnums and add all family members for all guars included in the superbill to the all patnums list
+				if(isSuperBills && patAgeCur.HasSuperBilling && patAgeCur.SuperFamily==patAgeCur.PatNum) {
+					dictSuperFamGNums[patAgeCur.SuperFamily]=Patients.GetSuperFamilyGuarantors(patAgeCur.SuperFamily)
+						.FindAll(x => x.HasSuperBilling)
+						.Select(x => x.PatNum).ToList();
+				}
+				else {//not a superBill, just add all family members for this guarantor
+					dictSuperFamGNums[patAgeCur.PatNum]=new List<long>() { patAgeCur.PatNum };
+				}
+			}
+			//list of all family member PatNums for each guarantor/superhead for all statements being generated
+			List<long> listPatNumsAll=Patients.GetAllFamilyPatNums(dictSuperFamGNums.SelectMany(x => x.Value).ToList());
+			if(listPatNumsAll.Count<1) {//should never happen
 				return retval;
 			}
 			string patNumStr=string.Join(",",listPatNumsAll);
 			string command="SELECT patient.Guarantor AS PatNum,TranDate,SUM(CASE WHEN TranAmount>0 THEN TranAmount ELSE 0 END) AS ChargeForDate,"
-				+"SUM(CASE WHEN TranAmount<0 THEN -TranAmount ELSE 0 END) AS PayForDate "
+				+"SUM(CASE WHEN TranAmount<0 THEN TranAmount ELSE 0 END) AS PayForDate "
 				+"FROM ("
 					//Get the completed procedure dates and charges for the fam
 					+"SELECT PatNum,ProcDate AS TranDate,ProcFee*(UnitQty+BaseUnits) AS TranAmount "
@@ -531,31 +546,53 @@ namespace OpenDentBusiness{
 			if(table.Rows.Count<1) {
 				return retval;
 			}
+			Dictionary<long,double> dictGuarCreditTotals=table.Rows.OfType<DataRow>()
+				.GroupBy(x => PIn.Long(x["PatNum"].ToString()),x => PIn.Double(x["PayForDate"].ToString()))
+				.ToDictionary(x => x.Key,y => y.Sum());
 			double runTot=0;
-			long patNumCur;
+			long guarNumCur;
 			//Create a dictionary that tells a story about the transactions and their dates for each family.
-			Dictionary<long,Dictionary<DateTime,double>> dictPatDateBal=new Dictionary<long,Dictionary<DateTime,double>>();
+			Dictionary<long,Dictionary<DateTime,double>> dictGuarDateBal=new Dictionary<long,Dictionary<DateTime,double>>();
 			foreach(DataRow rowCur in table.Rows) {
-				patNumCur=PIn.Long(rowCur["PatNum"].ToString());
-				if(dictPatDateBal.Keys.Count==0 || patNumCur!=dictPatDateBal.Keys.Last()) {
-					runTot=0;
-					dictPatDateBal[patNumCur]=new Dictionary<DateTime,double>();
+				guarNumCur=PIn.Long(rowCur["PatNum"].ToString());
+				if(!dictGuarDateBal.ContainsKey(guarNumCur)) {
+					runTot=dictGuarCreditTotals[guarNumCur];
+					dictGuarDateBal[guarNumCur]=new Dictionary<DateTime,double>();
 				}
-				runTot+=PIn.Double(rowCur["ChargeForDate"].ToString())-PIn.Double(rowCur["PayForDate"].ToString());
-				dictPatDateBal[patNumCur][PIn.Date(rowCur["TranDate"].ToString())]=runTot;
+				runTot+=PIn.Double(rowCur["ChargeForDate"].ToString());
+				dictGuarDateBal[guarNumCur][PIn.Date(rowCur["TranDate"].ToString())]=runTot;
 			}
 			DataRow row;
-			DateTime dateLastZero;
-			Dictionary<DateTime,double> dictDateBal;
-			//Find the earliest date where the family had a balance since the last time they "didn't" have a balance.
-			foreach(long patNum in listGuarantors) {
-				dictDateBal=dictPatDateBal[patNum];
+			List<DateTime> listDateBals;
+			List<long> listGuarNums;
+			//find the earliest trans that uses up the account credits and is therefore the trans date for which the account balance is "first" positive
+			foreach(PatAging patAgeCur in listGuarantors) {
+				if(isSuperBills && patAgeCur.HasSuperBilling && patAgeCur.PatNum!=patAgeCur.SuperFamily) {
+					continue;
+				}
+				if(!isSuperBills || !patAgeCur.HasSuperBilling) {
+					listGuarNums=new List<long>() { patAgeCur.PatNum };
+				}
+				else {//must be superbill and this is the superhead
+					if(!dictSuperFamGNums.ContainsKey(patAgeCur.PatNum)) {
+						continue;//should never happen
+					}
+					listGuarNums=dictSuperFamGNums[patAgeCur.PatNum];
+				}
+				//dateLastZero=DateTime.MinValue;
+				listDateBals=new List<DateTime>();
+				foreach(long guarNum in listGuarNums) {
+					if(!dictGuarDateBal.ContainsKey(guarNum)) {//should never happen
+						continue;
+					}
+					//list of guars, or if not a super statement a list of one guar, and the date of the trans that used up the last of the acct credits
+					listDateBals.Add(dictGuarDateBal[guarNum].Where(x => x.Value>0).Select(x => x.Key).DefaultIfEmpty(DateTime.MinValue).Min());
+				}
 				row=retval.NewRow();
-				row["PatNum"]=POut.Long(patNum);
-				//last date the guar's account had a zero or negative bal.  If the account has never been <=0, DateTime.MinValue
-				dateLastZero=dictDateBal.Where(x => x.Value<=0).Select(x => x.Key).DefaultIfEmpty(DateTime.MinValue).Max();
-				//earliest date acct was pos after dateLastZero, could be DateTime.MinValue if there has not been a balance after the last time it was <=0
-				row["DateAccountAge"]=dictDateBal.Where(x => x.Key>dateLastZero && x.Value>0).Select(x => x.Key).DefaultIfEmpty(DateTime.MinValue).Min();
+				row["PatNum"]=POut.Long(patAgeCur.PatNum);
+				//set to the oldest balance date for all guarantors on this superbill, or if not a super bill, the oldest balance date for this guarantor
+				//could be DateTime.MinValue if their credits pay for all of their charges
+				row["DateAccountAge"]=listDateBals.Where(x => x>DateTime.MinValue).DefaultIfEmpty(DateTime.MinValue).Min();
 				retval.Rows.Add(row);
 			}
 			return retval;
