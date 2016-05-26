@@ -2012,9 +2012,15 @@ namespace OpenDental {
 			if(SheetDefCur.PageCount==1) {
 				//SheetDefCur.IsMultiPage=false;
 			}
-			if(SheetDefCur.SheetFieldDefs.FindAll(i => i.YPos>SheetDefCur.HeightTotal).Count>0) { //Find all fields that have a YPos greater than the bottom of the page.
+			//Once sheet defs are enhanced to allow showing users editable margins we can go back to using the SheetDefCur.HeightTotal property.
+			//For now we need to use the algorithm that Ryan provided me.  See task #743211 for more information.
+			int lowestYPos=SheetUtil.GetLowestYPos(SheetDefCur.SheetFieldDefs);
+			int arbitraryHeight=lowestYPos-60;
+			int onePageHeight=SheetDefCur.IsLandscape ? SheetDefCur.Width : SheetDefCur.Height;
+			int minimumPageCount=(int)Math.Ceiling((double)arbitraryHeight / (onePageHeight-40-60));//40/60 for the header/footer respectively.
+			if(minimumPageCount > SheetDefCur.PageCount) { //There are fields that have a YPos and heights that push them past the bottom of the page.
 				MsgBox.Show(this,"Cannot remove pages that contain sheet fields.");
-				SheetDefCur.PageCount++;
+				SheetDefCur.PageCount++;//Forcefully add a page back.
 				return;
 			}
 			panelMain.Height=SheetDefCur.HeightTotal-(SheetDefCur.PageCount==1?0:SheetDefCur.PageCount*100-40);
