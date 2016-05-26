@@ -948,7 +948,7 @@ namespace OpenDentBusiness{
 					dictRefToPatNums[listRefAttaches[j].PatNum]+=("\r\n"+nameLF);//Concatenate all refTo nameLF's to the refTo dict
 				}
 			}
-			command="SELECT * FROM adjustment WHERE AdjDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd.AddDays(1));
+			command="SELECT * FROM adjustment WHERE AdjDate BETWEEN "+POut.Date(dateStart)+" AND "+POut.Date(dateEnd);
 			List<Adjustment> listAdjustments=Crud.AdjustmentCrud.SelectMany(command);
 			DateTime aptDate;
 			DateTime aptDateArrived;
