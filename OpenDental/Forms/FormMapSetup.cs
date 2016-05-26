@@ -9,7 +9,9 @@ namespace OpenDental {
 	public partial class FormMapSetup:ODForm {
 
 		#region Init
-		
+		public List<MapAreaContainer> ListMaps;
+		private MapAreaContainer _mapCur;
+
 		public FormMapSetup() {
 			InitializeComponent();
 		}
@@ -17,14 +19,30 @@ namespace OpenDental {
 		private void FormMapSetup_Load(object sender,EventArgs e) {
 			//Get latest prefs. We will use them to setup our clinic panel.
 			Cache.Refresh(InvalidType.Prefs);
+			FillCombo();
 			//fill the employee list			
 			FillEmployees();
-			//set preview defaults
-			this.numFloorHeightFeet.Value=this.mapAreaPanel.FloorHeightFeet;
-			this.numFloorWidthFeet.Value=this.mapAreaPanel.FloorWidthFeet;
-			this.numPixelsPerFoot.Value=this.mapAreaPanel.PixelsPerFoot;
+			FillSettings();
 			//map panel
 			mapAreaPanel_MapAreaChanged(this,new EventArgs());
+		}
+
+		private void FillCombo() {
+			ListMaps=PhoneMapJSON.GetFromDb();
+			_mapCur=ListMaps[0];
+			foreach(MapAreaContainer mapCur in ListMaps) {
+				comboRoom.Items.Add(mapCur.Description);
+			}
+			comboRoom.SelectedIndex=0;
+		}
+
+		private void FillSettings() {
+			numFloorWidthFeet.Value=_mapCur.FloorWidthFeet;
+			numFloorHeightFeet.Value=_mapCur.FloorHeightFeet;
+			numPixelsPerFoot.Value=_mapCur.PixelsPerFoot;
+			checkShowGrid.Checked=_mapCur.ShowGrid;
+			checkShowOutline.Checked=_mapCur.ShowOutline;
+			FillMap();
 		}
 
 		private void FillEmployees() {
@@ -46,36 +64,15 @@ namespace OpenDental {
 			}
 			gridEmployees.EndUpdate();
 		}
-				
-		private void mapAreaPanel_MapAreaChanged(object sender,EventArgs e) {
+
+		private void FillMap() {
 			mapAreaPanel.Clear(false);
-			//All prefs are hard-coded for now. We will likely create a parent table which will hold these values in the event that we release this feature to customers.
-			/*
-			//Load clinic panel values from database.
-			bool showGrid=false;
-			if(bool.TryParse(PrefC.GetRaw("clinicMapPanelHQ.ShowGrid"),out showGrid)) {
-				checkShowGrid.Checked=showGrid;
-			}
-			bool showOutline=false;
-			if(bool.TryParse(PrefC.GetRaw("clinicMapPanelHQ.ShowOutline"),out showOutline)) {
-				checkShowOutline.Checked=showOutline;
-			}
-			int floorWidthFeet=0;
-			if(int.TryParse(PrefC.GetRaw("clinicMapPanelHQ.FloorWidthFeet"),out floorWidthFeet)) {
-				numFloorWidthFeet.Value=floorWidthFeet;
-			}
-			int floorHeightFeet=0;
-			if(int.TryParse(PrefC.GetRaw("clinicMapPanelHQ.FloorHeightFeet"),out floorHeightFeet)) {
-				numFloorHeightFeet.Value=floorHeightFeet;
-			}
-			int pixelsPerFoot=0;
-			if(int.TryParse(PrefC.GetRaw("clinicMapPanelHQ.PixelsPerFoot"),out pixelsPerFoot)) {
-				numPixelsPerFoot.Value=pixelsPerFoot;
-			}
-			*/
 			//fill the panel
 			List<MapArea> clinicMapItems=MapAreas.Refresh();
 			for(int i=0;i<clinicMapItems.Count;i++) {
+				if(clinicMapItems[i].MapAreaContainerNum!=_mapCur.MapAreaContainerNum) {
+					continue;
+				}
 				if(clinicMapItems[i].ItemType==MapItemType.Room) {
 					mapAreaPanel.AddCubicle(clinicMapItems[i]);
 				}
@@ -83,17 +80,16 @@ namespace OpenDental {
 					mapAreaPanel.AddDisplayLabel(clinicMapItems[i]);
 				}
 			}
+			mapAreaPanel.ShowGrid=_mapCur.ShowGrid;
+			mapAreaPanel.ShowOutline=_mapCur.ShowOutline;
+			mapAreaPanel.FloorWidthFeet=(int)_mapCur.FloorWidthFeet;
+			mapAreaPanel.FloorHeightFeet=(int)_mapCur.FloorHeightFeet;
+			mapAreaPanel.PixelsPerFoot=(int)_mapCur.PixelsPerFoot;
+			textDescription.Text=_mapCur.Description;
 		}
 
-		///<summary>This function will NOT update the prefs table (for now). All pref values for this form are hard-coded until we decide to make this a cutsomer-facing feature.</summary>
-		private void TryUpdatePref(string prefName,string newValue) {
-			return;
-			try {
-				Prefs.UpdateRaw(prefName,newValue);
-			}
-			catch(Exception e) {
-				MessageBox.Show("Updating preference table failed. Any changes you made were not saved.\r\n\r\n"+e.Message);
-			}
+		private void mapAreaPanel_MapAreaChanged(object sender,EventArgs e) {
+			FillMap();
 		}
 
 		#endregion
@@ -101,17 +97,13 @@ namespace OpenDental {
 		#region Check Boxes
 
 		private void checkShowGrid_CheckedChanged(object sender,EventArgs e) {
-			mapAreaPanel.ShowGrid=checkShowGrid.Checked;
-			if(sender!=null) { //Sender will be null on form load. Otherwise save the new value.
-				TryUpdatePref("clinicMapPanelHQ.ShowGrid",mapAreaPanel.ShowGrid.ToString());
-			}
+			_mapCur.ShowGrid=checkShowGrid.Checked;
+			FillMap();
 		}
 
 		private void checkShowOutline_CheckedChanged(object sender,EventArgs e) {
-			mapAreaPanel.ShowOutline=checkShowOutline.Checked;
-			if(sender!=null) { //Sender will be null on form load. Otherwise save the new value.
-				TryUpdatePref("clinicMapPanelHQ.ShowOutline",mapAreaPanel.ShowOutline.ToString());
-			}
+			_mapCur.ShowOutline=checkShowOutline.Checked;
+			FillMap();
 		}
 
 		#endregion
@@ -119,24 +111,23 @@ namespace OpenDental {
 		#region Numerics
 
 		private void numericFloorWidthFeet_ValueChanged(object sender,EventArgs e) {
-			mapAreaPanel.FloorWidthFeet=(int)numFloorWidthFeet.Value;
-			if(sender!=null) { //Sender will be null on form load. Otherwise save the new value.
-				TryUpdatePref("clinicMapPanelHQ.FloorWidthFeet",mapAreaPanel.FloorWidthFeet.ToString());
-			}
+			_mapCur.FloorWidthFeet=(int)numFloorWidthFeet.Value;
+			FillMap();
 		}
 
 		private void numericFloorHeightFeet_ValueChanged(object sender,EventArgs e) {
-			mapAreaPanel.FloorHeightFeet=(int)numFloorHeightFeet.Value;
-			if(sender!=null) { //Sender will be null on form load. Otherwise save the new value.
-				TryUpdatePref("clinicMapPanelHQ.FloorHeightFeet",mapAreaPanel.FloorHeightFeet.ToString());
-			}
+			_mapCur.FloorHeightFeet=(int)numFloorHeightFeet.Value;
+			FillMap();
 		}
 
 		private void numericPixelsPerFoot_ValueChanged(object sender,EventArgs e) {
-			mapAreaPanel.PixelsPerFoot=(int)numPixelsPerFoot.Value;
-			if(sender!=null) { //Sender will be null on form load. Otherwise save the new value.
-				TryUpdatePref("clinicMapPanelHQ.PixelsPerFoot",mapAreaPanel.PixelsPerFoot.ToString());
-			}
+			_mapCur.PixelsPerFoot=(int)numPixelsPerFoot.Value;
+			FillMap();
+		}
+
+		private void textDescription_TextChanged(object sender,EventArgs e) {
+			_mapCur.Description=textDescription.Text;
+			comboRoom.Items[comboRoom.SelectedIndex]=_mapCur.Description;
 		}
 
 		#endregion
@@ -153,10 +144,11 @@ namespace OpenDental {
 			PointF xy=GetXYFromMenuLocation(sender);
 			FormEP.MapItem.XPos=Math.Round(xy.X,3);
 			FormEP.MapItem.YPos=Math.Round(xy.Y,3);
+			FormEP.MapItem.MapAreaContainerNum=_mapCur.MapAreaContainerNum;
 			if(FormEP.ShowDialog(this)!=DialogResult.OK) {
 				return;
 			}
-			mapAreaPanel_MapAreaChanged(this,new EventArgs());
+			FillMap();
 		}
 
 		private void newLabelToolStripMenuItem_Click(object sender,EventArgs e) {
@@ -169,13 +161,20 @@ namespace OpenDental {
 			PointF xy=GetXYFromMenuLocation(sender);
 			FormEP.MapItem.XPos=Math.Round(xy.X,3);
 			FormEP.MapItem.YPos=Math.Round(xy.Y,3);
+			FormEP.MapItem.MapAreaContainerNum=_mapCur.MapAreaContainerNum;
 			if(FormEP.ShowDialog(this)!=DialogResult.OK) {
 				return;
 			}
-			mapAreaPanel_MapAreaChanged(this,new EventArgs());
+			FillMap();
+		}
+
+		private void comboRoom_SelectionChangeCommitted(object sender,EventArgs e) {
+			_mapCur=ListMaps[comboRoom.SelectedIndex];
+			FillSettings();
 		}
 
 		#endregion
+
 				
 		#region Map Panel
 
@@ -185,19 +184,20 @@ namespace OpenDental {
 			}
 			newCubicleToolStripMenuItem.Tag=e.Location;
 			newLabelToolStripMenuItem.Tag=e.Location;
-			menu.Show(mapAreaPanel,e.Location);	
+			menu.Show(mapAreaPanel,e.Location);
 		}
 
 		private PointF GetXYFromMenuLocation(object sender) {
 			PointF xy=PointF.Empty;
 			if(sender!=null
-				&& sender is ToolStripMenuItem 
+				&& sender is ToolStripMenuItem
 				&& ((ToolStripMenuItem)sender).Tag!=null
 				&& ((ToolStripMenuItem)sender).Tag is System.Drawing.Point) {
 				xy=MapAreaPanel.ConvertScreenLocationToXY(((System.Drawing.Point)((ToolStripMenuItem)sender).Tag),mapAreaPanel.PixelsPerFoot);
 			}
 			return xy;
 		}
+
 
 		#endregion
 
@@ -206,13 +206,13 @@ namespace OpenDental {
 		private void butBuildFromPhoneTable_Click(object sender,EventArgs e) {
 			if(MessageBox.Show("This action will clear all information from clinicmapitem table and recreated it from current phone table rows. Would you like to continue?","",MessageBoxButtons.YesNo)!=System.Windows.Forms.DialogResult.Yes) {
 				return;
-			}
+			} 
 			mapAreaPanel.Clear(true);
 			List<Phone> phones=Phones.GetPhoneList();
 			int defaultSizeFeet=6;
 			int row=1;
 			int column=0;
-			for(int i=0;i<78;i++) {
+			for(int i = 0;i<78;i++) {
 				if(row>=7) {
 					if(++column>8) {
 						column=3;
@@ -242,12 +242,12 @@ namespace OpenDental {
 				MapAreas.Insert(clinicMapItem);
 			}
 		}
-		
+
 		private void butAddMapArea_Click(object sender,EventArgs e) {
 			//edit this entry
 			if(gridEmployees.SelectedIndices==null
 				|| gridEmployees.SelectedIndices.Length<=0
-				|| gridEmployees.Rows[gridEmployees.SelectedIndices[0]].Tag==null 
+				|| gridEmployees.Rows[gridEmployees.SelectedIndices[0]].Tag==null
 				|| !(gridEmployees.Rows[gridEmployees.SelectedIndices[0]].Tag is Employee)) {
 				MsgBox.Show(this,"Select an employee");
 				return;
@@ -261,16 +261,26 @@ namespace OpenDental {
 			FormEP.MapItem.ItemType=MapItemType.Room;
 			FormEP.MapItem.Extension=employee.PhoneExt;
 			FormEP.MapItem.Description="";
+			FormEP.MapItem.MapAreaContainerNum=_mapCur.MapAreaContainerNum;
 			if(FormEP.ShowDialog(this)!=DialogResult.OK) {
 				return;
 			}
-			mapAreaPanel_MapAreaChanged(this,new EventArgs());
+			FillMap();
+		}
+
+		private void butSave_Click(object sender,EventArgs e) {
+			PhoneMapJSON.SaveToDb(ListMaps);
+			DialogResult=DialogResult.OK;
+			Close();
 		}
 
 		private void butClose_Click(object sender,EventArgs e) {
+			DialogResult=DialogResult.Cancel;
 			this.Close();
 		}
 
-		#endregion		
+		#endregion
+
 	}
+
 }

@@ -46,14 +46,15 @@ namespace OpenDentBusiness.Crud{
 			MapArea mapArea;
 			foreach(DataRow row in table.Rows) {
 				mapArea=new MapArea();
-				mapArea.MapAreaNum = PIn.Long  (row["MapAreaNum"].ToString());
-				mapArea.Extension  = PIn.Int   (row["Extension"].ToString());
-				mapArea.XPos       = PIn.Double(row["XPos"].ToString());
-				mapArea.YPos       = PIn.Double(row["YPos"].ToString());
-				mapArea.Width      = PIn.Double(row["Width"].ToString());
-				mapArea.Height     = PIn.Double(row["Height"].ToString());
-				mapArea.Description= PIn.String(row["Description"].ToString());
-				mapArea.ItemType   = (OpenDentBusiness.MapItemType)PIn.Int(row["ItemType"].ToString());
+				mapArea.MapAreaNum         = PIn.Long  (row["MapAreaNum"].ToString());
+				mapArea.Extension          = PIn.Int   (row["Extension"].ToString());
+				mapArea.XPos               = PIn.Double(row["XPos"].ToString());
+				mapArea.YPos               = PIn.Double(row["YPos"].ToString());
+				mapArea.Width              = PIn.Double(row["Width"].ToString());
+				mapArea.Height             = PIn.Double(row["Height"].ToString());
+				mapArea.Description        = PIn.String(row["Description"].ToString());
+				mapArea.ItemType           = (OpenDentBusiness.MapItemType)PIn.Int(row["ItemType"].ToString());
+				mapArea.MapAreaContainerNum= PIn.Long  (row["MapAreaContainerNum"].ToString());
 				retVal.Add(mapArea);
 			}
 			return retVal;
@@ -73,6 +74,7 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("Height");
 			table.Columns.Add("Description");
 			table.Columns.Add("ItemType");
+			table.Columns.Add("MapAreaContainerNum");
 			foreach(MapArea mapArea in listMapAreas) {
 				table.Rows.Add(new object[] {
 					POut.Long  (mapArea.MapAreaNum),
@@ -83,6 +85,7 @@ namespace OpenDentBusiness.Crud{
 					POut.Double(mapArea.Height),
 					            mapArea.Description,
 					POut.Int   ((int)mapArea.ItemType),
+					POut.Long  (mapArea.MapAreaContainerNum),
 				});
 			}
 			return table;
@@ -123,7 +126,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="MapAreaNum,";
 			}
-			command+="Extension,XPos,YPos,Width,Height,Description,ItemType) VALUES(";
+			command+="Extension,XPos,YPos,Width,Height,Description,ItemType,MapAreaContainerNum) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(mapArea.MapAreaNum)+",";
 			}
@@ -134,7 +137,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.Double(mapArea.Width)+"',"
 				+"'"+POut.Double(mapArea.Height)+"',"
 				+"'"+POut.String(mapArea.Description)+"',"
-				+    POut.Int   ((int)mapArea.ItemType)+")";
+				+    POut.Int   ((int)mapArea.ItemType)+","
+				+    POut.Long  (mapArea.MapAreaContainerNum)+")";
 			if(useExistingPK || PrefC.RandomKeys) {
 				Db.NonQ(command);
 			}
@@ -167,7 +171,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="MapAreaNum,";
 			}
-			command+="Extension,XPos,YPos,Width,Height,Description,ItemType) VALUES(";
+			command+="Extension,XPos,YPos,Width,Height,Description,ItemType,MapAreaContainerNum) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(mapArea.MapAreaNum)+",";
 			}
@@ -178,7 +182,8 @@ namespace OpenDentBusiness.Crud{
 				+"'"+POut.Double(mapArea.Width)+"',"
 				+"'"+POut.Double(mapArea.Height)+"',"
 				+"'"+POut.String(mapArea.Description)+"',"
-				+    POut.Int   ((int)mapArea.ItemType)+")";
+				+    POut.Int   ((int)mapArea.ItemType)+","
+				+    POut.Long  (mapArea.MapAreaContainerNum)+")";
 			if(useExistingPK || isRandomKeys) {
 				Db.NonQ(command);
 			}
@@ -191,13 +196,14 @@ namespace OpenDentBusiness.Crud{
 		///<summary>Updates one MapArea in the database.</summary>
 		public static void Update(MapArea mapArea){
 			string command="UPDATE maparea SET "
-				+"Extension  =  "+POut.Int   (mapArea.Extension)+", "
-				+"XPos       = '"+POut.Double(mapArea.XPos)+"', "
-				+"YPos       = '"+POut.Double(mapArea.YPos)+"', "
-				+"Width      = '"+POut.Double(mapArea.Width)+"', "
-				+"Height     = '"+POut.Double(mapArea.Height)+"', "
-				+"Description= '"+POut.String(mapArea.Description)+"', "
-				+"ItemType   =  "+POut.Int   ((int)mapArea.ItemType)+" "
+				+"Extension          =  "+POut.Int   (mapArea.Extension)+", "
+				+"XPos               = '"+POut.Double(mapArea.XPos)+"', "
+				+"YPos               = '"+POut.Double(mapArea.YPos)+"', "
+				+"Width              = '"+POut.Double(mapArea.Width)+"', "
+				+"Height             = '"+POut.Double(mapArea.Height)+"', "
+				+"Description        = '"+POut.String(mapArea.Description)+"', "
+				+"ItemType           =  "+POut.Int   ((int)mapArea.ItemType)+", "
+				+"MapAreaContainerNum=  "+POut.Long  (mapArea.MapAreaContainerNum)+" "
 				+"WHERE MapAreaNum = "+POut.Long(mapArea.MapAreaNum);
 			Db.NonQ(command);
 		}
@@ -233,6 +239,10 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="ItemType = "+POut.Int   ((int)mapArea.ItemType)+"";
 			}
+			if(mapArea.MapAreaContainerNum != oldMapArea.MapAreaContainerNum) {
+				if(command!=""){ command+=",";}
+				command+="MapAreaContainerNum = "+POut.Long(mapArea.MapAreaContainerNum)+"";
+			}
 			if(command==""){
 				return false;
 			}
@@ -264,6 +274,9 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			if(mapArea.ItemType != oldMapArea.ItemType) {
+				return true;
+			}
+			if(mapArea.MapAreaContainerNum != oldMapArea.MapAreaContainerNum) {
 				return true;
 			}
 			return false;
