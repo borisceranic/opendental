@@ -14,6 +14,7 @@ namespace OpenDental {
 		public DateTime ApptPrintStopTime;
 		public int ApptPrintFontSize;
 		public int ApptPrintColsPerPage;
+		public bool IsPrintPreview;
 
 		public FormApptPrintSetup() {
 			InitializeComponent();
@@ -95,7 +96,7 @@ namespace OpenDental {
 			}
 		}
 
-		private void butOK_Click(object sender,EventArgs e) {
+		private void PrintViewSetup() {
 			bool changed=false;
 			if(!ValidEntries()) {
 				return;
@@ -116,6 +117,18 @@ namespace OpenDental {
 			ApptPrintStopTime=PIn.DateT(comboStop.SelectedItem.ToString());
 			ApptPrintFontSize=PIn.Int(textFontSize.Text);
 			ApptPrintColsPerPage=PIn.Int(textColumnsPerPage.Text);
+		}
+
+		private void butPreview_Click(object sender,EventArgs e) {
+			PrintViewSetup();
+			IsPrintPreview=true;
+			DialogResult=DialogResult.OK;
+
+		}
+
+		private void butOK_Click(object sender,EventArgs e) {
+			PrintViewSetup();
+			IsPrintPreview=false;
 			DialogResult=DialogResult.OK;
 		}
 

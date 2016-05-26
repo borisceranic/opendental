@@ -181,7 +181,7 @@ namespace OpenDental {
 		///<summary></summary>
 		[Category("Data"),Description("Occurs when a user has taken action on an item needing an action taken.")]
 		public event ActionNeededEventHandler ActionTaken=null;
-
+		private bool _isPrintPreview;
 		///<summary></summary>
 		public ContrAppt() {
 			Logger.openlog.Log("Initializing appointment module...",Logger.Severity.INFO);
@@ -4621,6 +4621,7 @@ namespace OpenDental {
 					apptPrintStopTime=FormAPS.ApptPrintStopTime;
 					apptPrintFontSize=FormAPS.ApptPrintFontSize;
 					apptPrintColsPerPage=FormAPS.ApptPrintColsPerPage;
+					_isPrintPreview=FormAPS.IsPrintPreview;
 					pagesPrinted=0;
 					pageRow=0;
 					pageColumn=0;
@@ -4637,8 +4638,26 @@ namespace OpenDental {
 			pd2=new PrintDocument();
 			pd2.PrintPage += new PrintPageEventHandler(this.pd2_PrintPage);
 			//pd2.DefaultPageSettings.Margins= new Margins(10,40,40,60);
-			FormPrintPreview pView=new FormPrintPreview(PrintSituation.Appointments,pd2,0,"Daily appointment view for "+apptPrintStartTime.ToShortDateString()+" printed");
-			pView.ShowDialog();
+			if(_isPrintPreview) {
+				FormPrintPreview pView=new FormPrintPreview(PrintSituation.Appointments,pd2,0,"Daily appointment view for "+apptPrintStartTime.ToShortDateString()+" printed");
+				pView.ShowDialog();
+			}
+			else {
+#if DEBUG
+				FormPrintPreview pView=new FormPrintPreview(PrintSituation.Appointments,pd2,0,"Daily appointment view for "+apptPrintStartTime.ToShortDateString()+" printed");
+				pView.ShowDialog();
+#else
+				if(!PrinterL.SetPrinter(pd2,PrintSituation.Appointments,0,"Daily appointment view for "+apptPrintStartTime.ToShortDateString()+" printed")){
+					return;
+				}
+				try{
+					pd2.Print();
+				}
+				catch{
+					MessageBox.Show(Lan.g(this,"Printer not available"));
+				}
+#endif
+ 			}
 		}
 
 		private void pd2_PrintPage(object sender,System.Drawing.Printing.PrintPageEventArgs e) {

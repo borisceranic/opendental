@@ -36,6 +36,7 @@ namespace OpenDental{
 			this.label3 = new System.Windows.Forms.Label();
 			this.comboStart = new System.Windows.Forms.ComboBox();
 			this.comboStop = new System.Windows.Forms.ComboBox();
+			this.butPreview = new OpenDental.UI.Button();
 			this.SuspendLayout();
 			// 
 			// labelColumnsPerPage
@@ -169,10 +170,28 @@ namespace OpenDental{
 			this.comboStop.Size = new System.Drawing.Size(143, 21);
 			this.comboStop.TabIndex = 91;
 			// 
+			// butPreview
+			// 
+			this.butPreview.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butPreview.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butPreview.Autosize = true;
+			this.butPreview.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butPreview.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butPreview.CornerRadius = 4F;
+			this.butPreview.Image = global::OpenDental.Properties.Resources.butPreview;
+			this.butPreview.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			this.butPreview.Location = new System.Drawing.Point(114, 168);
+			this.butPreview.Name = "butPreview";
+			this.butPreview.Size = new System.Drawing.Size(75, 24);
+			this.butPreview.TabIndex = 92;
+			this.butPreview.Text = "&Preview";
+			this.butPreview.Click += new System.EventHandler(this.butPreview_Click);
+			// 
 			// FormApptPrintSetup
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.ClientSize = new System.Drawing.Size(367, 204);
+			this.Controls.Add(this.butPreview);
 			this.Controls.Add(this.comboStop);
 			this.Controls.Add(this.comboStart);
 			this.Controls.Add(this.label3);
@@ -211,5 +230,6 @@ namespace OpenDental{
 		private System.Windows.Forms.Label label3;
 		private System.Windows.Forms.ComboBox comboStart;
 		private System.Windows.Forms.ComboBox comboStop;
+		private UI.Button butPreview;
 	}
 }
