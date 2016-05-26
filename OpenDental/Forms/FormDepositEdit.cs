@@ -72,6 +72,8 @@ namespace OpenDental{
 		private UI.Button butPDF;
 		///<summary>Used to store DefNums in a 1:1 ratio for listInsPayType</summary>
 		private List<long> _insPayDefNums;
+		///<summary>Used to store DefNums in a 1:1 ratio for listPayType</summary>
+		private List<long> _payTypeDefNums;
 
 		///<summary></summary>
 		public FormDepositEdit(Deposit depositCur)
@@ -617,9 +619,14 @@ namespace OpenDental{
 				for(int i=0;i<Clinics.List.Length;i++) {
 					comboClinic.Items.Add(Clinics.List[i].Description);
 				}
+				_payTypeDefNums=new List<long>();
 				for(int i=0;i<DefC.Short[(int)DefCat.PaymentTypes].Length;i++) {
+					if(DefC.Short[(int)DefCat.PaymentTypes][i].ItemValue!="") {
+						continue;//skip defs not selected for deposit slip
+					}
 					listPayType.Items.Add(DefC.Short[(int)DefCat.PaymentTypes][i].ItemName);
-					listPayType.SetSelected(i,true);
+					_payTypeDefNums.Add(DefC.Short[(int)DefCat.PaymentTypes][i].DefNum);
+					listPayType.SetSelected(listPayType.Items.Count-1,true);
 				}
 				_insPayDefNums=new List<long>();
 				for(int i=0;i<DefC.Short[(int)DefCat.InsurancePaymentType].Length;i++) {
@@ -719,7 +726,7 @@ namespace OpenDental{
 				}
 				List<long> payTypes=new List<long>();//[listPayType.SelectedIndices.Count];
 				for(int i=0;i<listPayType.SelectedIndices.Count;i++) {
-					payTypes.Add(DefC.Short[(int)DefCat.PaymentTypes][listPayType.SelectedIndices[i]].DefNum);
+					payTypes.Add(_payTypeDefNums[listPayType.SelectedIndices[i]]);
 				}
 				List<long> insPayTypes=new List<long>();
 				for(int i=0;i<listInsPayType.SelectedIndices.Count;i++) {

@@ -481,6 +481,8 @@ namespace OpenDental{
 					break;
 				case 20://"Payment Types":
 					//SelectedCat=10;
+					FormDefEdit.EnableValue=true;
+					FormDefEdit.ValueText=Lan.g(this,"N=Not selected for deposit");
 					FormDefEdit.HelpText=Lan.g(this,"Types of payments that patients might make. Any changes will affect all patients.");
 					break;
 				case 21://paysplit unearned types
