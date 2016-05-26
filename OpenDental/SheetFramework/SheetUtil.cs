@@ -355,6 +355,18 @@ namespace OpenDental{
 			}
 		}
 
+		///<summary>Returns the lowest Y position from all the sheet field defs passed in.</summary>
+		public static int GetLowestYPos(List<SheetFieldDef> listSheetFieldDefs) {
+			int lowestYPos=0;
+			foreach(SheetFieldDef sheetFieldDef in listSheetFieldDefs) {
+				int bottom=sheetFieldDef.YPos + sheetFieldDef.Height;
+				if(bottom > lowestYPos) {
+					lowestYPos=bottom;
+				}
+			}
+			return lowestYPos;
+		}
+
 		///<summary>Creates a Sheet object from a sheetDef, complete with fields and parameters.  Sets date to today. If patNum=0, do not save to DB, such as for labels.</summary>
 		public static Sheet CreateSheet(SheetDef sheetDef,long patNum=0,bool hidePaymentOptions=false) {
 			Sheet sheet=new Sheet();
