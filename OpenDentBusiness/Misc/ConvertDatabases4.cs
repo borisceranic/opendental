@@ -1451,6 +1451,26 @@ namespace OpenDentBusiness {
 					}
 				}
 				catch(Exception) { }//Only an index.
+				command="SELECT ProgramNum FROM program WHERE ProgName='Schick'";
+				long schickProgramNum=PIn.Long(Db.GetScalar(command));
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="INSERT INTO programproperty (ProgramNum,PropertyDesc,PropertyValue"
+						+") VALUES("
+						+"'"+POut.Long(schickProgramNum)+"', "
+						+"'Schick Version 4 or 5', "
+						+"'5')";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="INSERT INTO programproperty (ProgramPropertyNum,ProgramNum,PropertyDesc,PropertyValue,ClinicNum"
+						+") VALUES("
+						+"(SELECT COALESCE(MAX(ProgramPropertyNum),0)+1 FROM programproperty),"
+						+"'"+POut.Long(schickProgramNum)+"', "
+						+"'Schick Version 4 or 5', "
+						+"'5', "
+						+"'0')";
+					Db.NonQ(command);
+				}
 
 
 

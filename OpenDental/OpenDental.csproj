@@ -127,6 +127,14 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
       <HintPath>..\Required dlls\Interop.AFORMAUTLib.dll</HintPath>
     </Reference>
+    <Reference Include="Interop.CDRDATALib">
+      <HintPath>..\Required dlls\Interop.CDRDATALib.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Interop.CDRDicom">
+      <HintPath>..\Required dlls\Interop.CDRDicom.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="Interop.Microsoft.Office.Core, Version=2.2.0.0, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Required dlls\Interop.Microsoft.Office.Core.dll</HintPath>
@@ -144,6 +152,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Required dlls\Ionic.Zip.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.DirectX.Direct3D, Version=1.0.2902.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <HintPath>..\Required dlls\Microsoft.DirectX.Direct3D.dll</HintPath>
     </Reference>
