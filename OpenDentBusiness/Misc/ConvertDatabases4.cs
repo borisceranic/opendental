@@ -1408,6 +1408,29 @@ namespace OpenDentBusiness {
 				command="UPDATE preference SET ValueString = '16.2.1.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
+			To16_2_7();
+		}
+
+		private static void To16_2_7() {
+			if(FromVersion<new Version("16.2.7.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.2.7"));//No translation in convert script.
+				string command;
+				try {
+					if(DataConnection.DBtype==DatabaseType.MySql) {
+						if(!IndexExists("popup","PatNum")) {
+							command="ALTER TABLE popup ADD INDEX (PatNum)";
+							Db.NonQ(command);
+						}
+					}
+					else {//oracle
+						command=@"CREATE INDEX popup_PatNum ON popup (PatNum)";
+						Db.NonQ(command);
+					}
+				}
+				catch(Exception) { }//Only an index.
+				command="UPDATE preference SET ValueString = '16.2.7.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
 			To16_3_0();
 		}
 
