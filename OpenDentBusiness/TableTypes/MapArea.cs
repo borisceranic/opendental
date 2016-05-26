@@ -22,6 +22,8 @@ namespace OpenDentBusiness {
 		public string Description;
 		///<summary>Enum:MapItemType 0-Room,1-DisplayLabel</summary>
 		public MapItemType ItemType;
+		///<summary>The room that this map is in. This is not currently a table. Stored as a JSON serialized list in HQ only pref, HQSerializedMapContainers.</summary>
+		public long MapAreaContainerNum;
 		
 		public MapArea Copy() {
 			return (MapArea)this.MemberwiseClone();

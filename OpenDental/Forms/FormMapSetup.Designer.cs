@@ -42,6 +42,10 @@
 			this.mapAreaPanel = new OpenDental.MapAreaPanel();
 			this.butCancel = new OpenDental.UI.Button();
 			this.butAddMapArea = new OpenDental.UI.Button();
+			this.comboRoom = new System.Windows.Forms.ComboBox();
+			this.label5 = new System.Windows.Forms.Label();
+			this.butSave = new OpenDental.UI.Button();
+			this.textDescription = new OpenDental.ODtextBox();
 			((System.ComponentModel.ISupportInitialize)(this.numFloorWidthFeet)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.numFloorHeightFeet)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.numPixelsPerFoot)).BeginInit();
@@ -88,7 +92,7 @@
 			this.numFloorWidthFeet.TabIndex = 14;
 			this.numFloorWidthFeet.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
 			this.numFloorWidthFeet.Value = new decimal(new int[] {
-            71,
+            1,
             0,
             0,
             0});
@@ -121,7 +125,7 @@
 			this.numFloorHeightFeet.TabIndex = 16;
 			this.numFloorHeightFeet.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
 			this.numFloorHeightFeet.Value = new decimal(new int[] {
-            57,
+            1,
             0,
             0,
             0});
@@ -154,7 +158,7 @@
 			this.numPixelsPerFoot.TabIndex = 19;
 			this.numPixelsPerFoot.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
 			this.numPixelsPerFoot.Value = new decimal(new int[] {
-            17,
+            1,
             0,
             0,
             0});
@@ -198,19 +202,19 @@
             this.newCubicleToolStripMenuItem,
             this.newLabelToolStripMenuItem});
 			this.menu.Name = "menu";
-			this.menu.Size = new System.Drawing.Size(143, 48);
+			this.menu.Size = new System.Drawing.Size(142, 48);
 			// 
 			// newCubicleToolStripMenuItem
 			// 
 			this.newCubicleToolStripMenuItem.Name = "newCubicleToolStripMenuItem";
-			this.newCubicleToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
+			this.newCubicleToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
 			this.newCubicleToolStripMenuItem.Text = "New Cubicle";
 			this.newCubicleToolStripMenuItem.Click += new System.EventHandler(this.newCubicleToolStripMenuItem_Click);
 			// 
 			// newLabelToolStripMenuItem
 			// 
 			this.newLabelToolStripMenuItem.Name = "newLabelToolStripMenuItem";
-			this.newLabelToolStripMenuItem.Size = new System.Drawing.Size(142, 22);
+			this.newLabelToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
 			this.newLabelToolStripMenuItem.Text = "New Label";
 			this.newLabelToolStripMenuItem.Click += new System.EventHandler(this.newLabelToolStripMenuItem_Click);
 			// 
@@ -227,6 +231,8 @@
 			// 
 			this.gridEmployees.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.gridEmployees.Font = new System.Drawing.Font("Calibri", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.gridEmployees.HasAddButton = false;
+			this.gridEmployees.HasMultilineHeaders = false;
 			this.gridEmployees.HScrollVisible = false;
 			this.gridEmployees.Location = new System.Drawing.Point(1392, 178);
 			this.gridEmployees.Name = "gridEmployees";
@@ -259,7 +265,7 @@
 			this.mapAreaPanel.PixelsPerFoot = 17;
 			this.mapAreaPanel.ShowGrid = false;
 			this.mapAreaPanel.ShowOutline = true;
-			this.mapAreaPanel.Size = new System.Drawing.Size(1374, 973);
+			this.mapAreaPanel.Size = new System.Drawing.Size(1374, 969);
 			this.mapAreaPanel.TabIndex = 4;
 			this.mapAreaPanel.MapAreaChanged += new System.EventHandler(this.mapAreaPanel_MapAreaChanged);
 			this.mapAreaPanel.MouseUp += new System.Windows.Forms.MouseEventHandler(this.mapAreaPanel_MouseUp);
@@ -272,7 +278,7 @@
 			this.butCancel.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
-			this.butCancel.Location = new System.Drawing.Point(1499, 1023);
+			this.butCancel.Location = new System.Drawing.Point(1499, 1019);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(75, 24);
 			this.butCancel.TabIndex = 28;
@@ -289,18 +295,75 @@
 			this.butAddMapArea.CornerRadius = 4F;
 			this.butAddMapArea.Image = global::OpenDental.Properties.Resources.Add;
 			this.butAddMapArea.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butAddMapArea.Location = new System.Drawing.Point(1499, 913);
+			this.butAddMapArea.Location = new System.Drawing.Point(1499, 909);
 			this.butAddMapArea.Name = "butAddMapArea";
 			this.butAddMapArea.Size = new System.Drawing.Size(75, 24);
 			this.butAddMapArea.TabIndex = 49;
 			this.butAddMapArea.Text = "Add";
 			this.butAddMapArea.Click += new System.EventHandler(this.butAddMapArea_Click);
 			// 
+			// comboRoom
+			// 
+			this.comboRoom.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.comboRoom.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboRoom.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.comboRoom.ForeColor = System.Drawing.Color.Black;
+			this.comboRoom.ItemHeight = 13;
+			this.comboRoom.Location = new System.Drawing.Point(1252, 8);
+			this.comboRoom.MaxDropDownItems = 30;
+			this.comboRoom.Name = "comboRoom";
+			this.comboRoom.Size = new System.Drawing.Size(134, 21);
+			this.comboRoom.TabIndex = 50;
+			this.comboRoom.SelectionChangeCommitted += new System.EventHandler(this.comboRoom_SelectionChangeCommitted);
+			// 
+			// label5
+			// 
+			this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.label5.Location = new System.Drawing.Point(1158, 11);
+			this.label5.Name = "label5";
+			this.label5.Size = new System.Drawing.Size(91, 16);
+			this.label5.TabIndex = 22;
+			this.label5.Text = "Select Room:";
+			this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// butSave
+			// 
+			this.butSave.AdjustImageLocation = new System.Drawing.Point(0, 0);
+			this.butSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.butSave.Autosize = true;
+			this.butSave.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
+			this.butSave.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
+			this.butSave.CornerRadius = 4F;
+			this.butSave.Location = new System.Drawing.Point(1499, 989);
+			this.butSave.Name = "butSave";
+			this.butSave.Size = new System.Drawing.Size(75, 24);
+			this.butSave.TabIndex = 51;
+			this.butSave.Text = "&Save";
+			this.butSave.Click += new System.EventHandler(this.butSave_Click);
+			// 
+			// textDescription
+			// 
+			this.textDescription.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.textDescription.DetectLinksEnabled = false;
+			this.textDescription.Location = new System.Drawing.Point(1392, 8);
+			this.textDescription.Multiline = false;
+			this.textDescription.Name = "textDescription";
+			this.textDescription.QuickPasteType = OpenDentBusiness.QuickPasteType.None;
+			this.textDescription.Size = new System.Drawing.Size(181, 20);
+			this.textDescription.SpellCheckIsEnabled = false;
+			this.textDescription.TabIndex = 53;
+			this.textDescription.Text = "";
+			this.textDescription.TextChanged += new System.EventHandler(this.textDescription_TextChanged);
+			// 
 			// FormMapSetup
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.AutoScroll = true;
-			this.ClientSize = new System.Drawing.Size(1579, 1049);
+			this.ClientSize = new System.Drawing.Size(1579, 1045);
+			this.Controls.Add(this.textDescription);
+			this.Controls.Add(this.butSave);
+			this.Controls.Add(this.label5);
+			this.Controls.Add(this.comboRoom);
 			this.Controls.Add(this.butAddMapArea);
 			this.Controls.Add(this.butCancel);
 			this.Controls.Add(this.label1);
@@ -310,7 +373,6 @@
 			this.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormMapSetup";
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Map Setup";
 			this.Load += new System.EventHandler(this.FormMapSetup_Load);
 			((System.ComponentModel.ISupportInitialize)(this.numFloorWidthFeet)).EndInit();
@@ -342,5 +404,9 @@
 		private System.Windows.Forms.Label label1;
 		private UI.Button butCancel;
 		private UI.Button butAddMapArea;
+		private System.Windows.Forms.ComboBox comboRoom;
+		private System.Windows.Forms.Label label5;
+		private UI.Button butSave;
+		private ODtextBox textDescription;
 	}
 }

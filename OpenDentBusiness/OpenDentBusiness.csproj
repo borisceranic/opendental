@@ -723,6 +723,7 @@
     <Compile Include="HL7\MessageConstructor.cs" />
     <Compile Include="InternalTools\Phones\PhoneAsterisks.cs" />
     <Compile Include="InternalTools\Phones\PhoneEmpDefaults.cs" />
+    <Compile Include="InternalTools\Phones\PhoneMapJSON.cs" />
     <Compile Include="InternalTools\Phones\PhoneGraphs.cs" />
     <Compile Include="InternalTools\Phones\PhoneMetrics.cs" />
     <Compile Include="InternalTools\Phones\PhoneNumbers.cs" />

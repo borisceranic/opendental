@@ -12,6 +12,8 @@ namespace OpenDental {
 		private bool _isFullScreen;
 		///<summary>This is the difference between server time and local computer time.  Used to ensure that times displayed are accurate to the second.  This value is usally just a few seconds, but possibly a few minutes.</summary>
 		private TimeSpan _timeDelta;
+		private List<MapAreaContainer> _listMaps;
+		private MapAreaContainer _mapCur;
 		#endregion Private Members
 
 		#region Initialize
@@ -21,19 +23,37 @@ namespace OpenDental {
 			//Do not do anything to do with database or control init here. We will be using this ctor later in order to create a temporary object so we can figure out what size the form should be when the user comes back from full screen mode. Wait until FormMapHQ_Load to do anything meaningful.
 			_isFullScreen=false;
 			_timeDelta=MiscData.GetNowDateTime()-DateTime.Now;
+			//Add the mousewheel event to allow mousewheel scrolling to repaint the grid as well.
+			mapAreaPanelHQ.MouseWheel+=new MouseEventHandler(mapAreaPanelHQ_Scroll);
 		}
 
 		private void FormMapHQ_Load(object sender,EventArgs e) {
+			FormOpenDental.AddMapToList(this);
+			_listMaps=PhoneMapJSON.GetFromDb();
+			_mapCur=_listMaps[0];
+			FillCombo();
 			FillMapAreaPanel();
 			labelTriageOpsStaff.SetTriageColors();
+		}
+		private void FillCombo() {
+			comboRoom.Items.Clear();
+			foreach(MapAreaContainer mapCur in _listMaps) {
+				comboRoom.Items.Add(mapCur.Description);
+			}
+			comboRoom.SelectedIndex=0;
 		}
 
 		///<summary>Setup the map panel with the cubicles and labels before filling with real-time data. Call this on load or anytime the cubicle layout has changed.</summary>
 		private void FillMapAreaPanel() {
 			mapAreaPanelHQ.Controls.Clear();
+			mapAreaPanelHQ.FloorHeightFeet=_mapCur.FloorHeightFeet;
+			mapAreaPanelHQ.FloorWidthFeet=_mapCur.FloorWidthFeet;
 			//fill the panel
 			List<MapArea> clinicMapItems=MapAreas.Refresh();
 			for(int i=0;i<clinicMapItems.Count;i++) {
+				if(clinicMapItems[i].MapAreaContainerNum!=_listMaps[comboRoom.SelectedIndex].MapAreaContainerNum) {
+					continue;
+				}
 				if(clinicMapItems[i].ItemType==MapItemType.Room) {
 					mapAreaPanelHQ.AddCubicle(clinicMapItems[i]);
 				}
@@ -319,6 +339,11 @@ namespace OpenDental {
 
 		#endregion Set label text and colors
 
+		private void comboRoom_SelectionChangeCommitted(object sender,EventArgs e) {
+			_mapCur=_listMaps[comboRoom.SelectedIndex];
+			FillMapAreaPanel();
+		}
+
 		private void fullScreenToolStripMenuItem_Click(object sender,EventArgs e) {
 			_isFullScreen=!_isFullScreen;
 			if(_isFullScreen) { //switch to full screen
@@ -343,9 +368,15 @@ namespace OpenDental {
 		private void mapToolStripMenuItem_Click(object sender,EventArgs e) {
 			if(!Security.IsAuthorized(Permissions.Setup)) {
 				return;
-			}			
+			}
 			FormMapSetup FormMS=new FormMapSetup();
 			FormMS.ShowDialog();
+			if(FormMS.DialogResult!=DialogResult.OK) {
+				return;
+			}
+			_listMaps=FormMS.ListMaps;
+			_mapCur=_listMaps[comboRoom.SelectedIndex];
+			FillCombo();
 			FillMapAreaPanel();
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"MapHQ layout changed");
 		}
@@ -359,5 +390,31 @@ namespace OpenDental {
 			SetEscalationList(PhoneEmpDefaults.Refresh(),Phones.GetPhoneList());
 			SecurityLogs.MakeLogEntry(Permissions.Setup,0,"Escalation team changed");
 		}
+		
+		///<summary>Starts the timer that will refresh the panel so that ugly lines don't stay on the panel when scrolling.
+		///The timer prevents lag due to repainting every time the scroll bar moves.</summary>
+		private void mapAreaPanelHQ_Scroll(object sender,EventArgs e) {
+			timer1.Stop();
+			timer1.Start();
+		}
+
+		private void timer1_Tick(object sender,EventArgs e) {
+			mapAreaPanelHQ.Refresh();
+			timer1.Stop();
+		}
+		
+
+		private void toggleTriageToolStripMenuItem_Click(object sender,EventArgs e) {
+			splitContainer2.Panel1Collapsed=!splitContainer2.Panel1Collapsed;
+		}
+
+		private void openNewMapToolStripMenuItem_Click(object sender,EventArgs e) {
+			new FormMapHQ().Show();
+		}
+
+		private void FormMapHQ_FormClosed(object sender,FormClosedEventArgs e) {
+			FormOpenDental.RemoveMapFromList(this);
+		}
+
 	}
 }

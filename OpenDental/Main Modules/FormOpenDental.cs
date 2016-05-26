@@ -220,7 +220,6 @@ namespace OpenDental{
 		private MenuItem menuItemWebForms;
 		private FormTerminalManager formTerminalManager;
 		private FormPhoneTiles formPhoneTiles;
-		private FormMapHQ formMapHQ;
 		private System.Windows.Forms.Timer timerWebHostSynch;
 		private MenuItem menuItemCCRecurring;
 		private UserControlPhoneSmall phoneSmall;
@@ -387,6 +386,8 @@ namespace OpenDental{
 		private MenuItem menuItemAutoClosePayPlans;
 		///<summary>List of currently showing phones.  This list is accessed within a thread but is only accessed by one thread so no lock.</summary>
 		private List<Phone> _listPhonesCur;
+		///<summary>HQ only. Multiple phone maps can be opened at the same time. This keeps a list of all that are open so we can modify their contents.</summary>
+		private static List<FormMapHQ> _listMaps=new List<FormMapHQ>();
 
 		//consider rewriting this to use new FormOpenDental singleton method pattern.
 		[Category("Data"),Description("Occurs when a user has taken action on an item needing action taken.")]
@@ -5272,12 +5273,14 @@ namespace OpenDental{
 		}
 
 		private void butMapPhones_Click(object sender,EventArgs e) {
-			if(formMapHQ==null || formMapHQ.IsDisposed) {
+			FormMapHQ formMapHQ;
+			if(_listMaps.Count==0) {
 				formMapHQ=new FormMapHQ();
 			}
 			else {
+				formMapHQ=_listMaps[0]; //always just take the first one.
 				if(formMapHQ.WindowState==FormWindowState.Minimized) {
-					formMapHQ.WindowState=FormWindowState.Normal;
+					_listMaps[0].WindowState=FormWindowState.Normal; //always just take the first map in the list
 				}
 			}
 			formMapHQ.Show();
@@ -5410,7 +5413,7 @@ namespace OpenDental{
 				labelMsg.Font=new Font(FontFamily.GenericSansSerif,7.75f,FontStyle.Bold);
 				labelMsg.ForeColor=Color.Firebrick;
 			}
-			if(formMapHQ!=null && !formMapHQ.IsDisposed) {				
+			foreach(FormMapHQ formMapHQ in _listMaps) {
 				formMapHQ.SetVoicemailRed(voiceMailCount,ageOfOldestVoicemail);
 			}
 			if(formPhoneTiles!=null && !formPhoneTiles.IsDisposed) {
@@ -7325,9 +7328,9 @@ namespace OpenDental{
 			new DataConnection().SetDbT("server","customers","root","","","",DatabaseType.MySql,true);
 #endif			
 			if( //Fill the triage labels at the fastest interval if the HQ map is open. This is only typically for the project PC in the HQ call center.
-				(formMapHQ!=null && !formMapHQ.IsDisposed) || 
-				//For everyone else, Only fill triage labels at given interval. Too taxing on the server to perform every 1.6 seconds.
-				DateTime.Now.Subtract(_hqTriageMetricsLastRefreshed).TotalSeconds>PrefC.GetInt(PrefName.ProcessSigsIntervalInSecs)) 
+				_listMaps.Count>0 //Only run if the HQ map is open. 
+				||  //For everyone else, Only fill triage labels at given interval. Too taxing on the server to perform every 1.6 seconds.
+					DateTime.Now.Subtract(_hqTriageMetricsLastRefreshed).TotalSeconds>PrefC.GetInt(PrefName.ProcessSigsIntervalInSecs)) 
 			{
 				DataTable phoneMetrics=Phones.GetTriageMetrics();
 				this.Invoke(new FillTriageLabelsResultsArgs(OnFillTriageLabelsResults),phoneMetrics);
@@ -7375,7 +7378,7 @@ namespace OpenDental{
 			if(DateTime.Now.Subtract(_hqEServiceMetricsLastRefreshed).TotalSeconds<10) {
 				return;
 			}
-			if(formMapHQ==null || formMapHQ.IsDisposed) { //Only run if the HQ map is open.
+			if(_listMaps.Count==0) { //Do not run if the HQ map is not open.
 				return;
 			}
 			_hqEServiceMetricsLastRefreshed=DateTime.Now;
@@ -7386,7 +7389,9 @@ namespace OpenDental{
 #endif
 			//Get important metrics from serviceshq db.
 			EServiceMetrics metricsToday=EServiceMetrics.GetEServiceMetricsFromSignalHQ();
-			formMapHQ.Invoke(new MethodInvoker(delegate { formMapHQ.SetEServiceMetrics(metricsToday); }));
+			foreach(FormMapHQ formMapHQ in _listMaps) {
+				formMapHQ.Invoke(new MethodInvoker(delegate { formMapHQ.SetEServiceMetrics(metricsToday); }));
+			}
 		}
 
 		/// <summary>HQ Only. OnProcessHqMetricsResults must be invoked from a worker thread. These are the arguments necessary.</summary>
@@ -7402,7 +7407,7 @@ namespace OpenDental{
 				if(formPhoneTiles!=null && !formPhoneTiles.IsDisposed) { //2) Send to the big phones panel if it is open.
 					formPhoneTiles.SetPhoneList(phoneEmpDefaultList,phoneList);
 				}
-				if(formMapHQ!=null && !formMapHQ.IsDisposed) { //3) Send to the map hq if it is open.
+				foreach(FormMapHQ formMapHQ in _listMaps) {
 					formMapHQ.SetPhoneList(phoneEmpDefaultList,phoneList);
 					formMapHQ.SetOfficesDownList(listOfficesDown);
 				}
@@ -7419,6 +7424,13 @@ namespace OpenDental{
 				//HQ users are complaining of unhandled exception when they close OD.
 				//Suspect it could be caused here if the thread tries to access a control that has been disposed.
 			}
+		}
+
+		public static void AddMapToList(FormMapHQ map) {
+			_listMaps.Add(map);
+		}
+		public static void RemoveMapFromList(FormMapHQ map) {
+			_listMaps.Remove(map);
 		}
 
 		/// <summary>HQ Only. OnFillTriageLabelsResults must be invoked from a worker thread. These are the arguments necessary.</summary>
@@ -7459,7 +7471,7 @@ namespace OpenDental{
 			}
 			labelTriage.Text="T:"+countStr;
 			labelWaitTime.Text=((int)triageBehind.TotalMinutes).ToString()+"m";
-			if(formMapHQ!=null && !formMapHQ.IsDisposed) {
+			foreach(FormMapHQ formMapHQ in _listMaps) {
 				formMapHQ.SetTriageNormal(countWhiteTasks,countBlueTasks,triageBehind,countRedTasks);
 				TimeSpan urgentTriageBehind=new TimeSpan(0);
 				if(timeOfOldestRedTaskNote.Year>1880) {
