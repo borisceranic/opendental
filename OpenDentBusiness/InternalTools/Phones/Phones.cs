@@ -657,7 +657,7 @@ namespace OpenDentBusiness {
 		///<summary>Get triage metrics to be displayed in phone panels</summary>
 		public static DataTable GetTriageMetrics() {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
-				return Meth.GetObject<DataTable>(MethodBase.GetCurrentMethod());
+				return Meth.GetTable(MethodBase.GetCurrentMethod());
 			}
 			//-- get all phone metrics as a collection of sub-selects
 			string command=@"SELECT 
