@@ -863,6 +863,8 @@ namespace OpenDental {
 						comboDepositAccount.Enabled=false;
 						comboCreditCards.Enabled=false;
 						checkPayPlan.Enabled=false;
+						checkProcessed.Enabled=false;
+						gridMain.Enabled=true;//To be able to edit splits past the lock date
 					}
 				}
 			}
@@ -1317,6 +1319,9 @@ namespace OpenDental {
 		private void gridMain_CellDoubleClick(object sender,ODGridClickEventArgs e) {
 			FormPaySplitEdit FormPS=new FormPaySplitEdit(_famCur);
 			FormPS.PaySplitCur=_listPaySplits[e.Row];
+			if(!Security.IsAuthorized(Permissions.PaymentEdit,FormPS.PaySplitCur.DateEntry,false) && FormPS.PaySplitCur.DateEntry!=DateTime.MinValue) {
+				return;//Don't allow user to edit splits entered before the global lock date
+			}
 			FormPS.Remain=_paymentCur.PayAmt-PIn.Double(textTotal.Text)+_listPaySplits[e.Row].SplitAmt;
 			FormPS.ShowDialog();
 			if(FormPS.PaySplitCur==null) {//user deleted
@@ -2396,7 +2401,8 @@ namespace OpenDental {
 			FormPSM.ShowDialog();
 			if(FormPSM.DialogResult==DialogResult.OK) {
 				_listPaySplits=FormPSM.ListSplitsCur;
-				textAmount.Text=FormPSM.AmtTotal.ToString("F");
+				decimal amount=FormPSM.AmtTotal;
+				textAmount.Text=amount.ToString("F");
 			}
 			FillMain();
 			setCheckPayPlanHelper(true);
