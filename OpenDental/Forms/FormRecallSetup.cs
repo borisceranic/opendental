@@ -1915,9 +1915,18 @@ namespace OpenDental{
 
 		#region Automation Settings
 		private void FillAutomationTab() {
-			dateRunStart.Text=PrefC.GetDateT(PrefName.AutomaticCommunicationTimeStart).ToShortTimeString();
+			//.NET has a bug in the DateTimePicker control where the text will not get updated and will instead default to showing DateTime.Now.
+			//In order to get the control into a mode where it will display the correct value that we set, we need to set the property Checked to true.
+			//Today's date will show even when the property is defaulted to true (via the designer), so we need to do it programmatically right here.
+			//E.g. set your computer region to Assamese (India) and the DateTimePickers on the Automation Setting tab will both be set to todays date
+			// if the tab is NOT set to be the first tab to display (don't ask me why it works then).
+			//This is bad for our customers because setting both of the date pickers to the same date and time will cause automation to stop.
+			dateRunStart.Checked=true;
+			dateRunEnd.Checked=true;
+			//Now that the DateTimePicker controls are ready to display the DateTime we set, go ahead and set them.
+			dateRunStart.Value=PrefC.GetDateT(PrefName.AutomaticCommunicationTimeStart);
 			_automationStart=dateRunStart.Value.TimeOfDay;
-			dateRunEnd.Text=PrefC.GetDateT(PrefName.AutomaticCommunicationTimeEnd).ToShortTimeString();
+			dateRunEnd.Value=PrefC.GetDateT(PrefName.AutomaticCommunicationTimeEnd);
 			_automationEnd=dateRunEnd.Value.TimeOfDay;
 			switch(PrefC.GetInt(PrefName.WebSchedAutomaticSendSetting)) {
 				case (int)WebSchedAutomaticSend.DoNotSend:
