@@ -920,6 +920,7 @@ namespace OpenDental
 					}//for toothI
 				}//for seqI
 			}//for examI
+			//Start in the very first cell on the first tooth and loop through teeth until we come across one that is not missing.
 			CurCell=new Point(1,GetTableRow(selectedExam,0,PerioSequenceType.Probing));
 			int curTooth=GetToothNumCur(GetSection(CurCell.Y));
 			while(skippedTeeth.Contains(curTooth)) {
@@ -1707,6 +1708,13 @@ namespace OpenDental
 						else{
 							SetNewCell(CurCell.X,newRow);
 						}
+					}
+					//Check to see if tooth #16 is missing.
+					else if(section==1 && CurCell.X==1 && startedOnSkipped) {
+						//Tooth 16 is missing so we need to jump down to section 3 (tooth 32) and start going the other direction.
+						newSection=3;
+						SetNewCell(1,GetTableRow(selectedExam,newSection,seqType));
+						OnDirectionChangedLeft();
 					}
 					else if(section==2 && skippedTeeth.Contains(32) || section==0 && skippedTeeth.Contains(1)){
 						count++;//used jump back to last non missing tooth
