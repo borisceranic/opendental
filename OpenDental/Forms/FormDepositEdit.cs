@@ -72,6 +72,8 @@ namespace OpenDental{
 		private UI.Button butPDF;
 		///<summary>Used to store DefNums in a 1:1 ratio for listInsPayType</summary>
 		private List<long> _insPayDefNums;
+		///<summary>Keeps track of whether the payment has been saved to the database since the form was opened.</summary>
+		private bool _hasBeenSavedToDB;
 
 		///<summary></summary>
 		public FormDepositEdit(Deposit depositCur)
@@ -1083,7 +1085,7 @@ namespace OpenDental{
 			Process.Start(filePathAndName);
 		}
 
-		///<summary>Saves the selected rows to database.  MUST close window after this.</summary>
+		///<summary>Saves the selected rows to database.</summary>
 		private bool SaveToDB(){
 			if(textDate.errorProvider1.GetError(textDate)!=""){
 				MsgBox.Show(this,"Please fix data entry errors first.");
@@ -1110,46 +1112,14 @@ namespace OpenDental{
 						return false;
 					}
 				}
-				//Deposits.Insert(DepositCur);
-				if(Accounts.DepositsLinked() && DepositCur.Amount>0) {
-					if(IsQuickBooks) {//Create a deposit in QuickBooks.						
-						if(!CreateDepositQB(true)) {
-							return false;
-						}
-						Deposits.Insert(DepositCur);
-					}
-					else {
-						Deposits.Insert(DepositCur);
-						//create a transaction here
-						Transaction trans=new Transaction();
-						trans.DepositNum=DepositCur.DepositNum;
-						trans.UserNum=Security.CurUser.UserNum;
-						Transactions.Insert(trans);
-						//first the deposit entry
-						JournalEntry je=new JournalEntry();
-						je.AccountNum=DepositAccounts[comboDepositAccount.SelectedIndex];
-						je.CheckNumber=Lan.g(this,"DEP");
-						je.DateDisplayed=DepositCur.DateDeposit;//it would be nice to add security here.
-						je.DebitAmt=DepositCur.Amount;
-						je.Memo=Lan.g(this,"Deposit");
-						je.Splits=Accounts.GetDescript(PrefC.GetLong(PrefName.AccountingIncomeAccount));
-						je.TransactionNum=trans.TransactionNum;
-						JournalEntries.Insert(je);
-						//then, the income entry
-						je=new JournalEntry();
-						je.AccountNum=PrefC.GetLong(PrefName.AccountingIncomeAccount);
-						//je.CheckNumber=;
-						je.DateDisplayed=DepositCur.DateDeposit;//it would be nice to add security here.
-						je.CreditAmt=DepositCur.Amount;
-						je.Memo=Lan.g(this,"Deposit");
-						je.Splits=Accounts.GetDescript(DepositAccounts[comboDepositAccount.SelectedIndex]);
-						je.TransactionNum=trans.TransactionNum;
-						JournalEntries.Insert(je);
-					}
+			}
+			if(IsNew && !_hasBeenSavedToDB){	
+				if(Accounts.DepositsLinked() && DepositCur.Amount>0
+					&& IsQuickBooks && !CreateDepositQB(true)) //Create a deposit in QuickBooks
+				{
+					return false;
 				}
-				else {//Deposits are not linked or deposit amount is not greater than 0.
-					Deposits.Insert(DepositCur);
-				}
+				Deposits.Insert(DepositCur);
 			}
 			else{
 				Deposits.Update(DepositCur);
@@ -1164,14 +1134,7 @@ namespace OpenDental{
 					ClaimPayments.Update(ClaimPayList[gridIns.SelectedIndices[i]]);
 				}
 			}
-			if(IsNew) {
-				SecurityLogs.MakeLogEntry(Permissions.DepositSlips,0,
-					DepositCur.DateDeposit.ToShortDateString()+" New "+DepositCur.Amount.ToString("c"));
-			}
-			else {
-				SecurityLogs.MakeLogEntry(Permissions.AdjustmentEdit,0,
-					DepositCur.DateDeposit.ToShortDateString()+" "+DepositCur.Amount.ToString("c"));
-			}
+			_hasBeenSavedToDB=true;//So that we don't insert the deposit slip again when clicking Print or PDF or OK
 			return true;
 		}
 
@@ -1179,18 +1142,51 @@ namespace OpenDental{
 			if(!SaveToDB()){
 				return;
 			}
+			if(IsNew) {
+				if(Accounts.DepositsLinked() && DepositCur.Amount>0 && !IsQuickBooks) {
+					//create a transaction here
+					Transaction trans=new Transaction();
+					trans.DepositNum=DepositCur.DepositNum;
+					trans.UserNum=Security.CurUser.UserNum;
+					Transactions.Insert(trans);
+					//first the deposit entry
+					JournalEntry je=new JournalEntry();
+					je.AccountNum=DepositAccounts[comboDepositAccount.SelectedIndex];
+					je.CheckNumber=Lan.g(this,"DEP");
+					je.DateDisplayed=DepositCur.DateDeposit;//it would be nice to add security here.
+					je.DebitAmt=DepositCur.Amount;
+					je.Memo=Lan.g(this,"Deposit");
+					je.Splits=Accounts.GetDescript(PrefC.GetLong(PrefName.AccountingIncomeAccount));
+					je.TransactionNum=trans.TransactionNum;
+					JournalEntries.Insert(je);
+					//then, the income entry
+					je=new JournalEntry();
+					je.AccountNum=PrefC.GetLong(PrefName.AccountingIncomeAccount);
+					//je.CheckNumber=;
+					je.DateDisplayed=DepositCur.DateDeposit;//it would be nice to add security here.
+					je.CreditAmt=DepositCur.Amount;
+					je.Memo=Lan.g(this,"Deposit");
+					je.Splits=Accounts.GetDescript(DepositAccounts[comboDepositAccount.SelectedIndex]);
+					je.TransactionNum=trans.TransactionNum;
+					JournalEntries.Insert(je);
+				}
+				SecurityLogs.MakeLogEntry(Permissions.DepositSlips,0,DepositCur.DateDeposit.ToShortDateString()+" New "+DepositCur.Amount.ToString("c"));
+			}
+			else {//Not new
+				SecurityLogs.MakeLogEntry(Permissions.AdjustmentEdit,0,DepositCur.DateDeposit.ToShortDateString()+" "+DepositCur.Amount.ToString("c"));
+			}
 			DialogResult=DialogResult.OK;
 		}
 
 		private void butCancel_Click(object sender, System.EventArgs e) {
-			if(IsNew){
-				//no need to worry about deposit links, since none made yet.
-				Deposits.Delete(DepositCur);
-			}
 			DialogResult=DialogResult.Cancel;
 		}
 
 		private void FormDepositEdit_Closing(object sender, System.ComponentModel.CancelEventArgs e) {
+			if(IsNew && DialogResult==DialogResult.Cancel) {
+				//User might have printed this, causing an insert into the DB.
+				Deposits.Delete(DepositCur);//This will handle unattaching payments from this deposit. A Transaction should not have been made yet.
+			}
 			if(changed){
 				DataValid.SetInvalid(InvalidType.Prefs);
 			}
