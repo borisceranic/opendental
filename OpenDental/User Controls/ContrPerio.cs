@@ -922,6 +922,7 @@ namespace OpenDental
 			}//for examI
 			//Start in the very first cell on the first tooth and loop through teeth until we come across one that is not missing.
 			CurCell=new Point(1,GetTableRow(selectedExam,0,PerioSequenceType.Probing));
+			OnDirectionChangedLeft();//Always start looping to the left.
 			int curTooth=GetToothNumCur(GetSection(CurCell.Y));
 			while(skippedTeeth.Contains(curTooth)) {
 				AdvanceCell();//Advance forward 3 times, since there are 3 measurements per tooth.
