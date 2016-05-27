@@ -2059,18 +2059,26 @@ namespace OpenDental{
 				for(int i=0;i<listPayPlanChargesCopy.Count;i++) {
 					PayPlanCharge chargeCur=listPayPlanChargesCopy[i];
 					if(chargeCur.ChargeDate<=DateTime.Today) {//Historical pay plan charge.
+						_listPayPlanCharges.Add(chargeCur);
+						if(chargeCur.ChargeType!=PayPlanChargeType.Debit) {
+							continue;
+						}
 						pastDueTotal+=chargeCur.Principal+chargeCur.Interest;
 						principalAmt-=chargeCur.Principal;
-						_listPayPlanCharges.Add(chargeCur);
 						//Don't count charges that we made in addition to the original terms
 						if(!chargeCur.Note.Trim().ToLower().Contains("recalculated based on") && !chargeCur.Note.Trim().ToLower().Contains("downpayment")) {
 							countPayPlanCharges++;
 						}
 					}
 					else {//Future pay plan charge.
+						if(chargeCur.ChargeType!=PayPlanChargeType.Debit) {
+							_listPayPlanCharges.Add(chargeCur);
+							continue;
+						}
 						interestFutureUnpaidAmt+=chargeCur.Interest;//Only used if not recalculating interest
 					}
 				}
+				listPayPlanChargesCopy.RemoveAll(x => x.ChargeType != PayPlanChargeType.Debit);
 				//Find the first pay plan charge in the future which has not happened yet, or if all else fails get the date on the last charge.
 				for(int i=0;i<listPayPlanChargesCopy.Count;i++) {
 					nextChargeIdx=i;
