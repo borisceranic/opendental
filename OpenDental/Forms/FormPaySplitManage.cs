@@ -38,10 +38,6 @@ namespace OpenDental {
 
 		///<summary>Performs all of the Load functionality.  Public so it can be called from unit tests.</summary>
 		public void Init(bool isTest) {
-			if(!Security.IsAuthorized(Permissions.PaymentEdit,PaymentCur.PayDate,true)) {
-				butDelete.Enabled=false;
-				butClear.Enabled=false;
-			}
 			_listAccountCharges=new List<AccountEntry>();
 			textPayAmt.Text=PaymentAmt.ToString("f");
 			AmtTotal=PaymentAmt;
@@ -605,7 +601,7 @@ namespace OpenDental {
 		///If payAmt==0, attempt to pay charge in full.</summary>
 		private void CreateSplit(AccountEntry charge,decimal payAmt) {
 			PaySplit split=new PaySplit();
-			split.DatePay=DateTime.Today;
+			split.DatePay=DateTimeOD.Today;
 			if(charge.GetType()==typeof(Procedure)) {//Row selected is a Procedure.
 				Procedure proc=(Procedure)charge.Tag;
 				split.ProcNum=charge.PriKey;
@@ -613,7 +609,7 @@ namespace OpenDental {
 			else if(charge.GetType()==typeof(PayPlanCharge)) {//Row selected is a PayPlanCharge.  If on PP version 2 it will be a debit type.
 				if(PrefC.GetInt(PrefName.PayPlansVersion)==2) {
 					//CreatePayPlanSplits takes care of updating PaymentAmt
-					CreatePayPlanAutoSplits(((PayPlanCharge)charge.Tag).PayPlanNum,DateTime.Today,PaymentCur.PayNum,ListSplitsCur,
+					CreatePayPlanAutoSplits(((PayPlanCharge)charge.Tag).PayPlanNum,DateTimeOD.Today,PaymentCur.PayNum,ListSplitsCur,
 						PayPlanCharges.GetCreditsForPayPlan(((PayPlanCharge)charge.Tag).PayPlanNum));
 					return;
 				}
@@ -650,10 +646,15 @@ namespace OpenDental {
 		}
 
 		///<summary>Deletes selected paysplits from the grid and attributes amounts back to where they originated from.</summary>
-		private void DeleteSelected() {
+		private void DeleteSelected() {		
+			bool suppressMessage=false;
 			for(int i=gridSplits.SelectedIndices.Length-1;i>=0;i--) {
 				int idx=gridSplits.SelectedIndices[i];
 				PaySplit paySplit=(PaySplit)gridSplits.Rows[idx].Tag;
+				if(paySplit.DateEntry!=DateTime.MinValue && !Security.IsAuthorized(Permissions.PaymentEdit,paySplit.DateEntry,suppressMessage)) {
+					suppressMessage=true;
+					continue;//Don't delete this paysplit
+				}
 				if(paySplit.PayPlanNum!=0 && PrefC.GetInt(PrefName.PayPlansVersion)==2) {
 					foreach(AccountEntry charge in _listAccountCharges) {
 						if(charge.GetType()!=typeof(PayPlanCharge)) {//If the charge is not a payplancharge, we don't care
@@ -715,11 +716,11 @@ namespace OpenDental {
 		
 		///<summary>Allows editing of an individual double clicked paysplit entry.</summary>
 		private void gridSplits_CellDoubleClick(object sender,ODGridClickEventArgs e) {
-			if(!Security.IsAuthorized(Permissions.PaymentEdit,PaymentCur.PayDate,true)) {
-				return;
-			}
 			PaySplit paySplitOld=(PaySplit)gridSplits.Rows[e.Row].Tag;
 			PaySplit paySplit=paySplitOld.Copy();
+			if(paySplit.DateEntry!=DateTime.MinValue && !Security.IsAuthorized(Permissions.PaymentEdit,paySplit.DateEntry,false)) {
+				return;
+			}
 			FormPaySplitEdit FormPSE=new FormPaySplitEdit(FamCur);
 			FormPSE.PaySplitCur=paySplit;
 			if(FormPSE.ShowDialog()==DialogResult.OK) {//paySplit contains all the info we want.  
@@ -779,8 +780,8 @@ namespace OpenDental {
 		private void butAdd_Click(object sender,EventArgs e) {
 			PaySplit paySplit=new PaySplit();
 			paySplit.SplitAmt=0;
-			paySplit.DateEntry=DateTime.Today;
-			paySplit.DatePay=DateTime.Today;
+			paySplit.DatePay=DateTimeOD.Today;
+			paySplit.DateEntry=MiscData.GetNowDateTime();//just a nicity for the user.  Insert uses server time.
 			paySplit.PayNum=PaymentCur.PayNum;
 			paySplit.ProvNum=Patients.GetProvNum(PatCur);
 			FormPaySplitEdit FormPSE=new FormPaySplitEdit(FamCur);
