@@ -40,6 +40,7 @@ namespace OpenDental.Bridges {
 			request.SecurityCode=securityCode;
 			request.TransType=transtype;
 			request.Zip=zip;
+			request.PaymentTokenRequestedSpecified=true;
 			request.PaymentTokenRequested=tokenRequested;
 			//request.AuthCode=authCode;//This field does not exist in the WSDL yet.  Dentalxchange will let us know once they finish adding it.
 			request.ForceDuplicateSpecified=true;
