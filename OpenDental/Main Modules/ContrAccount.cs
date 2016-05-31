@@ -3512,6 +3512,15 @@ namespace OpenDental {
 						}
 					}
 				}
+				//Set the claim note to a concatenation of all the default procedure notes for new claims.
+				ProcedureCode procCodeCur=ProcedureCodes.GetProcCode(proc.CodeNum);
+				if(ClaimCur.ClaimNote==null) {
+					ClaimCur.ClaimNote="";
+				}
+				if(ClaimCur.ClaimNote.Length > 0) {
+					ClaimCur.ClaimNote+="\n";
+				}
+				ClaimCur.ClaimNote+=procCodeCur.DefaultClaimNote;
 			}//for claimProc
 			List <ClaimProc> listClaimProcs=new List<ClaimProc>(claimProcs);
 			for(int i=0;i<listClaimProcs.Count;i++) {
