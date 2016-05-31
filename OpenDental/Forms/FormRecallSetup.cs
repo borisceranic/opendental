@@ -1924,9 +1924,14 @@ namespace OpenDental{
 			dateRunStart.Checked=true;
 			dateRunEnd.Checked=true;
 			//Now that the DateTimePicker controls are ready to display the DateTime we set, go ahead and set them.
-			dateRunStart.Value=PrefC.GetDateT(PrefName.AutomaticCommunicationTimeStart);
+			try {
+				dateRunStart.Value=PrefC.GetDateT(PrefName.AutomaticCommunicationTimeStart);
+				dateRunEnd.Value=PrefC.GetDateT(PrefName.AutomaticCommunicationTimeEnd);
+			}
+			catch(Exception) {
+				//Loading the picker controls with the DateTime fields from the database failed.  The date picker controls default to 7 AM and 10 PM.
+			}
 			_automationStart=dateRunStart.Value.TimeOfDay;
-			dateRunEnd.Value=PrefC.GetDateT(PrefName.AutomaticCommunicationTimeEnd);
 			_automationEnd=dateRunEnd.Value.TimeOfDay;
 			switch(PrefC.GetInt(PrefName.WebSchedAutomaticSendSetting)) {
 				case (int)WebSchedAutomaticSend.DoNotSend:
