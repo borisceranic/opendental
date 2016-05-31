@@ -185,6 +185,7 @@
     <Compile Include="Crud\AutoNoteCrud.cs" />
     <Compile Include="Crud\CDSPermissionCrud.cs" />
     <Compile Include="Crud\ClaimSnapshotCrud.cs" />
+    <Compile Include="Crud\ConfirmationRequestCrud.cs" />
     <Compile Include="Crud\ConnectionGroupCrud.cs" />
     <Compile Include="Crud\ConnGroupAttachCrud.cs" />
     <Compile Include="Crud\DashboardCellCrud.cs" />
@@ -439,6 +440,7 @@
     <Compile Include="Crud\XWebResponseCrud.cs" />
     <Compile Include="Data Interface\ApptComms.cs" />
     <Compile Include="Data Interface\ClaimSnapshots.cs" />
+    <Compile Include="Data Interface\ConfirmationRequests.cs" />
     <Compile Include="Data Interface\DashboardCells.cs" />
     <Compile Include="Data Interface\DashboardLayouts.cs" />
     <Compile Include="Data Interface\DisplayReports.cs" />
@@ -1023,6 +1025,7 @@
     <Compile Include="Reports\RpProcSheet.cs" />
     <Compile Include="Reports\RpProdInc.cs" />
     <Compile Include="Reports\RpRouting.cs" />
+    <Compile Include="TableTypes\ConfirmationRequest.cs" />
     <Compile Include="TableTypes\StmtAdjAttach.cs" />
     <Compile Include="TableTypes\StmtPaySplitAttach.cs" />
     <Compile Include="TableTypes\StmtProcAttach.cs" />

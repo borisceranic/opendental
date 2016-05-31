@@ -62,7 +62,9 @@ namespace OpenDentBusiness {
 		///<summary>4. Used when sending a test message from HQ. Customer will not be charged for this message.</summary>
 		TestNoCharge,
 		///<summary>5. Used when sending confirmations.</summary>
-		Confirmation
+		Confirmation,
+		///<summary>6. Used when sending confirmation requests. Will be the subject of automated response processing.</summary>
+		ConfirmationRequest
 	}
 
 	///<summary>None should never be used, the code should be re-written to not use it.</summary>

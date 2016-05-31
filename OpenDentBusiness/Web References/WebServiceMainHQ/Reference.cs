@@ -41,6 +41,8 @@ namespace OpenDentBusiness.WebServiceMainHQ {
         
         private System.Threading.SendOrPostCallback ValidateVersionOperationCompleted;
         
+        private System.Threading.SendOrPostCallback ConfirmationRequestSendOperationCompleted;
+        
         private System.Threading.SendOrPostCallback SmsSendOperationCompleted;
         
         private System.Threading.SendOrPostCallback SmsSignAgreementOperationCompleted;
@@ -56,6 +58,8 @@ namespace OpenDentBusiness.WebServiceMainHQ {
         private System.Threading.SendOrPostCallback ValidateEServiceOperationCompleted;
         
         private System.Threading.SendOrPostCallback GetFeaturesForCustomerOperationCompleted;
+        
+        private System.Threading.SendOrPostCallback GetFeaturesForEServiceOperationCompleted;
         
         private System.Threading.SendOrPostCallback EnableAdditionalFeaturesOperationCompleted;
         
@@ -116,6 +120,9 @@ namespace OpenDentBusiness.WebServiceMainHQ {
         public event ValidateVersionCompletedEventHandler ValidateVersionCompleted;
         
         /// <remarks/>
+        public event ConfirmationRequestSendCompletedEventHandler ConfirmationRequestSendCompleted;
+        
+        /// <remarks/>
         public event SmsSendCompletedEventHandler SmsSendCompleted;
         
         /// <remarks/>
@@ -138,6 +145,9 @@ namespace OpenDentBusiness.WebServiceMainHQ {
         
         /// <remarks/>
         public event GetFeaturesForCustomerCompletedEventHandler GetFeaturesForCustomerCompleted;
+        
+        /// <remarks/>
+        public event GetFeaturesForEServiceCompletedEventHandler GetFeaturesForEServiceCompleted;
         
         /// <remarks/>
         public event EnableAdditionalFeaturesCompletedEventHandler EnableAdditionalFeaturesCompleted;
@@ -317,6 +327,35 @@ namespace OpenDentBusiness.WebServiceMainHQ {
             if ((this.ValidateVersionCompleted != null)) {
                 System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
                 this.ValidateVersionCompleted(this, new ValidateVersionCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("https://www.opendental.com/OpenDentalWebServiceHQ/ConfirmationRequestSend", RequestNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/", ResponseNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string ConfirmationRequestSend(string officeData) {
+            object[] results = this.Invoke("ConfirmationRequestSend", new object[] {
+                        officeData});
+            return ((string)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void ConfirmationRequestSendAsync(string officeData) {
+            this.ConfirmationRequestSendAsync(officeData, null);
+        }
+        
+        /// <remarks/>
+        public void ConfirmationRequestSendAsync(string officeData, object userState) {
+            if ((this.ConfirmationRequestSendOperationCompleted == null)) {
+                this.ConfirmationRequestSendOperationCompleted = new System.Threading.SendOrPostCallback(this.OnConfirmationRequestSendOperationCompleted);
+            }
+            this.InvokeAsync("ConfirmationRequestSend", new object[] {
+                        officeData}, this.ConfirmationRequestSendOperationCompleted, userState);
+        }
+        
+        private void OnConfirmationRequestSendOperationCompleted(object arg) {
+            if ((this.ConfirmationRequestSendCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.ConfirmationRequestSendCompleted(this, new ConfirmationRequestSendCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
             }
         }
         
@@ -557,6 +596,37 @@ namespace OpenDentBusiness.WebServiceMainHQ {
         }
         
         /// <remarks/>
+        [System.Web.Services.Protocols.SoapDocumentMethodAttribute("https://www.opendental.com/OpenDentalWebServiceHQ/GetFeaturesForEService", RequestNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/", ResponseNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
+        public string GetFeaturesForEService(string registrationKey, string eService) {
+            object[] results = this.Invoke("GetFeaturesForEService", new object[] {
+                        registrationKey,
+                        eService});
+            return ((string)(results[0]));
+        }
+        
+        /// <remarks/>
+        public void GetFeaturesForEServiceAsync(string registrationKey, string eService) {
+            this.GetFeaturesForEServiceAsync(registrationKey, eService, null);
+        }
+        
+        /// <remarks/>
+        public void GetFeaturesForEServiceAsync(string registrationKey, string eService, object userState) {
+            if ((this.GetFeaturesForEServiceOperationCompleted == null)) {
+                this.GetFeaturesForEServiceOperationCompleted = new System.Threading.SendOrPostCallback(this.OnGetFeaturesForEServiceOperationCompleted);
+            }
+            this.InvokeAsync("GetFeaturesForEService", new object[] {
+                        registrationKey,
+                        eService}, this.GetFeaturesForEServiceOperationCompleted, userState);
+        }
+        
+        private void OnGetFeaturesForEServiceOperationCompleted(object arg) {
+            if ((this.GetFeaturesForEServiceCompleted != null)) {
+                System.Web.Services.Protocols.InvokeCompletedEventArgs invokeArgs = ((System.Web.Services.Protocols.InvokeCompletedEventArgs)(arg));
+                this.GetFeaturesForEServiceCompleted(this, new GetFeaturesForEServiceCompletedEventArgs(invokeArgs.Results, invokeArgs.Error, invokeArgs.Cancelled, invokeArgs.UserState));
+            }
+        }
+        
+        /// <remarks/>
         [System.Web.Services.Protocols.SoapDocumentMethodAttribute("https://www.opendental.com/OpenDentalWebServiceHQ/EnableAdditionalFeatures", RequestNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/", ResponseNamespace="https://www.opendental.com/OpenDentalWebServiceHQ/", Use=System.Web.Services.Description.SoapBindingUse.Literal, ParameterStyle=System.Web.Services.Protocols.SoapParameterStyle.Wrapped)]
         public string EnableAdditionalFeatures(string officeData) {
             object[] results = this.Invoke("EnableAdditionalFeatures", new object[] {
@@ -747,6 +817,32 @@ namespace OpenDentBusiness.WebServiceMainHQ {
         private object[] results;
         
         internal ValidateVersionCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public string Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1055.0")]
+    public delegate void ConfirmationRequestSendCompletedEventHandler(object sender, ConfirmationRequestSendCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1055.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class ConfirmationRequestSendCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal ConfirmationRequestSendCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
                 base(exception, cancelled, userState) {
             this.results = results;
         }
@@ -955,6 +1051,32 @@ namespace OpenDentBusiness.WebServiceMainHQ {
         private object[] results;
         
         internal GetFeaturesForCustomerCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        /// <remarks/>
+        public string Result {
+            get {
+                this.RaiseExceptionIfNecessary();
+                return ((string)(this.results[0]));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1055.0")]
+    public delegate void GetFeaturesForEServiceCompletedEventHandler(object sender, GetFeaturesForEServiceCompletedEventArgs e);
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Web.Services", "4.6.1055.0")]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class GetFeaturesForEServiceCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        internal GetFeaturesForEServiceCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
                 base(exception, cancelled, userState) {
             this.results = results;
         }
