@@ -1327,11 +1327,15 @@ namespace OpenDental {
 			Plugins.HookAddCode(this,"ContrAppt.ModuleSelected_end",patNum);
 		}
 
-		///<summary>Refreshes everything except the patient info.</summary>
-		public void RefreshPeriod() {
+		///<summary>Refreshes everything except the patient info.  If false, will not refresh the appointment bubble.</summary>
+		public void RefreshPeriod(bool isRefreshBubble=true) {
+			long oldBubbleNum=bubbleAptNum;
 			RefreshModuleDataPeriod();
 			LayoutScrollOpProv();
 			RefreshModuleScreenPeriod();
+			if(!isRefreshBubble) {
+				bubbleAptNum=oldBubbleNum;
+			}
 		}
 
 		///<summary>Fills PatCur from the database unless the patnum has not changed.</summary>
@@ -6091,7 +6095,7 @@ namespace OpenDental {
 					endDate=AppointmentL.DateSelected;
 				}
 				if(PrefC.GetBool(PrefName.ApptModuleRefreshesEveryMinute)) {
-					RefreshPeriod();
+					RefreshPeriod(false);
 				}
 				else {
 					ContrApptSheet2.CreateShadow();

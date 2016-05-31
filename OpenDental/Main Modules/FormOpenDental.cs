@@ -4448,7 +4448,7 @@ namespace OpenDental{
 				}
 			}
 			if(ContrAppt2.Visible && Signalods.ApptNeedsRefresh(listSignals,AppointmentL.DateSelected.Date)) {
-				ContrAppt2.RefreshPeriod();
+				ContrAppt2.RefreshPeriod(false);
 			}
 			bool areAnySignalsTasks = false;
 			for(int i = 0;i<listSignals.Count;i++) {
