@@ -8,7 +8,7 @@ using System.Text;
 
 namespace OpenDentBusiness {
 	public partial class ConvertDatabases {
-		public static System.Version LatestVersion=new Version("16.2.7.0");//This value must be changed when a new conversion is to be triggered.
+		public static System.Version LatestVersion=new Version("16.2.10.0");//This value must be changed when a new conversion is to be triggered.
 
 		#region Helper Functions
 
@@ -1429,6 +1429,34 @@ namespace OpenDentBusiness {
 				}
 				catch(Exception) { }//Only an index.
 				command="UPDATE preference SET ValueString = '16.2.7.0' WHERE PrefName = 'DataBaseVersion'";
+				Db.NonQ(command);
+			}
+			To16_2_10();
+		}
+
+		private static void To16_2_10() {
+			if(FromVersion<new Version("16.2.10.0")) {
+				ODEvent.Fire(new ODEventArgs("ConvertDatabases","Upgrading database to version: 16.2.10"));//No translation in convert script.
+				string command;
+				if(DataConnection.DBtype==DatabaseType.MySql) {
+					command="ALTER TABLE maparea ADD MapAreaContainerNum bigint NOT NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE maparea ADD INDEX (MapAreaContainerNum)";
+					Db.NonQ(command);
+				}
+				else {//oracle
+					command="ALTER TABLE maparea ADD MapAreaContainerNum number(20)";
+					Db.NonQ(command);
+					command="UPDATE maparea SET MapAreaContainerNum = 0 WHERE MapAreaContainerNum IS NULL";
+					Db.NonQ(command);
+					command="ALTER TABLE maparea MODIFY MapAreaContainerNum NOT NULL";
+					Db.NonQ(command);
+					command=@"CREATE INDEX maparea_MapAreaContainerNum ON maparea (MapAreaContainerNum)";
+					Db.NonQ(command);
+				}
+				command="UPDATE maparea SET MapAreaContainerNum=1";
+				Db.NonQ(command);
+				command="UPDATE preference SET ValueString = '16.2.10.0' WHERE PrefName = 'DataBaseVersion'";
 				Db.NonQ(command);
 			}
 			//To16_2_X();
