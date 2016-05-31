@@ -243,6 +243,9 @@ namespace OpenDental{
 				}
 			}
 			else if(clearinghouseClin.CommBridge==EclaimsCommBridge.ClaimConnect){
+				if(isAutomaticMode && !Directory.Exists(clearinghouseClin.ResponsePath)) {
+					return "";//The clearinghouse report path is not setup.  The customer does not use ClaimConnect reports.  Suppress error message.
+				}
 				if(!ClaimConnect.Retrieve(clearinghouseClin)) {
 					if(isAutomaticMode && ClaimConnect.ErrorMessage.Contains(": 150\r\n")) {//Error message 150 "Service Not Contracted"
 						return "";//Pretend that there is no error when loading FormClaimsSend for those customers who do not pay for ERA service.
