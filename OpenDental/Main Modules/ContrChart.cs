@@ -3388,8 +3388,8 @@ namespace OpenDental {
 			ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"LabCase"),-1,"","LabCase"));
 			if(!Clinics.IsMedicalPracticeOrClinic(Clinics.ClinicNum)) {
 				ToolBarMain.Buttons.Add(new ODToolBarButton(Lan.g(this,"Perio Chart"),2,"","Perio"));
-				ToolBarMain.Buttons.Add(new ODToolBarButton(OrthoChartTabs.Listt[0].TabName,-1,"","Ortho"));
-			}			
+			}
+			ToolBarMain.Buttons.Add(new ODToolBarButton(OrthoChartTabs.Listt[0].TabName,-1,"","Ortho"));
 			button=new ODToolBarButton(Lan.g(this,"Consent"),-1,"","Consent");
 			button.Style=ODToolBarButtonStyle.DropDownButton;
 			button.DropDownMenu=menuConsent;
