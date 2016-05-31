@@ -622,13 +622,15 @@ namespace OpenDentBusiness {
 			table.Columns.Add("subscribers");
 			table.Columns.Add("trojanID");
 			table.Columns.Add("Zip");
+			table.Columns.Add("IsCDA");
 			List<DataRow> rows=new List<DataRow>();
 			string command="SELECT carrier.Address,carrier.City,CarrierName,ElectID,EmpName,GroupName,GroupNum,NoSendElect,"
 				+"carrier.Phone,PlanNum,"
 				+"(SELECT COUNT(DISTINCT Subscriber) FROM inssub WHERE insplan.PlanNum=inssub.PlanNum) subscribers,"//for Oracle
 				+"carrier.State,TrojanID,carrier.Zip, "
 				//+"(SELECT COUNT(*) FROM employer WHERE insplan.EmployerNum=employer.EmployerNum) haveName "//for Oracle. Could be higher than 1?
-				+"CASE WHEN (EmpName IS NULL) THEN 1 ELSE 0 END as haveName "//for Oracle
+				+"CASE WHEN (EmpName IS NULL) THEN 1 ELSE 0 END as haveName,"//for Oracle
+				+"carrier.IsCDA "
 				+"FROM insplan "
 				+"LEFT JOIN employer ON employer.EmployerNum = insplan.EmployerNum "
 				+"LEFT JOIN carrier ON carrier.CarrierNum = insplan.CarrierNum "
@@ -676,6 +678,7 @@ namespace OpenDentBusiness {
 				row["subscribers"]=rawT.Rows[i]["subscribers"].ToString();
 				row["TrojanID"]=rawT.Rows[i]["TrojanID"].ToString();
 				row["Zip"]=rawT.Rows[i]["Zip"].ToString();
+				row["IsCDA"]=rawT.Rows[i]["IsCDA"].ToString();
 				rows.Add(row);
 			}
 			for(int i=0;i<rows.Count;i++) {

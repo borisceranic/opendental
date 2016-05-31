@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Windows.Forms;
 using OpenDental.UI;
 using OpenDentBusiness;
@@ -103,7 +104,7 @@ namespace OpenDental{
 			this.groupBox2.Controls.Add(this.radioOrderCarrier);
 			this.groupBox2.Controls.Add(this.radioOrderEmp);
 			this.groupBox2.FlatStyle = System.Windows.Forms.FlatStyle.System;
-			this.groupBox2.Location = new System.Drawing.Point(740, 3);
+			this.groupBox2.Location = new System.Drawing.Point(752, 3);
 			this.groupBox2.Name = "groupBox2";
 			this.groupBox2.Size = new System.Drawing.Size(207, 33);
 			this.groupBox2.TabIndex = 2;
@@ -243,7 +244,7 @@ namespace OpenDental{
 			this.butMerge.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butMerge.CornerRadius = 4F;
 			this.butMerge.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butMerge.Location = new System.Drawing.Point(11, 637);
+			this.butMerge.Location = new System.Drawing.Point(11, 664);
 			this.butMerge.Name = "butMerge";
 			this.butMerge.Size = new System.Drawing.Size(74, 24);
 			this.butMerge.TabIndex = 24;
@@ -255,12 +256,14 @@ namespace OpenDental{
 			this.gridMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.gridMain.HasAddButton = false;
+			this.gridMain.HasMultilineHeaders = false;
 			this.gridMain.HScrollVisible = true;
 			this.gridMain.Location = new System.Drawing.Point(11, 51);
 			this.gridMain.Name = "gridMain";
 			this.gridMain.ScrollValue = 0;
 			this.gridMain.SelectionMode = OpenDental.UI.GridSelectionMode.MultiExtended;
-			this.gridMain.Size = new System.Drawing.Size(936, 579);
+			this.gridMain.Size = new System.Drawing.Size(948, 606);
 			this.gridMain.TabIndex = 19;
 			this.gridMain.Title = "Insurance Plans";
 			this.gridMain.TranslationName = "TableInsurancePlans";
@@ -274,7 +277,7 @@ namespace OpenDental{
 			this.butOK.BtnShape = OpenDental.UI.enumType.BtnShape.Rectangle;
 			this.butOK.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butOK.CornerRadius = 4F;
-			this.butOK.Location = new System.Drawing.Point(774, 637);
+			this.butOK.Location = new System.Drawing.Point(786, 664);
 			this.butOK.Name = "butOK";
 			this.butOK.Size = new System.Drawing.Size(78, 24);
 			this.butOK.TabIndex = 4;
@@ -290,7 +293,7 @@ namespace OpenDental{
 			this.butBlank.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butBlank.CornerRadius = 4F;
 			this.butBlank.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butBlank.Location = new System.Drawing.Point(427, 637);
+			this.butBlank.Location = new System.Drawing.Point(427, 664);
 			this.butBlank.Name = "butBlank";
 			this.butBlank.Size = new System.Drawing.Size(87, 24);
 			this.butBlank.TabIndex = 3;
@@ -307,7 +310,7 @@ namespace OpenDental{
 			this.butCancel.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butCancel.CornerRadius = 4F;
 			this.butCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-			this.butCancel.Location = new System.Drawing.Point(869, 637);
+			this.butCancel.Location = new System.Drawing.Point(881, 664);
 			this.butCancel.Name = "butCancel";
 			this.butCancel.Size = new System.Drawing.Size(78, 24);
 			this.butCancel.TabIndex = 5;
@@ -323,7 +326,7 @@ namespace OpenDental{
 			this.butHide.BtnStyle = OpenDental.UI.enumType.XPStyle.Silver;
 			this.butHide.CornerRadius = 4F;
 			this.butHide.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			this.butHide.Location = new System.Drawing.Point(104, 637);
+			this.butHide.Location = new System.Drawing.Point(104, 664);
 			this.butHide.Name = "butHide";
 			this.butHide.Size = new System.Drawing.Size(84, 24);
 			this.butHide.TabIndex = 28;
@@ -332,8 +335,7 @@ namespace OpenDental{
 			// 
 			// FormInsPlans
 			// 
-			this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-			this.ClientSize = new System.Drawing.Size(962, 669);
+			this.ClientSize = new System.Drawing.Size(974, 696);
 			this.Controls.Add(this.butHide);
 			this.Controls.Add(this.checkShowHidden);
 			this.Controls.Add(this.textTrojanID);
@@ -355,7 +357,6 @@ namespace OpenDental{
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "FormInsPlans";
 			this.ShowInTaskbar = false;
-			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Insurance Plans";
 			this.Load += new System.EventHandler(this.FormInsTemplates_Load);
 			this.groupBox2.ResumeLayout(false);
@@ -425,6 +426,10 @@ namespace OpenDental{
 			gridMain.Columns.Add(col);
 			col=new ODGridColumn(Lans.g("TableInsurancePlans","Subs"),40);
 			gridMain.Columns.Add(col);
+			if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+				col=new ODGridColumn(Lan.g("TableCarriers","CDAnet"),50);
+				gridMain.Columns.Add(col);
+			}
 			if(trojan){
 				col=new ODGridColumn(Lans.g("TableInsurancePlans","TrojanID"),60);
 				gridMain.Columns.Add(col);
@@ -447,6 +452,9 @@ namespace OpenDental{
 				row.Cells.Add(table.Rows[i]["noSendElect"].ToString());
 				row.Cells.Add(table.Rows[i]["ElectID"].ToString());
 				row.Cells.Add(table.Rows[i]["subscribers"].ToString());
+				if(CultureInfo.CurrentCulture.Name.EndsWith("CA")) {//Canadian. en-CA or fr-CA
+					row.Cells.Add((table.Rows[i]["IsCDA"].ToString()=="0")?"":"X");
+				}
 				if(trojan){
 					row.Cells.Add(table.Rows[i]["TrojanID"].ToString());
 				}
