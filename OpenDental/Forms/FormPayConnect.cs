@@ -476,7 +476,7 @@ namespace OpenDental {
 			_creditCardCur.Zip=textZipCode.Text;
 			_creditCardCur.PayConnectToken="";
 			_creditCardCur.PayConnectTokenExp=DateTime.MinValue;
-			//Store the token and the masked CC number (only last four digits).  PaymentToken is null when testing the predefined fake card numbers.
+			//Store the token and the masked CC number (only last four digits).
 			if(checkSaveToken.Checked && _response.PaymentToken!=null) {
 				_creditCardCur.PayConnectToken=_response.PaymentToken.TokenId;
 				_creditCardCur.PayConnectTokenExp=new DateTime(_response.PaymentToken.Expiration.year,_response.PaymentToken.Expiration.month,
