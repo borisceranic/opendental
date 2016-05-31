@@ -4761,17 +4761,6 @@ namespace OpenDental{
 					}
 					ProcedureCode procCodeSent=ProcedureCodes.GetProcCode(_listClaimProcsForClaim[i].CodeSent);
 					row.Cells.Add(procCodeSent.Descript);
-					if(IsNew) {
-						ProcedureCode procCodeCur=ProcedureCodes.GetProcCode(ProcCur.CodeNum,listProcCodes);
-						if(ClaimCur.ClaimNote==null) {
-							ClaimCur.ClaimNote="";
-						}
-						if(ClaimCur.ClaimNote.Length > 0) {
-							ClaimCur.ClaimNote+="\n";
-						}
-						ClaimCur.ClaimNote+=procCodeCur.DefaultClaimNote;
-						textNote.Text=ClaimCur.ClaimNote;
-					}
 				}
 				row.Cells.Add(_listClaimProcsForClaim[i].FeeBilled.ToString("F"));
 				decimal claimProcInsEst=(decimal)_listClaimProcsForClaim[i].InsPayEst;
