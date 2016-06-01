@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace OpenDentBusiness{
 		///<summary>(User OD since "user" is a reserved word) Users are a completely separate entity from Providers and Employees even though they can be linked.  A usernumber can never be changed, ensuring a permanent way to record database entries and leave an audit trail.  A user can be a provider, employee, or neither.</summary>
@@ -39,6 +40,24 @@ namespace OpenDentBusiness{
 		///<summary>FK to userod.UserNum.  The user num within the Central Manager database.  Only editable via CEMT.  Can change when CEMT syncs.</summary>
 		public long UserNumCEMT;
 
+		///<summary>Enum representing what eService this user is a "phantom" user for.
+		///This variable is to be ignored for serialization and was made private to emphasize the fact that it should not be a db column.
+		///Mainly used to not have Security.IsAuthorized() checks throw exceptions due to a null Userod when the eServices are calling S class methods.
+		///Currently only used to grant eServices access to certain methods that would otherwise reject it due to permissions.</summary>
+		private EServiceTypes _eServiceType;
+		///<summary>All valid users should NOT set this value to anything other than None otherwise permission checking will act unexpectedly.
+		///Programmatically set this value from the init method of the corresponding eService.  Helps prevent unhandled exceptions.
+		///Custom property only meant to be used via eServices.  Not a column in db.  Not to be used in middle tier environment.</summary>
+		[XmlIgnore]
+		public EServiceTypes EServiceType {
+			get {
+				return _eServiceType;
+			}
+			set {
+				_eServiceType=value;
+			}
+		}
+
 		public Userod(){
 
 		}
@@ -65,6 +84,20 @@ namespace OpenDentBusiness{
 
 		public override string ToString(){
 			return UserName;
+		}
+
+		///<summary>EServiceType specifically for Userods so it is purposefully not added to the namespace.</summary>
+		public enum EServiceTypes {
+			///<summmary>Not an eService user.  All valid users should be this type otherwise permission checking will act differently.</summmary>
+			None,
+			///<summary></summary>
+			EConnector,
+			///<summary></summary>
+			Broadcaster,
+			///<summary></summary>
+			BroadcastMonitor,
+			///<summary></summary>
+			ServiceMainHQ,
 		}
 	}
 
