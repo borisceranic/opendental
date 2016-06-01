@@ -3458,21 +3458,29 @@ namespace OpenDental{
 				}
 				if(numLabProcsUnselected>0) {
 					MessageBox.Show(Lan.g(this,"Number of lab fee procedures unselected")+": "+numLabProcsUnselected.ToString());
+					if(gridMain.SelectedIndices.Length==0) {
+						return;
+					}
 				}
 				if(gridMain.SelectedIndices.Length>7) {
-					List <int> selectedIndicies=new List<int>(gridMain.SelectedIndices);
-					selectedIndicies.Sort();
 					gridMain.SetSelected(false);
 					foreach(int selectedIdx in selectedIndices) {
 						if(gridMain.Rows[selectedIdx].Tag==null) {
 							continue;//subtotal row.
+						}
+						Procedure proc=(Procedures.GetOneProc(((ProcTP)gridMain.Rows[selectedIdx].Tag).ProcNumOrig,false));
+						if(proc!=null) {
+							ProcedureCode procCode=ProcedureCodes.GetProcCodeFromDb(proc.CodeNum);
+							if(procCode.IsCanadianLab) {
+								continue;//lab procedure
+							}
 						}
 						gridMain.SetSelected(selectedIdx,true);
 						if(gridMain.SelectedIndices.Length>=7) {
 							break;//we have found seven procedures.
 						}
 					}
-					if(selectedIndices.FindAll(x => gridMain.Rows[x].Tag!=null).Count>7) {//only if they selected more than 7 procedures, not 7 rows.
+					if(selectedIndices.FindAll(x => gridMain.Rows[x].Tag!=null).Count-numLabProcsUnselected>7) {//only if they selected more than 7 procedures, not 7 rows.
 						MsgBox.Show(this,"Only the first 7 procedures will be selected.  You will need to create another preauth for the remaining procedures.");
 					}
 				}
