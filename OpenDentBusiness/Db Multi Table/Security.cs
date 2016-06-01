@@ -80,6 +80,10 @@ namespace OpenDentBusiness{
 		public static bool IsAuthorized(Permissions perm,DateTime date,bool suppressMessage,bool suppressLockDateMessage,long userGroupNum) {
 			//No need to check RemotingRole; no call to db.
 			date=date.Date; //Remove the time portion of date so we can compare strictly as a date later.
+			//Check eConnector permission first.
+			if(IsValidEServicePermission(perm)) {
+				return true;
+			}
 			if(!GroupPermissions.HasPermission(userGroupNum,perm)){
 				if(!suppressMessage){
 					throw new Exception(Lans.g("Security","Not authorized.")+"\r\n"
@@ -230,27 +234,6 @@ namespace OpenDentBusiness{
 			return Permissions.None;
 		}
 
-		//<summary>Obsolete</summary>
-		//public static void ResetPassword(){
-			//FIXME:UPDATE-MULTIPLE-TABLES
-			/*string command="UPDATE userod,grouppermissions SET userod.Password='' "
-				+"WHERE grouppermissions.UserGroupNum=userod.UserGroupNum "
-				+"AND grouppermissions.PermType=24";
- 			Db.NonQ(command);
-			 */
-			//Code updated to be compatible with Oracle as well as MySQL.
-			/*
-			string command="SELECT userod.UserNum FROM userod,grouppermissions "
-				+"WHERE grouppermissions.UserGroupNum=userod.UserGroupNum "
-				+"AND grouppermissions.PermType=24";
-			DataTable table=Db.GetTable(command); 
-			if(table.Rows.Count==0){
-				throw new ApplicationException("No admin exists.");
-			}
-			command="UPDATE userod SET Password='' WHERE UserNum="+POut.PString(table.Rows[0][0].ToString());
-			Db.NonQ(command);
-		}*/
-
 		///<summary>RemotingRole has not yet been set to ClientWeb, but it will if this succeeds.  Will throw an exception if server cannot validate username and password.  configPath will be empty from a workstation and filled from the server.  If Ecw, odpass will actually be the hash.</summary>
 		public static Userod LogInWeb(string oduser,string odpass,string configPath,string clientVersionStr,bool usingEcw) {
 			//Very unusual method.  Remoting role can't be checked, but is implied by the presence of a value in configPath.
@@ -299,7 +282,46 @@ namespace OpenDentBusiness{
 			}
 		}
 
-		
+		#region eServices
+
+		///<summary>Returns false if the currently logged in user is not designated for the eConnector or if the user does not have permission.</summary>
+		private static bool IsValidEServicePermission(Permissions perm) {
+			//No need to check RemotingRole; no call to db.
+			if(curUser==null) {
+				return false;
+			}
+			//Run specific checks against certain types of eServices.
+			switch(curUser.EServiceType) {
+				case Userod.EServiceTypes.Broadcaster:
+				case Userod.EServiceTypes.BroadcastMonitor:
+				case Userod.EServiceTypes.ServiceMainHQ:
+					return true;//These eServices are at HQ and we trust ourselves to have full permissions for any S class method.
+				case Userod.EServiceTypes.EConnector:
+					return IsPermAllowedEConnector(perm);
+				case Userod.EServiceTypes.None:
+				default:
+					return false;//Not an eService, let IsAuthorized handle the permission checking.
+			}
+		}
+
+		///<summary>Returns true if the eConnector should be allowed to run methods with the passed in permission.</summary>
+		private static bool IsPermAllowedEConnector(Permissions perm) {
+			//We are typically on the customers eConnector and need to be careful when giving access to certain permission types.
+			//Engineers must EXCPLICITLY add permissions to this switch statement as they need them.
+			//Be very cautious when adding permissions because the flood gates for that permission will be opened once added.
+			//E.g. we should never add a permission like Setup or SecurityAdmin.  If there is a need for such a thing, we need to rethink this paradigm.
+			switch(perm) {
+				//Add additional permissions to this case as needed to grant access.
+				case Permissions.EmailSend:
+					return true;
+				default:
+					return false;
+			}
+		}
+
+		#endregion
+
+
 	}
 }
 
