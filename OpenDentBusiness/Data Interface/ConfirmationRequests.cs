@@ -16,6 +16,14 @@ namespace OpenDentBusiness{
 			return Crud.ConfirmationRequestCrud.SelectMany(command);
 		}
 
+		public static ConfirmationRequest GetConfirmationByGuidMessageToMobile(string guidMessageToMobile) {
+			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
+				return Meth.GetObject<ConfirmationRequest>(MethodBase.GetCurrentMethod(),guidMessageToMobile);
+			}
+			string command="SELECT * FROM confirmationrequest WHERE GuidMessageToMobile = '"+POut.String(guidMessageToMobile)+"'";
+			return Crud.ConfirmationRequestCrud.SelectOne(command);
+		}
+
 		public static long Insert(ConfirmationRequest confirmationRequest) {
 			if(RemotingClient.RemotingRole==RemotingRole.ClientWeb) {
 				confirmationRequest.ConfirmationRequestNum=Meth.GetLong(MethodBase.GetCurrentMethod(),confirmationRequest);

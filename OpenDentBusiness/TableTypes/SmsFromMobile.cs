@@ -39,10 +39,6 @@ namespace OpenDentBusiness {
 		///<summary>Messages are not deleted, they can only be hidden.</summary>
 		public bool IsHidden;
 		public int MatchCount;
-		/////<summary>Indicates if this message was found to match a pending matchable transaction. EG appointment confirmation.</summary>
-		//public SmsMatchCodeStatus MatchStatus;
-		/////<summary>Base36 guid generated at HQ which will be used to match incoming responses against outgoing transaction requests.</summary>
-		//public string MatchGuid;
 
 		///<summary></summary>
 		public SmsFromMobile Copy() {
@@ -70,14 +66,5 @@ namespace OpenDentBusiness {
 		ReceivedUnread,
 		///<summary>1</summary>
 		ReceivedRead,
-	}
-	
-	public enum SmsMatchCodeStatus {
-		///<summary>User reponse did not match positive or negative action code (NO MATCH). This is not an automatically digestable response..</summary>
-		NotFound,
-		///<summary>User reponse matched positive action code (YES).</summary>
-		Positive,
-		///<summary>User reponse matched negative action code (NO).</summary>
-		Negative
 	}
 }
