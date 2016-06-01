@@ -482,11 +482,12 @@ namespace OpenDental {
 				//XImage xI=XImage.FromGdiPlusImage(bmpDraw);
 				// 10/07/2015 We cannot do the above fix for the distorted images because it forcefully changes all images to be BMPs.  
 				// Instead, we need to resave the image but in it's native "RawFormat" in order to preserve it's original format.
-				// Forcefully making all images on PDFs use BMP causes the PDFs to bloat in size significantly (harder to email).  E.g. 2MB turns into 22MBs. 
+				// Forcefully making all images on PDFs use BMP causes the PDFs to bloat in size significantly (harder to email).  E.g. 2MB turns into 22MBs.
+				Bitmap bmpQualityCopy=new Bitmap(bmpOriginal);//Convert to a BMP to preserve the quality of the original image.
 				ms=new MemoryStream();
-				bmpOriginal.Save(ms,bmpOriginal.RawFormat);
+				bmpQualityCopy.Save(ms,bmpOriginal.RawFormat);//Convert the BMP back to the original image format which will typically cut down the image size.
 				bmpOriginal.Dispose();
-				bmpOriginal=new Bitmap(ms);
+				bmpOriginal=new Bitmap(ms);//Override the original image with the re-saved imaged in the memory stream (fixes corrupt images).
 				XImage xI=XImage.FromGdiPlusImage(bmpOriginal);
 				gx.DrawImage(xI,p(field.XPos+adjustX),p(field.YPos-_yPosPrint+adjustY),p(imgDrawWidth),p(imgDrawHeight));
 				xI.Dispose();
@@ -494,6 +495,10 @@ namespace OpenDental {
 				if(ms!=null) {
 					ms.Dispose();
 					ms=null;
+				}
+				if(bmpQualityCopy!=null) {
+					bmpQualityCopy.Dispose();
+					bmpQualityCopy=null;
 				}
 			}
 			if(bmpOriginal!=null) {
