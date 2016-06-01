@@ -1403,8 +1403,13 @@ namespace OpenDental{
 				try {
 					FormST.PrintStatement(StmtCur,true,dataSet,fam,pat);
 				}
-				catch {
-					MsgBox.Show(this,"No printers installed.");
+				catch(Exception ex) {
+					if(ex.Message=="WidthAndHeightCannotBeNegative") {//A possible exception message from PdfSharp.Drawing.XGraphics.DrawString()
+						throw ex;
+					}
+					else {
+						MsgBox.Show(this,"No printers installed.");
+					}
 					Cursor=Cursors.Default;
 					return;
 				}
