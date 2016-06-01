@@ -52,19 +52,18 @@ namespace OpenDentBusiness.Crud{
 				confirmationRequest.PatNum                  = PIn.Long  (row["PatNum"].ToString());
 				confirmationRequest.ApptNum                 = PIn.Long  (row["ApptNum"].ToString());
 				confirmationRequest.PhonePat                = PIn.String(row["PhonePat"].ToString());
-				confirmationRequest.DateTimeExpire          = PIn.DateT (row["DateTimeExpire"].ToString());
+				confirmationRequest.DateTimeConfirmExpire   = PIn.DateT (row["DateTimeConfirmExpire"].ToString());
 				confirmationRequest.SecondsFromEntryToExpire= PIn.Int   (row["SecondsFromEntryToExpire"].ToString());
 				confirmationRequest.ShortGUID               = PIn.String(row["ShortGUID"].ToString());
 				confirmationRequest.ConfirmCode             = PIn.String(row["ConfirmCode"].ToString());
 				confirmationRequest.MsgTextToMobileTemplate = PIn.String(row["MsgTextToMobileTemplate"].ToString());
 				confirmationRequest.MsgTextToMobile         = PIn.String(row["MsgTextToMobile"].ToString());
 				confirmationRequest.DateTimeEntry           = PIn.DateT (row["DateTimeEntry"].ToString());
-				confirmationRequest.DateTimeTransmit        = PIn.DateT (row["DateTimeTransmit"].ToString());
+				confirmationRequest.DateTimeConfirmTransmit = PIn.DateT (row["DateTimeConfirmTransmit"].ToString());
 				confirmationRequest.DateTimeRSVP            = PIn.DateT (row["DateTimeRSVP"].ToString());
 				confirmationRequest.RSVPStatus              = (OpenDentBusiness.RSVPStatusCodes)PIn.Int(row["RSVPStatus"].ToString());
 				confirmationRequest.ResponseDescript        = PIn.String(row["ResponseDescript"].ToString());
 				confirmationRequest.GuidMessageToMobile     = PIn.String(row["GuidMessageToMobile"].ToString());
-				confirmationRequest.GuidMessageFromMobile   = PIn.String(row["GuidMessageFromMobile"].ToString());
 				retVal.Add(confirmationRequest);
 			}
 			return retVal;
@@ -82,19 +81,18 @@ namespace OpenDentBusiness.Crud{
 			table.Columns.Add("PatNum");
 			table.Columns.Add("ApptNum");
 			table.Columns.Add("PhonePat");
-			table.Columns.Add("DateTimeExpire");
+			table.Columns.Add("DateTimeConfirmExpire");
 			table.Columns.Add("SecondsFromEntryToExpire");
 			table.Columns.Add("ShortGUID");
 			table.Columns.Add("ConfirmCode");
 			table.Columns.Add("MsgTextToMobileTemplate");
 			table.Columns.Add("MsgTextToMobile");
 			table.Columns.Add("DateTimeEntry");
-			table.Columns.Add("DateTimeTransmit");
+			table.Columns.Add("DateTimeConfirmTransmit");
 			table.Columns.Add("DateTimeRSVP");
 			table.Columns.Add("RSVPStatus");
 			table.Columns.Add("ResponseDescript");
 			table.Columns.Add("GuidMessageToMobile");
-			table.Columns.Add("GuidMessageFromMobile");
 			foreach(ConfirmationRequest confirmationRequest in listConfirmationRequests) {
 				table.Rows.Add(new object[] {
 					POut.Long  (confirmationRequest.ConfirmationRequestNum),
@@ -103,19 +101,18 @@ namespace OpenDentBusiness.Crud{
 					POut.Long  (confirmationRequest.PatNum),
 					POut.Long  (confirmationRequest.ApptNum),
 					            confirmationRequest.PhonePat,
-					POut.DateT (confirmationRequest.DateTimeExpire,false),
+					POut.DateT (confirmationRequest.DateTimeConfirmExpire,false),
 					POut.Int   (confirmationRequest.SecondsFromEntryToExpire),
 					            confirmationRequest.ShortGUID,
 					            confirmationRequest.ConfirmCode,
 					            confirmationRequest.MsgTextToMobileTemplate,
 					            confirmationRequest.MsgTextToMobile,
 					POut.DateT (confirmationRequest.DateTimeEntry,false),
-					POut.DateT (confirmationRequest.DateTimeTransmit,false),
+					POut.DateT (confirmationRequest.DateTimeConfirmTransmit,false),
 					POut.DateT (confirmationRequest.DateTimeRSVP,false),
 					POut.Int   ((int)confirmationRequest.RSVPStatus),
 					            confirmationRequest.ResponseDescript,
 					            confirmationRequest.GuidMessageToMobile,
-					            confirmationRequest.GuidMessageFromMobile,
 				});
 			}
 			return table;
@@ -156,7 +153,7 @@ namespace OpenDentBusiness.Crud{
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+="ConfirmationRequestNum,";
 			}
-			command+="ClinicNum,IsForSms,PatNum,ApptNum,PhonePat,DateTimeExpire,SecondsFromEntryToExpire,ShortGUID,ConfirmCode,MsgTextToMobileTemplate,MsgTextToMobile,DateTimeEntry,DateTimeTransmit,DateTimeRSVP,RSVPStatus,ResponseDescript,GuidMessageToMobile,GuidMessageFromMobile) VALUES(";
+			command+="ClinicNum,IsForSms,PatNum,ApptNum,PhonePat,DateTimeConfirmExpire,SecondsFromEntryToExpire,ShortGUID,ConfirmCode,MsgTextToMobileTemplate,MsgTextToMobile,DateTimeEntry,DateTimeConfirmTransmit,DateTimeRSVP,RSVPStatus,ResponseDescript,GuidMessageToMobile) VALUES(";
 			if(useExistingPK || PrefC.RandomKeys) {
 				command+=POut.Long(confirmationRequest.ConfirmationRequestNum)+",";
 			}
@@ -166,19 +163,18 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (confirmationRequest.PatNum)+","
 				+    POut.Long  (confirmationRequest.ApptNum)+","
 				+"'"+POut.String(confirmationRequest.PhonePat)+"',"
-				+    POut.DateT (confirmationRequest.DateTimeExpire)+","
+				+    POut.DateT (confirmationRequest.DateTimeConfirmExpire)+","
 				+    POut.Int   (confirmationRequest.SecondsFromEntryToExpire)+","
 				+"'"+POut.String(confirmationRequest.ShortGUID)+"',"
 				+"'"+POut.String(confirmationRequest.ConfirmCode)+"',"
 				+    DbHelper.ParamChar+"paramMsgTextToMobileTemplate,"
 				+    DbHelper.ParamChar+"paramMsgTextToMobile,"
 				+    DbHelper.Now()+","
-				+    POut.DateT (confirmationRequest.DateTimeTransmit)+","
+				+    POut.DateT (confirmationRequest.DateTimeConfirmTransmit)+","
 				+    POut.DateT (confirmationRequest.DateTimeRSVP)+","
 				+    POut.Int   ((int)confirmationRequest.RSVPStatus)+","
 				+    DbHelper.ParamChar+"paramResponseDescript,"
-				+    DbHelper.ParamChar+"paramGuidMessageToMobile,"
-				+    DbHelper.ParamChar+"paramGuidMessageFromMobile)";
+				+    DbHelper.ParamChar+"paramGuidMessageToMobile)";
 			if(confirmationRequest.MsgTextToMobileTemplate==null) {
 				confirmationRequest.MsgTextToMobileTemplate="";
 			}
@@ -195,15 +191,11 @@ namespace OpenDentBusiness.Crud{
 				confirmationRequest.GuidMessageToMobile="";
 			}
 			OdSqlParameter paramGuidMessageToMobile=new OdSqlParameter("paramGuidMessageToMobile",OdDbType.Text,POut.StringNote(confirmationRequest.GuidMessageToMobile));
-			if(confirmationRequest.GuidMessageFromMobile==null) {
-				confirmationRequest.GuidMessageFromMobile="";
-			}
-			OdSqlParameter paramGuidMessageFromMobile=new OdSqlParameter("paramGuidMessageFromMobile",OdDbType.Text,POut.StringNote(confirmationRequest.GuidMessageFromMobile));
 			if(useExistingPK || PrefC.RandomKeys) {
-				Db.NonQ(command,paramMsgTextToMobileTemplate,paramMsgTextToMobile,paramResponseDescript,paramGuidMessageToMobile,paramGuidMessageFromMobile);
+				Db.NonQ(command,paramMsgTextToMobileTemplate,paramMsgTextToMobile,paramResponseDescript,paramGuidMessageToMobile);
 			}
 			else {
-				confirmationRequest.ConfirmationRequestNum=Db.NonQ(command,true,paramMsgTextToMobileTemplate,paramMsgTextToMobile,paramResponseDescript,paramGuidMessageToMobile,paramGuidMessageFromMobile);
+				confirmationRequest.ConfirmationRequestNum=Db.NonQ(command,true,paramMsgTextToMobileTemplate,paramMsgTextToMobile,paramResponseDescript,paramGuidMessageToMobile);
 			}
 			return confirmationRequest.ConfirmationRequestNum;
 		}
@@ -231,7 +223,7 @@ namespace OpenDentBusiness.Crud{
 			if(isRandomKeys || useExistingPK) {
 				command+="ConfirmationRequestNum,";
 			}
-			command+="ClinicNum,IsForSms,PatNum,ApptNum,PhonePat,DateTimeExpire,SecondsFromEntryToExpire,ShortGUID,ConfirmCode,MsgTextToMobileTemplate,MsgTextToMobile,DateTimeEntry,DateTimeTransmit,DateTimeRSVP,RSVPStatus,ResponseDescript,GuidMessageToMobile,GuidMessageFromMobile) VALUES(";
+			command+="ClinicNum,IsForSms,PatNum,ApptNum,PhonePat,DateTimeConfirmExpire,SecondsFromEntryToExpire,ShortGUID,ConfirmCode,MsgTextToMobileTemplate,MsgTextToMobile,DateTimeEntry,DateTimeConfirmTransmit,DateTimeRSVP,RSVPStatus,ResponseDescript,GuidMessageToMobile) VALUES(";
 			if(isRandomKeys || useExistingPK) {
 				command+=POut.Long(confirmationRequest.ConfirmationRequestNum)+",";
 			}
@@ -241,19 +233,18 @@ namespace OpenDentBusiness.Crud{
 				+    POut.Long  (confirmationRequest.PatNum)+","
 				+    POut.Long  (confirmationRequest.ApptNum)+","
 				+"'"+POut.String(confirmationRequest.PhonePat)+"',"
-				+    POut.DateT (confirmationRequest.DateTimeExpire)+","
+				+    POut.DateT (confirmationRequest.DateTimeConfirmExpire)+","
 				+    POut.Int   (confirmationRequest.SecondsFromEntryToExpire)+","
 				+"'"+POut.String(confirmationRequest.ShortGUID)+"',"
 				+"'"+POut.String(confirmationRequest.ConfirmCode)+"',"
 				+    DbHelper.ParamChar+"paramMsgTextToMobileTemplate,"
 				+    DbHelper.ParamChar+"paramMsgTextToMobile,"
 				+    DbHelper.Now()+","
-				+    POut.DateT (confirmationRequest.DateTimeTransmit)+","
+				+    POut.DateT (confirmationRequest.DateTimeConfirmTransmit)+","
 				+    POut.DateT (confirmationRequest.DateTimeRSVP)+","
 				+    POut.Int   ((int)confirmationRequest.RSVPStatus)+","
 				+    DbHelper.ParamChar+"paramResponseDescript,"
-				+    DbHelper.ParamChar+"paramGuidMessageToMobile,"
-				+    DbHelper.ParamChar+"paramGuidMessageFromMobile)";
+				+    DbHelper.ParamChar+"paramGuidMessageToMobile)";
 			if(confirmationRequest.MsgTextToMobileTemplate==null) {
 				confirmationRequest.MsgTextToMobileTemplate="";
 			}
@@ -270,15 +261,11 @@ namespace OpenDentBusiness.Crud{
 				confirmationRequest.GuidMessageToMobile="";
 			}
 			OdSqlParameter paramGuidMessageToMobile=new OdSqlParameter("paramGuidMessageToMobile",OdDbType.Text,POut.StringNote(confirmationRequest.GuidMessageToMobile));
-			if(confirmationRequest.GuidMessageFromMobile==null) {
-				confirmationRequest.GuidMessageFromMobile="";
-			}
-			OdSqlParameter paramGuidMessageFromMobile=new OdSqlParameter("paramGuidMessageFromMobile",OdDbType.Text,POut.StringNote(confirmationRequest.GuidMessageFromMobile));
 			if(useExistingPK || isRandomKeys) {
-				Db.NonQ(command,paramMsgTextToMobileTemplate,paramMsgTextToMobile,paramResponseDescript,paramGuidMessageToMobile,paramGuidMessageFromMobile);
+				Db.NonQ(command,paramMsgTextToMobileTemplate,paramMsgTextToMobile,paramResponseDescript,paramGuidMessageToMobile);
 			}
 			else {
-				confirmationRequest.ConfirmationRequestNum=Db.NonQ(command,true,paramMsgTextToMobileTemplate,paramMsgTextToMobile,paramResponseDescript,paramGuidMessageToMobile,paramGuidMessageFromMobile);
+				confirmationRequest.ConfirmationRequestNum=Db.NonQ(command,true,paramMsgTextToMobileTemplate,paramMsgTextToMobile,paramResponseDescript,paramGuidMessageToMobile);
 			}
 			return confirmationRequest.ConfirmationRequestNum;
 		}
@@ -291,19 +278,18 @@ namespace OpenDentBusiness.Crud{
 				+"PatNum                  =  "+POut.Long  (confirmationRequest.PatNum)+", "
 				+"ApptNum                 =  "+POut.Long  (confirmationRequest.ApptNum)+", "
 				+"PhonePat                = '"+POut.String(confirmationRequest.PhonePat)+"', "
-				+"DateTimeExpire          =  "+POut.DateT (confirmationRequest.DateTimeExpire)+", "
+				+"DateTimeConfirmExpire   =  "+POut.DateT (confirmationRequest.DateTimeConfirmExpire)+", "
 				+"SecondsFromEntryToExpire=  "+POut.Int   (confirmationRequest.SecondsFromEntryToExpire)+", "
 				+"ShortGUID               = '"+POut.String(confirmationRequest.ShortGUID)+"', "
 				+"ConfirmCode             = '"+POut.String(confirmationRequest.ConfirmCode)+"', "
 				+"MsgTextToMobileTemplate =  "+DbHelper.ParamChar+"paramMsgTextToMobileTemplate, "
 				+"MsgTextToMobile         =  "+DbHelper.ParamChar+"paramMsgTextToMobile, "
 				//DateTimeEntry not allowed to change
-				+"DateTimeTransmit        =  "+POut.DateT (confirmationRequest.DateTimeTransmit)+", "
+				+"DateTimeConfirmTransmit =  "+POut.DateT (confirmationRequest.DateTimeConfirmTransmit)+", "
 				+"DateTimeRSVP            =  "+POut.DateT (confirmationRequest.DateTimeRSVP)+", "
 				+"RSVPStatus              =  "+POut.Int   ((int)confirmationRequest.RSVPStatus)+", "
 				+"ResponseDescript        =  "+DbHelper.ParamChar+"paramResponseDescript, "
-				+"GuidMessageToMobile     =  "+DbHelper.ParamChar+"paramGuidMessageToMobile, "
-				+"GuidMessageFromMobile   =  "+DbHelper.ParamChar+"paramGuidMessageFromMobile "
+				+"GuidMessageToMobile     =  "+DbHelper.ParamChar+"paramGuidMessageToMobile "
 				+"WHERE ConfirmationRequestNum = "+POut.Long(confirmationRequest.ConfirmationRequestNum);
 			if(confirmationRequest.MsgTextToMobileTemplate==null) {
 				confirmationRequest.MsgTextToMobileTemplate="";
@@ -321,11 +307,7 @@ namespace OpenDentBusiness.Crud{
 				confirmationRequest.GuidMessageToMobile="";
 			}
 			OdSqlParameter paramGuidMessageToMobile=new OdSqlParameter("paramGuidMessageToMobile",OdDbType.Text,POut.StringNote(confirmationRequest.GuidMessageToMobile));
-			if(confirmationRequest.GuidMessageFromMobile==null) {
-				confirmationRequest.GuidMessageFromMobile="";
-			}
-			OdSqlParameter paramGuidMessageFromMobile=new OdSqlParameter("paramGuidMessageFromMobile",OdDbType.Text,POut.StringNote(confirmationRequest.GuidMessageFromMobile));
-			Db.NonQ(command,paramMsgTextToMobileTemplate,paramMsgTextToMobile,paramResponseDescript,paramGuidMessageToMobile,paramGuidMessageFromMobile);
+			Db.NonQ(command,paramMsgTextToMobileTemplate,paramMsgTextToMobile,paramResponseDescript,paramGuidMessageToMobile);
 		}
 
 		///<summary>Updates one ConfirmationRequest in the database.  Uses an old object to compare to, and only alters changed fields.  This prevents collisions and concurrency problems in heavily used tables.  Returns true if an update occurred.</summary>
@@ -351,9 +333,9 @@ namespace OpenDentBusiness.Crud{
 				if(command!=""){ command+=",";}
 				command+="PhonePat = '"+POut.String(confirmationRequest.PhonePat)+"'";
 			}
-			if(confirmationRequest.DateTimeExpire != oldConfirmationRequest.DateTimeExpire) {
+			if(confirmationRequest.DateTimeConfirmExpire != oldConfirmationRequest.DateTimeConfirmExpire) {
 				if(command!=""){ command+=",";}
-				command+="DateTimeExpire = "+POut.DateT(confirmationRequest.DateTimeExpire)+"";
+				command+="DateTimeConfirmExpire = "+POut.DateT(confirmationRequest.DateTimeConfirmExpire)+"";
 			}
 			if(confirmationRequest.SecondsFromEntryToExpire != oldConfirmationRequest.SecondsFromEntryToExpire) {
 				if(command!=""){ command+=",";}
@@ -376,9 +358,9 @@ namespace OpenDentBusiness.Crud{
 				command+="MsgTextToMobile = "+DbHelper.ParamChar+"paramMsgTextToMobile";
 			}
 			//DateTimeEntry not allowed to change
-			if(confirmationRequest.DateTimeTransmit != oldConfirmationRequest.DateTimeTransmit) {
+			if(confirmationRequest.DateTimeConfirmTransmit != oldConfirmationRequest.DateTimeConfirmTransmit) {
 				if(command!=""){ command+=",";}
-				command+="DateTimeTransmit = "+POut.DateT(confirmationRequest.DateTimeTransmit)+"";
+				command+="DateTimeConfirmTransmit = "+POut.DateT(confirmationRequest.DateTimeConfirmTransmit)+"";
 			}
 			if(confirmationRequest.DateTimeRSVP != oldConfirmationRequest.DateTimeRSVP) {
 				if(command!=""){ command+=",";}
@@ -395,10 +377,6 @@ namespace OpenDentBusiness.Crud{
 			if(confirmationRequest.GuidMessageToMobile != oldConfirmationRequest.GuidMessageToMobile) {
 				if(command!=""){ command+=",";}
 				command+="GuidMessageToMobile = "+DbHelper.ParamChar+"paramGuidMessageToMobile";
-			}
-			if(confirmationRequest.GuidMessageFromMobile != oldConfirmationRequest.GuidMessageFromMobile) {
-				if(command!=""){ command+=",";}
-				command+="GuidMessageFromMobile = "+DbHelper.ParamChar+"paramGuidMessageFromMobile";
 			}
 			if(command==""){
 				return false;
@@ -419,13 +397,9 @@ namespace OpenDentBusiness.Crud{
 				confirmationRequest.GuidMessageToMobile="";
 			}
 			OdSqlParameter paramGuidMessageToMobile=new OdSqlParameter("paramGuidMessageToMobile",OdDbType.Text,POut.StringNote(confirmationRequest.GuidMessageToMobile));
-			if(confirmationRequest.GuidMessageFromMobile==null) {
-				confirmationRequest.GuidMessageFromMobile="";
-			}
-			OdSqlParameter paramGuidMessageFromMobile=new OdSqlParameter("paramGuidMessageFromMobile",OdDbType.Text,POut.StringNote(confirmationRequest.GuidMessageFromMobile));
 			command="UPDATE confirmationrequest SET "+command
 				+" WHERE ConfirmationRequestNum = "+POut.Long(confirmationRequest.ConfirmationRequestNum);
-			Db.NonQ(command,paramMsgTextToMobileTemplate,paramMsgTextToMobile,paramResponseDescript,paramGuidMessageToMobile,paramGuidMessageFromMobile);
+			Db.NonQ(command,paramMsgTextToMobileTemplate,paramMsgTextToMobile,paramResponseDescript,paramGuidMessageToMobile);
 			return true;
 		}
 
@@ -447,7 +421,7 @@ namespace OpenDentBusiness.Crud{
 			if(confirmationRequest.PhonePat != oldConfirmationRequest.PhonePat) {
 				return true;
 			}
-			if(confirmationRequest.DateTimeExpire != oldConfirmationRequest.DateTimeExpire) {
+			if(confirmationRequest.DateTimeConfirmExpire != oldConfirmationRequest.DateTimeConfirmExpire) {
 				return true;
 			}
 			if(confirmationRequest.SecondsFromEntryToExpire != oldConfirmationRequest.SecondsFromEntryToExpire) {
@@ -466,7 +440,7 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			//DateTimeEntry not allowed to change
-			if(confirmationRequest.DateTimeTransmit != oldConfirmationRequest.DateTimeTransmit) {
+			if(confirmationRequest.DateTimeConfirmTransmit != oldConfirmationRequest.DateTimeConfirmTransmit) {
 				return true;
 			}
 			if(confirmationRequest.DateTimeRSVP != oldConfirmationRequest.DateTimeRSVP) {
@@ -479,9 +453,6 @@ namespace OpenDentBusiness.Crud{
 				return true;
 			}
 			if(confirmationRequest.GuidMessageToMobile != oldConfirmationRequest.GuidMessageToMobile) {
-				return true;
-			}
-			if(confirmationRequest.GuidMessageFromMobile != oldConfirmationRequest.GuidMessageFromMobile) {
 				return true;
 			}
 			return false;
