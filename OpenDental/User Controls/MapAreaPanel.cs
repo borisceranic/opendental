@@ -300,7 +300,8 @@ namespace OpenDental {
 		public void ResizeScrollbarsToFitContents() {
 			Size sizeControl=new Size(this.FloorWidthFeet*this.PixelsPerFoot,this.FloorHeightFeet*this.PixelsPerFoot);
 			if(this.AutoScrollMinSize!=sizeControl) {
-				this.AutoScrollMinSize=sizeControl;
+			//todo: removed scrolling for now. It was causing more problems than it was worth.
+			//this.AutoScrollMinSize=sizeControl;
 				this.AutoScrollPosition=new Point(0,0);
 			}
 		}

@@ -32,6 +32,7 @@
 			this.escalationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.fullScreenToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toggleTriageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.openNewMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.comboRoom = new System.Windows.Forms.ComboBox();
 			this.label5 = new System.Windows.Forms.Label();
 			this.labelCurrentTime = new OpenDental.MapAreaRoomControl();
@@ -58,7 +59,6 @@
 			this.label14 = new System.Windows.Forms.Label();
 			this.mapAreaPanelHQ = new OpenDental.MapAreaPanel();
 			this.timer1 = new System.Windows.Forms.Timer(this.components);
-			this.openNewMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
@@ -105,7 +105,7 @@
             this.openNewMapToolStripMenuItem});
 			this.menuStrip.Location = new System.Drawing.Point(6, 0);
 			this.menuStrip.Name = "menuStrip";
-			this.menuStrip.Size = new System.Drawing.Size(447, 24);
+			this.menuStrip.Size = new System.Drawing.Size(355, 24);
 			this.menuStrip.TabIndex = 71;
 			this.menuStrip.Text = "menuStrip1";
 			// 
@@ -145,6 +145,13 @@
 			this.toggleTriageToolStripMenuItem.Size = new System.Drawing.Size(120, 20);
 			this.toggleTriageToolStripMenuItem.Text = "Toggle Triage View";
 			this.toggleTriageToolStripMenuItem.Click += new System.EventHandler(this.toggleTriageToolStripMenuItem_Click);
+			// 
+			// openNewMapToolStripMenuItem
+			// 
+			this.openNewMapToolStripMenuItem.Name = "openNewMapToolStripMenuItem";
+			this.openNewMapToolStripMenuItem.Size = new System.Drawing.Size(102, 20);
+			this.openNewMapToolStripMenuItem.Text = "Open New Map";
+			this.openNewMapToolStripMenuItem.Click += new System.EventHandler(this.openNewMapToolStripMenuItem_Click);
 			// 
 			// comboRoom
 			// 
@@ -534,18 +541,17 @@
 			// 
 			this.mapAreaPanelHQ.AllowDragging = false;
 			this.mapAreaPanelHQ.AllowEditing = false;
-			this.mapAreaPanelHQ.AutoScroll = true;
-			this.mapAreaPanelHQ.AutoScrollMinSize = new System.Drawing.Size(1326, 935);
 			this.mapAreaPanelHQ.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.mapAreaPanelHQ.FloorColor = System.Drawing.Color.White;
 			this.mapAreaPanelHQ.FloorHeightFeet = 55;
 			this.mapAreaPanelHQ.FloorWidthFeet = 78;
 			this.mapAreaPanelHQ.Font = new System.Drawing.Font("Calibri", 25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.mapAreaPanelHQ.FontCubicle = new System.Drawing.Font("Calibri", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.mapAreaPanelHQ.FontCubicle = new System.Drawing.Font("Calibri", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.mapAreaPanelHQ.FontCubicleHeader = new System.Drawing.Font("Calibri", 19F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.mapAreaPanelHQ.FontLabel = new System.Drawing.Font("Calibri", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 			this.mapAreaPanelHQ.GridColor = System.Drawing.Color.LightGray;
 			this.mapAreaPanelHQ.Location = new System.Drawing.Point(0, 0);
+			this.mapAreaPanelHQ.Margin = new System.Windows.Forms.Padding(0);
 			this.mapAreaPanelHQ.Name = "mapAreaPanelHQ";
 			this.mapAreaPanelHQ.PixelsPerFoot = 17;
 			this.mapAreaPanelHQ.ShowGrid = false;
@@ -558,13 +564,6 @@
 			// 
 			this.timer1.Interval = 250;
 			this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-			// 
-			// openNewMapToolStripMenuItem
-			// 
-			this.openNewMapToolStripMenuItem.Name = "openNewMapToolStripMenuItem";
-			this.openNewMapToolStripMenuItem.Size = new System.Drawing.Size(102, 20);
-			this.openNewMapToolStripMenuItem.Text = "Open New Map";
-			this.openNewMapToolStripMenuItem.Click += new System.EventHandler(this.openNewMapToolStripMenuItem_Click);
 			// 
 			// FormMapHQ
 			// 
