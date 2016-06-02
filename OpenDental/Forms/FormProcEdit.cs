@@ -4085,7 +4085,10 @@ namespace OpenDental{
 				else {
 					textDate.Text=MiscData.GetNowDateTime().ToShortDateString();
 				}
-				Procedures.SetDateFirstVisit(DateTimeOD.Today,2,PatCur);
+				//broken appointment procedure codes shouldn't trigger DateFirstVisit update.
+				if(ProcedureCodes.GetStringProcCode(ProcCur.CodeNum)!="D9986" && ProcedureCodes.GetStringProcCode(ProcCur.CodeNum)!="D9987") {
+					Procedures.SetDateFirstVisit(DateTimeOD.Today,2,PatCur);
+				}
 				ProcCur.ProcStatus=ProcStat.C;
 			}
 			if(comboProcStatus.SelectedIndex==2) {
@@ -4128,7 +4131,10 @@ namespace OpenDental{
 				MsgBox.Show(this,"Procedures cannot be set complete in this window.  Set the procedure complete by setting the appointment complete.");
 				return;
 			}
-			Procedures.SetDateFirstVisit(DateTimeOD.Today,2,PatCur);
+			//broken appointment procedure codes shouldn't trigger DateFirstVisit update.
+			if(ProcedureCodes.GetStringProcCode(ProcCur.CodeNum)!="D9986" && ProcedureCodes.GetStringProcCode(ProcCur.CodeNum)!="D9987") {
+				Procedures.SetDateFirstVisit(DateTimeOD.Today,2,PatCur);
+			}
 			if(ProcCur.AptNum!=0){//if attached to an appointment
 				Appointment apt=Appointments.GetOneApt(ProcCur.AptNum);
 				if(apt.AptDateTime.Date > MiscData.GetNowDateTime().Date){//if appointment is in the future
