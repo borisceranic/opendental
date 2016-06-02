@@ -7682,7 +7682,10 @@ namespace OpenDental {
 				return;
 			}
 			List<string> procCodes=new List<string>();
-			Procedures.SetDateFirstVisit(DateTimeOD.Today,1,PatCur);
+			//broken appointment procedure codes shouldn't trigger DateFirstVisit update.
+			if(ProcedureCodes.GetStringProcCode(FormP.SelectedCodeNum)!="D9986" && ProcedureCodes.GetStringProcCode(FormP.SelectedCodeNum)!="D9987") {
+				Procedures.SetDateFirstVisit(DateTimeOD.Today,1,PatCur);
+			}
 			Procedure ProcCur;
 			for(int n=0;n==0 || n<toothChart.SelectedTeeth.Count;n++) {
 				isValid=true;
@@ -8024,7 +8027,10 @@ namespace OpenDental {
 				}
 			}
 			//Do not return past this point---------------------------------------------------------------------------------
-			Procedures.SetDateFirstVisit(DateTimeOD.Today,1,PatCur);
+			//If there are any codes in the list that are NOT 9986s and 9987s, then set the date first visit.
+			if(codeList.Any(x => ProcedureCodes.GetStringProcCode(x) != "D9986" && ProcedureCodes.GetStringProcCode(x) != "D9987")) {
+				Procedures.SetDateFirstVisit(DateTimeOD.Today,1,PatCur);
+			}
 			List<string> procCodes=new List<string>();
 			Procedure ProcCur=null;
 			//"Bug fix" for Dr. Lazar-------------
@@ -8339,7 +8345,10 @@ namespace OpenDental {
 			}
 			//Do not return past this point---------------------------------------------------------------------------------
 			List<string> procCodes=new List<string>();
-			Procedures.SetDateFirstVisit(DateTimeOD.Today,1,PatCur);
+			//broken appointment procedure codes shouldn't trigger DateFirstVisit update.
+			if(textProcCode.Text!="D9986" && textProcCode.Text!="D9987") {
+				Procedures.SetDateFirstVisit(DateTimeOD.Today,1,PatCur);
+			}
 			TreatmentArea tArea;
 			Procedure ProcCur;
 			for(int n=0;n==0 || n<toothChart.SelectedTeeth.Count;n++) {//always loops at least once.
@@ -10049,7 +10058,10 @@ namespace OpenDental {
 					procCur.ProcDate=MiscData.GetNowDateTime();
 				}
 				procCur.SiteNum=PatCur.SiteNum;
-				Procedures.SetDateFirstVisit(procCur.ProcDate,2,PatCur);
+				//broken appointment procedure codes shouldn't trigger DateFirstVisit update.
+				if(ProcedureCodes.GetStringProcCode(procCur.CodeNum)!="D9986" && ProcedureCodes.GetStringProcCode(procCur.CodeNum)!="D9987") {
+					Procedures.SetDateFirstVisit(procCur.ProcDate,2,PatCur);
+				}
 				if(procCode.PaintType==ToothPaintingType.Extraction) {//if an extraction, then mark previous procs hidden
 					//Procedures.SetHideGraphical(procCur);//might not matter anymore
 					ToothInitials.SetValue(PatCur.PatNum,procCur.ToothNum,ToothInitialType.Missing);

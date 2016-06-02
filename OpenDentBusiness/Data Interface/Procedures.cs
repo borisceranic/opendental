@@ -683,8 +683,10 @@ namespace OpenDentBusiness {
 					return;//a date has already been set.
 				}
 			}
-			string command="SELECT Count(*) from procedurelog WHERE "
-				+"PatNum = '"+POut.Long(pat.PatNum)+"' "
+			string command="SELECT COUNT(*) from procedurelog "
+				+"INNER JOIN procedurecode on procedurecode.CodeNum = procedurelog.CodeNum "
+					+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
+				+"WHERE PatNum = '"+POut.Long(pat.PatNum)+"' "
 				+"AND ProcStatus = '2'";
 			DataTable table=Db.GetTable(command);
 			if(PIn.Long(table.Rows[0][0].ToString())>0) {
@@ -729,6 +731,8 @@ namespace OpenDentBusiness {
 				return Meth.GetBool(MethodBase.GetCurrentMethod(),patNum);
 			}
 			string command="SELECT COUNT(*) FROM procedurelog "
+				+"INNER JOIN procedurecode on procedurecode.CodeNum = procedurelog.CodeNum "
+					+"AND procedurecode.ProcCode NOT IN ('D9986','D9987') "
 				+"WHERE PatNum="+patNum.ToString()
 				+" AND ProcStatus=2";
 			DataTable table=Db.GetTable(command);
