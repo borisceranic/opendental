@@ -1770,7 +1770,10 @@ namespace OpenDentBusiness.HL7 {
 					break;
 			}
 			#endregion Validate/Convert/Set Treatment Area
-			Procedures.SetDateFirstVisit(dateProc,1,pat);//wait until after validating, might not insert the proc, don't return after this point
+			//broken appointment procedure codes shouldn't trigger DateFirstVisit update.
+			if(procCode.ProcCode!="D9986" && procCode.ProcCode!="D9987") {
+				Procedures.SetDateFirstVisit(dateProc,1,pat);//wait until after validating, might not insert the proc, don't return after this point
+			}
 			procCur.PatNum=pat.PatNum;
 			procCur.CodeNum=procCode.CodeNum;
 			procCur.ProcDate=dateProc;
